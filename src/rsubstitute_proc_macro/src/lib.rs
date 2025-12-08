@@ -1,3 +1,6 @@
+mod macros;
+mod di;
+
 #[proc_macro_attribute]
 pub fn mock(
     proc_macro_attribute: proc_macro::TokenStream,
