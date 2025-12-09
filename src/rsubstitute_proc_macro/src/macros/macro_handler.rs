@@ -1,5 +1,5 @@
 use proc_macro::TokenStream;
-use syn::{ItemImpl, parse_macro_input};
+use syn::{ItemImpl, ItemTrait, parse_macro_input};
 
 pub trait IMacroHandler {
     fn handle(
@@ -17,10 +17,22 @@ impl IMacroHandler for MacroHandler {
         proc_macro_attribute: TokenStream,
         proc_macro_item: TokenStream,
     ) -> TokenStream {
-        let item_impl = parse_macro_input!(proc_macro_item as ItemImpl);
+        if let Ok(item_impl) = syn::parse::<ItemImpl>(proc_macro_item.clone()) {
+            return self.handle_item_impl(item_impl);
+        } else if let Ok(item_trait) = syn::parse::<ItemTrait>(proc_macro_item) {
+            return self.handle_item_trait(item_trait);
+        }
 
-        todo!()
+        panic!("Expected `impl` or `trait`.");
     }
 }
 
-impl MacroHandler {}
+impl MacroHandler {
+    fn handle_item_impl(&self, item_impl: ItemImpl) -> TokenStream {
+        todo!();
+    }
+
+    fn handle_item_trait(&self, item_trait: ItemTrait) -> TokenStream {
+        todo!();
+    }
+}
