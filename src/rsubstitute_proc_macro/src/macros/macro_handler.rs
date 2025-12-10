@@ -14,7 +14,7 @@ pub struct MacroHandler;
 impl IMacroHandler for MacroHandler {
     fn handle(
         &self,
-        proc_macro_attribute: TokenStream,
+        _proc_macro_attribute: TokenStream,
         proc_macro_item: TokenStream,
     ) -> TokenStream {
         if let Ok(item_impl) = syn::parse::<ItemImpl>(proc_macro_item.clone()) {
