@@ -1,16 +1,29 @@
 use std::cell::RefCell;
 
-pub struct FnConfig<TCall, TReturnValue> {
-    predicate: fn(TCall) -> bool,
-    return_value: TReturnValue,
+pub struct FnConfig<TArgsMatcher, TReturnValue> {
+    args_matcher: TArgsMatcher,
+    return_value: Option<TReturnValue>,
 }
 
-pub struct FnData<TCall, TReturnValue> {
+impl<TArgsMatcher, TReturnValue> FnConfig<TArgsMatcher, TReturnValue> {
+    pub fn new(args_matcher: TArgsMatcher) -> Self {
+        FnConfig {
+            args_matcher,
+            return_value: None,
+        }
+    }
+
+    pub fn returns(&mut self, return_value: TReturnValue) {
+        self.return_value = Some(return_value);
+    }
+}
+
+pub struct FnData<TCall, TArgsMatcher, TReturnValue> {
     calls: RefCell<Vec<TCall>>,
-    configs: RefCell<Vec<FnConfig<TCall, TReturnValue>>>,
+    configs: RefCell<Vec<FnConfig<TArgsMatcher, TReturnValue>>>,
 }
 
-impl<TCall, TReturnValue> Default for FnData<TCall, TReturnValue> {
+impl<TCall, TArgsMatcher, TReturnValue> Default for FnData<TCall, TArgsMatcher, TReturnValue> {
     fn default() -> Self {
         Self {
             calls: RefCell::new(Vec::new()),
@@ -19,47 +32,20 @@ impl<TCall, TReturnValue> Default for FnData<TCall, TReturnValue> {
     }
 }
 
-impl<TCall, TReturnValue> FnData<TCall, TReturnValue> {
-    pub fn add_call(&self, call: TCall) -> &Self {
+impl<TCall, TArgsMatcher, TReturnValue> FnData<TCall, TArgsMatcher, TReturnValue> {
+    pub fn register_call(&self, call: TCall) -> &Self {
         self.calls.borrow_mut().push(call);
         self
     }
 
-    pub fn add_return_value(&self, return_value: TReturnValue) -> &Self {
-        self.return_values.borrow_mut().push(return_value);
-        self
-    }
-
-    pub fn get_return_value(&self) -> TReturnValue {
-        let Some(return_value) = self.return_values.borrow_mut().pop() else {
-            panic!("Return value must've been set!");
-        };
-        return return_value;
+    pub fn add_config(
+        &self,
+        config: FnConfig<TArgsMatcher, TReturnValue>,
+    ) -> &mut FnConfig<TArgsMatcher, TReturnValue> {
+        let mut mut_configs = self.configs.borrow_mut();
+        mut_configs.push(config);
+        return mut_configs.last_mut().unwrap();
     }
 }
 
-pub use value_predicate::*;
-
-mod value_predicate {
-    pub trait IValuePredicate<T> {
-        fn matches(&self, other: T) -> bool;
-    }
-
-    // impl<T> IValuePredicate<T> for fn(T) -> bool {
-    //     fn matches(&self, other: T) -> bool {
-    //         self(other)
-    //     }
-    // }
-
-    impl<T: PartialEq> IValuePredicate<T> for T {
-        fn matches(&self, other: T) -> bool {
-            self.eq(&other)
-        }
-    }
-
-    impl<T, F: Fn(T) -> bool> IValuePredicate<T> for F {
-        fn matches(&self, other: T) -> bool {
-            self(other)
-        }
-    }
-}
+pub mod argument_matching;
