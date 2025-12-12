@@ -1,4 +1,4 @@
-use crate::generated::{MyTraitMock, work_Call};
+use crate::generated::MyTraitMock;
 use crate::lib::argument_matching::Arg;
 use std::sync::Arc;
 
@@ -22,7 +22,7 @@ mod lib;
 
 mod generated {
     use crate::lib::argument_matching::Arg;
-    use crate::lib::{FnConfig, FnData};
+    use crate::lib::{FnData, SharedFnConfig};
     use crate::{Foo, MyTrait};
     use std::default::Default;
     use std::sync::Arc;
@@ -46,23 +46,23 @@ mod generated {
     }
 
     #[allow(non_camel_case_types)]
-    pub struct another_work_ArgsMatcher {
-        pub string: Arg<*const str>,
-        pub something: Arg<*const &'static [u8]>,
-        pub dyn_obj: Arg<*const dyn Foo>,
+    pub struct another_work_ArgsMatcher<'a> {
+        pub string: Arg<&'a str>,
+        pub something: Arg<&'a &'a [u8]>,
+        pub dyn_obj: Arg<&'a dyn Foo>,
         pub arc: Arg<Arc<dyn Foo>>,
     }
 
     #[allow(non_camel_case_types)]
     pub struct get_Call;
 
-    pub struct MyTraitMock {
+    pub struct MyTraitMock<'a> {
         work_data: FnData<work_Call, work_ArgsMatcher, ()>,
-        another_work_data: FnData<another_work_Call, another_work_ArgsMatcher, Vec<u8>>,
+        another_work_data: FnData<another_work_Call, another_work_ArgsMatcher<'a>, Vec<u8>>,
         get_data: FnData<get_Call, (), i32>,
     }
 
-    impl MyTrait for MyTraitMock {
+    impl<'a> MyTrait for MyTraitMock<'a> {
         fn work(&self, value: i32) {
             self.work_data.register_call(work_Call { value });
         }
@@ -87,11 +87,12 @@ mod generated {
 
         fn get(&self) -> i32 {
             self.get_data.register_call(get_Call);
-            return self.get_data.get_return_value();
+            // return self.get_data.get_return_value();
+            todo!();
         }
     }
 
-    impl MyTraitMock {
+    impl<'a> MyTraitMock<'a> {
         pub fn new() -> Self {
             Self {
                 work_data: Default::default(),
@@ -100,17 +101,43 @@ mod generated {
             }
         }
 
-        pub fn work(&self, value: Arg<i32>) -> &mut FnConfig<work_ArgsMatcher, ()> {
+        pub fn work(&'a self, value: Arg<i32>) -> SharedFnConfig<'a, work_ArgsMatcher, (), Self> {
             let work_args_matcher = work_ArgsMatcher { value };
-            let work_config = FnConfig::new(work_args_matcher);
-            return self.work_data.add_config(work_config);
+            let shared_fn_config = self.work_data.add_config(work_args_matcher);
+            let work_config = SharedFnConfig::new(shared_fn_config, self);
+            return work_config;
+        }
+
+        pub fn another_work(
+            &'a self,
+            string: Arg<&'a str>,
+            something: Arg<&'a &'a [u8]>,
+            dyn_obj: Arg<&'a dyn Foo>,
+            arc: Arg<Arc<dyn Foo>>,
+        ) -> SharedFnConfig<'a, another_work_ArgsMatcher<'a>, Vec<u8>, Self> {
+            let another_work_args_matcher = another_work_ArgsMatcher {
+                string,
+                something,
+                dyn_obj,
+                arc,
+            };
+            let shared_fn_config = self.another_work_data.add_config(another_work_args_matcher);
+            let another_work_config = SharedFnConfig::new(shared_fn_config, self);
+            return another_work_config;
         }
     }
 }
 
 fn main() {
+    let string = &String::from("amogus");
+    let bytes = vec![1u8, 2, 3, 44];
+    let something = &&bytes[..];
     let my_trait = MyTraitMock::new();
-    my_trait.work(Arg::Is(|value| value == 32)).returns(());
+    my_trait
+        .work(Arg::Is(|value| value == 32))
+        .returns(())
+        .another_work(Arg::Eq(string), Arg::Eq(something), Arg::Any, Arg::Any)
+        .returns(vec![4, 5, 6]);
     // my_trait_mock.assert_work_args(|args| args.value_is(22));
     // my_trait_mock.assert_another_work_args(|args| args.value_is("amogus").something_is(&b"quo vadis"));
 }

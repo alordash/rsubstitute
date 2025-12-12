@@ -1,8 +1,35 @@
 use std::cell::RefCell;
+use std::rc::Rc;
 
 pub struct FnConfig<TArgsMatcher, TReturnValue> {
     args_matcher: TArgsMatcher,
     return_value: Option<TReturnValue>,
+}
+
+pub struct SharedFnConfig<'a, TArgsMatcher, TReturnValue, TOwner> {
+    shared_fn_config: Rc<RefCell<FnConfig<TArgsMatcher, TReturnValue>>>,
+    owner: &'a TOwner,
+}
+
+impl<'a, TArgsMatcher, TReturnValue, TOwner>
+    SharedFnConfig<'a, TArgsMatcher, TReturnValue, TOwner>
+{
+    pub fn new(
+        shared_fn_config: Rc<RefCell<FnConfig<TArgsMatcher, TReturnValue>>>,
+        owner: &'a TOwner,
+    ) -> Self {
+        Self {
+            shared_fn_config,
+            owner,
+        }
+    }
+    
+    pub fn returns(&self, return_value: TReturnValue) -> &'a TOwner {
+        self.shared_fn_config
+            .borrow_mut()
+            .set_return_value(return_value);
+        return self.owner;
+    }
 }
 
 impl<TArgsMatcher, TReturnValue> FnConfig<TArgsMatcher, TReturnValue> {
@@ -13,14 +40,14 @@ impl<TArgsMatcher, TReturnValue> FnConfig<TArgsMatcher, TReturnValue> {
         }
     }
 
-    pub fn returns(&mut self, return_value: TReturnValue) {
+    pub fn set_return_value(&mut self, return_value: TReturnValue) {
         self.return_value = Some(return_value);
     }
 }
 
 pub struct FnData<TCall, TArgsMatcher, TReturnValue> {
     calls: RefCell<Vec<TCall>>,
-    configs: RefCell<Vec<FnConfig<TArgsMatcher, TReturnValue>>>,
+    configs: RefCell<Vec<Rc<RefCell<FnConfig<TArgsMatcher, TReturnValue>>>>>,
 }
 
 impl<TCall, TArgsMatcher, TReturnValue> Default for FnData<TCall, TArgsMatcher, TReturnValue> {
@@ -40,11 +67,12 @@ impl<TCall, TArgsMatcher, TReturnValue> FnData<TCall, TArgsMatcher, TReturnValue
 
     pub fn add_config(
         &self,
-        config: FnConfig<TArgsMatcher, TReturnValue>,
-    ) -> &mut FnConfig<TArgsMatcher, TReturnValue> {
-        let mut mut_configs = self.configs.borrow_mut();
-        mut_configs.push(config);
-        return mut_configs.last_mut().unwrap();
+        args_matcher: TArgsMatcher,
+    ) -> Rc<RefCell<FnConfig<TArgsMatcher, TReturnValue>>> {
+        let config = FnConfig::new(args_matcher);
+        let shared_config = Rc::new(RefCell::new(config));
+        self.configs.borrow_mut().push(shared_config.clone());
+        return shared_config;
     }
 }
 
