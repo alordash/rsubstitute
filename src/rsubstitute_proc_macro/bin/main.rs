@@ -98,12 +98,7 @@ mod generated {
     impl<'a> MyTrait for MyTraitMock<'a> {
         fn work(&self, value: i32) {
             let call = work_Call { value };
-            self.work_data.register_call(call.clone());
-            if let Some(fn_config) = self.work_data.take_matching_config(call) {
-                if let Some(callback) = fn_config.borrow().get_callback() {
-                    callback();
-                }
-            }
+            self.work_data.handle(call);
         }
 
         fn another_work(
@@ -121,36 +116,12 @@ mod generated {
                     arc,
                 }
             };
-            self.another_work_data.register_call(call.clone());
-            if let Some(fn_config) = self.another_work_data.take_matching_config(call) {
-                if let Some(callback) = fn_config.borrow().get_callback() {
-                    callback();
-                }
-                let Some(return_value) = fn_config.borrow_mut().take_return_value() else {
-                    panic!(
-                        "No return value configured for 'another_work'! TODO: write call description?"
-                    );
-                };
-                return return_value;
-            }
-            panic!("No fn configuration found for this call! TODO: write call description");
+            return self.another_work_data.handle_returning(call);
         }
 
         fn get(&self) -> i32 {
             let call = get_Call;
-            self.get_data.register_call(call.clone());
-            if let Some(fn_config) = self.get_data.take_matching_config(call) {
-                if let Some(callback) = fn_config.borrow().get_callback() {
-                    callback();
-                }
-                let Some(return_value) = fn_config.borrow_mut().take_return_value() else {
-                    panic!(
-                        "No return value configured for 'another_work'! TODO: write call description?"
-                    );
-                };
-                return return_value;
-            }
-            panic!("No fn configuration found for this call! TODO: write call description");
+            return self.get_data.handle_returning(call);
         }
     }
 
@@ -168,9 +139,9 @@ mod generated {
             value: Arg<i32>,
         ) -> SharedFnConfig<'a, work_Call, work_ArgsMatcher, (), Self> {
             let work_args_matcher = work_ArgsMatcher { value };
-            let shared_fn_config = self.work_data.add_config(work_args_matcher);
-            let work_config = SharedFnConfig::new(shared_fn_config, self);
-            return work_config;
+            let fn_config = self.work_data.add_config(work_args_matcher);
+            let shared_fn_config = SharedFnConfig::new(fn_config, self);
+            return shared_fn_config;
         }
 
         pub fn another_work(
@@ -187,16 +158,16 @@ mod generated {
                 dyn_obj,
                 arc,
             };
-            let shared_fn_config = self.another_work_data.add_config(another_work_args_matcher);
-            let another_work_config = SharedFnConfig::new(shared_fn_config, self);
-            return another_work_config;
+            let fn_config = self.another_work_data.add_config(another_work_args_matcher);
+            let shared_fn_config = SharedFnConfig::new(fn_config, self);
+            return shared_fn_config;
         }
 
         pub fn get(&'a self) -> SharedFnConfig<'a, get_Call, get_ArgsMatcher, i32, Self> {
             let get_args_matcher = get_ArgsMatcher;
-            let shared_fn_config = self.get_data.add_config(get_args_matcher);
-            let get_config = SharedFnConfig::new(shared_fn_config, self);
-            return get_config;
+            let fn_config = self.get_data.add_config(get_args_matcher);
+            let shared_fn_config = SharedFnConfig::new(fn_config, self);
+            return shared_fn_config;
         }
     }
 }

@@ -37,19 +37,35 @@ impl<TCall: Clone, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue>
         return shared_config;
     }
 
-    pub fn take_matching_config(
+    pub fn handle(&self, call: TCall) -> Rc<RefCell<FnConfig<TCall, TArgsMatcher, TReturnValue>>> {
+        self.register_call(call.clone());
+        let fn_config = self.take_matching_config(call);
+        if let Some(callback) = fn_config.borrow().get_callback() {
+            callback();
+        }
+        return fn_config;
+    }
+
+    pub fn handle_returning(&self, call: TCall) -> TReturnValue {
+        let fn_config = self.handle(call);
+        let return_value = fn_config
+            .borrow_mut()
+            .take_return_value()
+            .expect("No return value configured for 'another_work'! TODO: write call description?");
+        return return_value;
+    }
+
+    fn take_matching_config(
         &self,
         call: TCall,
-    ) -> Option<Rc<RefCell<FnConfig<TCall, TArgsMatcher, TReturnValue>>>> {
-        let Some(index) = self
+    ) -> Rc<RefCell<FnConfig<TCall, TArgsMatcher, TReturnValue>>> {
+        let index = self
             .configs
             .borrow()
             .iter()
             .position(|config| config.borrow().matches(call.clone()))
-        else {
-            return None;
-        };
+            .expect("No fn configuration found for this call! TODO: write call description");
         let fn_config = self.configs.borrow_mut().remove(index);
-        return Some(fn_config);
+        return fn_config;
     }
 }
