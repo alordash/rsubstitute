@@ -6,8 +6,6 @@ pub enum Arg<T> {
     Is(fn(T) -> bool),
 }
 
-trait Quo {}
-
 impl<T: PartialOrd> Arg<T> {
     pub fn matches(&self, value: T) -> bool {
         match self {
