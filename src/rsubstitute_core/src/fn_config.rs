@@ -31,4 +31,12 @@ impl<TCall, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue>
     pub fn matches(&self, call: TCall) -> bool {
         self.args_matcher.matches(call)
     }
+
+    pub fn take_return_value(&mut self) -> Option<TReturnValue> {
+        self.return_value.take()
+    }
+
+    pub fn get_callback(&self) -> Option<fn()> {
+        self.callback
+    }
 }

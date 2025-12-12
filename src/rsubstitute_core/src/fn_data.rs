@@ -37,14 +37,19 @@ impl<TCall: Clone, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue>
         return shared_config;
     }
 
-    pub fn get_matching_config(
+    pub fn take_matching_config(
         &self,
         call: TCall,
     ) -> Option<Rc<RefCell<FnConfig<TCall, TArgsMatcher, TReturnValue>>>> {
-        self.configs
+        let Some(index) = self
+            .configs
             .borrow()
             .iter()
-            .find(|config| config.borrow().matches(call.clone()))
-            .cloned()
+            .position(|config| config.borrow().matches(call.clone()))
+        else {
+            return None;
+        };
+        let fn_config = self.configs.borrow_mut().remove(index);
+        return Some(fn_config);
     }
 }

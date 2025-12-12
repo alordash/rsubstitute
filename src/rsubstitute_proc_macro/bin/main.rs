@@ -2,7 +2,15 @@ use crate::generated::MyTraitMock;
 use rsubstitute_core::arguments_matching::Arg;
 use std::sync::Arc;
 
-trait Foo {}
+trait IFoo {
+    fn get_value(&self) -> i32;
+}
+struct Foo(i32);
+impl IFoo for Foo {
+    fn get_value(&self) -> i32 {
+        self.0
+    }
+}
 
 trait MyTrait {
     fn work(&self, value: i32);
@@ -11,19 +19,18 @@ trait MyTrait {
         &self,
         string: &str,
         something: &&[u8],
-        dyn_obj: &dyn Foo,
-        arc: Arc<dyn Foo>,
+        dyn_obj: &dyn IFoo,
+        arc: Arc<dyn IFoo>,
     ) -> Vec<u8>;
 
     fn get(&self) -> i32;
 }
 
 mod generated {
-    use crate::{Foo, MyTrait};
+    use crate::{IFoo, MyTrait};
     use rsubstitute_core::arguments_matching::IArgsMatcher;
     use rsubstitute_core::{FnData, SharedFnConfig, arguments_matching::Arg};
     use std::default::Default;
-    use std::ops::Deref;
     use std::sync::Arc;
 
     #[allow(non_camel_case_types)]
@@ -48,16 +55,16 @@ mod generated {
     pub struct another_work_Call<'a> {
         pub string: &'a str,
         pub something: &'a &'a [u8],
-        pub dyn_obj: &'a dyn Foo,
-        pub arc: Arc<dyn Foo>,
+        pub dyn_obj: &'a dyn IFoo,
+        pub arc: Arc<dyn IFoo>,
     }
 
     #[allow(non_camel_case_types)]
     pub struct another_work_ArgsMatcher<'a> {
         pub string: Arg<&'a str>,
         pub something: Arg<&'a &'a [u8]>,
-        pub dyn_obj: Arg<&'a dyn Foo>,
-        pub arc: Arg<Arc<dyn Foo>>,
+        pub dyn_obj: Arg<&'a dyn IFoo>,
+        pub arc: Arg<Arc<dyn IFoo>>,
     }
 
     impl<'a> IArgsMatcher<another_work_Call<'a>> for another_work_ArgsMatcher<'a> {
@@ -77,8 +84,8 @@ mod generated {
     pub struct get_ArgsMatcher;
 
     impl IArgsMatcher<get_Call> for get_ArgsMatcher {
-        fn matches(&self, call: get_Call) -> bool {
-            todo!()
+        fn matches(&self, _call: get_Call) -> bool {
+            true
         }
     }
 
@@ -90,32 +97,60 @@ mod generated {
 
     impl<'a> MyTrait for MyTraitMock<'a> {
         fn work(&self, value: i32) {
-            self.work_data.register_call(work_Call { value });
-            // if let Some(fn_config) = self.work_data.
+            let call = work_Call { value };
+            self.work_data.register_call(call.clone());
+            if let Some(fn_config) = self.work_data.take_matching_config(call) {
+                if let Some(callback) = fn_config.borrow().get_callback() {
+                    callback();
+                }
+            }
         }
 
         fn another_work(
             &self,
             string: &str,
             something: &&[u8],
-            dyn_obj: &dyn Foo,
-            arc: Arc<dyn Foo>,
+            dyn_obj: &dyn IFoo,
+            arc: Arc<dyn IFoo>,
         ) -> Vec<u8> {
-            self.another_work_data.register_call(unsafe {
+            let call = unsafe {
                 another_work_Call {
                     string: std::mem::transmute(string),
                     something: std::mem::transmute(something),
                     dyn_obj: std::mem::transmute(dyn_obj),
                     arc,
                 }
-            });
-            return vec![1, 2, 3];
+            };
+            self.another_work_data.register_call(call.clone());
+            if let Some(fn_config) = self.another_work_data.take_matching_config(call) {
+                if let Some(callback) = fn_config.borrow().get_callback() {
+                    callback();
+                }
+                let Some(return_value) = fn_config.borrow_mut().take_return_value() else {
+                    panic!(
+                        "No return value configured for 'another_work'! TODO: write call description?"
+                    );
+                };
+                return return_value;
+            }
+            panic!("No fn configuration found for this call! TODO: write call description");
         }
 
         fn get(&self) -> i32 {
-            self.get_data.register_call(get_Call);
-            // return self.get_data.get_return_value();
-            todo!();
+            let call = get_Call;
+            self.get_data.register_call(call.clone());
+            if let Some(fn_config) = self.get_data.take_matching_config(call) {
+                if let Some(callback) = fn_config.borrow().get_callback() {
+                    callback();
+                }
+                let Some(return_value) = fn_config.borrow_mut().take_return_value() else {
+                    panic!(
+                        "No return value configured for 'another_work'! TODO: write call description?"
+                    );
+                };
+                return return_value;
+            }
+            panic!("No fn configuration found for this call! TODO: write call description");
         }
     }
 
@@ -142,9 +177,9 @@ mod generated {
             &'a self,
             string: Arg<&'a str>,
             something: Arg<&'a &'a [u8]>,
-            dyn_obj: Arg<&'a dyn Foo>,
-            arc: Arg<Arc<dyn Foo>>,
-        ) -> SharedFnConfig<'a, another_work_Call, another_work_ArgsMatcher<'a>, Vec<u8>, Self>
+            dyn_obj: Arg<&'a dyn IFoo>,
+            arc: Arg<Arc<dyn IFoo>>,
+        ) -> SharedFnConfig<'a, another_work_Call<'a>, another_work_ArgsMatcher<'a>, Vec<u8>, Self>
         {
             let another_work_args_matcher = another_work_ArgsMatcher {
                 string,
@@ -156,6 +191,13 @@ mod generated {
             let another_work_config = SharedFnConfig::new(shared_fn_config, self);
             return another_work_config;
         }
+
+        pub fn get(&'a self) -> SharedFnConfig<'a, get_Call, get_ArgsMatcher, i32, Self> {
+            let get_args_matcher = get_ArgsMatcher;
+            let shared_fn_config = self.get_data.add_config(get_args_matcher);
+            let get_config = SharedFnConfig::new(shared_fn_config, self);
+            return get_config;
+        }
     }
 }
 
@@ -163,15 +205,49 @@ fn main() {
     let string = &String::from("amogus");
     let bytes = vec![1u8, 2, 3, 44];
     let something = &&bytes[..];
-    let my_trait = MyTraitMock::new();
-    my_trait
+    let my_trait_mock = MyTraitMock::new();
+
+    let foo1: &dyn IFoo = &Foo(52);
+    let foo2: &dyn IFoo = &Foo(8998);
+    let arc_foo1: Arc<dyn IFoo> = Arc::new(Foo(10));
+    let arc_foo2: Arc<dyn IFoo> = Arc::new(Foo(144));
+    my_trait_mock
         .work(Arg::Is(|value| value == 32))
         .does(|| println!("work mock called"))
-        .another_work(Arg::Eq(string), Arg::Eq(something), Arg::Any, Arg::Any)
-        .returns(vec![4, 5, 6]);
-    MyTrait::work(&my_trait, 22);
-    // my_trait_mock.assert_work_args(|args| args.value_is(22));
-    // my_trait_mock.assert_another_work_args(|args| args.value_is("amogus").something_is(&b"quo vadis"));
+        .another_work(
+            Arg::Eq(string),
+            Arg::Eq(something),
+            Arg::Any,
+            Arg::Eq(arc_foo1.clone()),
+        )
+        .returns(vec![4, 5, 6])
+        .another_work(
+            Arg::Any,
+            Arg::Any,
+            Arg::Any,
+            Arg::Is(|foo| foo.get_value() == 144),
+        )
+        .returns(vec![7, 70, 77])
+        .get()
+        .returns_and_does(112, || println!("first get call!"))
+        .get()
+        .returns(900000);
+    MyTrait::work(&my_trait_mock, 32);
+
+    let first_another_work =
+        MyTrait::another_work(&my_trait_mock, string, something, foo1, arc_foo1);
+    println!("first_another_work = {first_another_work:?}");
+    let second_another_work =
+        MyTrait::another_work(&my_trait_mock, "que", something, foo2, arc_foo2);
+    println!("second_another_work = {second_another_work:?}");
+
+    let first_get = MyTrait::get(&my_trait_mock);
+    println!("first_get = {first_get}");
+    let second_get = MyTrait::get(&my_trait_mock);
+    println!("second_get = {second_get}");
+
+    MyTrait::work(&my_trait_mock, 11111);
+    let panics = MyTrait::get(&my_trait_mock);
 
     println!("Done");
 }
