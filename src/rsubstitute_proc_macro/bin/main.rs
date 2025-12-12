@@ -1,5 +1,5 @@
 use crate::generated::MyTraitMock;
-use crate::lib::argument_matching::Arg;
+use rsubstitute_core::Arg;
 use std::sync::Arc;
 
 trait Foo {}
@@ -18,14 +18,11 @@ trait MyTrait {
     fn get(&self) -> i32;
 }
 
-mod lib;
-
 mod generated {
-    use crate::lib::argument_matching::Arg;
-    use crate::lib::{FnData, SharedFnConfig};
     use crate::{Foo, MyTrait};
     use std::default::Default;
     use std::sync::Arc;
+    use rsubstitute_core::{Arg, FnData, SharedFnConfig};
 
     #[allow(non_camel_case_types)]
     pub struct work_Call {

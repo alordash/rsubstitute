@@ -21,11 +21,16 @@ dependencies = [
 ]
 
 [[package]]
+name = "rsubstitute_core"
+version = "0.1.0"
+
+[[package]]
 name = "rsubstitute_proc_macro"
 version = "0.1.0"
 dependencies = [
  "proc-macro2",
  "quote",
+ "rsubstitute_core",
  "syn",
 ]
 
