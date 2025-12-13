@@ -1,4 +1,7 @@
+use crate::macros::fn_info_extractor::IFnInfoExtractor;
 use proc_macro::TokenStream;
+use std::rc::Rc;
+use std::sync::Arc;
 use syn::{ItemImpl, ItemTrait, parse_macro_input};
 
 pub trait IMacroHandler {
@@ -9,7 +12,9 @@ pub trait IMacroHandler {
     ) -> proc_macro::TokenStream;
 }
 
-pub struct MacroHandler;
+pub struct MacroHandler {
+    pub(crate) fn_info_extractor: Rc<dyn IFnInfoExtractor>,
+}
 
 impl IMacroHandler for MacroHandler {
     fn handle(
@@ -33,6 +38,7 @@ impl MacroHandler {
     }
 
     fn handle_item_trait(&self, item_trait: ItemTrait) -> TokenStream {
+        let fn_infos = self.fn_info_extractor.extract(item_trait.items);
         todo!();
     }
 }

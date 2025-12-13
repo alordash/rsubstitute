@@ -24,6 +24,8 @@ trait MyTrait {
     ) -> Vec<u8>;
 
     fn get(&self) -> i32;
+    
+    fn standalone() -> f32;
 }
 
 mod generated {
@@ -122,6 +124,10 @@ mod generated {
         fn get(&self) -> i32 {
             let call = get_Call;
             return self.get_data.handle_returning(call);
+        }
+
+        fn standalone() -> f32 {
+            todo!()
         }
     }
 
