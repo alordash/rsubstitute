@@ -184,6 +184,31 @@ mod generated {
             self.work_data.verify_received(work_args_matcher, &times);
             return self;
         }
+
+        pub fn received_another_work(
+            &'a self,
+            string: Arg<&'a str>,
+            something: Arg<&'a &'a [u8]>,
+            dyn_obj: Arg<&'a dyn IFoo>,
+            arc: Arg<Arc<dyn IFoo>>,
+            times: Times,
+        ) -> &'a Self {
+            let another_work_args_matcher = another_work_ArgsMatcher {
+                string,
+                something,
+                dyn_obj,
+                arc,
+            };
+            self.another_work_data
+                .verify_received(another_work_args_matcher, &times);
+            return self;
+        }
+
+        pub fn received_get(&'a self, times: Times) -> &'a Self {
+            let get_args_matcher = get_ArgsMatcher;
+            self.get_data.verify_received(get_args_matcher, &times);
+            return self;
+        }
     }
 
     // end - Mock
@@ -239,6 +264,8 @@ fn main() {
 
     my_trait_mock.received_work(Arg::Eq(11111), Times::Once);
     my_trait_mock.received_work(Arg::Any, Times::Exactly(2));
+    my_trait_mock.received_another_work(Arg::Any, Arg::Any, Arg::Any, Arg::Any, Times::Exactly(2));
+    my_trait_mock.received_get(Times::Exactly(2));
 
     println!("Done");
 }
