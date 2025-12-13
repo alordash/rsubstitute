@@ -5,10 +5,10 @@ pub struct FnConfig<TCall, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue> {
     args_matcher: TArgsMatcher,
     return_value: Option<TReturnValue>,
     callback: Option<fn()>,
-    _call: PhantomData<TCall>,
+    calls: Vec<TCall>,
 }
 
-impl<TCall, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue>
+impl<TCall, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
     FnConfig<TCall, TArgsMatcher, TReturnValue>
 {
     pub fn new(args_matcher: TArgsMatcher) -> Self {
@@ -16,7 +16,7 @@ impl<TCall, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue>
             args_matcher,
             return_value: None,
             callback: None,
-            _call: PhantomData,
+            calls: Vec::new(),
         }
     }
 
@@ -28,12 +28,16 @@ impl<TCall, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue>
         self.callback = Some(callback);
     }
 
+    pub fn register_call(&mut self, call: TCall) {
+        self.calls.push(call);
+    }
+
     pub fn matches(&self, call: TCall) -> bool {
         self.args_matcher.matches(call)
     }
 
-    pub fn take_return_value(&mut self) -> Option<TReturnValue> {
-        self.return_value.take()
+    pub fn get_return_value(&mut self) -> Option<TReturnValue> {
+        self.return_value.clone()
     }
 
     pub fn get_callback(&self) -> Option<fn()> {

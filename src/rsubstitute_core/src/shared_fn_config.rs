@@ -8,7 +8,7 @@ pub struct SharedFnConfig<'a, TCall, TArgsMatcher: IArgsMatcher<TCall>, TReturnV
     owner: &'a TOwner,
 }
 
-impl<'a, TCall, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue, TOwner>
+impl<'a, TCall, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone, TOwner>
     SharedFnConfig<'a, TCall, TArgsMatcher, TReturnValue, TOwner>
 {
     pub fn new(
