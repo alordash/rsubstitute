@@ -24,17 +24,16 @@ trait MyTrait {
     ) -> Vec<u8>;
 
     fn get(&self) -> i32;
-    
+
     fn standalone() -> f32;
 }
 
 mod generated {
-    use crate::{IFoo, MyTrait};
+    use super::*;
     use rsubstitute_core::arguments_matching::IArgsMatcher;
     use rsubstitute_core::{FnData, SharedFnConfig, arguments_matching::Arg};
-    use std::default::Default;
-    use std::sync::Arc;
 
+    // start - Calls
     #[allow(non_camel_case_types)]
     #[derive(Clone)]
     pub struct work_Call {
@@ -90,6 +89,9 @@ mod generated {
             true
         }
     }
+    
+    // end - Calls
+    // start - Mock
 
     pub struct MyTraitMock<'a> {
         work_data: FnData<work_Call, work_ArgsMatcher, ()>,
@@ -176,6 +178,8 @@ mod generated {
             return shared_fn_config;
         }
     }
+    
+    // end - Mock
 }
 
 fn main() {

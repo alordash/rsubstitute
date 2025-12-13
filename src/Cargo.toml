@@ -3,7 +3,9 @@ resolver = "3"
 members = ["rsubstitute_core", "rsubstitute_proc_macro"]
 
 [workspace.dependencies]
+rsubstitute_core = { path = "rsubstitute_core" }
+
 proc-macro2 = "1.0.95"
 quote = "1.0.40"
 syn = { version = "2.0.104", features = ["full"] }
-rsubstitute_core = { path = "rsubstitute_core" }
+nameof = "1.3.0"

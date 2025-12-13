@@ -1,7 +1,6 @@
 use crate::macros::fn_info_extractor::IFnInfoExtractor;
 use proc_macro::TokenStream;
 use std::rc::Rc;
-use std::sync::Arc;
 use syn::{ItemImpl, ItemTrait, parse_macro_input};
 
 pub trait IMacroHandler {
