@@ -64,14 +64,19 @@ impl<TCall: Clone, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
         return return_value;
     }
 
-    pub fn received(&self, args_matcher: TArgsMatcher, times: &Times) -> bool {
+    pub fn verify_received(&self, args_matcher: TArgsMatcher, times: &Times) {
         let calls = self.calls.borrow();
         let matching_calls_count = calls
             .iter()
             .filter(|call| args_matcher.matches((*call).clone()))
             .count();
 
-        return times.matches(matching_calls_count);
+        let valid = times.matches(matching_calls_count);
+        if !valid {
+            panic!(
+                "Expected 'work' to be called {times}, but it was called {matching_calls_count} times."
+            );
+        }
     }
 
     fn try_get_matching_config(

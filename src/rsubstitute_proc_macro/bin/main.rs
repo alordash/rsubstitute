@@ -181,13 +181,8 @@ mod generated {
 
         pub fn received_work(&'a self, value: Arg<i32>, times: Times) -> &'a Self {
             let work_args_matcher = work_ArgsMatcher { value };
-            let received = self.work_data.received(work_args_matcher, &times);
-            if !received {
-                panic!(
-                    "Expected 'work' to be called {times}, but it was called TODO (return actual count) times."
-                );
-            }
-            self
+            self.work_data.verify_received(work_args_matcher, &times);
+            return self;
         }
     }
 
@@ -243,6 +238,7 @@ fn main() {
     // let panics = MyTrait::get(&my_trait_mock);
 
     my_trait_mock.received_work(Arg::Eq(11111), Times::Once);
+    my_trait_mock.received_work(Arg::Any, Times::Exactly(2));
 
     println!("Done");
 }
