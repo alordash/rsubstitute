@@ -1,4 +1,5 @@
 use crate::generated::MyTraitMock;
+use rsubstitute_core::Times;
 use rsubstitute_core::arguments_matching::Arg;
 use std::sync::Arc;
 
@@ -31,7 +32,7 @@ trait MyTrait {
 mod generated {
     use super::*;
     use rsubstitute_core::arguments_matching::IArgsMatcher;
-    use rsubstitute_core::{FnData, SharedFnConfig, arguments_matching::Arg};
+    use rsubstitute_core::{FnData, SharedFnConfig, Times, arguments_matching::Arg};
 
     // start - Calls
     #[allow(non_camel_case_types)]
@@ -177,6 +178,17 @@ mod generated {
             let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
         }
+
+        pub fn received_work(&'a self, value: Arg<i32>, times: Times) -> &'a Self {
+            let work_args_matcher = work_ArgsMatcher { value };
+            let received = self.work_data.received(work_args_matcher, &times);
+            if !received {
+                panic!(
+                    "Expected 'work' to be called {times}, but it was called TODO (return actual count) times."
+                );
+            }
+            self
+        }
     }
 
     // end - Mock
@@ -229,6 +241,8 @@ fn main() {
 
     MyTrait::work(&my_trait_mock, 11111);
     // let panics = MyTrait::get(&my_trait_mock);
+
+    my_trait_mock.received_work(Arg::Eq(11111), Times::Once);
 
     println!("Done");
 }

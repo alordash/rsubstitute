@@ -1,5 +1,5 @@
-use crate::FnConfig;
 use crate::arguments_matching::IArgsMatcher;
+use crate::{FnConfig, Times};
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -62,6 +62,16 @@ impl<TCall: Clone, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
             .get_return_value()
             .expect("No return value configured for 'another_work'! TODO: write call description?");
         return return_value;
+    }
+
+    pub fn received(&self, args_matcher: TArgsMatcher, times: &Times) -> bool {
+        let calls = self.calls.borrow();
+        let matching_calls_count = calls
+            .iter()
+            .filter(|call| args_matcher.matches((*call).clone()))
+            .count();
+
+        return times.matches(matching_calls_count);
     }
 
     fn try_get_matching_config(
