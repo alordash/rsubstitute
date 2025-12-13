@@ -89,7 +89,7 @@ mod generated {
             true
         }
     }
-    
+
     // end - Calls
     // start - Mock
 
@@ -178,7 +178,7 @@ mod generated {
             return shared_fn_config;
         }
     }
-    
+
     // end - Mock
 }
 
@@ -228,7 +228,7 @@ fn main() {
     println!("second_get = {second_get}");
 
     MyTrait::work(&my_trait_mock, 11111);
-    let panics = MyTrait::get(&my_trait_mock);
+    // let panics = MyTrait::get(&my_trait_mock);
 
     println!("Done");
 }

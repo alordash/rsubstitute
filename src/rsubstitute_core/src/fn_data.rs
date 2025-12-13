@@ -37,18 +37,26 @@ impl<TCall: Clone, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
         return shared_config;
     }
 
-    pub fn handle(&self, call: TCall) -> Rc<RefCell<FnConfig<TCall, TArgsMatcher, TReturnValue>>> {
+    pub fn handle(&self, call: TCall) {
+        let maybe_fn_config = self.try_get_matching_config(call.clone());
         self.register_call(call.clone());
-        let fn_config = self.get_matching_config(call.clone());
+        if let Some(fn_config) = maybe_fn_config {
+            fn_config.borrow_mut().register_call(call);
+            if let Some(callback) = fn_config.borrow().get_callback() {
+                callback();
+            }
+        }
+    }
+
+    pub fn handle_returning(&self, call: TCall) -> TReturnValue {
+        let fn_config = self
+            .try_get_matching_config(call.clone())
+            .expect("No fn configuration found for this call! TODO: write call description");
+        self.register_call(call.clone());
         fn_config.borrow_mut().register_call(call);
         if let Some(callback) = fn_config.borrow().get_callback() {
             callback();
         }
-        return fn_config;
-    }
-
-    pub fn handle_returning(&self, call: TCall) -> TReturnValue {
-        let fn_config = self.handle(call);
         let return_value = fn_config
             .borrow_mut()
             .get_return_value()
@@ -56,15 +64,15 @@ impl<TCall: Clone, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
         return return_value;
     }
 
-    fn get_matching_config(
+    fn try_get_matching_config(
         &self,
         call: TCall,
-    ) -> Rc<RefCell<FnConfig<TCall, TArgsMatcher, TReturnValue>>> {
+    ) -> Option<Rc<RefCell<FnConfig<TCall, TArgsMatcher, TReturnValue>>>> {
         let configs = self.configs.borrow();
-        let fn_config = configs
+        let maybe_fn_config = configs
             .iter()
             .find(|config| config.borrow().matches(call.clone()))
-            .expect("No fn configuration found for this call! TODO: write call description");
-        return fn_config.clone();
+            .cloned();
+        return maybe_fn_config;
     }
 }
