@@ -1,13 +1,14 @@
 use crate::macros::constants;
 use crate::macros::fn_info_generation::models::{ArgsMatcherImplInfo, ArgsMatcherInfo, CallInfo};
-use proc_macro2::Ident;
+use proc_macro2::{Ident, Span};
 use quote::format_ident;
 use std::cell::LazyCell;
 use syn::punctuated::Punctuated;
 use syn::{
-    BinOp, Block, Expr, ExprBinary, ExprField, ExprMethodCall, ExprPath, Field, FnArg,
-    GenericParam, Generics, ImplItem, ImplItemFn, ItemImpl, Member, Pat, PatIdent, PatType, Path,
-    PathArguments, PathSegment, ReturnType, Signature, Stmt, Type, TypeParam, TypePath, Visibility,
+    BinOp, Block, Expr, ExprBinary, ExprField, ExprLit, ExprMethodCall, ExprPath, Field, FnArg,
+    GenericParam, Generics, ImplItem, ImplItemFn, ItemImpl, Lit, LitBool, Member, Pat, PatIdent,
+    PatType, Path, PathArguments, PathSegment, ReturnType, Signature, Stmt, Type, TypeParam,
+    TypePath, Visibility,
 };
 
 pub trait IArgsMatcherImplGenerator {
@@ -89,13 +90,7 @@ impl ArgsMatcherImplGenerator {
     const CALL_ARG_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("matches"));
 
     fn generate_matches_fn(&self, call_info: &CallInfo, call_type: Box<Type>) -> ImplItem {
-        let matches_exprs = call_info
-            .item_struct
-            .fields
-            .iter()
-            .map(|field| self.generate_matches_exprs(field))
-            .collect();
-        let matches_stmt = self.join_matches_statements_with_and(matches_exprs);
+        let matches_stmt = self.generate_matches_statement(call_info);
         let block = Block {
             brace_token: Default::default(),
             stmts: vec![matches_stmt],
@@ -135,6 +130,43 @@ impl ArgsMatcherImplGenerator {
         return impl_item;
     }
 
+    fn generate_matches_statement(&self, call_info: &CallInfo) -> Stmt {
+        if call_info.item_struct.fields.len() == 0 {
+            let true_stmt = Stmt::Expr(
+                Expr::Lit(ExprLit {
+                    attrs: Vec::new(),
+                    lit: Lit::Bool(LitBool {
+                        value: true,
+                        span: Span::call_site(),
+                    }),
+                }),
+                Default::default(),
+            );
+            return true_stmt;
+        }
+
+        let matches_exprs: Vec<_> = call_info
+            .item_struct
+            .fields
+            .iter()
+            .map(|field| self.generate_matches_exprs(field))
+            .collect();
+        let joined_expr = matches_exprs
+            .first()
+            .expect("Should have at least one 'matches' statement.")
+            .clone();
+        let joined_exprs = matches_exprs.iter().skip(1).fold(joined_expr, |acc, x| {
+            Expr::Binary(ExprBinary {
+                attrs: Vec::new(),
+                left: Box::new(acc.clone()),
+                op: BinOp::And(Default::default()),
+                right: Box::new(x.clone()),
+            })
+        });
+        let stmt = Stmt::Expr(joined_exprs, Default::default());
+        return stmt;
+    }
+
     fn generate_matches_exprs(&self, field: &Field) -> Expr {
         let expr = Expr::MethodCall(ExprMethodCall {
             attrs: Vec::new(),
@@ -168,25 +200,5 @@ impl ArgsMatcherImplGenerator {
             args: Punctuated::new(),
         });
         return expr;
-    }
-
-    fn join_matches_statements_with_and(&self, matches_statements: Vec<Expr>) -> Stmt {
-        let joined_expr = matches_statements
-            .first()
-            .expect("Should have at least one 'matches' statement.")
-            .clone();
-        let joined_exprs = matches_statements
-            .iter()
-            .skip(1)
-            .fold(joined_expr, |acc, x| {
-                Expr::Binary(ExprBinary {
-                    attrs: Vec::new(),
-                    left: Box::new(acc.clone()),
-                    op: BinOp::And(Default::default()),
-                    right: Box::new(x.clone()),
-                })
-            });
-        let stmt = Stmt::Expr(joined_exprs, Default::default());
-        return stmt;
     }
 }

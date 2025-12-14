@@ -26,13 +26,16 @@ trait MyTrait {
 
     fn get(&self) -> i32;
 
-    fn standalone() -> f32;
+    fn standalone(number: i32) -> f32;
+
+    fn standalone_with_ref(number: &i32) -> f32;
 }
 
 mod generated {
     use super::*;
     use rsubstitute_core::arguments_matching::IArgsMatcher;
     use rsubstitute_core::{FnData, SharedFnConfig, Times, arguments_matching::Arg};
+    use std::cell::LazyCell;
 
     // start - Calls
     #[allow(non_camel_case_types)]
@@ -91,6 +94,23 @@ mod generated {
         }
     }
 
+    #[allow(non_camel_case_types)]
+    #[derive(Clone)]
+    pub struct standalone_Call {
+        number: i32,
+    }
+
+    #[allow(non_camel_case_types)]
+    pub struct standalone_ArgsMatcher {
+        number: Arg<i32>,
+    }
+
+    impl IArgsMatcher<standalone_Call> for standalone_ArgsMatcher {
+        fn matches(&self, call: standalone_Call) -> bool {
+            self.number.matches(call.number)
+        }
+    }
+
     // end - Calls
     // start - Mock
 
@@ -129,7 +149,12 @@ mod generated {
             return self.get_data.handle_returning(call);
         }
 
-        fn standalone() -> f32 {
+        fn standalone(number: i32) -> f32 {
+            let call = standalone_Call { number };
+            return Self::standalone_data.handle_returning(call);
+        }
+
+        fn standalone_with_ref(number: &i32) -> f32 {
             todo!()
         }
     }
@@ -153,6 +178,12 @@ mod generated {
             return shared_fn_config;
         }
 
+        pub fn received_work(&'a self, value: Arg<i32>, times: Times) -> &'a Self {
+            let work_args_matcher = work_ArgsMatcher { value };
+            self.work_data.verify_received(work_args_matcher, &times);
+            return self;
+        }
+
         pub fn another_work(
             &'a self,
             string: Arg<&'a str>,
@@ -170,19 +201,6 @@ mod generated {
             let fn_config = self.another_work_data.add_config(another_work_args_matcher);
             let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
-        }
-
-        pub fn get(&'a self) -> SharedFnConfig<'a, get_Call, get_ArgsMatcher, i32, Self> {
-            let get_args_matcher = get_ArgsMatcher;
-            let fn_config = self.get_data.add_config(get_args_matcher);
-            let shared_fn_config = SharedFnConfig::new(fn_config, self);
-            return shared_fn_config;
-        }
-
-        pub fn received_work(&'a self, value: Arg<i32>, times: Times) -> &'a Self {
-            let work_args_matcher = work_ArgsMatcher { value };
-            self.work_data.verify_received(work_args_matcher, &times);
-            return self;
         }
 
         pub fn received_another_work(
@@ -204,10 +222,27 @@ mod generated {
             return self;
         }
 
+        pub fn get(&'a self) -> SharedFnConfig<'a, get_Call, get_ArgsMatcher, i32, Self> {
+            let get_args_matcher = get_ArgsMatcher;
+            let fn_config = self.get_data.add_config(get_args_matcher);
+            let shared_fn_config = SharedFnConfig::new(fn_config, self);
+            return shared_fn_config;
+        }
+
         pub fn received_get(&'a self, times: Times) -> &'a Self {
             let get_args_matcher = get_ArgsMatcher;
             self.get_data.verify_received(get_args_matcher, &times);
             return self;
+        }
+
+        #[allow(non_upper_case_globals)]
+        const standalone_data: LazyCell<FnData<standalone_Call, standalone_ArgsMatcher, f32>> =
+            LazyCell::new(Default::default);
+        pub fn standalone(number: Arg<i32>) -> f32 {
+            let standalone_args_matcher = standalone_ArgsMatcher {number};
+            let fn_config = Self::standalone_data.add_config(standalone_args_matcher);
+            // let shared_fn_config = SharedFnConfig::new()
+            todo!()
         }
     }
 
