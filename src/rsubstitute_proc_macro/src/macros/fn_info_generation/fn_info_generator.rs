@@ -8,7 +8,7 @@ pub trait IFnInfoGenerator {
 }
 
 pub struct FnInfoGenerator {
-    call_struct_generator: Rc<dyn ICallStructGenerator>,
+    pub(crate) call_struct_generator: Rc<dyn ICallStructGenerator>,
 }
 
 impl IFnInfoGenerator for FnInfoGenerator {

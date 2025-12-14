@@ -1,18 +1,20 @@
 use crate::macros::constants;
 use crate::macros::models::FnInfo;
+use crate::syntax::{IArgTypeFactory, IFieldFactory, IStructFactory};
 use proc_macro2::Ident;
 use quote::{ToTokens, format_ident};
-use syn::{
-    AngleBracketedGenericArguments, Field, FieldMutability, Fields, FieldsNamed, FnArg,
-    GenericArgument, Generics, ItemStruct, PatType, Path, PathArguments, PathSegment, Type,
-    TypePath, Visibility,
-};
+use std::rc::Rc;
+use syn::{Field, Fields, FieldsNamed, FnArg, Generics, ItemStruct, PatType, Type, Visibility};
 
 pub trait ICallStructGenerator {
     fn generate(&self, fn_info: &FnInfo) -> ItemStruct;
 }
 
-pub struct CallStructGenerator;
+pub struct CallStructGenerator {
+    pub(crate) arg_type_factory: Rc<dyn IArgTypeFactory>,
+    pub(crate) field_factory: Rc<dyn IFieldFactory>,
+    pub(crate) struct_factory: Rc<dyn IStructFactory>,
+}
 
 impl ICallStructGenerator for CallStructGenerator {
     fn generate(&self, fn_info: &FnInfo) -> ItemStruct {
@@ -32,15 +34,7 @@ impl ICallStructGenerator for CallStructGenerator {
             named: struct_fields.into_iter().collect(),
         });
 
-        let result = ItemStruct {
-            attrs,
-            vis: Visibility::Public(Default::default()),
-            struct_token: Default::default(),
-            ident,
-            generics: Generics::default(),
-            fields,
-            semi_token: Default::default(),
-        };
+        let result = self.struct_factory.create(attrs, ident, fields);
 
         return result;
     }
@@ -55,38 +49,13 @@ impl CallStructGenerator {
         let ty = self.try_generate_wrapped_field_type(pat_type)?;
         let ident = self.generate_field_ident(pat_type);
 
-        let result = Field {
-            attrs: Vec::new(),
-            vis: Visibility::Public(Default::default()),
-            mutability: FieldMutability::None,
-            ident: Some(ident),
-            colon_token: Some(Default::default()),
-            ty,
-        };
+        let result = self.field_factory.create(ident, ty);
         return Some(result);
     }
 
     fn try_generate_wrapped_field_type(&self, pat_type: &PatType) -> Option<Type> {
         let result = match &*pat_type.ty {
-            Type::Path(inner_type_path) => Some(Type::Path(TypePath {
-                qself: None,
-                path: Path {
-                    leading_colon: Default::default(),
-                    segments: [PathSegment {
-                        ident: constants::ARG_WRAPPER_TYPE_IDENT.clone(),
-                        arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
-                            colon2_token: Some(Default::default()),
-                            lt_token: Default::default(),
-                            args: [GenericArgument::Type(Type::Path(inner_type_path.clone()))]
-                                .into_iter()
-                                .collect(),
-                            gt_token: Default::default(),
-                        }),
-                    }]
-                    .into_iter()
-                    .collect(),
-                },
-            })),
+            Type::Path(inner_type_path) => Some(self.arg_type_factory.create(inner_type_path)),
             _ => None,
         };
         return result;

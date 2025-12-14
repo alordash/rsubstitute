@@ -1,5 +1,6 @@
 use crate::di::SERVICES;
 
+mod syntax;
 mod macros;
 mod di;
 
