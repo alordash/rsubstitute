@@ -7,8 +7,6 @@ use std::cell::LazyCell;
 use std::str::FromStr;
 use syn::Attribute;
 
-pub const CALL_STRUCT_SUFFIX: &'static str = "Call";
-
 pub const ARG_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| {
     let result = syn::parse_str(name_of_type!(Arg<()>))
         .expect("Should be able to parse arg wrapper type name as ident.");
