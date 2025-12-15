@@ -1,5 +1,6 @@
 use crate::macros::constants;
 use crate::macros::fn_info_generation::models::{ArgsMatcherImplInfo, ArgsMatcherInfo, CallInfo};
+use crate::macros::models::FnDecl;
 use proc_macro2::{Ident, Span};
 use quote::format_ident;
 use std::cell::LazyCell;
@@ -10,7 +11,6 @@ use syn::{
     PatType, Path, PathArguments, PathSegment, ReturnType, Signature, Stmt, Type, TypeParam,
     TypePath, Visibility,
 };
-use crate::macros::models::FnDecl;
 
 pub trait IArgsMatcherImplGenerator {
     fn generate<'a>(
@@ -154,18 +154,18 @@ impl ArgsMatcherImplGenerator {
             .iter()
             .map(|field| self.generate_matches_exprs(field))
             .collect();
-        let joined_expr = matches_exprs
-            .first()
-            .expect("Should have at least one 'matches' statement.")
-            .clone();
-        let joined_exprs = matches_exprs.iter().skip(1).fold(joined_expr, |acc, x| {
-            Expr::Binary(ExprBinary {
-                attrs: Vec::new(),
-                left: Box::new(acc.clone()),
-                op: BinOp::And(Default::default()),
-                right: Box::new(x.clone()),
+        let joined_exprs = matches_exprs
+            .iter()
+            .cloned()
+            .reduce(|a, b| {
+                Expr::Binary(ExprBinary {
+                    attrs: Vec::new(),
+                    left: Box::new(a),
+                    op: BinOp::And(Default::default()),
+                    right: Box::new(b),
+                })
             })
-        });
+            .expect("Should have at least one 'matches' statement.");
         let stmt = Stmt::Expr(joined_exprs, Default::default());
         return stmt;
     }

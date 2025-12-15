@@ -239,7 +239,7 @@ mod generated {
         const standalone_data: LazyCell<FnData<standalone_Call, standalone_ArgsMatcher, f32>> =
             LazyCell::new(Default::default);
         pub fn standalone(number: Arg<i32>) -> f32 {
-            let standalone_args_matcher = standalone_ArgsMatcher {number};
+            let standalone_args_matcher = standalone_ArgsMatcher { number };
             let fn_config = Self::standalone_data.add_config(standalone_args_matcher);
             // let shared_fn_config = SharedFnConfig::new()
             todo!()
