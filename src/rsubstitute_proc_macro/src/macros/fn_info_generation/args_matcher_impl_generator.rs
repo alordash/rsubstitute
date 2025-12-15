@@ -10,12 +10,14 @@ use syn::{
     PatType, Path, PathArguments, PathSegment, ReturnType, Signature, Stmt, Type, TypeParam,
     TypePath, Visibility,
 };
+use crate::macros::models::FnDecl;
 
 pub trait IArgsMatcherImplGenerator {
     fn generate<'a>(
         &self,
-        call_info: &'a CallInfo,
-        args_matcher_info: &'a ArgsMatcherInfo,
+        fn_decl: &'a FnDecl,
+        call_info: &CallInfo,
+        args_matcher_info: &ArgsMatcherInfo,
     ) -> ArgsMatcherImplInfo<'a>;
 }
 
@@ -24,8 +26,9 @@ pub struct ArgsMatcherImplGenerator;
 impl IArgsMatcherImplGenerator for ArgsMatcherImplGenerator {
     fn generate<'a>(
         &self,
-        call_info: &'a CallInfo,
-        args_matcher_info: &'a ArgsMatcherInfo,
+        fn_decl: &'a FnDecl,
+        call_info: &CallInfo,
+        args_matcher_info: &ArgsMatcherInfo,
     ) -> ArgsMatcherImplInfo<'a> {
         let call_info_ident = &call_info.item_struct.ident;
         let generics = Generics {
@@ -78,7 +81,7 @@ impl IArgsMatcherImplGenerator for ArgsMatcherImplGenerator {
             items: vec![items],
         };
         let args_matcher_impl_info = ArgsMatcherImplInfo {
-            parent: call_info.parent,
+            parent: fn_decl,
             item_impl,
         };
         return args_matcher_impl_info;
