@@ -43,7 +43,7 @@ impl MockStructGenerator {
             attrs: Vec::new(),
             vis: Visibility::Inherited,
             mutability: FieldMutability::None,
-            ident: Some(fn_info.parent.ident.clone()),
+            ident: Some(fn_info.data_field_ident.clone()),
             colon_token: Default::default(),
             ty: Type::Path(TypePath {
                 qself: None,

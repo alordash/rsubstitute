@@ -123,7 +123,7 @@ mod generated {
     impl<'a> MyTrait for MyTraitMock<'a> {
         fn work(&self, value: i32) {
             let call = work_Call { value };
-            self.work_data.handle(call);
+            return self.work_data.handle(call);
         }
 
         fn another_work(

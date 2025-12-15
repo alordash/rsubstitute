@@ -1,5 +1,7 @@
 use crate::macros::{FnDeclExtractor, IMacroHandler, MacroHandler};
-use crate::syntax::{AttributeFactory, IAttributeFactory, IPathFactory, ITypeFactory, PathFactory, TypeFactory};
+use crate::syntax::{
+    AttributeFactory, IAttributeFactory, IPathFactory, ITypeFactory, PathFactory, TypeFactory,
+};
 use std::cell::LazyCell;
 use std::rc::Rc;
 
@@ -13,7 +15,8 @@ pub(crate) struct ServiceCollection {
 
 fn create_services() -> ServiceCollection {
     let attribute_factory = Rc::new(AttributeFactory);
-    let type_factory = Rc::new(TypeFactory);
+    let path_factory = Rc::new(PathFactory);
+    let type_factory = Rc::new(TypeFactory { path_factory });
 
     let fn_decl_extractor = Rc::new(FnDeclExtractor);
     let macro_handler = Rc::new(MacroHandler { fn_decl_extractor });

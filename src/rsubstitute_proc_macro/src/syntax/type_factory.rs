@@ -8,7 +8,7 @@ pub trait ITypeFactory {
 }
 
 pub struct TypeFactory {
-    path_factory: Rc<dyn IPathFactory>,
+    pub(crate) path_factory: Rc<dyn IPathFactory>,
 }
 
 impl ITypeFactory for TypeFactory {

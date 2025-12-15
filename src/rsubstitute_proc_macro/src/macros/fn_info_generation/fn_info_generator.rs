@@ -2,6 +2,8 @@ use crate::macros::fn_info_generation::call_generator::ICallStructGenerator;
 use crate::macros::fn_info_generation::models::FnInfo;
 use crate::macros::fn_info_generation::{IArgsMatcherGenerator, IArgsMatcherImplGenerator};
 use crate::macros::models::FnDecl;
+use proc_macro2::Ident;
+use quote::format_ident;
 use std::rc::Rc;
 
 pub trait IFnInfoGenerator {
@@ -21,12 +23,23 @@ impl IFnInfoGenerator for FnInfoGenerator {
         let args_matcher_impl_info =
             self.args_matcher_impl_generator
                 .generate(fn_decl, &call_info, &args_matcher_info);
+        let data_field_ident = self.generate_data_field_ident(fn_decl);
         let fn_info = FnInfo {
             parent: fn_decl,
             call_info,
             args_matcher_info,
             args_matcher_impl_info,
+            data_field_ident,
         };
         return fn_info;
+    }
+}
+
+impl FnInfoGenerator {
+    const DATA_FIELD_IDENT_SUFFIX: &'static str = "data";
+
+    fn generate_data_field_ident(&self, fn_decl: &FnDecl) -> Ident {
+        let data_field_ident = format_ident!("{}_{}", fn_decl.ident, Self::DATA_FIELD_IDENT_SUFFIX);
+        return data_field_ident;
     }
 }

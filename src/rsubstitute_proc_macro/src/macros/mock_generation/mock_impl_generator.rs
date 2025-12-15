@@ -1,3 +1,4 @@
+use crate::macros::constants;
 use crate::macros::fn_info_generation::models::FnInfo;
 use crate::macros::mock_generation::models::{MockImplInfo, MockStructInfo};
 use crate::macros::models::TargetDecl;
@@ -7,9 +8,9 @@ use quote::format_ident;
 use std::cell::LazyCell;
 use std::rc::Rc;
 use syn::{
-    Block, Expr, ExprMethodCall, ExprPath, ExprReturn, ExprStruct, FieldValue, ImplItem,
-    ImplItemFn, ItemImpl, Local, LocalInit, Member, Pat, PatPath, Path, ReturnType, Signature,
-    Stmt, Visibility,
+    Block, Expr, ExprField, ExprMethodCall, ExprPath, ExprReturn, ExprStruct, FieldValue, ImplItem,
+    ImplItemFn, ItemImpl, Local, LocalInit, Member, Pat, PatPath, Path, PathArguments, PathSegment,
+    ReturnType, Signature, Stmt, Visibility,
 };
 
 pub trait IMockImplGenerator {
@@ -59,6 +60,9 @@ impl IMockImplGenerator for MockImplGenerator {
 
 impl MockImplGenerator {
     const CALL_VARIABLE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("call"));
+    const HANDLE_METHOD_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("handle")); // TODO - add test that it equals to FnData::handle
+    const HANDLE_RETURNING_METHOD_IDENT: LazyCell<Ident> =
+        LazyCell::new(|| format_ident!("handle_returning")); // TODO - add test that it equals to FnData::handle_returning
 
     fn generate_impl_item_fn(&self, fn_info: &FnInfo) -> ImplItemFn {
         let sig = Signature {
@@ -92,13 +96,13 @@ impl MockImplGenerator {
 
     fn generate_impl_item_fn_block(&self, fn_info: &FnInfo) -> Block {
         let call_stmt = self.generate_call_stmt(fn_info);
-        let return_stmt = self.generate_return_stmt(fn_info);
-        let stmts = vec![call_stmt, return_stmt];
+        let last_stmt = self.generate_last_stmt(fn_info);
+        let stmts = vec![call_stmt, last_stmt];
         let block = Block {
             brace_token: Default::default(),
             stmts,
         };
-        todo!();
+        return block;
     }
 
     fn generate_call_stmt(&self, fn_info: &FnInfo) -> Stmt {
@@ -151,16 +155,50 @@ impl MockImplGenerator {
         return call_stmt;
     }
 
-    fn generate_return_stmt(&self, fn_info: &FnInfo) -> Stmt {
-        let return_expr = Expr::Return(ExprReturn {
-            attrs: Vec::new(),
-            return_token: Default::default(),
-            expr: Some(Box::new(Expr::MethodCall(ExprMethodCall {
+    fn generate_last_stmt(&self, fn_info: &FnInfo) -> Stmt {
+        let handle_expr = self.generate_handle_expr(fn_info);
+        let last_expr = if fn_info.parent.return_value.is_some() {
+            Expr::Return(ExprReturn {
                 attrs: Vec::new(),
-                receiver: todo!(),
-            }))),
+                return_token: Default::default(),
+                expr: Some(Box::new(handle_expr)),
+            })
+        } else {
+            handle_expr
+        };
+        let last_stmt = Stmt::Expr(last_expr, Some(Default::default()));
+        return last_stmt;
+    }
+
+    fn generate_handle_expr(&self, fn_info: &FnInfo) -> Expr {
+        let expr = Expr::MethodCall(ExprMethodCall {
+            attrs: Vec::new(),
+            receiver: Box::new(Expr::Field(ExprField {
+                attrs: Vec::new(),
+                base: Box::new(Expr::Path(ExprPath {
+                    attrs: Vec::new(),
+                    qself: None,
+                    path: self.path_factory.create(constants::SELF_IDENT.clone()),
+                })),
+                dot_token: Default::default(),
+                member: Member::Named(fn_info.data_field_ident.clone()),
+            })),
+            dot_token: Default::default(),
+            method: if fn_info.parent.return_value.is_some() {
+                Self::HANDLE_RETURNING_METHOD_IDENT.clone()
+            } else {
+                Self::HANDLE_METHOD_IDENT.clone()
+            },
+            turbofish: None,
+            paren_token: Default::default(),
+            args: [Expr::Path(ExprPath {
+                attrs: Vec::new(),
+                qself: None,
+                path: self.path_factory.create(Self::CALL_VARIABLE_IDENT.clone()),
+            })]
+            .into_iter()
+            .collect(),
         });
-        let return_stmt = Stmt::Expr(return_expr, Some(Default::default()));
-        return return_stmt;
+        return expr;
     }
 }
