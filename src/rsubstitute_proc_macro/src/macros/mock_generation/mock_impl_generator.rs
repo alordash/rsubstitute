@@ -9,8 +9,8 @@ use std::cell::LazyCell;
 use std::rc::Rc;
 use syn::{
     Block, Expr, ExprField, ExprMethodCall, ExprPath, ExprReturn, ExprStruct, FieldValue, ImplItem,
-    ImplItemFn, ItemImpl, Local, LocalInit, Member, Pat, PatPath, Path, PathArguments, PathSegment,
-    ReturnType, Signature, Stmt, Visibility,
+    ImplItemFn, ItemImpl, Local, LocalInit, Member, Pat, PatPath, ReturnType, Signature, Stmt,
+    Visibility,
 };
 
 pub trait IMockImplGenerator {
@@ -54,7 +54,9 @@ impl IMockImplGenerator for MockImplGenerator {
             brace_token: Default::default(),
             items,
         };
-        todo!()
+
+        let mock_impl_info = MockImplInfo { item_impl };
+        return mock_impl_info;
     }
 }
 
