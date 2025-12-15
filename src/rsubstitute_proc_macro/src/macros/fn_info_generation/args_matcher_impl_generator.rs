@@ -1,9 +1,11 @@
 use crate::macros::constants;
 use crate::macros::fn_info_generation::models::{ArgsMatcherImplInfo, ArgsMatcherInfo, CallInfo};
 use crate::macros::models::FnDecl;
+use crate::syntax::ITypeFactory;
 use proc_macro2::{Ident, Span};
 use quote::format_ident;
 use std::cell::LazyCell;
+use std::rc::Rc;
 use syn::punctuated::Punctuated;
 use syn::{
     BinOp, Block, Expr, ExprBinary, ExprField, ExprLit, ExprMethodCall, ExprPath, Field, FnArg,
@@ -21,7 +23,9 @@ pub trait IArgsMatcherImplGenerator {
     ) -> ArgsMatcherImplInfo<'a>;
 }
 
-pub struct ArgsMatcherImplGenerator;
+pub struct ArgsMatcherImplGenerator {
+    pub(crate) type_factory: Rc<dyn ITypeFactory>,
+}
 
 impl IArgsMatcherImplGenerator for ArgsMatcherImplGenerator {
     fn generate<'a>(
@@ -56,18 +60,10 @@ impl IArgsMatcherImplGenerator for ArgsMatcherImplGenerator {
             .into_iter()
             .collect(),
         };
-        let call_ty = Box::new(Type::Path(TypePath {
-            qself: None,
-            path: Path {
-                leading_colon: None,
-                segments: [PathSegment {
-                    ident: args_matcher_info.item_struct.ident.clone(),
-                    arguments: PathArguments::None,
-                }]
-                .into_iter()
-                .collect(),
-            },
-        }));
+        let call_ty = Box::new(
+            self.type_factory
+                .create(args_matcher_info.item_struct.ident.clone()),
+        );
         let items = self.generate_matches_fn(call_info, call_ty.clone());
         let item_impl = ItemImpl {
             attrs: Vec::new(),
