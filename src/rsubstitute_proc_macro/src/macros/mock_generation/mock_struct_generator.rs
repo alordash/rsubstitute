@@ -1,6 +1,7 @@
 use crate::macros::constants;
 use crate::macros::fn_info_generation::models::FnInfo;
 use crate::macros::mock_generation::models::MockStructInfo;
+use crate::macros::models::TargetDecl;
 use crate::syntax::{IStructFactory, ITypeFactory};
 use proc_macro2::Ident;
 use quote::format_ident;
@@ -11,7 +12,7 @@ use syn::{
 };
 
 pub trait IMockStructGenerator {
-    fn generate(&self, type_ident: Ident, fn_infos: &[FnInfo]) -> MockStructInfo;
+    fn generate(&self, target_decl: &TargetDecl, fn_infos: &[FnInfo]) -> MockStructInfo;
 }
 
 pub struct MockStructGenerator {
@@ -20,9 +21,9 @@ pub struct MockStructGenerator {
 }
 
 impl IMockStructGenerator for MockStructGenerator {
-    fn generate(&self, type_ident: Ident, fn_infos: &[FnInfo]) -> MockStructInfo {
+    fn generate(&self, target_decl: &TargetDecl, fn_infos: &[FnInfo]) -> MockStructInfo {
         let attrs = Vec::new();
-        let ident = format_ident!("{}{}", type_ident, Self::MOCK_STRUCT_IDENT_PREFIX);
+        let ident = format_ident!("{}{}", target_decl.ident, Self::MOCK_STRUCT_IDENT_PREFIX);
         let fields = fn_infos.iter().map(|x| self.generate_field(x));
         let fields = Fields::Named(FieldsNamed {
             brace_token: Default::default(),

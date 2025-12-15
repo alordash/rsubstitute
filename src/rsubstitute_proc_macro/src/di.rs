@@ -1,5 +1,5 @@
 use crate::macros::{FnDeclExtractor, IMacroHandler, MacroHandler};
-use crate::syntax::{AttributeFactory, IAttributeFactory, ITypeFactory, TypeFactory};
+use crate::syntax::{AttributeFactory, IAttributeFactory, IPathFactory, ITypeFactory, PathFactory, TypeFactory};
 use std::cell::LazyCell;
 use std::rc::Rc;
 
