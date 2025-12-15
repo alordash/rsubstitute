@@ -1,4 +1,4 @@
-use crate::macros::{FnInfoExtractor, IMacroHandler, MacroHandler};
+use crate::macros::{FnDeclExtractor, IMacroHandler, MacroHandler};
 use crate::syntax::{AttributeFactory, IAttributeFactory};
 use std::cell::LazyCell;
 use std::rc::Rc;
@@ -13,8 +13,8 @@ pub(crate) struct ServiceCollection {
 fn create_services() -> ServiceCollection {
     let attribute_factory = Rc::new(AttributeFactory);
 
-    let fn_info_extractor = Rc::new(FnInfoExtractor);
-    let macro_handler = Rc::new(MacroHandler { fn_info_extractor });
+    let fn_decl_extractor = Rc::new(FnDeclExtractor);
+    let macro_handler = Rc::new(MacroHandler { fn_decl_extractor });
 
     let services = ServiceCollection {
         attribute_factory,

@@ -1,6 +1,6 @@
 use crate::macros::constants;
 use crate::macros::fn_info_generation::models::CallInfo;
-use crate::macros::models::FnInfo;
+use crate::macros::models::FnDecl;
 use crate::syntax::{IFieldFactory, IStructFactory};
 use proc_macro2::Ident;
 use quote::{ToTokens, format_ident};
@@ -8,7 +8,7 @@ use std::rc::Rc;
 use syn::{Field, Fields, FieldsNamed, FnArg, PatType, Type};
 
 pub trait ICallStructGenerator {
-    fn generate<'a>(&self, fn_info: &'a FnInfo) -> CallInfo<'a>;
+    fn generate<'a>(&self, fn_decl: &'a FnDecl) -> CallInfo<'a>;
 }
 
 pub struct CallStructGenerator {
@@ -17,13 +17,13 @@ pub struct CallStructGenerator {
 }
 
 impl ICallStructGenerator for CallStructGenerator {
-    fn generate<'a>(&self, fn_info: &'a FnInfo) -> CallInfo<'a> {
+    fn generate<'a>(&self, fn_decl: &'a FnDecl) -> CallInfo<'a> {
         let attrs = vec![
             constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone(),
             constants::DERIVE_CLONE_ATTRIBUTE.clone(),
         ];
-        let ident = format_ident!("{}_{}", fn_info.ident, Self::CALL_STRUCT_SUFFIX);
-        let struct_fields: Vec<_> = fn_info
+        let ident = format_ident!("{}_{}", fn_decl.ident, Self::CALL_STRUCT_SUFFIX);
+        let struct_fields: Vec<_> = fn_decl
             .arguments
             .iter()
             .flat_map(|x| self.try_convert_fn_arg_to_field(x))
@@ -36,7 +36,7 @@ impl ICallStructGenerator for CallStructGenerator {
         let item_struct = self.struct_factory.create(attrs, ident, fields);
         let call_info = CallInfo {
             item_struct,
-            parent: fn_info,
+            parent: fn_decl,
         };
 
         return call_info;

@@ -1,7 +1,7 @@
-use crate::macros::models::FnInfo;
+use crate::macros::models::FnDecl;
 use syn::ItemImpl;
 
 pub struct ArgsMatcherImplInfo<'a> {
-    pub(crate) parent: &'a FnInfo,
+    pub(crate) parent: &'a FnDecl,
     pub(crate) item_impl: ItemImpl,
 }

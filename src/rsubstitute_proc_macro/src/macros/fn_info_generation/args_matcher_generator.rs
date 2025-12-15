@@ -1,6 +1,6 @@
 use crate::macros::constants;
 use crate::macros::fn_info_generation::models::ArgsMatcherInfo;
-use crate::macros::models::FnInfo;
+use crate::macros::models::FnDecl;
 use crate::syntax::{IArgTypeFactory, IFieldFactory, IStructFactory};
 use proc_macro2::Ident;
 use quote::{format_ident, ToTokens};
@@ -8,7 +8,7 @@ use std::rc::Rc;
 use syn::{Field, Fields, FieldsNamed, FnArg, PatType, Type};
 
 pub trait IArgsMatcherGenerator {
-    fn generate<'a>(&self, fn_info: &'a FnInfo) -> ArgsMatcherInfo<'a>;
+    fn generate<'a>(&self, fn_decl: &'a FnDecl) -> ArgsMatcherInfo<'a>;
 }
 
 pub struct ArgsMatcherGenerator {
@@ -18,10 +18,10 @@ pub struct ArgsMatcherGenerator {
 }
 
 impl IArgsMatcherGenerator for ArgsMatcherGenerator {
-    fn generate<'a>(&self, fn_info: &'a FnInfo) -> ArgsMatcherInfo<'a> {
+    fn generate<'a>(&self, fn_decl: &'a FnDecl) -> ArgsMatcherInfo<'a> {
         let attrs = vec![constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone()];
-        let ident = format_ident!("{}_{}", fn_info.ident, Self::ARGS_MATCHER_STRUCT_SUFFIX);
-        let struct_fields: Vec<_> = fn_info
+        let ident = format_ident!("{}_{}", fn_decl.ident, Self::ARGS_MATCHER_STRUCT_SUFFIX);
+        let struct_fields: Vec<_> = fn_decl
             .arguments
             .iter()
             .flat_map(|x| self.try_convert_fn_arg_to_field(x))
@@ -34,7 +34,7 @@ impl IArgsMatcherGenerator for ArgsMatcherGenerator {
         let item_struct = self.struct_factory.create(attrs, ident, fields);
         let args_matcher_info = ArgsMatcherInfo {
             item_struct,
-            parent: fn_info,
+            parent: fn_decl,
         };
 
         return args_matcher_info;

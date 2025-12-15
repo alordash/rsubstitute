@@ -1,3 +1,3 @@
-mod fn_info;
+mod fn_decl;
 
-pub use fn_info::*;
+pub use fn_decl::*;
