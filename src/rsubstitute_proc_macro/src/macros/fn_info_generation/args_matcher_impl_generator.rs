@@ -126,7 +126,10 @@ impl ArgsMatcherImplGenerator {
                 .into_iter()
                 .collect(),
                 variadic: None,
-                output: ReturnType::Type(Default::default(), constants::BOOL_TYPE.clone()),
+                output: ReturnType::Type(
+                    Default::default(),
+                    Box::new(constants::BOOL_TYPE.clone()),
+                ),
             },
             block,
         });

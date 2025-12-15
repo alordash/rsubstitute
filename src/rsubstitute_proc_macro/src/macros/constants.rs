@@ -6,7 +6,8 @@ use rsubstitute_core::arguments_matching::Arg;
 use std::cell::LazyCell;
 use std::iter::{IntoIterator, Iterator};
 use std::str::FromStr;
-use syn::{Attribute, Path, PathArguments, PathSegment, Type, TypePath};
+use syn::punctuated::Punctuated;
+use syn::{Attribute, Path, PathArguments, PathSegment, Type, TypePath, TypeTuple};
 
 pub const ARG_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| {
     let result = syn::parse_str(name_of_type!(Arg<()>))
@@ -19,6 +20,9 @@ pub const SELF_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("self"));
 // TODO - add test that it's equal to rsubstitute_core::arguments_matching::IArgsMatcher
 pub const I_ARGS_MATCHER_TRAIT_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("IArgsMatcher"));
+
+// TODO - add test that it's equal to rsubstitute_core::FnData
+pub const FN_DATA_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("FnData"));
 
 pub const ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     let attribute_factory = &SERVICES.attribute_factory;
@@ -37,17 +41,16 @@ pub const DERIVE_CLONE_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     return result;
 });
 
-pub const BOOL_TYPE: LazyCell<Box<Type>> = LazyCell::new(|| {
-    Box::new(Type::Path(TypePath {
-        qself: None,
-        path: Path {
-            leading_colon: None,
-            segments: [PathSegment {
-                ident: format_ident!("bool"),
-                arguments: PathArguments::None,
-            }]
-            .into_iter()
-            .collect(),
-        },
-    }))
+pub const BOOL_TYPE: LazyCell<Type> = LazyCell::new(|| {
+    let type_factory = &SERVICES.type_factory;
+    let result = type_factory.create(format_ident!("bool"));
+    return result;
+});
+
+pub const VOID_TYPE: LazyCell<Type> = LazyCell::new(|| {
+    let result = Type::Tuple(TypeTuple {
+        paren_token: Default::default(),
+        elems: Punctuated::new(),
+    });
+    return result;
 });

@@ -1,20 +1,42 @@
+use crate::macros::constants;
 use crate::macros::fn_info_generation::models::FnInfo;
 use crate::macros::mock_generation::models::MockStructInfo;
-use syn::{Field, FieldMutability, Visibility};
+use crate::syntax::{IStructFactory, ITypeFactory};
+use proc_macro2::Ident;
+use quote::format_ident;
+use std::rc::Rc;
+use syn::{
+    AngleBracketedGenericArguments, Field, FieldMutability, Fields, FieldsNamed, GenericArgument,
+    Path, PathArguments, PathSegment, Type, TypePath, Visibility,
+};
 
 pub trait IMockStructGenerator {
-    fn generate(&self, fn_infos: &[FnInfo]) -> MockStructInfo;
+    fn generate(&self, type_ident: Ident, fn_infos: &[FnInfo]) -> MockStructInfo;
 }
 
-pub struct MockStructGenerator;
+pub struct MockStructGenerator {
+    pub(crate) type_factory: Rc<dyn ITypeFactory>,
+    pub(crate) struct_factory: Rc<dyn IStructFactory>,
+}
 
 impl IMockStructGenerator for MockStructGenerator {
-    fn generate(&self, fn_infos: &[FnInfo]) -> MockStructInfo {
-        todo!()
+    fn generate(&self, type_ident: Ident, fn_infos: &[FnInfo]) -> MockStructInfo {
+        let attrs = Vec::new();
+        let ident = format_ident!("{}{}", type_ident, Self::MOCK_STRUCT_IDENT_PREFIX);
+        let fields = fn_infos.iter().map(|x| self.generate_field(x));
+        let fields = Fields::Named(FieldsNamed {
+            brace_token: Default::default(),
+            named: fields.collect(),
+        });
+        let item_struct = self.struct_factory.create(attrs, ident, fields);
+        let mock_struct_info = MockStructInfo { item_struct };
+        return mock_struct_info;
     }
 }
 
 impl MockStructGenerator {
+    const MOCK_STRUCT_IDENT_PREFIX: &'static str = "Mock";
+
     fn generate_field(&self, fn_info: &FnInfo) -> Field {
         let field = Field {
             attrs: Vec::new(),
@@ -22,8 +44,44 @@ impl MockStructGenerator {
             mutability: FieldMutability::None,
             ident: Some(fn_info.parent.ident.clone()),
             colon_token: Default::default(),
-            ty: todo!(),
+            ty: Type::Path(TypePath {
+                qself: None,
+                path: Path {
+                    leading_colon: None,
+                    segments: [PathSegment {
+                        ident: constants::FN_DATA_TYPE_IDENT.clone(),
+                        arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
+                            colon2_token: None,
+                            lt_token: Default::default(),
+                            args: [
+                                GenericArgument::Type(
+                                    self.type_factory
+                                        .create(fn_info.call_info.item_struct.ident.clone()),
+                                ),
+                                GenericArgument::Type(
+                                    self.type_factory.create(
+                                        fn_info.args_matcher_info.item_struct.ident.clone(),
+                                    ),
+                                ),
+                                GenericArgument::Type(
+                                    fn_info
+                                        .parent
+                                        .return_value
+                                        .clone()
+                                        .map(|x| *x)
+                                        .unwrap_or(constants::VOID_TYPE.clone()),
+                                ),
+                            ]
+                            .into_iter()
+                            .collect(),
+                            gt_token: Default::default(),
+                        }),
+                    }]
+                    .into_iter()
+                    .collect(),
+                },
+            }),
         };
-        todo!();
+        return field;
     }
 }

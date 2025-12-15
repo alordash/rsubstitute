@@ -23,14 +23,13 @@ impl ICallStructGenerator for CallStructGenerator {
             constants::DERIVE_CLONE_ATTRIBUTE.clone(),
         ];
         let ident = format_ident!("{}_{}", fn_decl.ident, Self::CALL_STRUCT_SUFFIX);
-        let struct_fields: Vec<_> = fn_decl
+        let struct_fields = fn_decl
             .arguments
             .iter()
-            .flat_map(|x| self.try_convert_fn_arg_to_field(x))
-            .collect();
+            .flat_map(|x| self.try_convert_fn_arg_to_field(x));
         let fields = Fields::Named(FieldsNamed {
             brace_token: Default::default(),
-            named: struct_fields.into_iter().collect(),
+            named: struct_fields.collect(),
         });
 
         let item_struct = self.struct_factory.create(attrs, ident, fields);
