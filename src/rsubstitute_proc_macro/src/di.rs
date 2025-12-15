@@ -9,6 +9,7 @@ pub(crate) const SERVICES: LazyCell<ServiceCollection> = LazyCell::new(create_se
 
 pub(crate) struct ServiceCollection {
     pub(crate) attribute_factory: Rc<dyn IAttributeFactory>,
+    pub(crate) path_factory: Rc<dyn IPathFactory>,
     pub(crate) type_factory: Rc<dyn ITypeFactory>,
     pub(crate) macro_handler: Rc<dyn IMacroHandler>,
 }
@@ -16,13 +17,16 @@ pub(crate) struct ServiceCollection {
 fn create_services() -> ServiceCollection {
     let attribute_factory = Rc::new(AttributeFactory);
     let path_factory = Rc::new(PathFactory);
-    let type_factory = Rc::new(TypeFactory { path_factory });
+    let type_factory = Rc::new(TypeFactory {
+        path_factory: path_factory.clone(),
+    });
 
     let fn_decl_extractor = Rc::new(FnDeclExtractor);
     let macro_handler = Rc::new(MacroHandler { fn_decl_extractor });
 
     let services = ServiceCollection {
         attribute_factory,
+        path_factory,
         type_factory,
         macro_handler,
     };

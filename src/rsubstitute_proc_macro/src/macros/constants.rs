@@ -4,10 +4,9 @@ use proc_macro2::{Ident, TokenStream};
 use quote::format_ident;
 use rsubstitute_core::arguments_matching::Arg;
 use std::cell::LazyCell;
-use std::iter::{IntoIterator, Iterator};
 use std::str::FromStr;
 use syn::punctuated::Punctuated;
-use syn::{Attribute, Path, PathArguments, PathSegment, Type, TypePath, TypeTuple};
+use syn::{Attribute, Path, Type, TypeTuple};
 
 pub const ARG_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| {
     let result = syn::parse_str(name_of_type!(Arg<()>))
@@ -52,5 +51,22 @@ pub const VOID_TYPE: LazyCell<Type> = LazyCell::new(|| {
         paren_token: Default::default(),
         elems: Punctuated::new(),
     });
+    return result;
+});
+
+pub const SELF_TYPE_KEYWORD: &'static str = "Self";
+
+pub const SELF_TYPE_IDENT: LazyCell<Ident> =
+    LazyCell::new(|| format_ident!("{}", SELF_TYPE_KEYWORD));
+
+pub const SELF_TYPE: LazyCell<Type> = LazyCell::new(|| {
+    let type_factory = &SERVICES.type_factory;
+    let result = type_factory.create(SELF_TYPE_IDENT.clone());
+    return result;
+});
+
+pub const SELF_TYPE_PATH: LazyCell<Path> = LazyCell::new(|| {
+    let path_factory = &SERVICES.path_factory;
+    let result = path_factory.create(SELF_TYPE_IDENT.clone());
     return result;
 });
