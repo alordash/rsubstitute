@@ -180,7 +180,7 @@ mod generated {
 
         pub fn received_work(&'a self, value: Arg<i32>, times: Times) -> &'a Self {
             let work_args_matcher = work_ArgsMatcher { value };
-            self.work_data.verify_received(work_args_matcher, &times);
+            self.work_data.verify_received(work_args_matcher, times);
             return self;
         }
 
@@ -218,7 +218,7 @@ mod generated {
                 arc,
             };
             self.another_work_data
-                .verify_received(another_work_args_matcher, &times);
+                .verify_received(another_work_args_matcher, times);
             return self;
         }
 
@@ -231,7 +231,7 @@ mod generated {
 
         pub fn received_get(&'a self, times: Times) -> &'a Self {
             let get_args_matcher = get_ArgsMatcher;
-            self.get_data.verify_received(get_args_matcher, &times);
+            self.get_data.verify_received(get_args_matcher, times);
             return self;
         }
 

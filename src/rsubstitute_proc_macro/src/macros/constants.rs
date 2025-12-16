@@ -29,8 +29,12 @@ pub const I_ARGS_MATCHER_TRAIT_IDENT: LazyCell<Ident> =
 pub const FN_DATA_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("FnData"));
 
 // TODO - add test that verifies that it's equal to rsubstitute_core::FnData::add_config
-pub const FN_CONFIG_ADD_CONFIG_FN_IDENT: LazyCell<Ident> =
+pub const FN_DATA_ADD_CONFIG_FN_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("add_config"));
+
+// TODO - add test that verifies that it's equal to rsubstitute_core::FnData::verify_received
+pub const FN_DATA_VERIFY_RECEIVED_FN_IDENT: LazyCell<Ident> =
+    LazyCell::new(|| format_ident!("verify_received"));
 
 // TODO - add test that it's equal to rsubstitute_core::SharedFnConfig
 pub const SHARED_FN_CONFIG_TYPE_IDENT: LazyCell<Ident> =

@@ -64,7 +64,7 @@ impl<TCall: Clone, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
         return return_value;
     }
 
-    pub fn verify_received(&self, args_matcher: TArgsMatcher, times: &Times) {
+    pub fn verify_received(&self, args_matcher: TArgsMatcher, times: Times) {
         let calls = self.calls.borrow();
         let matching_calls_count = calls
             .iter()
