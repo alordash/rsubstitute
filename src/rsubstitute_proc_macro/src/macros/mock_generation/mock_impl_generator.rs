@@ -2,7 +2,7 @@ use crate::macros::constants;
 use crate::macros::fn_info_generation::models::FnInfo;
 use crate::macros::mock_generation::models::{MockImplInfo, MockStructInfo};
 use crate::macros::models::TargetDecl;
-use crate::syntax::{IPathFactory, ITypeFactory};
+use crate::syntax::{IExprMethodCallFactory, IFieldValueFactory, IPathFactory, ITypeFactory};
 use proc_macro2::Ident;
 use quote::format_ident;
 use std::cell::LazyCell;
@@ -25,6 +25,8 @@ pub trait IMockImplGenerator {
 pub struct MockImplGenerator {
     path_factory: Rc<dyn IPathFactory>,
     type_factory: Rc<dyn ITypeFactory>,
+    field_value_factory: Rc<dyn IFieldValueFactory>,
+    expr_method_call_factory: Rc<dyn IExprMethodCallFactory>,
 }
 
 impl IMockImplGenerator for MockImplGenerator {
@@ -78,12 +80,7 @@ impl MockImplGenerator {
             paren_token: Default::default(),
             inputs: fn_info.parent.arguments.iter().cloned().collect(),
             variadic: None,
-            output: fn_info
-                .parent
-                .return_value
-                .clone()
-                .map(|x| ReturnType::Type(Default::default(), x))
-                .unwrap_or(ReturnType::Default),
+            output: fn_info.parent.return_value.clone(),
         };
         let block = self.generate_impl_item_fn_block(fn_info);
         let impl_item_fn = ImplItemFn {
@@ -130,22 +127,7 @@ impl MockImplGenerator {
                         .item_struct
                         .fields
                         .iter()
-                        .map(|field| {
-                            let field_ident = field
-                                .ident
-                                .clone()
-                                .expect("Field in call struct should be named");
-                            FieldValue {
-                                attrs: Vec::new(),
-                                member: Member::Named(field_ident.clone()),
-                                colon_token: None,
-                                expr: Expr::Path(ExprPath {
-                                    attrs: Vec::new(),
-                                    qself: None,
-                                    path: self.path_factory.create(field_ident),
-                                }),
-                            }
-                        })
+                        .map(|field| self.field_value_factory.create(field))
                         .collect(),
                     dot2_token: None,
                     rest: None,
@@ -159,7 +141,7 @@ impl MockImplGenerator {
 
     fn generate_last_stmt(&self, fn_info: &FnInfo) -> Stmt {
         let handle_expr = self.generate_handle_expr(fn_info);
-        let last_expr = if fn_info.parent.return_value.is_some() {
+        let last_expr = if fn_info.parent.has_return_value() {
             Expr::Return(ExprReturn {
                 attrs: Vec::new(),
                 return_token: Default::default(),
@@ -173,34 +155,21 @@ impl MockImplGenerator {
     }
 
     fn generate_handle_expr(&self, fn_info: &FnInfo) -> Expr {
-        let expr = Expr::MethodCall(ExprMethodCall {
-            attrs: Vec::new(),
-            receiver: Box::new(Expr::Field(ExprField {
-                attrs: Vec::new(),
-                base: Box::new(Expr::Path(ExprPath {
-                    attrs: Vec::new(),
-                    qself: None,
-                    path: self.path_factory.create(constants::SELF_IDENT.clone()),
-                })),
-                dot_token: Default::default(),
-                member: Member::Named(fn_info.data_field_ident.clone()),
-            })),
-            dot_token: Default::default(),
-            method: if fn_info.parent.return_value.is_some() {
-                Self::HANDLE_RETURNING_METHOD_IDENT.clone()
-            } else {
-                Self::HANDLE_METHOD_IDENT.clone()
-            },
-            turbofish: None,
-            paren_token: Default::default(),
-            args: [Expr::Path(ExprPath {
-                attrs: Vec::new(),
-                qself: None,
-                path: self.path_factory.create(Self::CALL_VARIABLE_IDENT.clone()),
-            })]
-            .into_iter()
-            .collect(),
-        });
+        let idents = [
+            constants::SELF_IDENT.clone(),
+            fn_info.data_field_ident.clone(),
+        ];
+        let method = if fn_info.parent.has_return_value() {
+            Self::HANDLE_RETURNING_METHOD_IDENT.clone()
+        } else {
+            Self::HANDLE_METHOD_IDENT.clone()
+        };
+        let expr_method_call = self.expr_method_call_factory.create(
+            &idents,
+            method,
+            &[Self::CALL_VARIABLE_IDENT.clone()],
+        );
+        let expr = Expr::MethodCall(expr_method_call);
         return expr;
     }
 }

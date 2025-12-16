@@ -1,5 +1,5 @@
-use syn::ImplItem;
+use syn::ItemImpl;
 
 pub struct InternalMockImplInfo {
-    pub impl_item: ImplItem,
+    pub item_impl: ItemImpl,
 }

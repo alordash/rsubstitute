@@ -64,14 +64,7 @@ impl MockStructGenerator {
                                         fn_info.args_matcher_info.item_struct.ident.clone(),
                                     ),
                                 ),
-                                GenericArgument::Type(
-                                    fn_info
-                                        .parent
-                                        .return_value
-                                        .clone()
-                                        .map(|x| *x)
-                                        .unwrap_or(constants::VOID_TYPE.clone()),
-                                ),
+                                GenericArgument::Type(fn_info.parent.get_return_value_type()),
                             ]
                             .into_iter()
                             .collect(),

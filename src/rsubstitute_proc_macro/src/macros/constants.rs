@@ -6,7 +6,7 @@ use rsubstitute_core::arguments_matching::Arg;
 use std::cell::LazyCell;
 use std::str::FromStr;
 use syn::punctuated::Punctuated;
-use syn::{Attribute, Path, Type, TypeTuple};
+use syn::{Attribute, Expr, ExprCall, ExprPath, Path, PathArguments, PathSegment, Type, TypeTuple};
 
 pub const ARG_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| {
     let result = syn::parse_str(name_of_type!(Arg<()>))
@@ -15,6 +15,11 @@ pub const ARG_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| {
 });
 
 pub const SELF_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("self"));
+pub const SELF_IDENT_PATH: LazyCell<Path> = LazyCell::new(|| {
+    let path_factory = &SERVICES.path_factory;
+    let result = path_factory.create(SELF_IDENT.clone());
+    return result;
+});
 
 // TODO - add test that it's equal to rsubstitute_core::arguments_matching::IArgsMatcher
 pub const I_ARGS_MATCHER_TRAIT_IDENT: LazyCell<Ident> =
@@ -22,6 +27,19 @@ pub const I_ARGS_MATCHER_TRAIT_IDENT: LazyCell<Ident> =
 
 // TODO - add test that it's equal to rsubstitute_core::FnData
 pub const FN_DATA_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("FnData"));
+
+// TODO - add test that verifies that it's equal to rsubstitute_core::FnData::add_config
+pub const FN_CONFIG_ADD_CONFIG_FN_IDENT: LazyCell<Ident> =
+    LazyCell::new(|| format_ident!("add_config"));
+
+// TODO - add test that it's equal to rsubstitute_core::SharedFnConfig
+pub const SHARED_FN_CONFIG_TYPE_IDENT: LazyCell<Ident> =
+    LazyCell::new(|| format_ident!("SharedFnConfig"));
+
+// TODO - add test that it's equal to rsubstitute_core::SharedFnConfig::new
+pub const SHARED_FN_CONFIG_NEW_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("new"));
+
+pub const DISCARD_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("_"));
 
 pub const ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     let attribute_factory = &SERVICES.attribute_factory;
@@ -68,5 +86,34 @@ pub const SELF_TYPE: LazyCell<Type> = LazyCell::new(|| {
 pub const SELF_TYPE_PATH: LazyCell<Path> = LazyCell::new(|| {
     let path_factory = &SERVICES.path_factory;
     let result = path_factory.create(SELF_TYPE_IDENT.clone());
+    return result;
+});
+
+pub const DEFAULT_INVOKE_EXPR: LazyCell<Expr> = LazyCell::new(|| {
+    let func = Expr::Path(ExprPath {
+        attrs: Vec::new(),
+        qself: None,
+        path: Path {
+            leading_colon: None,
+            segments: [
+                PathSegment {
+                    ident: format_ident!("Default"),
+                    arguments: PathArguments::None,
+                },
+                PathSegment {
+                    ident: format_ident!("default"),
+                    arguments: PathArguments::None,
+                },
+            ]
+            .into_iter()
+            .collect(),
+        },
+    });
+    let result = Expr::Call(ExprCall {
+        attrs: Vec::new(),
+        func: Box::new(func),
+        paren_token: Default::default(),
+        args: Punctuated::new(),
+    });
     return result;
 });

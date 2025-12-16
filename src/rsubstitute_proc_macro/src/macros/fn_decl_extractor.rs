@@ -30,10 +30,7 @@ impl FnDeclExtractor {
         let fn_decl = FnDecl {
             ident: sig.ident,
             arguments: sig.inputs.into_iter().collect(),
-            return_value: match sig.output {
-                ReturnType::Default => None,
-                ReturnType::Type(_, r#type) => Some(r#type),
-            },
+            return_value: sig.output
         };
         return fn_decl;
     }
