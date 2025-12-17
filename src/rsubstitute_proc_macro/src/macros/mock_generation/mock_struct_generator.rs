@@ -3,7 +3,6 @@ use crate::macros::fn_info_generation::models::FnInfo;
 use crate::macros::mock_generation::models::MockStructInfo;
 use crate::macros::models::TargetDecl;
 use crate::syntax::{IStructFactory, ITypeFactory};
-use proc_macro2::Ident;
 use quote::format_ident;
 use std::rc::Rc;
 use syn::{

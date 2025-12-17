@@ -1,5 +1,5 @@
 use proc_macro2::Ident;
-use syn::{Expr, ExprStruct, Local, LocalInit, Pat, PatIdent};
+use syn::{Local, LocalInit, Pat, PatIdent};
 
 pub trait ILocalFactory {
     fn create(&self, variable_ident: Ident, init: LocalInit) -> Local;

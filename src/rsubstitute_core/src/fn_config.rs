@@ -1,5 +1,4 @@
 use crate::arguments_matching::IArgsMatcher;
-use std::marker::PhantomData;
 
 pub struct FnConfig<TCall, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue> {
     args_matcher: TArgsMatcher,

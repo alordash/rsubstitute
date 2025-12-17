@@ -1,5 +1,5 @@
 use crate::macros::models::FnDecl;
-use syn::{ReturnType, TraitItem, TraitItemFn};
+use syn::{TraitItem, TraitItemFn};
 
 pub trait IFnDeclExtractor {
     fn extract(&self, items: Vec<TraitItem>) -> Vec<FnDecl>;

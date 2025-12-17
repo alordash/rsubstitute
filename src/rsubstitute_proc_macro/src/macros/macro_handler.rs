@@ -1,7 +1,7 @@
 use crate::macros::fn_decl_extractor::IFnDeclExtractor;
 use proc_macro::TokenStream;
 use std::rc::Rc;
-use syn::{ItemImpl, ItemTrait, parse_macro_input};
+use syn::{ItemImpl, ItemTrait};
 
 pub trait IMacroHandler {
     fn handle(

@@ -10,8 +10,8 @@ use syn::punctuated::Punctuated;
 use syn::{
     BinOp, Block, Expr, ExprBinary, ExprField, ExprLit, ExprMethodCall, ExprPath, Field, FnArg,
     GenericParam, Generics, ImplItem, ImplItemFn, ItemImpl, Lit, LitBool, Member, Pat, PatIdent,
-    PatType, Path, PathArguments, PathSegment, ReturnType, Signature, Stmt, Type, TypeParam,
-    TypePath, Visibility,
+    PatType, Path, PathArguments, PathSegment, ReturnType, Signature, Stmt, Type, TypeParam
+    , Visibility,
 };
 
 pub trait IArgsMatcherImplGenerator {

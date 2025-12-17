@@ -3,7 +3,7 @@ use crate::macros::fn_info_generation::models::CallInfo;
 use crate::macros::models::FnDecl;
 use crate::syntax::{IFieldFactory, IStructFactory};
 use proc_macro2::Ident;
-use quote::{ToTokens, format_ident};
+use quote::{format_ident, ToTokens};
 use std::rc::Rc;
 use syn::{Field, Fields, FieldsNamed, FnArg, PatType, Type};
 

@@ -8,8 +8,8 @@ use quote::format_ident;
 use std::cell::LazyCell;
 use std::rc::Rc;
 use syn::{
-    Block, Expr, ExprField, ExprMethodCall, ExprPath, ExprReturn, ExprStruct, FieldValue, ImplItem,
-    ImplItemFn, ItemImpl, Local, LocalInit, Member, Pat, PatPath, ReturnType, Signature, Stmt,
+    Block, Expr, ExprReturn, ExprStruct, ImplItem,
+    ImplItemFn, ItemImpl, Local, LocalInit, Pat, PatPath, Signature, Stmt,
     Visibility,
 };
 
