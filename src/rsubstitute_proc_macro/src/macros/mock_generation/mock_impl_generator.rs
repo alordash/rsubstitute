@@ -8,9 +8,8 @@ use quote::format_ident;
 use std::cell::LazyCell;
 use std::rc::Rc;
 use syn::{
-    Block, Expr, ExprReturn, ExprStruct, ImplItem,
-    ImplItemFn, ItemImpl, Local, LocalInit, Pat, PatPath, Signature, Stmt,
-    Visibility,
+    Block, Expr, ExprReturn, ExprStruct, ImplItem, ImplItemFn, ItemImpl, Local, LocalInit, Pat,
+    PatPath, Signature, Stmt, Visibility,
 };
 
 pub trait IMockImplGenerator {
@@ -23,10 +22,10 @@ pub trait IMockImplGenerator {
 }
 
 pub struct MockImplGenerator {
-    path_factory: Rc<dyn IPathFactory>,
-    type_factory: Rc<dyn ITypeFactory>,
-    field_value_factory: Rc<dyn IFieldValueFactory>,
-    expr_method_call_factory: Rc<dyn IExprMethodCallFactory>,
+    pub(crate) path_factory: Rc<dyn IPathFactory>,
+    pub(crate) type_factory: Rc<dyn ITypeFactory>,
+    pub(crate) field_value_factory: Rc<dyn IFieldValueFactory>,
+    pub(crate) expr_method_call_factory: Rc<dyn IExprMethodCallFactory>,
 }
 
 impl IMockImplGenerator for MockImplGenerator {

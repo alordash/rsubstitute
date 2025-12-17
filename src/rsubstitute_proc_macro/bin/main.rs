@@ -33,8 +33,7 @@ trait MyTrait {
 
 mod generated {
     use super::*;
-    use rsubstitute_core::arguments_matching::IArgsMatcher;
-    use rsubstitute_core::{FnData, SharedFnConfig, Times, arguments_matching::Arg};
+    use rsubstitute_core::prelude::*;
     use std::cell::LazyCell;
 
     // start - Calls

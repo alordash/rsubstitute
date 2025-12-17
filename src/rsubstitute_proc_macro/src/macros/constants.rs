@@ -1,4 +1,5 @@
 use crate::di::SERVICES;
+use crate::macros::constants;
 use nameof::name_of_type;
 use proc_macro2::{Ident, TokenStream};
 use quote::format_ident;
@@ -6,7 +7,10 @@ use rsubstitute_core::arguments_matching::Arg;
 use std::cell::LazyCell;
 use std::str::FromStr;
 use syn::punctuated::Punctuated;
-use syn::{Attribute, Expr, ExprCall, ExprPath, Path, PathArguments, PathSegment, Type, TypeTuple};
+use syn::{
+    Attribute, Expr, ExprCall, ExprPath, ItemUse, Path, PathArguments, PathSegment, Type,
+    TypeTuple, UseGlob, UsePath, UseTree, Visibility,
+};
 
 pub const ARG_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| {
     let result = syn::parse_str(name_of_type!(Arg<()>))
@@ -20,6 +24,13 @@ pub const SELF_IDENT_PATH: LazyCell<Path> = LazyCell::new(|| {
     let result = path_factory.create(SELF_IDENT.clone());
     return result;
 });
+
+pub const SUPER_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("super"));
+
+pub const PRELUDE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("prelude"));
+
+// TODO - add test that it's equal to crate's name
+pub const CRATE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("rsubstitute"));
 
 // TODO - add test that it's equal to rsubstitute_core::arguments_matching::IArgsMatcher
 pub const I_ARGS_MATCHER_TRAIT_IDENT: LazyCell<Ident> =
@@ -120,4 +131,44 @@ pub const DEFAULT_INVOKE_EXPR: LazyCell<Expr> = LazyCell::new(|| {
         args: Punctuated::new(),
     });
     return result;
+});
+
+pub const USE_SUPER: LazyCell<ItemUse> = LazyCell::new(|| {
+    let result = ItemUse {
+        attrs: Vec::new(),
+        vis: Visibility::Inherited,
+        use_token: Default::default(),
+        leading_colon: None,
+        tree: UseTree::Path(UsePath {
+            ident: SUPER_IDENT.clone(),
+            colon2_token: Default::default(),
+            tree: Box::new(UseTree::Glob(UseGlob {
+                star_token: Default::default(),
+            })),
+        }),
+        semi_token: Default::default(),
+    };
+    return result;
+});
+
+pub const USE_CRATE_PRELUDE: LazyCell<ItemUse> = LazyCell::new(|| {
+    let result = ItemUse {
+        attrs: Vec::new(),
+        vis: Visibility::Inherited,
+        use_token: Default::default(),
+        leading_colon: None,
+        tree: UseTree::Path(UsePath {
+            ident: CRATE_IDENT.clone(),
+            colon2_token: Default::default(),
+            tree: Box::new(UseTree::Path(UsePath {
+                ident: PRELUDE_IDENT.clone(),
+                colon2_token: Default::default(),
+                tree: Box::new(UseTree::Glob(UseGlob {
+                    star_token: Default::default(),
+                })),
+            })),
+        }),
+        semi_token: Default::default(),
+    };
+    todo!();
 });

@@ -5,8 +5,10 @@ pub mod models;
 
 mod fn_decl_extractor;
 mod macro_handler;
+mod mod_generator;
 mod target_decl_extractor;
 
 pub use fn_decl_extractor::*;
 pub use macro_handler::*;
+pub use mod_generator::*;
 pub use target_decl_extractor::*;

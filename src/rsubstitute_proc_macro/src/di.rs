@@ -1,6 +1,16 @@
-use crate::macros::{FnDeclExtractor, IMacroHandler, MacroHandler};
+use crate::macros::fn_info_generation::{
+    ArgsMatcherGenerator, ArgsMatcherImplGenerator, CallStructGenerator, FnInfoGenerator,
+};
+use crate::macros::mock_generation::{
+    InternalMockImplGenerator, MockImplGenerator, MockStructGenerator,
+};
+use crate::macros::{
+    FnDeclExtractor, IMacroHandler, MacroHandler, ModGenerator, TargetDeclExtractor,
+};
 use crate::syntax::{
-    AttributeFactory, IAttributeFactory, IPathFactory, ITypeFactory, PathFactory, TypeFactory,
+    ArgTypeFactory, AttributeFactory, ExprMethodCallFactory, FieldFactory, FieldValueFactory,
+    IAttributeFactory, IPathFactory, ITypeFactory, LocalFactory, PathFactory, StructFactory,
+    TypeFactory,
 };
 use std::cell::LazyCell;
 use std::rc::Rc;
@@ -15,14 +25,70 @@ pub(crate) struct ServiceCollection {
 }
 
 fn create_services() -> ServiceCollection {
-    let attribute_factory = Rc::new(AttributeFactory);
+    let target_decl_extractor = Rc::new(TargetDeclExtractor);
+    let fn_decl_extractor = Rc::new(FnDeclExtractor);
+
+    let field_factory = Rc::new(FieldFactory);
+    let struct_factory = Rc::new(StructFactory);
+    let call_struct_generator = Rc::new(CallStructGenerator {
+        field_factory: field_factory.clone(),
+        struct_factory: struct_factory.clone(),
+    });
+    let arg_type_factory = Rc::new(ArgTypeFactory);
+    let args_matcher_generator = Rc::new(ArgsMatcherGenerator {
+        arg_type_factory: arg_type_factory.clone(),
+        field_factory: field_factory.clone(),
+        struct_factory: struct_factory.clone(),
+    });
     let path_factory = Rc::new(PathFactory);
     let type_factory = Rc::new(TypeFactory {
         path_factory: path_factory.clone(),
     });
+    let args_matcher_impl_generator = Rc::new(ArgsMatcherImplGenerator {
+        type_factory: type_factory.clone(),
+    });
+    let fn_info_generator = Rc::new(FnInfoGenerator {
+        call_struct_generator: call_struct_generator.clone(),
+        args_matcher_generator: args_matcher_generator.clone(),
+        args_matcher_impl_generator: args_matcher_impl_generator.clone(),
+    });
+    let mock_struct_generator = Rc::new(MockStructGenerator {
+        type_factory: type_factory.clone(),
+        struct_factory: struct_factory.clone(),
+    });
+    let field_value_factory = Rc::new(FieldValueFactory {
+        path_factory: path_factory.clone(),
+    });
+    let expr_method_call_factory = Rc::new(ExprMethodCallFactory {
+        path_factory: path_factory.clone(),
+    });
+    let mock_impl_generator = Rc::new(MockImplGenerator {
+        path_factory: path_factory.clone(),
+        type_factory: type_factory.clone(),
+        field_value_factory: field_value_factory.clone(),
+        expr_method_call_factory: expr_method_call_factory.clone(),
+    });
+    let local_factory = Rc::new(LocalFactory);
+    let internal_mock_impl_generator = Rc::new(InternalMockImplGenerator {
+        path_factory: path_factory.clone(),
+        type_factory: type_factory.clone(),
+        field_value_factory: field_value_factory.clone(),
+        local_factory: local_factory.clone(),
+        expr_method_call_factory: expr_method_call_factory.clone(),
+    });
+    let mod_generator = Rc::new(ModGenerator);
 
-    let fn_decl_extractor = Rc::new(FnDeclExtractor);
-    let macro_handler = Rc::new(MacroHandler { fn_decl_extractor });
+    let macro_handler = Rc::new(MacroHandler {
+        target_decl_extractor: target_decl_extractor.clone(),
+        fn_decl_extractor: fn_decl_extractor.clone(),
+        fn_info_generator: fn_info_generator.clone(),
+        mock_struct_generator: mock_struct_generator.clone(),
+        mock_impl_generator: mock_impl_generator.clone(),
+        internal_mock_impl_generator: internal_mock_impl_generator.clone(),
+        mod_generator: mod_generator.clone(),
+    });
+
+    let attribute_factory = Rc::new(AttributeFactory);
 
     let services = ServiceCollection {
         attribute_factory,
