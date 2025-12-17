@@ -1,4 +1,9 @@
+use crate::macros::ITargetDeclExtractor;
 use crate::macros::fn_decl_extractor::IFnDeclExtractor;
+use crate::macros::fn_info_generation::IFnInfoGenerator;
+use crate::macros::mock_generation::{
+    IInternalMockImplGenerator, IMockImplGenerator, IMockStructGenerator,
+};
 use proc_macro::TokenStream;
 use std::rc::Rc;
 use syn::{ItemImpl, ItemTrait};
@@ -12,7 +17,12 @@ pub trait IMacroHandler {
 }
 
 pub struct MacroHandler {
+    pub(crate) target_decl_extractor: Rc<dyn ITargetDeclExtractor>,
     pub(crate) fn_decl_extractor: Rc<dyn IFnDeclExtractor>,
+    pub(crate) fn_info_generator: Rc<dyn IFnInfoGenerator>,
+    pub(crate) mock_struct_generator: Rc<dyn IMockStructGenerator>,
+    pub(crate) mock_impl_generator: Rc<dyn IMockImplGenerator>,
+    pub(crate) internal_mock_impl_generator: Rc<dyn IInternalMockImplGenerator>,
 }
 
 impl IMacroHandler for MacroHandler {
@@ -37,7 +47,19 @@ impl MacroHandler {
     }
 
     fn handle_item_trait(&self, item_trait: ItemTrait) -> TokenStream {
+        let target_decl = self.target_decl_extractor.extract(&item_trait);
         let fn_decls = self.fn_decl_extractor.extract(item_trait.items);
+        let fn_infos: Vec<_> = fn_decls
+            .iter()
+            .map(|x| self.fn_info_generator.generate(x))
+            .collect();
+        let mock_struct_info = self.mock_struct_generator.generate(&target_decl, &fn_infos);
+        let mock_impl_info =
+            self.mock_impl_generator
+                .generate(&target_decl, &mock_struct_info, &fn_infos);
+        let internal_mock_impl_info = self
+            .internal_mock_impl_generator
+            .generate(&mock_struct_info, &fn_infos);
         todo!();
     }
 }

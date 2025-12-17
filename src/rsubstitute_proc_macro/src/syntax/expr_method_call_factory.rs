@@ -18,7 +18,6 @@ pub struct ExprMethodCallFactory {
 
 impl IExprMethodCallFactory for ExprMethodCallFactory {
     fn create(&self, members_idents: &[Ident], method: Ident, args: &[Ident]) -> ExprMethodCall {
-        let members_idents_len = members_idents.len();
         let base_expr = members_idents
             .first()
             .map(|first_ident| {
