@@ -8,9 +8,9 @@ use crate::macros::{
     FnDeclExtractor, IMacroHandler, MacroHandler, ModGenerator, TargetDeclExtractor,
 };
 use crate::syntax::{
-    ArgTypeFactory, AttributeFactory, ExprMethodCallFactory, FieldFactory, FieldValueFactory,
-    IAttributeFactory, IPathFactory, ITypeFactory, LocalFactory, PathFactory, StructFactory,
-    TypeFactory,
+    ArgTypeFactory, AttributeFactory, ExprMethodCallFactory, FieldAccessExprFactory, FieldFactory,
+    FieldValueFactory, IAttributeFactory, IPathFactory, ITypeFactory, LocalFactory, PathFactory,
+    StructFactory, TypeFactory,
 };
 use std::cell::LazyCell;
 use std::rc::Rc;
@@ -44,8 +44,12 @@ fn create_services() -> ServiceCollection {
     let type_factory = Rc::new(TypeFactory {
         path_factory: path_factory.clone(),
     });
+    let field_access_expr_factory = Rc::new(FieldAccessExprFactory {
+        path_factory: path_factory.clone(),
+    });
     let args_matcher_impl_generator = Rc::new(ArgsMatcherImplGenerator {
         type_factory: type_factory.clone(),
+        field_access_expr_factory: field_access_expr_factory.clone(),
     });
     let fn_info_generator = Rc::new(FnInfoGenerator {
         call_struct_generator: call_struct_generator.clone(),
@@ -61,6 +65,7 @@ fn create_services() -> ServiceCollection {
     });
     let expr_method_call_factory = Rc::new(ExprMethodCallFactory {
         path_factory: path_factory.clone(),
+        field_access_expr_factory: field_access_expr_factory.clone(),
     });
     let mock_impl_generator = Rc::new(MockImplGenerator {
         path_factory: path_factory.clone(),

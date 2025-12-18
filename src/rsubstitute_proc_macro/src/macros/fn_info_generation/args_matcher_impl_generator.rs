@@ -1,16 +1,14 @@
 use crate::macros::constants;
 use crate::macros::fn_info_generation::models::{ArgsMatcherImplInfo, ArgsMatcherInfo, CallInfo};
-use crate::syntax::ITypeFactory;
+use crate::syntax::{IFieldAccessExprFactory, ITypeFactory};
 use proc_macro2::{Ident, Span};
 use quote::format_ident;
 use std::cell::LazyCell;
 use std::rc::Rc;
-use syn::punctuated::Punctuated;
 use syn::{
-    BinOp, Block, Expr, ExprBinary, ExprField, ExprLit, ExprMethodCall, ExprPath, Field, FnArg,
-    GenericParam, Generics, ImplItem, ImplItemFn, ItemImpl, Lit, LitBool, Member, Pat, PatIdent,
-    PatType, Path, PathArguments, PathSegment, Receiver, ReturnType, Signature, Stmt, Type,
-    TypeParam, Visibility,
+    AngleBracketedGenericArguments, BinOp, Block, Expr, ExprBinary, ExprLit, ExprMethodCall, Field,
+    FnArg, GenericArgument, Generics, ImplItem, ImplItemFn, ItemImpl, Lit, LitBool, Pat, PatIdent,
+    PatType, Path, PathArguments, PathSegment, ReturnType, Signature, Stmt, Type, Visibility,
 };
 
 pub trait IArgsMatcherImplGenerator {
@@ -23,6 +21,7 @@ pub trait IArgsMatcherImplGenerator {
 
 pub struct ArgsMatcherImplGenerator {
     pub(crate) type_factory: Rc<dyn ITypeFactory>,
+    pub(crate) field_access_expr_factory: Rc<dyn IFieldAccessExprFactory>,
 }
 
 impl IArgsMatcherImplGenerator for ArgsMatcherImplGenerator {
@@ -31,45 +30,43 @@ impl IArgsMatcherImplGenerator for ArgsMatcherImplGenerator {
         call_info: &CallInfo,
         args_matcher_info: &ArgsMatcherInfo,
     ) -> ArgsMatcherImplInfo {
-        let call_info_ident = &call_info.item_struct.ident;
-        let generics = Generics {
-            lt_token: Default::default(),
-            params: [GenericParam::Type(TypeParam {
-                attrs: Vec::new(),
-                ident: call_info_ident.clone(),
-                colon_token: None,
-                bounds: Punctuated::new(),
-                eq_token: None,
-                default: None,
-            })]
-            .into_iter()
-            .collect(),
-            gt_token: None,
-            where_clause: None,
-        };
         let trait_ident = constants::I_ARGS_MATCHER_TRAIT_IDENT.clone();
         let trait_path = Path {
             leading_colon: None,
             segments: [PathSegment {
                 ident: trait_ident,
-                arguments: PathArguments::None,
+                arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
+                    colon2_token: None,
+                    lt_token: Default::default(),
+                    args: [GenericArgument::Type(
+                        self.type_factory
+                            .create(call_info.item_struct.ident.clone()),
+                    )]
+                    .into_iter()
+                    .collect(),
+                    gt_token: Default::default(),
+                }),
             }]
             .into_iter()
             .collect(),
         };
         let call_ty = Box::new(
             self.type_factory
+                .create(call_info.item_struct.ident.clone()),
+        );
+        let self_ty = Box::new(
+            self.type_factory
                 .create(args_matcher_info.item_struct.ident.clone()),
         );
-        let items = self.generate_matches_fn(call_info, call_ty.clone());
+        let items = self.generate_matches_fn(call_info, call_ty);
         let item_impl = ItemImpl {
             attrs: Vec::new(),
             defaultness: None,
             unsafety: None,
             impl_token: Default::default(),
-            generics,
+            generics: Default::default(),
             trait_: Some((None, trait_path, Default::default())),
-            self_ty: call_ty,
+            self_ty,
             brace_token: Default::default(),
             items: vec![items],
         };
@@ -80,7 +77,7 @@ impl IArgsMatcherImplGenerator for ArgsMatcherImplGenerator {
 
 impl ArgsMatcherImplGenerator {
     const MATCHES_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("matches"));
-    const CALL_ARG_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("matches"));
+    const CALL_ARG_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("call"));
 
     fn generate_matches_fn(&self, call_info: &CallInfo, call_type: Box<Type>) -> ImplItem {
         let matches_stmt = self.generate_matches_statement(call_info);
@@ -167,36 +164,24 @@ impl ArgsMatcherImplGenerator {
     }
 
     fn generate_matches_exprs(&self, field: &Field) -> Expr {
+        let field_ident = field
+            .ident
+            .clone()
+            .expect("Call struct fields should have ident.");
+        let receiver = self
+            .field_access_expr_factory
+            .create(&[constants::SELF_IDENT.clone(), field_ident.clone()]);
+        let arg = self
+            .field_access_expr_factory
+            .create(&[Self::CALL_ARG_IDENT.clone(), field_ident]);
         let expr = Expr::MethodCall(ExprMethodCall {
             attrs: Vec::new(),
-            receiver: Box::new(Expr::Field(ExprField {
-                attrs: Vec::new(),
-                base: Box::new(Expr::Path(ExprPath {
-                    attrs: Vec::new(),
-                    qself: None,
-                    path: Path {
-                        leading_colon: None,
-                        segments: [PathSegment {
-                            ident: constants::SELF_IDENT.clone(),
-                            arguments: PathArguments::None,
-                        }]
-                        .into_iter()
-                        .collect(),
-                    },
-                })),
-                dot_token: Default::default(),
-                member: Member::Named(
-                    field
-                        .ident
-                        .clone()
-                        .expect("Call struct fields should have ident."),
-                ),
-            })),
+            receiver: Box::new(receiver),
             dot_token: Default::default(),
             method: Self::MATCHES_FN_IDENT.clone(),
             turbofish: None,
             paren_token: Default::default(),
-            args: Punctuated::new(),
+            args: [arg].into_iter().collect(),
         });
         return expr;
     }

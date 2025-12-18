@@ -6,9 +6,11 @@ trait Foo {
 }
 
 mod tests {
-    use super::*;
+    use crate::Foo;
+    use super::__rsubstitute_generated::FooMock;
     
     fn a() {
-        
+        let foo_mock = FooMock::new();
+        // foo_mock.work(rsubstitute::prelude::Arg::Any);
     }
 }
