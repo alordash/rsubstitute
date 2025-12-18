@@ -77,6 +77,18 @@ impl IArgsMatcherImplGenerator for ArgsMatcherImplGenerator {
 
 impl ArgsMatcherImplGenerator {
     const MATCHES_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("matches"));
+
+    // TODO - test that equals to Arg::matches
+    const ARG_MATCHES_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("matches"));
+    // TODO - test that equals to Arg::matches_ref
+    const ARG_MATCHES_REF_FN_IDENT: LazyCell<Ident> =
+        LazyCell::new(|| format_ident!("matches_ref"));
+    // TODO - test that equals to Arg::matches_rc
+    const ARG_MATCHES_RC_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("matches_rc"));
+    // TODO - test that equals to Arg::matches_arc
+    const ARG_MATCHES_ARC_FN_IDENT: LazyCell<Ident> =
+        LazyCell::new(|| format_ident!("matches_arc"));
+
     const CALL_ARG_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("call"));
 
     fn generate_matches_fn(&self, call_info: &CallInfo, call_type: Box<Type>) -> ImplItem {
@@ -174,15 +186,34 @@ impl ArgsMatcherImplGenerator {
         let arg = self
             .field_access_expr_factory
             .create(&[Self::CALL_ARG_IDENT.clone(), field_ident]);
+        let method = self.get_matches_fn_ident(&field.ty);
         let expr = Expr::MethodCall(ExprMethodCall {
             attrs: Vec::new(),
             receiver: Box::new(receiver),
             dot_token: Default::default(),
-            method: Self::MATCHES_FN_IDENT.clone(),
+            method,
             turbofish: None,
             paren_token: Default::default(),
             args: [arg].into_iter().collect(),
         });
         return expr;
+    }
+
+    fn get_matches_fn_ident(&self, ty: &Type) -> Ident {
+        if let Type::Reference(_) = ty {
+            return Self::ARG_MATCHES_REF_FN_IDENT.clone();
+        }
+        if let Type::Path(type_path) = ty {
+            if let Some(ident) = type_path.path.segments.last().map(|x| &x.ident) {
+                println!("arg ident: {}", ident);
+                if ident == "Rc" {
+                    return Self::ARG_MATCHES_RC_FN_IDENT.clone();
+                }
+                if ident == "Arc" {
+                    return Self::ARG_MATCHES_ARC_FN_IDENT.clone();
+                }
+            }
+        }
+        return Self::ARG_MATCHES_FN_IDENT.clone();
     }
 }
