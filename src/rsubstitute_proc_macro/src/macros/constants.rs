@@ -170,5 +170,5 @@ pub const USE_CRATE_PRELUDE: LazyCell<ItemUse> = LazyCell::new(|| {
         }),
         semi_token: Default::default(),
     };
-    todo!();
+    return result;
 });
