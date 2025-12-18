@@ -49,8 +49,8 @@ mod generated {
     }
 
     impl IArgsMatcher<work_Call> for work_ArgsMatcher {
-        fn matches(&self, call: work_Call) -> bool {
-            self.value.matches(call.value)
+        fn matches(&self, call: work_Call) -> Vec<Option<String>> {
+            vec![self.value.matches("value", call.value)]
         }
     }
 
@@ -72,11 +72,13 @@ mod generated {
     }
 
     impl<'a> IArgsMatcher<another_work_Call<'a>> for another_work_ArgsMatcher<'a> {
-        fn matches(&self, call: another_work_Call<'a>) -> bool {
-            self.string.matches(call.string)
-                && self.something.matches(call.something)
-                && self.dyn_obj.matches_ref(call.dyn_obj)
-                && self.arc.matches_arc(call.arc)
+        fn matches(&self, call: another_work_Call<'a>) -> Vec<Option<String>> {
+            vec![
+                self.string.matches("string", call.string),
+                self.something.matches_ref("something", call.something),
+                self.dyn_obj.matches_ref("dyn_obj", call.dyn_obj),
+                self.arc.matches_arc("arc", call.arc),
+            ]
         }
     }
 
@@ -88,8 +90,8 @@ mod generated {
     pub struct get_ArgsMatcher;
 
     impl IArgsMatcher<get_Call> for get_ArgsMatcher {
-        fn matches(&self, _call: get_Call) -> bool {
-            true
+        fn matches(&self, _call: get_Call) -> Vec<Option<String>> {
+            Vec::new()
         }
     }
 
@@ -105,8 +107,8 @@ mod generated {
     }
 
     impl IArgsMatcher<standalone_Call> for standalone_ArgsMatcher {
-        fn matches(&self, call: standalone_Call) -> bool {
-            self.number.matches(call.number)
+        fn matches(&self, call: standalone_Call) -> Vec<Option<String>> {
+            vec![self.number.matches("number", call.number)]
         }
     }
 

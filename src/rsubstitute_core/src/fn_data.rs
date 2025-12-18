@@ -66,16 +66,27 @@ impl<TCall: Clone, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
 
     pub fn verify_received(&self, args_matcher: TArgsMatcher, times: Times) {
         let calls = self.calls.borrow();
-        let matching_calls_count = calls
+        let calls_matching_result: Vec<_> = calls
             .iter()
-            .filter(|call| args_matcher.matches((*call).clone()))
+            .map(|call| args_matcher.matches((*call).clone()))
+            .collect();
+        let matching_calls_count = calls_matching_result
+            .iter()
+            .filter(|x| x.iter().all(|y| y.is_none()))
             .count();
+        // let matching_calls_count = calls
+        //     .iter()
+        //     .filter(|call| args_matcher.matches((*call).clone()))
+        //     .count();
 
         let valid = times.matches(matching_calls_count);
         if !valid {
-            panic!(
-                "Expected 'work' to be called {times}, but it was called {matching_calls_count} times."
-            );
+            if matching_calls_count > 0 {
+                panic!(
+                    "Expected 'work' to be called {times}, but it was called {matching_calls_count} times."
+                );
+            }
+            panic!("Expected 'work' to be called {times}, but it was never called.");
         }
     }
 

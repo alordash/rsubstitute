@@ -9,7 +9,8 @@ pub enum Arg<T> {
 }
 
 impl<T: Debug + PartialOrd> Arg<T> {
-    pub fn matches(&self, actual_value: T) -> Option<String> {
+    pub fn matches(&self, argument_name: &'static str, actual_value: T) -> Option<String> {
+        let type_name = std::any::type_name::<T>();
         match self {
             Arg::Any => None,
             Arg::Eq(expected_value) => {
@@ -17,8 +18,7 @@ impl<T: Debug + PartialOrd> Arg<T> {
                     None
                 } else {
                     Some(format!(
-                        "Expected: {:?}\nActual: {:?}",
-                        expected_value, actual_value
+                        "{argument_name}: {type_name}\nExpected: {expected_value:?}\nActual: {actual_value:?}"
                     ))
                 }
             }
@@ -28,7 +28,7 @@ impl<T: Debug + PartialOrd> Arg<T> {
                     None
                 } else {
                     Some(format!(
-                        "Custom predicate didn't match passed value. Received value: {actual_value_fmt}"
+                        "{argument_name}: {type_name} | Custom predicate didn't match passed value. Received value: {actual_value_fmt}",
                     ))
                 }
             }
@@ -37,31 +37,88 @@ impl<T: Debug + PartialOrd> Arg<T> {
 }
 
 impl<'a, T: Debug + ?Sized> Arg<&'a T> {
-    pub fn matches_ref(&self, actual_value: &'a T) -> Option<String> {
+    pub fn matches_ref(&self, argument_name: &'static str, actual_value: &'a T) -> Option<String> {
+        let type_name = std::any::type_name::<T>();
+        let actual_ptr = std::ptr::from_ref(actual_value);
         match self {
             Arg::Any => None,
-            Arg::Eq(expected_value) => std::ptr::eq(*expected_value, actual_value),
-            Arg::Is(predicate) => predicate(actual_value),
+            Arg::Eq(expected_value) => {
+                if std::ptr::eq(*expected_value, actual_value) {
+                    None
+                } else {
+                    let expected_ptr = std::ptr::from_ref(expected_value);
+                    Some(format!(
+                        "{argument_name}: {type_name}\nExpected reference (ptr: {expected_ptr:?}): {expected_value:?}\nActual reference (ptr: {actual_ptr:?}): {actual_value:?}"
+                    ))
+                }
+            }
+            Arg::Is(predicate) => {
+                if predicate(actual_value) {
+                    None
+                } else {
+                    Some(format!(
+                        "{argument_name}: {type_name} | Custom predicate didn't match passed reference value. Received value (ptr: {actual_ptr:?}): {actual_value:?}"
+                    ))
+                }
+            }
         }
     }
 }
 
 impl<T: Debug + ?Sized> Arg<Rc<T>> {
-    pub fn matches_rc(&self, actual_value: Rc<T>) -> Option<String> {
+    pub fn matches_rc(&self, argument_name: &'static str, actual_value: Rc<T>) -> Option<String> {
+        let type_name = std::any::type_name::<T>();
+        let actual_ptr = Rc::as_ptr(&actual_value);
         match self {
             Arg::Any => None,
-            Arg::Eq(expected_value) => Rc::ptr_eq(expected_value, &actual_value),
-            Arg::Is(predicate) => predicate(actual_value),
+            Arg::Eq(expected_value) => {
+                if Rc::ptr_eq(expected_value, &actual_value) {
+                    None
+                } else {
+                    let expected_ptr = Rc::as_ptr(&expected_value);
+                    Some(format!(
+                        "{argument_name}: {type_name}\nExpected Rc (ptr: {expected_ptr:?}): {expected_value:?}\nActual reference (ptr: {actual_ptr:?}): {actual_value:?}"
+                    ))
+                }
+            }
+            Arg::Is(predicate) => {
+                if predicate(actual_value.clone()) {
+                    None
+                } else {
+                    Some(format!(
+                        "{argument_name}: {type_name} | Custom predicate didn't match passed Rc. Received value (ptr: {actual_ptr:?}): {actual_value:?}"
+                    ))
+                }
+            }
         }
     }
 }
 
 impl<T: Debug + ?Sized> Arg<Arc<T>> {
-    pub fn matches_arc(&self, actual_value: Arc<T>) -> Option<String> {
+    pub fn matches_arc(&self, argument_name: &'static str, actual_value: Arc<T>) -> Option<String> {
+        let type_name = std::any::type_name::<T>();
+        let actual_ptr = Arc::as_ptr(&actual_value);
         match self {
             Arg::Any => None,
-            Arg::Eq(expected_value) => Arc::ptr_eq(expected_value, &actual_value),
-            Arg::Is(predicate) => predicate(actual_value),
+            Arg::Eq(expected_value) => {
+                if Arc::ptr_eq(expected_value, &actual_value) {
+                    None
+                } else {
+                    let expected_ptr = Arc::as_ptr(&expected_value);
+                    Some(format!(
+                        "{argument_name}: {type_name}\nExpected Arc (ptr: {expected_ptr:?}): {expected_value:?}\nActual reference (ptr: {actual_ptr:?}): {actual_value:?}"
+                    ))
+                }
+            }
+            Arg::Is(predicate) => {
+                if predicate(actual_value.clone()) {
+                    None
+                } else {
+                    Some(format!(
+                        "{argument_name}: {type_name} | Custom predicate didn't match passed Rc. Received value (ptr: {actual_ptr:?}): {actual_value:?}"
+                    ))
+                }
+            }
         }
     }
 }

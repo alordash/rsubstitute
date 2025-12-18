@@ -31,7 +31,7 @@ impl<TCall, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
         self.calls.push(call);
     }
 
-    pub fn matches(&self, call: TCall) -> bool {
+    pub fn matches(&self, call: TCall) -> Vec<Option<String>> {
         self.args_matcher.matches(call)
     }
 
