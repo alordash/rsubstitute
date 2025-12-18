@@ -1,14 +1,12 @@
 use crate::di::SERVICES;
-use nameof::name_of_type;
 use proc_macro2::{Ident, TokenStream};
 use quote::format_ident;
-use rsubstitute_core::arguments_matching::Arg;
 use std::cell::LazyCell;
 use std::str::FromStr;
 use syn::punctuated::Punctuated;
 use syn::{
-    Attribute, Expr, ExprCall, ExprPath, ItemUse, Path, PathArguments, PathSegment, Type,
-    TypeTuple, UseGlob, UsePath, UseTree, Visibility,
+    Attribute, Expr, ExprCall, ExprPath, FnArg, ItemUse, Path, PathArguments, PathSegment,
+    Receiver, Type, TypePath, TypeReference, TypeTuple, UseGlob, UsePath, UseTree, Visibility,
 };
 
 pub const SELF_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("self"));
@@ -17,7 +15,6 @@ pub const SELF_IDENT_PATH: LazyCell<Path> = LazyCell::new(|| {
     let result = path_factory.create(SELF_IDENT.clone());
     return result;
 });
-
 
 pub const SUPER_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("super"));
 
@@ -84,10 +81,13 @@ pub const VOID_TYPE: LazyCell<Type> = LazyCell::new(|| {
     return result;
 });
 
-pub const SELF_TYPE_KEYWORD: &'static str = "Self";
+pub const SELF_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Self"));
 
-pub const SELF_TYPE_IDENT: LazyCell<Ident> =
-    LazyCell::new(|| format_ident!("{}", SELF_TYPE_KEYWORD));
+pub const SELF_TYPE_PATH: LazyCell<Path> = LazyCell::new(|| {
+    let path_factory = &SERVICES.path_factory;
+    let result = path_factory.create(SELF_TYPE_IDENT.clone());
+    return result;
+});
 
 pub const SELF_TYPE: LazyCell<Type> = LazyCell::new(|| {
     let type_factory = &SERVICES.type_factory;
@@ -95,9 +95,28 @@ pub const SELF_TYPE: LazyCell<Type> = LazyCell::new(|| {
     return result;
 });
 
-pub const SELF_TYPE_PATH: LazyCell<Path> = LazyCell::new(|| {
-    let path_factory = &SERVICES.path_factory;
-    let result = path_factory.create(SELF_TYPE_IDENT.clone());
+pub const REF_SELF_TYPE: LazyCell<Type> = LazyCell::new(|| {
+    let result = Type::Reference(TypeReference {
+        and_token: Default::default(),
+        lifetime: None,
+        mutability: None,
+        elem: Box::new(Type::Path(TypePath {
+            qself: None,
+            path: SELF_TYPE_PATH.clone(),
+        })),
+    });
+    return result;
+});
+
+pub const REF_SELF_ARG: LazyCell<FnArg> = LazyCell::new(|| {
+    let result = FnArg::Receiver(Receiver {
+        attrs: Vec::new(),
+        reference: Some((Default::default(), None)),
+        mutability: None,
+        self_token: Default::default(),
+        colon_token: None,
+        ty: Box::new(REF_SELF_TYPE.clone()),
+    });
     return result;
 });
 

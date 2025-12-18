@@ -9,8 +9,8 @@ use syn::punctuated::Punctuated;
 use syn::{
     BinOp, Block, Expr, ExprBinary, ExprField, ExprLit, ExprMethodCall, ExprPath, Field, FnArg,
     GenericParam, Generics, ImplItem, ImplItemFn, ItemImpl, Lit, LitBool, Member, Pat, PatIdent,
-    PatType, Path, PathArguments, PathSegment, ReturnType, Signature, Stmt, Type, TypeParam
-    , Visibility,
+    PatType, Path, PathArguments, PathSegment, Receiver, ReturnType, Signature, Stmt, Type,
+    TypeParam, Visibility,
 };
 
 pub trait IArgsMatcherImplGenerator {
@@ -73,9 +73,7 @@ impl IArgsMatcherImplGenerator for ArgsMatcherImplGenerator {
             brace_token: Default::default(),
             items: vec![items],
         };
-        let args_matcher_impl_info = ArgsMatcherImplInfo {
-            item_impl,
-        };
+        let args_matcher_impl_info = ArgsMatcherImplInfo { item_impl };
         return args_matcher_impl_info;
     }
 }
@@ -103,18 +101,21 @@ impl ArgsMatcherImplGenerator {
                 ident: Self::MATCHES_FN_IDENT.clone(),
                 generics: Generics::default(),
                 paren_token: Default::default(),
-                inputs: [FnArg::Typed(PatType {
-                    attrs: Vec::new(),
-                    pat: Box::new(Pat::Ident(PatIdent {
+                inputs: [
+                    constants::REF_SELF_ARG.clone(),
+                    FnArg::Typed(PatType {
                         attrs: Vec::new(),
-                        by_ref: None,
-                        mutability: None,
-                        ident: Self::CALL_ARG_IDENT.clone(),
-                        subpat: None,
-                    })),
-                    colon_token: Default::default(),
-                    ty: call_type.clone(),
-                })]
+                        pat: Box::new(Pat::Ident(PatIdent {
+                            attrs: Vec::new(),
+                            by_ref: None,
+                            mutability: None,
+                            ident: Self::CALL_ARG_IDENT.clone(),
+                            subpat: None,
+                        })),
+                        colon_token: Default::default(),
+                        ty: call_type.clone(),
+                    }),
+                ]
                 .into_iter()
                 .collect(),
                 variadic: None,

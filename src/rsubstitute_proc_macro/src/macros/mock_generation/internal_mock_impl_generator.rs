@@ -7,6 +7,7 @@ use crate::syntax::{
 use proc_macro2::{Ident, Span};
 use quote::format_ident;
 use std::cell::LazyCell;
+use std::iter;
 use std::rc::Rc;
 use syn::punctuated::Punctuated;
 use syn::*;
@@ -72,6 +73,7 @@ impl InternalMockImplGenerator {
         LazyCell::new(|| format_ident!("shared_fn_config"));
     const RECEIVED_FN_PREFIX: &'static str = "received";
     const TIMES_ARG_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("times"));
+    const TIMES_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Times"));
 
     fn generate_constructor(&self, mock_struct_info: &MockStructInfo) -> ImplItem {
         let block = self.generate_constructor_block(mock_struct_info);
@@ -147,7 +149,9 @@ impl InternalMockImplGenerator {
                 ident: fn_info.parent.ident.clone(),
                 generics: Generics::default(),
                 paren_token: Default::default(),
-                inputs: self.generate_input_args(fn_info).collect(),
+                inputs: iter::once(constants::REF_SELF_ARG.clone())
+                    .chain(self.generate_input_args(fn_info))
+                    .collect(),
                 variadic: None,
                 output: ReturnType::Type(
                     Default::default(),
@@ -293,6 +297,18 @@ impl InternalMockImplGenerator {
     }
 
     fn generate_fn_received(&self, fn_info: &FnInfo) -> ImplItemFn {
+        let times_arg = FnArg::Typed(PatType {
+            attrs: Vec::new(),
+            pat: Box::new(Pat::Ident(PatIdent {
+                attrs: Vec::new(),
+                by_ref: None,
+                mutability: None,
+                ident: Self::TIMES_ARG_IDENT.clone(),
+                subpat: None,
+            })),
+            colon_token: Default::default(),
+            ty: Box::new(self.type_factory.create(Self::TIMES_TYPE_IDENT.clone())),
+        });
         let sig = Signature {
             constness: None,
             asyncness: None,
@@ -302,7 +318,10 @@ impl InternalMockImplGenerator {
             ident: format_ident!("{}_{}", fn_info.parent.ident, Self::RECEIVED_FN_PREFIX),
             generics: Generics::default(),
             paren_token: Default::default(),
-            inputs: self.generate_input_args(fn_info).collect(),
+            inputs: iter::once(constants::REF_SELF_ARG.clone())
+                .chain(self.generate_input_args(fn_info))
+                .chain(iter::once(times_arg))
+                .collect(),
             variadic: None,
             output: ReturnType::Type(
                 Default::default(),
