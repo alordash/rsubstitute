@@ -1,5 +1,4 @@
 use crate::di::SERVICES;
-use crate::macros::constants;
 use nameof::name_of_type;
 use proc_macro2::{Ident, TokenStream};
 use quote::format_ident;
@@ -12,12 +11,6 @@ use syn::{
     TypeTuple, UseGlob, UsePath, UseTree, Visibility,
 };
 
-pub const ARG_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| {
-    let result = syn::parse_str(name_of_type!(Arg<()>))
-        .expect("Should be able to parse arg wrapper type name as ident.");
-    return result;
-});
-
 pub const SELF_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("self"));
 pub const SELF_IDENT_PATH: LazyCell<Path> = LazyCell::new(|| {
     let path_factory = &SERVICES.path_factory;
@@ -25,12 +18,16 @@ pub const SELF_IDENT_PATH: LazyCell<Path> = LazyCell::new(|| {
     return result;
 });
 
+
 pub const SUPER_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("super"));
 
 pub const PRELUDE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("prelude"));
 
 // TODO - add test that it's equal to crate's name
 pub const CRATE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("rsubstitute"));
+
+// TODO - add test that it's equal to rsubstitute_core::arguments_matching::Argh
+pub const ARG_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Arg"));
 
 // TODO - add test that it's equal to rsubstitute_core::arguments_matching::IArgsMatcher
 pub const I_ARGS_MATCHER_TRAIT_IDENT: LazyCell<Ident> =

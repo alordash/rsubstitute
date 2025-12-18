@@ -33,7 +33,7 @@ trait MyTrait {
 
 mod generated {
     use super::*;
-    use rsubstitute_core::prelude::*;
+    use rsubstitute::prelude::*;
     use std::cell::LazyCell;
 
     // start - Calls
@@ -153,7 +153,7 @@ mod generated {
             return Self::standalone_data.handle_returning(call);
         }
 
-        fn standalone_with_ref(number: &i32) -> f32 {
+        fn standalone_with_ref(_number: &i32) -> f32 {
             todo!()
         }
     }
@@ -239,7 +239,7 @@ mod generated {
             LazyCell::new(Default::default);
         pub fn standalone(number: Arg<i32>) -> f32 {
             let standalone_args_matcher = standalone_ArgsMatcher { number };
-            let fn_config = Self::standalone_data.add_config(standalone_args_matcher);
+            let _fn_config = Self::standalone_data.add_config(standalone_args_matcher);
             // let shared_fn_config = SharedFnConfig::new()
             todo!()
         }

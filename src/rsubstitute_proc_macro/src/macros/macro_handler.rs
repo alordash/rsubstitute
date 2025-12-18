@@ -5,7 +5,7 @@ use crate::macros::mock_generation::{
 };
 use crate::macros::{IModGenerator, ITargetDeclExtractor};
 use proc_macro::TokenStream;
-use quote::ToTokens;
+use quote::quote;
 use std::rc::Rc;
 use syn::{ItemImpl, ItemTrait};
 
@@ -44,13 +44,13 @@ impl IMacroHandler for MacroHandler {
 }
 
 impl MacroHandler {
-    fn handle_item_impl(&self, item_impl: ItemImpl) -> TokenStream {
+    fn handle_item_impl(&self, _item_impl: ItemImpl) -> TokenStream {
         todo!();
     }
 
     fn handle_item_trait(&self, item_trait: ItemTrait) -> TokenStream {
         let target_decl = self.target_decl_extractor.extract(&item_trait);
-        let fn_decls = self.fn_decl_extractor.extract(item_trait.items);
+        let fn_decls = self.fn_decl_extractor.extract(&item_trait.items);
         let fn_infos: Vec<_> = fn_decls
             .iter()
             .map(|x| self.fn_info_generator.generate(x))
@@ -68,6 +68,13 @@ impl MacroHandler {
             mock_impl_info,
             internal_mock_impl_info,
         );
-        return mod_info.item_mod.to_token_stream().into();
+        
+        let generated_mod = mod_info.item_mod;
+        let result = quote! {
+            #item_trait
+            
+            #generated_mod
+        };
+        return result.into();
     }
 }

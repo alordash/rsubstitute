@@ -27,6 +27,14 @@ dependencies = [
 ]
 
 [[package]]
+name = "rsubstitute"
+version = "0.1.0"
+dependencies = [
+ "rsubstitute_core",
+ "rsubstitute_proc_macro",
+]
+
+[[package]]
 name = "rsubstitute_core"
 version = "0.1.0"
 

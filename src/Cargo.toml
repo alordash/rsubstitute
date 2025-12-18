@@ -1,9 +1,10 @@
 [workspace]
 resolver = "3"
-members = ["rsubstitute_core", "rsubstitute_proc_macro"]
+members = ["rsubstitute", "rsubstitute_core", "rsubstitute_proc_macro"]
 
 [workspace.dependencies]
 rsubstitute_core = { path = "rsubstitute_core" }
+rsubstitute_proc_macro = { path = "rsubstitute_proc_macro" }
 
 proc-macro2 = "1.0.95"
 quote = "1.0.40"

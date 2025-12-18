@@ -5,7 +5,6 @@ use crate::macros::models::ModInfo;
 use proc_macro2::Ident;
 use quote::format_ident;
 use std::cell::LazyCell;
-use std::iter;
 use syn::{Item, ItemMod, Visibility};
 
 pub trait IModGenerator {

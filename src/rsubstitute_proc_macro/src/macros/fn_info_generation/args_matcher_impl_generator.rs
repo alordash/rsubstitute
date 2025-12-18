@@ -1,6 +1,5 @@
 use crate::macros::constants;
 use crate::macros::fn_info_generation::models::{ArgsMatcherImplInfo, ArgsMatcherInfo, CallInfo};
-use crate::macros::models::FnDecl;
 use crate::syntax::ITypeFactory;
 use proc_macro2::{Ident, Span};
 use quote::format_ident;
@@ -15,12 +14,11 @@ use syn::{
 };
 
 pub trait IArgsMatcherImplGenerator {
-    fn generate<'a>(
+    fn generate(
         &self,
-        fn_decl: &'a FnDecl,
         call_info: &CallInfo,
         args_matcher_info: &ArgsMatcherInfo,
-    ) -> ArgsMatcherImplInfo<'a>;
+    ) -> ArgsMatcherImplInfo;
 }
 
 pub struct ArgsMatcherImplGenerator {
@@ -28,12 +26,11 @@ pub struct ArgsMatcherImplGenerator {
 }
 
 impl IArgsMatcherImplGenerator for ArgsMatcherImplGenerator {
-    fn generate<'a>(
+    fn generate(
         &self,
-        fn_decl: &'a FnDecl,
         call_info: &CallInfo,
         args_matcher_info: &ArgsMatcherInfo,
-    ) -> ArgsMatcherImplInfo<'a> {
+    ) -> ArgsMatcherImplInfo {
         let call_info_ident = &call_info.item_struct.ident;
         let generics = Generics {
             lt_token: Default::default(),
@@ -77,7 +74,6 @@ impl IArgsMatcherImplGenerator for ArgsMatcherImplGenerator {
             items: vec![items],
         };
         let args_matcher_impl_info = ArgsMatcherImplInfo {
-            parent: fn_decl,
             item_impl,
         };
         return args_matcher_impl_info;

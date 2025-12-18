@@ -2,13 +2,13 @@ use crate::macros::models::FnDecl;
 use syn::{TraitItem, TraitItemFn};
 
 pub trait IFnDeclExtractor {
-    fn extract(&self, items: Vec<TraitItem>) -> Vec<FnDecl>;
+    fn extract(&self, items: &[TraitItem]) -> Vec<FnDecl>;
 }
 
 pub struct FnDeclExtractor;
 
 impl IFnDeclExtractor for FnDeclExtractor {
-    fn extract(&self, trait_items: Vec<TraitItem>) -> Vec<FnDecl> {
+    fn extract(&self, trait_items: &[TraitItem]) -> Vec<FnDecl> {
         let fn_decls = trait_items
             .into_iter()
             .flat_map(|x| self.try_map(x))
@@ -18,19 +18,19 @@ impl IFnDeclExtractor for FnDeclExtractor {
 }
 
 impl FnDeclExtractor {
-    fn try_map(&self, trait_item: TraitItem) -> Option<FnDecl> {
+    fn try_map(&self, trait_item: &TraitItem) -> Option<FnDecl> {
         match trait_item {
             TraitItem::Fn(trait_item_fn) => Some(self.map(trait_item_fn)),
             _ => None,
         }
     }
 
-    fn map(&self, trait_item_fn: TraitItemFn) -> FnDecl {
-        let sig = trait_item_fn.sig;
+    fn map(&self, trait_item_fn: &TraitItemFn) -> FnDecl {
+        let sig = &trait_item_fn.sig;
         let fn_decl = FnDecl {
-            ident: sig.ident,
-            arguments: sig.inputs.into_iter().collect(),
-            return_value: sig.output
+            ident: sig.ident.clone(),
+            arguments: sig.inputs.iter().cloned().collect(),
+            return_value: sig.output.clone()
         };
         return fn_decl;
     }

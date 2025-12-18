@@ -8,7 +8,7 @@ use std::rc::Rc;
 use syn::{Field, Fields, FieldsNamed, FnArg, PatType, Type};
 
 pub trait IArgsMatcherGenerator {
-    fn generate<'a>(&self, fn_decl: &'a FnDecl) -> ArgsMatcherInfo<'a>;
+    fn generate(&self, fn_decl: &FnDecl) -> ArgsMatcherInfo;
 }
 
 pub struct ArgsMatcherGenerator {
@@ -18,7 +18,7 @@ pub struct ArgsMatcherGenerator {
 }
 
 impl IArgsMatcherGenerator for ArgsMatcherGenerator {
-    fn generate<'a>(&self, fn_decl: &'a FnDecl) -> ArgsMatcherInfo<'a> {
+    fn generate(&self, fn_decl: &FnDecl) -> ArgsMatcherInfo {
         let attrs = vec![constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone()];
         let ident = format_ident!("{}_{}", fn_decl.ident, Self::ARGS_MATCHER_STRUCT_SUFFIX);
         let struct_fields: Vec<_> = fn_decl
@@ -34,7 +34,6 @@ impl IArgsMatcherGenerator for ArgsMatcherGenerator {
         let item_struct = self.struct_factory.create(attrs, ident, fields);
         let args_matcher_info = ArgsMatcherInfo {
             item_struct,
-            parent: fn_decl,
         };
 
         return args_matcher_info;

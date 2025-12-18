@@ -8,7 +8,7 @@ use std::rc::Rc;
 use syn::{Field, Fields, FieldsNamed, FnArg, PatType, Type};
 
 pub trait ICallStructGenerator {
-    fn generate<'a>(&self, fn_decl: &'a FnDecl) -> CallInfo<'a>;
+    fn generate(&self, fn_decl: &FnDecl) -> CallInfo;
 }
 
 pub struct CallStructGenerator {
@@ -17,7 +17,7 @@ pub struct CallStructGenerator {
 }
 
 impl ICallStructGenerator for CallStructGenerator {
-    fn generate<'a>(&self, fn_decl: &'a FnDecl) -> CallInfo<'a> {
+    fn generate(&self, fn_decl: &FnDecl) -> CallInfo {
         let attrs = vec![
             constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone(),
             constants::DERIVE_CLONE_ATTRIBUTE.clone(),
@@ -35,7 +35,6 @@ impl ICallStructGenerator for CallStructGenerator {
         let item_struct = self.struct_factory.create(attrs, ident, fields);
         let call_info = CallInfo {
             item_struct,
-            parent: fn_decl,
         };
 
         return call_info;

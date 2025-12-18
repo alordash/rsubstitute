@@ -1,0 +1,12 @@
+[package]
+name = "rsubstitute"
+version = "0.1.0"
+edition = "2024"
+
+[[bin]]
+name = "sandbox"
+path = "bin/main.rs"
+
+[dependencies]
+rsubstitute_core = { workspace = true }
+rsubstitute_proc_macro = { workspace = true }

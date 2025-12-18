@@ -7,10 +7,6 @@ edition = "2024"
 name = "rsubstitute_proc_macro"
 proc-macro = true
 
-[[bin]]
-name = "sandbox"
-path = "bin/main.rs"
-
 [dependencies]
 rsubstitute_core = { workspace = true }
 
