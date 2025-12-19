@@ -1,6 +1,6 @@
 use crate::generated::MyTraitMock;
 use rsubstitute_core::Times;
-use rsubstitute_core::arguments_matching::Arg;
+use rsubstitute_core::args_matching::Arg;
 use std::sync::Arc;
 
 trait IFoo {
@@ -44,6 +44,7 @@ mod generated {
     }
 
     #[allow(non_camel_case_types)]
+    #[derive(Debug)]
     pub struct work_ArgsMatcher {
         pub value: Arg<i32>,
     }

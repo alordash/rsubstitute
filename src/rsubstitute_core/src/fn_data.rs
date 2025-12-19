@@ -1,4 +1,4 @@
-use crate::arguments_matching::IArgsMatcher;
+use crate::args_matching::IArgsMatcher;
 use crate::{FnConfig, Times};
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -72,21 +72,38 @@ impl<TCall: Clone, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
             .collect();
         let matching_calls_count = calls_matching_result
             .iter()
-            .filter(|x| x.iter().all(|y| y.is_none()))
+            .filter(|args_matching_result| {
+                args_matching_result
+                    .iter()
+                    .all(|arg_error| arg_error.is_none())
+            })
             .count();
-        // let matching_calls_count = calls
-        //     .iter()
-        //     .filter(|call| args_matcher.matches((*call).clone()))
-        //     .count();
 
         let valid = times.matches(matching_calls_count);
         if !valid {
-            if matching_calls_count > 0 {
-                panic!(
-                    "Expected 'work' to be called {times}, but it was called {matching_calls_count} times."
-                );
-            }
-            panic!("Expected 'work' to be called {times}, but it was never called.");
+            let mut not_matching_calls_grouped_by_errors_count: Vec<_> = calls_matching_result
+                .iter()
+                .filter_map(|args_matching_result| {
+                    let errors_count = args_matching_result
+                        .iter()
+                        .filter(|arg_error| arg_error.is_some())
+                        .count();
+                    return if errors_count == 0 {
+                        None
+                    } else {
+                        Some((errors_count, args_matching_result))
+                    };
+                })
+                .collect();
+            not_matching_calls_grouped_by_errors_count.sort_by(|a, b| a.0.cmp(&b.0));
+            let not_matching_calls_ordered_by_errors_count: Vec<_> =
+                not_matching_calls_grouped_by_errors_count
+                    .into_iter()
+                    .map(|x| x.1)
+                    .collect();
+            panic!(
+                "Expected 'work' to be called {times}, but it was called {matching_calls_count} times.\nExpected arguments: {args_matcher:?}\n"
+            );
         }
     }
 

@@ -1,4 +1,4 @@
-use crate::arguments_matching::IArgsMatcher;
+use crate::args_matching::IArgsMatcher;
 
 pub struct FnConfig<TCall, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue> {
     args_matcher: TArgsMatcher,

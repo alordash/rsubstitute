@@ -1,4 +1,4 @@
-pub mod arguments_matching;
+pub mod args_matching;
 
 mod fn_config;
 mod fn_data;
@@ -11,6 +11,6 @@ pub use shared_fn_config::*;
 pub use times::*;
 
 pub mod prelude {
-    pub use crate::arguments_matching::*;
+    pub use crate::args_matching::*;
     pub use crate::*;
 }

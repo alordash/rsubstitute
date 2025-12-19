@@ -1,4 +1,4 @@
-use crate::arguments_matching::IArgsMatcher;
+use crate::args_matching::IArgsMatcher;
 use crate::FnConfig;
 use std::cell::RefCell;
 use std::rc::Rc;
