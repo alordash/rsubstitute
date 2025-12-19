@@ -1,11 +1,13 @@
+use std::fmt::Debug;
 use crate::generated::MyTraitMock;
 use rsubstitute_core::Times;
 use rsubstitute_core::args_matching::Arg;
 use std::sync::Arc;
 
-trait IFoo {
+trait IFoo: Debug {
     fn get_value(&self) -> i32;
 }
+#[derive(Debug)]
 struct Foo(i32);
 impl IFoo for Foo {
     fn get_value(&self) -> i32 {
@@ -35,6 +37,7 @@ mod generated {
     use super::*;
     use rsubstitute::prelude::*;
     use std::cell::LazyCell;
+    use std::fmt::Debug;
 
     // start - Calls
     #[allow(non_camel_case_types)]
@@ -50,7 +53,7 @@ mod generated {
     }
 
     impl IArgsMatcher<work_Call> for work_ArgsMatcher {
-        fn matches(&self, call: work_Call) -> Vec<Option<String>> {
+        fn matches(&self, call: work_Call) -> Vec<ArgMatchingResult> {
             vec![self.value.matches("value", call.value)]
         }
     }
@@ -65,6 +68,7 @@ mod generated {
     }
 
     #[allow(non_camel_case_types)]
+    #[derive(Debug)]
     pub struct another_work_ArgsMatcher<'a> {
         pub string: Arg<&'a str>,
         pub something: Arg<&'a &'a [u8]>,
@@ -73,7 +77,7 @@ mod generated {
     }
 
     impl<'a> IArgsMatcher<another_work_Call<'a>> for another_work_ArgsMatcher<'a> {
-        fn matches(&self, call: another_work_Call<'a>) -> Vec<Option<String>> {
+        fn matches(&self, call: another_work_Call<'a>) -> Vec<ArgMatchingResult> {
             vec![
                 self.string.matches("string", call.string),
                 self.something.matches_ref("something", call.something),
@@ -88,10 +92,11 @@ mod generated {
     pub struct get_Call;
 
     #[allow(non_camel_case_types)]
+    #[derive(Debug)]
     pub struct get_ArgsMatcher;
 
     impl IArgsMatcher<get_Call> for get_ArgsMatcher {
-        fn matches(&self, _call: get_Call) -> Vec<Option<String>> {
+        fn matches(&self, _call: get_Call) -> Vec<ArgMatchingResult> {
             Vec::new()
         }
     }
@@ -103,12 +108,13 @@ mod generated {
     }
 
     #[allow(non_camel_case_types)]
+    #[derive(Debug)]
     pub struct standalone_ArgsMatcher {
         number: Arg<i32>,
     }
 
     impl IArgsMatcher<standalone_Call> for standalone_ArgsMatcher {
-        fn matches(&self, call: standalone_Call) -> Vec<Option<String>> {
+        fn matches(&self, call: standalone_Call) -> Vec<ArgMatchingResult> {
             vec![self.number.matches("number", call.number)]
         }
     }
@@ -301,7 +307,7 @@ fn main() {
 
     my_trait_mock.received_work(Arg::Eq(11111), Times::Once);
     my_trait_mock.received_work(Arg::Any, Times::Exactly(2));
-    my_trait_mock.received_another_work(Arg::Any, Arg::Any, Arg::Any, Arg::Any, Times::Exactly(2));
+    my_trait_mock.received_another_work(Arg::Eq("asdas"), Arg::Any, Arg::Any, Arg::Any, Times::Exactly(22));
     my_trait_mock.received_get(Times::Exactly(2));
 
     println!("Done");

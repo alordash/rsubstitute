@@ -1,4 +1,4 @@
-use crate::args_matching::IArgsMatcher;
+use crate::args_matching::{ArgMatchingResult, IArgsMatcher};
 
 pub struct FnConfig<TCall, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue> {
     args_matcher: TArgsMatcher,
@@ -31,7 +31,7 @@ impl<TCall, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
         self.calls.push(call);
     }
 
-    pub fn matches(&self, call: TCall) -> Vec<Option<String>> {
+    pub fn matches(&self, call: TCall) -> Vec<ArgMatchingResult> {
         self.args_matcher.matches(call)
     }
 

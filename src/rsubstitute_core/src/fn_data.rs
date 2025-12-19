@@ -22,6 +22,9 @@ impl<TCall, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue> Default
 impl<TCall: Clone, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
     FnData<TCall, TArgsMatcher, TReturnValue>
 {
+    // TODO - should be configurable
+    const MAX_INVALID_CALLS_LISTED_COUNT: usize = 10;
+
     pub fn register_call(&self, call: TCall) -> &Self {
         self.calls.borrow_mut().push(call);
         self
@@ -66,27 +69,27 @@ impl<TCall: Clone, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
 
     pub fn verify_received(&self, args_matcher: TArgsMatcher, times: Times) {
         let calls = self.calls.borrow();
-        let calls_matching_result: Vec<_> = calls
+        let args_matching_results: Vec<_> = calls
             .iter()
             .map(|call| args_matcher.matches((*call).clone()))
             .collect();
-        let matching_calls_count = calls_matching_result
+        let matching_calls_count = args_matching_results
             .iter()
             .filter(|args_matching_result| {
                 args_matching_result
                     .iter()
-                    .all(|arg_error| arg_error.is_none())
+                    .all(|arg_matching_result| arg_matching_result.is_ok())
             })
             .count();
 
         let valid = times.matches(matching_calls_count);
         if !valid {
-            let mut not_matching_calls_grouped_by_errors_count: Vec<_> = calls_matching_result
-                .iter()
+            let mut not_matching_calls_grouped_by_errors_count: Vec<_> = args_matching_results
+                .into_iter()
                 .filter_map(|args_matching_result| {
                     let errors_count = args_matching_result
                         .iter()
-                        .filter(|arg_error| arg_error.is_some())
+                        .filter(|arg_matching_result| arg_matching_result.is_err())
                         .count();
                     return if errors_count == 0 {
                         None
@@ -96,13 +99,32 @@ impl<TCall: Clone, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
                 })
                 .collect();
             not_matching_calls_grouped_by_errors_count.sort_by(|a, b| a.0.cmp(&b.0));
+            let not_matching_calls_count = not_matching_calls_grouped_by_errors_count.len();
             let not_matching_calls_ordered_by_errors_count: Vec<_> =
                 not_matching_calls_grouped_by_errors_count
                     .into_iter()
                     .map(|x| x.1)
                     .collect();
+            let not_matching_calls_str = not_matching_calls_ordered_by_errors_count
+                .into_iter()
+                .take(Self::MAX_INVALID_CALLS_LISTED_COUNT)
+                .enumerate()
+                .map(|(i, x)| {
+                    let call_number = i + 1;
+                    let error_msgs = x
+                        .into_iter()
+                        .map(|y| format!("{y:?}"))
+                        .collect::<Vec<_>>()
+                        .join("\n");
+                    format!("Call #{call_number}\n{error_msgs}")
+                })
+                .collect::<Vec<_>>()
+                .join("\n");
             panic!(
-                "Expected 'work' to be called {times}, but it was called {matching_calls_count} times.\nExpected arguments: {args_matcher:?}\n"
+                r#"Expected 'work' to be called {times}, but it was called {matching_calls_count} times.
+Expected arguments: {args_matcher:?}
+Received {not_matching_calls_count} not matching calls:
+{not_matching_calls_str}"#
             );
         }
     }
@@ -114,7 +136,13 @@ impl<TCall: Clone, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
         let configs = self.configs.borrow();
         let maybe_fn_config = configs
             .iter()
-            .find(|config| config.borrow().matches(call.clone()))
+            .find(|config| {
+                config
+                    .borrow()
+                    .matches(call.clone())
+                    .into_iter()
+                    .all(|x| x.is_ok())
+            })
             .cloned();
         return maybe_fn_config;
     }
