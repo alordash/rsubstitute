@@ -4,15 +4,17 @@ use std::cell::RefCell;
 use std::rc::Rc;
 
 pub struct FnData<TCall, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue> {
+    fn_name: &'static str,
     calls: RefCell<Vec<TCall>>,
     configs: RefCell<Vec<Rc<RefCell<FnConfig<TCall, TArgsMatcher, TReturnValue>>>>>,
 }
 
-impl<TCall, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue> Default
-    for FnData<TCall, TArgsMatcher, TReturnValue>
+impl<TCall, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue>
+    FnData<TCall, TArgsMatcher, TReturnValue>
 {
-    fn default() -> Self {
+    pub fn new(fn_name: &'static str) -> Self {
         Self {
+            fn_name,
             calls: RefCell::new(Vec::new()),
             configs: RefCell::new(Vec::new()),
         }
@@ -68,12 +70,14 @@ impl<TCall: Clone, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
     }
 
     pub fn verify_received(&self, args_matcher: TArgsMatcher, times: Times) {
-        let calls = self.calls.borrow();
-        let args_matching_results: Vec<_> = calls
-            .iter()
-            .map(|call| args_matcher.matches((*call).clone()))
-            .collect();
-        let matching_calls_count = args_matching_results
+        let call_matching_results: Vec<_> = {
+            let calls = self.calls.borrow();
+            calls
+                .iter()
+                .map(|call| args_matcher.matches((*call).clone()))
+                .collect()
+        };
+        let matching_calls_count = call_matching_results
             .iter()
             .filter(|args_matching_result| {
                 args_matching_result
@@ -84,7 +88,11 @@ impl<TCall: Clone, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
 
         let valid = times.matches(matching_calls_count);
         if !valid {
-            let mut not_matching_calls_grouped_by_errors_count: Vec<_> = args_matching_results
+            let msg = format!(
+                r#"Expected to receive a call {times} matching:
+"#
+            );
+            let mut not_matching_calls_grouped_by_errors_count: Vec<_> = call_matching_results
                 .into_iter()
                 .filter_map(|args_matching_result| {
                     let errors_count = args_matching_result
@@ -98,8 +106,8 @@ impl<TCall: Clone, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
                     };
                 })
                 .collect();
-            not_matching_calls_grouped_by_errors_count.sort_by(|a, b| a.0.cmp(&b.0));
             let not_matching_calls_count = not_matching_calls_grouped_by_errors_count.len();
+            not_matching_calls_grouped_by_errors_count.sort_by(|a, b| a.0.cmp(&b.0));
             let not_matching_calls_ordered_by_errors_count: Vec<_> =
                 not_matching_calls_grouped_by_errors_count
                     .into_iter()

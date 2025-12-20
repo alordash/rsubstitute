@@ -1,7 +1,7 @@
-use std::fmt::Debug;
 use crate::generated::MyTraitMock;
 use rsubstitute_core::Times;
 use rsubstitute_core::args_matching::Arg;
+use std::fmt::Debug;
 use std::sync::Arc;
 
 trait IFoo: Debug {
@@ -77,7 +77,7 @@ mod generated {
     }
 
     impl<'a> IArgsMatcher<another_work_Call<'a>> for another_work_ArgsMatcher<'a> {
-        fn matches(&self, call: another_work_Call<'a>) -> Vec<ArgMatchingResult> {
+        fn matches(&self, call: another_work_Call<'a>) -> Vec<ArgMatchingResult<'a>> {
             vec![
                 self.string.matches("string", call.string),
                 self.something.matches_ref("something", call.something),
@@ -170,9 +170,9 @@ mod generated {
     impl<'a> MyTraitMock<'a> {
         pub fn new() -> Self {
             Self {
-                work_data: Default::default(),
-                another_work_data: Default::default(),
-                get_data: Default::default(),
+                work_data: FnData::new("work"),
+                another_work_data: FnData::new("another_work"),
+                get_data: FnData::new("get"),
             }
         }
 
@@ -245,7 +245,7 @@ mod generated {
 
         #[allow(non_upper_case_globals)]
         const standalone_data: LazyCell<FnData<standalone_Call, standalone_ArgsMatcher, f32>> =
-            LazyCell::new(Default::default);
+            LazyCell::new(|| FnData::new("standalone"));
         pub fn standalone(number: Arg<i32>) -> f32 {
             let standalone_args_matcher = standalone_ArgsMatcher { number };
             let _fn_config = Self::standalone_data.add_config(standalone_args_matcher);
@@ -307,7 +307,13 @@ fn main() {
 
     my_trait_mock.received_work(Arg::Eq(11111), Times::Once);
     my_trait_mock.received_work(Arg::Any, Times::Exactly(2));
-    my_trait_mock.received_another_work(Arg::Eq("asdas"), Arg::Any, Arg::Any, Arg::Any, Times::Exactly(22));
+    my_trait_mock.received_another_work(
+        Arg::Eq("asdas"),
+        Arg::Any,
+        Arg::Any,
+        Arg::Any,
+        Times::Exactly(22),
+    );
     my_trait_mock.received_get(Times::Exactly(2));
 
     println!("Done");

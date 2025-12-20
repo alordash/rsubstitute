@@ -22,9 +22,9 @@ impl<T: Debug> Debug for Arg<T> {
     }
 }
 
-impl<T: Debug + PartialOrd> Arg<T> {
-    pub fn matches(&self, arg_name: &'static str, actual_value: T) -> ArgMatchingResult {
-        let arg_info = ArgInfo::new::<T>(arg_name);
+impl<'a, T: Debug + PartialOrd + Clone + 'a> Arg<T> {
+    pub fn matches(&self, arg_name: &'static str, actual_value: T) -> ArgMatchingResult<'a> {
+        let arg_info = ArgInfo::new(arg_name, actual_value.clone());
         match self {
             Arg::Eq(expected_value) if !actual_value.eq(expected_value) => {
                 return ArgMatchingResult::Err {
@@ -50,8 +50,12 @@ impl<T: Debug + PartialOrd> Arg<T> {
 }
 
 impl<'a, T: Debug + ?Sized> Arg<&'a T> {
-    pub fn matches_ref(&self, arg_name: &'static str, actual_value: &'a T) -> ArgMatchingResult {
-        let arg_info = ArgInfo::new::<T>(arg_name);
+    pub fn matches_ref(
+        &self,
+        arg_name: &'static str,
+        actual_value: &'a T,
+    ) -> ArgMatchingResult<'a> {
+        let arg_info = ArgInfo::new(arg_name, actual_value);
         let actual_ptr = std::ptr::from_ref(actual_value);
         match self {
             Arg::Eq(expected_value) => {
@@ -79,9 +83,9 @@ impl<'a, T: Debug + ?Sized> Arg<&'a T> {
     }
 }
 
-impl<T: Debug + ?Sized> Arg<Rc<T>> {
-    pub fn matches_rc(&self, arg_name: &'static str, actual_value: Rc<T>) -> ArgMatchingResult {
-        let arg_info = ArgInfo::new::<T>(arg_name);
+impl<'a, T: Debug + ?Sized + 'a> Arg<Rc<T>> {
+    pub fn matches_rc(&self, arg_name: &'static str, actual_value: Rc<T>) -> ArgMatchingResult<'a> {
+        let arg_info = ArgInfo::new(arg_name, actual_value.clone());
         let actual_ptr = Rc::as_ptr(&actual_value);
         match self {
             Arg::Eq(expected_value) => {
@@ -112,9 +116,13 @@ impl<T: Debug + ?Sized> Arg<Rc<T>> {
     }
 }
 
-impl<T: Debug + ?Sized> Arg<Arc<T>> {
-    pub fn matches_arc(&self, arg_name: &'static str, actual_value: Arc<T>) -> ArgMatchingResult {
-        let arg_info = ArgInfo::new::<T>(arg_name);
+impl<'a, T: Debug + ?Sized + 'a> Arg<Arc<T>> {
+    pub fn matches_arc(
+        &self,
+        arg_name: &'static str,
+        actual_value: Arc<T>,
+    ) -> ArgMatchingResult<'a> {
+        let arg_info = ArgInfo::new(arg_name, actual_value.clone());
         let actual_ptr = Arc::as_ptr(&actual_value);
         match self {
             Arg::Eq(expected_value) => {

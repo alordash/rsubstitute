@@ -4,6 +4,7 @@ mod fn_config;
 mod fn_data;
 mod shared_fn_config;
 mod times;
+mod error_printer;
 
 pub use fn_config::*;
 pub use fn_data::*;

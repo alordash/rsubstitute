@@ -1,14 +1,19 @@
-pub struct ArgInfo {
+use std::fmt::Debug;
+
+pub struct ArgInfo<'a> {
     arg_name: &'static str,
     arg_type_name: &'static str,
+    arg_value: Box<dyn Debug + 'a>,
 }
 
-impl ArgInfo {
-    pub fn new<T: ?Sized>(arg_name: &'static str) -> Self {
+impl<'a> ArgInfo<'a> {
+    pub fn new<T: Debug + 'a>(arg_name: &'static str, arg_value: T) -> Self {
         let arg_type_name = std::any::type_name::<T>();
+        let arg_value: Box<dyn Debug> = Box::new(arg_value);
         return Self {
             arg_name,
             arg_type_name,
+            arg_value,
         };
     }
 
