@@ -24,4 +24,8 @@ impl<'a> ArgInfo<'a> {
     pub fn arg_type_name(&self) -> &'static str {
         self.arg_type_name
     }
+
+    pub fn arg_value(&self) -> &Box<dyn Debug + 'a> {
+        &self.arg_value
+    }
 }

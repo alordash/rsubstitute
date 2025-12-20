@@ -1,4 +1,4 @@
-use crate::args_matching::{ArgInfo, ArgMatchingResult};
+use crate::args_matching::{ArgInfo, ArgMatchingResult, ArgMatchingResultErr, ArgMatchingResultOk};
 use std::fmt::{Debug, Formatter};
 use std::rc::Rc;
 use std::sync::Arc;
@@ -27,25 +27,25 @@ impl<'a, T: Debug + PartialOrd + Clone + 'a> Arg<T> {
         let arg_info = ArgInfo::new(arg_name, actual_value.clone());
         match self {
             Arg::Eq(expected_value) if !actual_value.eq(expected_value) => {
-                return ArgMatchingResult::Err {
+                return ArgMatchingResult::Err(ArgMatchingResultErr {
                     arg_info,
-                    error_msg: format!("Expected: {expected_value:?}\nActual: {actual_value:?}"),
-                };
+                    error_msg: format!("\t\t\tExpected: {expected_value:?}\n\t\t\tActual:   {actual_value:?}"),
+                });
             }
             Arg::Is(predicate) => {
                 let actual_value_str = format!("{:?}", actual_value);
                 if !predicate(actual_value) {
-                    return ArgMatchingResult::Err {
+                    return ArgMatchingResult::Err(ArgMatchingResultErr {
                         arg_info,
                         error_msg: format!(
-                            "Custom predicate didn't match passed value. Received value: {actual_value_str}",
+                            "\t\t\tCustom predicate didn't match passed value. Received value: {actual_value_str}",
                         ),
-                    };
+                    });
                 }
             }
             _ => (),
         };
-        return ArgMatchingResult::Ok { arg_info };
+        return ArgMatchingResult::Ok(ArgMatchingResultOk { arg_info });
     }
 }
 
@@ -61,25 +61,25 @@ impl<'a, T: Debug + ?Sized> Arg<&'a T> {
             Arg::Eq(expected_value) => {
                 let expected_ptr = std::ptr::from_ref(*expected_value);
                 if !std::ptr::eq(actual_ptr, expected_ptr) {
-                    return ArgMatchingResult::Err {
+                    return ArgMatchingResult::Err(ArgMatchingResultErr {
                         arg_info,
                         error_msg: format!(
-                            "Expected reference (ptr: {expected_ptr:?}): {expected_value:?}\nActual reference (ptr: {actual_ptr:?}): {actual_value:?}"
+                            "\t\t\tExpected reference (ptr: {expected_ptr:?}): {expected_value:?}\n\t\t\tActual reference   (ptr: {actual_ptr:?}): {actual_value:?}"
                         ),
-                    };
+                    });
                 }
             }
             Arg::Is(predicate) if !predicate(actual_value) => {
-                return ArgMatchingResult::Err {
+                return ArgMatchingResult::Err(ArgMatchingResultErr {
                     arg_info,
                     error_msg: format!(
-                        "Custom predicate didn't match passed reference value. Received value (ptr: {actual_ptr:?}): {actual_value:?}"
+                        "\t\t\tCustom predicate didn't match passed reference value. Received value (ptr: {actual_ptr:?}): {actual_value:?}"
                     ),
-                };
+                });
             }
             _ => (),
         };
-        return ArgMatchingResult::Ok { arg_info };
+        return ArgMatchingResult::Ok(ArgMatchingResultOk { arg_info });
     }
 }
 
@@ -91,28 +91,28 @@ impl<'a, T: Debug + ?Sized + 'a> Arg<Rc<T>> {
             Arg::Eq(expected_value) => {
                 let expected_ptr = Rc::as_ptr(expected_value);
                 if !std::ptr::eq(actual_ptr, expected_ptr) {
-                    return ArgMatchingResult::Err {
+                    return ArgMatchingResult::Err(ArgMatchingResultErr {
                         arg_info,
                         error_msg: format!(
-                            "Expected Rc (ptr: {expected_ptr:?}): {expected_value:?}\nActual reference (ptr: {actual_ptr:?}): {actual_value:?}"
+                            "\t\t\tExpected Rc (ptr: {expected_ptr:?}): {expected_value:?}\n\t\t\tActual Rc   (ptr: {actual_ptr:?}): {actual_value:?}"
                         ),
-                    };
+                    });
                 }
             }
             Arg::Is(predicate) => {
                 let actual_value_str = format!("{:?}", actual_value);
                 if !predicate(actual_value) {
-                    return ArgMatchingResult::Err {
+                    return ArgMatchingResult::Err(ArgMatchingResultErr {
                         arg_info,
                         error_msg: format!(
-                            "Custom predicate didn't match passed Rc. Received value (ptr: {actual_ptr:?}): {actual_value_str}"
+                            "\t\t\tCustom predicate didn't match passed Rc. Received value (ptr: {actual_ptr:?}): {actual_value_str}"
                         ),
-                    };
+                    });
                 }
             }
             _ => (),
         };
-        return ArgMatchingResult::Ok { arg_info };
+        return ArgMatchingResult::Ok(ArgMatchingResultOk { arg_info });
     }
 }
 
@@ -128,27 +128,27 @@ impl<'a, T: Debug + ?Sized + 'a> Arg<Arc<T>> {
             Arg::Eq(expected_value) => {
                 let expected_ptr = Arc::as_ptr(expected_value);
                 if !std::ptr::eq(actual_ptr, expected_ptr) {
-                    return ArgMatchingResult::Err {
+                    return ArgMatchingResult::Err(ArgMatchingResultErr {
                         arg_info,
                         error_msg: format!(
-                            "Expected Arc (ptr: {expected_ptr:?}): {expected_value:?}\nActual reference (ptr: {actual_ptr:?}): {actual_value:?}"
+                            "\t\t\tExpected Arc (ptr: {expected_ptr:?}): {expected_value:?}\n\t\t\tActual Arc   (ptr: {actual_ptr:?}): {actual_value:?}"
                         ),
-                    };
+                    });
                 }
             }
             Arg::Is(predicate) => {
                 let actual_value_str = format!("{:?}", actual_value);
                 if !predicate(actual_value) {
-                    return ArgMatchingResult::Err {
+                    return ArgMatchingResult::Err(ArgMatchingResultErr {
                         arg_info,
                         error_msg: format!(
-                            "Custom predicate didn't match passed Rc. Received value (ptr: {actual_ptr:?}): {actual_value_str}"
+                            "\t\t\tCustom predicate didn't match passed Rc. Received value (ptr: {actual_ptr:?}): {actual_value_str}"
                         ),
-                    };
+                    });
                 }
             }
             _ => (),
         }
-        return ArgMatchingResult::Ok { arg_info };
+        return ArgMatchingResult::Ok(ArgMatchingResultOk { arg_info });
     }
 }

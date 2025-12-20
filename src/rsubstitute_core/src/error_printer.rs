@@ -5,9 +5,9 @@ pub trait IErrorPrinter {
     fn print_received_verification_error<TCall, TArgsMatcher: IArgsMatcher<TCall>>(
         &self,
         fn_name: &'static str,
-        args_matcher: TArgsMatcher,
+        args_matcher: &TArgsMatcher,
         matching_calls: Vec<Vec<ArgMatchingResult>>,
-        not_matching_calls: Vec<Vec<ArgMatchingResult>>,
+        non_matching_calls: Vec<Vec<ArgMatchingResult>>,
         times: Times,
     ) -> !;
 }
@@ -18,36 +18,99 @@ impl IErrorPrinter for ErrorPrinter {
     fn print_received_verification_error<TCall, TArgsMatcher: IArgsMatcher<TCall>>(
         &self,
         fn_name: &'static str,
-        args_matcher: TArgsMatcher,
+        args_matcher: &TArgsMatcher,
         matching_calls: Vec<Vec<ArgMatchingResult>>,
-        not_matching_calls: Vec<Vec<ArgMatchingResult>>,
+        non_matching_calls: Vec<Vec<ArgMatchingResult>>,
         times: Times,
     ) -> ! {
         let matching_calls_count = matching_calls.len();
-        debug_assert!(matching_calls_count != 0);
 
-        let expected_call_str = format!("\t{fn_name}({args_matcher:?})");
-        let matching_calls_str = if matching_calls_count == 0 {
+        let expected_call_msg = format!("\t{fn_name}({})", args_matcher.fmt_args());
+        let matching_calls_report = if matching_calls_count == 0 {
             "Actually received no matching calls".to_string()
         } else {
+            let matching_calls_args_msgs: Vec<_> = matching_calls
+                .into_iter()
+                .map(|x| self.fmt_call(fn_name, x))
+                .collect();
+            let matching_calls_args_msg = matching_calls_args_msgs.join("\n\t");
+            let call_fmt = self.fmt_calls(matching_calls_count);
             format!(
-                r#"Actually received {matching_calls_count} matching calls:
-\t"#
+                "Actually received {matching_calls_count} matching {call_fmt}:
+\t{matching_calls_args_msg}"
+            )
+        };
+        let non_matching_calls_count = non_matching_calls.len();
+        let non_matching_calls_report = if non_matching_calls_count == 0 {
+            "Received no non-matching calls".to_string()
+        } else {
+            let call_fmt = self.fmt_calls(non_matching_calls_count);
+            let non_matching_calls_args_msgs: Vec<_> = non_matching_calls
+                .into_iter()
+                .map(|x| self.fmt_call(fn_name, x))
+                .collect();
+            let non_matching_calls_args_msg = non_matching_calls_args_msgs.join("\n—>\t");
+            format!(
+                "Received {non_matching_calls_count} non-matching {call_fmt} (non-matching arguments indicated with '*' characters):
+—>\t{non_matching_calls_args_msg}"
             )
         };
         let msg = format!(
             r#"Expected to receive a call {times} matching:
-{expected_call_str}
-Actually received {matching_calls_count} matching calls.
-Received "#
+{expected_call_msg}
+{matching_calls_report}
+{non_matching_calls_report}"#
         );
-        todo!()
+        panic!("{msg}");
     }
 }
 
 impl ErrorPrinter {
-    fn fmt_call(&self, call: Vec<ArgMatchingResult>) -> String {
-        todo!()
-        // format!()
+    fn fmt_call(&self, fn_name: &'static str, call: Vec<ArgMatchingResult>) -> String {
+        let error_msgs: Vec<_> = call
+            .iter()
+            .filter_map(ArgMatchingResult::as_err)
+            .enumerate()
+            .map(|(i, x)| {
+                let error_number = i + 1;
+                format!(
+                    "{}.\t{} ({}):
+{}",
+                    error_number,
+                    x.arg_info.arg_name(),
+                    x.arg_info.arg_type_name(),
+                    x.error_msg
+                )
+            })
+            .collect();
+        let errors_count = error_msgs.len();
+        let errors_report = if errors_count == 0 {
+            String::new()
+        } else {
+            let error_msgs_joined = error_msgs.join("\n\t");
+            format!(
+                "
+\tErrors ({errors_count}):
+\t{error_msgs_joined}"
+            )
+        };
+        let args_msgs: Vec<_> = call
+            .into_iter()
+            .map(|x| match x {
+                ArgMatchingResult::Ok(x) => {
+                    format!("{:?}", x.arg_info.arg_value())
+                }
+                ArgMatchingResult::Err(x) => {
+                    format!("*{:?}*", x.arg_info.arg_value())
+                }
+            })
+            .collect();
+        let args_msgs_joined = args_msgs.join(", ");
+        format!("{fn_name}({args_msgs_joined}){errors_report}")
+    }
+
+    fn fmt_calls(&self, calls_count: usize) -> &'static str {
+        assert_ne!(calls_count, 0);
+        return if calls_count == 1 { "call" } else { "calls" };
     }
 }

@@ -1,4 +1,5 @@
-use crate::args_matching::IArgsMatcher;
+use crate::args_matching::{ArgMatchingResult, IArgsMatcher};
+use crate::error_printer::{ErrorPrinter, IErrorPrinter};
 use crate::{FnConfig, Times};
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -70,69 +71,17 @@ impl<TCall: Clone, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
     }
 
     pub fn verify_received(&self, args_matcher: TArgsMatcher, times: Times) {
-        let call_matching_results: Vec<_> = {
-            let calls = self.calls.borrow();
-            calls
-                .iter()
-                .map(|call| args_matcher.matches((*call).clone()))
-                .collect()
-        };
-        let matching_calls_count = call_matching_results
-            .iter()
-            .filter(|args_matching_result| {
-                args_matching_result
-                    .iter()
-                    .all(|arg_matching_result| arg_matching_result.is_ok())
-            })
-            .count();
-
+        let (matching_calls, non_matching_calls) =
+            self.get_matching_and_non_matching_calls(&args_matcher);
+        let matching_calls_count = matching_calls.len();
         let valid = times.matches(matching_calls_count);
         if !valid {
-            let msg = format!(
-                r#"Expected to receive a call {times} matching:
-"#
-            );
-            let mut not_matching_calls_grouped_by_errors_count: Vec<_> = call_matching_results
-                .into_iter()
-                .filter_map(|args_matching_result| {
-                    let errors_count = args_matching_result
-                        .iter()
-                        .filter(|arg_matching_result| arg_matching_result.is_err())
-                        .count();
-                    return if errors_count == 0 {
-                        None
-                    } else {
-                        Some((errors_count, args_matching_result))
-                    };
-                })
-                .collect();
-            let not_matching_calls_count = not_matching_calls_grouped_by_errors_count.len();
-            not_matching_calls_grouped_by_errors_count.sort_by(|a, b| a.0.cmp(&b.0));
-            let not_matching_calls_ordered_by_errors_count: Vec<_> =
-                not_matching_calls_grouped_by_errors_count
-                    .into_iter()
-                    .map(|x| x.1)
-                    .collect();
-            let not_matching_calls_str = not_matching_calls_ordered_by_errors_count
-                .into_iter()
-                .take(Self::MAX_INVALID_CALLS_LISTED_COUNT)
-                .enumerate()
-                .map(|(i, x)| {
-                    let call_number = i + 1;
-                    let error_msgs = x
-                        .into_iter()
-                        .map(|y| format!("{y:?}"))
-                        .collect::<Vec<_>>()
-                        .join("\n");
-                    format!("Call #{call_number}\n{error_msgs}")
-                })
-                .collect::<Vec<_>>()
-                .join("\n");
-            panic!(
-                r#"Expected 'work' to be called {times}, but it was called {matching_calls_count} times.
-Expected arguments: {args_matcher:?}
-Received {not_matching_calls_count} not matching calls:
-{not_matching_calls_str}"#
+            ErrorPrinter.print_received_verification_error(
+                self.fn_name,
+                &args_matcher,
+                matching_calls,
+                non_matching_calls,
+                times,
             );
         }
     }
@@ -153,5 +102,27 @@ Received {not_matching_calls_count} not matching calls:
             })
             .cloned();
         return maybe_fn_config;
+    }
+
+    fn get_matching_and_non_matching_calls<'a>(
+        &'a self,
+        args_matcher: &'a TArgsMatcher,
+    ) -> (
+        Vec<Vec<ArgMatchingResult<'a>>>,
+        Vec<Vec<ArgMatchingResult<'a>>>,
+    ) {
+        let mut matching_calls = Vec::new();
+        let mut non_matching_calls = Vec::new();
+        let calls = self.calls.borrow();
+        for call in calls.iter() {
+            let call_matching_result = args_matcher.matches((*call).clone());
+            let is_matching = call_matching_result.iter().all(ArgMatchingResult::is_ok);
+            if is_matching {
+                matching_calls.push(call_matching_result);
+            } else {
+                non_matching_calls.push(call_matching_result);
+            }
+        }
+        return (matching_calls, non_matching_calls);
     }
 }

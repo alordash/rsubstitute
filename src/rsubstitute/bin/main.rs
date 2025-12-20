@@ -56,6 +56,10 @@ mod generated {
         fn matches(&self, call: work_Call) -> Vec<ArgMatchingResult> {
             vec![self.value.matches("value", call.value)]
         }
+
+        fn fmt_args(&self) -> String {
+            format!("value {:?}", self.value)
+        }
     }
 
     #[allow(non_camel_case_types)]
@@ -85,6 +89,13 @@ mod generated {
                 self.arc.matches_arc("arc", call.arc),
             ]
         }
+
+        fn fmt_args(&self) -> String {
+            format!(
+                "string {:?}, something {:?}, dyn_obj {:?}, arc {:?}",
+                self.string, self.something, self.dyn_obj, self.arc
+            )
+        }
     }
 
     #[allow(non_camel_case_types)]
@@ -98,6 +109,10 @@ mod generated {
     impl IArgsMatcher<get_Call> for get_ArgsMatcher {
         fn matches(&self, _call: get_Call) -> Vec<ArgMatchingResult> {
             Vec::new()
+        }
+
+        fn fmt_args(&self) -> String {
+            String::new()
         }
     }
 
@@ -116,6 +131,10 @@ mod generated {
     impl IArgsMatcher<standalone_Call> for standalone_ArgsMatcher {
         fn matches(&self, call: standalone_Call) -> Vec<ArgMatchingResult> {
             vec![self.number.matches("number", call.number)]
+        }
+
+        fn fmt_args(&self) -> String {
+            format!("number {:?}", self.number)
         }
     }
 
@@ -310,8 +329,8 @@ fn main() {
     my_trait_mock.received_another_work(
         Arg::Eq("asdas"),
         Arg::Any,
-        Arg::Any,
-        Arg::Any,
+        Arg::Is(|_| false),
+        Arg::Eq(Arc::new(Foo(44))),
         Times::Exactly(22),
     );
     my_trait_mock.received_get(Times::Exactly(2));
