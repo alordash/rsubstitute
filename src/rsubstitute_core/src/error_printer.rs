@@ -49,10 +49,10 @@ impl IErrorPrinter for ErrorPrinter {
                 .into_iter()
                 .map(|x| self.fmt_call(fn_name, x))
                 .collect();
-            let non_matching_calls_args_msg = non_matching_calls_args_msgs.join("\n—>\t");
+            let non_matching_calls_args_msg = non_matching_calls_args_msgs.join("\n");
             format!(
                 "Received {non_matching_calls_count} non-matching {call_fmt} (non-matching arguments indicated with '*' characters):
-—>\t{non_matching_calls_args_msg}"
+{non_matching_calls_args_msg}"
             )
         };
         let msg = format!(
@@ -74,7 +74,7 @@ impl ErrorPrinter {
             .map(|(i, x)| {
                 let error_number = i + 1;
                 format!(
-                    "{}.\t{} ({}):
+                    "{}. {} ({}):
 {}",
                     error_number,
                     x.arg_info.arg_name(),
@@ -90,7 +90,6 @@ impl ErrorPrinter {
             let error_msgs_joined = error_msgs.join("\n\t");
             format!(
                 "
-\tErrors ({errors_count}):
 \t{error_msgs_joined}"
             )
         };

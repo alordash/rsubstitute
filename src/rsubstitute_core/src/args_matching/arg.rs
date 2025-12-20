@@ -29,7 +29,7 @@ impl<'a, T: Debug + PartialOrd + Clone + 'a> Arg<T> {
             Arg::Eq(expected_value) if !actual_value.eq(expected_value) => {
                 return ArgMatchingResult::Err(ArgMatchingResultErr {
                     arg_info,
-                    error_msg: format!("\t\t\tExpected: {expected_value:?}\n\t\t\tActual:   {actual_value:?}"),
+                    error_msg: format!("\t\tExpected: {expected_value:?}\n\t\tActual:   {actual_value:?}"),
                 });
             }
             Arg::Is(predicate) => {
@@ -38,7 +38,7 @@ impl<'a, T: Debug + PartialOrd + Clone + 'a> Arg<T> {
                     return ArgMatchingResult::Err(ArgMatchingResultErr {
                         arg_info,
                         error_msg: format!(
-                            "\t\t\tCustom predicate didn't match passed value. Received value: {actual_value_str}",
+                            "\t\tCustom predicate didn't match passed value. Received value: {actual_value_str}",
                         ),
                     });
                 }
@@ -64,7 +64,7 @@ impl<'a, T: Debug + ?Sized> Arg<&'a T> {
                     return ArgMatchingResult::Err(ArgMatchingResultErr {
                         arg_info,
                         error_msg: format!(
-                            "\t\t\tExpected reference (ptr: {expected_ptr:?}): {expected_value:?}\n\t\t\tActual reference   (ptr: {actual_ptr:?}): {actual_value:?}"
+                            "\t\tExpected reference (ptr: {expected_ptr:?}): {expected_value:?}\n\t\tActual reference   (ptr: {actual_ptr:?}): {actual_value:?}"
                         ),
                     });
                 }
@@ -73,7 +73,7 @@ impl<'a, T: Debug + ?Sized> Arg<&'a T> {
                 return ArgMatchingResult::Err(ArgMatchingResultErr {
                     arg_info,
                     error_msg: format!(
-                        "\t\t\tCustom predicate didn't match passed reference value. Received value (ptr: {actual_ptr:?}): {actual_value:?}"
+                        "\t\tCustom predicate didn't match passed reference value. Received value (ptr: {actual_ptr:?}): {actual_value:?}"
                     ),
                 });
             }
@@ -94,7 +94,7 @@ impl<'a, T: Debug + ?Sized + 'a> Arg<Rc<T>> {
                     return ArgMatchingResult::Err(ArgMatchingResultErr {
                         arg_info,
                         error_msg: format!(
-                            "\t\t\tExpected Rc (ptr: {expected_ptr:?}): {expected_value:?}\n\t\t\tActual Rc   (ptr: {actual_ptr:?}): {actual_value:?}"
+                            "\t\tExpected Rc (ptr: {expected_ptr:?}): {expected_value:?}\n\t\tActual Rc   (ptr: {actual_ptr:?}): {actual_value:?}"
                         ),
                     });
                 }
@@ -105,7 +105,7 @@ impl<'a, T: Debug + ?Sized + 'a> Arg<Rc<T>> {
                     return ArgMatchingResult::Err(ArgMatchingResultErr {
                         arg_info,
                         error_msg: format!(
-                            "\t\t\tCustom predicate didn't match passed Rc. Received value (ptr: {actual_ptr:?}): {actual_value_str}"
+                            "\t\tCustom predicate didn't match passed Rc. Received value (ptr: {actual_ptr:?}): {actual_value_str}"
                         ),
                     });
                 }
@@ -131,7 +131,7 @@ impl<'a, T: Debug + ?Sized + 'a> Arg<Arc<T>> {
                     return ArgMatchingResult::Err(ArgMatchingResultErr {
                         arg_info,
                         error_msg: format!(
-                            "\t\t\tExpected Arc (ptr: {expected_ptr:?}): {expected_value:?}\n\t\t\tActual Arc   (ptr: {actual_ptr:?}): {actual_value:?}"
+                            "\t\tExpected Arc (ptr: {expected_ptr:?}): {expected_value:?}\n\t\tActual Arc   (ptr: {actual_ptr:?}): {actual_value:?}"
                         ),
                     });
                 }
@@ -142,7 +142,7 @@ impl<'a, T: Debug + ?Sized + 'a> Arg<Arc<T>> {
                     return ArgMatchingResult::Err(ArgMatchingResultErr {
                         arg_info,
                         error_msg: format!(
-                            "\t\t\tCustom predicate didn't match passed Rc. Received value (ptr: {actual_ptr:?}): {actual_value_str}"
+                            "\t\tCustom predicate didn't match passed Rc. Received value (ptr: {actual_ptr:?}): {actual_value_str}"
                         ),
                     });
                 }

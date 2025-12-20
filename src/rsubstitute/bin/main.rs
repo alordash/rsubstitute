@@ -327,7 +327,7 @@ fn main() {
     my_trait_mock.received_work(Arg::Eq(11111), Times::Once);
     my_trait_mock.received_work(Arg::Any, Times::Exactly(2));
     my_trait_mock.received_another_work(
-        Arg::Eq("asdas"),
+        Arg::Eq("que"),
         Arg::Any,
         Arg::Is(|_| false),
         Arg::Eq(Arc::new(Foo(44))),
