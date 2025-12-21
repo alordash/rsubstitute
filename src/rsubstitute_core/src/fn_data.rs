@@ -8,16 +8,18 @@ pub struct FnData<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue> {
     fn_name: &'static str,
     calls: RefCell<Vec<TCall>>,
     configs: RefCell<Vec<Rc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue>>>>>,
+    error_printer: Rc<dyn IErrorPrinter>,
 }
 
 impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue>
     FnData<TCall, TArgsChecker, TReturnValue>
 {
-    pub fn new(fn_name: &'static str) -> Self {
+    pub fn new(fn_name: &'static str, error_printer: Rc<dyn IErrorPrinter>) -> Self {
         Self {
             fn_name,
             calls: RefCell::new(Vec::new()),
             configs: RefCell::new(Vec::new()),
+            error_printer,
         }
     }
 }
@@ -73,8 +75,7 @@ impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
         let matching_calls_count = matching_calls.len();
         let valid = times.matches(matching_calls_count);
         if !valid {
-            // TODO - pass via DI
-            ErrorPrinter.print_received_verification_error(
+            self.error_printer.print_received_verification_error(
                 self.fn_name,
                 &args_checker,
                 matching_calls,

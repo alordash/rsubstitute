@@ -35,7 +35,7 @@ trait MyTrait {
 
 mod generated {
     use super::*;
-    use rsubstitute::prelude::*;
+    use rsubstitute::*;
     use std::cell::LazyCell;
     use std::fmt::Debug;
 
@@ -197,9 +197,9 @@ mod generated {
     impl<'a> MyTraitMock<'a> {
         pub fn new() -> Self {
             Self {
-                work_data: FnData::new("work"),
-                another_work_data: FnData::new("another_work"),
-                get_data: FnData::new("get"),
+                work_data: FnData::new("work", SERVICES.error_printer.clone()),
+                another_work_data: FnData::new("another_work", SERVICES.error_printer.clone()),
+                get_data: FnData::new("get", SERVICES.error_printer.clone()),
             }
         }
 
@@ -272,7 +272,7 @@ mod generated {
 
         #[allow(non_upper_case_globals)]
         const standalone_data: LazyCell<FnData<standalone_Call, standalone_ArgsChecker, f32>> =
-            LazyCell::new(|| FnData::new("standalone"));
+            LazyCell::new(|| FnData::new("standalone", SERVICES.error_printer.clone()));
         pub fn standalone(number: Arg<i32>) -> f32 {
             let standalone_args_checker = standalone_ArgsChecker { number };
             let _fn_config = Self::standalone_data.add_config(standalone_args_checker);

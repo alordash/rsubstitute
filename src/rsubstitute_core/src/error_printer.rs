@@ -12,7 +12,7 @@ pub trait IErrorPrinter {
     ) -> !;
 }
 
-pub struct ErrorPrinter;
+pub(crate) struct ErrorPrinter;
 
 impl IErrorPrinter for ErrorPrinter {
     fn print_received_verification_error(

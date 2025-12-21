@@ -1,2 +1,6 @@
+pub use rsubstitute_core::args_matching::*;
 pub use rsubstitute_core::*;
-pub use rsubstitute_proc_macro::*;
+
+pub mod macros {
+    pub use rsubstitute_proc_macro::*;
+}
