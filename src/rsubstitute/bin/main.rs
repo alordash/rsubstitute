@@ -54,7 +54,7 @@ mod generated {
 
     impl IArgsFormatter for work_ArgsMatcher {
         fn fmt_args(&self) -> String {
-            format!("value {:?}", self.value)
+            format!("{:?}", self.value)
         }
     }
 

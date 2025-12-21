@@ -9,7 +9,7 @@ use quote::quote;
 use std::rc::Rc;
 use syn::{ItemImpl, ItemTrait};
 
-pub trait IMacroHandler {
+pub trait IMockMacroHandler {
     fn handle(
         &self,
         proc_macro_attribute: proc_macro::TokenStream,
@@ -17,7 +17,7 @@ pub trait IMacroHandler {
     ) -> proc_macro::TokenStream;
 }
 
-pub struct MacroHandler {
+pub struct MockMacroHandler {
     pub(crate) target_decl_extractor: Rc<dyn ITargetDeclExtractor>,
     pub(crate) fn_decl_extractor: Rc<dyn IFnDeclExtractor>,
     pub(crate) fn_info_generator: Rc<dyn IFnInfoGenerator>,
@@ -27,7 +27,7 @@ pub struct MacroHandler {
     pub(crate) mod_generator: Rc<dyn IModGenerator>,
 }
 
-impl IMacroHandler for MacroHandler {
+impl IMockMacroHandler for MockMacroHandler {
     fn handle(
         &self,
         _proc_macro_attribute: TokenStream,
@@ -43,7 +43,7 @@ impl IMacroHandler for MacroHandler {
     }
 }
 
-impl MacroHandler {
+impl MockMacroHandler {
     fn handle_item_impl(&self, _item_impl: ItemImpl) -> TokenStream {
         todo!();
     }

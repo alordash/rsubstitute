@@ -11,7 +11,7 @@ pub(crate) struct ServiceCollection {
     pub(crate) attribute_factory: Rc<dyn IAttributeFactory>,
     pub(crate) path_factory: Rc<dyn IPathFactory>,
     pub(crate) type_factory: Rc<dyn ITypeFactory>,
-    pub(crate) macro_handler: Rc<dyn IMacroHandler>,
+    pub(crate) mock_macro_handler: Rc<dyn IMockMacroHandler>,
 }
 
 fn create_services() -> ServiceCollection {
@@ -73,7 +73,7 @@ fn create_services() -> ServiceCollection {
     });
     let mod_generator = Rc::new(ModGenerator);
 
-    let macro_handler = Rc::new(MacroHandler {
+    let mock_macro_handler = Rc::new(MockMacroHandler {
         target_decl_extractor: target_decl_extractor.clone(),
         fn_decl_extractor: fn_decl_extractor.clone(),
         fn_info_generator: fn_info_generator.clone(),
@@ -89,7 +89,7 @@ fn create_services() -> ServiceCollection {
         attribute_factory,
         path_factory,
         type_factory,
-        macro_handler,
+        mock_macro_handler,
     };
 
     return services;
