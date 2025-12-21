@@ -1,9 +1,5 @@
-use crate::args_matching::ArgMatchingResult;
+use crate::args_matching::{ArgMatchingResult, IArgsFormatter};
 
-pub trait IArgsMatcher<TCall> {
+pub trait IArgsMatcher<TCall>: IArgsFormatter {
     fn matches(&self, call: TCall) -> Vec<ArgMatchingResult>;
-
-    // TODO - should remove something like:
-    // "foo == 2, bar – custom predicate, baz – Any"
-    fn fmt_args(&self) -> String;
 }

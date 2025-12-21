@@ -1,11 +1,11 @@
 use crate::Times;
-use crate::args_matching::{ArgMatchingResult, IArgsMatcher};
+use crate::args_matching::{ArgMatchingResult, IArgsFormatter, IArgsMatcher};
 
 pub trait IErrorPrinter {
-    fn print_received_verification_error<TCall, TArgsMatcher: IArgsMatcher<TCall>>(
+    fn print_received_verification_error(
         &self,
         fn_name: &'static str,
-        args_matcher: &TArgsMatcher,
+        args_matcher: &dyn IArgsFormatter,
         matching_calls: Vec<Vec<ArgMatchingResult>>,
         non_matching_calls: Vec<Vec<ArgMatchingResult>>,
         times: Times,
@@ -15,10 +15,10 @@ pub trait IErrorPrinter {
 pub struct ErrorPrinter;
 
 impl IErrorPrinter for ErrorPrinter {
-    fn print_received_verification_error<TCall, TArgsMatcher: IArgsMatcher<TCall>>(
+    fn print_received_verification_error(
         &self,
         fn_name: &'static str,
-        args_matcher: &TArgsMatcher,
+        args_matcher: &dyn IArgsFormatter,
         matching_calls: Vec<Vec<ArgMatchingResult>>,
         non_matching_calls: Vec<Vec<ArgMatchingResult>>,
         times: Times,

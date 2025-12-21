@@ -52,13 +52,15 @@ mod generated {
         pub value: Arg<i32>,
     }
 
+    impl IArgsFormatter for work_ArgsMatcher {
+        fn fmt_args(&self) -> String {
+            format!("value {:?}", self.value)
+        }
+    }
+
     impl IArgsMatcher<work_Call> for work_ArgsMatcher {
         fn matches(&self, call: work_Call) -> Vec<ArgMatchingResult> {
             vec![self.value.matches("value", call.value)]
-        }
-
-        fn fmt_args(&self) -> String {
-            format!("value {:?}", self.value)
         }
     }
 
@@ -80,6 +82,15 @@ mod generated {
         pub arc: Arg<Arc<dyn IFoo>>,
     }
 
+    impl<'a> IArgsFormatter for another_work_ArgsMatcher<'a> {
+        fn fmt_args(&self) -> String {
+            format!(
+                "string {:?}, something {:?}, dyn_obj {:?}, arc {:?}",
+                self.string, self.something, self.dyn_obj, self.arc
+            )
+        }
+    }
+
     impl<'a> IArgsMatcher<another_work_Call<'a>> for another_work_ArgsMatcher<'a> {
         fn matches(&self, call: another_work_Call<'a>) -> Vec<ArgMatchingResult<'a>> {
             vec![
@@ -88,13 +99,6 @@ mod generated {
                 self.dyn_obj.matches_ref("dyn_obj", call.dyn_obj),
                 self.arc.matches_arc("arc", call.arc),
             ]
-        }
-
-        fn fmt_args(&self) -> String {
-            format!(
-                "string {:?}, something {:?}, dyn_obj {:?}, arc {:?}",
-                self.string, self.something, self.dyn_obj, self.arc
-            )
         }
     }
 
@@ -106,13 +110,15 @@ mod generated {
     #[derive(Debug)]
     pub struct get_ArgsMatcher;
 
+    impl IArgsFormatter for get_ArgsMatcher {
+        fn fmt_args(&self) -> String {
+            String::new()
+        }
+    }
+
     impl IArgsMatcher<get_Call> for get_ArgsMatcher {
         fn matches(&self, _call: get_Call) -> Vec<ArgMatchingResult> {
             Vec::new()
-        }
-
-        fn fmt_args(&self) -> String {
-            String::new()
         }
     }
 
@@ -128,13 +134,15 @@ mod generated {
         number: Arg<i32>,
     }
 
+    impl IArgsFormatter for standalone_ArgsMatcher {
+        fn fmt_args(&self) -> String {
+            format!("number {:?}", self.number)
+        }
+    }
+
     impl IArgsMatcher<standalone_Call> for standalone_ArgsMatcher {
         fn matches(&self, call: standalone_Call) -> Vec<ArgMatchingResult> {
             vec![self.number.matches("number", call.number)]
-        }
-
-        fn fmt_args(&self) -> String {
-            format!("number {:?}", self.number)
         }
     }
 
