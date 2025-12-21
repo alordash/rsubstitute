@@ -1,5 +1,5 @@
 use syn::ItemImpl;
 
-pub struct ArgsMatcherImplInfo {
+pub struct ArgsCheckerImplInfo {
     pub(crate) item_impl: ItemImpl,
 }

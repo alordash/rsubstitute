@@ -1,11 +1,11 @@
 use crate::Times;
-use crate::args_matching::{ArgMatchingResult, IArgsFormatter, IArgsMatcher};
+use crate::args_matching::{ArgMatchingResult, IArgsFormatter, IArgsChecker};
 
 pub trait IErrorPrinter {
     fn print_received_verification_error(
         &self,
         fn_name: &'static str,
-        args_matcher: &dyn IArgsFormatter,
+        args_formatter: &dyn IArgsFormatter,
         matching_calls: Vec<Vec<ArgMatchingResult>>,
         non_matching_calls: Vec<Vec<ArgMatchingResult>>,
         times: Times,
@@ -18,14 +18,14 @@ impl IErrorPrinter for ErrorPrinter {
     fn print_received_verification_error(
         &self,
         fn_name: &'static str,
-        args_matcher: &dyn IArgsFormatter,
+        args_formatter: &dyn IArgsFormatter,
         matching_calls: Vec<Vec<ArgMatchingResult>>,
         non_matching_calls: Vec<Vec<ArgMatchingResult>>,
         times: Times,
     ) -> ! {
         let matching_calls_count = matching_calls.len();
 
-        let expected_call_msg = format!("\t{fn_name}({})", args_matcher.fmt_args());
+        let expected_call_msg = format!("\t{fn_name}({})", args_formatter.fmt_args());
         let matching_calls_report = if matching_calls_count == 0 {
             "Actually received no matching calls".to_string()
         } else {

@@ -60,7 +60,7 @@ impl MockStructGenerator {
                                 ),
                                 GenericArgument::Type(
                                     self.type_factory.create(
-                                        fn_info.args_matcher_info.item_struct.ident.clone(),
+                                        fn_info.args_checker_info.item_struct.ident.clone(),
                                     ),
                                 ),
                                 GenericArgument::Type(fn_info.parent.get_return_value_type()),

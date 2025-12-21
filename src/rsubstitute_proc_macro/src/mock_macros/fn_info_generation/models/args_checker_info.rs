@@ -1,5 +1,5 @@
 use syn::ItemStruct;
 
-pub struct ArgsMatcherInfo {
+pub struct ArgsCheckerInfo {
     pub(crate) item_struct: ItemStruct,
 }

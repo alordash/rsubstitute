@@ -37,8 +37,8 @@ impl IModGenerator for ModGenerator {
             .chain(fn_infos.into_iter().flat_map(|x| {
                 [
                     Item::Struct(x.call_info.item_struct),
-                    Item::Struct(x.args_matcher_info.item_struct),
-                    Item::Impl(x.args_matcher_impl_info.item_impl),
+                    Item::Struct(x.args_checker_info.item_struct),
+                    Item::Impl(x.args_checker_impl_info.item_impl),
                 ]
             }))
             .chain([

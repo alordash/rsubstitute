@@ -23,7 +23,7 @@ impl<T: Debug> Debug for Arg<T> {
 }
 
 impl<'a, T: Debug + PartialOrd + Clone + 'a> Arg<T> {
-    pub fn matches(&self, arg_name: &'static str, actual_value: T) -> ArgMatchingResult<'a> {
+    pub fn check(&self, arg_name: &'static str, actual_value: T) -> ArgMatchingResult<'a> {
         let arg_info = ArgInfo::new(arg_name, actual_value.clone());
         match self {
             Arg::Eq(expected_value) if !actual_value.eq(expected_value) => {
@@ -50,7 +50,7 @@ impl<'a, T: Debug + PartialOrd + Clone + 'a> Arg<T> {
 }
 
 impl<'a, T: Debug + ?Sized> Arg<&'a T> {
-    pub fn matches_ref(
+    pub fn check_ref(
         &self,
         arg_name: &'static str,
         actual_value: &'a T,
@@ -84,7 +84,7 @@ impl<'a, T: Debug + ?Sized> Arg<&'a T> {
 }
 
 impl<'a, T: Debug + ?Sized + 'a> Arg<Rc<T>> {
-    pub fn matches_rc(&self, arg_name: &'static str, actual_value: Rc<T>) -> ArgMatchingResult<'a> {
+    pub fn check_rc(&self, arg_name: &'static str, actual_value: Rc<T>) -> ArgMatchingResult<'a> {
         let arg_info = ArgInfo::new(arg_name, actual_value.clone());
         let actual_ptr = Rc::as_ptr(&actual_value);
         match self {
@@ -117,7 +117,7 @@ impl<'a, T: Debug + ?Sized + 'a> Arg<Rc<T>> {
 }
 
 impl<'a, T: Debug + ?Sized + 'a> Arg<Arc<T>> {
-    pub fn matches_arc(
+    pub fn check_arc(
         &self,
         arg_name: &'static str,
         actual_value: Arc<T>,

@@ -1,5 +1,5 @@
 use crate::mock_macros::constants;
-use crate::mock_macros::fn_info_generation::models::{ArgsMatcherImplInfo, ArgsMatcherInfo, CallInfo};
+use crate::mock_macros::fn_info_generation::models::{ArgsCheckerImplInfo, ArgsCheckerInfo, CallInfo};
 use crate::syntax::{IFieldAccessExprFactory, ITypeFactory};
 use proc_macro2::{Ident, Span};
 use quote::format_ident;
@@ -11,26 +11,26 @@ use syn::{
     PatType, Path, PathArguments, PathSegment, ReturnType, Signature, Stmt, Type, Visibility,
 };
 
-pub trait IArgsMatcherImplGenerator {
+pub trait IArgsCheckerImplGenerator {
     fn generate(
         &self,
         call_info: &CallInfo,
-        args_matcher_info: &ArgsMatcherInfo,
-    ) -> ArgsMatcherImplInfo;
+        args_checker_info: &ArgsCheckerInfo,
+    ) -> ArgsCheckerImplInfo;
 }
 
-pub struct ArgsMatcherImplGenerator {
+pub struct ArgsCheckerImplGenerator {
     pub(crate) type_factory: Rc<dyn ITypeFactory>,
     pub(crate) field_access_expr_factory: Rc<dyn IFieldAccessExprFactory>,
 }
 
-impl IArgsMatcherImplGenerator for ArgsMatcherImplGenerator {
+impl IArgsCheckerImplGenerator for ArgsCheckerImplGenerator {
     fn generate(
         &self,
         call_info: &CallInfo,
-        args_matcher_info: &ArgsMatcherInfo,
-    ) -> ArgsMatcherImplInfo {
-        let trait_ident = constants::I_ARGS_MATCHER_TRAIT_IDENT.clone();
+        args_checker_info: &ArgsCheckerInfo,
+    ) -> ArgsCheckerImplInfo {
+        let trait_ident = constants::I_ARGS_CHECKER_TRAIT_IDENT.clone();
         let trait_path = Path {
             leading_colon: None,
             segments: [PathSegment {
@@ -56,7 +56,7 @@ impl IArgsMatcherImplGenerator for ArgsMatcherImplGenerator {
         );
         let self_ty = Box::new(
             self.type_factory
-                .create(args_matcher_info.item_struct.ident.clone()),
+                .create(args_checker_info.item_struct.ident.clone()),
         );
         let items = self.generate_matches_fn(call_info, call_ty);
         let item_impl = ItemImpl {
@@ -70,12 +70,12 @@ impl IArgsMatcherImplGenerator for ArgsMatcherImplGenerator {
             brace_token: Default::default(),
             items: vec![items],
         };
-        let args_matcher_impl_info = ArgsMatcherImplInfo { item_impl };
-        return args_matcher_impl_info;
+        let args_checker_impl_info = ArgsCheckerImplInfo { item_impl };
+        return args_checker_impl_info;
     }
 }
 
-impl ArgsMatcherImplGenerator {
+impl ArgsCheckerImplGenerator {
     const MATCHES_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("matches"));
 
     // TODO - test that equals to Arg::matches

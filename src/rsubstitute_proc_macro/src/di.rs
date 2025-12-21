@@ -25,7 +25,7 @@ fn create_services() -> ServiceCollection {
         struct_factory: struct_factory.clone(),
     });
     let arg_type_factory = Rc::new(ArgTypeFactory);
-    let args_matcher_generator = Rc::new(ArgsMatcherGenerator {
+    let args_checker_generator = Rc::new(ArgsCheckerGenerator {
         arg_type_factory: arg_type_factory.clone(),
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
@@ -37,14 +37,14 @@ fn create_services() -> ServiceCollection {
     let field_access_expr_factory = Rc::new(FieldAccessExprFactory {
         path_factory: path_factory.clone(),
     });
-    let args_matcher_impl_generator = Rc::new(ArgsMatcherImplGenerator {
+    let args_checker_impl_generator = Rc::new(ArgsCheckerImplGenerator {
         type_factory: type_factory.clone(),
         field_access_expr_factory: field_access_expr_factory.clone(),
     });
     let fn_info_generator = Rc::new(FnInfoGenerator {
         call_struct_generator: call_struct_generator.clone(),
-        args_matcher_generator: args_matcher_generator.clone(),
-        args_matcher_impl_generator: args_matcher_impl_generator.clone(),
+        args_checker_generator: args_checker_generator.clone(),
+        args_checker_impl_generator: args_checker_impl_generator.clone(),
     });
     let mock_struct_generator = Rc::new(MockStructGenerator {
         type_factory: type_factory.clone(),

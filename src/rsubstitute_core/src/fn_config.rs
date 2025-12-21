@@ -1,18 +1,18 @@
-use crate::args_matching::{ArgMatchingResult, IArgsMatcher};
+use crate::args_matching::{ArgMatchingResult, IArgsChecker};
 
-pub struct FnConfig<TCall, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue> {
-    args_matcher: TArgsMatcher,
+pub struct FnConfig<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue> {
+    args_checker: TArgsChecker,
     return_value: Option<TReturnValue>,
     callback: Option<fn()>,
     calls: Vec<TCall>,
 }
 
-impl<TCall, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
-    FnConfig<TCall, TArgsMatcher, TReturnValue>
+impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
+    FnConfig<TCall, TArgsChecker, TReturnValue>
 {
-    pub fn new(args_matcher: TArgsMatcher) -> Self {
+    pub fn new(args_checker: TArgsChecker) -> Self {
         FnConfig {
-            args_matcher,
+            args_checker,
             return_value: None,
             callback: None,
             calls: Vec::new(),
@@ -32,7 +32,7 @@ impl<TCall, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
     }
 
     pub fn matches(&self, call: TCall) -> Vec<ArgMatchingResult> {
-        self.args_matcher.matches(call)
+        self.args_checker.matches(call)
     }
 
     pub fn get_return_value(&mut self) -> Option<TReturnValue> {

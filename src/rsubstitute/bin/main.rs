@@ -48,19 +48,19 @@ mod generated {
 
     #[allow(non_camel_case_types)]
     #[derive(Debug)]
-    pub struct work_ArgsMatcher {
+    pub struct work_ArgsChecker {
         pub value: Arg<i32>,
     }
 
-    impl IArgsFormatter for work_ArgsMatcher {
+    impl IArgsFormatter for work_ArgsChecker {
         fn fmt_args(&self) -> String {
             format!("{:?}", self.value)
         }
     }
 
-    impl IArgsMatcher<work_Call> for work_ArgsMatcher {
+    impl IArgsChecker<work_Call> for work_ArgsChecker {
         fn matches(&self, call: work_Call) -> Vec<ArgMatchingResult> {
-            vec![self.value.matches("value", call.value)]
+            vec![self.value.check("value", call.value)]
         }
     }
 
@@ -75,14 +75,14 @@ mod generated {
 
     #[allow(non_camel_case_types)]
     #[derive(Debug)]
-    pub struct another_work_ArgsMatcher<'a> {
+    pub struct another_work_ArgsChecker<'a> {
         pub string: Arg<&'a str>,
         pub something: Arg<&'a &'a [u8]>,
         pub dyn_obj: Arg<&'a dyn IFoo>,
         pub arc: Arg<Arc<dyn IFoo>>,
     }
 
-    impl<'a> IArgsFormatter for another_work_ArgsMatcher<'a> {
+    impl<'a> IArgsFormatter for another_work_ArgsChecker<'a> {
         fn fmt_args(&self) -> String {
             format!(
                 "string {:?}, something {:?}, dyn_obj {:?}, arc {:?}",
@@ -91,13 +91,13 @@ mod generated {
         }
     }
 
-    impl<'a> IArgsMatcher<another_work_Call<'a>> for another_work_ArgsMatcher<'a> {
+    impl<'a> IArgsChecker<another_work_Call<'a>> for another_work_ArgsChecker<'a> {
         fn matches(&self, call: another_work_Call<'a>) -> Vec<ArgMatchingResult<'a>> {
             vec![
-                self.string.matches("string", call.string),
-                self.something.matches_ref("something", call.something),
-                self.dyn_obj.matches_ref("dyn_obj", call.dyn_obj),
-                self.arc.matches_arc("arc", call.arc),
+                self.string.check("string", call.string),
+                self.something.check_ref("something", call.something),
+                self.dyn_obj.check_ref("dyn_obj", call.dyn_obj),
+                self.arc.check_arc("arc", call.arc),
             ]
         }
     }
@@ -108,15 +108,15 @@ mod generated {
 
     #[allow(non_camel_case_types)]
     #[derive(Debug)]
-    pub struct get_ArgsMatcher;
+    pub struct get_ArgsChecker;
 
-    impl IArgsFormatter for get_ArgsMatcher {
+    impl IArgsFormatter for get_ArgsChecker {
         fn fmt_args(&self) -> String {
             String::new()
         }
     }
 
-    impl IArgsMatcher<get_Call> for get_ArgsMatcher {
+    impl IArgsChecker<get_Call> for get_ArgsChecker {
         fn matches(&self, _call: get_Call) -> Vec<ArgMatchingResult> {
             Vec::new()
         }
@@ -130,19 +130,19 @@ mod generated {
 
     #[allow(non_camel_case_types)]
     #[derive(Debug)]
-    pub struct standalone_ArgsMatcher {
+    pub struct standalone_ArgsChecker {
         number: Arg<i32>,
     }
 
-    impl IArgsFormatter for standalone_ArgsMatcher {
+    impl IArgsFormatter for standalone_ArgsChecker {
         fn fmt_args(&self) -> String {
             format!("number {:?}", self.number)
         }
     }
 
-    impl IArgsMatcher<standalone_Call> for standalone_ArgsMatcher {
+    impl IArgsChecker<standalone_Call> for standalone_ArgsChecker {
         fn matches(&self, call: standalone_Call) -> Vec<ArgMatchingResult> {
-            vec![self.number.matches("number", call.number)]
+            vec![self.number.check("number", call.number)]
         }
     }
 
@@ -150,9 +150,9 @@ mod generated {
     // start - Mock
 
     pub struct MyTraitMock<'a> {
-        work_data: FnData<work_Call, work_ArgsMatcher, ()>,
-        another_work_data: FnData<another_work_Call<'a>, another_work_ArgsMatcher<'a>, Vec<u8>>,
-        get_data: FnData<get_Call, get_ArgsMatcher, i32>,
+        work_data: FnData<work_Call, work_ArgsChecker, ()>,
+        another_work_data: FnData<another_work_Call<'a>, another_work_ArgsChecker<'a>, Vec<u8>>,
+        get_data: FnData<get_Call, get_ArgsChecker, i32>,
     }
 
     impl<'a> MyTrait for MyTraitMock<'a> {
@@ -206,16 +206,16 @@ mod generated {
         pub fn work(
             &'a self,
             value: Arg<i32>,
-        ) -> SharedFnConfig<'a, work_Call, work_ArgsMatcher, (), Self> {
-            let work_args_matcher = work_ArgsMatcher { value };
-            let fn_config = self.work_data.add_config(work_args_matcher);
+        ) -> SharedFnConfig<'a, work_Call, work_ArgsChecker, (), Self> {
+            let work_args_checker = work_ArgsChecker { value };
+            let fn_config = self.work_data.add_config(work_args_checker);
             let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
         }
 
         pub fn received_work(&'a self, value: Arg<i32>, times: Times) -> &'a Self {
-            let work_args_matcher = work_ArgsMatcher { value };
-            self.work_data.verify_received(work_args_matcher, times);
+            let work_args_checker = work_ArgsChecker { value };
+            self.work_data.verify_received(work_args_checker, times);
             return self;
         }
 
@@ -225,15 +225,15 @@ mod generated {
             something: Arg<&'a &'a [u8]>,
             dyn_obj: Arg<&'a dyn IFoo>,
             arc: Arg<Arc<dyn IFoo>>,
-        ) -> SharedFnConfig<'a, another_work_Call<'a>, another_work_ArgsMatcher<'a>, Vec<u8>, Self>
+        ) -> SharedFnConfig<'a, another_work_Call<'a>, another_work_ArgsChecker<'a>, Vec<u8>, Self>
         {
-            let another_work_args_matcher = another_work_ArgsMatcher {
+            let another_work_args_checker = another_work_ArgsChecker {
                 string,
                 something,
                 dyn_obj,
                 arc,
             };
-            let fn_config = self.another_work_data.add_config(another_work_args_matcher);
+            let fn_config = self.another_work_data.add_config(another_work_args_checker);
             let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
         }
@@ -246,36 +246,36 @@ mod generated {
             arc: Arg<Arc<dyn IFoo>>,
             times: Times,
         ) -> &'a Self {
-            let another_work_args_matcher = another_work_ArgsMatcher {
+            let another_work_args_checker = another_work_ArgsChecker {
                 string,
                 something,
                 dyn_obj,
                 arc,
             };
             self.another_work_data
-                .verify_received(another_work_args_matcher, times);
+                .verify_received(another_work_args_checker, times);
             return self;
         }
 
-        pub fn get(&'a self) -> SharedFnConfig<'a, get_Call, get_ArgsMatcher, i32, Self> {
-            let get_args_matcher = get_ArgsMatcher;
-            let fn_config = self.get_data.add_config(get_args_matcher);
+        pub fn get(&'a self) -> SharedFnConfig<'a, get_Call, get_ArgsChecker, i32, Self> {
+            let get_args_checker = get_ArgsChecker;
+            let fn_config = self.get_data.add_config(get_args_checker);
             let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
         }
 
         pub fn received_get(&'a self, times: Times) -> &'a Self {
-            let get_args_matcher = get_ArgsMatcher;
-            self.get_data.verify_received(get_args_matcher, times);
+            let get_args_checker = get_ArgsChecker;
+            self.get_data.verify_received(get_args_checker, times);
             return self;
         }
 
         #[allow(non_upper_case_globals)]
-        const standalone_data: LazyCell<FnData<standalone_Call, standalone_ArgsMatcher, f32>> =
+        const standalone_data: LazyCell<FnData<standalone_Call, standalone_ArgsChecker, f32>> =
             LazyCell::new(|| FnData::new("standalone"));
         pub fn standalone(number: Arg<i32>) -> f32 {
-            let standalone_args_matcher = standalone_ArgsMatcher { number };
-            let _fn_config = Self::standalone_data.add_config(standalone_args_matcher);
+            let standalone_args_checker = standalone_ArgsChecker { number };
+            let _fn_config = Self::standalone_data.add_config(standalone_args_checker);
             // let shared_fn_config = SharedFnConfig::new()
             todo!()
         }

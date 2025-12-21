@@ -1,5 +1,5 @@
 use crate::mock_macros::constants;
-use crate::mock_macros::fn_info_generation::models::ArgsMatcherInfo;
+use crate::mock_macros::fn_info_generation::models::ArgsCheckerInfo;
 use crate::mock_macros::models::FnDecl;
 use crate::syntax::{IArgTypeFactory, IFieldFactory, IStructFactory};
 use proc_macro2::Ident;
@@ -7,20 +7,20 @@ use quote::{format_ident, ToTokens};
 use std::rc::Rc;
 use syn::{Field, Fields, FieldsNamed, FnArg, PatType, Type};
 
-pub trait IArgsMatcherGenerator {
-    fn generate(&self, fn_decl: &FnDecl) -> ArgsMatcherInfo;
+pub trait IArgsCheckerGenerator {
+    fn generate(&self, fn_decl: &FnDecl) -> ArgsCheckerInfo;
 }
 
-pub struct ArgsMatcherGenerator {
+pub struct ArgsCheckerGenerator {
     pub(crate) arg_type_factory: Rc<dyn IArgTypeFactory>,
     pub(crate) field_factory: Rc<dyn IFieldFactory>,
     pub(crate) struct_factory: Rc<dyn IStructFactory>,
 }
 
-impl IArgsMatcherGenerator for ArgsMatcherGenerator {
-    fn generate(&self, fn_decl: &FnDecl) -> ArgsMatcherInfo {
+impl IArgsCheckerGenerator for ArgsCheckerGenerator {
+    fn generate(&self, fn_decl: &FnDecl) -> ArgsCheckerInfo {
         let attrs = vec![constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone()];
-        let ident = format_ident!("{}_{}", fn_decl.ident, Self::ARGS_MATCHER_STRUCT_SUFFIX);
+        let ident = format_ident!("{}_{}", fn_decl.ident, Self::ARGS_CHECKER_STRUCT_SUFFIX);
         let struct_fields: Vec<_> = fn_decl
             .arguments
             .iter()
@@ -32,16 +32,16 @@ impl IArgsMatcherGenerator for ArgsMatcherGenerator {
         });
 
         let item_struct = self.struct_factory.create(attrs, ident, fields);
-        let args_matcher_info = ArgsMatcherInfo {
+        let args_checker_info = ArgsCheckerInfo {
             item_struct,
         };
 
-        return args_matcher_info;
+        return args_checker_info;
     }
 }
 
-impl ArgsMatcherGenerator {
-    const ARGS_MATCHER_STRUCT_SUFFIX: &'static str = "ArgsMatcher";
+impl ArgsCheckerGenerator {
+    const ARGS_CHECKER_STRUCT_SUFFIX: &'static str = "ArgsChecker";
 
     fn try_convert_fn_arg_to_field(&self, fn_arg: &FnArg) -> Option<Field> {
         let pat_type = match fn_arg {

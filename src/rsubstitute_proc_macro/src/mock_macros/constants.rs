@@ -26,9 +26,9 @@ pub const CRATE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("rsubsti
 // TODO - add test that it's equal to rsubstitute_core::arguments_matching::Argh
 pub const ARG_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Arg"));
 
-// TODO - add test that it's equal to rsubstitute_core::arguments_matching::IArgsMatcher
-pub const I_ARGS_MATCHER_TRAIT_IDENT: LazyCell<Ident> =
-    LazyCell::new(|| format_ident!("IArgsMatcher"));
+// TODO - add test that it's equal to rsubstitute_core::arguments_matching::IArgsChecker
+pub const I_ARGS_CHECKER_TRAIT_IDENT: LazyCell<Ident> =
+    LazyCell::new(|| format_ident!("IArgsChecker"));
 
 // TODO - add test that it's equal to rsubstitute_core::FnData
 pub const FN_DATA_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("FnData"));

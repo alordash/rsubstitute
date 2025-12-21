@@ -67,7 +67,7 @@ impl IInternalMockImplGenerator for InternalMockImplGenerator {
 
 impl InternalMockImplGenerator {
     const CONSTRUCTOR_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("new"));
-    const ARGS_MATCHER_VARIABLE_SUFFIX: &'static str = "args_matcher";
+    const ARGS_CHECKER_VARIABLE_SUFFIX: &'static str = "args_checker";
     const FN_CONFIG_VAR_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("fn_config"));
     const SHARED_FN_CONFIG_VAR_IDENT: LazyCell<Ident> =
         LazyCell::new(|| format_ident!("shared_fn_config"));
@@ -174,7 +174,7 @@ impl InternalMockImplGenerator {
                                                 fn_info.call_info.item_struct.ident.clone(),
                                             )),
                                             GenericArgument::Type(self.type_factory.create(
-                                                fn_info.args_matcher_info.item_struct.ident.clone(),
+                                                fn_info.args_checker_info.item_struct.ident.clone(),
                                             )),
                                             GenericArgument::Type(
                                                 fn_info.parent.get_return_value_type(),
@@ -205,8 +205,8 @@ impl InternalMockImplGenerator {
     }
 
     fn generate_fn_setup_block(&self, fn_info: &FnInfo) -> Block {
-        let (args_matcher_var_ident, args_matcher_decl_stmt) =
-            self.generate_args_matcher_var_ident_and_decl_stmt(fn_info);
+        let (args_checker_var_ident, args_checker_decl_stmt) =
+            self.generate_args_checker_var_ident_and_decl_stmt(fn_info);
         let fn_config_decl_stmt = Stmt::Local(self.local_factory.create(
             Self::FN_CONFIG_VAR_IDENT.clone(),
             LocalInit {
@@ -217,7 +217,7 @@ impl InternalMockImplGenerator {
                         fn_info.data_field_ident.clone(),
                     ],
                     constants::FN_DATA_ADD_CONFIG_FN_IDENT.clone(),
-                    &[args_matcher_var_ident],
+                    &[args_checker_var_ident],
                 ))),
                 diverge: None,
             },
@@ -284,7 +284,7 @@ impl InternalMockImplGenerator {
             Some(Default::default()),
         );
         let stmts = vec![
-            args_matcher_decl_stmt,
+            args_checker_decl_stmt,
             fn_config_decl_stmt,
             shared_fn_config_decl_stmt,
             return_stmt,
@@ -345,8 +345,8 @@ impl InternalMockImplGenerator {
     }
 
     fn generate_fn_received_block(&self, fn_info: &FnInfo) -> Block {
-        let (args_matcher_var_ident, args_matcher_decl_stmt) =
-            self.generate_args_matcher_var_ident_and_decl_stmt(fn_info);
+        let (args_checker_var_ident, args_checker_decl_stmt) =
+            self.generate_args_checker_var_ident_and_decl_stmt(fn_info);
         let verify_received_stmt = Stmt::Expr(
             Expr::MethodCall(self.expr_method_call_factory.create(
                 &[
@@ -354,7 +354,7 @@ impl InternalMockImplGenerator {
                     fn_info.data_field_ident.clone(),
                 ],
                 constants::FN_DATA_VERIFY_RECEIVED_FN_IDENT.clone(),
-                &[args_matcher_var_ident, Self::TIMES_ARG_IDENT.clone()],
+                &[args_checker_var_ident, Self::TIMES_ARG_IDENT.clone()],
             )),
             Some(Default::default()),
         );
@@ -371,7 +371,7 @@ impl InternalMockImplGenerator {
             Some(Default::default()),
         );
         let stmts = vec![
-            args_matcher_decl_stmt,
+            args_checker_decl_stmt,
             verify_received_stmt,
             return_self_stmt,
         ];
@@ -384,7 +384,7 @@ impl InternalMockImplGenerator {
 
     fn generate_input_args(&self, fn_info: &FnInfo) -> impl Iterator<Item = FnArg> {
         return fn_info
-            .args_matcher_info
+            .args_checker_info
             .item_struct
             .fields
             .iter()
@@ -398,7 +398,7 @@ impl InternalMockImplGenerator {
                         ident: field
                             .ident
                             .clone()
-                            .expect("Field in args matcher struct should be named"),
+                            .expect("Field in args checker struct should be named"),
                         subpat: None,
                     })),
                     colon_token: Default::default(),
@@ -407,15 +407,15 @@ impl InternalMockImplGenerator {
             });
     }
 
-    fn generate_args_matcher_var_ident_and_decl_stmt(&self, fn_info: &FnInfo) -> (Ident, Stmt) {
-        let args_matcher_var_ident = format_ident!(
+    fn generate_args_checker_var_ident_and_decl_stmt(&self, fn_info: &FnInfo) -> (Ident, Stmt) {
+        let args_checker_var_ident = format_ident!(
             "{}_{}",
             fn_info.parent.ident,
-            Self::ARGS_MATCHER_VARIABLE_SUFFIX
+            Self::ARGS_CHECKER_VARIABLE_SUFFIX
         );
-        let args_matcher_decl_stmt = Stmt::Local(
+        let args_checker_decl_stmt = Stmt::Local(
             self.local_factory.create(
-                args_matcher_var_ident.clone(),
+                args_checker_var_ident.clone(),
                 LocalInit {
                     eq_token: Default::default(),
                     expr: Box::new(Expr::Struct(ExprStruct {
@@ -423,10 +423,10 @@ impl InternalMockImplGenerator {
                         qself: None,
                         path: self
                             .path_factory
-                            .create(fn_info.args_matcher_info.item_struct.ident.clone()),
+                            .create(fn_info.args_checker_info.item_struct.ident.clone()),
                         brace_token: Default::default(),
                         fields: fn_info
-                            .args_matcher_info
+                            .args_checker_info
                             .item_struct
                             .fields
                             .iter()
@@ -439,6 +439,6 @@ impl InternalMockImplGenerator {
                 },
             ),
         );
-        return (args_matcher_var_ident, args_matcher_decl_stmt);
+        return (args_checker_var_ident, args_checker_decl_stmt);
     }
 }

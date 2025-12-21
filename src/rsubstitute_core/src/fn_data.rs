@@ -1,17 +1,17 @@
-use crate::args_matching::{ArgMatchingResult, IArgsMatcher};
+use crate::args_matching::{ArgMatchingResult, IArgsChecker};
 use crate::error_printer::{ErrorPrinter, IErrorPrinter};
 use crate::{FnConfig, Times};
 use std::cell::RefCell;
 use std::rc::Rc;
 
-pub struct FnData<TCall, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue> {
+pub struct FnData<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue> {
     fn_name: &'static str,
     calls: RefCell<Vec<TCall>>,
-    configs: RefCell<Vec<Rc<RefCell<FnConfig<TCall, TArgsMatcher, TReturnValue>>>>>,
+    configs: RefCell<Vec<Rc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue>>>>>,
 }
 
-impl<TCall, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue>
-    FnData<TCall, TArgsMatcher, TReturnValue>
+impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue>
+    FnData<TCall, TArgsChecker, TReturnValue>
 {
     pub fn new(fn_name: &'static str) -> Self {
         Self {
@@ -22,8 +22,8 @@ impl<TCall, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue>
     }
 }
 
-impl<TCall: Clone, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
-    FnData<TCall, TArgsMatcher, TReturnValue>
+impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
+    FnData<TCall, TArgsChecker, TReturnValue>
 {
     pub fn register_call(&self, call: TCall) -> &Self {
         self.calls.borrow_mut().push(call);
@@ -32,9 +32,9 @@ impl<TCall: Clone, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
 
     pub fn add_config(
         &self,
-        args_matcher: TArgsMatcher,
-    ) -> Rc<RefCell<FnConfig<TCall, TArgsMatcher, TReturnValue>>> {
-        let config = FnConfig::new(args_matcher);
+        args_checker: TArgsChecker,
+    ) -> Rc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue>>> {
+        let config = FnConfig::new(args_checker);
         let shared_config = Rc::new(RefCell::new(config));
         self.configs.borrow_mut().push(shared_config.clone());
         return shared_config;
@@ -67,16 +67,16 @@ impl<TCall: Clone, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
         return return_value;
     }
 
-    pub fn verify_received(&self, args_matcher: TArgsMatcher, times: Times) {
+    pub fn verify_received(&self, args_checker: TArgsChecker, times: Times) {
         let (matching_calls, non_matching_calls) =
-            self.get_matching_and_non_matching_calls(&args_matcher);
+            self.get_matching_and_non_matching_calls(&args_checker);
         let matching_calls_count = matching_calls.len();
         let valid = times.matches(matching_calls_count);
         if !valid {
             // TODO - pass via DI
             ErrorPrinter.print_received_verification_error(
                 self.fn_name,
-                &args_matcher,
+                &args_checker,
                 matching_calls,
                 non_matching_calls,
                 times,
@@ -87,7 +87,7 @@ impl<TCall: Clone, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
     fn try_get_matching_config(
         &self,
         call: TCall,
-    ) -> Option<Rc<RefCell<FnConfig<TCall, TArgsMatcher, TReturnValue>>>> {
+    ) -> Option<Rc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue>>>> {
         let configs = self.configs.borrow();
         let maybe_fn_config = configs
             .iter()
@@ -104,7 +104,7 @@ impl<TCall: Clone, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
 
     fn get_matching_and_non_matching_calls<'a>(
         &'a self,
-        args_matcher: &'a TArgsMatcher,
+        args_checker: &'a TArgsChecker,
     ) -> (
         Vec<Vec<ArgMatchingResult<'a>>>,
         Vec<Vec<ArgMatchingResult<'a>>>,
@@ -113,7 +113,7 @@ impl<TCall: Clone, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
         let mut non_matching_calls = Vec::new();
         let calls = self.calls.borrow();
         for call in calls.iter() {
-            let call_matching_result = args_matcher.matches((*call).clone());
+            let call_matching_result = args_checker.matches((*call).clone());
             let is_matching = call_matching_result.iter().all(ArgMatchingResult::is_ok);
             if is_matching {
                 matching_calls.push(call_matching_result);

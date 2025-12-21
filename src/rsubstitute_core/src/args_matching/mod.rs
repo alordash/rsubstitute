@@ -1,11 +1,11 @@
 mod arg;
 mod arg_info;
 mod arg_matching_result;
-mod args_formatter;
-mod args_matcher;
+mod i_args_formatter;
+mod i_args_checker;
 
 pub use arg::*;
 pub use arg_info::*;
 pub use arg_matching_result::*;
-pub use args_formatter::*;
-pub use args_matcher::*;
+pub use i_args_formatter::*;
+pub use i_args_checker::*;
