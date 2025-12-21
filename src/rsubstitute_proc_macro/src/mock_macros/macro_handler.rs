@@ -1,9 +1,9 @@
-use crate::macros::fn_decl_extractor::IFnDeclExtractor;
-use crate::macros::fn_info_generation::IFnInfoGenerator;
-use crate::macros::mock_generation::{
+use crate::mock_macros::fn_decl_extractor::IFnDeclExtractor;
+use crate::mock_macros::fn_info_generation::IFnInfoGenerator;
+use crate::mock_macros::mock_generation::{
     IInternalMockImplGenerator, IMockImplGenerator, IMockStructGenerator,
 };
-use crate::macros::{IModGenerator, ITargetDeclExtractor};
+use crate::mock_macros::{IModGenerator, ITargetDeclExtractor};
 use proc_macro::TokenStream;
 use quote::quote;
 use std::rc::Rc;

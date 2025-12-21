@@ -1,5 +1,5 @@
-use crate::macros::fn_info_generation::models::{ArgsMatcherImplInfo, ArgsMatcherInfo, CallInfo};
-use crate::macros::models::FnDecl;
+use crate::mock_macros::fn_info_generation::models::{ArgsMatcherImplInfo, ArgsMatcherInfo, CallInfo};
+use crate::mock_macros::models::FnDecl;
 use proc_macro2::Ident;
 
 pub struct FnInfo<'a> {

@@ -1,7 +1,7 @@
 use crate::di::SERVICES;
 
 mod syntax;
-mod macros;
+mod mock_macros;
 mod di;
 
 #[proc_macro_attribute]

@@ -1,7 +1,7 @@
-use crate::macros::fn_info_generation::call_generator::ICallStructGenerator;
-use crate::macros::fn_info_generation::models::FnInfo;
-use crate::macros::fn_info_generation::{IArgsMatcherGenerator, IArgsMatcherImplGenerator};
-use crate::macros::models::FnDecl;
+use crate::mock_macros::fn_info_generation::call_generator::ICallStructGenerator;
+use crate::mock_macros::fn_info_generation::models::FnInfo;
+use crate::mock_macros::fn_info_generation::{IArgsMatcherGenerator, IArgsMatcherImplGenerator};
+use crate::mock_macros::models::FnDecl;
 use proc_macro2::Ident;
 use quote::format_ident;
 use std::rc::Rc;

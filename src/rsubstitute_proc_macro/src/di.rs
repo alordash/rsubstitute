@@ -1,6 +1,6 @@
-use crate::macros::fn_info_generation::*;
-use crate::macros::mock_generation::*;
-use crate::macros::*;
+use crate::mock_macros::fn_info_generation::*;
+use crate::mock_macros::mock_generation::*;
+use crate::mock_macros::*;
 use crate::syntax::*;
 use std::cell::LazyCell;
 use std::rc::Rc;

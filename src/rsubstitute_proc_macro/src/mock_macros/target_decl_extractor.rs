@@ -1,4 +1,4 @@
-use crate::macros::models::TargetDecl;
+use crate::mock_macros::models::TargetDecl;
 use syn::ItemTrait;
 
 pub trait ITargetDeclExtractor {

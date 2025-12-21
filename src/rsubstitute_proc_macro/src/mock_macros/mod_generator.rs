@@ -1,7 +1,7 @@
-use crate::macros::constants;
-use crate::macros::fn_info_generation::models::FnInfo;
-use crate::macros::mock_generation::models::{InternalMockImplInfo, MockImplInfo, MockStructInfo};
-use crate::macros::models::ModInfo;
+use crate::mock_macros::constants;
+use crate::mock_macros::fn_info_generation::models::FnInfo;
+use crate::mock_macros::mock_generation::models::{InternalMockImplInfo, MockImplInfo, MockStructInfo};
+use crate::mock_macros::models::ModInfo;
 use proc_macro2::Ident;
 use quote::format_ident;
 use std::cell::LazyCell;

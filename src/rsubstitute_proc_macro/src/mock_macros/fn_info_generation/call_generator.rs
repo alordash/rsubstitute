@@ -1,6 +1,6 @@
-use crate::macros::constants;
-use crate::macros::fn_info_generation::models::CallInfo;
-use crate::macros::models::FnDecl;
+use crate::mock_macros::constants;
+use crate::mock_macros::fn_info_generation::models::CallInfo;
+use crate::mock_macros::models::FnDecl;
 use crate::syntax::{IFieldFactory, IStructFactory};
 use proc_macro2::Ident;
 use quote::{format_ident, ToTokens};

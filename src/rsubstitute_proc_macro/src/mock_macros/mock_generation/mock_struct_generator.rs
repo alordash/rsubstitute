@@ -1,7 +1,7 @@
-use crate::macros::constants;
-use crate::macros::fn_info_generation::models::FnInfo;
-use crate::macros::mock_generation::models::MockStructInfo;
-use crate::macros::models::TargetDecl;
+use crate::mock_macros::constants;
+use crate::mock_macros::fn_info_generation::models::FnInfo;
+use crate::mock_macros::mock_generation::models::MockStructInfo;
+use crate::mock_macros::models::TargetDecl;
 use crate::syntax::{IStructFactory, ITypeFactory};
 use quote::format_ident;
 use std::rc::Rc;

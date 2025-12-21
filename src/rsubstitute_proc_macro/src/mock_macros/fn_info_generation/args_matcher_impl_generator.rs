@@ -1,5 +1,5 @@
-use crate::macros::constants;
-use crate::macros::fn_info_generation::models::{ArgsMatcherImplInfo, ArgsMatcherInfo, CallInfo};
+use crate::mock_macros::constants;
+use crate::mock_macros::fn_info_generation::models::{ArgsMatcherImplInfo, ArgsMatcherInfo, CallInfo};
 use crate::syntax::{IFieldAccessExprFactory, ITypeFactory};
 use proc_macro2::{Ident, Span};
 use quote::format_ident;

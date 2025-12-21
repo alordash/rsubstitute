@@ -1,6 +1,6 @@
-use crate::macros::constants;
-use crate::macros::fn_info_generation::models::FnInfo;
-use crate::macros::mock_generation::models::{InternalMockImplInfo, MockStructInfo};
+use crate::mock_macros::constants;
+use crate::mock_macros::fn_info_generation::models::FnInfo;
+use crate::mock_macros::mock_generation::models::{InternalMockImplInfo, MockStructInfo};
 use crate::syntax::{
     IExprMethodCallFactory, IFieldValueFactory, ILocalFactory, IPathFactory, ITypeFactory,
 };

@@ -1,4 +1,4 @@
-use crate::macros::models::FnDecl;
+use crate::mock_macros::models::FnDecl;
 use syn::{TraitItem, TraitItemFn};
 
 pub trait IFnDeclExtractor {

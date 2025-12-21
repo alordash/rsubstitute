@@ -1,4 +1,4 @@
-use crate::macros::constants;
+use crate::mock_macros::constants;
 use syn::{
     AngleBracketedGenericArguments, GenericArgument, Path, PathArguments, PathSegment, Type,
     TypePath,

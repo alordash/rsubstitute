@@ -1,7 +1,7 @@
-use crate::macros::constants;
-use crate::macros::fn_info_generation::models::FnInfo;
-use crate::macros::mock_generation::models::{MockImplInfo, MockStructInfo};
-use crate::macros::models::TargetDecl;
+use crate::mock_macros::constants;
+use crate::mock_macros::fn_info_generation::models::FnInfo;
+use crate::mock_macros::mock_generation::models::{MockImplInfo, MockStructInfo};
+use crate::mock_macros::models::TargetDecl;
 use crate::syntax::{IExprMethodCallFactory, IFieldValueFactory, IPathFactory, ITypeFactory};
 use proc_macro2::Ident;
 use quote::format_ident;
