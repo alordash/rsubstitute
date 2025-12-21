@@ -321,7 +321,9 @@ fn main() {
         MyTrait::another_work(&my_trait_mock, string, something, foo1, arc_foo1);
     println!("first_another_work = {first_another_work:?}");
     let second_another_work =
-        MyTrait::another_work(&my_trait_mock, "que", something, foo2, arc_foo2);
+        MyTrait::another_work(&my_trait_mock, "que", something, foo2, arc_foo2.clone());
+    MyTrait::another_work(&my_trait_mock, "que", something, foo2, arc_foo2.clone());
+    MyTrait::another_work(&my_trait_mock, "que", something, foo2, arc_foo2.clone());
     println!("second_another_work = {second_another_work:?}");
 
     let first_get = MyTrait::get(&my_trait_mock);

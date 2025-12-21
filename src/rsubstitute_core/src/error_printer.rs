@@ -47,11 +47,21 @@ impl IErrorPrinter for ErrorPrinter {
             let call_fmt = self.fmt_calls(non_matching_calls_count);
             let non_matching_calls_args_msgs: Vec<_> = non_matching_calls
                 .into_iter()
+                .take(Self::MAX_INVALID_CALLS_LISTED_COUNT)
                 .map(|x| self.fmt_call(fn_name, x))
                 .collect();
+            let trimmed_output_disclaimer =
+                if non_matching_calls_count > Self::MAX_INVALID_CALLS_LISTED_COUNT {
+                    format!(
+                        " (listing only first {})",
+                        Self::MAX_INVALID_CALLS_LISTED_COUNT
+                    )
+                } else {
+                    String::new()
+                };
             let non_matching_calls_args_msg = non_matching_calls_args_msgs.join("\n");
             format!(
-                "Received {non_matching_calls_count} non-matching {call_fmt} (non-matching arguments indicated with '*' characters):
+                "Received {non_matching_calls_count} non-matching {call_fmt}{trimmed_output_disclaimer} (non-matching arguments indicated with '*' characters):
 {non_matching_calls_args_msg}"
             )
         };
@@ -66,6 +76,9 @@ impl IErrorPrinter for ErrorPrinter {
 }
 
 impl ErrorPrinter {
+    // TODO - should be configurable
+    const MAX_INVALID_CALLS_LISTED_COUNT: usize = 10;
+
     fn fmt_call(&self, fn_name: &'static str, call: Vec<ArgMatchingResult>) -> String {
         let error_msgs: Vec<_> = call
             .iter()

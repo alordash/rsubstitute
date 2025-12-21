@@ -25,9 +25,6 @@ impl<TCall, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue>
 impl<TCall: Clone, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
     FnData<TCall, TArgsMatcher, TReturnValue>
 {
-    // TODO - should be configurable
-    const MAX_INVALID_CALLS_LISTED_COUNT: usize = 10;
-
     pub fn register_call(&self, call: TCall) -> &Self {
         self.calls.borrow_mut().push(call);
         self
@@ -76,6 +73,7 @@ impl<TCall: Clone, TArgsMatcher: IArgsMatcher<TCall>, TReturnValue: Clone>
         let matching_calls_count = matching_calls.len();
         let valid = times.matches(matching_calls_count);
         if !valid {
+            // TODO - pass via DI
             ErrorPrinter.print_received_verification_error(
                 self.fn_name,
                 &args_matcher,

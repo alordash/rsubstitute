@@ -1,17 +1,7 @@
-use crate::macros::fn_info_generation::{
-    ArgsMatcherGenerator, ArgsMatcherImplGenerator, CallStructGenerator, FnInfoGenerator,
-};
-use crate::macros::mock_generation::{
-    InternalMockImplGenerator, MockImplGenerator, MockStructGenerator,
-};
-use crate::macros::{
-    FnDeclExtractor, IMacroHandler, MacroHandler, ModGenerator, TargetDeclExtractor,
-};
-use crate::syntax::{
-    ArgTypeFactory, AttributeFactory, ExprMethodCallFactory, FieldAccessExprFactory, FieldFactory,
-    FieldValueFactory, IAttributeFactory, IPathFactory, ITypeFactory, LocalFactory, PathFactory,
-    StructFactory, TypeFactory,
-};
+use crate::macros::fn_info_generation::*;
+use crate::macros::mock_generation::*;
+use crate::macros::*;
+use crate::syntax::*;
 use std::cell::LazyCell;
 use std::rc::Rc;
 
