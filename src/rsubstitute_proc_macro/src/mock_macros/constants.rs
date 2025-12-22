@@ -1,13 +1,11 @@
+// TODO - move to crate root
 use crate::di::SERVICES;
 use proc_macro2::{Ident, TokenStream};
 use quote::format_ident;
 use std::cell::LazyCell;
 use std::str::FromStr;
 use syn::punctuated::Punctuated;
-use syn::{
-    Attribute, Expr, ExprCall, ExprPath, FnArg, ItemUse, Path, PathArguments, PathSegment,
-    Receiver, Type, TypePath, TypeReference, TypeTuple, UseGlob, UsePath, UseTree, Visibility,
-};
+use syn::*;
 
 pub const SELF_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("self"));
 pub const SELF_IDENT_PATH: LazyCell<Path> = LazyCell::new(|| {
@@ -25,6 +23,13 @@ pub const CRATE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("rsubsti
 
 // TODO - add test that it's equal to rsubstitute_core::arguments_matching::Argh
 pub const ARG_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Arg"));
+
+// TODO - add test that it's equal to rsubstitute_core::arguments_matching::IArgsFormatter
+pub const I_ARGS_FORMATTER_TRAIT_IDENT: LazyCell<Ident> =
+    LazyCell::new(|| format_ident!("IArgsFormatter"));
+
+// TODO - add test that it's equal to rsubstitute_core::arguments_matching::IArgsFormatter::fmt_args
+pub const I_ARGS_FORMATTER_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("fmt_args"));
 
 // TODO - add test that it's equal to rsubstitute_core::arguments_matching::IArgsChecker
 pub const I_ARGS_CHECKER_TRAIT_IDENT: LazyCell<Ident> =
@@ -81,6 +86,12 @@ pub const VOID_TYPE: LazyCell<Type> = LazyCell::new(|| {
     return result;
 });
 
+pub const MACRO_FORMAT_PATH: LazyCell<Path> = LazyCell::new(|| {
+    let path_factory = &SERVICES.path_factory;
+    let result = path_factory.create(format_ident!("format"));
+    return result;
+});
+
 pub const SELF_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Self"));
 
 pub const SELF_TYPE_PATH: LazyCell<Path> = LazyCell::new(|| {
@@ -105,6 +116,12 @@ pub const REF_SELF_TYPE: LazyCell<Type> = LazyCell::new(|| {
             path: SELF_TYPE_PATH.clone(),
         })),
     });
+    return result;
+});
+
+pub const STRING_TYPE: LazyCell<Type> = LazyCell::new(|| {
+    let type_factory = &SERVICES.type_factory;
+    let result = type_factory.create(format_ident!("String"));
     return result;
 });
 

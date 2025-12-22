@@ -1,3 +1,6 @@
+use crate::derive_args_formatter_macros::{
+    DeriveArgsFormatterMacroHandler, IDeriveArgsFormatterMacroHandler,
+};
 use crate::mock_macros::fn_info_generation::*;
 use crate::mock_macros::mock_generation::*;
 use crate::mock_macros::*;
@@ -8,10 +11,12 @@ use std::rc::Rc;
 pub(crate) const SERVICES: LazyCell<ServiceCollection> = LazyCell::new(create_services);
 
 pub(crate) struct ServiceCollection {
-    pub(crate) attribute_factory: Rc<dyn IAttributeFactory>,
-    pub(crate) path_factory: Rc<dyn IPathFactory>,
-    pub(crate) type_factory: Rc<dyn ITypeFactory>,
-    pub(crate) mock_macro_handler: Rc<dyn IMockMacroHandler>,
+    pub attribute_factory: Rc<dyn IAttributeFactory>,
+    pub path_factory: Rc<dyn IPathFactory>,
+    pub type_factory: Rc<dyn ITypeFactory>,
+
+    pub derive_args_formatter_macro_handler: Rc<dyn IDeriveArgsFormatterMacroHandler>,
+    pub mock_macro_handler: Rc<dyn IMockMacroHandler>,
 }
 
 fn create_services() -> ServiceCollection {
@@ -73,6 +78,12 @@ fn create_services() -> ServiceCollection {
     });
     let mod_generator = Rc::new(ModGenerator);
 
+    let derive_args_formatter_macro_handler = Rc::new(DeriveArgsFormatterMacroHandler {
+        path_factory: path_factory.clone(),
+        type_factory: type_factory.clone(),
+        field_access_expr_factory: field_access_expr_factory.clone(),
+    });
+
     let mock_macro_handler = Rc::new(MockMacroHandler {
         target_decl_extractor: target_decl_extractor.clone(),
         fn_decl_extractor: fn_decl_extractor.clone(),
@@ -89,6 +100,7 @@ fn create_services() -> ServiceCollection {
         attribute_factory,
         path_factory,
         type_factory,
+        derive_args_formatter_macro_handler,
         mock_macro_handler,
     };
 

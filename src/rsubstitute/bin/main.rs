@@ -38,6 +38,7 @@ mod generated {
     use rsubstitute::*;
     use std::cell::LazyCell;
     use std::fmt::Debug;
+    use rsubstitute_proc_macro::IArgsFormatter;
 
     // start - Calls
     #[allow(non_camel_case_types)]
@@ -47,15 +48,9 @@ mod generated {
     }
 
     #[allow(non_camel_case_types)]
-    #[derive(Debug)]
+    #[derive(Debug, IArgsFormatter)]
     pub struct work_ArgsChecker {
         pub value: Arg<i32>,
-    }
-
-    impl IArgsFormatter for work_ArgsChecker {
-        fn fmt_args(&self) -> String {
-            format!("{:?}", self.value)
-        }
     }
 
     impl IArgsChecker<work_Call> for work_ArgsChecker {
