@@ -1,10 +1,12 @@
 use crate::syntax::IPathFactory;
 use proc_macro2::Ident;
 use std::rc::Rc;
-use syn::{Type, TypePath};
+use syn::{Generics, Type, TypePath};
 
 pub trait ITypeFactory {
     fn create(&self, ident: Ident) -> Type;
+
+    fn create_with_generics(&self, ident: Ident, generics: Generics) -> Type;
 }
 
 pub struct TypeFactory {
@@ -14,6 +16,12 @@ pub struct TypeFactory {
 impl ITypeFactory for TypeFactory {
     fn create(&self, ident: Ident) -> Type {
         let path = self.path_factory.create(ident);
+        let result = Type::Path(TypePath { qself: None, path });
+        return result;
+    }
+
+    fn create_with_generics(&self, ident: Ident, generics: Generics) -> Type {
+        let path = self.path_factory.create_with_generics(ident, generics);
         let result = Type::Path(TypePath { qself: None, path });
         return result;
     }

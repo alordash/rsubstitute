@@ -1,3 +1,5 @@
+mod single;
+
 use crate::generated::MyTraitMock;
 use rsubstitute_core::Times;
 use rsubstitute_core::args_matching::Arg;
@@ -36,9 +38,9 @@ trait MyTrait {
 mod generated {
     use super::*;
     use rsubstitute::*;
+    use rsubstitute_proc_macro::IArgsFormatter;
     use std::cell::LazyCell;
     use std::fmt::Debug;
-    use rsubstitute_proc_macro::IArgsFormatter;
 
     // start - Calls
     #[allow(non_camel_case_types)]
@@ -69,21 +71,12 @@ mod generated {
     }
 
     #[allow(non_camel_case_types)]
-    #[derive(Debug)]
+    #[derive(Debug, IArgsFormatter)]
     pub struct another_work_ArgsChecker<'a> {
         pub string: Arg<&'a str>,
         pub something: Arg<&'a &'a [u8]>,
         pub dyn_obj: Arg<&'a dyn IFoo>,
         pub arc: Arg<Arc<dyn IFoo>>,
-    }
-
-    impl<'a> IArgsFormatter for another_work_ArgsChecker<'a> {
-        fn fmt_args(&self) -> String {
-            format!(
-                "string {:?}, something {:?}, dyn_obj {:?}, arc {:?}",
-                self.string, self.something, self.dyn_obj, self.arc
-            )
-        }
     }
 
     impl<'a> IArgsChecker<another_work_Call<'a>> for another_work_ArgsChecker<'a> {

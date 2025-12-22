@@ -27,14 +27,17 @@ impl IDeriveArgsFormatterMacroHandler for DeriveArgsFormatterMacroHandler {
             defaultness: None,
             unsafety: None,
             impl_token: Default::default(),
-            generics: Generics::default(),
+            generics: item_struct.generics.clone(),
             trait_: Some((
                 None,
                 self.path_factory
                     .create(constants::I_ARGS_FORMATTER_TRAIT_IDENT.clone()),
                 Default::default(),
             )),
-            self_ty: Box::new(self.type_factory.create(item_struct.ident.clone())),
+            self_ty: Box::new(
+                self.type_factory
+                    .create_with_generics(item_struct.ident.clone(), item_struct.generics.clone()),
+            ),
             brace_token: Default::default(),
             items: vec![fmt_args_impl],
         };

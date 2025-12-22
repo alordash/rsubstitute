@@ -5,7 +5,7 @@ use crate::mock_macros::fn_info_generation::*;
 use crate::mock_macros::mock_generation::*;
 use crate::mock_macros::*;
 use crate::syntax::*;
-use std::cell::LazyCell;
+use std::cell::{LazyCell, OnceCell};
 use std::rc::Rc;
 
 pub(crate) const SERVICES: LazyCell<ServiceCollection> = LazyCell::new(create_services);
@@ -35,10 +35,18 @@ fn create_services() -> ServiceCollection {
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
     });
-    let path_factory = Rc::new(PathFactory);
+    let generic_argument_factory_cell = Rc::new(OnceCell::new());
+    let path_factory = Rc::new(PathFactory {
+        generic_argument_factory: generic_argument_factory_cell.clone(),
+    });
     let type_factory = Rc::new(TypeFactory {
         path_factory: path_factory.clone(),
     });
+    let generic_argument_factory = Rc::new(GenericArgumentFactory {
+        path_factory: path_factory.clone(),
+        type_factory: type_factory.clone(),
+    });
+    generic_argument_factory_cell.get_or_init(move || generic_argument_factory);
     let field_access_expr_factory = Rc::new(FieldAccessExprFactory {
         path_factory: path_factory.clone(),
     });
