@@ -1,26 +1,26 @@
 use crate::args_matching::arg_info::ArgInfo;
 
-pub enum ArgMatchingResult<'a> {
-    Ok(ArgMatchingResultOk<'a>),
-    Err(ArgMatchingResultErr<'a>),
+pub enum ArcCheckResult<'a> {
+    Ok(ArcCheckResultOk<'a>),
+    Err(ArgCheckResultErr<'a>),
 }
 
-pub struct ArgMatchingResultOk<'a> {
+pub struct ArcCheckResultOk<'a> {
     pub arg_info: ArgInfo<'a>,
 }
 
-pub struct ArgMatchingResultErr<'a> {
+pub struct ArgCheckResultErr<'a> {
     pub arg_info: ArgInfo<'a>,
     pub error_msg: String,
 }
 
-impl<'a> ArgMatchingResult<'a> {
+impl<'a> ArcCheckResult<'a> {
     pub fn ok(arg_info: ArgInfo<'a>) -> Self {
-        Self::Ok(ArgMatchingResultOk { arg_info })
+        Self::Ok(ArcCheckResultOk { arg_info })
     }
 
     pub fn err(arg_info: ArgInfo<'a>, error_msg: String) -> Self {
-        Self::Err(ArgMatchingResultErr {
+        Self::Err(ArgCheckResultErr {
             arg_info,
             error_msg,
         })
@@ -28,14 +28,14 @@ impl<'a> ArgMatchingResult<'a> {
     
     pub fn is_ok(&self) -> bool {
         match self {
-            ArgMatchingResult::Ok(_) => true,
+            ArcCheckResult::Ok(_) => true,
             _ => false
         }
     }
 
-    pub fn as_err(&self) -> Option<&ArgMatchingResultErr<'a>> {
+    pub fn as_err(&self) -> Option<&ArgCheckResultErr<'a>> {
         match self {
-            ArgMatchingResult::Err(result) => Some(result),
+            ArcCheckResult::Err(result) => Some(result),
             _ => None,
         }
     }

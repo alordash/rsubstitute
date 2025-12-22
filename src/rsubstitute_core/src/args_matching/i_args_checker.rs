@@ -1,5 +1,5 @@
-use crate::args_matching::{ArgMatchingResult, IArgsFormatter};
+use crate::args_matching::{ArcCheckResult, IArgsFormatter};
 
 pub trait IArgsChecker<TCall>: IArgsFormatter {
-    fn check(&self, call: TCall) -> Vec<ArgMatchingResult>;
+    fn check(&self, call: TCall) -> Vec<ArcCheckResult>;
 }

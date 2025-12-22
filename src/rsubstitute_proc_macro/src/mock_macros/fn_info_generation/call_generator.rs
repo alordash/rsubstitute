@@ -1,4 +1,4 @@
-use crate::mock_macros::constants;
+use crate::constants;
 use crate::mock_macros::fn_info_generation::models::CallInfo;
 use crate::mock_macros::models::FnDecl;
 use crate::syntax::{IFieldFactory, IStructFactory};

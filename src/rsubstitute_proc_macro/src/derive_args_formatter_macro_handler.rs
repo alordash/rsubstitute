@@ -1,4 +1,4 @@
-use crate::mock_macros::constants;
+use crate::constants;
 use crate::syntax::{IFieldAccessExprFactory, IPathFactory, ITypeFactory};
 use proc_macro::TokenStream;
 use proc_macro2::Literal;

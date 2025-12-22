@@ -10,8 +10,7 @@ trait Foo {
 mod tests {
     use super::__rsubstitute_generated::FooMock;
     use crate::Foo;
-    use rsubstitute::Times;
-    use rsubstitute::prelude::Arg;
+    use rsubstitute::*;
     use std::rc::Rc;
     use std::sync::Arc;
 

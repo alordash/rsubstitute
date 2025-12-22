@@ -14,6 +14,12 @@ pub const SELF_IDENT_PATH: LazyCell<Path> = LazyCell::new(|| {
     return result;
 });
 
+pub const MACRO_VEC_PATH: LazyCell<Path> = LazyCell::new(|| {
+    let path_factory = &SERVICES.path_factory;
+    let result = path_factory.create(format_ident!("vec"));
+    return result;
+});
+
 pub const SUPER_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("super"));
 
 pub const PRELUDE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("prelude"));
@@ -75,9 +81,12 @@ pub const DERIVE_CLONE_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     return result;
 });
 
-pub const BOOL_TYPE: LazyCell<Type> = LazyCell::new(|| {
-    let type_factory = &SERVICES.type_factory;
-    let result = type_factory.create(format_ident!("bool"));
+pub const DERIVE_DEBUG_AND_I_ARGS_FORMATTER_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+    let attribute_factory = &SERVICES.attribute_factory;
+    let ident = format_ident!("derive");
+    let arguments = TokenStream::from_str("Debug, IArgsFormatter")
+        .expect("Should be able to parse attribute arg.");
+    let result = attribute_factory.create(ident, arguments);
     return result;
 });
 
@@ -125,6 +134,32 @@ pub const REF_SELF_TYPE: LazyCell<Type> = LazyCell::new(|| {
 pub const STRING_TYPE: LazyCell<Type> = LazyCell::new(|| {
     let type_factory = &SERVICES.type_factory;
     let result = type_factory.create(format_ident!("String"));
+    return result;
+});
+
+// TODO - add tests to verify that ArcCheckResult ident is correct
+pub const VEC_OF_ARG_CHECK_RESULT_TYPE: LazyCell<Type> = LazyCell::new(|| {
+    let type_factory = &SERVICES.type_factory;
+    let arg_check_result_type = type_factory.create(format_ident!("ArcCheckResult"));
+    let result = Type::Path(TypePath {
+        qself: None,
+        path: Path {
+            leading_colon: None,
+            segments: [PathSegment {
+                ident: format_ident!("Vec"),
+                arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
+                    colon2_token: None,
+                    lt_token: Default::default(),
+                    args: [GenericArgument::Type(arg_check_result_type)]
+                        .into_iter()
+                        .collect(),
+                    gt_token: Default::default(),
+                }),
+            }]
+            .into_iter()
+            .collect(),
+        },
+    });
     return result;
 });
 

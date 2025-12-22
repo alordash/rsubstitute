@@ -1,15 +1,15 @@
-use crate::mock_macros::constants;
-use crate::mock_macros::fn_info_generation::models::{ArgsCheckerImplInfo, ArgsCheckerInfo, CallInfo};
+use crate::constants;
+use crate::mock_macros::fn_info_generation::models::{
+    ArgsCheckerImplInfo, ArgsCheckerInfo, CallInfo,
+};
 use crate::syntax::{IFieldAccessExprFactory, ITypeFactory};
-use proc_macro2::{Ident, Span};
-use quote::format_ident;
+use proc_macro2::{Ident, Span, TokenStream};
+use quote::{ToTokens, format_ident};
 use std::cell::LazyCell;
 use std::rc::Rc;
-use syn::{
-    AngleBracketedGenericArguments, BinOp, Block, Expr, ExprBinary, ExprLit, ExprMethodCall, Field,
-    FnArg, GenericArgument, Generics, ImplItem, ImplItemFn, ItemImpl, Lit, LitBool, Pat, PatIdent,
-    PatType, Path, PathArguments, PathSegment, ReturnType, Signature, Stmt, Type, Visibility,
-};
+use syn::punctuated::Punctuated;
+use syn::token::Bracket;
+use syn::*;
 
 pub trait IArgsCheckerImplGenerator {
     fn generate(
@@ -58,7 +58,7 @@ impl IArgsCheckerImplGenerator for ArgsCheckerImplGenerator {
             self.type_factory
                 .create(args_checker_info.item_struct.ident.clone()),
         );
-        let items = self.generate_matches_fn(call_info, call_ty);
+        let items = self.generate_check_fn(call_info, call_ty);
         let item_impl = ItemImpl {
             attrs: Vec::new(),
             defaultness: None,
@@ -76,26 +76,24 @@ impl IArgsCheckerImplGenerator for ArgsCheckerImplGenerator {
 }
 
 impl ArgsCheckerImplGenerator {
-    const MATCHES_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("matches"));
+    const CHECK_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("check"));
 
-    // TODO - test that equals to Arg::matches
-    const ARG_MATCHES_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("matches"));
-    // TODO - test that equals to Arg::matches_ref
-    const ARG_MATCHES_REF_FN_IDENT: LazyCell<Ident> =
-        LazyCell::new(|| format_ident!("matches_ref"));
-    // TODO - test that equals to Arg::matches_rc
-    const ARG_MATCHES_RC_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("matches_rc"));
-    // TODO - test that equals to Arg::matches_arc
-    const ARG_MATCHES_ARC_FN_IDENT: LazyCell<Ident> =
-        LazyCell::new(|| format_ident!("matches_arc"));
+    // TODO - test that equals to Arg::check
+    const ARG_CHECK_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("check"));
+    // TODO - test that equals to Arg::check_ref
+    const ARG_CHECK_REF_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("check_ref"));
+    // TODO - test that equals to Arg::check_rc
+    const ARG_CHECK_RC_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("check_rc"));
+    // TODO - test that equals to Arg::check_arc
+    const ARG_CHECK_ARC_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("check_arc"));
 
     const CALL_ARG_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("call"));
 
-    fn generate_matches_fn(&self, call_info: &CallInfo, call_type: Box<Type>) -> ImplItem {
-        let matches_stmt = self.generate_matches_statement(call_info);
+    fn generate_check_fn(&self, call_info: &CallInfo, call_type: Box<Type>) -> ImplItem {
+        let check_stmt = self.generate_check_stmt(call_info);
         let block = Block {
             brace_token: Default::default(),
-            stmts: vec![matches_stmt],
+            stmts: vec![check_stmt],
         };
         let impl_item = ImplItem::Fn(ImplItemFn {
             attrs: Vec::new(),
@@ -107,7 +105,7 @@ impl ArgsCheckerImplGenerator {
                 unsafety: None,
                 abi: None,
                 fn_token: Default::default(),
-                ident: Self::MATCHES_FN_IDENT.clone(),
+                ident: Self::CHECK_FN_IDENT.clone(),
                 generics: Generics::default(),
                 paren_token: Default::default(),
                 inputs: [
@@ -130,7 +128,7 @@ impl ArgsCheckerImplGenerator {
                 variadic: None,
                 output: ReturnType::Type(
                     Default::default(),
-                    Box::new(constants::BOOL_TYPE.clone()),
+                    Box::new(constants::VEC_OF_ARG_CHECK_RESULT_TYPE.clone()),
                 ),
             },
             block,
@@ -138,44 +136,27 @@ impl ArgsCheckerImplGenerator {
         return impl_item;
     }
 
-    fn generate_matches_statement(&self, call_info: &CallInfo) -> Stmt {
-        if call_info.item_struct.fields.len() == 0 {
-            let true_stmt = Stmt::Expr(
-                Expr::Lit(ExprLit {
-                    attrs: Vec::new(),
-                    lit: Lit::Bool(LitBool {
-                        value: true,
-                        span: Span::call_site(),
-                    }),
-                }),
-                Default::default(),
-            );
-            return true_stmt;
-        }
-
-        let matches_exprs: Vec<_> = call_info
+    fn generate_check_stmt(&self, call_info: &CallInfo) -> Stmt {
+        let check_exprs: Punctuated<_, Token![,]> = call_info
             .item_struct
             .fields
             .iter()
-            .map(|field| self.generate_matches_exprs(field))
+            .map(|field| self.generate_check_exprs(field))
             .collect();
-        let joined_exprs = matches_exprs
-            .iter()
-            .cloned()
-            .reduce(|a, b| {
-                Expr::Binary(ExprBinary {
-                    attrs: Vec::new(),
-                    left: Box::new(a),
-                    op: BinOp::And(Default::default()),
-                    right: Box::new(b),
-                })
-            })
-            .expect("Should have at least one 'matches' statement.");
-        let stmt = Stmt::Expr(joined_exprs, Default::default());
+        let vec_expr = Expr::Macro(ExprMacro {
+            attrs: Vec::new(),
+            mac: Macro {
+                path: constants::MACRO_VEC_PATH.clone(),
+                bang_token: Default::default(),
+                delimiter: MacroDelimiter::Bracket(Bracket::default()),
+                tokens: check_exprs.into_token_stream(),
+            },
+        });
+        let stmt = Stmt::Expr(vec_expr, None);
         return stmt;
     }
 
-    fn generate_matches_exprs(&self, field: &Field) -> Expr {
+    fn generate_check_exprs(&self, field: &Field) -> Expr {
         let field_ident = field
             .ident
             .clone()
@@ -183,10 +164,14 @@ impl ArgsCheckerImplGenerator {
         let receiver = self
             .field_access_expr_factory
             .create(&[constants::SELF_IDENT.clone(), field_ident.clone()]);
-        let arg = self
+        let field_name_arg = Expr::Lit(ExprLit {
+            attrs: Vec::new(),
+            lit: Lit::Str(LitStr::new(&field_ident.to_string(), Span::call_site())),
+        });
+        let field_access_arg = self
             .field_access_expr_factory
             .create(&[Self::CALL_ARG_IDENT.clone(), field_ident]);
-        let method = self.get_matches_fn_ident(&field.ty);
+        let method = self.get_check_fn_ident(&field.ty);
         let expr = Expr::MethodCall(ExprMethodCall {
             attrs: Vec::new(),
             receiver: Box::new(receiver),
@@ -194,26 +179,25 @@ impl ArgsCheckerImplGenerator {
             method,
             turbofish: None,
             paren_token: Default::default(),
-            args: [arg].into_iter().collect(),
+            args: [field_name_arg, field_access_arg].into_iter().collect(),
         });
         return expr;
     }
 
-    fn get_matches_fn_ident(&self, ty: &Type) -> Ident {
+    fn get_check_fn_ident(&self, ty: &Type) -> Ident {
         if let Type::Reference(_) = ty {
-            return Self::ARG_MATCHES_REF_FN_IDENT.clone();
+            return Self::ARG_CHECK_REF_FN_IDENT.clone();
         }
         if let Type::Path(type_path) = ty {
             if let Some(ident) = type_path.path.segments.last().map(|x| &x.ident) {
-                println!("arg ident: {}", ident);
                 if ident == "Rc" {
-                    return Self::ARG_MATCHES_RC_FN_IDENT.clone();
+                    return Self::ARG_CHECK_RC_FN_IDENT.clone();
                 }
                 if ident == "Arc" {
-                    return Self::ARG_MATCHES_ARC_FN_IDENT.clone();
+                    return Self::ARG_CHECK_ARC_FN_IDENT.clone();
                 }
             }
         }
-        return Self::ARG_MATCHES_FN_IDENT.clone();
+        return Self::ARG_CHECK_FN_IDENT.clone();
     }
 }

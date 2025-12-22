@@ -1,4 +1,4 @@
-use crate::mock_macros::constants;
+use crate::constants;
 use proc_macro2::Ident;
 use syn::{FnArg, ReturnType, Type};
 

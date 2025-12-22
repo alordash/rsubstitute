@@ -1,4 +1,4 @@
-use crate::args_matching::{ArgMatchingResult, IArgsChecker};
+use crate::args_matching::{ArcCheckResult, IArgsChecker};
 use crate::error_printer::{ErrorPrinter, IErrorPrinter};
 use crate::{FnConfig, Times};
 use std::cell::RefCell;
@@ -95,7 +95,7 @@ impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
             .find(|config| {
                 config
                     .borrow()
-                    .matches(call.clone())
+                    .check(call.clone())
                     .into_iter()
                     .all(|x| x.is_ok())
             })
@@ -107,15 +107,15 @@ impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
         &'a self,
         args_checker: &'a TArgsChecker,
     ) -> (
-        Vec<Vec<ArgMatchingResult<'a>>>,
-        Vec<Vec<ArgMatchingResult<'a>>>,
+        Vec<Vec<ArcCheckResult<'a>>>,
+        Vec<Vec<ArcCheckResult<'a>>>,
     ) {
         let mut matching_calls = Vec::new();
         let mut non_matching_calls = Vec::new();
         let calls = self.calls.borrow();
         for call in calls.iter() {
             let call_matching_result = args_checker.check((*call).clone());
-            let is_matching = call_matching_result.iter().all(ArgMatchingResult::is_ok);
+            let is_matching = call_matching_result.iter().all(ArcCheckResult::is_ok);
             if is_matching {
                 matching_calls.push(call_matching_result);
             } else {

@@ -1,4 +1,4 @@
-use crate::mock_macros::constants;
+use crate::constants;
 use crate::mock_macros::fn_info_generation::models::FnInfo;
 use crate::mock_macros::mock_generation::models::{InternalMockImplInfo, MockStructInfo};
 use crate::syntax::{

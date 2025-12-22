@@ -1,13 +1,13 @@
 use crate::Times;
-use crate::args_matching::{ArgMatchingResult, IArgsFormatter, IArgsChecker};
+use crate::args_matching::{ArcCheckResult, IArgsFormatter, IArgsChecker};
 
 pub trait IErrorPrinter {
     fn print_received_verification_error(
         &self,
         fn_name: &'static str,
         args_formatter: &dyn IArgsFormatter,
-        matching_calls: Vec<Vec<ArgMatchingResult>>,
-        non_matching_calls: Vec<Vec<ArgMatchingResult>>,
+        matching_calls: Vec<Vec<ArcCheckResult>>,
+        non_matching_calls: Vec<Vec<ArcCheckResult>>,
         times: Times,
     ) -> !;
 }
@@ -19,8 +19,8 @@ impl IErrorPrinter for ErrorPrinter {
         &self,
         fn_name: &'static str,
         args_formatter: &dyn IArgsFormatter,
-        matching_calls: Vec<Vec<ArgMatchingResult>>,
-        non_matching_calls: Vec<Vec<ArgMatchingResult>>,
+        matching_calls: Vec<Vec<ArcCheckResult>>,
+        non_matching_calls: Vec<Vec<ArcCheckResult>>,
         times: Times,
     ) -> ! {
         let matching_calls_count = matching_calls.len();
@@ -79,10 +79,10 @@ impl ErrorPrinter {
     // TODO - should be configurable
     const MAX_INVALID_CALLS_LISTED_COUNT: usize = 10;
 
-    fn fmt_call(&self, fn_name: &'static str, call: Vec<ArgMatchingResult>) -> String {
+    fn fmt_call(&self, fn_name: &'static str, call: Vec<ArcCheckResult>) -> String {
         let error_msgs: Vec<_> = call
             .iter()
-            .filter_map(ArgMatchingResult::as_err)
+            .filter_map(ArcCheckResult::as_err)
             .enumerate()
             .map(|(i, x)| {
                 let error_number = i + 1;
@@ -109,10 +109,10 @@ impl ErrorPrinter {
         let args_msgs: Vec<_> = call
             .into_iter()
             .map(|x| match x {
-                ArgMatchingResult::Ok(x) => {
+                ArcCheckResult::Ok(x) => {
                     format!("{:?}", x.arg_info.arg_value())
                 }
-                ArgMatchingResult::Err(x) => {
+                ArcCheckResult::Err(x) => {
                     format!("*{:?}*", x.arg_info.arg_value())
                 }
             })

@@ -56,7 +56,7 @@ mod generated {
     }
 
     impl IArgsChecker<work_Call> for work_ArgsChecker {
-        fn check(&self, call: work_Call) -> Vec<ArgMatchingResult> {
+        fn check(&self, call: work_Call) -> Vec<ArcCheckResult> {
             vec![self.value.check("value", call.value)]
         }
     }
@@ -80,7 +80,7 @@ mod generated {
     }
 
     impl<'a> IArgsChecker<another_work_Call<'a>> for another_work_ArgsChecker<'a> {
-        fn check(&self, call: another_work_Call<'a>) -> Vec<ArgMatchingResult<'a>> {
+        fn check(&self, call: another_work_Call<'a>) -> Vec<ArcCheckResult<'a>> {
             vec![
                 self.string.check("string", call.string),
                 self.something.check_ref("something", call.something),
@@ -99,7 +99,7 @@ mod generated {
     pub struct get_ArgsChecker;
 
     impl IArgsChecker<get_Call> for get_ArgsChecker {
-        fn check(&self, _call: get_Call) -> Vec<ArgMatchingResult> {
+        fn check(&self, _call: get_Call) -> Vec<ArcCheckResult> {
             Vec::new()
         }
     }
@@ -117,7 +117,7 @@ mod generated {
     }
 
     impl IArgsChecker<standalone_Call> for standalone_ArgsChecker {
-        fn check(&self, call: standalone_Call) -> Vec<ArgMatchingResult> {
+        fn check(&self, call: standalone_Call) -> Vec<ArcCheckResult> {
             vec![self.number.check("number", call.number)]
         }
     }

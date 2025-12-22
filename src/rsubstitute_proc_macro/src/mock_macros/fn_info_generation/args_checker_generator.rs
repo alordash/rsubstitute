@@ -1,9 +1,9 @@
-use crate::mock_macros::constants;
+use crate::constants;
 use crate::mock_macros::fn_info_generation::models::ArgsCheckerInfo;
 use crate::mock_macros::models::FnDecl;
 use crate::syntax::{IArgTypeFactory, IFieldFactory, IStructFactory};
 use proc_macro2::Ident;
-use quote::{format_ident, ToTokens};
+use quote::{ToTokens, format_ident};
 use std::rc::Rc;
 use syn::{Field, Fields, FieldsNamed, FnArg, PatType, Type};
 
@@ -19,7 +19,10 @@ pub struct ArgsCheckerGenerator {
 
 impl IArgsCheckerGenerator for ArgsCheckerGenerator {
     fn generate(&self, fn_decl: &FnDecl) -> ArgsCheckerInfo {
-        let attrs = vec![constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone()];
+        let attrs = vec![
+            constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone(),
+            constants::DERIVE_DEBUG_AND_I_ARGS_FORMATTER_ATTRIBUTE.clone(),
+        ];
         let ident = format_ident!("{}_{}", fn_decl.ident, Self::ARGS_CHECKER_STRUCT_SUFFIX);
         let struct_fields: Vec<_> = fn_decl
             .arguments
@@ -32,9 +35,7 @@ impl IArgsCheckerGenerator for ArgsCheckerGenerator {
         });
 
         let item_struct = self.struct_factory.create(attrs, ident, fields);
-        let args_checker_info = ArgsCheckerInfo {
-            item_struct,
-        };
+        let args_checker_info = ArgsCheckerInfo { item_struct };
 
         return args_checker_info;
     }
