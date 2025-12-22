@@ -1,4 +1,5 @@
 use crate::args_matching::{ArcCheckResult, IArgsChecker};
+use crate::di::ServiceCollection;
 use crate::error_printer::{ErrorPrinter, IErrorPrinter};
 use crate::{FnConfig, Times};
 use std::cell::RefCell;
@@ -14,12 +15,12 @@ pub struct FnData<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue> {
 impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue>
     FnData<TCall, TArgsChecker, TReturnValue>
 {
-    pub fn new(fn_name: &'static str, error_printer: Rc<dyn IErrorPrinter>) -> Self {
+    pub fn new(fn_name: &'static str, services: &ServiceCollection) -> Self {
         Self {
             fn_name,
             calls: RefCell::new(Vec::new()),
             configs: RefCell::new(Vec::new()),
-            error_printer,
+            error_printer: services.error_printer.clone(),
         }
     }
 }
@@ -106,10 +107,7 @@ impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
     fn get_matching_and_non_matching_calls<'a>(
         &'a self,
         args_checker: &'a TArgsChecker,
-    ) -> (
-        Vec<Vec<ArcCheckResult<'a>>>,
-        Vec<Vec<ArcCheckResult<'a>>>,
-    ) {
+    ) -> (Vec<Vec<ArcCheckResult<'a>>>, Vec<Vec<ArcCheckResult<'a>>>) {
         let mut matching_calls = Vec::new();
         let mut non_matching_calls = Vec::new();
         let calls = self.calls.borrow();

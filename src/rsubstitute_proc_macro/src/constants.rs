@@ -47,6 +47,9 @@ pub const I_ARGS_CHECKER_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ide
 // TODO - add test that it's equal to rsubstitute_core::FnData
 pub const FN_DATA_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("FnData"));
 
+// TODO - add test that it's equal to rsubstitute_core::FnData::new
+pub const FN_DATA_NEW_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("new"));
+
 // TODO - add test that verifies that it's equal to rsubstitute_core::FnData::add_config
 pub const FN_DATA_ADD_CONFIG_FN_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("add_config"));
@@ -54,6 +57,22 @@ pub const FN_DATA_ADD_CONFIG_FN_IDENT: LazyCell<Ident> =
 // TODO - add test that verifies that it's equal to rsubstitute_core::FnData::verify_received
 pub const FN_DATA_VERIFY_RECEIVED_FN_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("verify_received"));
+
+pub const SERVICES_REF_EXPR: LazyCell<Expr> = LazyCell::new(|| {
+    let path_factory = &SERVICES.path_factory;
+    let path = path_factory.create(format_ident!("SERVICES"));
+    let result = Expr::Reference(ExprReference {
+        attrs: Vec::new(),
+        and_token: Default::default(),
+        mutability: None,
+        expr: Box::new(Expr::Path(ExprPath {
+            attrs: Vec::new(),
+            qself: None,
+            path,
+        })),
+    });
+    return result;
+});
 
 // TODO - add test that it's equal to rsubstitute_core::SharedFnConfig
 pub const SHARED_FN_CONFIG_TYPE_IDENT: LazyCell<Ident> =

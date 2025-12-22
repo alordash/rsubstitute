@@ -103,22 +103,51 @@ impl InternalMockImplGenerator {
     }
 
     fn generate_constructor_block(&self, mock_struct_info: &MockStructInfo) -> Block {
-        let fields = mock_struct_info
-            .item_struct
-            .fields
-            .iter()
-            .map(|field| FieldValue {
+        let fields = mock_struct_info.item_struct.fields.iter().map(|field| {
+            let field_ident = field
+                .ident
+                .clone()
+                .expect("Field in call struct should be named");
+            FieldValue {
                 attrs: Vec::new(),
                 // TODO - do something with this "expect", it appears more than one time
-                member: Member::Named(
-                    field
-                        .ident
-                        .clone()
-                        .expect("Field in call struct should be named"),
-                ),
+                member: Member::Named(field_ident.clone()),
                 colon_token: Some(Default::default()),
-                expr: constants::DEFAULT_INVOKE_EXPR.clone(),
-            });
+                // expr: constants::DEFAULT_INVOKE_EXPR.clone(),
+                expr: Expr::Call(ExprCall {
+                    attrs: Vec::new(),
+                    func: Box::new(Expr::Path(ExprPath {
+                        attrs: Vec::new(),
+                        qself: None,
+                        path: Path {
+                            leading_colon: None,
+                            segments: [
+                                PathSegment {
+                                    ident: constants::FN_DATA_TYPE_IDENT.clone(),
+                                    arguments: PathArguments::None,
+                                },
+                                PathSegment {
+                                    ident: constants::FN_DATA_NEW_FN_IDENT.clone(),
+                                    arguments: PathArguments::None,
+                                },
+                            ]
+                            .into_iter()
+                            .collect(),
+                        },
+                    })),
+                    paren_token: Default::default(),
+                    args: [
+                        Expr::Lit(ExprLit {
+                            attrs: Vec::new(),
+                            lit: Lit::Str(LitStr::new(&field_ident.to_string(), Span::call_site())),
+                        }),
+                        constants::SERVICES_REF_EXPR.clone(),
+                    ]
+                    .into_iter()
+                    .collect(),
+                }),
+            }
+        });
         let block = Block {
             brace_token: Default::default(),
             stmts: vec![Stmt::Expr(
