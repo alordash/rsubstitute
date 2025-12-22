@@ -56,7 +56,7 @@ mod generated {
     }
 
     impl IArgsChecker<work_Call> for work_ArgsChecker {
-        fn matches(&self, call: work_Call) -> Vec<ArgMatchingResult> {
+        fn check(&self, call: work_Call) -> Vec<ArgMatchingResult> {
             vec![self.value.check("value", call.value)]
         }
     }
@@ -80,7 +80,7 @@ mod generated {
     }
 
     impl<'a> IArgsChecker<another_work_Call<'a>> for another_work_ArgsChecker<'a> {
-        fn matches(&self, call: another_work_Call<'a>) -> Vec<ArgMatchingResult<'a>> {
+        fn check(&self, call: another_work_Call<'a>) -> Vec<ArgMatchingResult<'a>> {
             vec![
                 self.string.check("string", call.string),
                 self.something.check_ref("something", call.something),
@@ -95,17 +95,11 @@ mod generated {
     pub struct get_Call;
 
     #[allow(non_camel_case_types)]
-    #[derive(Debug)]
+    #[derive(Debug, IArgsFormatter)]
     pub struct get_ArgsChecker;
 
-    impl IArgsFormatter for get_ArgsChecker {
-        fn fmt_args(&self) -> String {
-            String::new()
-        }
-    }
-
     impl IArgsChecker<get_Call> for get_ArgsChecker {
-        fn matches(&self, _call: get_Call) -> Vec<ArgMatchingResult> {
+        fn check(&self, _call: get_Call) -> Vec<ArgMatchingResult> {
             Vec::new()
         }
     }
@@ -117,19 +111,13 @@ mod generated {
     }
 
     #[allow(non_camel_case_types)]
-    #[derive(Debug)]
+    #[derive(Debug, IArgsFormatter)]
     pub struct standalone_ArgsChecker {
         number: Arg<i32>,
     }
 
-    impl IArgsFormatter for standalone_ArgsChecker {
-        fn fmt_args(&self) -> String {
-            format!("number {:?}", self.number)
-        }
-    }
-
     impl IArgsChecker<standalone_Call> for standalone_ArgsChecker {
-        fn matches(&self, call: standalone_Call) -> Vec<ArgMatchingResult> {
+        fn check(&self, call: standalone_Call) -> Vec<ArgMatchingResult> {
             vec![self.number.check("number", call.number)]
         }
     }

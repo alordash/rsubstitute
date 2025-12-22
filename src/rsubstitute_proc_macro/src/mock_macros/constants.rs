@@ -31,9 +31,12 @@ pub const I_ARGS_FORMATTER_TRAIT_IDENT: LazyCell<Ident> =
 // TODO - add test that it's equal to rsubstitute_core::arguments_matching::IArgsFormatter::fmt_args
 pub const I_ARGS_FORMATTER_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("fmt_args"));
 
-// TODO - add test that it's equal to rsubstitute_core::arguments_matching::IArgsChecker
+// TODO - add test that it's equal to rsubstitute_core::arguments_matching::IArgschecker
 pub const I_ARGS_CHECKER_TRAIT_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("IArgsChecker"));
+
+// TODO - add test that it's equal to rsubstitute_core::arguments_matching::IArgschecker::check
+pub const I_ARGS_CHECKER_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("check"));
 
 // TODO - add test that it's equal to rsubstitute_core::FnData
 pub const FN_DATA_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("FnData"));

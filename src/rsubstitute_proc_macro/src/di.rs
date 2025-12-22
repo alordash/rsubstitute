@@ -1,6 +1,4 @@
-use crate::derive_args_formatter_macros::{
-    DeriveArgsFormatterMacroHandler, IDeriveArgsFormatterMacroHandler,
-};
+use crate::derive_args_formatter_macro_handler::*;
 use crate::mock_macros::fn_info_generation::*;
 use crate::mock_macros::mock_generation::*;
 use crate::mock_macros::*;

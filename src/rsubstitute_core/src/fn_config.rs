@@ -32,7 +32,7 @@ impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
     }
 
     pub fn matches(&self, call: TCall) -> Vec<ArgMatchingResult> {
-        self.args_checker.matches(call)
+        self.args_checker.check(call)
     }
 
     pub fn get_return_value(&mut self) -> Option<TReturnValue> {

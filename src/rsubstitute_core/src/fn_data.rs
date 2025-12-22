@@ -114,7 +114,7 @@ impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
         let mut non_matching_calls = Vec::new();
         let calls = self.calls.borrow();
         for call in calls.iter() {
-            let call_matching_result = args_checker.matches((*call).clone());
+            let call_matching_result = args_checker.check((*call).clone());
             let is_matching = call_matching_result.iter().all(ArgMatchingResult::is_ok);
             if is_matching {
                 matching_calls.push(call_matching_result);

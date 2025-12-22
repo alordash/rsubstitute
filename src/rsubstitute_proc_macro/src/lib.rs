@@ -1,6 +1,6 @@
 use crate::di::SERVICES;
 
-mod derive_args_formatter_macros;
+mod derive_args_formatter_macro_handler;
 mod di;
 mod mock_macros;
 mod syntax;
