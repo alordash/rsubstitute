@@ -2,7 +2,8 @@ use crate::constants;
 use crate::mock_macros::fn_info_generation::models::FnInfo;
 use crate::mock_macros::mock_generation::models::{InternalMockImplInfo, MockStructInfo};
 use crate::syntax::{
-    IExprMethodCallFactory, IFieldValueFactory, ILocalFactory, IPathFactory, ITypeFactory,
+    IExprMethodCallFactory, IFieldValueFactory, ILocalFactory, IPathFactory, IReferenceNormalizer,
+    ITypeFactory,
 };
 use proc_macro2::{Ident, Span};
 use quote::format_ident;
@@ -20,12 +21,13 @@ pub trait IInternalMockImplGenerator {
     ) -> InternalMockImplInfo;
 }
 
-pub struct InternalMockImplGenerator {
-    pub(crate) path_factory: Rc<dyn IPathFactory>,
-    pub(crate) type_factory: Rc<dyn ITypeFactory>,
-    pub(crate) field_value_factory: Rc<dyn IFieldValueFactory>,
-    pub(crate) local_factory: Rc<dyn ILocalFactory>,
-    pub(crate) expr_method_call_factory: Rc<dyn IExprMethodCallFactory>,
+pub(crate) struct InternalMockImplGenerator {
+    pub path_factory: Rc<dyn IPathFactory>,
+    pub type_factory: Rc<dyn ITypeFactory>,
+    pub field_value_factory: Rc<dyn IFieldValueFactory>,
+    pub local_factory: Rc<dyn ILocalFactory>,
+    pub expr_method_call_factory: Rc<dyn IExprMethodCallFactory>,
+    pub reference_normalizer: Rc<dyn IReferenceNormalizer>,
 }
 
 impl IInternalMockImplGenerator for InternalMockImplGenerator {
@@ -48,7 +50,8 @@ impl IInternalMockImplGenerator for InternalMockImplGenerator {
             .chain(fn_setups)
             .chain(fn_receiveds)
             .collect();
-        let item_impl = ItemImpl {
+
+        let mut item_impl = ItemImpl {
             attrs: Vec::new(),
             defaultness: None,
             unsafety: None,
@@ -59,7 +62,10 @@ impl IInternalMockImplGenerator for InternalMockImplGenerator {
             brace_token: Default::default(),
             items,
         };
-
+        self.reference_normalizer.normalize_in_impl(
+            constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
+            &mut item_impl,
+        );
         let internal_mock_impl_info = InternalMockImplInfo { item_impl };
         return internal_mock_impl_info;
     }
@@ -195,10 +201,7 @@ impl InternalMockImplGenerator {
                                         colon2_token: None,
                                         lt_token: Default::default(),
                                         args: [
-                                            GenericArgument::Lifetime(Lifetime {
-                                                apostrophe: Span::call_site(),
-                                                ident: constants::DISCARD_IDENT.clone(),
-                                            }),
+                                            GenericArgument::Lifetime(constants::DEFAULT_ARG_FIELD_LIFETIME.clone()),
                                             GenericArgument::Type(self.type_factory.create(
                                                 fn_info.call_info.item_struct.ident.clone(),
                                             )),

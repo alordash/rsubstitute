@@ -2,7 +2,9 @@ use crate::constants;
 use crate::mock_macros::fn_info_generation::models::FnInfo;
 use crate::mock_macros::mock_generation::models::{MockImplInfo, MockStructInfo};
 use crate::mock_macros::models::TargetDecl;
-use crate::syntax::{IExprMethodCallFactory, IFieldValueFactory, IPathFactory, ITypeFactory};
+use crate::syntax::{
+    IExprMethodCallFactory, IFieldValueFactory, IPathFactory, IReferenceNormalizer, ITypeFactory,
+};
 use proc_macro2::Ident;
 use quote::format_ident;
 use std::cell::LazyCell;
@@ -21,11 +23,12 @@ pub trait IMockImplGenerator {
     ) -> MockImplInfo;
 }
 
-pub struct MockImplGenerator {
-    pub(crate) path_factory: Rc<dyn IPathFactory>,
-    pub(crate) type_factory: Rc<dyn ITypeFactory>,
-    pub(crate) field_value_factory: Rc<dyn IFieldValueFactory>,
-    pub(crate) expr_method_call_factory: Rc<dyn IExprMethodCallFactory>,
+pub(crate) struct MockImplGenerator {
+    pub path_factory: Rc<dyn IPathFactory>,
+    pub type_factory: Rc<dyn ITypeFactory>,
+    pub field_value_factory: Rc<dyn IFieldValueFactory>,
+    pub expr_method_call_factory: Rc<dyn IExprMethodCallFactory>,
+    pub reference_normalizer: Rc<dyn IReferenceNormalizer>,
 }
 
 impl IMockImplGenerator for MockImplGenerator {
@@ -44,7 +47,8 @@ impl IMockImplGenerator for MockImplGenerator {
             .map(|x| self.generate_impl_item_fn(x))
             .map(ImplItem::Fn)
             .collect();
-        let item_impl = ItemImpl {
+
+        let mut item_impl = ItemImpl {
             attrs: Vec::new(),
             defaultness: None,
             unsafety: None,
@@ -55,7 +59,10 @@ impl IMockImplGenerator for MockImplGenerator {
             brace_token: Default::default(),
             items,
         };
-
+        self.reference_normalizer.normalize_in_impl(
+            constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
+            &mut item_impl,
+        );
         let mock_impl_info = MockImplInfo { item_impl };
         return mock_impl_info;
     }

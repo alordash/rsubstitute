@@ -63,6 +63,7 @@ fn create_services() -> ServiceCollection {
     let mock_struct_generator = Rc::new(MockStructGenerator {
         type_factory: type_factory.clone(),
         struct_factory: struct_factory.clone(),
+        reference_normalizer: reference_normalizer.clone(),
     });
     let field_value_factory = Rc::new(FieldValueFactory {
         path_factory: path_factory.clone(),
@@ -76,6 +77,7 @@ fn create_services() -> ServiceCollection {
         type_factory: type_factory.clone(),
         field_value_factory: field_value_factory.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
+        reference_normalizer: reference_normalizer.clone(),
     });
     let local_factory = Rc::new(LocalFactory);
     let internal_mock_impl_generator = Rc::new(InternalMockImplGenerator {
@@ -84,6 +86,7 @@ fn create_services() -> ServiceCollection {
         field_value_factory: field_value_factory.clone(),
         local_factory: local_factory.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
+        reference_normalizer: reference_normalizer.clone(),
     });
     let mod_generator = Rc::new(ModGenerator);
 
