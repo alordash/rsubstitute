@@ -1,7 +1,7 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::ArgsCheckerInfo;
 use crate::mock_macros::models::FnDecl;
-use crate::syntax::{IArgTypeFactory, IFieldFactory, IStructFactory};
+use crate::syntax::{IArgTypeFactory, IFieldFactory, IReferenceNormalizer, IStructFactory};
 use proc_macro2::Ident;
 use quote::{ToTokens, format_ident};
 use std::rc::Rc;
@@ -15,6 +15,7 @@ pub struct ArgsCheckerGenerator {
     pub(crate) arg_type_factory: Rc<dyn IArgTypeFactory>,
     pub(crate) field_factory: Rc<dyn IFieldFactory>,
     pub(crate) struct_factory: Rc<dyn IStructFactory>,
+    pub(crate) reference_normalizer: Rc<dyn IReferenceNormalizer>
 }
 
 impl IArgsCheckerGenerator for ArgsCheckerGenerator {
@@ -34,7 +35,8 @@ impl IArgsCheckerGenerator for ArgsCheckerGenerator {
             named: struct_fields.into_iter().collect(),
         });
 
-        let item_struct = self.struct_factory.create(attrs, ident, fields);
+        let mut item_struct = self.struct_factory.create(attrs, ident, fields);
+        self.reference_normalizer.normalize_in_struct(&mut item_struct);
         let args_checker_info = ArgsCheckerInfo { item_struct };
 
         return args_checker_info;
@@ -49,19 +51,11 @@ impl ArgsCheckerGenerator {
             FnArg::Receiver(_) => return None,
             FnArg::Typed(pat_type) => pat_type,
         };
-        let ty = self.try_generate_wrapped_field_type(pat_type)?;
+        let ty = self.arg_type_factory.create(*pat_type.ty.clone());
         let ident = self.generate_field_ident(pat_type);
 
         let result = self.field_factory.create(ident, ty);
         return Some(result);
-    }
-
-    fn try_generate_wrapped_field_type(&self, pat_type: &PatType) -> Option<Type> {
-        let result = match &*pat_type.ty {
-            Type::Path(inner_type_path) => Some(self.arg_type_factory.create(inner_type_path)),
-            _ => None,
-        };
-        return result;
     }
 
     fn generate_field_ident(&self, pat_type: &PatType) -> Ident {

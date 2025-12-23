@@ -1,4 +1,6 @@
-use crate::mock_macros::fn_info_generation::models::{ArgsCheckerImplInfo, ArgsCheckerInfo, CallInfo};
+use crate::mock_macros::fn_info_generation::models::{
+    ArgsCheckerImplInfo, ArgsCheckerInfo, CallInfo,
+};
 use crate::mock_macros::models::FnDecl;
 use proc_macro2::Ident;
 

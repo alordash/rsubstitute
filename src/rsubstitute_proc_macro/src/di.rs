@@ -23,15 +23,18 @@ fn create_services() -> ServiceCollection {
 
     let field_factory = Rc::new(FieldFactory);
     let struct_factory = Rc::new(StructFactory);
+    let reference_normalizer = Rc::new(ReferenceNormalizer);
     let call_struct_generator = Rc::new(CallStructGenerator {
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
+        reference_normalizer: reference_normalizer.clone(),
     });
     let arg_type_factory = Rc::new(ArgTypeFactory);
     let args_checker_generator = Rc::new(ArgsCheckerGenerator {
         arg_type_factory: arg_type_factory.clone(),
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
+        reference_normalizer: reference_normalizer.clone(),
     });
     let generic_argument_factory_cell = Rc::new(OnceCell::new());
     let path_factory = Rc::new(PathFactory {

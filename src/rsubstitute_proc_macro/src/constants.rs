@@ -1,6 +1,6 @@
 // TODO - move to crate root
 use crate::di::SERVICES;
-use proc_macro2::{Ident, TokenStream};
+use proc_macro2::{Ident, Span, TokenStream};
 use quote::format_ident;
 use std::cell::LazyCell;
 use std::str::FromStr;
@@ -261,4 +261,9 @@ pub const USE_CRATE_PRELUDE: LazyCell<ItemUse> = LazyCell::new(|| {
         semi_token: Default::default(),
     };
     return result;
+});
+
+pub const DEFAULT_ARG_FIELD_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
+    apostrophe: Span::call_site(),
+    ident: format_ident!("__rsubstitute_arg_field_lifetime"),
 });

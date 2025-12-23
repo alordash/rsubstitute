@@ -27,8 +27,8 @@ impl IFnInfoGenerator for FnInfoGenerator {
         let fn_info = FnInfo {
             parent: fn_decl,
             call_info,
-            args_checker_info: args_checker_info,
-            args_checker_impl_info: args_checker_impl_info,
+            args_checker_info,
+            args_checker_impl_info,
             data_field_ident,
         };
         return fn_info;

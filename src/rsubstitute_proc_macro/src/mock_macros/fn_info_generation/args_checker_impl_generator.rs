@@ -54,17 +54,17 @@ impl IArgsCheckerImplGenerator for ArgsCheckerImplGenerator {
             self.type_factory
                 .create(call_info.item_struct.ident.clone()),
         );
-        let self_ty = Box::new(
-            self.type_factory
-                .create(args_checker_info.item_struct.ident.clone()),
-        );
+        let self_ty = Box::new(self.type_factory.create_with_generics(
+            args_checker_info.item_struct.ident.clone(),
+            args_checker_info.item_struct.generics.clone(),
+        ));
         let items = self.generate_check_fn(call_info, call_ty);
         let item_impl = ItemImpl {
             attrs: Vec::new(),
             defaultness: None,
             unsafety: None,
             impl_token: Default::default(),
-            generics: Default::default(),
+            generics: args_checker_info.item_struct.generics.clone(),
             trait_: Some((None, trait_path, Default::default())),
             self_ty,
             brace_token: Default::default(),

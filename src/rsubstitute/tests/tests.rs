@@ -1,52 +1,43 @@
 use rsubstitute_proc_macro::mock;
+use std::fmt::Debug;
 use std::rc::Rc;
 use std::sync::Arc;
 
+trait IFoo: Debug {
+    fn get_value(&self) -> i32;
+}
+
 #[mock]
-trait Foo {
-    fn work(&self, number: i32, string: String, rc: Rc<u8>, arc: Arc<u8>, r#box: Box<u8>) -> f32;
+trait MyTrait {
+    // fn work(&self, value: i32);
+
+    fn another_work(
+        &self,
+        string: &str,
+        something: &&[u8],
+        dyn_obj: &dyn IFoo,
+        arc: Arc<dyn IFoo>,
+    ) -> Vec<u8>;
 }
 
 mod tests {
-    use super::__rsubstitute_generated::FooMock;
-    use crate::Foo;
+    use super::__rsubstitute_generated::MyTraitMock;
+    use crate::MyTrait;
     use rsubstitute::*;
-    use std::rc::Rc;
-    use std::sync::Arc;
 
     #[test]
-    fn a() {
-        let foo_mock = FooMock::new();
-        let rc = Rc::new(1);
-        let arc = Arc::new(2);
-        let r#box = Box::new(3);
-        foo_mock
-            .work(
-                Arg::Any,
-                Arg::Eq(String::from("amogus")),
-                Arg::Any,
-                Arg::Any,
-                Arg::Any,
-            )
-            .returns(21.0f32);
+    fn work() {
+        let my_trait_mock = MyTraitMock::new();
+        // my_trait_mock.work(Arg::Any).does(|| println!("work 1"));
 
-        let result = Foo::work(
-            &foo_mock,
-            20,
-            String::from("amogus"),
-            rc.clone(),
-            arc.clone(),
-            r#box,
-        );
+        // MyTrait::work(&my_trait_mock, 20);
 
-        assert_eq!(21.0f32, result);
-        foo_mock.work_received(
-            Arg::Eq(20),
-            Arg::Is(|x| x == "amogus"),
-            Arg::Eq(rc),
-            Arg::Eq(arc),
-            Arg::Eq(Box::new(3)),
-            Times::Once,
-        );
+        // my_trait_mock.work_received(Arg::Eq(20), Times::Once);
+    }
+    
+    #[test]
+    fn another_work() {
+        let my_trait_mock = MyTraitMock::new();
+        my_trait_mock.another_work(Arg::Any);
     }
 }

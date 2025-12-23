@@ -1,9 +1,9 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::CallInfo;
 use crate::mock_macros::models::FnDecl;
-use crate::syntax::{IFieldFactory, IStructFactory};
+use crate::syntax::{IFieldFactory, IReferenceNormalizer, IStructFactory};
 use proc_macro2::Ident;
-use quote::{format_ident, ToTokens};
+use quote::{ToTokens, format_ident};
 use std::rc::Rc;
 use syn::{Field, Fields, FieldsNamed, FnArg, PatType, Type};
 
@@ -14,6 +14,7 @@ pub trait ICallStructGenerator {
 pub struct CallStructGenerator {
     pub(crate) field_factory: Rc<dyn IFieldFactory>,
     pub(crate) struct_factory: Rc<dyn IStructFactory>,
+    pub(crate) reference_normalizer: Rc<dyn IReferenceNormalizer>,
 }
 
 impl ICallStructGenerator for CallStructGenerator {
@@ -32,10 +33,10 @@ impl ICallStructGenerator for CallStructGenerator {
             named: struct_fields.collect(),
         });
 
-        let item_struct = self.struct_factory.create(attrs, ident, fields);
-        let call_info = CallInfo {
-            item_struct,
-        };
+        let mut item_struct = self.struct_factory.create(attrs, ident, fields);
+        self.reference_normalizer
+            .normalize_in_struct(&mut item_struct);
+        let call_info = CallInfo { item_struct };
 
         return call_info;
     }
@@ -49,19 +50,11 @@ impl CallStructGenerator {
             FnArg::Receiver(_) => return None,
             FnArg::Typed(pat_type) => pat_type,
         };
-        let ty = self.get_field_type(pat_type)?;
+        let ty = *pat_type.ty.clone();
         let ident = self.generate_field_ident(pat_type);
 
         let result = self.field_factory.create(ident, ty);
         return Some(result);
-    }
-
-    fn get_field_type(&self, pat_type: &PatType) -> Option<Type> {
-        let result = match &*pat_type.ty {
-            Type::Path(inner_type_path) => Some(Type::Path(inner_type_path.clone())),
-            _ => None,
-        };
-        return result;
     }
 
     fn generate_field_ident(&self, pat_type: &PatType) -> Ident {
