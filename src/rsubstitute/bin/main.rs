@@ -41,21 +41,24 @@ mod generated {
     use rsubstitute_proc_macro::IArgsFormatter;
     use std::cell::LazyCell;
     use std::fmt::Debug;
+    use std::marker::PhantomData;
 
     // start - Calls
     #[allow(non_camel_case_types)]
     #[derive(Clone)]
-    pub struct work_Call {
+    pub struct work_Call<'a> {
+        phantom_lifetime: PhantomData<&'a ()>,
         pub value: i32,
     }
 
     #[allow(non_camel_case_types)]
     #[derive(Debug, IArgsFormatter)]
-    pub struct work_ArgsChecker {
+    pub struct work_ArgsChecker<'a> {
+        phantom_lifetime: PhantomData<&'a ()>,
         pub value: Arg<i32>,
     }
 
-    impl IArgsChecker<work_Call> for work_ArgsChecker {
+    impl<'a> IArgsChecker<work_Call<'a>> for work_ArgsChecker<'a> {
         fn check(&self, call: work_Call) -> Vec<ArcCheckResult> {
             vec![self.value.check("value", call.value)]
         }
@@ -64,6 +67,7 @@ mod generated {
     #[allow(non_camel_case_types)]
     #[derive(Clone)]
     pub struct another_work_Call<'a> {
+        phantom_lifetime: PhantomData<&'a ()>,
         pub string: &'a str,
         pub something: &'a &'a [u8],
         pub dyn_obj: &'a dyn IFoo,
@@ -73,6 +77,7 @@ mod generated {
     #[allow(non_camel_case_types)]
     #[derive(Debug, IArgsFormatter)]
     pub struct another_work_ArgsChecker<'a> {
+        phantom_lifetime: PhantomData<&'a ()>,
         pub string: Arg<&'a str>,
         pub something: Arg<&'a &'a [u8]>,
         pub dyn_obj: Arg<&'a dyn IFoo>,
@@ -92,13 +97,17 @@ mod generated {
 
     #[allow(non_camel_case_types)]
     #[derive(Clone)]
-    pub struct get_Call;
+    pub struct get_Call<'a> {
+        phantom_lifetime: PhantomData<&'a ()>,
+    }
 
     #[allow(non_camel_case_types)]
     #[derive(Debug, IArgsFormatter)]
-    pub struct get_ArgsChecker;
+    pub struct get_ArgsChecker<'a> {
+        phantom_lifetime: PhantomData<&'a ()>,
+    }
 
-    impl IArgsChecker<get_Call> for get_ArgsChecker {
+    impl<'a> IArgsChecker<get_Call<'a>> for get_ArgsChecker<'a> {
         fn check(&self, _call: get_Call) -> Vec<ArcCheckResult> {
             Vec::new()
         }
@@ -106,17 +115,19 @@ mod generated {
 
     #[allow(non_camel_case_types)]
     #[derive(Clone)]
-    pub struct standalone_Call {
+    pub struct standalone_Call<'a> {
+        phantom_lifetime: PhantomData<&'a ()>,
         number: i32,
     }
 
     #[allow(non_camel_case_types)]
     #[derive(Debug, IArgsFormatter)]
-    pub struct standalone_ArgsChecker {
+    pub struct standalone_ArgsChecker<'a> {
+        phantom_lifetime: PhantomData<&'a ()>,
         number: Arg<i32>,
     }
 
-    impl IArgsChecker<standalone_Call> for standalone_ArgsChecker {
+    impl<'a> IArgsChecker<standalone_Call<'a>> for standalone_ArgsChecker<'a> {
         fn check(&self, call: standalone_Call) -> Vec<ArcCheckResult> {
             vec![self.number.check("number", call.number)]
         }
@@ -126,14 +137,18 @@ mod generated {
     // start - Mock
 
     pub struct MyTraitMock<'a> {
-        work_data: FnData<work_Call, work_ArgsChecker, ()>,
+        phantom_lifetime: PhantomData<&'a ()>,
+        work_data: FnData<work_Call<'a>, work_ArgsChecker<'a>, ()>,
         another_work_data: FnData<another_work_Call<'a>, another_work_ArgsChecker<'a>, Vec<u8>>,
-        get_data: FnData<get_Call, get_ArgsChecker, i32>,
+        get_data: FnData<get_Call<'a>, get_ArgsChecker<'a>, i32>,
     }
 
     impl<'a> MyTrait for MyTraitMock<'a> {
         fn work(&self, value: i32) {
-            let call = work_Call { value };
+            let call = work_Call {
+                phantom_lifetime: PhantomData,
+                value,
+            };
             return self.work_data.handle(call);
         }
 
@@ -146,6 +161,7 @@ mod generated {
         ) -> Vec<u8> {
             let call = unsafe {
                 another_work_Call {
+                    phantom_lifetime: PhantomData,
                     string: std::mem::transmute(string),
                     something: std::mem::transmute(something),
                     dyn_obj: std::mem::transmute(dyn_obj),
@@ -156,12 +172,17 @@ mod generated {
         }
 
         fn get(&self) -> i32 {
-            let call = get_Call;
+            let call = get_Call {
+                phantom_lifetime: PhantomData,
+            };
             return self.get_data.handle_returning(call);
         }
 
         fn standalone(number: i32) -> f32 {
-            let call = standalone_Call { number };
+            let call = standalone_Call {
+                phantom_lifetime: PhantomData,
+                number,
+            };
             return Self::standalone_data.handle_returning(call);
         }
 
@@ -173,6 +194,7 @@ mod generated {
     impl<'a> MyTraitMock<'a> {
         pub fn new() -> Self {
             Self {
+                phantom_lifetime: PhantomData,
                 work_data: FnData::new("work", &SERVICES),
                 another_work_data: FnData::new("another_work", &SERVICES),
                 get_data: FnData::new("get", &SERVICES),
@@ -182,15 +204,21 @@ mod generated {
         pub fn work(
             &'a self,
             value: Arg<i32>,
-        ) -> SharedFnConfig<'a, work_Call, work_ArgsChecker, (), Self> {
-            let work_args_checker = work_ArgsChecker { value };
+        ) -> SharedFnConfig<'a, work_Call<'a>, work_ArgsChecker<'a>, (), Self> {
+            let work_args_checker = work_ArgsChecker {
+                phantom_lifetime: PhantomData,
+                value,
+            };
             let fn_config = self.work_data.add_config(work_args_checker);
             let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
         }
 
         pub fn received_work(&'a self, value: Arg<i32>, times: Times) -> &'a Self {
-            let work_args_checker = work_ArgsChecker { value };
+            let work_args_checker = work_ArgsChecker {
+                phantom_lifetime: PhantomData,
+                value,
+            };
             self.work_data.verify_received(work_args_checker, times);
             return self;
         }
@@ -204,6 +232,7 @@ mod generated {
         ) -> SharedFnConfig<'a, another_work_Call<'a>, another_work_ArgsChecker<'a>, Vec<u8>, Self>
         {
             let another_work_args_checker = another_work_ArgsChecker {
+                phantom_lifetime: PhantomData,
                 string,
                 something,
                 dyn_obj,
@@ -223,6 +252,7 @@ mod generated {
             times: Times,
         ) -> &'a Self {
             let another_work_args_checker = another_work_ArgsChecker {
+                phantom_lifetime: PhantomData,
                 string,
                 something,
                 dyn_obj,
@@ -233,24 +263,32 @@ mod generated {
             return self;
         }
 
-        pub fn get(&'a self) -> SharedFnConfig<'a, get_Call, get_ArgsChecker, i32, Self> {
-            let get_args_checker = get_ArgsChecker;
+        pub fn get(&'a self) -> SharedFnConfig<'a, get_Call<'a>, get_ArgsChecker<'a>, i32, Self> {
+            let get_args_checker = get_ArgsChecker {
+                phantom_lifetime: PhantomData,
+            };
             let fn_config = self.get_data.add_config(get_args_checker);
             let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
         }
 
         pub fn received_get(&'a self, times: Times) -> &'a Self {
-            let get_args_checker = get_ArgsChecker;
+            let get_args_checker = get_ArgsChecker {
+                phantom_lifetime: PhantomData,
+            };
             self.get_data.verify_received(get_args_checker, times);
             return self;
         }
 
         #[allow(non_upper_case_globals)]
-        const standalone_data: LazyCell<FnData<standalone_Call, standalone_ArgsChecker, f32>> =
-            LazyCell::new(|| FnData::new("standalone", &SERVICES));
+        const standalone_data: LazyCell<
+            FnData<standalone_Call<'a>, standalone_ArgsChecker<'a>, f32>,
+        > = LazyCell::new(|| FnData::new("standalone", &SERVICES));
         pub fn standalone(number: Arg<i32>) -> f32 {
-            let standalone_args_checker = standalone_ArgsChecker { number };
+            let standalone_args_checker = standalone_ArgsChecker {
+                phantom_lifetime: PhantomData,
+                number,
+            };
             let _fn_config = Self::standalone_data.add_config(standalone_args_checker);
             // let shared_fn_config = SharedFnConfig::new()
             todo!()
