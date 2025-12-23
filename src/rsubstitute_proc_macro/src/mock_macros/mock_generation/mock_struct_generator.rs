@@ -29,7 +29,7 @@ impl IMockStructGenerator for MockStructGenerator {
             named: fields,
         });
 
-        let mut item_struct = self.struct_factory.create(attrs, ident, fields_named);
+        let mut item_struct = self.struct_factory.create_with_default_lifetime(attrs, ident, fields_named);
         if fn_infos.iter().any(|fn_info| {
             fn_info
                 .call_info

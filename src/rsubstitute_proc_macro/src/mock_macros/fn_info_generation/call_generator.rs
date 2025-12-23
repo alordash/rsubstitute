@@ -33,7 +33,7 @@ impl ICallStructGenerator for CallStructGenerator {
             named: struct_fields.collect(),
         });
 
-        let mut item_struct = self.struct_factory.create(attrs, ident, fields);
+        let mut item_struct = self.struct_factory.create_with_default_lifetime(attrs, ident, fields);
         self.reference_normalizer
             .normalize_in_struct(&mut item_struct);
         let call_info = CallInfo { item_struct };

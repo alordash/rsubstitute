@@ -3,6 +3,7 @@ use crate::di::SERVICES;
 use proc_macro2::{Ident, Span, TokenStream};
 use quote::format_ident;
 use std::cell::LazyCell;
+use std::clone::Clone;
 use std::str::FromStr;
 use syn::punctuated::Punctuated;
 use syn::*;
@@ -261,6 +262,16 @@ pub const USE_CRATE_PRELUDE: LazyCell<ItemUse> = LazyCell::new(|| {
         semi_token: Default::default(),
     };
     return result;
+});
+
+pub const DEFAULT_ARG_FIELD_LIFETIME_FIELD_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("_phantom_lifetime"));
+
+pub const DEFAULT_ARG_FIELD_LIFETIME_FIELD: LazyCell<Field> = LazyCell::new(|| Field {
+    attrs: Vec::new(),
+    vis: Visibility::Inherited,
+    mutability: FieldMutability::None,
+    ident: Some(DEFAULT_ARG_FIELD_LIFETIME_FIELD_IDENT.clone()),
+    colon_token: Some(Default::default())
 });
 
 pub const DEFAULT_ARG_FIELD_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {

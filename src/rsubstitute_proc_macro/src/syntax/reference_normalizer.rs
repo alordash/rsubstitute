@@ -24,28 +24,28 @@ impl IReferenceNormalizer for ReferenceNormalizer {
             return;
         }
 
-        item_struct.generics.params.insert(
-            0,
-            GenericParam::Lifetime(LifetimeParam {
-                attrs: Vec::new(),
-                lifetime: constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
-                colon_token: None,
-                bounds: Punctuated::new(),
-            }),
-        )
+        // item_struct.generics.params.insert(
+        //     0,
+        //     GenericParam::Lifetime(LifetimeParam {
+        //         attrs: Vec::new(),
+        //         lifetime: constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
+        //         colon_token: None,
+        //         bounds: Punctuated::new(),
+        //     }),
+        // )
     }
 
     // TODO - just always add as first generic parameter
     fn normalize_in_impl(&self, lifetime: Lifetime, item_impl: &mut ItemImpl) {
-        item_impl.generics.params.insert(
-            0,
-            GenericParam::Lifetime(LifetimeParam {
-                attrs: Vec::new(),
-                lifetime: lifetime.clone(),
-                colon_token: None,
-                bounds: Punctuated::new(),
-            }),
-        );
+        // item_impl.generics.params.insert(
+        //     0,
+        //     GenericParam::Lifetime(LifetimeParam {
+        //         attrs: Vec::new(),
+        //         lifetime: lifetime.clone(),
+        //         colon_token: None,
+        //         bounds: Punctuated::new(),
+        //     }),
+        // );
         if let Type::Path(type_path) = item_impl.self_ty.as_mut() {
             let last_segment = type_path
                 .path

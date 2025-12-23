@@ -35,7 +35,7 @@ impl IArgsCheckerGenerator for ArgsCheckerGenerator {
             named: struct_fields.into_iter().collect(),
         });
 
-        let mut item_struct = self.struct_factory.create(attrs, ident, fields);
+        let mut item_struct = self.struct_factory.create_with_default_lifetime(attrs, ident, fields);
         self.reference_normalizer.normalize_in_struct(&mut item_struct);
         let args_checker_info = ArgsCheckerInfo { item_struct };
 
