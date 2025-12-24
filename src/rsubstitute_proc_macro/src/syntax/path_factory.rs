@@ -8,6 +8,8 @@ pub trait IPathFactory {
     fn create(&self, ident: Ident) -> Path;
 
     fn create_with_generics(&self, ident: Ident, generics: Generics) -> Path;
+
+    fn create_from_parts(&self, idents: &[Ident]) -> Path;
 }
 
 pub(crate) struct PathFactory {
@@ -51,6 +53,20 @@ impl IPathFactory for PathFactory {
         let result = Path {
             leading_colon: None,
             segments: [PathSegment { ident, arguments }].into_iter().collect(),
+        };
+        return result;
+    }
+
+    fn create_from_parts(&self, idents: &[Ident]) -> Path {
+        let result = Path {
+            leading_colon: None,
+            segments: idents
+                .iter()
+                .map(|ident| PathSegment {
+                    ident: ident.clone(),
+                    arguments: PathArguments::None,
+                })
+                .collect(),
         };
         return result;
     }
