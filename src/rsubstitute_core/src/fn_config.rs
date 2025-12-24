@@ -3,7 +3,7 @@ use crate::args_matching::{ArgCheckResult, IArgsChecker};
 pub struct FnConfig<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue> {
     args_checker: TArgsChecker,
     return_value: Option<TReturnValue>,
-    callback: Option<fn()>,
+    callback: Option<Box<dyn FnMut()>>,
     calls: Vec<TCall>,
 }
 
@@ -23,8 +23,8 @@ impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
         self.return_value = Some(return_value);
     }
 
-    pub fn set_callback(&mut self, callback: fn()) {
-        self.callback = Some(callback);
+    pub fn set_callback(&mut self, callback: impl FnMut() + 'static) {
+        self.callback = Some(Box::new(callback));
     }
 
     pub fn register_call(&mut self, call: TCall) {
@@ -39,7 +39,7 @@ impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
         self.return_value.clone()
     }
 
-    pub fn get_callback(&self) -> Option<fn()> {
-        self.callback
+    pub fn get_callback(&mut self) -> Option<&mut Box<dyn FnMut()>> {
+        self.callback.as_mut()
     }
 }

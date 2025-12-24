@@ -1,5 +1,5 @@
-use crate::args_matching::IArgsChecker;
 use crate::FnConfig;
+use crate::args_matching::IArgsChecker;
 use std::cell::RefCell;
 use std::rc::Rc;
 
@@ -28,12 +28,16 @@ impl<'a, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TOwner>
         return self.owner;
     }
 
-    pub fn does(&self, callback: fn()) -> &'a TOwner {
+    pub fn does(&self, callback: impl FnMut() + 'static) -> &'a TOwner {
         self.shared_fn_config.borrow_mut().set_callback(callback);
         return self.owner;
     }
 
-    pub fn returns_and_does(&self, return_value: TReturnValue, callback: fn()) -> &'a TOwner {
+    pub fn returns_and_does(
+        &self,
+        return_value: TReturnValue,
+        callback: impl FnMut() + 'static,
+    ) -> &'a TOwner {
         self.returns(return_value);
         self.does(callback);
         return self.owner;

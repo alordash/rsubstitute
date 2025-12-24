@@ -48,7 +48,7 @@ impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
         self.register_call(call.clone());
         if let Some(fn_config) = maybe_fn_config {
             fn_config.borrow_mut().register_call(call);
-            if let Some(callback) = fn_config.borrow().get_callback() {
+            if let Some(callback) = fn_config.borrow_mut().get_callback() {
                 callback();
             }
         }
@@ -60,7 +60,7 @@ impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
             .expect("No fn configuration found for this call! TODO: write call description");
         self.register_call(call.clone());
         fn_config.borrow_mut().register_call(call);
-        if let Some(callback) = fn_config.borrow().get_callback() {
+        if let Some(callback) = fn_config.borrow_mut().get_callback() {
             callback();
         }
         let return_value = fn_config
