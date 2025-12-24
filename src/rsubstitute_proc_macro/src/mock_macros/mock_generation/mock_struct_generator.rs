@@ -24,39 +24,14 @@ impl IMockStructGenerator for MockStructGenerator {
         let attrs = Vec::new();
         let ident = format_ident!("{}{}", target_decl.ident, Self::MOCK_STRUCT_IDENT_PREFIX);
         let fields = fn_infos.iter().map(|x| self.generate_field(x)).collect();
-        let fields_named = Fields::Named(FieldsNamed {
+        let fields_named = FieldsNamed {
             brace_token: Default::default(),
             named: fields,
-        });
+        };
 
-        let mut item_struct = self.struct_factory.create_with_default_lifetime(attrs, ident, fields_named);
-        if fn_infos.iter().any(|fn_info| {
-            fn_info
-                .call_info
-                .item_struct
-                .generics
-                .params
-                .iter()
-                .any(|generic_param| match &generic_param {
-                    GenericParam::Lifetime(lifetime_param)
-                        if lifetime_param.lifetime.ident
-                            == constants::DEFAULT_ARG_FIELD_LIFETIME.ident =>
-                    {
-                        true
-                    }
-                    _ => false,
-                })
-        }) {
-            item_struct
-                .generics
-                .params
-                .push(GenericParam::Lifetime(LifetimeParam {
-                    attrs: Vec::new(),
-                    lifetime: constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
-                    colon_token: None,
-                    bounds: Punctuated::new(),
-                }));
-        }
+        let item_struct =
+            self.struct_factory
+                .create_with_default_lifetime(attrs, ident, fields_named);
         let mock_struct_info = MockStructInfo { item_struct };
         return mock_struct_info;
     }

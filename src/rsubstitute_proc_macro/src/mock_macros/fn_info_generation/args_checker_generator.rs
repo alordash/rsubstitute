@@ -15,7 +15,7 @@ pub struct ArgsCheckerGenerator {
     pub(crate) arg_type_factory: Rc<dyn IArgTypeFactory>,
     pub(crate) field_factory: Rc<dyn IFieldFactory>,
     pub(crate) struct_factory: Rc<dyn IStructFactory>,
-    pub(crate) reference_normalizer: Rc<dyn IReferenceNormalizer>
+    pub(crate) reference_normalizer: Rc<dyn IReferenceNormalizer>,
 }
 
 impl IArgsCheckerGenerator for ArgsCheckerGenerator {
@@ -30,13 +30,16 @@ impl IArgsCheckerGenerator for ArgsCheckerGenerator {
             .iter()
             .flat_map(|x| self.try_convert_fn_arg_to_field(x))
             .collect();
-        let fields = Fields::Named(FieldsNamed {
+        let fields_named = FieldsNamed {
             brace_token: Default::default(),
             named: struct_fields.into_iter().collect(),
-        });
+        };
 
-        let mut item_struct = self.struct_factory.create_with_default_lifetime(attrs, ident, fields);
-        self.reference_normalizer.normalize_in_struct(&mut item_struct);
+        let mut item_struct =
+            self.struct_factory
+                .create_with_default_lifetime(attrs, ident, fields_named);
+        self.reference_normalizer
+            .normalize_in_struct(&mut item_struct);
         let args_checker_info = ArgsCheckerInfo { item_struct };
 
         return args_checker_info;

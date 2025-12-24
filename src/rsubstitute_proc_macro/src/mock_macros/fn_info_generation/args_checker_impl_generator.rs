@@ -39,8 +39,7 @@ impl IArgsCheckerImplGenerator for ArgsCheckerImplGenerator {
                     colon2_token: None,
                     lt_token: Default::default(),
                     args: [GenericArgument::Type(
-                        self.type_factory
-                            .create(call_info.item_struct.ident.clone()),
+                        self.type_factory.create_from_struct(&call_info.item_struct),
                     )]
                     .into_iter()
                     .collect(),
@@ -141,6 +140,7 @@ impl ArgsCheckerImplGenerator {
             .item_struct
             .fields
             .iter()
+            .skip(1)
             .map(|field| self.generate_check_exprs(field))
             .collect();
         let vec_expr = Expr::Macro(ExprMacro {

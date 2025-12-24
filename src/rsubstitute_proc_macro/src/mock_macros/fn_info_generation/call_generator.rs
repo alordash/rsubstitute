@@ -28,12 +28,14 @@ impl ICallStructGenerator for CallStructGenerator {
             .arguments
             .iter()
             .flat_map(|x| self.try_convert_fn_arg_to_field(x));
-        let fields = Fields::Named(FieldsNamed {
+        let fields_named = FieldsNamed {
             brace_token: Default::default(),
             named: struct_fields.collect(),
-        });
+        };
 
-        let mut item_struct = self.struct_factory.create_with_default_lifetime(attrs, ident, fields);
+        let mut item_struct =
+            self.struct_factory
+                .create_with_default_lifetime(attrs, ident, fields_named);
         self.reference_normalizer
             .normalize_in_struct(&mut item_struct);
         let call_info = CallInfo { item_struct };

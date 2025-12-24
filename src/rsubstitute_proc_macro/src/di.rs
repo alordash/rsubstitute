@@ -23,7 +23,10 @@ fn create_services() -> ServiceCollection {
 
     let field_factory = Rc::new(FieldFactory);
     let struct_factory = Rc::new(StructFactory);
-    let reference_normalizer = Rc::new(ReferenceNormalizer);
+    let reference_type_crawler = Rc::new(ReferenceTypeCrawler);
+    let reference_normalizer = Rc::new(ReferenceNormalizer {
+        reference_type_crawler: reference_type_crawler.clone(),
+    });
     let call_struct_generator = Rc::new(CallStructGenerator {
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
@@ -78,6 +81,7 @@ fn create_services() -> ServiceCollection {
         field_value_factory: field_value_factory.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
         reference_normalizer: reference_normalizer.clone(),
+        reference_type_crawler: reference_type_crawler.clone(),
     });
     let local_factory = Rc::new(LocalFactory);
     let internal_mock_impl_generator = Rc::new(InternalMockImplGenerator {

@@ -3,16 +3,15 @@ use crate::mock_macros::fn_info_generation::models::FnInfo;
 use crate::mock_macros::mock_generation::models::{MockImplInfo, MockStructInfo};
 use crate::mock_macros::models::TargetDecl;
 use crate::syntax::{
-    IExprMethodCallFactory, IFieldValueFactory, IPathFactory, IReferenceNormalizer, ITypeFactory,
+    IExprMethodCallFactory, IFieldValueFactory, IPathFactory, IReferenceNormalizer,
+    IReferenceTypeCrawler, ITypeFactory,
 };
 use proc_macro2::Ident;
-use quote::format_ident;
+use quote::{ToTokens, format_ident};
 use std::cell::LazyCell;
 use std::rc::Rc;
-use syn::{
-    Block, Expr, ExprReturn, ExprStruct, ImplItem, ImplItemFn, ItemImpl, Local, LocalInit, Pat,
-    PatPath, Signature, Stmt, Visibility,
-};
+use syn::punctuated::Punctuated;
+use syn::*;
 
 pub trait IMockImplGenerator {
     fn generate(
@@ -29,6 +28,7 @@ pub(crate) struct MockImplGenerator {
     pub field_value_factory: Rc<dyn IFieldValueFactory>,
     pub expr_method_call_factory: Rc<dyn IExprMethodCallFactory>,
     pub reference_normalizer: Rc<dyn IReferenceNormalizer>,
+    pub reference_type_crawler: Rc<dyn IReferenceTypeCrawler>,
 }
 
 impl IMockImplGenerator for MockImplGenerator {
@@ -53,7 +53,7 @@ impl IMockImplGenerator for MockImplGenerator {
             defaultness: None,
             unsafety: None,
             impl_token: Default::default(),
-            generics: Default::default(),
+            generics: constants::DEFAULT_ARG_FIELD_LIFETIME_GENERIC.clone(),
             trait_: Some((None, trait_, Default::default())),
             self_ty: Box::new(self_ty),
             brace_token: Default::default(),
@@ -82,9 +82,30 @@ impl MockImplGenerator {
             abi: None,
             fn_token: Default::default(),
             ident: fn_info.parent.ident.clone(),
-            generics: Default::default(),
+            generics: Generics {
+                lt_token: Some(Default::default()),
+                params: [GenericParam::Lifetime(LifetimeParam {
+                    attrs: Vec::new(),
+                    lifetime: constants::ANONYMOUS_LIFETIME.clone(),
+                    colon_token: None,
+                    bounds: Punctuated::new(),
+                })]
+                .into_iter()
+                .collect(),
+                gt_token: Some(Default::default()),
+                where_clause: None,
+            },
             paren_token: Default::default(),
-            inputs: fn_info.parent.arguments.iter().cloned().collect(),
+            inputs: fn_info
+                .parent
+                .arguments
+                .clone()
+                .into_iter()
+                .map(|mut fn_arg| {
+                    self.convert_input_reference(&mut fn_arg);
+                    return fn_arg;
+                })
+                .collect(),
             variadic: None,
             output: fn_info.parent.return_value.clone(),
         };
@@ -99,6 +120,31 @@ impl MockImplGenerator {
         return impl_item_fn;
     }
 
+    fn convert_input_reference(&self, fn_arg: &mut FnArg) {
+        let ty = match fn_arg {
+            FnArg::Receiver(receiver) => {
+                if let Some((_, lifetime)) = &mut receiver.reference {
+                    self.anonymize_input_reference_lifetime(lifetime);
+                }
+                receiver.ty.as_mut()
+            }
+            FnArg::Typed(pat_type) => pat_type.ty.as_mut(),
+            _ => return,
+        };
+        println!("CONVERTING TY: {}", ty.to_token_stream().to_string());
+        let type_references = self.reference_type_crawler.get_all_type_references(ty);
+        for type_reference in type_references {
+            self.anonymize_input_reference_lifetime(&mut type_reference.lifetime);
+        }
+        println!("AFTER NORM TY: {}", ty.to_token_stream().to_string());
+    }
+
+    fn anonymize_input_reference_lifetime(&self, lifetime: &mut Option<Lifetime>) {
+        if lifetime.is_none() {
+            *lifetime = Some(constants::ANONYMOUS_LIFETIME.clone());
+        }
+    }
+
     fn generate_impl_item_fn_block(&self, fn_info: &FnInfo) -> Block {
         let call_stmt = self.generate_call_stmt(fn_info);
         let last_stmt = self.generate_last_stmt(fn_info);
@@ -111,6 +157,14 @@ impl MockImplGenerator {
     }
 
     fn generate_call_stmt(&self, fn_info: &FnInfo) -> Stmt {
+        let fn_fields: Vec<_> = fn_info
+            .call_info
+            .item_struct
+            .fields
+            .iter()
+            .skip(1)
+            .map(|field| self.field_value_factory.create(field))
+            .collect();
         let call_stmt = Stmt::Local(Local {
             attrs: Vec::new(),
             let_token: Default::default(),
@@ -128,13 +182,11 @@ impl MockImplGenerator {
                         .path_factory
                         .create(fn_info.call_info.item_struct.ident.clone()),
                     brace_token: Default::default(),
-                    fields: fn_info
-                        .call_info
-                        .item_struct
-                        .fields
-                        .iter()
-                        .map(|field| self.field_value_factory.create(field))
-                        .collect(),
+                    fields: std::iter::once(
+                        constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE.clone(),
+                    )
+                    .chain(fn_fields)
+                    .collect(),
                     dot2_token: None,
                     rest: None,
                 })),

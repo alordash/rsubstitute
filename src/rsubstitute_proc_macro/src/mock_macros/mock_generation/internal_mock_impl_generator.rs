@@ -56,7 +56,7 @@ impl IInternalMockImplGenerator for InternalMockImplGenerator {
             defaultness: None,
             unsafety: None,
             impl_token: Default::default(),
-            generics: Default::default(),
+            generics: constants::DEFAULT_ARG_FIELD_LIFETIME_GENERIC.clone(),
             trait_: None,
             self_ty: Box::new(self_ty),
             brace_token: Default::default(),
@@ -109,51 +109,60 @@ impl InternalMockImplGenerator {
     }
 
     fn generate_constructor_block(&self, mock_struct_info: &MockStructInfo) -> Block {
-        let fields = mock_struct_info.item_struct.fields.iter().map(|field| {
-            let field_ident = field
-                .ident
-                .clone()
-                .expect("Field in call struct should be named");
-            FieldValue {
-                attrs: Vec::new(),
-                // TODO - do something with this "expect", it appears more than one time
-                member: Member::Named(field_ident.clone()),
-                colon_token: Some(Default::default()),
-                // expr: constants::DEFAULT_INVOKE_EXPR.clone(),
-                expr: Expr::Call(ExprCall {
+        let phantom_lifetime_field = constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE.clone();
+        let data_fields = mock_struct_info
+            .item_struct
+            .fields
+            .iter()
+            .skip(1) // First is phantom data
+            .map(|field| {
+                let field_ident = field
+                    .ident
+                    .clone()
+                    .expect("Field in call struct should be named");
+                FieldValue {
                     attrs: Vec::new(),
-                    func: Box::new(Expr::Path(ExprPath {
+                    // TODO - do something with this "expect", it appears more than one time
+                    member: Member::Named(field_ident.clone()),
+                    colon_token: Some(Default::default()),
+                    // expr: constants::DEFAULT_INVOKE_EXPR.clone(),
+                    expr: Expr::Call(ExprCall {
                         attrs: Vec::new(),
-                        qself: None,
-                        path: Path {
-                            leading_colon: None,
-                            segments: [
-                                PathSegment {
-                                    ident: constants::FN_DATA_TYPE_IDENT.clone(),
-                                    arguments: PathArguments::None,
-                                },
-                                PathSegment {
-                                    ident: constants::FN_DATA_NEW_FN_IDENT.clone(),
-                                    arguments: PathArguments::None,
-                                },
-                            ]
-                            .into_iter()
-                            .collect(),
-                        },
-                    })),
-                    paren_token: Default::default(),
-                    args: [
-                        Expr::Lit(ExprLit {
+                        func: Box::new(Expr::Path(ExprPath {
                             attrs: Vec::new(),
-                            lit: Lit::Str(LitStr::new(&field_ident.to_string(), Span::call_site())),
-                        }),
-                        constants::SERVICES_REF_EXPR.clone(),
-                    ]
-                    .into_iter()
-                    .collect(),
-                }),
-            }
-        });
+                            qself: None,
+                            path: Path {
+                                leading_colon: None,
+                                segments: [
+                                    PathSegment {
+                                        ident: constants::FN_DATA_TYPE_IDENT.clone(),
+                                        arguments: PathArguments::None,
+                                    },
+                                    PathSegment {
+                                        ident: constants::FN_DATA_NEW_FN_IDENT.clone(),
+                                        arguments: PathArguments::None,
+                                    },
+                                ]
+                                .into_iter()
+                                .collect(),
+                            },
+                        })),
+                        paren_token: Default::default(),
+                        args: [
+                            Expr::Lit(ExprLit {
+                                attrs: Vec::new(),
+                                lit: Lit::Str(LitStr::new(
+                                    &field_ident.to_string(),
+                                    Span::call_site(),
+                                )),
+                            }),
+                            constants::SERVICES_REF_EXPR.clone(),
+                        ]
+                        .into_iter()
+                        .collect(),
+                    }),
+                }
+            });
         let block = Block {
             brace_token: Default::default(),
             stmts: vec![Stmt::Expr(
@@ -162,7 +171,9 @@ impl InternalMockImplGenerator {
                     qself: None,
                     path: constants::SELF_TYPE_PATH.clone(),
                     brace_token: Default::default(),
-                    fields: fields.collect(),
+                    fields: std::iter::once(phantom_lifetime_field)
+                        .chain(data_fields)
+                        .collect(),
                     dot2_token: None,
                     rest: None,
                 }),
@@ -184,7 +195,7 @@ impl InternalMockImplGenerator {
                 ident: fn_info.parent.ident.clone(),
                 generics: Generics::default(),
                 paren_token: Default::default(),
-                inputs: iter::once(constants::REF_SELF_ARG.clone())
+                inputs: iter::once(constants::REF_SELF_ARG_WITH_LIFETIME.clone())
                     .chain(self.generate_input_args(fn_info))
                     .collect(),
                 variadic: None,
@@ -201,7 +212,9 @@ impl InternalMockImplGenerator {
                                         colon2_token: None,
                                         lt_token: Default::default(),
                                         args: [
-                                            GenericArgument::Lifetime(constants::DEFAULT_ARG_FIELD_LIFETIME.clone()),
+                                            GenericArgument::Lifetime(
+                                                constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
+                                            ),
                                             GenericArgument::Type(self.type_factory.create(
                                                 fn_info.call_info.item_struct.ident.clone(),
                                             )),
@@ -350,7 +363,7 @@ impl InternalMockImplGenerator {
             ident: format_ident!("{}_{}", fn_info.parent.ident, Self::RECEIVED_FN_PREFIX),
             generics: Generics::default(),
             paren_token: Default::default(),
-            inputs: iter::once(constants::REF_SELF_ARG.clone())
+            inputs: iter::once(constants::REF_SELF_ARG_WITH_LIFETIME.clone())
                 .chain(self.generate_input_args(fn_info))
                 .chain(iter::once(times_arg))
                 .collect(),
@@ -359,7 +372,7 @@ impl InternalMockImplGenerator {
                 Default::default(),
                 Box::new(Type::Reference(TypeReference {
                     and_token: Default::default(),
-                    lifetime: None,
+                    lifetime: Some(constants::DEFAULT_ARG_FIELD_LIFETIME.clone()),
                     mutability: None,
                     elem: Box::new(constants::SELF_TYPE.clone()),
                 })),
@@ -420,6 +433,7 @@ impl InternalMockImplGenerator {
             .item_struct
             .fields
             .iter()
+            .skip(1)
             .map(|field| {
                 FnArg::Typed(PatType {
                     attrs: Vec::new(),
@@ -445,6 +459,14 @@ impl InternalMockImplGenerator {
             fn_info.parent.ident,
             Self::ARGS_CHECKER_VARIABLE_SUFFIX
         );
+        let fn_fields: Vec<_> = fn_info
+            .args_checker_info
+            .item_struct
+            .fields
+            .iter()
+            .skip(1)
+            .map(|field| self.field_value_factory.create(field))
+            .collect();
         let args_checker_decl_stmt = Stmt::Local(
             self.local_factory.create(
                 args_checker_var_ident.clone(),
@@ -457,13 +479,11 @@ impl InternalMockImplGenerator {
                             .path_factory
                             .create(fn_info.args_checker_info.item_struct.ident.clone()),
                         brace_token: Default::default(),
-                        fields: fn_info
-                            .args_checker_info
-                            .item_struct
-                            .fields
-                            .iter()
-                            .map(|field| self.field_value_factory.create(field))
-                            .collect(),
+                        fields: std::iter::once(
+                            constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE.clone(),
+                        )
+                        .chain(fn_fields)
+                        .collect(),
                         dot2_token: None,
                         rest: None,
                     })),

@@ -76,6 +76,7 @@ impl DeriveArgsFormatterMacroHandler {
         let literal_str = item_struct
             .fields
             .iter()
+            .skip(1)
             .map(|_| "{:?}")
             .collect::<Vec<_>>()
             .join(", ");
@@ -83,6 +84,7 @@ impl DeriveArgsFormatterMacroHandler {
         let args: Vec<_> = item_struct
             .fields
             .iter()
+            .skip(1)
             .map(|field| {
                 self.field_access_expr_factory.create(&[
                     constants::SELF_IDENT.clone(),

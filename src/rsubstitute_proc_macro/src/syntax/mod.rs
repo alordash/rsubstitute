@@ -10,6 +10,7 @@ mod path_factory;
 mod struct_factory;
 mod type_factory;
 mod reference_normalizer;
+mod reference_type_crawler;
 
 pub use arg_type_factory::*;
 pub use attribute_factory::*;
@@ -23,3 +24,4 @@ pub use path_factory::*;
 pub use struct_factory::*;
 pub use type_factory::*;
 pub use reference_normalizer::*;
+pub use reference_type_crawler::*;

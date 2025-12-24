@@ -1,13 +1,13 @@
 use crate::Times;
-use crate::args_matching::{ArcCheckResult, IArgsFormatter, IArgsChecker};
+use crate::args_matching::{ArgCheckResult, IArgsFormatter, IArgsChecker};
 
 pub trait IErrorPrinter {
     fn print_received_verification_error(
         &self,
         fn_name: &'static str,
         args_formatter: &dyn IArgsFormatter,
-        matching_calls: Vec<Vec<ArcCheckResult>>,
-        non_matching_calls: Vec<Vec<ArcCheckResult>>,
+        matching_calls: Vec<Vec<ArgCheckResult>>,
+        non_matching_calls: Vec<Vec<ArgCheckResult>>,
         times: Times,
     ) -> !;
 }
@@ -19,8 +19,8 @@ impl IErrorPrinter for ErrorPrinter {
         &self,
         fn_name: &'static str,
         args_formatter: &dyn IArgsFormatter,
-        matching_calls: Vec<Vec<ArcCheckResult>>,
-        non_matching_calls: Vec<Vec<ArcCheckResult>>,
+        matching_calls: Vec<Vec<ArgCheckResult>>,
+        non_matching_calls: Vec<Vec<ArgCheckResult>>,
         times: Times,
     ) -> ! {
         let matching_calls_count = matching_calls.len();
@@ -79,10 +79,10 @@ impl ErrorPrinter {
     // TODO - should be configurable
     const MAX_INVALID_CALLS_LISTED_COUNT: usize = 10;
 
-    fn fmt_call(&self, fn_name: &'static str, call: Vec<ArcCheckResult>) -> String {
+    fn fmt_call(&self, fn_name: &'static str, call: Vec<ArgCheckResult>) -> String {
         let error_msgs: Vec<_> = call
             .iter()
-            .filter_map(ArcCheckResult::as_err)
+            .filter_map(ArgCheckResult::as_err)
             .enumerate()
             .map(|(i, x)| {
                 let error_number = i + 1;
@@ -109,10 +109,10 @@ impl ErrorPrinter {
         let args_msgs: Vec<_> = call
             .into_iter()
             .map(|x| match x {
-                ArcCheckResult::Ok(x) => {
+                ArgCheckResult::Ok(x) => {
                     format!("{:?}", x.arg_info.arg_value())
                 }
-                ArcCheckResult::Err(x) => {
+                ArgCheckResult::Err(x) => {
                     format!("*{:?}*", x.arg_info.arg_value())
                 }
             })

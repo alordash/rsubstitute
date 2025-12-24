@@ -19,28 +19,18 @@ impl IStructFactory for StructFactory {
         &self,
         attrs: Vec<Attribute>,
         ident: Ident,
-        mut fields: FieldsNamed,
+        mut fields_named: FieldsNamed,
     ) -> ItemStruct {
-        fields.named.insert(0, )
+        fields_named
+            .named
+            .insert(0, constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD.clone());
         let result = ItemStruct {
             attrs,
             vis: Visibility::Public(Default::default()),
             struct_token: Default::default(),
             ident,
-            generics: Generics {
-                lt_token: Some(Default::default()),
-                params: [GenericParam::Lifetime(LifetimeParam {
-                    attrs: Vec::new(),
-                    lifetime: constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
-                    colon_token: None,
-                    bounds: Punctuated::new(),
-                })]
-                .into_iter()
-                .collect(),
-                gt_token: Some(Default::default()),
-                where_clause: None,
-            },
-            fields,
+            generics: constants::DEFAULT_ARG_FIELD_LIFETIME_GENERIC.clone(),
+            fields: Fields::Named(fields_named),
             semi_token: Default::default(),
         };
 

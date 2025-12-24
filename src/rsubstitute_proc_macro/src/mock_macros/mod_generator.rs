@@ -30,6 +30,7 @@ impl IModGenerator for ModGenerator {
         let usings = [
             constants::USE_SUPER.clone(),
             constants::USE_CRATE_PRELUDE.clone(),
+            constants::USE_STD_MARKER_PHANTOM_DATA.clone()
         ];
         let items = usings
             .into_iter()
