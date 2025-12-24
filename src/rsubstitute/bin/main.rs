@@ -159,6 +159,7 @@ mod generated {
             dyn_obj: &dyn IFoo,
             arc: Arc<dyn IFoo>,
         ) -> Vec<u8> {
+            // TODO - this is solution for lifetimes
             let call = unsafe {
                 another_work_Call {
                     phantom_lifetime: PhantomData,
