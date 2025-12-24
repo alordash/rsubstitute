@@ -51,6 +51,7 @@ impl MockMacroHandler {
     fn handle_item_trait(&self, item_trait: ItemTrait) -> TokenStream {
         let target_decl = self.target_decl_extractor.extract(&item_trait);
         let fn_decls = self.fn_decl_extractor.extract(&item_trait.items);
+        let trait_ident = item_trait.ident.clone();
         let fn_infos: Vec<_> = fn_decls
             .iter()
             .map(|x| self.fn_info_generator.generate(x))
@@ -63,16 +64,17 @@ impl MockMacroHandler {
             .internal_mock_impl_generator
             .generate(&mock_struct_info, &fn_infos);
         let mod_info = self.mod_generator.generate(
+            trait_ident,
             fn_infos,
             mock_struct_info,
             mock_impl_info,
             internal_mock_impl_info,
         );
-        
+
         let generated_mod = mod_info.item_mod;
         let result = quote! {
             #item_trait
-            
+
             #generated_mod
         };
         return result.into();

@@ -3,8 +3,8 @@ use crate::mock_macros::fn_info_generation::models::{
     ArgsCheckerImplInfo, ArgsCheckerInfo, CallInfo,
 };
 use crate::syntax::{IFieldAccessExprFactory, ITypeFactory};
-use proc_macro2::{Ident, Span, TokenStream};
-use quote::{ToTokens, format_ident};
+use proc_macro2::{Ident, Span};
+use quote::{format_ident, ToTokens};
 use std::cell::LazyCell;
 use std::rc::Rc;
 use syn::punctuated::Punctuated;

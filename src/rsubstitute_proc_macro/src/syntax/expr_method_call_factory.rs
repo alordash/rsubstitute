@@ -1,7 +1,7 @@
 use crate::syntax::{IFieldAccessExprFactory, IPathFactory};
 use proc_macro2::Ident;
 use std::rc::Rc;
-use syn::{Expr, ExprField, ExprMethodCall, ExprPath, Member};
+use syn::{Expr, ExprMethodCall, ExprPath};
 
 pub trait IExprMethodCallFactory {
     fn create(

@@ -1,6 +1,5 @@
 use crate::constants;
 use proc_macro2::Ident;
-use syn::punctuated::Punctuated;
 use syn::*;
 
 pub trait IStructFactory {

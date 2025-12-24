@@ -1,5 +1,4 @@
 // TODO - move to crate root
-use crate::constants;
 use crate::di::SERVICES;
 use proc_macro2::{Ident, Span, TokenStream};
 use quote::format_ident;
@@ -44,9 +43,6 @@ pub const I_ARGS_FORMATTER_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_i
 pub const I_ARGS_CHECKER_TRAIT_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("IArgsChecker"));
 
-// TODO - add test that it's equal to rsubstitute_core::arguments_matching::IArgschecker::check
-pub const I_ARGS_CHECKER_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("check"));
-
 // TODO - add test that it's equal to rsubstitute_core::FnData
 pub const FN_DATA_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("FnData"));
 
@@ -84,14 +80,22 @@ pub const SHARED_FN_CONFIG_TYPE_IDENT: LazyCell<Ident> =
 // TODO - add test that it's equal to rsubstitute_core::SharedFnConfig::new
 pub const SHARED_FN_CONFIG_NEW_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("new"));
 
-pub const DISCARD_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("_"));
+pub const ALLOW_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("allow"));
+
+#[warn(mismatched_lifetime_syntaxes)]
+pub const ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+    let attribute_factory = &SERVICES.attribute_factory;
+    let arguments = TokenStream::from_str("mismatched_lifetime_syntaxes")
+        .expect("Should be able to parse attribute arg.");
+    let result = attribute_factory.create(ALLOW_IDENT.clone(), arguments);
+    return result;
+});
 
 pub const ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     let attribute_factory = &SERVICES.attribute_factory;
-    let ident = format_ident!("allow");
     let arguments = TokenStream::from_str("non_camel_case_types")
         .expect("Should be able to parse attribute arg.");
-    let result = attribute_factory.create(ident, arguments);
+    let result = attribute_factory.create(ALLOW_IDENT.clone(), arguments);
     return result;
 });
 
@@ -205,35 +209,6 @@ pub const REF_SELF_ARG_WITH_LIFETIME: LazyCell<FnArg> = LazyCell::new(|| {
         self_token: Default::default(),
         colon_token: None,
         ty: Box::new(REF_SELF_TYPE.clone()),
-    });
-    return result;
-});
-
-pub const DEFAULT_INVOKE_EXPR: LazyCell<Expr> = LazyCell::new(|| {
-    let func = Expr::Path(ExprPath {
-        attrs: Vec::new(),
-        qself: None,
-        path: Path {
-            leading_colon: None,
-            segments: [
-                PathSegment {
-                    ident: format_ident!("Default"),
-                    arguments: PathArguments::None,
-                },
-                PathSegment {
-                    ident: format_ident!("default"),
-                    arguments: PathArguments::None,
-                },
-            ]
-            .into_iter()
-            .collect(),
-        },
-    });
-    let result = Expr::Call(ExprCall {
-        attrs: Vec::new(),
-        func: Box::new(func),
-        paren_token: Default::default(),
-        args: Punctuated::new(),
     });
     return result;
 });

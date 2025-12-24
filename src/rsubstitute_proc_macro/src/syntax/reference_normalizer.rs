@@ -6,8 +6,6 @@ use syn::*;
 pub trait IReferenceNormalizer {
     fn get_normalized_lifetime(&self) -> Lifetime;
 
-    fn normalize_in_type(&self, ty: &mut Type);
-
     fn normalize_in_struct(&self, item_struct: &mut ItemStruct);
 
     fn normalize_in_impl(&self, lifetime: Lifetime, item_impl: &mut ItemImpl);
@@ -20,13 +18,6 @@ pub(crate) struct ReferenceNormalizer {
 impl IReferenceNormalizer for ReferenceNormalizer {
     fn get_normalized_lifetime(&self) -> Lifetime {
         constants::DEFAULT_ARG_FIELD_LIFETIME.clone()
-    }
-
-    fn normalize_in_type(&self, ty: &mut Type) {
-        let type_references: Vec<_> = self.reference_type_crawler.get_all_type_references(ty);
-        for type_reference in type_references {
-            type_reference.lifetime = Some(self.get_normalized_lifetime());
-        }
     }
 
     fn normalize_in_struct(&self, item_struct: &mut ItemStruct) {

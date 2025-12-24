@@ -1,6 +1,6 @@
 use crate::args_matching::{ArgCheckResult, IArgsChecker};
 use crate::di::ServiceCollection;
-use crate::error_printer::{ErrorPrinter, IErrorPrinter};
+use crate::error_printer::IErrorPrinter;
 use crate::{FnConfig, Times};
 use std::cell::RefCell;
 use std::rc::Rc;

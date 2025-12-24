@@ -21,7 +21,7 @@ trait MyTrait {
 }
 
 mod tests {
-    use super::__rsubstitute_generated::MyTraitMock;
+    use super::__rsubstitute_generated_MyTrait::MyTraitMock;
     use crate::MyTrait;
     use rsubstitute::*;
 

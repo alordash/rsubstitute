@@ -2,10 +2,7 @@ use crate::constants;
 use crate::mock_macros::fn_info_generation::models::FnInfo;
 use crate::mock_macros::mock_generation::models::{MockImplInfo, MockStructInfo};
 use crate::mock_macros::models::TargetDecl;
-use crate::syntax::{
-    IExprMethodCallFactory, IFieldValueFactory, IPathFactory, IReferenceNormalizer,
-    IReferenceTypeCrawler, IStdMemTransmuteExprFactory, ITypeFactory,
-};
+use crate::syntax::*;
 use proc_macro2::Ident;
 use quote::{ToTokens, format_ident};
 use std::cell::LazyCell;
@@ -25,7 +22,6 @@ pub trait IMockImplGenerator {
 pub(crate) struct MockImplGenerator {
     pub path_factory: Rc<dyn IPathFactory>,
     pub type_factory: Rc<dyn ITypeFactory>,
-    pub field_value_factory: Rc<dyn IFieldValueFactory>,
     pub expr_method_call_factory: Rc<dyn IExprMethodCallFactory>,
     pub std_mem_transmute_expr_factory: Rc<dyn IStdMemTransmuteExprFactory>,
     pub reference_normalizer: Rc<dyn IReferenceNormalizer>,
@@ -130,7 +126,6 @@ impl MockImplGenerator {
                 receiver.ty.as_mut()
             }
             FnArg::Typed(pat_type) => pat_type.ty.as_mut(),
-            _ => return,
         };
         println!("CONVERTING TY: {}", ty.to_token_stream().to_string());
         let type_references = self.reference_type_crawler.get_all_type_references(ty);

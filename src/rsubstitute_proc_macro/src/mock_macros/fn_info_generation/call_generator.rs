@@ -3,9 +3,9 @@ use crate::mock_macros::fn_info_generation::models::CallInfo;
 use crate::mock_macros::models::FnDecl;
 use crate::syntax::{IFieldFactory, IReferenceNormalizer, IStructFactory};
 use proc_macro2::Ident;
-use quote::{ToTokens, format_ident};
+use quote::{format_ident, ToTokens};
 use std::rc::Rc;
-use syn::{Field, Fields, FieldsNamed, FnArg, PatType, Type};
+use syn::{Field, FieldsNamed, FnArg, PatType};
 
 pub trait ICallStructGenerator {
     fn generate(&self, fn_decl: &FnDecl) -> CallInfo;

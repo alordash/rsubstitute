@@ -1,5 +1,5 @@
+use crate::args_matching::{ArgCheckResult, IArgsFormatter};
 use crate::Times;
-use crate::args_matching::{ArgCheckResult, IArgsFormatter, IArgsChecker};
 
 pub trait IErrorPrinter {
     fn print_received_verification_error(

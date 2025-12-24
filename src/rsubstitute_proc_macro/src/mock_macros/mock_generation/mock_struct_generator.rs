@@ -2,10 +2,9 @@ use crate::constants;
 use crate::mock_macros::fn_info_generation::models::FnInfo;
 use crate::mock_macros::mock_generation::models::MockStructInfo;
 use crate::mock_macros::models::TargetDecl;
-use crate::syntax::{IReferenceNormalizer, IStructFactory, ITypeFactory};
+use crate::syntax::{IStructFactory, ITypeFactory};
 use quote::format_ident;
 use std::rc::Rc;
-use syn::punctuated::Punctuated;
 use syn::*;
 
 pub trait IMockStructGenerator {
@@ -16,7 +15,6 @@ pub trait IMockStructGenerator {
 pub(crate) struct MockStructGenerator {
     pub type_factory: Rc<dyn ITypeFactory>,
     pub struct_factory: Rc<dyn IStructFactory>,
-    pub reference_normalizer: Rc<dyn IReferenceNormalizer>,
 }
 
 impl IMockStructGenerator for MockStructGenerator {
