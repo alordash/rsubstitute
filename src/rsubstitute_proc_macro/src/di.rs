@@ -75,11 +75,15 @@ fn create_services() -> ServiceCollection {
         path_factory: path_factory.clone(),
         field_access_expr_factory: field_access_expr_factory.clone(),
     });
+    let std_mem_transmute_expr_factory = Rc::new(StdMemTransmuteExprFactory {
+        expr_method_call_factory: expr_method_call_factory.clone(),
+    });
     let mock_impl_generator = Rc::new(MockImplGenerator {
         path_factory: path_factory.clone(),
         type_factory: type_factory.clone(),
         field_value_factory: field_value_factory.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
+        std_mem_transmute_expr_factory: std_mem_transmute_expr_factory.clone(),
         reference_normalizer: reference_normalizer.clone(),
         reference_type_crawler: reference_type_crawler.clone(),
     });

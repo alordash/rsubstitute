@@ -4,7 +4,7 @@ use crate::mock_macros::mock_generation::models::{MockImplInfo, MockStructInfo};
 use crate::mock_macros::models::TargetDecl;
 use crate::syntax::{
     IExprMethodCallFactory, IFieldValueFactory, IPathFactory, IReferenceNormalizer,
-    IReferenceTypeCrawler, ITypeFactory,
+    IReferenceTypeCrawler, IStdMemTransmuteExprFactory, ITypeFactory,
 };
 use proc_macro2::Ident;
 use quote::{ToTokens, format_ident};
@@ -27,6 +27,7 @@ pub(crate) struct MockImplGenerator {
     pub type_factory: Rc<dyn ITypeFactory>,
     pub field_value_factory: Rc<dyn IFieldValueFactory>,
     pub expr_method_call_factory: Rc<dyn IExprMethodCallFactory>,
+    pub std_mem_transmute_expr_factory: Rc<dyn IStdMemTransmuteExprFactory>,
     pub reference_normalizer: Rc<dyn IReferenceNormalizer>,
     pub reference_type_crawler: Rc<dyn IReferenceTypeCrawler>,
 }
@@ -163,7 +164,15 @@ impl MockImplGenerator {
             .fields
             .iter()
             .skip(1)
-            .map(|field| self.field_value_factory.create(field))
+            .map(|field| {
+                let field_ident = field.ident.clone().expect("TODO field ident");
+                FieldValue {
+                    attrs: Vec::new(),
+                    member: Member::Named(field_ident.clone()),
+                    colon_token: Some(Default::default()),
+                    expr: self.std_mem_transmute_expr_factory.create(field_ident),
+                }
+            })
             .collect();
         let call_stmt = Stmt::Local(Local {
             attrs: Vec::new(),
@@ -175,20 +184,30 @@ impl MockImplGenerator {
             }),
             init: Some(LocalInit {
                 eq_token: Default::default(),
-                expr: Box::new(Expr::Struct(ExprStruct {
+                expr: Box::new(Expr::Unsafe(ExprUnsafe {
                     attrs: Vec::new(),
-                    qself: None,
-                    path: self
-                        .path_factory
-                        .create(fn_info.call_info.item_struct.ident.clone()),
-                    brace_token: Default::default(),
-                    fields: std::iter::once(
-                        constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE.clone(),
-                    )
-                    .chain(fn_fields)
-                    .collect(),
-                    dot2_token: None,
-                    rest: None,
+                    unsafe_token: Default::default(),
+                    block: Block {
+                        brace_token: Default::default(),
+                        stmts: vec![Stmt::Expr(
+                            Expr::Struct(ExprStruct {
+                                attrs: Vec::new(),
+                                qself: None,
+                                path: self
+                                    .path_factory
+                                    .create(fn_info.call_info.item_struct.ident.clone()),
+                                brace_token: Default::default(),
+                                fields: std::iter::once(
+                                    constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE.clone(),
+                                )
+                                .chain(fn_fields)
+                                .collect(),
+                                dot2_token: None,
+                                rest: None,
+                            }),
+                            None,
+                        )],
+                    },
                 })),
                 diverge: None,
             }),
