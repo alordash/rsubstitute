@@ -49,10 +49,7 @@ impl IArgsCheckerImplGenerator for ArgsCheckerImplGenerator {
             .into_iter()
             .collect(),
         };
-        let call_ty = Box::new(
-            self.type_factory
-                .create(call_info.item_struct.ident.clone()),
-        );
+        let call_ty = Box::new(self.type_factory.create_from_struct(&call_info.item_struct));
         let self_ty = Box::new(self.type_factory.create_with_generics(
             args_checker_info.item_struct.ident.clone(),
             args_checker_info.item_struct.generics.clone(),

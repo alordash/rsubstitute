@@ -76,7 +76,7 @@ fn create_services() -> ServiceCollection {
         field_access_expr_factory: field_access_expr_factory.clone(),
     });
     let std_mem_transmute_expr_factory = Rc::new(StdMemTransmuteExprFactory {
-        expr_method_call_factory: expr_method_call_factory.clone(),
+        path_factory: path_factory.clone(),
     });
     let mock_impl_generator = Rc::new(MockImplGenerator {
         path_factory: path_factory.clone(),

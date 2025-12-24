@@ -9,7 +9,7 @@ trait IFoo: Debug {
 
 #[mock]
 trait MyTrait {
-    // fn work(&self, value: i32);
+    fn work(&self, value: i32);
 
     fn another_work(
         &self,
@@ -29,9 +29,9 @@ mod tests {
     // fn work() {
     //     let my_trait_mock = MyTraitMock::new();
     //     my_trait_mock.work(Arg::Any).does(|| println!("work 1"));
-    // 
+    //
     //     MyTrait::work(&my_trait_mock, 20);
-    // 
+    //
     //     my_trait_mock.work_received(Arg::Eq(20), Times::Once);
     // }
 
