@@ -28,7 +28,7 @@ fn accept_value_Ok() {
     Trait::accept_value(&mock, value);
 
     // Assert
-    mock.accept_value_received(Arg::Any, Times::Once)
-        .accept_value_received(Arg::Eq(value), Times::Once)
-        .accept_value_received(Arg::is(|actual_value| actual_value == 10), Times::Once);
+    mock.received_accept_value(Arg::Any, Times::Once)
+        .received_accept_value(Arg::Eq(value), Times::Once)
+        .received_accept_value(Arg::is(|actual_value| actual_value == value), Times::Once);
 }

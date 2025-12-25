@@ -213,15 +213,6 @@ mod generated {
             return shared_fn_config;
         }
 
-        pub fn received_work(&'a self, value: Arg<'a, i32>, times: Times) -> &'a Self {
-            let work_args_checker = work_ArgsChecker {
-                phantom_lifetime: PhantomData,
-                value,
-            };
-            self.work_data.verify_received(work_args_checker, times);
-            return self;
-        }
-
         pub fn another_work(
             &'a self,
             string: Arg<'a, &'a str>,
@@ -240,6 +231,24 @@ mod generated {
             let fn_config = self.another_work_data.add_config(another_work_args_checker);
             let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
+        }
+
+        pub fn get(&'a self) -> SharedFnConfig<'a, get_Call<'a>, get_ArgsChecker<'a>, i32, Self> {
+            let get_args_checker = get_ArgsChecker {
+                phantom_lifetime: PhantomData,
+            };
+            let fn_config = self.get_data.add_config(get_args_checker);
+            let shared_fn_config = SharedFnConfig::new(fn_config, self);
+            return shared_fn_config;
+        }
+
+        pub fn received_work(&'a self, value: Arg<'a, i32>, times: Times) -> &'a Self {
+            let work_args_checker = work_ArgsChecker {
+                phantom_lifetime: PhantomData,
+                value,
+            };
+            self.work_data.verify_received(work_args_checker, times);
+            return self;
         }
 
         pub fn received_another_work(
@@ -262,16 +271,7 @@ mod generated {
             return self;
         }
 
-        pub fn get(&'a self) -> SharedFnConfig<'a, get_Call<'a>, get_ArgsChecker<'a>, i32, Self> {
-            let get_args_checker = get_ArgsChecker {
-                phantom_lifetime: PhantomData,
-            };
-            let fn_config = self.get_data.add_config(get_args_checker);
-            let shared_fn_config = SharedFnConfig::new(fn_config, self);
-            return shared_fn_config;
-        }
-
-        pub fn received_get(&'a self, times: Times) -> &'a Self {
+        pub fn get_received(&'a self, times: Times) -> &'a Self {
             let get_args_checker = get_ArgsChecker {
                 phantom_lifetime: PhantomData,
             };
@@ -356,7 +356,7 @@ fn main() {
         Arg::Eq(Arc::new(Foo(44))),
         Times::Exactly(22),
     );
-    my_trait_mock.received_get(Times::Exactly(2));
+    my_trait_mock.get_received(Times::Exactly(2));
 
     println!("Done");
 }

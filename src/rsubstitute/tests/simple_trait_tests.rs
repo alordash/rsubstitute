@@ -36,7 +36,7 @@ fn f_Ok() {
     // Assert
     assert_eq!((), result);
     assert!(*callback_flag.borrow());
-    mock.f_received(Times::Once);
+    mock.received_f(Times::Once);
 }
 
 #[test]
@@ -66,13 +66,13 @@ fn f_MultipleTimes_Ok() {
     assert_eq!((), result2);
     assert_eq!((), result3);
 
-    mock.f_received(Times::Exactly(3))
-        .f_received(Times::AtLeast(0))
-        .f_received(Times::AtLeast(1))
-        .f_received(Times::AtLeast(2))
-        .f_received(Times::AtLeast(3))
-        .f_received(Times::AtMost(3))
-        .f_received(Times::AtMost(4));
+    mock.received_f(Times::Exactly(3))
+        .received_f(Times::AtLeast(0))
+        .received_f(Times::AtLeast(1))
+        .received_f(Times::AtLeast(2))
+        .received_f(Times::AtLeast(3))
+        .received_f(Times::AtMost(3))
+        .received_f(Times::AtMost(4));
 }
 
 #[test]
@@ -87,7 +87,7 @@ fn fn_MultipleTimes_OkPanics() {
 
     // Assert
     assert_panics(
-        || mock.f_received(Times::Once),
+        || mock.received_f(Times::Once),
         r#"Expected to receive a call exactly once matching:
 	f_data()
 Actually received 3 matching calls:
@@ -98,7 +98,7 @@ Received no non-matching calls"#,
     );
 
     assert_panics(
-        || mock.f_received(Times::Exactly(1)),
+        || mock.received_f(Times::Exactly(1)),
         r#"Expected to receive a call exactly once matching:
 	f_data()
 Actually received 3 matching calls:
@@ -109,7 +109,7 @@ Received no non-matching calls"#,
     );
 
     assert_panics(
-        || mock.f_received(Times::Exactly(2)),
+        || mock.received_f(Times::Exactly(2)),
         r#"Expected to receive a call 2 times matching:
 	f_data()
 Actually received 3 matching calls:
@@ -120,7 +120,7 @@ Received no non-matching calls"#,
     );
 
     assert_panics(
-        || mock.f_received(Times::Exactly(4)),
+        || mock.received_f(Times::Exactly(4)),
         r#"Expected to receive a call 4 times matching:
 	f_data()
 Actually received 3 matching calls:
@@ -131,7 +131,7 @@ Received no non-matching calls"#,
     );
 
     assert_panics(
-        || mock.f_received(Times::AtLeast(4)),
+        || mock.received_f(Times::AtLeast(4)),
         r#"Expected to receive a call at least 4 times matching:
 	f_data()
 Actually received 3 matching calls:
@@ -142,7 +142,7 @@ Received no non-matching calls"#,
     );
 
     assert_panics(
-        || mock.f_received(Times::AtMost(2)),
+        || mock.received_f(Times::AtMost(2)),
         r#"Expected to receive a call at most 2 times matching:
 	f_data()
 Actually received 3 matching calls:

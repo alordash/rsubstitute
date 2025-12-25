@@ -360,7 +360,7 @@ impl InternalMockImplGenerator {
             unsafety: None,
             abi: None,
             fn_token: Default::default(),
-            ident: format_ident!("{}_{}", fn_info.parent.ident, Self::RECEIVED_FN_PREFIX),
+            ident: format_ident!("{}_{}", Self::RECEIVED_FN_PREFIX, fn_info.parent.ident),
             generics: Generics::default(),
             paren_token: Default::default(),
             inputs: iter::once(constants::REF_SELF_ARG_WITH_LIFETIME.clone())
