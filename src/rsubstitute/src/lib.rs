@@ -9,3 +9,6 @@ pub mod prelude {
     pub use crate::*;
     pub use macros::*;
 }
+
+// TODO - move to separate crate?
+pub mod assertions;

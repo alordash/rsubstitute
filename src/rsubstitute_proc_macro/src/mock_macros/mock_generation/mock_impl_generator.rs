@@ -127,12 +127,10 @@ impl MockImplGenerator {
             }
             FnArg::Typed(pat_type) => pat_type.ty.as_mut(),
         };
-        println!("CONVERTING TY: {}", ty.to_token_stream().to_string());
         let type_references = self.reference_type_crawler.get_all_type_references(ty);
         for type_reference in type_references {
             self.anonymize_input_reference_lifetime(&mut type_reference.lifetime);
         }
-        println!("AFTER NORM TY: {}", ty.to_token_stream().to_string());
     }
 
     fn anonymize_input_reference_lifetime(&self, lifetime: &mut Option<Lifetime>) {

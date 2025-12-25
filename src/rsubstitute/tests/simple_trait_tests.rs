@@ -1,50 +1,154 @@
+#![allow(non_snake_case)]
 use rsubstitute_proc_macro::mock;
 
 #[mock]
-trait TestTrait {
+trait Trait {
     fn f(&self);
 }
 
 #[mock]
+#[allow(unused)]
 trait AnotherTestTrait {}
 
-#[cfg(test)]
-#[allow(non_snake_case)]
-mod tests {
-    use super::__rsubstitute_generated_TestTrait::*;
-    use super::*;
-    use std::cell::RefCell;
-    use std::rc::Rc;
+// #[cfg(test)]
+// #[allow(non_snake_case)]
+// mod tests {
+use __rsubstitute_generated_Trait::*;
+use rsubstitute::assertions::assert_panics;
+use rsubstitute_core::Times;
+use std::cell::RefCell;
+use std::rc::Rc;
 
-    #[test]
-    fn f_Correct() {
-        // Arrange
-        let mock = TestTraitMock::new();
+#[test]
+fn f_Ok() {
+    // Arrange
+    let mock = TraitMock::new();
+    let callback_flag = Rc::new(RefCell::new(false));
+    let callback_flag_clone = callback_flag.clone();
+    let return_value = ();
+    mock.f().returns_and_does(return_value, move || {
+        *callback_flag_clone.borrow_mut() = true
+    });
 
-        let callback_flag = Rc::new(RefCell::new(false));
-        let callback_flag_clone = callback_flag.clone();
-        let return_value = ();
-        mock.f().returns_and_does(return_value, move || {
-            *callback_flag_clone.borrow_mut() = true
-        });
+    // Act
+    let result = Trait::f(&mock);
 
-        // Act
-        let result = TestTrait::f(&mock);
+    // Assert
+    assert_eq!((), result);
+    assert!(*callback_flag.borrow());
+    mock.f_received(Times::Once);
+}
 
-        // Assert
-        assert_eq!((), result);
-        assert!(*callback_flag.borrow());
-    }
+#[test]
+fn f_NoConfig_Ok() {
+    // Arrange
+    let mock = TraitMock::new();
 
-    #[test]
-    fn f_NoConfig_Ok() {
-        // Arrange
-        let mock = TestTraitMock::new();
+    // Act
+    let result = Trait::f(&mock);
 
-        // Act
-        let result = TestTrait::f(&mock);
+    // Assert
+    assert_eq!((), result);
+}
 
-        // Assert
-        assert_eq!((), result);
-    }
+#[test]
+fn f_MultipleTimes_Ok() {
+    // Arrange
+    let mock = TraitMock::new();
+
+    // Act
+    let result1 = Trait::f(&mock);
+    let result2 = Trait::f(&mock);
+    let result3 = Trait::f(&mock);
+
+    // Assert
+    assert_eq!((), result1);
+    assert_eq!((), result2);
+    assert_eq!((), result3);
+
+    mock.f_received(Times::Exactly(3))
+        .f_received(Times::AtLeast(0))
+        .f_received(Times::AtLeast(1))
+        .f_received(Times::AtLeast(2))
+        .f_received(Times::AtLeast(3))
+        .f_received(Times::AtMost(3))
+        .f_received(Times::AtMost(4));
+}
+
+#[test]
+fn fn_MultipleTimes_OkPanics() {
+    // Arrange
+    let mock = TraitMock::new();
+
+    // Act
+    Trait::f(&mock);
+    Trait::f(&mock);
+    Trait::f(&mock);
+
+    // Assert
+    assert_panics(
+        || mock.f_received(Times::Once),
+        r#"Expected to receive a call exactly once matching:
+	f_data()
+Actually received 3 matching calls:
+	f_data()
+	f_data()
+	f_data()
+Received no non-matching calls"#,
+    );
+
+    assert_panics(
+        || mock.f_received(Times::Exactly(1)),
+        r#"Expected to receive a call exactly once matching:
+	f_data()
+Actually received 3 matching calls:
+	f_data()
+	f_data()
+	f_data()
+Received no non-matching calls"#,
+    );
+
+    assert_panics(
+        || mock.f_received(Times::Exactly(2)),
+        r#"Expected to receive a call 2 times matching:
+	f_data()
+Actually received 3 matching calls:
+	f_data()
+	f_data()
+	f_data()
+Received no non-matching calls"#,
+    );
+
+    assert_panics(
+        || mock.f_received(Times::Exactly(4)),
+        r#"Expected to receive a call 4 times matching:
+	f_data()
+Actually received 3 matching calls:
+	f_data()
+	f_data()
+	f_data()
+Received no non-matching calls"#,
+    );
+
+    assert_panics(
+        || mock.f_received(Times::AtLeast(4)),
+        r#"Expected to receive a call at least 4 times matching:
+	f_data()
+Actually received 3 matching calls:
+	f_data()
+	f_data()
+	f_data()
+Received no non-matching calls"#,
+    );
+
+    assert_panics(
+        || mock.f_received(Times::AtMost(2)),
+        r#"Expected to receive a call at most 2 times matching:
+	f_data()
+Actually received 3 matching calls:
+	f_data()
+	f_data()
+	f_data()
+Received no non-matching calls"#,
+    );
 }

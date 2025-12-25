@@ -20,24 +20,21 @@ trait MyTrait {
     ) -> Vec<u8>;
 }
 
-mod tests {
-    use super::__rsubstitute_generated_MyTrait::MyTraitMock;
-    use crate::MyTrait;
-    use rsubstitute::*;
+use __rsubstitute_generated_MyTrait::MyTraitMock;
+use rsubstitute::*;
 
-    // #[test]
-    // fn work() {
-    //     let my_trait_mock = MyTraitMock::new();
-    //     my_trait_mock.work(Arg::Any).does(|| println!("work 1"));
-    //
-    //     MyTrait::work(&my_trait_mock, 20);
-    //
-    //     my_trait_mock.work_received(Arg::Eq(20), Times::Once);
-    // }
+// #[test]
+// fn work() {
+//     let my_trait_mock = MyTraitMock::new();
+//     my_trait_mock.work(Arg::Any).does(|| println!("work 1"));
+//
+//     MyTrait::work(&my_trait_mock, 20);
+//
+//     my_trait_mock.work_received(Arg::Eq(20), Times::Once);
+// }
 
-    #[test]
-    fn another_work() {
-        let my_trait_mock = MyTraitMock::new();
-        // my_trait_mock.another_work(Arg::Any);
-    }
+#[test]
+fn another_work() {
+    let my_trait_mock = MyTraitMock::new();
+    // my_trait_mock.another_work(Arg::Any);
 }

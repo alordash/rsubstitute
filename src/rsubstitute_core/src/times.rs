@@ -21,7 +21,7 @@ impl Times {
 impl Display for Times {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Times::Once => write!(f, "exactly once"),
+            Times::Once | Times::Exactly(1) => write!(f, "exactly once"),
             Times::Exactly(exact_count) => write!(f, "{exact_count} times"),
             Times::AtLeast(minimum) => write!(f, "at least {minimum} times"),
             Times::AtMost(maximum) => write!(f, "at most {maximum} times"),
