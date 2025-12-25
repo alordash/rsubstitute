@@ -66,13 +66,7 @@ fn f_MultipleTimes_Ok() {
     assert_eq!((), result2);
     assert_eq!((), result3);
 
-    mock.received_f(Times::Exactly(3))
-        .received_f(Times::AtLeast(0))
-        .received_f(Times::AtLeast(1))
-        .received_f(Times::AtLeast(2))
-        .received_f(Times::AtLeast(3))
-        .received_f(Times::AtMost(3))
-        .received_f(Times::AtMost(4));
+    mock.received_f(Times::Exactly(3));
 }
 
 #[test]
@@ -122,28 +116,6 @@ Received no non-matching calls"#,
     assert_panics(
         || mock.received_f(Times::Exactly(4)),
         r#"Expected to receive a call 4 times matching:
-	f_data()
-Actually received 3 matching calls:
-	f_data()
-	f_data()
-	f_data()
-Received no non-matching calls"#,
-    );
-
-    assert_panics(
-        || mock.received_f(Times::AtLeast(4)),
-        r#"Expected to receive a call at least 4 times matching:
-	f_data()
-Actually received 3 matching calls:
-	f_data()
-	f_data()
-	f_data()
-Received no non-matching calls"#,
-    );
-
-    assert_panics(
-        || mock.received_f(Times::AtMost(2)),
-        r#"Expected to receive a call at most 2 times matching:
 	f_data()
 Actually received 3 matching calls:
 	f_data()

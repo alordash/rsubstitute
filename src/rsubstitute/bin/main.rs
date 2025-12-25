@@ -308,7 +308,7 @@ fn main() {
     let arc_foo1: Arc<dyn IFoo> = Arc::new(Foo(10));
     let arc_foo2: Arc<dyn IFoo> = Arc::new(Foo(144));
     my_trait_mock
-        .work(Arg::is(|value| value == 32))
+        .work(Arg::Is(|value| value == 32))
         .does(|| println!("work mock called"))
         .another_work(
             Arg::Eq(string),
@@ -321,7 +321,7 @@ fn main() {
             Arg::Any,
             Arg::Any,
             Arg::Any,
-            Arg::is(|foo: Arc<dyn IFoo>| foo.get_value() == 144),
+            Arg::Is(|foo: Arc<dyn IFoo>| foo.get_value() == 144),
         )
         .returns(vec![7, 70, 77])
         .get()
@@ -352,7 +352,7 @@ fn main() {
     my_trait_mock.received_another_work(
         Arg::Eq("que"),
         Arg::Any,
-        Arg::is(|_| false),
+        Arg::Is(|_| false),
         Arg::Eq(Arc::new(Foo(44))),
         Times::Exactly(22),
     );

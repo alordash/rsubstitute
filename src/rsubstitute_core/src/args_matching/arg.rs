@@ -8,9 +8,10 @@ struct Private;
 pub enum Arg<'a, T> {
     Any,
     Eq(T),
+    // Private for cleaner API: just pass closure without having to box or reference it.
     #[allow(private_interfaces)]
     #[doc(hidden)]
-    Is(&'a dyn Fn(T) -> bool, Private),
+    PrivateIs(&'a dyn Fn(T) -> bool, Private),
 }
 
 impl<'a, T: Debug> Debug for Arg<'a, T> {
@@ -21,15 +22,16 @@ impl<'a, T: Debug> Debug for Arg<'a, T> {
         match self {
             Arg::Any => write!(f, "({arg_type_name}): any"),
             Arg::Eq(expected_value) => write!(f, "({arg_type_name}): equal to {expected_value:?}"),
-            Arg::Is(_, _) => write!(f, "({arg_type_name}): custom predicate"),
+            Arg::PrivateIs(_, _) => write!(f, "({arg_type_name}): custom predicate"),
         }
     }
 }
 
 impl<'a, T> Arg<'a, T> {
-    pub fn is(predicate: impl Fn(T) -> bool + 'a) -> Self {
+    #[allow(non_snake_case)]    // beautify API ✨
+    pub fn Is(predicate: impl Fn(T) -> bool + 'a) -> Self {
         let reference = Box::leak(Box::new(predicate));
-        return Self::Is(reference, Private);
+        return Self::PrivateIs(reference, Private);
     }
 }
 
@@ -45,7 +47,7 @@ impl<'a, T: Debug + PartialOrd + Clone + 'a> Arg<'a, T> {
                     ),
                 });
             }
-            Arg::Is(predicate, _) => {
+            Arg::PrivateIs(predicate, _) => {
                 let actual_value_str = format!("{:?}", actual_value);
                 if !predicate(actual_value) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
@@ -78,7 +80,7 @@ impl<'a, T: Debug + ?Sized> Arg<'a, &'a T> {
                     });
                 }
             }
-            Arg::Is(predicate, _) if !predicate(actual_value) => {
+            Arg::PrivateIs(predicate, _) if !predicate(actual_value) => {
                 return ArgCheckResult::Err(ArgCheckResultErr {
                     arg_info,
                     error_msg: format!(
@@ -108,7 +110,7 @@ impl<'a, T: Debug + ?Sized + 'a> Arg<'a, Rc<T>> {
                     });
                 }
             }
-            Arg::Is(predicate, _) => {
+            Arg::PrivateIs(predicate, _) => {
                 let actual_value_str = format!("{:?}", actual_value);
                 if !predicate(actual_value) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
@@ -141,7 +143,7 @@ impl<'a, T: Debug + ?Sized + 'a> Arg<'a, Arc<T>> {
                     });
                 }
             }
-            Arg::Is(predicate, _) => {
+            Arg::PrivateIs(predicate, _) => {
                 let actual_value_str = format!("{:?}", actual_value);
                 if !predicate(actual_value) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
