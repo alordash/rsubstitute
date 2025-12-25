@@ -19,9 +19,9 @@ impl Times {
 impl Display for Times {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
-            Times::Never | Times::Exactly(0) => write!(f, "never"),
-            Times::Once | Times::Exactly(1) => write!(f, "exactly once"),
-            Times::Exactly(exact_count) => write!(f, "{exact_count} times"),
+            Times::Never | Times::Exactly(0) => write!(f, "Expected to never receive a call"),
+            Times::Once | Times::Exactly(1) => write!(f, "Expected to receive a call exactly once"),
+            Times::Exactly(exact_count) => write!(f, "Expected to receive a call {exact_count} times"),
         }
     }
 }

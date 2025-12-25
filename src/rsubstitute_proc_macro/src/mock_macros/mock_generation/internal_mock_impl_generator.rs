@@ -84,7 +84,7 @@ impl InternalMockImplGenerator {
     fn generate_constructor(&self, mock_struct_info: &MockStructInfo) -> ImplItem {
         let block = self.generate_constructor_block(mock_struct_info);
         let item_impl = ImplItem::Fn(ImplItemFn {
-            attrs: Vec::new(),
+            attrs: vec![constants::ALLOW_UNUSED_ATTRIBUTE.clone()],
             vis: Visibility::Public(Default::default()),
             defaultness: None,
             sig: Signature {
@@ -240,7 +240,10 @@ impl InternalMockImplGenerator {
             };
         let block = self.generate_fn_setup_block(fn_info);
         let impl_item_fn = ImplItemFn {
-            attrs: Vec::new(),
+            attrs: vec![
+                constants::ALLOW_UNUSED_ATTRIBUTE.clone(),
+                constants::ALLOW_ELIDED_NAMED_LIFETIMES_ATTRIBUTE.clone(),
+            ],
             vis: Visibility::Public(Default::default()),
             defaultness: None,
             sig,
@@ -380,7 +383,10 @@ impl InternalMockImplGenerator {
         };
         let block = self.generate_fn_received_block(fn_info);
         let impl_item_fn = ImplItemFn {
-            attrs: Default::default(),
+            attrs: vec![
+                constants::ALLOW_UNUSED_ATTRIBUTE.clone(),
+                constants::ALLOW_ELIDED_NAMED_LIFETIMES_ATTRIBUTE.clone(),
+            ],
             vis: Visibility::Public(Default::default()),
             defaultness: None,
             sig,

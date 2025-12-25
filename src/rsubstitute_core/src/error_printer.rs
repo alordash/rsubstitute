@@ -66,7 +66,7 @@ impl IErrorPrinter for ErrorPrinter {
             )
         };
         let msg = format!(
-            r#"Expected to receive a call {times} matching:
+            r#"{times} matching:
 {expected_call_msg}
 {matching_calls_report}
 {non_matching_calls_report}"#

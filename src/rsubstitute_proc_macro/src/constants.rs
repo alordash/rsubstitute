@@ -82,37 +82,41 @@ pub const SHARED_FN_CONFIG_NEW_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| form
 
 pub const ALLOW_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("allow"));
 
-#[warn(mismatched_lifetime_syntaxes)]
+pub const ALLOW_UNUSED_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+    let attribute_factory = &SERVICES.attribute_factory;
+    let result = attribute_factory.create(ALLOW_IDENT.clone(), "dead_code");
+    return result;
+});
+
+pub const ALLOW_ELIDED_NAMED_LIFETIMES_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+    let attribute_factory = &SERVICES.attribute_factory;
+    let result = attribute_factory.create(ALLOW_IDENT.clone(), "elided_named_lifetimes");
+    return result;
+});
+
 pub const ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     let attribute_factory = &SERVICES.attribute_factory;
-    let arguments = TokenStream::from_str("mismatched_lifetime_syntaxes")
-        .expect("Should be able to parse attribute arg.");
-    let result = attribute_factory.create(ALLOW_IDENT.clone(), arguments);
+    let result = attribute_factory.create(ALLOW_IDENT.clone(), "mismatched_lifetime_syntaxes");
     return result;
 });
 
 pub const ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     let attribute_factory = &SERVICES.attribute_factory;
-    let arguments = TokenStream::from_str("non_camel_case_types")
-        .expect("Should be able to parse attribute arg.");
-    let result = attribute_factory.create(ALLOW_IDENT.clone(), arguments);
+    let result = attribute_factory.create(ALLOW_IDENT.clone(), "non_camel_case_types");
     return result;
 });
 
 pub const DERIVE_CLONE_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     let attribute_factory = &SERVICES.attribute_factory;
     let ident = format_ident!("derive");
-    let arguments = TokenStream::from_str("Clone").expect("Should be able to parse attribute arg.");
-    let result = attribute_factory.create(ident, arguments);
+    let result = attribute_factory.create(ident, "Clone");
     return result;
 });
 
 pub const DERIVE_DEBUG_AND_I_ARGS_FORMATTER_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     let attribute_factory = &SERVICES.attribute_factory;
     let ident = format_ident!("derive");
-    let arguments = TokenStream::from_str("Debug, IArgsFormatter")
-        .expect("Should be able to parse attribute arg.");
-    let result = attribute_factory.create(ident, arguments);
+    let result = attribute_factory.create(ident, "Debug, IArgsFormatter");
     return result;
 });
 
