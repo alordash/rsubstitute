@@ -15,9 +15,20 @@ trait Trait {
 }
 
 use __rsubstitute_generated_Trait::*;
+use rsubstitute_core::Times;
+use rsubstitute_core::args_matching::Arg;
 
 #[test]
 fn accept_value_Ok() {
     // Arrange
     let mock = TraitMock::new();
+    let value = 10;
+
+    // Act
+    Trait::accept_value(&mock, value);
+
+    // Assert
+    mock.accept_value_received(Arg::Any, Times::Once)
+        .accept_value_received(Arg::Eq(value), Times::Once)
+        .accept_value_received(Arg::is(|actual_value| actual_value == 10), Times::Once);
 }

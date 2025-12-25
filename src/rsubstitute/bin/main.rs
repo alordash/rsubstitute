@@ -1,5 +1,3 @@
-mod single;
-
 use crate::generated::MyTraitMock;
 use rsubstitute_core::Times;
 use rsubstitute_core::args_matching::Arg;
@@ -55,7 +53,7 @@ mod generated {
     #[derive(Debug, IArgsFormatter)]
     pub struct work_ArgsChecker<'a> {
         phantom_lifetime: PhantomData<&'a ()>,
-        pub value: Arg<i32>,
+        pub value: Arg<'a, i32>,
     }
 
     impl<'a> IArgsChecker<work_Call<'a>> for work_ArgsChecker<'a> {
@@ -78,10 +76,10 @@ mod generated {
     #[derive(Debug, IArgsFormatter)]
     pub struct another_work_ArgsChecker<'a> {
         phantom_lifetime: PhantomData<&'a ()>,
-        pub string: Arg<&'a str>,
-        pub something: Arg<&'a &'a [u8]>,
-        pub dyn_obj: Arg<&'a dyn IFoo>,
-        pub arc: Arg<Arc<dyn IFoo>>,
+        pub string: Arg<'a, &'a str>,
+        pub something: Arg<'a, &'a &'a [u8]>,
+        pub dyn_obj: Arg<'a, &'a dyn IFoo>,
+        pub arc: Arg<'a, Arc<dyn IFoo>>,
     }
 
     impl<'a> IArgsChecker<another_work_Call<'a>> for another_work_ArgsChecker<'a> {
@@ -124,7 +122,7 @@ mod generated {
     #[derive(Debug, IArgsFormatter)]
     pub struct standalone_ArgsChecker<'a> {
         phantom_lifetime: PhantomData<&'a ()>,
-        number: Arg<i32>,
+        number: Arg<'a, i32>,
     }
 
     impl<'a> IArgsChecker<standalone_Call<'a>> for standalone_ArgsChecker<'a> {
@@ -204,7 +202,7 @@ mod generated {
 
         pub fn work(
             &'a self,
-            value: Arg<i32>,
+            value: Arg<'a, i32>,
         ) -> SharedFnConfig<'a, work_Call<'a>, work_ArgsChecker<'a>, (), Self> {
             let work_args_checker = work_ArgsChecker {
                 phantom_lifetime: PhantomData,
@@ -215,7 +213,7 @@ mod generated {
             return shared_fn_config;
         }
 
-        pub fn received_work(&'a self, value: Arg<i32>, times: Times) -> &'a Self {
+        pub fn received_work(&'a self, value: Arg<'a, i32>, times: Times) -> &'a Self {
             let work_args_checker = work_ArgsChecker {
                 phantom_lifetime: PhantomData,
                 value,
@@ -226,10 +224,10 @@ mod generated {
 
         pub fn another_work(
             &'a self,
-            string: Arg<&'a str>,
-            something: Arg<&'a &'a [u8]>,
-            dyn_obj: Arg<&'a dyn IFoo>,
-            arc: Arg<Arc<dyn IFoo>>,
+            string: Arg<'a, &'a str>,
+            something: Arg<'a, &'a &'a [u8]>,
+            dyn_obj: Arg<'a, &'a dyn IFoo>,
+            arc: Arg<'a, Arc<dyn IFoo>>,
         ) -> SharedFnConfig<'a, another_work_Call<'a>, another_work_ArgsChecker<'a>, Vec<u8>, Self>
         {
             let another_work_args_checker = another_work_ArgsChecker {
@@ -246,10 +244,10 @@ mod generated {
 
         pub fn received_another_work(
             &'a self,
-            string: Arg<&'a str>,
-            something: Arg<&'a &'a [u8]>,
-            dyn_obj: Arg<&'a dyn IFoo>,
-            arc: Arg<Arc<dyn IFoo>>,
+            string: Arg<'a, &'a str>,
+            something: Arg<'a, &'a &'a [u8]>,
+            dyn_obj: Arg<'a, &'a dyn IFoo>,
+            arc: Arg<'a, Arc<dyn IFoo>>,
             times: Times,
         ) -> &'a Self {
             let another_work_args_checker = another_work_ArgsChecker {
@@ -290,7 +288,7 @@ mod generated {
                 phantom_lifetime: PhantomData,
                 number,
             };
-            let _fn_config = Self::standalone_data.add_config(standalone_args_checker);
+            // let _fn_config = Self::standalone_data.add_config(standalone_args_checker);
             // let shared_fn_config = SharedFnConfig::new()
             todo!()
         }
@@ -310,7 +308,7 @@ fn main() {
     let arc_foo1: Arc<dyn IFoo> = Arc::new(Foo(10));
     let arc_foo2: Arc<dyn IFoo> = Arc::new(Foo(144));
     my_trait_mock
-        .work(Arg::Is(|value| value == 32))
+        .work(Arg::is(|value| value == 32))
         .does(|| println!("work mock called"))
         .another_work(
             Arg::Eq(string),
@@ -323,7 +321,7 @@ fn main() {
             Arg::Any,
             Arg::Any,
             Arg::Any,
-            Arg::Is(|foo| foo.get_value() == 144),
+            Arg::is(|foo: Arc<dyn IFoo>| foo.get_value() == 144),
         )
         .returns(vec![7, 70, 77])
         .get()
@@ -354,7 +352,7 @@ fn main() {
     my_trait_mock.received_another_work(
         Arg::Eq("que"),
         Arg::Any,
-        Arg::Is(|_| false),
+        Arg::is(|_| false),
         Arg::Eq(Arc::new(Foo(44))),
         Times::Exactly(22),
     );

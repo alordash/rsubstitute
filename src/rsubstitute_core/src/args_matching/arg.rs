@@ -1,15 +1,19 @@
-use crate::args_matching::{ArgInfo, ArgCheckResult, ArgCheckResultErr, ArgCheckResultOk};
+use crate::args_matching::{ArgCheckResult, ArgCheckResultErr, ArgCheckResultOk, ArgInfo};
 use std::fmt::{Debug, Formatter};
 use std::rc::Rc;
 use std::sync::Arc;
 
-pub enum Arg<T> {
+struct Private;
+
+pub enum Arg<'a, T> {
     Any,
     Eq(T),
-    Is(fn(T) -> bool),
+    #[allow(private_interfaces)]
+    #[doc(hidden)]
+    Is(&'a dyn Fn(T) -> bool, Private),
 }
 
-impl<T: Debug> Debug for Arg<T> {
+impl<'a, T: Debug> Debug for Arg<'a, T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         // TODO - extract to const field when std::any::type_name becomes stabilized as const fn
         // https://github.com/rust-lang/rust/issues/63084
@@ -17,22 +21,31 @@ impl<T: Debug> Debug for Arg<T> {
         match self {
             Arg::Any => write!(f, "({arg_type_name}): any"),
             Arg::Eq(expected_value) => write!(f, "({arg_type_name}): equal to {expected_value:?}"),
-            Arg::Is(_) => write!(f, "({arg_type_name}): custom predicate"),
+            Arg::Is(_, _) => write!(f, "({arg_type_name}): custom predicate"),
         }
     }
 }
 
-impl<'a, T: Debug + PartialOrd + Clone + 'a> Arg<T> {
+impl<'a, T> Arg<'a, T> {
+    pub fn is(predicate: impl Fn(T) -> bool + 'a) -> Self {
+        let reference = Box::leak(Box::new(predicate));
+        return Self::Is(reference, Private);
+    }
+}
+
+impl<'a, T: Debug + PartialOrd + Clone + 'a> Arg<'a, T> {
     pub fn check(&self, arg_name: &'static str, actual_value: T) -> ArgCheckResult<'a> {
         let arg_info = ArgInfo::new(arg_name, actual_value.clone());
         match self {
             Arg::Eq(expected_value) if !actual_value.eq(expected_value) => {
                 return ArgCheckResult::Err(ArgCheckResultErr {
                     arg_info,
-                    error_msg: format!("\t\tExpected: {expected_value:?}\n\t\tActual:   {actual_value:?}"),
+                    error_msg: format!(
+                        "\t\tExpected: {expected_value:?}\n\t\tActual:   {actual_value:?}"
+                    ),
                 });
             }
-            Arg::Is(predicate) => {
+            Arg::Is(predicate, _) => {
                 let actual_value_str = format!("{:?}", actual_value);
                 if !predicate(actual_value) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
@@ -49,12 +62,8 @@ impl<'a, T: Debug + PartialOrd + Clone + 'a> Arg<T> {
     }
 }
 
-impl<'a, T: Debug + ?Sized> Arg<&'a T> {
-    pub fn check_ref(
-        &self,
-        arg_name: &'static str,
-        actual_value: &'a T,
-    ) -> ArgCheckResult<'a> {
+impl<'a, T: Debug + ?Sized> Arg<'a, &'a T> {
+    pub fn check_ref(&self, arg_name: &'static str, actual_value: &'a T) -> ArgCheckResult<'a> {
         let arg_info = ArgInfo::new(arg_name, actual_value);
         let actual_ptr = std::ptr::from_ref(actual_value);
         match self {
@@ -69,7 +78,7 @@ impl<'a, T: Debug + ?Sized> Arg<&'a T> {
                     });
                 }
             }
-            Arg::Is(predicate) if !predicate(actual_value) => {
+            Arg::Is(predicate, _) if !predicate(actual_value) => {
                 return ArgCheckResult::Err(ArgCheckResultErr {
                     arg_info,
                     error_msg: format!(
@@ -83,7 +92,7 @@ impl<'a, T: Debug + ?Sized> Arg<&'a T> {
     }
 }
 
-impl<'a, T: Debug + ?Sized + 'a> Arg<Rc<T>> {
+impl<'a, T: Debug + ?Sized + 'a> Arg<'a, Rc<T>> {
     pub fn check_rc(&self, arg_name: &'static str, actual_value: Rc<T>) -> ArgCheckResult<'a> {
         let arg_info = ArgInfo::new(arg_name, actual_value.clone());
         let actual_ptr = Rc::as_ptr(&actual_value);
@@ -99,7 +108,7 @@ impl<'a, T: Debug + ?Sized + 'a> Arg<Rc<T>> {
                     });
                 }
             }
-            Arg::Is(predicate) => {
+            Arg::Is(predicate, _) => {
                 let actual_value_str = format!("{:?}", actual_value);
                 if !predicate(actual_value) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
@@ -116,12 +125,8 @@ impl<'a, T: Debug + ?Sized + 'a> Arg<Rc<T>> {
     }
 }
 
-impl<'a, T: Debug + ?Sized + 'a> Arg<Arc<T>> {
-    pub fn check_arc(
-        &self,
-        arg_name: &'static str,
-        actual_value: Arc<T>,
-    ) -> ArgCheckResult<'a> {
+impl<'a, T: Debug + ?Sized + 'a> Arg<'a, Arc<T>> {
+    pub fn check_arc(&self, arg_name: &'static str, actual_value: Arc<T>) -> ArgCheckResult<'a> {
         let arg_info = ArgInfo::new(arg_name, actual_value.clone());
         let actual_ptr = Arc::as_ptr(&actual_value);
         match self {
@@ -136,7 +141,7 @@ impl<'a, T: Debug + ?Sized + 'a> Arg<Arc<T>> {
                     });
                 }
             }
-            Arg::Is(predicate) => {
+            Arg::Is(predicate, _) => {
                 let actual_value_str = format!("{:?}", actual_value);
                 if !predicate(actual_value) {
                     return ArgCheckResult::Err(ArgCheckResultErr {

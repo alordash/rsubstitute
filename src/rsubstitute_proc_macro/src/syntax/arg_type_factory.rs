@@ -18,7 +18,14 @@ impl IArgTypeFactory for ArgTypeFactory {
                     arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
                         colon2_token: Some(Default::default()),
                         lt_token: Default::default(),
-                        args: [GenericArgument::Type(ty)].into_iter().collect(),
+                        args: [
+                            GenericArgument::Lifetime(
+                                constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
+                            ),
+                            GenericArgument::Type(ty),
+                        ]
+                        .into_iter()
+                        .collect(),
                         gt_token: Default::default(),
                     }),
                 }]
