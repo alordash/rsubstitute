@@ -229,6 +229,7 @@ impl InternalMockSetupImplGenerator {
         return block;
     }
 
+    // TODO - unite this and next fn with same in received_impl_generator
     fn generate_input_args(&self, fn_info: &FnInfo) -> impl Iterator<Item = FnArg> {
         return fn_info
             .args_checker_struct
