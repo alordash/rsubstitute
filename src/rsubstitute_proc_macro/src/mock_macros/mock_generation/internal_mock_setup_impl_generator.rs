@@ -235,6 +235,7 @@ impl InternalMockSetupImplGenerator {
             .item_struct
             .fields
             .iter()
+            .skip(1)
             .map(|field| {
                 FnArg::Typed(PatType {
                     attrs: Vec::new(),

@@ -25,19 +25,20 @@ fn accept_value_Ok() {
     let second_value = 22;
 
     // Act
-    Trait::accept_value(&mock, first_value);
-    Trait::accept_value(&mock, second_value);
-    Trait::accept_value(&mock, second_value);
+    mock.accept_value(first_value);
+    mock.accept_value(second_value);
+    mock.accept_value(second_value);
 
     // Assert
-    mock.received_accept_value(Arg::Any, Times::Exactly(3))
-        .received_accept_value(Arg::Eq(first_value), Times::Once)
-        .received_accept_value(
+    mock.received
+        .accept_value(Arg::Any, Times::Exactly(3))
+        .accept_value(Arg::Eq(first_value), Times::Once)
+        .accept_value(
             Arg::Is(|actual_value| actual_value == first_value),
             Times::Once,
         )
-        .received_accept_value(Arg::Eq(second_value), Times::Exactly(2))
-        .received_accept_value(
+        .accept_value(Arg::Eq(second_value), Times::Exactly(2))
+        .accept_value(
             Arg::Is(|actual_value| actual_value == second_value),
             Times::Exactly(2),
         );
@@ -51,12 +52,12 @@ fn accept_value_ArgAny_OkPanics() {
     let second_value = 22;
 
     // Act
-    Trait::accept_value(&mock, first_value);
-    Trait::accept_value(&mock, second_value);
+    mock.accept_value(first_value);
+    mock.accept_value(second_value);
 
     // Assert
     assert_panics(
-        || mock.received_accept_value(Arg::Any, Times::Never),
+        || mock.received.accept_value(Arg::Any, Times::Never),
         format!(
             r#"Expected to never receive a call matching:
 	accept_value_data((i32): any)
@@ -67,7 +68,7 @@ Received no non-matching calls"#
         ),
     );
     assert_panics(
-        || mock.received_accept_value(Arg::Any, Times::Once),
+        || mock.received.accept_value(Arg::Any, Times::Once),
         format!(
             r#"Expected to receive a call exactly once matching:
 	accept_value_data((i32): any)
@@ -78,7 +79,7 @@ Received no non-matching calls"#
         ),
     );
     assert_panics(
-        || mock.received_accept_value(Arg::Any, Times::Exactly(3)),
+        || mock.received.accept_value(Arg::Any, Times::Exactly(3)),
         format!(
             r#"Expected to receive a call 3 times matching:
 	accept_value_data((i32): any)
@@ -98,12 +99,15 @@ fn accept_value_ArgEq_OkPanics() {
     let second_value = 22;
 
     // Act
-    Trait::accept_value(&mock, first_value);
-    Trait::accept_value(&mock, second_value);
+    mock.accept_value(first_value);
+    mock.accept_value(second_value);
 
     // Assert
     assert_panics(
-        || mock.received_accept_value(Arg::Eq(first_value), Times::Never),
+        || {
+            mock.received
+                .accept_value(Arg::Eq(first_value), Times::Never)
+        },
         format!(
             r#"Expected to never receive a call matching:
 	accept_value_data((i32): equal to {first_value})
@@ -117,7 +121,10 @@ accept_value_data(*{second_value}*)
         ),
     );
     assert_panics(
-        || mock.received_accept_value(Arg::Eq(first_value), Times::Exactly(3)),
+        || {
+            mock.received
+                .accept_value(Arg::Eq(first_value), Times::Exactly(3))
+        },
         format!(
             r#"Expected to receive a call 3 times matching:
 	accept_value_data((i32): equal to {first_value})
@@ -131,7 +138,10 @@ accept_value_data(*{second_value}*)
         ),
     );
     assert_panics(
-        || mock.received_accept_value(Arg::Eq(second_value), Times::Never),
+        || {
+            mock.received
+                .accept_value(Arg::Eq(second_value), Times::Never)
+        },
         format!(
             r#"Expected to never receive a call matching:
 	accept_value_data((i32): equal to {second_value})
@@ -145,7 +155,10 @@ accept_value_data(*{first_value}*)
         ),
     );
     assert_panics(
-        || mock.received_accept_value(Arg::Eq(second_value), Times::Exactly(3)),
+        || {
+            mock.received
+                .accept_value(Arg::Eq(second_value), Times::Exactly(3))
+        },
         format!(
             r#"Expected to receive a call 3 times matching:
 	accept_value_data((i32): equal to {second_value})
@@ -168,12 +181,17 @@ fn accept_value_ArgIs_OkPanics() {
     let second_value = 22;
 
     // Act
-    Trait::accept_value(&mock, first_value);
-    Trait::accept_value(&mock, second_value);
+    mock.accept_value(first_value);
+    mock.accept_value(second_value);
 
     // Assert
     assert_panics(
-        || mock.received_accept_value(Arg::Is(|actual_value| actual_value == first_value), Times::Never),
+        || {
+            mock.received.accept_value(
+                Arg::Is(|actual_value| actual_value == first_value),
+                Times::Never,
+            )
+        },
         format!(
             r#"Expected to never receive a call matching:
 	accept_value_data((i32): custom predicate)
@@ -186,7 +204,12 @@ accept_value_data(*{second_value}*)
         ),
     );
     assert_panics(
-        || mock.received_accept_value(Arg::Is(|actual_value| actual_value == first_value), Times::Exactly(3)),
+        || {
+            mock.received.accept_value(
+                Arg::Is(|actual_value| actual_value == first_value),
+                Times::Exactly(3),
+            )
+        },
         format!(
             r#"Expected to receive a call 3 times matching:
 	accept_value_data((i32): custom predicate)
@@ -199,7 +222,12 @@ accept_value_data(*{second_value}*)
         ),
     );
     assert_panics(
-        || mock.received_accept_value(Arg::Is(|actual_value| actual_value == second_value), Times::Never),
+        || {
+            mock.received.accept_value(
+                Arg::Is(|actual_value| actual_value == second_value),
+                Times::Never,
+            )
+        },
         format!(
             r#"Expected to never receive a call matching:
 	accept_value_data((i32): custom predicate)
@@ -212,7 +240,12 @@ accept_value_data(*{first_value}*)
         ),
     );
     assert_panics(
-        || mock.received_accept_value(Arg::Is(|actual_value| actual_value == second_value), Times::Exactly(3)),
+        || {
+            mock.received.accept_value(
+                Arg::Is(|actual_value| actual_value == second_value),
+                Times::Exactly(3),
+            )
+        },
         format!(
             r#"Expected to receive a call 3 times matching:
 	accept_value_data((i32): custom predicate)

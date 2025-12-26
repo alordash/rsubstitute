@@ -302,6 +302,11 @@ pub const USE_STD_MARKER_PHANTOM_DATA: LazyCell<ItemUse> = LazyCell::new(|| {
     return result;
 });
 
+pub const USE_STD_RC: LazyCell<ItemUse> = LazyCell::new(|| {
+    let result = syn::parse_str("use std::rc::Rc;").unwrap();
+    return result;
+});
+
 pub const PHANTOM_DATA_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("PhantomData"));
 
 pub const DEFAULT_ARG_FIELD_LIFETIME_FIELD_IDENT: LazyCell<Ident> =

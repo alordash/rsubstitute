@@ -62,7 +62,6 @@ impl IInternalMockReceivedImplGenerator for InternalMockReceivedImplGenerator {
 
 impl InternalMockReceivedImplGenerator {
     const ARGS_CHECKER_VARIABLE_SUFFIX: &'static str = "args_checker";
-    const RECEIVED_FN_PREFIX: &'static str = "received";
     const TIMES_ARG_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("times"));
     const TIMES_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Times"));
 
@@ -85,7 +84,7 @@ impl InternalMockReceivedImplGenerator {
             unsafety: None,
             abi: None,
             fn_token: Default::default(),
-            ident: format_ident!("{}_{}", Self::RECEIVED_FN_PREFIX, fn_info.parent.ident),
+            ident: fn_info.parent.ident.clone(),
             generics: Generics::default(),
             paren_token: Default::default(),
             inputs: iter::once(constants::REF_SELF_ARG_WITH_LIFETIME.clone())
@@ -162,6 +161,7 @@ impl InternalMockReceivedImplGenerator {
             .item_struct
             .fields
             .iter()
+            .skip(1)
             .map(|field| {
                 FnArg::Typed(PatType {
                     attrs: Vec::new(),

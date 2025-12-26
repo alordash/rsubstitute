@@ -22,15 +22,15 @@ trait MyTrait {
 
 use rsubstitute::*;
 
-// #[test]
-// fn work() {
-//     let my_trait_mock = MyTraitMock::new();
-//     my_trait_mock.work(Arg::Any).does(|| println!("work 1"));
-//
-//     MyTrait::work(&my_trait_mock, 20);
-//
-//     my_trait_mock.work_received(Arg::Eq(20), Times::Once);
-// }
+#[test]
+fn work() {
+    let my_trait_mock = MyTraitMock::new();
+    my_trait_mock.setup.work(Arg::Any).does(|| println!("work 1"));
+
+    my_trait_mock.work(20);
+
+    my_trait_mock.received.work(Arg::Eq(20), Times::Once);
+}
 
 #[test]
 fn another_work() {

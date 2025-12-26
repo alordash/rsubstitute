@@ -25,17 +25,17 @@ fn f_Ok() {
     let callback_flag = Rc::new(RefCell::new(false));
     let callback_flag_clone = callback_flag.clone();
     let return_value = ();
-    mock.f().returns_and_does(return_value, move || {
+    mock.setup.f().returns_and_does(return_value, move || {
         *callback_flag_clone.borrow_mut() = true
     });
 
     // Act
-    let result = Trait::f(&mock);
+    let result = mock.f();
 
     // Assert
     assert_eq!((), result);
     assert!(*callback_flag.borrow());
-    mock.received_f(Times::Once);
+    mock.received.f(Times::Once);
 }
 
 #[test]
@@ -44,7 +44,7 @@ fn f_NoConfig_Ok() {
     let mock = TraitMock::new();
 
     // Act
-    let result = Trait::f(&mock);
+    let result = mock.f();
 
     // Assert
     assert_eq!((), result);
@@ -56,16 +56,16 @@ fn f_MultipleTimes_Ok() {
     let mock = TraitMock::new();
 
     // Act
-    let result1 = Trait::f(&mock);
-    let result2 = Trait::f(&mock);
-    let result3 = Trait::f(&mock);
+    let result1 = mock.f();
+    let result2 = mock.f();
+    let result3 = mock.f();
 
     // Assert
     assert_eq!((), result1);
     assert_eq!((), result2);
     assert_eq!((), result3);
 
-    mock.received_f(Times::Exactly(3));
+    mock.received.f(Times::Exactly(3));
 }
 
 #[test]
@@ -74,13 +74,13 @@ fn fn_MultipleTimes_OkPanics() {
     let mock = TraitMock::new();
 
     // Act
-    Trait::f(&mock);
-    Trait::f(&mock);
-    Trait::f(&mock);
+    mock.f();
+    mock.f();
+    mock.f();
 
     // Assert
     assert_panics(
-        || mock.received_f(Times::Once),
+        || mock.received.f(Times::Once),
         r#"Expected to receive a call exactly once matching:
 	f_data()
 Actually received 3 matching calls:
@@ -91,7 +91,7 @@ Received no non-matching calls"#,
     );
 
     assert_panics(
-        || mock.received_f(Times::Exactly(1)),
+        || mock.received.f(Times::Exactly(1)),
         r#"Expected to receive a call exactly once matching:
 	f_data()
 Actually received 3 matching calls:
@@ -102,7 +102,7 @@ Received no non-matching calls"#,
     );
 
     assert_panics(
-        || mock.received_f(Times::Exactly(2)),
+        || mock.received.f(Times::Exactly(2)),
         r#"Expected to receive a call 2 times matching:
 	f_data()
 Actually received 3 matching calls:
@@ -113,7 +113,7 @@ Received no non-matching calls"#,
     );
 
     assert_panics(
-        || mock.received_f(Times::Exactly(4)),
+        || mock.received.f(Times::Exactly(4)),
         r#"Expected to receive a call 4 times matching:
 	f_data()
 Actually received 3 matching calls:
