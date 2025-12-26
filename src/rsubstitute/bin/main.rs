@@ -146,13 +146,13 @@ mod generated {
         data: MyTraitData<'a>,
     }
 
-    pub struct MyTraitMockVerify<'a> {
+    pub struct MyTraitMockReceived<'a> {
         data: MyTraitData<'a>,
     }
 
     pub struct MyTraitMock<'a> {
         pub setup: MyTraitMockSetup<'a>,
-        pub verify: MyTraitMockVerify<'a>,
+        pub received: MyTraitMockReceived<'a>,
         data: MyTraitData<'a>,
     }
 
@@ -215,7 +215,7 @@ mod generated {
             };
             Self {
                 setup: MyTraitMockSetup { data: data.clone() },
-                verify: MyTraitMockVerify { data: data.clone() },
+                received: MyTraitMockReceived { data: data.clone() },
                 data,
             }
         }
@@ -268,8 +268,8 @@ mod generated {
         }
     }
 
-    impl<'a> MyTraitMockVerify<'a> {
-        pub fn received_work(&'a self, value: Arg<'a, i32>, times: Times) -> &'a Self {
+    impl<'a> MyTraitMockReceived<'a> {
+        pub fn work(&'a self, value: Arg<'a, i32>, times: Times) -> &'a Self {
             let work_args_checker = work_ArgsChecker {
                 phantom_lifetime: PhantomData,
                 value,
@@ -280,7 +280,7 @@ mod generated {
             return self;
         }
 
-        pub fn received_another_work(
+        pub fn another_work(
             &'a self,
             string: Arg<'a, &'a str>,
             something: Arg<'a, &'a &'a [u8]>,
@@ -301,7 +301,7 @@ mod generated {
             return self;
         }
 
-        pub fn get_received(&'a self, times: Times) -> &'a Self {
+        pub fn get(&'a self, times: Times) -> &'a Self {
             let get_args_checker = get_ArgsChecker {
                 phantom_lifetime: PhantomData,
             };
@@ -359,15 +359,15 @@ fn main() {
         .returns_and_does(112, || println!("first get call!"))
         .get()
         .returns(900000);
-    MyTrait::work(&my_trait_mock, 32);
+    my_trait_mock.work(32);
 
     let first_another_work =
-        MyTrait::another_work(&my_trait_mock, string, something, foo1, arc_foo1);
+        my_trait_mock.another_work(string, something, foo1, arc_foo1);
     println!("first_another_work = {first_another_work:?}");
     let second_another_work =
-        MyTrait::another_work(&my_trait_mock, "que", something, foo2, arc_foo2.clone());
-    MyTrait::another_work(&my_trait_mock, "que", something, foo2, arc_foo2.clone());
-    MyTrait::another_work(&my_trait_mock, "que", something, foo2, arc_foo2.clone());
+        my_trait_mock.another_work("que", something, foo2, arc_foo2.clone());
+    my_trait_mock.another_work("que", something, foo2, arc_foo2.clone());
+    my_trait_mock.another_work("que", something, foo2, arc_foo2.clone());
     println!("second_another_work = {second_another_work:?}");
 
     let first_get = MyTrait::get(&my_trait_mock);
@@ -375,23 +375,23 @@ fn main() {
     let second_get = MyTrait::get(&my_trait_mock);
     println!("second_get = {second_get}");
 
-    MyTrait::work(&my_trait_mock, 11111);
+    my_trait_mock.work(11111);
     // let panics = MyTrait::get(&my_trait_mock);
 
     my_trait_mock
-        .verify
-        .received_work(Arg::Eq(11111), Times::Once);
+        .received
+        .work(Arg::Eq(11111), Times::Once);
     my_trait_mock
-        .verify
-        .received_work(Arg::Any, Times::Exactly(2));
-    my_trait_mock.verify.received_another_work(
+        .received
+        .work(Arg::Any, Times::Exactly(2));
+    my_trait_mock.received.another_work(
         Arg::Eq("que"),
         Arg::Any,
         Arg::Is(|_| false),
         Arg::Eq(Arc::new(Foo(44))),
         Times::Exactly(22),
     );
-    my_trait_mock.verify.get_received(Times::Exactly(2));
+    my_trait_mock.received.get(Times::Exactly(2));
 
     println!("Done");
 }
