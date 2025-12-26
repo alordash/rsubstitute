@@ -28,9 +28,9 @@ trait MyTrait {
 
     fn get(&self) -> i32;
 
-    fn standalone(number: i32) -> f32;
-
-    fn standalone_with_ref(number: &i32) -> f32;
+    // fn standalone(number: i32) -> f32;
+    //
+    // fn standalone_with_ref(number: &i32) -> f32;
 }
 
 mod generated {
@@ -40,6 +40,7 @@ mod generated {
     use std::cell::LazyCell;
     use std::fmt::Debug;
     use std::marker::PhantomData;
+    use std::rc::Rc;
 
     // start - Calls
     #[allow(non_camel_case_types)]
@@ -133,12 +134,26 @@ mod generated {
 
     // end - Calls
     // start - Mock
+    #[derive(Clone)]
+    struct MyTraitData<'a> {
+        phantom_lifetime: PhantomData<&'a ()>,
+        work_data: Rc<FnData<work_Call<'a>, work_ArgsChecker<'a>, ()>>,
+        another_work_data: Rc<FnData<another_work_Call<'a>, another_work_ArgsChecker<'a>, Vec<u8>>>,
+        get_data: Rc<FnData<get_Call<'a>, get_ArgsChecker<'a>, i32>>,
+    }
+
+    pub struct MyTraitMockSetup<'a> {
+        data: MyTraitData<'a>,
+    }
+
+    pub struct MyTraitMockVerify<'a> {
+        data: MyTraitData<'a>,
+    }
 
     pub struct MyTraitMock<'a> {
-        phantom_lifetime: PhantomData<&'a ()>,
-        work_data: FnData<work_Call<'a>, work_ArgsChecker<'a>, ()>,
-        another_work_data: FnData<another_work_Call<'a>, another_work_ArgsChecker<'a>, Vec<u8>>,
-        get_data: FnData<get_Call<'a>, get_ArgsChecker<'a>, i32>,
+        pub setup: MyTraitMockSetup<'a>,
+        pub verify: MyTraitMockVerify<'a>,
+        data: MyTraitData<'a>,
     }
 
     impl<'a> MyTrait for MyTraitMock<'a> {
@@ -147,7 +162,7 @@ mod generated {
                 phantom_lifetime: PhantomData,
                 value,
             };
-            return self.work_data.handle(call);
+            return self.data.work_data.handle(call);
         }
 
         fn another_work(
@@ -167,39 +182,46 @@ mod generated {
                     arc,
                 }
             };
-            return self.another_work_data.handle_returning(call);
+            return self.data.another_work_data.handle_returning(call);
         }
 
         fn get(&self) -> i32 {
             let call = get_Call {
                 phantom_lifetime: PhantomData,
             };
-            return self.get_data.handle_returning(call);
+            return self.data.get_data.handle_returning(call);
         }
 
-        fn standalone(number: i32) -> f32 {
-            let call = standalone_Call {
-                phantom_lifetime: PhantomData,
-                number,
-            };
-            return Self::standalone_data.handle_returning(call);
-        }
-
-        fn standalone_with_ref(_number: &i32) -> f32 {
-            todo!()
-        }
+        // fn standalone(number: i32) -> f32 {
+        //     let call = standalone_Call {
+        //         phantom_lifetime: PhantomData,
+        //         number,
+        //     };
+        //     return Self::standalone_data.handle_returning(call);
+        // }
+        //
+        // fn standalone_with_ref(_number: &i32) -> f32 {
+        //     todo!()
+        // }
     }
 
     impl<'a> MyTraitMock<'a> {
         pub fn new() -> Self {
-            Self {
+            let data = MyTraitData {
                 phantom_lifetime: PhantomData,
-                work_data: FnData::new("work", &SERVICES),
-                another_work_data: FnData::new("another_work", &SERVICES),
-                get_data: FnData::new("get", &SERVICES),
+                work_data: Rc::new(FnData::new("work", &SERVICES)),
+                another_work_data: Rc::new(FnData::new("another_work", &SERVICES)),
+                get_data: Rc::new(FnData::new("get", &SERVICES)),
+            };
+            Self {
+                setup: MyTraitMockSetup { data: data.clone() },
+                verify: MyTraitMockVerify { data: data.clone() },
+                data,
             }
         }
+    }
 
+    impl<'a> MyTraitMockSetup<'a> {
         pub fn work(
             &'a self,
             value: Arg<'a, i32>,
@@ -208,7 +230,7 @@ mod generated {
                 phantom_lifetime: PhantomData,
                 value,
             };
-            let fn_config = self.work_data.add_config(work_args_checker);
+            let fn_config = self.data.work_data.add_config(work_args_checker);
             let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
         }
@@ -228,7 +250,10 @@ mod generated {
                 dyn_obj,
                 arc,
             };
-            let fn_config = self.another_work_data.add_config(another_work_args_checker);
+            let fn_config = self
+                .data
+                .another_work_data
+                .add_config(another_work_args_checker);
             let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
         }
@@ -237,17 +262,21 @@ mod generated {
             let get_args_checker = get_ArgsChecker {
                 phantom_lifetime: PhantomData,
             };
-            let fn_config = self.get_data.add_config(get_args_checker);
+            let fn_config = self.data.get_data.add_config(get_args_checker);
             let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
         }
+    }
 
+    impl<'a> MyTraitMockVerify<'a> {
         pub fn received_work(&'a self, value: Arg<'a, i32>, times: Times) -> &'a Self {
             let work_args_checker = work_ArgsChecker {
                 phantom_lifetime: PhantomData,
                 value,
             };
-            self.work_data.verify_received(work_args_checker, times);
+            self.data
+                .work_data
+                .verify_received(work_args_checker, times);
             return self;
         }
 
@@ -266,7 +295,8 @@ mod generated {
                 dyn_obj,
                 arc,
             };
-            self.another_work_data
+            self.data
+                .another_work_data
                 .verify_received(another_work_args_checker, times);
             return self;
         }
@@ -275,7 +305,7 @@ mod generated {
             let get_args_checker = get_ArgsChecker {
                 phantom_lifetime: PhantomData,
             };
-            self.get_data.verify_received(get_args_checker, times);
+            self.data.get_data.verify_received(get_args_checker, times);
             return self;
         }
 
@@ -308,6 +338,7 @@ fn main() {
     let arc_foo1: Arc<dyn IFoo> = Arc::new(Foo(10));
     let arc_foo2: Arc<dyn IFoo> = Arc::new(Foo(144));
     my_trait_mock
+        .setup
         .work(Arg::Is(|value| value == 32))
         .does(|| println!("work mock called"))
         .another_work(
@@ -347,16 +378,20 @@ fn main() {
     MyTrait::work(&my_trait_mock, 11111);
     // let panics = MyTrait::get(&my_trait_mock);
 
-    my_trait_mock.received_work(Arg::Eq(11111), Times::Once);
-    my_trait_mock.received_work(Arg::Any, Times::Exactly(2));
-    my_trait_mock.received_another_work(
+    my_trait_mock
+        .verify
+        .received_work(Arg::Eq(11111), Times::Once);
+    my_trait_mock
+        .verify
+        .received_work(Arg::Any, Times::Exactly(2));
+    my_trait_mock.verify.received_another_work(
         Arg::Eq("que"),
         Arg::Any,
         Arg::Is(|_| false),
         Arg::Eq(Arc::new(Foo(44))),
         Times::Exactly(22),
     );
-    my_trait_mock.get_received(Times::Exactly(2));
+    my_trait_mock.verify.get_received(Times::Exactly(2));
 
     println!("Done");
 }
