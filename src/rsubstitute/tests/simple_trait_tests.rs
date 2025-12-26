@@ -13,7 +13,6 @@ trait AnotherTestTrait {}
 // #[cfg(test)]
 // #[allow(non_snake_case)]
 // mod tests {
-use __rsubstitute_generated_Trait::*;
 use rsubstitute::assertions::assert_panics;
 use rsubstitute_core::Times;
 use std::cell::RefCell;

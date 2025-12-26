@@ -20,7 +20,6 @@ trait MyTrait {
     ) -> Vec<u8>;
 }
 
-use __rsubstitute_generated_MyTrait::MyTraitMock;
 use rsubstitute::*;
 
 // #[test]

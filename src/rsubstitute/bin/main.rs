@@ -33,6 +33,7 @@ trait MyTrait {
     // fn standalone_with_ref(number: &i32) -> f32;
 }
 
+pub use generated::*;
 mod generated {
     use super::*;
     use rsubstitute::*;

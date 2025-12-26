@@ -7,7 +7,7 @@ use crate::mock_macros::{IModGenerator, ITargetDeclExtractor};
 use proc_macro::TokenStream;
 use quote::quote;
 use std::rc::Rc;
-use syn::{ItemImpl, ItemTrait};
+use syn::*;
 
 pub trait IMockMacroHandler {
     fn handle(
@@ -71,10 +71,25 @@ impl MockMacroHandler {
             internal_mock_impl_info,
         );
 
+        let use_generated_mod = ItemUse {
+            attrs: Vec::new(),
+            vis: Visibility::Public(Default::default()),
+            use_token: Default::default(),
+            leading_colon: None,
+            tree: UseTree::Path(UsePath {
+                ident: mod_info.item_mod.ident.clone(),
+                colon2_token: Default::default(),
+                tree: Box::new(UseTree::Glob(UseGlob {
+                    star_token: Default::default(),
+                })),
+            }),
+            semi_token: Default::default()
+        };
         let generated_mod = mod_info.item_mod;
         let result = quote! {
             #item_trait
 
+            #use_generated_mod
             #generated_mod
         };
         return result.into();
