@@ -18,17 +18,17 @@ pub struct FnInfoGenerator {
 
 impl IFnInfoGenerator for FnInfoGenerator {
     fn generate<'a>(&self, fn_decl: &'a FnDecl) -> FnInfo<'a> {
-        let call_info = self.call_struct_generator.generate(fn_decl);
-        let args_checker_info = self.args_checker_generator.generate(fn_decl);
-        let args_checker_impl_info = self
+        let call_struct = self.call_struct_generator.generate(fn_decl);
+        let args_checker_struct = self.args_checker_generator.generate(fn_decl);
+        let args_checker_impl = self
             .args_checker_impl_generator
-            .generate(&call_info, &args_checker_info);
+            .generate(&call_struct, &args_checker_struct);
         let data_field_ident = self.generate_data_field_ident(fn_decl);
         let fn_info = FnInfo {
             parent: fn_decl,
-            call_info,
-            args_checker_info,
-            args_checker_impl_info,
+            call_struct,
+            args_checker_struct,
+            args_checker_impl,
             data_field_ident,
         };
         return fn_info;

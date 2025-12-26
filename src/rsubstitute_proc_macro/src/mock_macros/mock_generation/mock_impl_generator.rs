@@ -1,10 +1,9 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::FnInfo;
-use crate::mock_macros::mock_generation::models::{MockImplInfo, MockStructInfo};
-use crate::mock_macros::models::TargetDecl;
+use crate::mock_macros::mock_generation::models::{MockImpl, MockStruct};
 use crate::syntax::*;
 use proc_macro2::Ident;
-use quote::{ToTokens, format_ident};
+use quote::format_ident;
 use std::cell::LazyCell;
 use std::rc::Rc;
 use syn::punctuated::Punctuated;
@@ -13,10 +12,10 @@ use syn::*;
 pub trait IMockImplGenerator {
     fn generate(
         &self,
-        target_decl: &TargetDecl,
-        mock_struct_info: &MockStructInfo,
+        target_ident: Ident,
+        mock_struct: &MockStruct,
         fn_infos: &[FnInfo],
-    ) -> MockImplInfo;
+    ) -> MockImpl;
 }
 
 pub(crate) struct MockImplGenerator {
@@ -31,14 +30,14 @@ pub(crate) struct MockImplGenerator {
 impl IMockImplGenerator for MockImplGenerator {
     fn generate(
         &self,
-        target_decl: &TargetDecl,
-        mock_struct_info: &MockStructInfo,
+        target_ident: Ident,
+        mock_struct: &MockStruct,
         fn_infos: &[FnInfo],
-    ) -> MockImplInfo {
-        let trait_ = self.path_factory.create(target_decl.ident.clone());
+    ) -> MockImpl {
+        let trait_ = self.path_factory.create(target_ident);
         let self_ty = self
             .type_factory
-            .create(mock_struct_info.item_struct.ident.clone());
+            .create(mock_struct.item_struct.ident.clone());
         let items = fn_infos
             .iter()
             .map(|x| self.generate_impl_item_fn(x))
@@ -60,8 +59,8 @@ impl IMockImplGenerator for MockImplGenerator {
             constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
             &mut item_impl,
         );
-        let mock_impl_info = MockImplInfo { item_impl };
-        return mock_impl_info;
+        let mock_impl = MockImpl { item_impl };
+        return mock_impl;
     }
 }
 
@@ -152,7 +151,7 @@ impl MockImplGenerator {
 
     fn generate_call_stmt(&self, fn_info: &FnInfo) -> Stmt {
         let fn_fields: Vec<_> = fn_info
-            .call_info
+            .call_struct
             .item_struct
             .fields
             .iter()
@@ -188,7 +187,7 @@ impl MockImplGenerator {
                                 qself: None,
                                 path: self
                                     .path_factory
-                                    .create(fn_info.call_info.item_struct.ident.clone()),
+                                    .create(fn_info.call_struct.item_struct.ident.clone()),
                                 brace_token: Default::default(),
                                 fields: std::iter::once(
                                     constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE.clone(),
@@ -227,6 +226,7 @@ impl MockImplGenerator {
     fn generate_handle_expr(&self, fn_info: &FnInfo) -> Expr {
         let idents = [
             constants::SELF_IDENT.clone(),
+            constants::DATA_IDENT.clone(),
             fn_info.data_field_ident.clone(),
         ];
         let method = if fn_info.parent.has_return_value() {

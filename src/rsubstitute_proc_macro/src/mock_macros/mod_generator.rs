@@ -1,9 +1,10 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::FnInfo;
 use crate::mock_macros::mock_generation::models::{
-    InternalMockImplInfo, MockImplInfo, MockStructInfo,
+    InternalMockImpl, InternalMockReceivedImpl, InternalMockSetupImpl, MockDataStruct, MockImpl,
+    MockReceivedStruct, MockSetupStruct, MockStruct,
 };
-use crate::mock_macros::models::ModInfo;
+use crate::mock_macros::models::GeneratedMod;
 use proc_macro2::Ident;
 use quote::format_ident;
 use std::cell::LazyCell;
@@ -14,10 +15,15 @@ pub trait IModGenerator {
         &self,
         trait_ident: Ident,
         fn_infos: Vec<FnInfo>,
-        mock_struct_info: MockStructInfo,
-        mock_impl_info: MockImplInfo,
-        internal_mock_impl_info: InternalMockImplInfo,
-    ) -> ModInfo;
+        mock_data_struct: MockDataStruct,
+        mock_setup_struct: MockSetupStruct,
+        mock_received_struct: MockReceivedStruct,
+        mock_struct: MockStruct,
+        mock_impl: MockImpl,
+        internal_mock_impl: InternalMockImpl,
+        internal_mock_setup_impl: InternalMockSetupImpl,
+        internal_mock_received_impl: InternalMockReceivedImpl,
+    ) -> GeneratedMod;
 }
 
 pub struct ModGenerator;
@@ -27,10 +33,15 @@ impl IModGenerator for ModGenerator {
         &self,
         trait_ident: Ident,
         fn_infos: Vec<FnInfo>,
-        mock_struct_info: MockStructInfo,
-        mock_impl_info: MockImplInfo,
-        internal_mock_impl_info: InternalMockImplInfo,
-    ) -> ModInfo {
+        mock_data_struct: MockDataStruct,
+        mock_setup_struct: MockSetupStruct,
+        mock_received_struct: MockReceivedStruct,
+        mock_struct: MockStruct,
+        mock_impl: MockImpl,
+        internal_mock_impl: InternalMockImpl,
+        internal_mock_setup_impl: InternalMockSetupImpl,
+        internal_mock_received_impl: InternalMockReceivedImpl,
+    ) -> GeneratedMod {
         let attrs = vec![constants::ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE.clone()];
         let usings = [
             constants::USE_SUPER.clone(),
@@ -43,15 +54,20 @@ impl IModGenerator for ModGenerator {
             .map(|x| Item::Use(x))
             .chain(fn_infos.into_iter().flat_map(|x| {
                 [
-                    Item::Struct(x.call_info.item_struct),
-                    Item::Struct(x.args_checker_info.item_struct),
-                    Item::Impl(x.args_checker_impl_info.item_impl),
+                    Item::Struct(x.call_struct.item_struct),
+                    Item::Struct(x.args_checker_struct.item_struct),
+                    Item::Impl(x.args_checker_impl.item_impl),
                 ]
             }))
             .chain([
-                Item::Struct(mock_struct_info.item_struct),
-                Item::Impl(mock_impl_info.item_impl),
-                Item::Impl(internal_mock_impl_info.item_impl),
+                Item::Struct(mock_data_struct.item_struct),
+                Item::Struct(mock_setup_struct.item_struct),
+                Item::Struct(mock_received_struct.item_struct),
+                Item::Struct(mock_struct.item_struct),
+                Item::Impl(mock_impl.item_impl),
+                Item::Impl(internal_mock_impl.item_impl),
+                Item::Impl(internal_mock_setup_impl.item_impl),
+                Item::Impl(internal_mock_received_impl.item_impl),
             ])
             .collect();
         let item_mod = ItemMod {
@@ -63,7 +79,7 @@ impl IModGenerator for ModGenerator {
             content: Some((Default::default(), items)),
             semi: None,
         };
-        let mod_info = ModInfo { item_mod };
+        let mod_info = GeneratedMod { item_mod };
         return mod_info;
     }
 }

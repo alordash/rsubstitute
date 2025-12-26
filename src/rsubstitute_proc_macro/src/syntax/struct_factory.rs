@@ -3,26 +3,13 @@ use proc_macro2::Ident;
 use syn::*;
 
 pub trait IStructFactory {
-    fn create_with_default_lifetime(
-        &self,
-        attrs: Vec<Attribute>,
-        ident: Ident,
-        fields: FieldsNamed,
-    ) -> ItemStruct;
+    fn create(&self, attrs: Vec<Attribute>, ident: Ident, fields: FieldsNamed) -> ItemStruct;
 }
 
 pub struct StructFactory;
 
 impl IStructFactory for StructFactory {
-    fn create_with_default_lifetime(
-        &self,
-        attrs: Vec<Attribute>,
-        ident: Ident,
-        mut fields_named: FieldsNamed,
-    ) -> ItemStruct {
-        fields_named
-            .named
-            .insert(0, constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD.clone());
+    fn create(&self, attrs: Vec<Attribute>, ident: Ident, fields_named: FieldsNamed) -> ItemStruct {
         let result = ItemStruct {
             attrs,
             vis: Visibility::Public(Default::default()),

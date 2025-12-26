@@ -135,26 +135,25 @@ mod generated {
 
     // end - Calls
     // start - Mock
-    #[derive(Clone)]
-    struct MyTraitData<'a> {
-        phantom_lifetime: PhantomData<&'a ()>,
-        work_data: Rc<FnData<work_Call<'a>, work_ArgsChecker<'a>, ()>>,
-        another_work_data: Rc<FnData<another_work_Call<'a>, another_work_ArgsChecker<'a>, Vec<u8>>>,
-        get_data: Rc<FnData<get_Call<'a>, get_ArgsChecker<'a>, i32>>,
+    struct MyTraitMockData<'a> {
+        _phantom_lifetime: PhantomData<&'a ()>,
+        work_data: FnData<work_Call<'a>, work_ArgsChecker<'a>, ()>,
+        another_work_data: FnData<another_work_Call<'a>, another_work_ArgsChecker<'a>, Vec<u8>>,
+        get_data: FnData<get_Call<'a>, get_ArgsChecker<'a>, i32>,
     }
 
     pub struct MyTraitMockSetup<'a> {
-        data: MyTraitData<'a>,
+        data: Rc<MyTraitMockData<'a>>,
     }
 
     pub struct MyTraitMockReceived<'a> {
-        data: MyTraitData<'a>,
+        data: Rc<MyTraitMockData<'a>>,
     }
 
     pub struct MyTraitMock<'a> {
         pub setup: MyTraitMockSetup<'a>,
         pub received: MyTraitMockReceived<'a>,
-        data: MyTraitData<'a>,
+        data: Rc<MyTraitMockData<'a>>,
     }
 
     impl<'a> MyTrait for MyTraitMock<'a> {
@@ -208,17 +207,17 @@ mod generated {
 
     impl<'a> MyTraitMock<'a> {
         pub fn new() -> Self {
-            let data = MyTraitData {
-                phantom_lifetime: PhantomData,
-                work_data: Rc::new(FnData::new("work", &SERVICES)),
-                another_work_data: Rc::new(FnData::new("another_work", &SERVICES)),
-                get_data: Rc::new(FnData::new("get", &SERVICES)),
-            };
-            Self {
+            let data = Rc::new(MyTraitMockData {
+                _phantom_lifetime: PhantomData,
+                work_data: FnData::new("work", &SERVICES),
+                another_work_data: FnData::new("another_work", &SERVICES),
+                get_data: FnData::new("get", &SERVICES),
+            });
+            return Self {
                 setup: MyTraitMockSetup { data: data.clone() },
                 received: MyTraitMockReceived { data: data.clone() },
                 data,
-            }
+            };
         }
     }
 
@@ -362,11 +361,9 @@ fn main() {
         .returns(900000);
     my_trait_mock.work(32);
 
-    let first_another_work =
-        my_trait_mock.another_work(string, something, foo1, arc_foo1);
+    let first_another_work = my_trait_mock.another_work(string, something, foo1, arc_foo1);
     println!("first_another_work = {first_another_work:?}");
-    let second_another_work =
-        my_trait_mock.another_work("que", something, foo2, arc_foo2.clone());
+    let second_another_work = my_trait_mock.another_work("que", something, foo2, arc_foo2.clone());
     my_trait_mock.another_work("que", something, foo2, arc_foo2.clone());
     my_trait_mock.another_work("que", something, foo2, arc_foo2.clone());
     println!("second_another_work = {second_another_work:?}");
@@ -379,12 +376,8 @@ fn main() {
     my_trait_mock.work(11111);
     // let panics = MyTrait::get(&my_trait_mock);
 
-    my_trait_mock
-        .received
-        .work(Arg::Eq(11111), Times::Once);
-    my_trait_mock
-        .received
-        .work(Arg::Any, Times::Exactly(2));
+    my_trait_mock.received.work(Arg::Eq(11111), Times::Once);
+    my_trait_mock.received.work(Arg::Any, Times::Exactly(2));
     my_trait_mock.received.another_work(
         Arg::Eq("que"),
         Arg::Any,

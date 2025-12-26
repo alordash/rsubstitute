@@ -1,13 +1,16 @@
-// TODO - move to crate root
 use crate::di::SERVICES;
-use proc_macro2::{Ident, Span, TokenStream};
+use proc_macro2::{Ident, Span};
 use quote::format_ident;
 use std::cell::LazyCell;
 use std::clone::Clone;
 use std::iter::{IntoIterator, Iterator};
-use std::str::FromStr;
 use syn::punctuated::Punctuated;
 use syn::*;
+
+pub const DATA_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("data"));
+pub const MOCK_STRUCT_IDENT_PREFIX: &'static str = "Mock";
+pub const MOCK_SETUP_FIELD_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("setup"));
+pub const MOCK_RECEIVED_FIELD_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("received"));
 
 pub const SELF_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("self"));
 pub const SELF_IDENT_PATH: LazyCell<Path> = LazyCell::new(|| {
@@ -46,8 +49,43 @@ pub const I_ARGS_CHECKER_TRAIT_IDENT: LazyCell<Ident> =
 // TODO - add test that it's equal to rsubstitute_core::FnData
 pub const FN_DATA_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("FnData"));
 
-// TODO - add test that it's equal to rsubstitute_core::FnData::new
-pub const FN_DATA_NEW_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("new"));
+pub const NEW_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("new"));
+
+pub const SETUP_MEMBER: LazyCell<Member> = LazyCell::new(|| Member::Named(format_ident!("setup")));
+pub const RECEIVED_MEMBER: LazyCell<Member> =
+    LazyCell::new(|| Member::Named(format_ident!("received")));
+
+pub const EMPTY_PATH_EXPR: LazyCell<Expr> = LazyCell::new(|| {
+    Expr::Path(ExprPath {
+        attrs: Vec::new(),
+        qself: None,
+        path: Path {
+            leading_colon: None,
+            segments: Punctuated::new(),
+        },
+    })
+});
+
+pub const DATA_SHORT_FIELD_VALUE: LazyCell<FieldValue> = LazyCell::new(|| FieldValue {
+    attrs: Vec::new(),
+    member: Member::Named(DATA_IDENT.clone()),
+    colon_token: None,
+    expr: EMPTY_PATH_EXPR.clone(),
+});
+pub const DATA_FIELD_VALUE: LazyCell<FieldValue> = LazyCell::new(|| {
+    let expr_method_call_factory = &SERVICES.expr_method_call_factory;
+    let result = FieldValue {
+        attrs: Vec::new(),
+        member: Member::Named(DATA_IDENT.clone()),
+        colon_token: Some(Default::default()),
+        expr: Expr::MethodCall(expr_method_call_factory.create(
+            &[DATA_IDENT.clone()],
+            format_ident!("clone"),
+            &[],
+        )),
+    };
+    return result;
+});
 
 // TODO - add test that verifies that it's equal to rsubstitute_core::FnData::add_config
 pub const FN_DATA_ADD_CONFIG_FN_IDENT: LazyCell<Ident> =
@@ -192,6 +230,8 @@ pub const VEC_OF_ARG_CHECK_RESULT_TYPE: LazyCell<Type> = LazyCell::new(|| {
     });
     return result;
 });
+
+pub const RC_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Rc"));
 
 pub const REF_SELF_ARG: LazyCell<FnArg> = LazyCell::new(|| {
     let result = FnArg::Receiver(Receiver {

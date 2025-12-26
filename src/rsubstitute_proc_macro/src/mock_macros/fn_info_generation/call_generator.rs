@@ -1,14 +1,14 @@
 use crate::constants;
-use crate::mock_macros::fn_info_generation::models::CallInfo;
+use crate::mock_macros::fn_info_generation::models::CallStruct;
 use crate::mock_macros::models::FnDecl;
 use crate::syntax::{IFieldFactory, IReferenceNormalizer, IStructFactory};
 use proc_macro2::Ident;
-use quote::{format_ident, ToTokens};
+use quote::{ToTokens, format_ident};
 use std::rc::Rc;
 use syn::{Field, FieldsNamed, FnArg, PatType};
 
 pub trait ICallStructGenerator {
-    fn generate(&self, fn_decl: &FnDecl) -> CallInfo;
+    fn generate(&self, fn_decl: &FnDecl) -> CallStruct;
 }
 
 pub struct CallStructGenerator {
@@ -18,29 +18,30 @@ pub struct CallStructGenerator {
 }
 
 impl ICallStructGenerator for CallStructGenerator {
-    fn generate(&self, fn_decl: &FnDecl) -> CallInfo {
+    fn generate(&self, fn_decl: &FnDecl) -> CallStruct {
         let attrs = vec![
             constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone(),
             constants::DERIVE_CLONE_ATTRIBUTE.clone(),
         ];
         let ident = format_ident!("{}_{}", fn_decl.ident, Self::CALL_STRUCT_SUFFIX);
-        let struct_fields = fn_decl
+        let fn_fields = fn_decl
             .arguments
             .iter()
             .flat_map(|x| self.try_convert_fn_arg_to_field(x));
+        let struct_fields = std::iter::once(constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD.clone())
+            .chain(fn_fields)
+            .collect();
         let fields_named = FieldsNamed {
             brace_token: Default::default(),
-            named: struct_fields.collect(),
+            named: struct_fields,
         };
 
-        let mut item_struct =
-            self.struct_factory
-                .create_with_default_lifetime(attrs, ident, fields_named);
+        let mut item_struct = self.struct_factory.create(attrs, ident, fields_named);
         self.reference_normalizer
             .normalize_in_struct(&mut item_struct);
-        let call_info = CallInfo { item_struct };
+        let call_struct = CallStruct { item_struct };
 
-        return call_info;
+        return call_struct;
     }
 }
 

@@ -1,14 +1,9 @@
 use crate::constants;
-use crate::mock_macros::fn_info_generation::models::FnInfo;
-use crate::mock_macros::mock_generation::models::{InternalMockImplInfo, MockStructInfo};
-use crate::syntax::{
-    IExprMethodCallFactory, IFieldValueFactory, ILocalFactory, IPathFactory, IReferenceNormalizer,
-    ITypeFactory,
-};
+use crate::mock_macros::mock_generation::models::*;
+use crate::syntax::*;
 use proc_macro2::{Ident, Span};
 use quote::format_ident;
 use std::cell::LazyCell;
-use std::iter;
 use std::rc::Rc;
 use syn::punctuated::Punctuated;
 use syn::*;
@@ -16,40 +11,35 @@ use syn::*;
 pub trait IInternalMockImplGenerator {
     fn generate(
         &self,
-        mock_struct_info: &MockStructInfo,
-        fn_infos: &[FnInfo],
-    ) -> InternalMockImplInfo;
+        mock_struct: &MockStruct,
+        mock_data_struct: &MockDataStruct,
+        mock_setup_struct: &MockSetupStruct,
+        mock_received_struct: &MockReceivedStruct,
+    ) -> InternalMockImpl;
 }
 
 pub(crate) struct InternalMockImplGenerator {
     pub path_factory: Rc<dyn IPathFactory>,
     pub type_factory: Rc<dyn ITypeFactory>,
-    pub field_value_factory: Rc<dyn IFieldValueFactory>,
-    pub local_factory: Rc<dyn ILocalFactory>,
-    pub expr_method_call_factory: Rc<dyn IExprMethodCallFactory>,
     pub reference_normalizer: Rc<dyn IReferenceNormalizer>,
 }
 
 impl IInternalMockImplGenerator for InternalMockImplGenerator {
     fn generate(
         &self,
-        mock_struct_info: &MockStructInfo,
-        fn_infos: &[FnInfo],
-    ) -> InternalMockImplInfo {
+        mock_struct: &MockStruct,
+        mock_data_struct: &MockDataStruct,
+        mock_setup_struct: &MockSetupStruct,
+        mock_received_struct: &MockReceivedStruct,
+    ) -> InternalMockImpl {
         let self_ty = self
             .type_factory
-            .create(mock_struct_info.item_struct.ident.clone());
-        let constructor = self.generate_constructor(mock_struct_info);
-        let fn_setups = fn_infos
-            .iter()
-            .map(|x| ImplItem::Fn(self.generate_fn_setup(x)));
-        let fn_receiveds = fn_infos
-            .iter()
-            .map(|x| ImplItem::Fn(self.generate_fn_received(x)));
-        let items = std::iter::once(constructor)
-            .chain(fn_setups)
-            .chain(fn_receiveds)
-            .collect();
+            .create(mock_struct.item_struct.ident.clone());
+        let constructor = self.generate_constructor(
+            mock_data_struct,
+            mock_setup_struct,
+            mock_received_struct,
+        );
 
         let mut item_impl = ItemImpl {
             attrs: Vec::new(),
@@ -60,29 +50,32 @@ impl IInternalMockImplGenerator for InternalMockImplGenerator {
             trait_: None,
             self_ty: Box::new(self_ty),
             brace_token: Default::default(),
-            items,
+            items: [constructor].into_iter().collect(),
         };
         self.reference_normalizer.normalize_in_impl(
             constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
             &mut item_impl,
         );
-        let internal_mock_impl_info = InternalMockImplInfo { item_impl };
-        return internal_mock_impl_info;
+        let internal_mock_impl = InternalMockImpl { item_impl };
+        return internal_mock_impl;
     }
 }
 
 impl InternalMockImplGenerator {
     const CONSTRUCTOR_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("new"));
-    const ARGS_CHECKER_VARIABLE_SUFFIX: &'static str = "args_checker";
-    const FN_CONFIG_VAR_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("fn_config"));
-    const SHARED_FN_CONFIG_VAR_IDENT: LazyCell<Ident> =
-        LazyCell::new(|| format_ident!("shared_fn_config"));
-    const RECEIVED_FN_PREFIX: &'static str = "received";
-    const TIMES_ARG_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("times"));
-    const TIMES_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Times"));
+    const DATA_VAR_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("data"));
 
-    fn generate_constructor(&self, mock_struct_info: &MockStructInfo) -> ImplItem {
-        let block = self.generate_constructor_block(mock_struct_info);
+    fn generate_constructor(
+        &self,
+        mock_data_struct: &MockDataStruct,
+        mock_setup_struct: &MockSetupStruct,
+        mock_received_struct: &MockReceivedStruct,
+    ) -> ImplItem {
+        let block = self.generate_constructor_block(
+            mock_data_struct,
+            mock_setup_struct,
+            mock_received_struct,
+        );
         let item_impl = ImplItem::Fn(ImplItemFn {
             attrs: vec![constants::ALLOW_UNUSED_ATTRIBUTE.clone()],
             vis: Visibility::Public(Default::default()),
@@ -108,9 +101,14 @@ impl InternalMockImplGenerator {
         return item_impl;
     }
 
-    fn generate_constructor_block(&self, mock_struct_info: &MockStructInfo) -> Block {
+    fn generate_constructor_block(
+        &self,
+        mock_data_struct: &MockDataStruct,
+        mock_setup_struct: &MockSetupStruct,
+        mock_received_struct: &MockReceivedStruct,
+    ) -> Block {
         let phantom_lifetime_field = constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE.clone();
-        let data_fields = mock_struct_info
+        let data_fields = mock_data_struct
             .item_struct
             .fields
             .iter()
@@ -139,7 +137,7 @@ impl InternalMockImplGenerator {
                                         arguments: PathArguments::None,
                                     },
                                     PathSegment {
-                                        ident: constants::FN_DATA_NEW_FN_IDENT.clone(),
+                                        ident: constants::NEW_IDENT.clone(),
                                         arguments: PathArguments::None,
                                     },
                                 ]
@@ -163,340 +161,105 @@ impl InternalMockImplGenerator {
                     }),
                 }
             });
-        let block = Block {
-            brace_token: Default::default(),
-            stmts: vec![Stmt::Expr(
-                Expr::Struct(ExprStruct {
-                    attrs: Vec::new(),
-                    qself: None,
-                    path: constants::SELF_TYPE_PATH.clone(),
-                    brace_token: Default::default(),
-                    fields: std::iter::once(phantom_lifetime_field)
-                        .chain(data_fields)
-                        .collect(),
-                    dot2_token: None,
-                    rest: None,
-                }),
-                None,
-            )],
-        };
-        return block;
-    }
-
-    fn generate_fn_setup(&self, fn_info: &FnInfo) -> ImplItemFn {
-        let sig =
-            Signature {
-                // TODO - all these `None` should be actually mapped to source fns signature
-                constness: None,
-                asyncness: None,
-                unsafety: None,
-                abi: None,
-                fn_token: Default::default(),
-                ident: fn_info.parent.ident.clone(),
-                generics: Generics::default(),
-                paren_token: Default::default(),
-                inputs: iter::once(constants::REF_SELF_ARG_WITH_LIFETIME.clone())
-                    .chain(self.generate_input_args(fn_info))
-                    .collect(),
-                variadic: None,
-                output: ReturnType::Type(
-                    Default::default(),
-                    Box::new(Type::Path(TypePath {
-                        qself: None,
-                        path: Path {
-                            leading_colon: None,
-                            segments: [PathSegment {
-                                ident: constants::SHARED_FN_CONFIG_TYPE_IDENT.clone(),
-                                arguments: PathArguments::AngleBracketed(
-                                    AngleBracketedGenericArguments {
-                                        colon2_token: None,
-                                        lt_token: Default::default(),
-                                        args: [
-                                            GenericArgument::Lifetime(
-                                                constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
-                                            ),
-                                            GenericArgument::Type(self.type_factory.create(
-                                                fn_info.call_info.item_struct.ident.clone(),
-                                            )),
-                                            GenericArgument::Type(self.type_factory.create(
-                                                fn_info.args_checker_info.item_struct.ident.clone(),
-                                            )),
-                                            GenericArgument::Type(
-                                                fn_info.parent.get_return_value_type(),
-                                            ),
-                                            GenericArgument::Type(constants::SELF_TYPE.clone()),
-                                        ]
-                                        .into_iter()
-                                        .collect(),
-                                        gt_token: Default::default(),
-                                    },
-                                ),
-                            }]
-                            .into_iter()
-                            .collect(),
-                        },
-                    })),
-                ),
-            };
-        let block = self.generate_fn_setup_block(fn_info);
-        let impl_item_fn = ImplItemFn {
-            attrs: vec![
-                constants::ALLOW_UNUSED_ATTRIBUTE.clone(),
-                constants::ALLOW_ELIDED_NAMED_LIFETIMES_ATTRIBUTE.clone(),
-            ],
-            vis: Visibility::Public(Default::default()),
-            defaultness: None,
-            sig,
-            block,
-        };
-        return impl_item_fn;
-    }
-
-    fn generate_fn_setup_block(&self, fn_info: &FnInfo) -> Block {
-        let (args_checker_var_ident, args_checker_decl_stmt) =
-            self.generate_args_checker_var_ident_and_decl_stmt(fn_info);
-        let fn_config_decl_stmt = Stmt::Local(self.local_factory.create(
-            Self::FN_CONFIG_VAR_IDENT.clone(),
-            LocalInit {
-                eq_token: Default::default(),
-                expr: Box::new(Expr::MethodCall(self.expr_method_call_factory.create(
-                    &[
-                        constants::SELF_IDENT.clone(),
-                        fn_info.data_field_ident.clone(),
-                    ],
-                    constants::FN_DATA_ADD_CONFIG_FN_IDENT.clone(),
-                    &[args_checker_var_ident],
-                ))),
-                diverge: None,
-            },
-        ));
-        let shared_fn_config_decl_stmt = Stmt::Local(
-            self.local_factory.create(
-                Self::SHARED_FN_CONFIG_VAR_IDENT.clone(),
-                LocalInit {
-                    eq_token: Default::default(),
-                    expr: Box::new(Expr::Call(ExprCall {
-                        attrs: Vec::new(),
-                        func: Box::new(Expr::Path(ExprPath {
-                            attrs: Vec::new(),
-                            qself: None,
-                            path: Path {
-                                leading_colon: None,
-                                segments: [
-                                    PathSegment {
-                                        ident: constants::SHARED_FN_CONFIG_TYPE_IDENT.clone(),
-                                        arguments: PathArguments::None,
-                                    },
-                                    PathSegment {
-                                        ident: constants::SHARED_FN_CONFIG_NEW_FN_IDENT.clone(),
-                                        arguments: PathArguments::None,
-                                    },
-                                ]
-                                .into_iter()
-                                .collect(),
-                            },
-                        })),
-                        paren_token: Default::default(),
-                        // TODO - add factory for ExprPath
-                        args: [
-                            Expr::Path(ExprPath {
-                                attrs: Vec::new(),
-                                qself: None,
-                                path: self.path_factory.create(Self::FN_CONFIG_VAR_IDENT.clone()),
-                            }),
-                            Expr::Path(ExprPath {
-                                attrs: Vec::new(),
-                                qself: None,
-                                path: constants::SELF_IDENT_PATH.clone(),
-                            }),
-                        ]
-                        .into_iter()
-                        .collect(),
-                    })),
-                    diverge: None,
-                },
-            ),
-        );
-        let return_stmt = Stmt::Expr(
-            Expr::Return(ExprReturn {
-                attrs: Vec::new(),
-                return_token: Default::default(),
-                expr: Some(Box::new(Expr::Path(ExprPath {
-                    attrs: Vec::new(),
-                    qself: None,
-                    path: self
-                        .path_factory
-                        .create(Self::SHARED_FN_CONFIG_VAR_IDENT.clone()),
-                }))),
-            }),
-            Some(Default::default()),
-        );
-        let stmts = vec![
-            args_checker_decl_stmt,
-            fn_config_decl_stmt,
-            shared_fn_config_decl_stmt,
-            return_stmt,
-        ];
-        let block = Block {
-            brace_token: Default::default(),
-            stmts,
-        };
-        return block;
-    }
-
-    fn generate_fn_received(&self, fn_info: &FnInfo) -> ImplItemFn {
-        let times_arg = FnArg::Typed(PatType {
+        let data_stmt = Stmt::Local(Local {
             attrs: Vec::new(),
-            pat: Box::new(Pat::Ident(PatIdent {
+            let_token: Default::default(),
+            pat: Pat::Ident(PatIdent {
                 attrs: Vec::new(),
                 by_ref: None,
                 mutability: None,
-                ident: Self::TIMES_ARG_IDENT.clone(),
+                ident: Self::DATA_VAR_IDENT.clone(),
                 subpat: None,
-            })),
-            colon_token: Default::default(),
-            ty: Box::new(self.type_factory.create(Self::TIMES_TYPE_IDENT.clone())),
-        });
-        let sig = Signature {
-            constness: None,
-            asyncness: None,
-            unsafety: None,
-            abi: None,
-            fn_token: Default::default(),
-            ident: format_ident!("{}_{}", Self::RECEIVED_FN_PREFIX, fn_info.parent.ident),
-            generics: Generics::default(),
-            paren_token: Default::default(),
-            inputs: iter::once(constants::REF_SELF_ARG_WITH_LIFETIME.clone())
-                .chain(self.generate_input_args(fn_info))
-                .chain(iter::once(times_arg))
-                .collect(),
-            variadic: None,
-            output: ReturnType::Type(
-                Default::default(),
-                Box::new(Type::Reference(TypeReference {
-                    and_token: Default::default(),
-                    lifetime: Some(constants::DEFAULT_ARG_FIELD_LIFETIME.clone()),
-                    mutability: None,
-                    elem: Box::new(constants::SELF_TYPE.clone()),
-                })),
-            ),
-        };
-        let block = self.generate_fn_received_block(fn_info);
-        let impl_item_fn = ImplItemFn {
-            attrs: vec![
-                constants::ALLOW_UNUSED_ATTRIBUTE.clone(),
-                constants::ALLOW_ELIDED_NAMED_LIFETIMES_ATTRIBUTE.clone(),
-            ],
-            vis: Visibility::Public(Default::default()),
-            defaultness: None,
-            sig,
-            block,
-        };
-        return impl_item_fn;
-    }
-
-    fn generate_fn_received_block(&self, fn_info: &FnInfo) -> Block {
-        let (args_checker_var_ident, args_checker_decl_stmt) =
-            self.generate_args_checker_var_ident_and_decl_stmt(fn_info);
-        let verify_received_stmt = Stmt::Expr(
-            Expr::MethodCall(self.expr_method_call_factory.create(
-                &[
-                    constants::SELF_IDENT.clone(),
-                    fn_info.data_field_ident.clone(),
-                ],
-                constants::FN_DATA_VERIFY_RECEIVED_FN_IDENT.clone(),
-                &[args_checker_var_ident, Self::TIMES_ARG_IDENT.clone()],
-            )),
-            Some(Default::default()),
-        );
-        let return_self_stmt = Stmt::Expr(
-            Expr::Return(ExprReturn {
-                attrs: Vec::new(),
-                return_token: Default::default(),
-                expr: Some(Box::new(Expr::Path(ExprPath {
-                    attrs: Vec::new(),
-                    qself: None,
-                    path: constants::SELF_IDENT_PATH.clone(),
-                }))),
             }),
-            Some(Default::default()),
-        );
-        let stmts = vec![
-            args_checker_decl_stmt,
-            verify_received_stmt,
-            return_self_stmt,
-        ];
-        let block = Block {
-            brace_token: Default::default(),
-            stmts,
-        };
-        return block;
-    }
-
-    fn generate_input_args(&self, fn_info: &FnInfo) -> impl Iterator<Item = FnArg> {
-        return fn_info
-            .args_checker_info
-            .item_struct
-            .fields
-            .iter()
-            .skip(1)
-            .map(|field| {
-                FnArg::Typed(PatType {
+            init: Some(LocalInit {
+                eq_token: Default::default(),
+                expr: Box::new(Expr::Call(ExprCall {
                     attrs: Vec::new(),
-                    pat: Box::new(Pat::Ident(PatIdent {
+                    func: Box::new(Expr::Path(ExprPath {
                         attrs: Vec::new(),
-                        by_ref: None,
-                        mutability: None,
-                        ident: field
-                            .ident
-                            .clone()
-                            .expect("Field in args checker struct should be named"),
-                        subpat: None,
+                        qself: None,
+                        path: self.path_factory.create_from_parts(&[
+                            constants::RC_IDENT.clone(),
+                            constants::NEW_IDENT.clone(),
+                        ]),
                     })),
-                    colon_token: Default::default(),
-                    ty: Box::new(field.ty.clone()),
-                })
-            });
-    }
-
-    fn generate_args_checker_var_ident_and_decl_stmt(&self, fn_info: &FnInfo) -> (Ident, Stmt) {
-        let args_checker_var_ident = format_ident!(
-            "{}_{}",
-            fn_info.parent.ident,
-            Self::ARGS_CHECKER_VARIABLE_SUFFIX
-        );
-        let fn_fields: Vec<_> = fn_info
-            .args_checker_info
-            .item_struct
-            .fields
-            .iter()
-            .skip(1)
-            .map(|field| self.field_value_factory.create(field))
-            .collect();
-        let args_checker_decl_stmt = Stmt::Local(
-            self.local_factory.create(
-                args_checker_var_ident.clone(),
-                LocalInit {
-                    eq_token: Default::default(),
-                    expr: Box::new(Expr::Struct(ExprStruct {
+                    paren_token: Default::default(),
+                    args: [Expr::Struct(ExprStruct {
                         attrs: Vec::new(),
                         qself: None,
                         path: self
                             .path_factory
-                            .create(fn_info.args_checker_info.item_struct.ident.clone()),
+                            .create(mock_data_struct.item_struct.ident.clone()),
                         brace_token: Default::default(),
-                        fields: std::iter::once(
-                            constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE.clone(),
-                        )
-                        .chain(fn_fields)
-                        .collect(),
+                        fields: std::iter::once(phantom_lifetime_field)
+                            .chain(data_fields)
+                            .collect(),
                         dot2_token: None,
                         rest: None,
-                    })),
-                    diverge: None,
-                },
-            ),
+                    })]
+                    .into_iter()
+                    .collect(),
+                })),
+                diverge: None,
+            }),
+            semi_token: Default::default(),
+        });
+        let return_stmt = Stmt::Expr(
+            Expr::Return(ExprReturn {
+                attrs: Vec::new(),
+                return_token: Default::default(),
+                expr: Some(Box::new(Expr::Struct(ExprStruct {
+                    attrs: Vec::new(),
+                    qself: None,
+                    path: constants::SELF_TYPE_PATH.clone(),
+                    brace_token: Default::default(),
+                    fields: [
+                        FieldValue {
+                            attrs: Vec::new(),
+                            member: constants::SETUP_MEMBER.clone(),
+                            colon_token: Some(Default::default()),
+                            expr: Expr::Struct(ExprStruct {
+                                attrs: Vec::new(),
+                                qself: None,
+                                path: self
+                                    .path_factory
+                                    .create(mock_setup_struct.item_struct.ident.clone()),
+                                brace_token: Default::default(),
+                                fields: [constants::DATA_FIELD_VALUE.clone()].into_iter().collect(),
+                                dot2_token: None,
+                                rest: None,
+                            }),
+                        },
+                        FieldValue {
+                            attrs: Vec::new(),
+                            member: constants::RECEIVED_MEMBER.clone(),
+                            colon_token: Some(Default::default()),
+                            expr: Expr::Struct(ExprStruct {
+                                attrs: Vec::new(),
+                                qself: None,
+                                path: self
+                                    .path_factory
+                                    .create(mock_received_struct.item_struct.ident.clone()),
+                                brace_token: Default::default(),
+                                fields: [constants::DATA_FIELD_VALUE.clone()].into_iter().collect(),
+                                dot2_token: None,
+                                rest: None,
+                            }),
+                        },
+                        constants::DATA_SHORT_FIELD_VALUE.clone(),
+                    ]
+                    .into_iter()
+                    .collect(),
+                    dot2_token: None,
+                    rest: None,
+                }))),
+            }),
+            Some(Default::default()),
         );
-        return (args_checker_var_ident, args_checker_decl_stmt);
+        let block = Block {
+            brace_token: Default::default(),
+            stmts: vec![data_stmt, return_stmt],
+        };
+        return block;
     }
 }

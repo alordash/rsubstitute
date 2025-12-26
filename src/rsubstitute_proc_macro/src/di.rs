@@ -12,16 +12,24 @@ pub(crate) struct ServiceCollection {
     pub attribute_factory: Rc<dyn IAttributeFactory>,
     pub path_factory: Rc<dyn IPathFactory>,
     pub type_factory: Rc<dyn ITypeFactory>,
-
+    pub expr_method_call_factory: Rc<dyn IExprMethodCallFactory>,
     pub derive_args_formatter_macro_handler: Rc<dyn IDeriveArgsFormatterMacroHandler>,
     pub mock_macro_handler: Rc<dyn IMockMacroHandler>,
 }
 
 fn create_services() -> ServiceCollection {
-    let target_decl_extractor = Rc::new(TargetDeclExtractor);
     let fn_decl_extractor = Rc::new(FnDeclExtractor);
+    let generic_argument_factory_cell = Rc::new(OnceCell::new());
+    let path_factory = Rc::new(PathFactory {
+        generic_argument_factory: generic_argument_factory_cell.clone(),
+    });
+    let type_factory = Rc::new(TypeFactory {
+        path_factory: path_factory.clone(),
+    });
 
-    let field_factory = Rc::new(FieldFactory);
+    let field_factory = Rc::new(FieldFactory {
+        type_factory: type_factory.clone(),
+    });
     let struct_factory = Rc::new(StructFactory);
     let reference_type_crawler = Rc::new(ReferenceTypeCrawler);
     let reference_normalizer = Rc::new(ReferenceNormalizer {
@@ -38,13 +46,6 @@ fn create_services() -> ServiceCollection {
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
         reference_normalizer: reference_normalizer.clone(),
-    });
-    let generic_argument_factory_cell = Rc::new(OnceCell::new());
-    let path_factory = Rc::new(PathFactory {
-        generic_argument_factory: generic_argument_factory_cell.clone(),
-    });
-    let type_factory = Rc::new(TypeFactory {
-        path_factory: path_factory.clone(),
     });
     let generic_argument_factory = Rc::new(GenericArgumentFactory {
         path_factory: path_factory.clone(),
@@ -63,8 +64,23 @@ fn create_services() -> ServiceCollection {
         args_checker_generator: args_checker_generator.clone(),
         args_checker_impl_generator: args_checker_impl_generator.clone(),
     });
+    let mock_data_struct_generator = Rc::new(MockDataStructGenerator {
+        type_factory: type_factory.clone(),
+        struct_factory: struct_factory.clone(),
+    });
+    let mock_setup_struct_generator = Rc::new(MockSetupStructGenerator {
+        type_factory: type_factory.clone(),
+        field_factory: field_factory.clone(),
+        struct_factory: struct_factory.clone(),
+    });
+    let mock_received_struct_generator = Rc::new(MockReceivedStructGenerator {
+        type_factory: type_factory.clone(),
+        field_factory: field_factory.clone(),
+        struct_factory: struct_factory.clone(),
+    });
     let mock_struct_generator = Rc::new(MockStructGenerator {
         type_factory: type_factory.clone(),
+        field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
     });
     let field_value_factory = Rc::new(FieldValueFactory {
@@ -89,6 +105,19 @@ fn create_services() -> ServiceCollection {
     let internal_mock_impl_generator = Rc::new(InternalMockImplGenerator {
         path_factory: path_factory.clone(),
         type_factory: type_factory.clone(),
+        reference_normalizer: reference_normalizer.clone(),
+    });
+    let internal_mock_setup_impl_generator = Rc::new(InternalMockSetupImplGenerator {
+        path_factory: path_factory.clone(),
+        type_factory: type_factory.clone(),
+        field_value_factory: field_value_factory.clone(),
+        local_factory: local_factory.clone(),
+        expr_method_call_factory: expr_method_call_factory.clone(),
+        reference_normalizer: reference_normalizer.clone(),
+    });
+    let internal_mock_received_impl_generator = Rc::new(InternalMockReceivedImplGenerator {
+        path_factory: path_factory.clone(),
+        type_factory: type_factory.clone(),
         field_value_factory: field_value_factory.clone(),
         local_factory: local_factory.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
@@ -103,12 +132,16 @@ fn create_services() -> ServiceCollection {
     });
 
     let mock_macro_handler = Rc::new(MockMacroHandler {
-        target_decl_extractor: target_decl_extractor.clone(),
         fn_decl_extractor: fn_decl_extractor.clone(),
         fn_info_generator: fn_info_generator.clone(),
+        mock_data_struct_generator: mock_data_struct_generator.clone(),
+        mock_setup_struct_generator: mock_setup_struct_generator.clone(),
+        mock_received_struct_generator: mock_received_struct_generator.clone(),
         mock_struct_generator: mock_struct_generator.clone(),
         mock_impl_generator: mock_impl_generator.clone(),
         internal_mock_impl_generator: internal_mock_impl_generator.clone(),
+        internal_mock_setup_impl_generator: internal_mock_setup_impl_generator.clone(),
+        internal_mock_received_impl_generator: internal_mock_received_impl_generator.clone(),
         mod_generator: mod_generator.clone(),
     });
 
@@ -118,6 +151,7 @@ fn create_services() -> ServiceCollection {
         attribute_factory,
         path_factory,
         type_factory,
+        expr_method_call_factory,
         derive_args_formatter_macro_handler,
         mock_macro_handler,
     };

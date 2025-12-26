@@ -1,7 +1,5 @@
 mod fn_decl;
-mod mod_info;
-mod target_decl;
+mod generated_mod;
 
 pub use fn_decl::*;
-pub use mod_info::*;
-pub use target_decl::*;
+pub use generated_mod::*;

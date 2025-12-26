@@ -2,6 +2,7 @@ use crate::constants;
 use proc_macro2::Ident;
 use syn::{FnArg, ReturnType, Type};
 
+// TODO - check which types need to be public - make internal where possible
 pub struct FnDecl {
     pub(crate) ident: Ident,
     pub(crate) arguments: Vec<FnArg>,

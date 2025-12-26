@@ -1,10 +1,8 @@
 use crate::constants;
-use crate::mock_macros::fn_info_generation::models::{
-    ArgsCheckerImplInfo, ArgsCheckerInfo, CallInfo,
-};
+use crate::mock_macros::fn_info_generation::models::*;
 use crate::syntax::{IFieldAccessExprFactory, ITypeFactory};
 use proc_macro2::{Ident, Span};
-use quote::{format_ident, ToTokens};
+use quote::{ToTokens, format_ident};
 use std::cell::LazyCell;
 use std::rc::Rc;
 use syn::punctuated::Punctuated;
@@ -14,9 +12,9 @@ use syn::*;
 pub trait IArgsCheckerImplGenerator {
     fn generate(
         &self,
-        call_info: &CallInfo,
-        args_checker_info: &ArgsCheckerInfo,
-    ) -> ArgsCheckerImplInfo;
+        call_struct: &CallStruct,
+        args_checker_struct: &ArgsCheckerStruct,
+    ) -> ArgsCheckerImpl;
 }
 
 pub struct ArgsCheckerImplGenerator {
@@ -27,9 +25,9 @@ pub struct ArgsCheckerImplGenerator {
 impl IArgsCheckerImplGenerator for ArgsCheckerImplGenerator {
     fn generate(
         &self,
-        call_info: &CallInfo,
-        args_checker_info: &ArgsCheckerInfo,
-    ) -> ArgsCheckerImplInfo {
+        call_struct: &CallStruct,
+        args_checker_struct: &ArgsCheckerStruct,
+    ) -> ArgsCheckerImpl {
         let trait_ident = constants::I_ARGS_CHECKER_TRAIT_IDENT.clone();
         let trait_path = Path {
             leading_colon: None,
@@ -39,7 +37,8 @@ impl IArgsCheckerImplGenerator for ArgsCheckerImplGenerator {
                     colon2_token: None,
                     lt_token: Default::default(),
                     args: [GenericArgument::Type(
-                        self.type_factory.create_from_struct(&call_info.item_struct),
+                        self.type_factory
+                            .create_from_struct(&call_struct.item_struct),
                     )]
                     .into_iter()
                     .collect(),
@@ -49,25 +48,28 @@ impl IArgsCheckerImplGenerator for ArgsCheckerImplGenerator {
             .into_iter()
             .collect(),
         };
-        let call_ty = Box::new(self.type_factory.create_from_struct(&call_info.item_struct));
+        let call_ty = Box::new(
+            self.type_factory
+                .create_from_struct(&call_struct.item_struct),
+        );
         let self_ty = Box::new(self.type_factory.create_with_generics(
-            args_checker_info.item_struct.ident.clone(),
-            args_checker_info.item_struct.generics.clone(),
+            args_checker_struct.item_struct.ident.clone(),
+            args_checker_struct.item_struct.generics.clone(),
         ));
-        let items = self.generate_check_fn(call_info, call_ty);
+        let items = self.generate_check_fn(call_struct, call_ty);
         let item_impl = ItemImpl {
             attrs: Vec::new(),
             defaultness: None,
             unsafety: None,
             impl_token: Default::default(),
-            generics: args_checker_info.item_struct.generics.clone(),
+            generics: args_checker_struct.item_struct.generics.clone(),
             trait_: Some((None, trait_path, Default::default())),
             self_ty,
             brace_token: Default::default(),
             items: vec![items],
         };
-        let args_checker_impl_info = ArgsCheckerImplInfo { item_impl };
-        return args_checker_impl_info;
+        let args_checker_impl = ArgsCheckerImpl { item_impl };
+        return args_checker_impl;
     }
 }
 
@@ -85,8 +87,8 @@ impl ArgsCheckerImplGenerator {
 
     const CALL_ARG_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("call"));
 
-    fn generate_check_fn(&self, call_info: &CallInfo, call_type: Box<Type>) -> ImplItem {
-        let check_stmt = self.generate_check_stmt(call_info);
+    fn generate_check_fn(&self, call_struct: &CallStruct, call_type: Box<Type>) -> ImplItem {
+        let check_stmt = self.generate_check_stmt(call_struct);
         let block = Block {
             brace_token: Default::default(),
             stmts: vec![check_stmt],
@@ -132,8 +134,8 @@ impl ArgsCheckerImplGenerator {
         return impl_item;
     }
 
-    fn generate_check_stmt(&self, call_info: &CallInfo) -> Stmt {
-        let check_exprs: Punctuated<_, Token![,]> = call_info
+    fn generate_check_stmt(&self, call_struct: &CallStruct) -> Stmt {
+        let check_exprs: Punctuated<_, Token![,]> = call_struct
             .item_struct
             .fields
             .iter()

@@ -2,7 +2,11 @@ use crate::syntax::IPathFactory;
 use proc_macro2::Ident;
 use std::rc::Rc;
 // TODO - replace everywhere with `use syn::*`
-use syn::{Generics, ItemStruct, Type, TypePath};
+use crate::constants;
+use syn::{
+    AngleBracketedGenericArguments, GenericArgument, Generics, ItemStruct, Path, PathArguments,
+    PathSegment, Type, TypePath,
+};
 
 pub trait ITypeFactory {
     fn create(&self, ident: Ident) -> Type;
@@ -11,6 +15,8 @@ pub trait ITypeFactory {
 
     // TODO - replace most `create_with_generics` with this method
     fn create_from_struct(&self, item_struct: &ItemStruct) -> Type;
+
+    fn wrap_in_rc(&self, ty: Type) -> Type;
 }
 
 pub struct TypeFactory {
@@ -32,5 +38,26 @@ impl ITypeFactory for TypeFactory {
 
     fn create_from_struct(&self, item_struct: &ItemStruct) -> Type {
         self.create_with_generics(item_struct.ident.clone(), item_struct.generics.clone())
+    }
+
+    fn wrap_in_rc(&self, ty: Type) -> Type {
+        let result = Type::Path(TypePath {
+            qself: None,
+            path: Path {
+                leading_colon: None,
+                segments: [PathSegment {
+                    ident: constants::RC_IDENT.clone(),
+                    arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
+                        colon2_token: None,
+                        lt_token: Default::default(),
+                        args: [GenericArgument::Type(ty)].into_iter().collect(),
+                        gt_token: Default::default(),
+                    }),
+                }]
+                .into_iter()
+                .collect(),
+            },
+        });
+        return result;
     }
 }
