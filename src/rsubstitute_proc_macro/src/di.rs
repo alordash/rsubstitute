@@ -126,7 +126,6 @@ fn create_services() -> ServiceCollection {
     let internal_mock_received_impl_generator = Rc::new(InternalMockReceivedImplGenerator {
         type_factory: type_factory.clone(),
         impl_factory: impl_factory.clone(),
-        local_factory: local_factory.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
         input_args_generator: input_args_generator.clone(),
     });

@@ -2,9 +2,7 @@ use crate::constants;
 // TODO - replace this with `use models::*`
 use crate::mock_macros::mock_generation::models::*;
 use crate::syntax::*;
-use quote::ToTokens;
 use std::rc::Rc;
-use syn::punctuated::Punctuated;
 use syn::*;
 
 pub trait IMockStructGenerator {

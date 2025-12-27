@@ -34,6 +34,8 @@ trait MyTrait {
 }
 
 pub use generated::*;
+use rsubstitute::qweee;
+
 mod generated {
     use super::*;
     use rsubstitute::*;
@@ -328,6 +330,8 @@ mod generated {
 }
 
 fn main() {
+    qweee();
+    
     let string = &String::from("amogus");
     let bytes = vec![1u8, 2, 3, 44];
     let something = &&bytes[..];

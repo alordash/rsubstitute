@@ -21,7 +21,6 @@ pub trait IInternalMockReceivedImplGenerator {
 pub(crate) struct InternalMockReceivedImplGenerator {
     pub type_factory: Rc<dyn ITypeFactory>,
     pub impl_factory: Rc<dyn IImplFactory>,
-    pub local_factory: Rc<dyn ILocalFactory>,
     pub expr_method_call_factory: Rc<dyn IExprMethodCallFactory>,
     pub input_args_generator: Rc<dyn IInputArgsGenerator>,
 }
