@@ -107,21 +107,28 @@ fn create_services() -> ServiceCollection {
         type_factory: type_factory.clone(),
         reference_normalizer: reference_normalizer.clone(),
     });
+    let input_args_generator = Rc::new(InputArgsGenerator {
+        path_factory: path_factory.clone(),
+        field_value_factory: field_value_factory.clone(),
+        local_factory: local_factory.clone(),
+    });
+    let impl_factory = Rc::new(ImplFactory {
+        reference_normalizer: reference_normalizer.clone(),
+    });
     let internal_mock_setup_impl_generator = Rc::new(InternalMockSetupImplGenerator {
         path_factory: path_factory.clone(),
         type_factory: type_factory.clone(),
-        field_value_factory: field_value_factory.clone(),
+        impl_factory: impl_factory.clone(),
         local_factory: local_factory.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
-        reference_normalizer: reference_normalizer.clone(),
+        input_args_generator: input_args_generator.clone(),
     });
     let internal_mock_received_impl_generator = Rc::new(InternalMockReceivedImplGenerator {
-        path_factory: path_factory.clone(),
         type_factory: type_factory.clone(),
-        field_value_factory: field_value_factory.clone(),
+        impl_factory: impl_factory.clone(),
         local_factory: local_factory.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
-        reference_normalizer: reference_normalizer.clone(),
+        input_args_generator: input_args_generator.clone(),
     });
     let mod_generator = Rc::new(ModGenerator);
 

@@ -123,7 +123,6 @@ impl InternalMockImplGenerator {
                     // TODO - do something with this "expect", it appears more than one time
                     member: Member::Named(field_ident.clone()),
                     colon_token: Some(Default::default()),
-                    // expr: constants::DEFAULT_INVOKE_EXPR.clone(),
                     expr: Expr::Call(ExprCall {
                         attrs: Vec::new(),
                         func: Box::new(Expr::Path(ExprPath {

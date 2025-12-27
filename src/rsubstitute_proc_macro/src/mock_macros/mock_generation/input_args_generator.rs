@@ -1,0 +1,94 @@
+use crate::constants;
+use crate::mock_macros::fn_info_generation::models::FnInfo;
+use crate::syntax::*;
+use proc_macro2::Ident;
+use quote::format_ident;
+use std::rc::Rc;
+use syn::*;
+
+pub trait IInputArgsGenerator {
+    fn generate_input_args(&self, fn_info: &FnInfo) -> Vec<FnArg>;
+
+    fn generate_args_checker_var_ident_and_decl_stmt(&self, fn_info: &FnInfo) -> (Ident, Stmt);
+}
+
+pub(crate) struct InputArgsGenerator {
+    pub path_factory: Rc<dyn IPathFactory>,
+    pub field_value_factory: Rc<dyn IFieldValueFactory>,
+    pub local_factory: Rc<dyn ILocalFactory>,
+}
+
+impl IInputArgsGenerator for InputArgsGenerator {
+    fn generate_input_args(&self, fn_info: &FnInfo) -> Vec<FnArg> {
+        let result = fn_info
+            .args_checker_struct
+            .item_struct
+            .fields
+            .iter()
+            .skip(1)
+            .map(|field| {
+                FnArg::Typed(PatType {
+                    attrs: Vec::new(),
+                    pat: Box::new(Pat::Ident(PatIdent {
+                        attrs: Vec::new(),
+                        by_ref: None,
+                        mutability: None,
+                        ident: field
+                            .ident
+                            .clone()
+                            .expect("Field in args checker struct should be named"),
+                        subpat: None,
+                    })),
+                    colon_token: Default::default(),
+                    ty: Box::new(field.ty.clone()),
+                })
+            })
+            .collect();
+        return result;
+    }
+
+    fn generate_args_checker_var_ident_and_decl_stmt(&self, fn_info: &FnInfo) -> (Ident, Stmt) {
+        let args_checker_var_ident = format_ident!(
+            "{}_{}",
+            fn_info.parent.ident,
+            Self::ARGS_CHECKER_VARIABLE_SUFFIX
+        );
+        let fn_fields: Vec<_> = fn_info
+            .args_checker_struct
+            .item_struct
+            .fields
+            .iter()
+            .skip(1)
+            .map(|field| self.field_value_factory.create(field))
+            .collect();
+        let args_checker_decl_stmt = Stmt::Local(
+            self.local_factory.create(
+                args_checker_var_ident.clone(),
+                LocalInit {
+                    eq_token: Default::default(),
+                    expr: Box::new(Expr::Struct(ExprStruct {
+                        attrs: Vec::new(),
+                        qself: None,
+                        path: self
+                            .path_factory
+                            .create(fn_info.args_checker_struct.item_struct.ident.clone()),
+                        brace_token: Default::default(),
+                        fields: std::iter::once(
+                            constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE.clone(),
+                        )
+                        .chain(fn_fields)
+                        .collect(),
+                        dot2_token: None,
+                        rest: None,
+                    })),
+                    diverge: None,
+                },
+            ),
+        );
+        return (args_checker_var_ident, args_checker_decl_stmt);
+    }
+}
+
+impl InputArgsGenerator {
+    const ARGS_CHECKER_VARIABLE_SUFFIX: &'static str = "args_checker";
+}
