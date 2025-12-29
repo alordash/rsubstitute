@@ -501,9 +501,9 @@ mod tests {
             .returns("MOCK: 143".to_string());
 
         // Act
-        let result1 = global::global(2);
-        let result2_1 = global::global(143);
-        let result2_2 = global::global(143);
+        let result1 = global(2);
+        let result2_1 = global(143);
+        let result2_2 = global(143);
 
         // Assert
         global::received(Arg::Eq(2), Times::Once).received(Arg::Eq(143), Times::Exactly(2));
@@ -514,7 +514,8 @@ mod tests {
 }
 
 fn main() {
-    qweee();
+    let global_result = global(22);
+    println!("global_result: {global_result}");
 
     let string = &String::from("amogus");
     let bytes = vec![1u8, 2, 3, 44];
