@@ -4,7 +4,7 @@ use crate::syntax::{IFieldAccessExprFactory, ITypeFactory};
 use proc_macro2::{Ident, Span};
 use quote::{ToTokens, format_ident};
 use std::cell::LazyCell;
-use std::rc::Rc;
+use std::sync::Arc;
 use syn::punctuated::Punctuated;
 use syn::token::Bracket;
 use syn::*;
@@ -18,8 +18,8 @@ pub trait IArgsCheckerImplGenerator {
 }
 
 pub struct ArgsCheckerImplGenerator {
-    pub(crate) type_factory: Rc<dyn ITypeFactory>,
-    pub(crate) field_access_expr_factory: Rc<dyn IFieldAccessExprFactory>,
+    pub(crate) type_factory: Arc<dyn ITypeFactory>,
+    pub(crate) field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
 }
 
 impl IArgsCheckerImplGenerator for ArgsCheckerImplGenerator {

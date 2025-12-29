@@ -16,13 +16,13 @@ trait AnotherTestTrait {}
 use rsubstitute::assertions::assert_panics;
 use rsubstitute_core::Times;
 use std::cell::RefCell;
-use std::rc::Rc;
+use std::sync::Arc;
 
 #[test]
 fn f_Ok() {
     // Arrange
     let mock = TraitMock::new();
-    let callback_flag = Rc::new(RefCell::new(false));
+    let callback_flag = Arc::new(RefCell::new(false));
     let callback_flag_clone = callback_flag.clone();
     let return_value = ();
     mock.setup.f().returns_and_does(return_value, move || {

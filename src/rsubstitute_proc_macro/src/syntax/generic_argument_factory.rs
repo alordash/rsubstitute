@@ -1,5 +1,5 @@
 use crate::syntax::{IPathFactory, ITypeFactory};
-use std::rc::Rc;
+use std::sync::Arc;
 use syn::*;
 
 pub trait IGenericArgumentFactory {
@@ -7,8 +7,8 @@ pub trait IGenericArgumentFactory {
 }
 
 pub(crate) struct GenericArgumentFactory {
-    pub type_factory: Rc<dyn ITypeFactory>,
-    pub path_factory: Rc<dyn IPathFactory>,
+    pub type_factory: Arc<dyn ITypeFactory>,
+    pub path_factory: Arc<dyn IPathFactory>,
 }
 
 impl IGenericArgumentFactory for GenericArgumentFactory {

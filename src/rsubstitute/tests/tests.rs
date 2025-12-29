@@ -1,6 +1,5 @@
 use rsubstitute_proc_macro::mock;
 use std::fmt::Debug;
-use std::rc::Rc;
 use std::sync::Arc;
 
 trait IFoo: Debug {

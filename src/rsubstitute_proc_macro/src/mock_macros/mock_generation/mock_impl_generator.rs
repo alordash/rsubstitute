@@ -5,7 +5,7 @@ use crate::syntax::*;
 use proc_macro2::Ident;
 use quote::format_ident;
 use std::cell::LazyCell;
-use std::rc::Rc;
+use std::sync::Arc;
 use syn::punctuated::Punctuated;
 use syn::*;
 
@@ -19,12 +19,12 @@ pub trait IMockImplGenerator {
 }
 
 pub(crate) struct MockImplGenerator {
-    pub path_factory: Rc<dyn IPathFactory>,
-    pub type_factory: Rc<dyn ITypeFactory>,
-    pub expr_method_call_factory: Rc<dyn IExprMethodCallFactory>,
-    pub std_mem_transmute_expr_factory: Rc<dyn IStdMemTransmuteExprFactory>,
-    pub reference_normalizer: Rc<dyn IReferenceNormalizer>,
-    pub reference_type_crawler: Rc<dyn IReferenceTypeCrawler>,
+    pub path_factory: Arc<dyn IPathFactory>,
+    pub type_factory: Arc<dyn ITypeFactory>,
+    pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
+    pub std_mem_transmute_expr_factory: Arc<dyn IStdMemTransmuteExprFactory>,
+    pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
+    pub reference_type_crawler: Arc<dyn IReferenceTypeCrawler>,
 }
 
 impl IMockImplGenerator for MockImplGenerator {

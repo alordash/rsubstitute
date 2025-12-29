@@ -4,7 +4,7 @@ use crate::mock_macros::models::FnDecl;
 use crate::syntax::{IFieldFactory, IReferenceNormalizer, IStructFactory};
 use proc_macro2::Ident;
 use quote::{ToTokens, format_ident};
-use std::rc::Rc;
+use std::sync::Arc;
 use syn::{Field, FieldsNamed, FnArg, PatType};
 
 pub trait ICallStructGenerator {
@@ -12,9 +12,9 @@ pub trait ICallStructGenerator {
 }
 
 pub struct CallStructGenerator {
-    pub(crate) field_factory: Rc<dyn IFieldFactory>,
-    pub(crate) struct_factory: Rc<dyn IStructFactory>,
-    pub(crate) reference_normalizer: Rc<dyn IReferenceNormalizer>,
+    pub(crate) field_factory: Arc<dyn IFieldFactory>,
+    pub(crate) struct_factory: Arc<dyn IStructFactory>,
+    pub(crate) reference_normalizer: Arc<dyn IReferenceNormalizer>,
 }
 
 impl ICallStructGenerator for CallStructGenerator {

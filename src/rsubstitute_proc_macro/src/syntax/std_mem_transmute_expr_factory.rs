@@ -3,7 +3,7 @@ use crate::syntax::IPathFactory;
 use proc_macro2::Ident;
 use quote::format_ident;
 use std::cell::LazyCell;
-use std::rc::Rc;
+use std::sync::Arc;
 use syn::*;
 
 pub trait IStdMemTransmuteExprFactory {
@@ -11,7 +11,7 @@ pub trait IStdMemTransmuteExprFactory {
 }
 
 pub(crate) struct StdMemTransmuteExprFactory {
-    pub path_factory: Rc<dyn IPathFactory>,
+    pub path_factory: Arc<dyn IPathFactory>,
 }
 
 impl IStdMemTransmuteExprFactory for StdMemTransmuteExprFactory {

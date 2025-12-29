@@ -3,7 +3,7 @@ use crate::mock_macros::fn_info_generation::models::FnInfo;
 use crate::syntax::*;
 use proc_macro2::Ident;
 use quote::format_ident;
-use std::rc::Rc;
+use std::sync::Arc;
 use syn::*;
 
 pub trait IInputArgsGenerator {
@@ -13,9 +13,9 @@ pub trait IInputArgsGenerator {
 }
 
 pub(crate) struct InputArgsGenerator {
-    pub path_factory: Rc<dyn IPathFactory>,
-    pub field_value_factory: Rc<dyn IFieldValueFactory>,
-    pub local_factory: Rc<dyn ILocalFactory>,
+    pub path_factory: Arc<dyn IPathFactory>,
+    pub field_value_factory: Arc<dyn IFieldValueFactory>,
+    pub local_factory: Arc<dyn ILocalFactory>,
 }
 
 impl IInputArgsGenerator for InputArgsGenerator {

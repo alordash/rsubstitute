@@ -3,7 +3,7 @@ use crate::mock_macros::fn_info_generation::models::FnInfo;
 use crate::mock_macros::mock_generation::models::MockDataStruct;
 use crate::syntax::{IStructFactory, ITypeFactory};
 use quote::format_ident;
-use std::rc::Rc;
+use std::sync::Arc;
 use syn::*;
 
 pub trait IMockDataStructGenerator {
@@ -12,8 +12,8 @@ pub trait IMockDataStructGenerator {
 
 // TODO - verify all impls are internal
 pub(crate) struct MockDataStructGenerator {
-    pub type_factory: Rc<dyn ITypeFactory>,
-    pub struct_factory: Rc<dyn IStructFactory>,
+    pub type_factory: Arc<dyn ITypeFactory>,
+    pub struct_factory: Arc<dyn IStructFactory>,
 }
 
 impl IMockDataStructGenerator for MockDataStructGenerator {

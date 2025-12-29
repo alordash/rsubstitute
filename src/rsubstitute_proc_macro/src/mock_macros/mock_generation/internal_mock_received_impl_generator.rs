@@ -7,7 +7,7 @@ use proc_macro2::Ident;
 use quote::format_ident;
 use std::cell::LazyCell;
 use std::iter;
-use std::rc::Rc;
+use std::sync::Arc;
 use syn::*;
 
 pub trait IInternalMockReceivedImplGenerator {
@@ -19,10 +19,10 @@ pub trait IInternalMockReceivedImplGenerator {
 }
 
 pub(crate) struct InternalMockReceivedImplGenerator {
-    pub type_factory: Rc<dyn ITypeFactory>,
-    pub impl_factory: Rc<dyn IImplFactory>,
-    pub expr_method_call_factory: Rc<dyn IExprMethodCallFactory>,
-    pub input_args_generator: Rc<dyn IInputArgsGenerator>,
+    pub type_factory: Arc<dyn ITypeFactory>,
+    pub impl_factory: Arc<dyn IImplFactory>,
+    pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
+    pub input_args_generator: Arc<dyn IInputArgsGenerator>,
 }
 
 impl IInternalMockReceivedImplGenerator for InternalMockReceivedImplGenerator {

@@ -1,6 +1,6 @@
 use crate::syntax::{IFieldAccessExprFactory, IPathFactory};
 use proc_macro2::Ident;
-use std::rc::Rc;
+use std::sync::Arc;
 use syn::{Expr, ExprMethodCall, ExprPath};
 
 pub trait IExprMethodCallFactory {
@@ -13,8 +13,8 @@ pub trait IExprMethodCallFactory {
 }
 
 pub struct ExprMethodCallFactory {
-    pub(crate) path_factory: Rc<dyn IPathFactory>,
-    pub(crate) field_access_expr_factory: Rc<dyn IFieldAccessExprFactory>,
+    pub(crate) path_factory: Arc<dyn IPathFactory>,
+    pub(crate) field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
 }
 
 impl IExprMethodCallFactory for ExprMethodCallFactory {

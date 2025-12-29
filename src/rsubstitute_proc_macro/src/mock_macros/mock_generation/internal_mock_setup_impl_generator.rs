@@ -7,7 +7,7 @@ use proc_macro2::Ident;
 use quote::format_ident;
 use std::cell::LazyCell;
 use std::iter;
-use std::rc::Rc;
+use std::sync::Arc;
 use syn::*;
 
 pub trait IInternalMockSetupImplGenerator {
@@ -19,12 +19,12 @@ pub trait IInternalMockSetupImplGenerator {
 }
 
 pub(crate) struct InternalMockSetupImplGenerator {
-    pub path_factory: Rc<dyn IPathFactory>,
-    pub type_factory: Rc<dyn ITypeFactory>,
-    pub impl_factory: Rc<dyn IImplFactory>,
-    pub local_factory: Rc<dyn ILocalFactory>,
-    pub expr_method_call_factory: Rc<dyn IExprMethodCallFactory>,
-    pub input_args_generator: Rc<dyn IInputArgsGenerator>,
+    pub path_factory: Arc<dyn IPathFactory>,
+    pub type_factory: Arc<dyn ITypeFactory>,
+    pub impl_factory: Arc<dyn IImplFactory>,
+    pub local_factory: Arc<dyn ILocalFactory>,
+    pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
+    pub input_args_generator: Arc<dyn IInputArgsGenerator>,
 }
 
 impl IInternalMockSetupImplGenerator for InternalMockSetupImplGenerator {
@@ -54,7 +54,7 @@ impl InternalMockSetupImplGenerator {
 
     fn generate_fn_setup(&self, fn_info: &FnInfo) -> ImplItemFn {
         let sig = Signature {
-            // TODO - all these `None` should be actually mapped to source fns signature
+            // TODO - all these `None` should be actually mapped to souarce fns signature
             constness: None,
             asyncness: None,
             unsafety: None,

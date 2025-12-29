@@ -1,7 +1,7 @@
 use crate::syntax::IGenericArgumentFactory;
 use proc_macro2::Ident;
 use std::cell::OnceCell;
-use std::rc::Rc;
+use std::sync::Arc;
 use syn::*;
 
 pub trait IPathFactory {
@@ -13,7 +13,7 @@ pub trait IPathFactory {
 }
 
 pub(crate) struct PathFactory {
-    pub generic_argument_factory: Rc<OnceCell<Rc<dyn IGenericArgumentFactory>>>,
+    pub generic_argument_factory: Arc<OnceCell<Arc<dyn IGenericArgumentFactory>>>,
 }
 
 impl IPathFactory for PathFactory {

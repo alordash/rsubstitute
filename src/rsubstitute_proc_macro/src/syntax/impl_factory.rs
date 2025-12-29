@@ -1,6 +1,6 @@
 use crate::constants;
 use crate::syntax::*;
-use std::rc::Rc;
+use std::sync::Arc;
 use syn::*;
 
 pub trait IImplFactory {
@@ -8,7 +8,7 @@ pub trait IImplFactory {
 }
 
 pub(crate) struct ImplFactory {
-    pub reference_normalizer: Rc<dyn IReferenceNormalizer>,
+    pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
 }
 
 impl IImplFactory for ImplFactory {

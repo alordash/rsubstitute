@@ -47,7 +47,7 @@ impl IModGenerator for ModGenerator {
             constants::USE_SUPER.clone(),
             constants::USE_CRATE_PRELUDE.clone(),
             constants::USE_STD_MARKER_PHANTOM_DATA.clone(),
-            constants::USE_STD_RC.clone(),
+            constants::USE_STD_ARC.clone(),
         ];
         let ident = format_ident!("{}_{}", Self::GENERATED_MOD_IDENT.clone(), trait_ident);
         let items = usings

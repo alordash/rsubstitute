@@ -4,7 +4,7 @@ use crate::syntax::*;
 use proc_macro2::{Ident, Span};
 use quote::format_ident;
 use std::cell::LazyCell;
-use std::rc::Rc;
+use std::sync::Arc;
 use syn::punctuated::Punctuated;
 use syn::*;
 
@@ -19,9 +19,9 @@ pub trait IInternalMockImplGenerator {
 }
 
 pub(crate) struct InternalMockImplGenerator {
-    pub path_factory: Rc<dyn IPathFactory>,
-    pub type_factory: Rc<dyn ITypeFactory>,
-    pub reference_normalizer: Rc<dyn IReferenceNormalizer>,
+    pub path_factory: Arc<dyn IPathFactory>,
+    pub type_factory: Arc<dyn ITypeFactory>,
+    pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
 }
 
 impl IInternalMockImplGenerator for InternalMockImplGenerator {
@@ -178,7 +178,7 @@ impl InternalMockImplGenerator {
                         attrs: Vec::new(),
                         qself: None,
                         path: self.path_factory.create_from_parts(&[
-                            constants::RC_IDENT.clone(),
+                            constants::ARC_IDENT.clone(),
                             constants::NEW_IDENT.clone(),
                         ]),
                     })),

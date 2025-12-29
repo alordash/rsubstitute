@@ -1,5 +1,5 @@
 use crate::syntax::IPathFactory;
-use std::rc::Rc;
+use std::sync::Arc;
 use syn::{Expr, ExprPath, Field, FieldValue, Member};
 
 pub trait IFieldValueFactory {
@@ -7,7 +7,7 @@ pub trait IFieldValueFactory {
 }
 
 pub struct FieldValueFactory {
-    pub(crate) path_factory: Rc<dyn IPathFactory>,
+    pub(crate) path_factory: Arc<dyn IPathFactory>,
 }
 
 impl IFieldValueFactory for FieldValueFactory {

@@ -3,7 +3,7 @@ use crate::syntax::{IFieldAccessExprFactory, IPathFactory, ITypeFactory};
 use proc_macro::TokenStream;
 use proc_macro2::Literal;
 use quote::{ToTokens, quote};
-use std::rc::Rc;
+use std::sync::Arc;
 use syn::token::Paren;
 use syn::*;
 
@@ -12,9 +12,9 @@ pub trait IDeriveArgsFormatterMacroHandler {
 }
 
 pub(crate) struct DeriveArgsFormatterMacroHandler {
-    pub path_factory: Rc<dyn IPathFactory>,
-    pub type_factory: Rc<dyn ITypeFactory>,
-    pub field_access_expr_factory: Rc<dyn IFieldAccessExprFactory>,
+    pub path_factory: Arc<dyn IPathFactory>,
+    pub type_factory: Arc<dyn ITypeFactory>,
+    pub field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
 }
 
 impl IDeriveArgsFormatterMacroHandler for DeriveArgsFormatterMacroHandler {

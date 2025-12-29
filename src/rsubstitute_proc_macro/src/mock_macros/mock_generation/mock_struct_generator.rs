@@ -2,7 +2,7 @@ use crate::constants;
 // TODO - replace this with `use models::*`
 use crate::mock_macros::mock_generation::models::*;
 use crate::syntax::*;
-use std::rc::Rc;
+use std::sync::Arc;
 use syn::*;
 
 pub trait IMockStructGenerator {
@@ -17,9 +17,9 @@ pub trait IMockStructGenerator {
 
 // TODO - make service impls internal
 pub(crate) struct MockStructGenerator {
-    pub field_factory: Rc<dyn IFieldFactory>,
-    pub type_factory: Rc<dyn ITypeFactory>,
-    pub struct_factory: Rc<dyn IStructFactory>,
+    pub field_factory: Arc<dyn IFieldFactory>,
+    pub type_factory: Arc<dyn ITypeFactory>,
+    pub struct_factory: Arc<dyn IStructFactory>,
 }
 
 impl IMockStructGenerator for MockStructGenerator {
@@ -33,7 +33,7 @@ impl IMockStructGenerator for MockStructGenerator {
         let attrs = Vec::new();
         let data_field = self.field_factory.create(
             constants::DATA_IDENT.clone(),
-            self.type_factory.wrap_in_rc(
+            self.type_factory.wrap_in_arc(
                 self.type_factory
                     .create_from_struct(&mock_data_struct.item_struct),
             ),

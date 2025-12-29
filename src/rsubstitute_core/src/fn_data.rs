@@ -3,13 +3,13 @@ use crate::di::ServiceCollection;
 use crate::error_printer::IErrorPrinter;
 use crate::{FnConfig, Times};
 use std::cell::RefCell;
-use std::rc::Rc;
+use std::sync::Arc;
 
 pub struct FnData<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue> {
     fn_name: &'static str,
     calls: RefCell<Vec<TCall>>,
-    configs: RefCell<Vec<Rc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue>>>>>,
-    error_printer: Rc<dyn IErrorPrinter>,
+    configs: RefCell<Vec<Arc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue>>>>>,
+    error_printer: Arc<dyn IErrorPrinter>,
 }
 
 impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue>
@@ -36,9 +36,9 @@ impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
     pub fn add_config(
         &self,
         args_checker: TArgsChecker,
-    ) -> Rc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue>>> {
+    ) -> Arc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue>>> {
         let config = FnConfig::new(args_checker);
-        let shared_config = Rc::new(RefCell::new(config));
+        let shared_config = Arc::new(RefCell::new(config));
         self.configs.borrow_mut().push(shared_config.clone());
         return shared_config;
     }
@@ -89,7 +89,7 @@ impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
     fn try_get_matching_config(
         &self,
         call: TCall,
-    ) -> Option<Rc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue>>>> {
+    ) -> Option<Arc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue>>>> {
         let configs = self.configs.borrow();
         let maybe_fn_config = configs
             .iter()

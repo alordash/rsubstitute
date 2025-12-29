@@ -1,6 +1,6 @@
 use crate::syntax::ITypeFactory;
 use proc_macro2::Ident;
-use std::rc::Rc;
+use std::sync::Arc;
 use syn::*;
 
 // TODO - review code where fields are created manually, this could be used in many places
@@ -13,7 +13,7 @@ pub trait IFieldFactory {
 }
 
 pub(crate) struct FieldFactory {
-    pub type_factory: Rc<dyn ITypeFactory>,
+    pub type_factory: Arc<dyn ITypeFactory>,
 }
 
 impl IFieldFactory for FieldFactory {

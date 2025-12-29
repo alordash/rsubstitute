@@ -1,10 +1,10 @@
-use crate::generated::MyTraitMock;
+#![allow(unused)]
 use rsubstitute_core::Times;
 use rsubstitute_core::args_matching::Arg;
 use std::fmt::Debug;
 use std::sync::Arc;
 
-trait IFoo: Debug {
+pub trait IFoo: Debug {
     fn get_value(&self) -> i32;
 }
 #[derive(Debug)]
@@ -43,7 +43,7 @@ mod generated {
     use std::cell::LazyCell;
     use std::fmt::Debug;
     use std::marker::PhantomData;
-    use std::rc::Rc;
+    use std::sync::Arc;
 
     // start - Calls
     #[allow(non_camel_case_types)]
@@ -61,7 +61,7 @@ mod generated {
     }
 
     impl<'a> IArgsChecker<work_Call<'a>> for work_ArgsChecker<'a> {
-        fn check(&self, call: work_Call) -> Vec<ArgCheckResult> {
+        fn check(&'_ self, call: work_Call) -> Vec<ArgCheckResult<'_>> {
             vec![self.value.check("value", call.value)]
         }
     }
@@ -110,7 +110,7 @@ mod generated {
     }
 
     impl<'a> IArgsChecker<get_Call<'a>> for get_ArgsChecker<'a> {
-        fn check(&self, _call: get_Call) -> Vec<ArgCheckResult> {
+        fn check(&'_ self, _call: get_Call) -> Vec<ArgCheckResult<'_>> {
             Vec::new()
         }
     }
@@ -130,7 +130,7 @@ mod generated {
     }
 
     impl<'a> IArgsChecker<standalone_Call<'a>> for standalone_ArgsChecker<'a> {
-        fn check(&self, call: standalone_Call) -> Vec<ArgCheckResult> {
+        fn check(&'_ self, call: standalone_Call) -> Vec<ArgCheckResult<'_>> {
             vec![self.number.check("number", call.number)]
         }
     }
@@ -145,17 +145,17 @@ mod generated {
     }
 
     pub struct MyTraitMockSetup<'a> {
-        data: Rc<MyTraitMockData<'a>>,
+        data: Arc<MyTraitMockData<'a>>,
     }
 
     pub struct MyTraitMockReceived<'a> {
-        data: Rc<MyTraitMockData<'a>>,
+        data: Arc<MyTraitMockData<'a>>,
     }
 
     pub struct MyTraitMock<'a> {
         pub setup: MyTraitMockSetup<'a>,
         pub received: MyTraitMockReceived<'a>,
-        data: Rc<MyTraitMockData<'a>>,
+        data: Arc<MyTraitMockData<'a>>,
     }
 
     impl<'a> MyTrait for MyTraitMock<'a> {
@@ -209,7 +209,7 @@ mod generated {
 
     impl<'a> MyTraitMock<'a> {
         pub fn new() -> Self {
-            let data = Rc::new(MyTraitMockData {
+            let data = Arc::new(MyTraitMockData {
                 _phantom_lifetime: PhantomData,
                 work_data: FnData::new("work", &SERVICES),
                 another_work_data: FnData::new("another_work", &SERVICES),
@@ -329,9 +329,139 @@ mod generated {
     // end - Mock
 }
 
+#[cfg(not(test))]
+fn global(number: i32) -> String {
+    return format!("actual number: {number}");
+}
+
+#[cfg(test)]
+use globals::global;
+#[cfg(test)]
+mod globals {
+    use super::*;
+    use rsubstitute::IArgsFormatter;
+    use rsubstitute_core::args_matching::{ArgCheckResult, IArgsChecker};
+    use rsubstitute_core::{FnData, SERVICES, SharedFnConfig};
+    use rsubstitute_proc_macro::IArgsFormatter;
+    use std::cell::LazyCell;
+    use std::marker::PhantomData;
+    use std::sync::Arc;
+    use std::sync::LazyLock;
+
+    #[allow(non_camel_case_types)]
+    #[derive(Clone)]
+    pub struct global_Call<'a> {
+        phantom_lifetime: PhantomData<&'a ()>,
+        pub number: i32,
+    }
+
+    #[allow(non_camel_case_types)]
+    #[derive(Debug, IArgsFormatter)]
+    pub struct global_ArgsChecker<'a> {
+        phantom_lifetime: PhantomData<&'a ()>,
+        pub number: Arg<'a, i32>,
+    }
+
+    impl<'a> IArgsChecker<global_Call<'a>> for global_ArgsChecker<'a> {
+        fn check(&self, call: global_Call<'a>) -> Vec<ArgCheckResult<'_>> {
+            vec![self.number.check("number", call.number)]
+        }
+    }
+
+    #[allow(non_camel_case_types)]
+    pub struct global_Data<'a> {
+        _phantom_lifetime: PhantomData<&'a ()>,
+        data: FnData<global_Call<'a>, global_ArgsChecker<'a>, String>,
+    }
+
+    unsafe impl<'a> Send for global_Data<'a> {}
+    unsafe impl<'a> Sync for global_Data<'a> {}
+
+    #[allow(non_camel_case_types)]
+    pub struct global_Setup<'a> {
+        _phantom_lifetime: PhantomData<&'a ()>,
+        global_data: Arc<global_Data<'a>>,
+    }
+
+    unsafe impl<'a> Send for global_Setup<'a> {}
+    unsafe impl<'a> Sync for global_Setup<'a> {}
+
+    impl<'a> global_Setup<'a> {
+        pub fn setup(
+            &'a self,
+            number: Arg<'a, i32>,
+        ) -> SharedFnConfig<'a, global_Call<'a>, global_ArgsChecker<'a>, String, Self> {
+            let global_args_checker = global_ArgsChecker {
+                phantom_lifetime: PhantomData,
+                number,
+            };
+            let fn_config = self.global_data.data.add_config(global_args_checker);
+            let shared_fn_config = SharedFnConfig::new(fn_config, self);
+            return shared_fn_config;
+        }
+    }
+
+    #[allow(non_upper_case_globals)]
+    static global_DATA: LazyLock<Arc<global_Data>> = LazyLock::new(|| {
+        println!("new global_DATA");
+        Arc::new(global_Data {
+            _phantom_lifetime: PhantomData,
+            data: FnData::new("global", &SERVICES),
+        })
+    });
+
+    #[allow(non_upper_case_globals)]
+    static global_SETUP: LazyLock<&'static global_Setup> = LazyLock::new(|| {
+        println!("new global_SETUP");
+        Box::leak(Box::new(global_Setup {
+            _phantom_lifetime: PhantomData,
+            global_data: (*global_DATA).clone(),
+        }))
+    });
+
+    pub fn setup(
+        number: Arg<'static, i32>,
+    ) -> SharedFnConfig<
+        'static,
+        global_Call<'static>,
+        global_ArgsChecker<'static>,
+        String,
+        global_Setup<'static>,
+    > {
+        let global_args_checker = global_ArgsChecker {
+            phantom_lifetime: PhantomData,
+            number,
+        };
+        let fn_config = global_DATA.data.add_config(global_args_checker);
+        let shared_fn_config = SharedFnConfig::new(fn_config, *global_SETUP);
+        return shared_fn_config;
+    }
+
+    pub fn global(number: i32) -> String {
+        let call = global_Call {
+            phantom_lifetime: PhantomData,
+            number,
+        };
+        return global_DATA.data.handle_returning(call);
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use crate::globals;
+    use rsubstitute_core::args_matching::Arg;
+
+    #[test]
+    pub fn global_test() {
+        globals::setup(Arg::Eq(2)).returns("MOCK: 2".to_string());
+        let result = globals::global(2);
+        assert_eq!("MOCK: 2", result);
+    }
+}
+
 fn main() {
     qweee();
-    
+
     let string = &String::from("amogus");
     let bytes = vec![1u8, 2, 3, 44];
     let something = &&bytes[..];

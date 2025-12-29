@@ -4,16 +4,16 @@ use crate::mock_macros::fn_info_generation::{IArgsCheckerGenerator, IArgsChecker
 use crate::mock_macros::models::FnDecl;
 use proc_macro2::Ident;
 use quote::format_ident;
-use std::rc::Rc;
+use std::sync::Arc;
 
 pub trait IFnInfoGenerator {
     fn generate<'a>(&self, fn_decl: &'a FnDecl) -> FnInfo<'a>;
 }
 
 pub struct FnInfoGenerator {
-    pub(crate) call_struct_generator: Rc<dyn ICallStructGenerator>,
-    pub(crate) args_checker_generator: Rc<dyn IArgsCheckerGenerator>,
-    pub(crate) args_checker_impl_generator: Rc<dyn IArgsCheckerImplGenerator>,
+    pub(crate) call_struct_generator: Arc<dyn ICallStructGenerator>,
+    pub(crate) args_checker_generator: Arc<dyn IArgsCheckerGenerator>,
+    pub(crate) args_checker_impl_generator: Arc<dyn IArgsCheckerImplGenerator>,
 }
 
 impl IFnInfoGenerator for FnInfoGenerator {

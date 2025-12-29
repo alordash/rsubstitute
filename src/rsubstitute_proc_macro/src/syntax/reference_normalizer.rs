@@ -1,6 +1,6 @@
 use crate::constants;
 use crate::syntax::IReferenceTypeCrawler;
-use std::rc::Rc;
+use std::sync::Arc;
 use syn::*;
 
 pub trait IReferenceNormalizer {
@@ -12,7 +12,7 @@ pub trait IReferenceNormalizer {
 }
 
 pub(crate) struct ReferenceNormalizer {
-    pub reference_type_crawler: Rc<dyn IReferenceTypeCrawler>,
+    pub reference_type_crawler: Arc<dyn IReferenceTypeCrawler>,
 }
 
 impl IReferenceNormalizer for ReferenceNormalizer {

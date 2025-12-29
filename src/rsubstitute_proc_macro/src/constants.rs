@@ -231,7 +231,7 @@ pub const VEC_OF_ARG_CHECK_RESULT_TYPE: LazyCell<Type> = LazyCell::new(|| {
     return result;
 });
 
-pub const RC_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Rc"));
+pub const ARC_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Arc"));
 
 pub const REF_SELF_ARG: LazyCell<FnArg> = LazyCell::new(|| {
     let result = FnArg::Receiver(Receiver {
@@ -302,8 +302,8 @@ pub const USE_STD_MARKER_PHANTOM_DATA: LazyCell<ItemUse> = LazyCell::new(|| {
     return result;
 });
 
-pub const USE_STD_RC: LazyCell<ItemUse> = LazyCell::new(|| {
-    let result = syn::parse_str("use std::rc::Rc;").unwrap();
+pub const USE_STD_ARC: LazyCell<ItemUse> = LazyCell::new(|| {
+    let result = syn::parse_str("use std::sync::Arc;").unwrap();
     return result;
 });
 

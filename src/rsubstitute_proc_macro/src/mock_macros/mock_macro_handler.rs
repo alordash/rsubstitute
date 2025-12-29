@@ -5,7 +5,7 @@ use crate::mock_macros::fn_info_generation::IFnInfoGenerator;
 use crate::mock_macros::mock_generation::*;
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
-use std::rc::Rc;
+use std::sync::Arc;
 use syn::*;
 
 pub trait IMockMacroHandler {
@@ -17,17 +17,17 @@ pub trait IMockMacroHandler {
 }
 
 pub(crate) struct MockMacroHandler {
-    pub fn_decl_extractor: Rc<dyn IFnDeclExtractor>,
-    pub fn_info_generator: Rc<dyn IFnInfoGenerator>,
-    pub mock_data_struct_generator: Rc<dyn IMockDataStructGenerator>,
-    pub mock_setup_struct_generator: Rc<dyn IMockSetupStructGenerator>,
-    pub mock_received_struct_generator: Rc<dyn IMockReceivedStructGenerator>,
-    pub mock_struct_generator: Rc<dyn IMockStructGenerator>,
-    pub mock_impl_generator: Rc<dyn IMockImplGenerator>,
-    pub internal_mock_impl_generator: Rc<dyn IInternalMockImplGenerator>,
-    pub internal_mock_setup_impl_generator: Rc<dyn IInternalMockSetupImplGenerator>,
-    pub internal_mock_received_impl_generator: Rc<dyn IInternalMockReceivedImplGenerator>,
-    pub mod_generator: Rc<dyn IModGenerator>,
+    pub fn_decl_extractor: Arc<dyn IFnDeclExtractor>,
+    pub fn_info_generator: Arc<dyn IFnInfoGenerator>,
+    pub mock_data_struct_generator: Arc<dyn IMockDataStructGenerator>,
+    pub mock_setup_struct_generator: Arc<dyn IMockSetupStructGenerator>,
+    pub mock_received_struct_generator: Arc<dyn IMockReceivedStructGenerator>,
+    pub mock_struct_generator: Arc<dyn IMockStructGenerator>,
+    pub mock_impl_generator: Arc<dyn IMockImplGenerator>,
+    pub internal_mock_impl_generator: Arc<dyn IInternalMockImplGenerator>,
+    pub internal_mock_setup_impl_generator: Arc<dyn IInternalMockSetupImplGenerator>,
+    pub internal_mock_received_impl_generator: Arc<dyn IInternalMockReceivedImplGenerator>,
+    pub mod_generator: Arc<dyn IModGenerator>,
 }
 
 impl IMockMacroHandler for MockMacroHandler {

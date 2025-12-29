@@ -3,7 +3,7 @@ use crate::mock_macros::mock_generation::models::*;
 use crate::syntax::*;
 use proc_macro2::Ident;
 use quote::format_ident;
-use std::rc::Rc;
+use std::sync::Arc;
 use syn::*;
 
 pub trait IMockSetupStructGenerator {
@@ -11,9 +11,9 @@ pub trait IMockSetupStructGenerator {
 }
 
 pub(crate) struct MockSetupStructGenerator {
-    pub type_factory: Rc<dyn ITypeFactory>,
-    pub field_factory: Rc<dyn IFieldFactory>,
-    pub struct_factory: Rc<dyn IStructFactory>,
+    pub type_factory: Arc<dyn ITypeFactory>,
+    pub field_factory: Arc<dyn IFieldFactory>,
+    pub struct_factory: Arc<dyn IStructFactory>,
 }
 
 impl IMockSetupStructGenerator for MockSetupStructGenerator {
@@ -23,12 +23,12 @@ impl IMockSetupStructGenerator for MockSetupStructGenerator {
         let data_type = self
             .type_factory
             .create_from_struct(&mock_data_struct.item_struct);
-        let data_rc_type = self.type_factory.wrap_in_rc(data_type);
+        let data_arc_type = self.type_factory.wrap_in_arc(data_type);
         let fields = FieldsNamed {
             brace_token: Default::default(),
             named: [self
                 .field_factory
-                .create(constants::DATA_IDENT.clone(), data_rc_type)]
+                .create(constants::DATA_IDENT.clone(), data_arc_type)]
             .into_iter()
             .collect(),
         };

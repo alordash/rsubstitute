@@ -1,6 +1,6 @@
 use crate::syntax::IPathFactory;
 use proc_macro2::Ident;
-use std::rc::Rc;
+use std::sync::Arc;
 // TODO - replace everywhere with `use syn::*`
 use crate::constants;
 use syn::{
@@ -16,11 +16,11 @@ pub trait ITypeFactory {
     // TODO - replace most `create_with_generics` with this method
     fn create_from_struct(&self, item_struct: &ItemStruct) -> Type;
 
-    fn wrap_in_rc(&self, ty: Type) -> Type;
+    fn wrap_in_arc(&self, ty: Type) -> Type;
 }
 
 pub struct TypeFactory {
-    pub(crate) path_factory: Rc<dyn IPathFactory>,
+    pub(crate) path_factory: Arc<dyn IPathFactory>,
 }
 
 impl ITypeFactory for TypeFactory {
@@ -40,13 +40,13 @@ impl ITypeFactory for TypeFactory {
         self.create_with_generics(item_struct.ident.clone(), item_struct.generics.clone())
     }
 
-    fn wrap_in_rc(&self, ty: Type) -> Type {
+    fn wrap_in_arc(&self, ty: Type) -> Type {
         let result = Type::Path(TypePath {
             qself: None,
             path: Path {
                 leading_colon: None,
                 segments: [PathSegment {
-                    ident: constants::RC_IDENT.clone(),
+                    ident: constants::ARC_IDENT.clone(),
                     arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
                         colon2_token: None,
                         lt_token: Default::default(),
