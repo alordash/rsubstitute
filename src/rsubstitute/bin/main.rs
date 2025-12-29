@@ -335,9 +335,9 @@ fn global(number: i32) -> String {
 }
 
 #[cfg(test)]
-use globals::global;
+use global::global;
 #[cfg(test)]
-mod globals {
+mod global {
     use super::*;
     use rsubstitute::IArgsFormatter;
     use rsubstitute_core::args_matching::{ArgCheckResult, IArgsChecker};
@@ -488,25 +488,25 @@ mod globals {
 
 #[cfg(test)]
 mod tests {
-    use crate::globals;
+    use crate::global;
     use rsubstitute_core::Times;
     use rsubstitute_core::args_matching::Arg;
 
     #[test]
     pub fn global_test() {
         // Arrange
-        globals::setup(Arg::Eq(2))
+        global::setup(Arg::Eq(2))
             .returns("MOCK: 2".to_string())
             .setup(Arg::Eq(143))
             .returns("MOCK: 143".to_string());
 
         // Act
-        let result1 = globals::global(2);
-        let result2_1 = globals::global(143);
-        let result2_2 = globals::global(143);
+        let result1 = global::global(2);
+        let result2_1 = global::global(143);
+        let result2_2 = global::global(143);
 
         // Assert
-        globals::received(Arg::Eq(2), Times::Once).received(Arg::Eq(143), Times::Exactly(2));
+        global::received(Arg::Eq(2), Times::Once).received(Arg::Eq(143), Times::Exactly(2));
         assert_eq!("MOCK: 2", result1);
         assert_eq!("MOCK: 143", result2_1);
         assert_eq!("MOCK: 143", result2_2);
