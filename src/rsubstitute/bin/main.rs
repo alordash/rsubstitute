@@ -371,20 +371,29 @@ mod globals {
     #[allow(non_camel_case_types)]
     pub struct global_Data<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
-        data: FnData<global_Call<'a>, global_ArgsChecker<'a>, String>,
+        global_data: FnData<global_Call<'a>, global_ArgsChecker<'a>, String>,
+    }
+
+    #[allow(non_camel_case_types)]
+    pub struct global_Setup<'a> {
+        _phantom_lifetime: PhantomData<&'a ()>,
+        data: Arc<global_Data<'a>>,
+    }
+
+    #[allow(non_camel_case_types)]
+    pub struct global_Received<'a> {
+        _phantom_lifetime: PhantomData<&'a ()>,
+        data: Arc<global_Data<'a>>,
     }
 
     unsafe impl<'a> Send for global_Data<'a> {}
     unsafe impl<'a> Sync for global_Data<'a> {}
 
-    #[allow(non_camel_case_types)]
-    pub struct global_Setup<'a> {
-        _phantom_lifetime: PhantomData<&'a ()>,
-        global_data: Arc<global_Data<'a>>,
-    }
-
     unsafe impl<'a> Send for global_Setup<'a> {}
     unsafe impl<'a> Sync for global_Setup<'a> {}
+
+    unsafe impl<'a> Send for global_Received<'a> {}
+    unsafe impl<'a> Sync for global_Received<'a> {}
 
     impl<'a> global_Setup<'a> {
         pub fn setup(
@@ -395,29 +404,24 @@ mod globals {
                 phantom_lifetime: PhantomData,
                 number,
             };
-            let fn_config = self.global_data.data.add_config(global_args_checker);
+            let fn_config = self.data.global_data.add_config(global_args_checker);
             let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
         }
     }
 
-    #[allow(non_upper_case_globals)]
-    static global_DATA: LazyLock<Arc<global_Data>> = LazyLock::new(|| {
-        println!("new global_DATA");
-        Arc::new(global_Data {
-            _phantom_lifetime: PhantomData,
-            data: FnData::new("global", &SERVICES),
-        })
-    });
-
-    #[allow(non_upper_case_globals)]
-    static global_SETUP: LazyLock<&'static global_Setup> = LazyLock::new(|| {
-        println!("new global_SETUP");
-        Box::leak(Box::new(global_Setup {
-            _phantom_lifetime: PhantomData,
-            global_data: (*global_DATA).clone(),
-        }))
-    });
+    impl<'a> global_Received<'a> {
+        pub fn received(&'a self, number: Arg<'a, i32>, times: Times) -> &'a Self {
+            let global_args_checker = global_ArgsChecker {
+                phantom_lifetime: PhantomData,
+                number,
+            };
+            self.data
+                .global_data
+                .verify_received(global_args_checker, times);
+            return self;
+        }
+    }
 
     pub fn setup(
         number: Arg<'static, i32>,
@@ -432,30 +436,80 @@ mod globals {
             phantom_lifetime: PhantomData,
             number,
         };
-        let fn_config = global_DATA.data.add_config(global_args_checker);
+        let fn_config = global_DATA.global_data.add_config(global_args_checker);
         let shared_fn_config = SharedFnConfig::new(fn_config, *global_SETUP);
         return shared_fn_config;
     }
+
+    pub fn received(number: Arg<'static, i32>, times: Times) -> &'static global_Received<'static> {
+        let global_args_checker = global_ArgsChecker {
+            phantom_lifetime: PhantomData,
+            number,
+        };
+        global_RECEIVED
+            .data
+            .global_data
+            .verify_received(global_args_checker, times);
+        return &global_RECEIVED;
+    }
+
+    #[allow(non_upper_case_globals)]
+    static global_DATA: LazyLock<Arc<global_Data>> = LazyLock::new(|| {
+        Arc::new(global_Data {
+            _phantom_lifetime: PhantomData,
+            global_data: FnData::new("global", &SERVICES),
+        })
+    });
+
+    #[allow(non_upper_case_globals)]
+    static global_SETUP: LazyLock<&'static global_Setup> = LazyLock::new(|| {
+        Box::leak(Box::new(global_Setup {
+            _phantom_lifetime: PhantomData,
+            data: (*global_DATA).clone(),
+        }))
+    });
+
+    #[allow(non_upper_case_globals)]
+    static global_RECEIVED: LazyLock<&'static global_Received> = LazyLock::new(|| {
+        Box::leak(Box::new(global_Received {
+            _phantom_lifetime: PhantomData,
+            data: (*global_DATA).clone(),
+        }))
+    });
 
     pub fn global(number: i32) -> String {
         let call = global_Call {
             phantom_lifetime: PhantomData,
             number,
         };
-        return global_DATA.data.handle_returning(call);
+        return global_DATA.global_data.handle_returning(call);
     }
 }
 
 #[cfg(test)]
 mod tests {
     use crate::globals;
+    use rsubstitute_core::Times;
     use rsubstitute_core::args_matching::Arg;
 
     #[test]
     pub fn global_test() {
-        globals::setup(Arg::Eq(2)).returns("MOCK: 2".to_string());
-        let result = globals::global(2);
-        assert_eq!("MOCK: 2", result);
+        // Arrange
+        globals::setup(Arg::Eq(2))
+            .returns("MOCK: 2".to_string())
+            .setup(Arg::Eq(143))
+            .returns("MOCK: 143".to_string());
+
+        // Act
+        let result1 = globals::global(2);
+        let result2_1 = globals::global(143);
+        let result2_2 = globals::global(143);
+
+        // Assert
+        globals::received(Arg::Eq(2), Times::Once).received(Arg::Eq(143), Times::Exactly(2));
+        assert_eq!("MOCK: 2", result1);
+        assert_eq!("MOCK: 143", result2_1);
+        assert_eq!("MOCK: 143", result2_2);
     }
 }
 
