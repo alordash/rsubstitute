@@ -1,6 +1,7 @@
 use crate::derive_args_formatter_macro_handler::*;
 use crate::mock_macros::fn_info_generation::*;
 use crate::mock_macros::mock_generation::*;
+use crate::mock_macros::targets::ItemTraitHandler;
 use crate::mock_macros::*;
 use crate::syntax::*;
 use std::cell::{LazyCell, OnceCell};
@@ -137,7 +138,7 @@ fn create_services() -> ServiceCollection {
         field_access_expr_factory: field_access_expr_factory.clone(),
     });
 
-    let mock_macro_handler = Arc::new(MockMacroHandler {
+    let item_trait_handler = Arc::new(ItemTraitHandler {
         fn_decl_extractor: fn_decl_extractor.clone(),
         fn_info_generator: fn_info_generator.clone(),
         mock_data_struct_generator: mock_data_struct_generator.clone(),
@@ -150,6 +151,8 @@ fn create_services() -> ServiceCollection {
         internal_mock_received_impl_generator: internal_mock_received_impl_generator.clone(),
         mod_generator: mod_generator.clone(),
     });
+
+    let mock_macro_handler = Arc::new(MockMacroHandler { item_trait_handler });
 
     let attribute_factory = Arc::new(AttributeFactory);
 

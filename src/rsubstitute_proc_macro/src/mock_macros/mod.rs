@@ -1,6 +1,7 @@
 pub mod fn_info_generation;
 pub mod mock_generation;
 pub mod models;
+pub mod targets;
 
 mod fn_decl_extractor;
 mod mock_macro_handler;
