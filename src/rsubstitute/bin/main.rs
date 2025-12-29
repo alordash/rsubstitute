@@ -432,25 +432,11 @@ mod global {
         String,
         global_Setup<'static>,
     > {
-        let global_args_checker = global_ArgsChecker {
-            phantom_lifetime: PhantomData,
-            number,
-        };
-        let fn_config = global_DATA.global_data.add_config(global_args_checker);
-        let shared_fn_config = SharedFnConfig::new(fn_config, *global_SETUP);
-        return shared_fn_config;
+        return global_Setup::setup(*global_SETUP, number);
     }
 
     pub fn received(number: Arg<'static, i32>, times: Times) -> &'static global_Received<'static> {
-        let global_args_checker = global_ArgsChecker {
-            phantom_lifetime: PhantomData,
-            number,
-        };
-        global_RECEIVED
-            .data
-            .global_data
-            .verify_received(global_args_checker, times);
-        return &global_RECEIVED;
+        return global_Received::received(*global_RECEIVED, number, times);
     }
 
     #[allow(non_upper_case_globals)]
