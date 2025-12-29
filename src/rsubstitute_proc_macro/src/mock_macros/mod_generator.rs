@@ -45,9 +45,7 @@ impl IModGenerator for ModGenerator {
         let attrs = vec![constants::ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE.clone()];
         let usings = [
             constants::USE_SUPER.clone(),
-            constants::USE_CRATE_PRELUDE.clone(),
-            constants::USE_STD_MARKER_PHANTOM_DATA.clone(),
-            constants::USE_STD_ARC.clone(),
+            constants::USE_FOR_GENERATED.clone(),
         ];
         let ident = format_ident!("{}_{}", Self::GENERATED_MOD_IDENT.clone(), trait_ident);
         let items = usings

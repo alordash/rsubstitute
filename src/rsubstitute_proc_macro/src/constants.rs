@@ -29,6 +29,8 @@ pub const SUPER_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("super")
 
 pub const PRELUDE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("prelude"));
 
+pub const FOR_GENERATED_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("for_generated"));
+
 // TODO - add test that it's equal to crate's name
 pub const CRATE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("rsubstitute"));
 
@@ -275,7 +277,7 @@ pub const USE_SUPER: LazyCell<ItemUse> = LazyCell::new(|| {
     return result;
 });
 
-pub const USE_CRATE_PRELUDE: LazyCell<ItemUse> = LazyCell::new(|| {
+pub const USE_FOR_GENERATED: LazyCell<ItemUse> = LazyCell::new(|| {
     let result = ItemUse {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
@@ -285,7 +287,7 @@ pub const USE_CRATE_PRELUDE: LazyCell<ItemUse> = LazyCell::new(|| {
             ident: CRATE_IDENT.clone(),
             colon2_token: Default::default(),
             tree: Box::new(UseTree::Path(UsePath {
-                ident: PRELUDE_IDENT.clone(),
+                ident: FOR_GENERATED_IDENT.clone(),
                 colon2_token: Default::default(),
                 tree: Box::new(UseTree::Glob(UseGlob {
                     star_token: Default::default(),
@@ -294,16 +296,6 @@ pub const USE_CRATE_PRELUDE: LazyCell<ItemUse> = LazyCell::new(|| {
         }),
         semi_token: Default::default(),
     };
-    return result;
-});
-
-pub const USE_STD_MARKER_PHANTOM_DATA: LazyCell<ItemUse> = LazyCell::new(|| {
-    let result = syn::parse_str("use std::marker::PhantomData;").unwrap();
-    return result;
-});
-
-pub const USE_STD_ARC: LazyCell<ItemUse> = LazyCell::new(|| {
-    let result = syn::parse_str("use std::sync::Arc;").unwrap();
     return result;
 });
 

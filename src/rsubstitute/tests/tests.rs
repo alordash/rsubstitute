@@ -38,17 +38,5 @@ fn work() {
 #[cfg(test)]
 fn another_work() {
     let my_trait_mock = MyTraitMock::new();
-    println!("{}", crate::static_fn(2, &[3, 4]));
     // my_trait_mock.another_work(Arg::Any);
-}
-
-#[cfg(test)]
-mod qwe {
-    use rsubstitute::qweee;
-
-    #[test]
-    fn q() {
-        println!("{}", crate::static_fn(10, &[1, 2, 3]));
-        qweee()
-    }
 }

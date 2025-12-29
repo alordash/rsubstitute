@@ -34,7 +34,6 @@ trait MyTrait {
 }
 
 pub use generated::*;
-use rsubstitute::qweee;
 
 mod generated {
     use super::*;
@@ -339,14 +338,7 @@ use global::global;
 #[cfg(test)]
 mod global {
     use super::*;
-    use rsubstitute::IArgsFormatter;
-    use rsubstitute_core::args_matching::{ArgCheckResult, IArgsChecker};
-    use rsubstitute_core::{FnData, SERVICES, SharedFnConfig};
-    use rsubstitute_proc_macro::IArgsFormatter;
-    use std::cell::LazyCell;
-    use std::marker::PhantomData;
-    use std::sync::Arc;
-    use std::sync::LazyLock;
+    use rsubstitute::for_generated::*;
 
     #[allow(non_camel_case_types)]
     #[derive(Clone)]
