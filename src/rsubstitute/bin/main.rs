@@ -378,15 +378,6 @@ mod global {
         data: Arc<global_Data<'a>>,
     }
 
-    unsafe impl<'a> Send for global_Data<'a> {}
-    unsafe impl<'a> Sync for global_Data<'a> {}
-
-    unsafe impl<'a> Send for global_Setup<'a> {}
-    unsafe impl<'a> Sync for global_Setup<'a> {}
-
-    unsafe impl<'a> Send for global_Received<'a> {}
-    unsafe impl<'a> Sync for global_Received<'a> {}
-
     impl<'a> global_Setup<'a> {
         pub fn setup(
             &'a self,
@@ -414,6 +405,15 @@ mod global {
             return self;
         }
     }
+
+    unsafe impl<'a> Send for global_Data<'a> {}
+    unsafe impl<'a> Sync for global_Data<'a> {}
+
+    unsafe impl<'a> Send for global_Setup<'a> {}
+    unsafe impl<'a> Sync for global_Setup<'a> {}
+
+    unsafe impl<'a> Send for global_Received<'a> {}
+    unsafe impl<'a> Sync for global_Received<'a> {}
 
     pub fn setup(
         number: Arg<'static, i32>,
