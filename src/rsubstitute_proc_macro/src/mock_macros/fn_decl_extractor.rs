@@ -1,8 +1,10 @@
 use crate::mock_macros::models::FnDecl;
-use syn::{TraitItem, TraitItemFn};
+use syn::*;
 
 pub trait IFnDeclExtractor {
     fn extract(&self, items: &[TraitItem]) -> Vec<FnDecl>;
+
+    fn extract_fn(&self, item_fn: ItemFn) -> FnDecl;
 }
 
 pub struct FnDeclExtractor;
@@ -14,6 +16,15 @@ impl IFnDeclExtractor for FnDeclExtractor {
             .flat_map(|x| self.try_map(x))
             .collect();
         return fn_decls;
+    }
+
+    fn extract_fn(&self, item_fn: ItemFn) -> FnDecl {
+        let fn_decl = FnDecl {
+            ident: item_fn.sig.ident.clone(),
+            arguments: item_fn.sig.inputs.iter().cloned().collect(),
+            return_value: item_fn.sig.output.clone(),
+        };
+        return fn_decl;
     }
 }
 
@@ -30,7 +41,7 @@ impl FnDeclExtractor {
         let fn_decl = FnDecl {
             ident: sig.ident.clone(),
             arguments: sig.inputs.iter().cloned().collect(),
-            return_value: sig.output.clone()
+            return_value: sig.output.clone(),
         };
         return fn_decl;
     }

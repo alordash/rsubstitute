@@ -1,17 +1,14 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::FnInfo;
-use crate::mock_macros::mock_generation::models::{
-    InternalMockImpl, InternalMockReceivedImpl, InternalMockSetupImpl, MockDataStruct, MockImpl,
-    MockReceivedStruct, MockSetupStruct, MockStruct,
-};
+use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::models::GeneratedMod;
 use proc_macro2::Ident;
 use quote::format_ident;
 use std::cell::LazyCell;
-use syn::{Item, ItemMod, Visibility};
+use syn::*;
 
 pub trait IModGenerator {
-    fn generate(
+    fn generate_trait(
         &self,
         trait_ident: Ident,
         fn_infos: Vec<FnInfo>,
@@ -24,12 +21,14 @@ pub trait IModGenerator {
         internal_mock_setup_impl: InternalMockSetupImpl,
         internal_mock_received_impl: InternalMockReceivedImpl,
     ) -> GeneratedMod;
+
+    fn generate_fn(&self, item_fn: ItemFn) -> GeneratedMod;
 }
 
 pub struct ModGenerator;
 
 impl IModGenerator for ModGenerator {
-    fn generate(
+    fn generate_trait(
         &self,
         trait_ident: Ident,
         fn_infos: Vec<FnInfo>,
@@ -78,8 +77,55 @@ impl IModGenerator for ModGenerator {
             content: Some((Default::default(), items)),
             semi: None,
         };
-        let mod_info = GeneratedMod { item_mod };
+        let use_generated_mod = ItemUse {
+            attrs: Vec::new(),
+            vis: Visibility::Public(Default::default()),
+            use_token: Default::default(),
+            leading_colon: None,
+            tree: UseTree::Path(UsePath {
+                ident: item_mod.ident.clone(),
+                colon2_token: Default::default(),
+                tree: Box::new(UseTree::Glob(UseGlob {
+                    star_token: Default::default(),
+                })),
+            }),
+            semi_token: Default::default(),
+        };
+        let mod_info = GeneratedMod {
+            item_mod,
+            use_generated_mod,
+        };
         return mod_info;
+    }
+
+    fn generate_fn(&self, item_fn: ItemFn) -> GeneratedMod {
+        let fn_ident = item_fn.sig.ident.clone();
+        let generated_mod = GeneratedMod {
+            item_mod: ItemMod {
+                attrs: vec![constants::CFG_TEST_ATTRIBUTE.clone()],
+                vis: Visibility::Inherited,
+                unsafety: None,
+                mod_token: Default::default(),
+                ident: fn_ident.clone(),
+                content: Some((Default::default(), vec![Item::Fn(item_fn)])),
+                semi: None,
+            },
+            use_generated_mod: ItemUse {
+                attrs: vec![constants::CFG_TEST_ATTRIBUTE.clone()],
+                vis: Visibility::Inherited,
+                use_token: Default::default(),
+                leading_colon: None,
+                tree: UseTree::Path(UsePath {
+                    ident: fn_ident,
+                    colon2_token: Default::default(),
+                    tree: Box::new(UseTree::Glob(UseGlob {
+                        star_token: Default::default(),
+                    })),
+                }),
+                semi_token: Default::default(),
+            },
+        };
+        return generated_mod;
     }
 }
 

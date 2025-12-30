@@ -1,7 +1,7 @@
 use crate::derive_args_formatter_macro_handler::*;
 use crate::mock_macros::fn_info_generation::*;
 use crate::mock_macros::mock_generation::*;
-use crate::mock_macros::targets::ItemTraitHandler;
+use crate::mock_macros::targets::{ItemFnHandler, ItemTraitHandler};
 use crate::mock_macros::*;
 use crate::syntax::*;
 use std::cell::{LazyCell, OnceCell};
@@ -152,7 +152,15 @@ fn create_services() -> ServiceCollection {
         mod_generator: mod_generator.clone(),
     });
 
-    let mock_macro_handler = Arc::new(MockMacroHandler { item_trait_handler });
+    let item_fn_handler = Arc::new(ItemFnHandler {
+        fn_decl_extractor: fn_decl_extractor.clone(),
+        mod_generator: mod_generator.clone(),
+    });
+
+    let mock_macro_handler = Arc::new(MockMacroHandler {
+        item_trait_handler,
+        item_fn_handler,
+    });
 
     let attribute_factory = Arc::new(AttributeFactory);
 

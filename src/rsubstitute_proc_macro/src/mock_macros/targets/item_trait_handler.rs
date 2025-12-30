@@ -1,6 +1,7 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::IFnInfoGenerator;
 use crate::mock_macros::mock_generation::*;
+use crate::mock_macros::models::GeneratedMod;
 use crate::mock_macros::*;
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
@@ -68,7 +69,7 @@ impl IItemTraitHandler for ItemTraitHandler {
         let internal_mock_received_impl = self
             .internal_mock_received_impl_generator
             .generate(&mock_received_struct, &fn_infos);
-        let mod_info = self.mod_generator.generate(
+        let mod_info = self.mod_generator.generate_trait(
             target_ident,
             fn_infos,
             mock_data_struct,
@@ -81,26 +82,15 @@ impl IItemTraitHandler for ItemTraitHandler {
             internal_mock_received_impl,
         );
 
-        let use_generated_mod = ItemUse {
-            attrs: Vec::new(),
-            vis: Visibility::Public(Default::default()),
-            use_token: Default::default(),
-            leading_colon: None,
-            tree: UseTree::Path(UsePath {
-                ident: mod_info.item_mod.ident.clone(),
-                colon2_token: Default::default(),
-                tree: Box::new(UseTree::Glob(UseGlob {
-                    star_token: Default::default(),
-                })),
-            }),
-            semi_token: Default::default(),
-        };
-        let generated_mod = mod_info.item_mod;
+        let GeneratedMod {
+            item_mod,
+            use_generated_mod,
+        } = mod_info;
         let result = quote! {
             #item_trait
 
             #use_generated_mod
-            #generated_mod
+            #item_mod
         };
         return result.into();
     }

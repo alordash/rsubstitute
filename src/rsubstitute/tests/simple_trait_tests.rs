@@ -1,5 +1,5 @@
 #![allow(non_snake_case)]
-use rsubstitute_proc_macro::mock;
+use rsubstitute::macros::mock;
 
 #[mock]
 trait Trait {

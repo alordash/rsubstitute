@@ -9,6 +9,7 @@ mod mock_impl_generator;
 mod mock_received_struct_generator;
 mod mock_setup_struct_generator;
 mod mock_struct_generator;
+mod mod_generator;
 
 pub use input_args_generator::*;
 pub use internal_mock_impl_generator::*;
@@ -19,3 +20,4 @@ pub use mock_impl_generator::*;
 pub use mock_received_struct_generator::*;
 pub use mock_setup_struct_generator::*;
 pub use mock_struct_generator::*;
+pub use mod_generator::*;

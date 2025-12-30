@@ -27,8 +27,6 @@ pub const MACRO_VEC_PATH: LazyCell<Path> = LazyCell::new(|| {
 
 pub const SUPER_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("super"));
 
-pub const PRELUDE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("prelude"));
-
 pub const FOR_GENERATED_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("for_generated"));
 
 // TODO - add test that it's equal to crate's name
@@ -157,6 +155,20 @@ pub const DERIVE_DEBUG_AND_I_ARGS_FORMATTER_ATTRIBUTE: LazyCell<Attribute> = Laz
     let attribute_factory = &SERVICES.attribute_factory;
     let ident = format_ident!("derive");
     let result = attribute_factory.create(ident, "Debug, IArgsFormatter");
+    return result;
+});
+
+pub const CFG_TEST_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+    let attribute_factory = &SERVICES.attribute_factory;
+    let ident = format_ident!("cfg");
+    let result = attribute_factory.create(ident, "test");
+    return result;
+});
+
+pub const CFG_NOT_TEST_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+    let attribute_factory = &SERVICES.attribute_factory;
+    let ident = format_ident!("cfg");
+    let result = attribute_factory.create(ident, "not(test)");
     return result;
 });
 
