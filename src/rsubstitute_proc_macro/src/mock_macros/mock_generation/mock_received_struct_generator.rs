@@ -9,6 +9,11 @@ use syn::*;
 pub trait IMockReceivedStructGenerator {
     fn generate(&self, mock_ident: &Ident, mock_data_struct: &MockDataStruct)
     -> MockReceivedStruct;
+    fn generate_with_non_camel_case_allowed(
+        &self,
+        mock_ident: &Ident,
+        mock_data_struct: &MockDataStruct,
+    ) -> MockReceivedStruct;
 }
 
 pub(crate) struct MockReceivedStructGenerator {
@@ -37,11 +42,21 @@ impl IMockReceivedStructGenerator for MockReceivedStructGenerator {
             .into_iter()
             .collect(),
         };
-        let item_struct = self
-            .struct_factory
-            .create(attrs, ident, fields);
+        let item_struct = self.struct_factory.create(attrs, ident, fields);
         let mock_received_struct = MockReceivedStruct { item_struct };
         return mock_received_struct;
+    }
+    fn generate_with_non_camel_case_allowed(
+        &self,
+        mock_ident: &Ident,
+        mock_data_struct: &MockDataStruct,
+    ) -> MockReceivedStruct {
+        let mut result = self.generate(mock_ident, mock_data_struct);
+        result
+            .item_struct
+            .attrs
+            .push(constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone());
+        return result;
     }
 }
 

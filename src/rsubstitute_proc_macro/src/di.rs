@@ -154,6 +154,12 @@ fn create_services() -> ServiceCollection {
 
     let item_fn_handler = Arc::new(ItemFnHandler {
         fn_decl_extractor: fn_decl_extractor.clone(),
+        fn_info_generator: fn_info_generator.clone(),
+        mock_data_struct_generator: mock_data_struct_generator.clone(),
+        mock_setup_struct_generator: mock_setup_struct_generator.clone(),
+        mock_received_struct_generator: mock_received_struct_generator.clone(),
+        internal_mock_setup_impl_generator: internal_mock_setup_impl_generator.clone(),
+        internal_mock_received_impl_generator: internal_mock_received_impl_generator.clone(),
         mod_generator: mod_generator.clone(),
     });
 

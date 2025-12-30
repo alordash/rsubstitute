@@ -22,7 +22,16 @@ pub trait IModGenerator {
         internal_mock_received_impl: InternalMockReceivedImpl,
     ) -> GeneratedMod;
 
-    fn generate_fn(&self, item_fn: ItemFn) -> GeneratedMod;
+    fn generate_fn(
+        &self,
+        item_fn: &ItemFn,
+        fn_info: FnInfo,
+        mock_data_struct: MockDataStruct,
+        mock_setup_struct: MockSetupStruct,
+        mock_received_struct: MockReceivedStruct,
+        internal_mock_setup_impl: InternalMockSetupImpl,
+        internal_mock_received_impl: InternalMockReceivedImpl,
+    ) -> GeneratedMod;
 }
 
 pub struct ModGenerator;
@@ -91,39 +100,68 @@ impl IModGenerator for ModGenerator {
             }),
             semi_token: Default::default(),
         };
-        let mod_info = GeneratedMod {
+        let generated_mod = GeneratedMod {
             item_mod,
             use_generated_mod,
         };
-        return mod_info;
+        return generated_mod;
     }
 
-    fn generate_fn(&self, item_fn: ItemFn) -> GeneratedMod {
+    fn generate_fn(
+        &self,
+        item_fn: &ItemFn,
+        fn_info: FnInfo,
+        mock_data_struct: MockDataStruct,
+        mock_setup_struct: MockSetupStruct,
+        mock_received_struct: MockReceivedStruct,
+        internal_mock_setup_impl: InternalMockSetupImpl,
+        internal_mock_received_impl: InternalMockReceivedImpl,
+    ) -> GeneratedMod {
         let fn_ident = item_fn.sig.ident.clone();
+        let attrs = vec![constants::ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE.clone()];
+        let usings = [
+            constants::USE_SUPER.clone(),
+            constants::USE_FOR_GENERATED.clone(),
+        ];
+        let ident = format_ident!("{}_{}", Self::GENERATED_MOD_IDENT.clone(), fn_ident);
+        let items = usings
+            .into_iter()
+            .map(|x| Item::Use(x))
+            .chain([
+                Item::Struct(fn_info.call_struct.item_struct),
+                Item::Struct(fn_info.args_checker_struct.item_struct),
+                Item::Impl(fn_info.args_checker_impl.item_impl),
+                Item::Struct(mock_data_struct.item_struct),
+                Item::Struct(mock_setup_struct.item_struct),
+                Item::Struct(mock_received_struct.item_struct),
+                Item::Impl(internal_mock_setup_impl.item_impl),
+                Item::Impl(internal_mock_received_impl.item_impl),
+            ])
+            .collect();
+        let item_mod = ItemMod {
+            attrs,
+            vis: Visibility::Inherited,
+            unsafety: None,
+            mod_token: Default::default(),
+            ident: ident.clone(),
+            content: Some((Default::default(), items)),
+            semi: None,
+        };
+        let use_generated_mod = ItemUse {
+            attrs: vec![constants::CFG_TEST_ATTRIBUTE.clone()],
+            vis: Visibility::Inherited,
+            use_token: Default::default(),
+            leading_colon: None,
+            tree: UseTree::Path(UsePath {
+                ident,
+                colon2_token: Default::default(),
+                tree: Box::new(UseTree::Name(UseName { ident: fn_ident })),
+            }),
+            semi_token: Default::default(),
+        };
         let generated_mod = GeneratedMod {
-            item_mod: ItemMod {
-                attrs: vec![constants::CFG_TEST_ATTRIBUTE.clone()],
-                vis: Visibility::Inherited,
-                unsafety: None,
-                mod_token: Default::default(),
-                ident: fn_ident.clone(),
-                content: Some((Default::default(), vec![Item::Fn(item_fn)])),
-                semi: None,
-            },
-            use_generated_mod: ItemUse {
-                attrs: vec![constants::CFG_TEST_ATTRIBUTE.clone()],
-                vis: Visibility::Inherited,
-                use_token: Default::default(),
-                leading_colon: None,
-                tree: UseTree::Path(UsePath {
-                    ident: fn_ident,
-                    colon2_token: Default::default(),
-                    tree: Box::new(UseTree::Glob(UseGlob {
-                        star_token: Default::default(),
-                    })),
-                }),
-                semi_token: Default::default(),
-            },
+            item_mod,
+            use_generated_mod,
         };
         return generated_mod;
     }

@@ -8,6 +8,12 @@ use syn::*;
 
 pub trait IMockDataStructGenerator {
     fn generate(&self, mock_ident: &Ident, fn_infos: &[FnInfo]) -> MockDataStruct;
+
+    fn generate_with_non_camel_case_allowed(
+        &self,
+        mock_ident: &Ident,
+        fn_infos: &[FnInfo],
+    ) -> MockDataStruct;
 }
 
 // TODO - verify all impls are internal
@@ -31,6 +37,19 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
         let item_struct = self.struct_factory.create(attrs, ident, fields_named);
         let mock_struct = MockDataStruct { item_struct };
         return mock_struct;
+    }
+
+    fn generate_with_non_camel_case_allowed(
+        &self,
+        mock_ident: &Ident,
+        fn_infos: &[FnInfo],
+    ) -> MockDataStruct {
+        let mut result = self.generate(mock_ident, fn_infos);
+        result
+            .item_struct
+            .attrs
+            .push(constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone());
+        return result;
     }
 }
 

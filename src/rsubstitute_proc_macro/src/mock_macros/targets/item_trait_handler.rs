@@ -69,7 +69,7 @@ impl IItemTraitHandler for ItemTraitHandler {
         let internal_mock_received_impl = self
             .internal_mock_received_impl_generator
             .generate(&mock_received_struct, &fn_infos);
-        let mod_info = self.mod_generator.generate_trait(
+        let generated_mod = self.mod_generator.generate_trait(
             target_ident,
             fn_infos,
             mock_data_struct,
@@ -85,7 +85,7 @@ impl IItemTraitHandler for ItemTraitHandler {
         let GeneratedMod {
             item_mod,
             use_generated_mod,
-        } = mod_info;
+        } = generated_mod;
         let result = quote! {
             #item_trait
 

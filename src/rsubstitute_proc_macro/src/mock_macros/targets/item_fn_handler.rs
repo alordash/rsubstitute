@@ -1,9 +1,10 @@
 use crate::constants;
+use crate::mock_macros::fn_info_generation::IFnInfoGenerator;
 use crate::mock_macros::mock_generation::*;
 use crate::mock_macros::models::*;
 use crate::mock_macros::*;
 use proc_macro::TokenStream;
-use quote::quote;
+use quote::{format_ident, quote};
 use std::sync::Arc;
 use syn::*;
 
@@ -13,18 +14,56 @@ pub trait IItemFnHandler {
 
 pub(crate) struct ItemFnHandler {
     pub fn_decl_extractor: Arc<dyn IFnDeclExtractor>,
+    pub fn_info_generator: Arc<dyn IFnInfoGenerator>,
+    pub mock_data_struct_generator: Arc<dyn IMockDataStructGenerator>,
+    pub mock_setup_struct_generator: Arc<dyn IMockSetupStructGenerator>,
+    pub mock_received_struct_generator: Arc<dyn IMockReceivedStructGenerator>,
+    pub internal_mock_setup_impl_generator: Arc<dyn IInternalMockSetupImplGenerator>,
+    pub internal_mock_received_impl_generator: Arc<dyn IInternalMockReceivedImplGenerator>,
     pub mod_generator: Arc<dyn IModGenerator>,
 }
 
 impl IItemFnHandler for ItemFnHandler {
-    fn handle(&self, mut item_fn: ItemFn) -> TokenStream {
-        let _fn_decls = self.fn_decl_extractor.extract_fn(item_fn.clone());
-        let target_ident = item_fn.sig.ident.clone();
+    fn handle(&self, item_fn: ItemFn) -> TokenStream {
+        let mock_ident = format_ident!(
+            "{}{}",
+            item_fn.sig.ident,
+            constants::MOCK_STRUCT_IDENT_PREFIX
+        );
+        let fn_decl = self.fn_decl_extractor.extract_fn(item_fn.clone());
+        let fn_info = self.fn_info_generator.generate(&fn_decl);
+        let fn_infos = [fn_info];
+        let mock_data_struct = self
+            .mock_data_struct_generator
+            .generate_with_non_camel_case_allowed(&mock_ident, &fn_infos);
+        let mock_setup_struct = self
+            .mock_setup_struct_generator
+            .generate_with_non_camel_case_allowed(&mock_ident, &mock_data_struct);
+        let mock_received_struct = self
+            .mock_received_struct_generator
+            .generate_with_non_camel_case_allowed(&mock_ident, &mock_data_struct);
+        let internal_mock_setup_impl = self
+            .internal_mock_setup_impl_generator
+            .generate(&mock_setup_struct, &fn_infos);
+        let internal_mock_received_impl = self
+            .internal_mock_received_impl_generator
+            .generate(&mock_received_struct, &fn_infos);
 
+        let [fn_info] = fn_infos;
+        let generated_mod = self.mod_generator.generate_fn(
+            &item_fn,
+            fn_info,
+            mock_data_struct,
+            mock_setup_struct,
+            mock_received_struct,
+            internal_mock_setup_impl,
+            internal_mock_received_impl,
+        );
         let GeneratedMod {
             item_mod,
             use_generated_mod,
-        } = self.mod_generator.generate_fn(item_fn.clone());
+        } = generated_mod;
+
         let cfg_not_test_attribute = constants::CFG_NOT_TEST_ATTRIBUTE.clone();
         let result = quote! {
             #cfg_not_test_attribute
