@@ -1,8 +1,9 @@
 use crate::args_matching::{ArgCheckResult, IArgsChecker};
+use std::collections::VecDeque;
 
 pub struct FnConfig<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue> {
     args_checker: TArgsChecker,
-    return_value: Option<TReturnValue>,
+    return_values: VecDeque<TReturnValue>,
     callback: Option<Box<dyn FnMut()>>,
     calls: Vec<TCall>,
 }
@@ -13,14 +14,20 @@ impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
     pub fn new(args_checker: TArgsChecker) -> Self {
         FnConfig {
             args_checker,
-            return_value: None,
+            return_values: VecDeque::new(),
             callback: None,
             calls: Vec::new(),
         }
     }
 
-    pub fn set_return_value(&mut self, return_value: TReturnValue) {
-        self.return_value = Some(return_value);
+    pub fn add_return_value(&mut self, return_value: TReturnValue) {
+        self.return_values.push_back(return_value);
+    }
+
+    pub fn add_return_values(&mut self, return_values: &[TReturnValue]) {
+        for return_value in return_values.iter().cloned() {
+            self.add_return_value(return_value);
+        }
     }
 
     pub fn set_callback(&mut self, callback: impl FnMut() + 'static) {
@@ -35,8 +42,8 @@ impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
         self.args_checker.check(call)
     }
 
-    pub fn get_return_value(&mut self) -> Option<TReturnValue> {
-        self.return_value.clone()
+    pub fn take_return_value(&mut self) -> Option<TReturnValue> {
+        self.return_values.pop_front()
     }
 
     pub fn get_callback(&mut self) -> Option<&mut Box<dyn FnMut()>> {

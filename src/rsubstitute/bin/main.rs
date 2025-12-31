@@ -485,6 +485,10 @@ mod tests {
         // Act
         let result1 = global(2);
         let result2_1 = global(143);
+        // TODO - check how NSubstitute behaves.
+        // I think like this:
+        // 1. If return only one argument - keep returning it
+        // 2. If return many arguments - return only them until ran out of them, then throw
         let result2_2 = global(143);
 
         // Assert

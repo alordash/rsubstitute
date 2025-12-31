@@ -24,7 +24,14 @@ impl<'a, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TOwner>
     pub fn returns(&self, return_value: TReturnValue) -> &'a TOwner {
         self.shared_fn_config
             .borrow_mut()
-            .set_return_value(return_value);
+            .add_return_value(return_value);
+        return self.owner;
+    }
+
+    pub fn returns_many(&self, return_values: &[TReturnValue]) -> &'a TOwner {
+        self.shared_fn_config
+            .borrow_mut()
+            .add_return_values(return_values);
         return self.owner;
     }
 

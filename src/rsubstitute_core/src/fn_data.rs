@@ -65,7 +65,7 @@ impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
         }
         let return_value = fn_config
             .borrow_mut()
-            .get_return_value()
+            .take_return_value()
             .expect("No return value configured for 'another_work'! TODO: write call description?");
         return return_value;
     }
