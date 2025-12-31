@@ -462,6 +462,10 @@ mod global {
         };
         return global_DATA.global_data.handle_returning(call);
     }
+    
+    fn source_global(number: i32) -> String {
+        return format!("actual number: {number}");
+    }
 }
 
 #[cfg(test)]
