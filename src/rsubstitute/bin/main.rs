@@ -140,9 +140,9 @@ mod generated {
     // start - Mock
     struct MyTraitMockData<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
-        work_data: FnData<work_Call<'a>, work_ArgsChecker<'a>, ()>,
-        another_work_data: FnData<another_work_Call<'a>, another_work_ArgsChecker<'a>, Vec<u8>>,
-        get_data: FnData<get_Call<'a>, get_ArgsChecker<'a>, i32>,
+        work_data: FnData<work_Call<'a>, work_ArgsChecker<'a>, (), ()>,
+        another_work_data: FnData<another_work_Call<'a>, another_work_ArgsChecker<'a>, Vec<u8>, ()>,
+        get_data: FnData<get_Call<'a>, get_ArgsChecker<'a>, i32, ()>,
     }
 
     pub struct MyTraitMockSetup<'a> {
@@ -228,7 +228,7 @@ mod generated {
         pub fn work(
             &'a self,
             value: Arg<'a, i32>,
-        ) -> SharedFnConfig<'a, work_Call<'a>, work_ArgsChecker<'a>, (), Self> {
+        ) -> SharedFnConfig<'a, work_Call<'a>, work_ArgsChecker<'a>, (), Self, ()> {
             let work_args_checker = work_ArgsChecker {
                 phantom_lifetime: PhantomData,
                 value,
@@ -244,8 +244,14 @@ mod generated {
             something: Arg<'a, &'a &'a [u8]>,
             dyn_obj: Arg<'a, &'a dyn IFoo>,
             arc: Arg<'a, Arc<dyn IFoo>>,
-        ) -> SharedFnConfig<'a, another_work_Call<'a>, another_work_ArgsChecker<'a>, Vec<u8>, Self>
-        {
+        ) -> SharedFnConfig<
+            'a,
+            another_work_Call<'a>,
+            another_work_ArgsChecker<'a>,
+            Vec<u8>,
+            Self,
+            (),
+        > {
             let another_work_args_checker = another_work_ArgsChecker {
                 phantom_lifetime: PhantomData,
                 string,
@@ -261,7 +267,9 @@ mod generated {
             return shared_fn_config;
         }
 
-        pub fn get(&'a self) -> SharedFnConfig<'a, get_Call<'a>, get_ArgsChecker<'a>, i32, Self> {
+        pub fn get(
+            &'a self,
+        ) -> SharedFnConfig<'a, get_Call<'a>, get_ArgsChecker<'a>, i32, Self, ()> {
             let get_args_checker = get_ArgsChecker {
                 phantom_lifetime: PhantomData,
             };
@@ -312,19 +320,19 @@ mod generated {
             return self;
         }
 
-        #[allow(non_upper_case_globals)]
-        const standalone_data: LazyCell<
-            FnData<standalone_Call<'a>, standalone_ArgsChecker<'a>, f32>,
-        > = LazyCell::new(|| FnData::new("standalone", &SERVICES));
-        pub fn standalone(number: Arg<i32>) -> f32 {
-            let standalone_args_checker = standalone_ArgsChecker {
-                phantom_lifetime: PhantomData,
-                number,
-            };
-            // let _fn_config = Self::standalone_data.add_config(standalone_args_checker);
-            // let shared_fn_config = SharedFnConfig::new()
-            todo!()
-        }
+        // #[allow(non_upper_case_globals)]
+        // const standalone_data: LazyCell<
+        //     FnData<standalone_Call<'a>, standalone_ArgsChecker<'a>, f32>,
+        // > = LazyCell::new(|| FnData::new("standalone", &SERVICES));
+        // pub fn standalone(number: Arg<i32>) -> f32 {
+        //     let standalone_args_checker = standalone_ArgsChecker {
+        //         phantom_lifetime: PhantomData,
+        //         number,
+        //     };
+        //     // let _fn_config = Self::standalone_data.add_config(standalone_args_checker);
+        //     // let shared_fn_config = SharedFnConfig::new()
+        //     todo!()
+        // }
     }
 
     // end - Mock
@@ -365,7 +373,7 @@ mod global {
     #[allow(non_camel_case_types)]
     pub struct global_Data<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
-        global_data: FnData<global_Call<'a>, global_ArgsChecker<'a>, String>,
+        global_data: FnData<global_Call<'a>, global_ArgsChecker<'a>, String, global_CallBase>,
     }
 
     #[allow(non_camel_case_types)]
@@ -382,7 +390,14 @@ mod global {
         pub fn setup(
             &'a self,
             number: Arg<'a, i32>,
-        ) -> SharedFnConfig<'a, global_Call<'a>, global_ArgsChecker<'a>, String, Self> {
+        ) -> SharedFnConfig<
+            'a,
+            global_Call<'a>,
+            global_ArgsChecker<'a>,
+            String,
+            Self,
+            global_CallBase,
+        > {
             let global_args_checker = global_ArgsChecker {
                 phantom_lifetime: PhantomData,
                 number,
@@ -413,6 +428,18 @@ mod global {
         data: Arc<global_Data<'a>>,
     }
 
+    pub struct global_CallBase;
+
+    impl<'a> ICallBase<global_Call<'a>, String> for global_CallBase {
+        fn new() -> Self {
+            Self
+        }
+
+        fn call_base(&self, call: global_Call) -> String {
+            return base_global(call.number);
+        }
+    }
+
     unsafe impl<'a> Send for global_Data<'a> {}
     unsafe impl<'a> Sync for global_Data<'a> {}
 
@@ -433,6 +460,7 @@ mod global {
         global_ArgsChecker<'static>,
         String,
         global_Setup<'static>,
+        global_CallBase,
     > {
         return (*global_MOCK).setup.setup(number);
     }
@@ -459,10 +487,10 @@ mod global {
             phantom_lifetime: PhantomData,
             number,
         };
-        return global_MOCK.data.global_data.handle_returning(call);
+        return global_MOCK.data.global_data.handle_base(call);
     }
 
-    fn source_global(number: i32) -> String {
+    fn base_global(number: i32) -> String {
         return format!("actual number: {number}");
     }
 }
@@ -470,6 +498,7 @@ mod global {
 #[cfg(test)]
 mod tests {
     use crate::global;
+    use crate::global::global_CallBase;
     use rsubstitute_core::Times;
     use rsubstitute_core::args_matching::Arg;
 
@@ -477,7 +506,7 @@ mod tests {
     pub fn global_test() {
         // Arrange
         global::setup(Arg::Eq(2))
-            .returns("MOCK: 2".to_string())
+            .call_base()
             .setup(Arg::Eq(143))
             .returns("MOCK: 143".to_string());
 

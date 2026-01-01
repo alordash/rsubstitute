@@ -1,19 +1,19 @@
 use crate::args_matching::{ArgCheckResult, IArgsChecker};
 use crate::di::ServiceCollection;
 use crate::error_printer::IErrorPrinter;
-use crate::{FnConfig, Times};
+use crate::{FnConfig, ICallBase, Times};
 use std::cell::RefCell;
 use std::sync::Arc;
 
-pub struct FnData<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue> {
+pub struct FnData<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TCallBase> {
     fn_name: &'static str,
     calls: RefCell<Vec<TCall>>,
-    configs: RefCell<Vec<Arc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue>>>>>,
+    configs: RefCell<Vec<Arc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue, TCallBase>>>>>,
     error_printer: Arc<dyn IErrorPrinter>,
 }
 
-impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue>
-    FnData<TCall, TArgsChecker, TReturnValue>
+impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TCallBase>
+    FnData<TCall, TArgsChecker, TReturnValue, TCallBase>
 {
     pub fn new(fn_name: &'static str, services: &ServiceCollection) -> Self {
         Self {
@@ -25,8 +25,8 @@ impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue>
     }
 }
 
-impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
-    FnData<TCall, TArgsChecker, TReturnValue>
+impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TCallBase>
+    FnData<TCall, TArgsChecker, TReturnValue, TCallBase>
 {
     pub fn register_call(&self, call: TCall) -> &Self {
         self.calls.borrow_mut().push(call);
@@ -36,7 +36,7 @@ impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
     pub fn add_config(
         &self,
         args_checker: TArgsChecker,
-    ) -> Arc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue>>> {
+    ) -> Arc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue, TCallBase>>> {
         let config = FnConfig::new(args_checker);
         let shared_config = Arc::new(RefCell::new(config));
         self.configs.borrow_mut().push(shared_config.clone());
@@ -89,7 +89,7 @@ impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
     fn try_get_matching_config(
         &self,
         call: TCall,
-    ) -> Option<Arc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue>>>> {
+    ) -> Option<Arc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue, TCallBase>>>> {
         let configs = self.configs.borrow();
         let maybe_fn_config = configs
             .iter()
@@ -121,5 +121,29 @@ impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
             }
         }
         return (matching_calls, non_matching_calls);
+    }
+}
+
+impl<
+    TCall: Clone,
+    TArgsChecker: IArgsChecker<TCall>,
+    TReturnValue: Clone,
+    TCallBase: ICallBase<TCall, TReturnValue>,
+> FnData<TCall, TArgsChecker, TReturnValue, TCallBase>
+{
+    pub fn handle_base(&self, call: TCall) -> TReturnValue {
+        let fn_config = self
+            .try_get_matching_config(call.clone())
+            .expect("No fn configuration found for this call! TODO: write call description");
+        self.register_call(call.clone());
+        fn_config.borrow_mut().register_call(call.clone());
+        if let Some(call_base) = fn_config.borrow_mut().get_call_base() {
+            return call_base.call_base(call);
+        }
+        let return_value = fn_config
+            .borrow_mut()
+            .take_return_value()
+            .expect("No return value configured for 'another_work'! TODO: write call description?");
+        return return_value;
     }
 }

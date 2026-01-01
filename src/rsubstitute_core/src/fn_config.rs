@@ -1,15 +1,17 @@
+use crate::ICallBase;
 use crate::args_matching::{ArgCheckResult, IArgsChecker};
 use std::collections::VecDeque;
 
-pub struct FnConfig<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue> {
+pub struct FnConfig<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TCallBase> {
     args_checker: TArgsChecker,
     return_values: VecDeque<TReturnValue>,
     callback: Option<Box<dyn FnMut()>>,
     calls: Vec<TCall>,
+    call_base: Option<TCallBase>,
 }
 
-impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
-    FnConfig<TCall, TArgsChecker, TReturnValue>
+impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TCallBase>
+    FnConfig<TCall, TArgsChecker, TReturnValue, TCallBase>
 {
     pub fn new(args_checker: TArgsChecker) -> Self {
         FnConfig {
@@ -17,6 +19,7 @@ impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
             return_values: VecDeque::new(),
             callback: None,
             calls: Vec::new(),
+            call_base: None,
         }
     }
 
@@ -48,5 +51,21 @@ impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
 
     pub fn get_callback(&mut self) -> Option<&mut Box<dyn FnMut()>> {
         self.callback.as_mut()
+    }
+}
+
+impl<
+    TCall,
+    TArgsChecker: IArgsChecker<TCall>,
+    TReturnValue,
+    TCallBase: ICallBase<TCall, TReturnValue>,
+> FnConfig<TCall, TArgsChecker, TReturnValue, TCallBase>
+{
+    pub fn set_call_base(&mut self, call_base: TCallBase) {
+        self.call_base = Some(call_base);
+    }
+    
+    pub fn get_call_base(&mut self) -> Option<&mut TCallBase> {
+        self.call_base.as_mut()
     }
 }
