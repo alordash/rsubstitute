@@ -131,7 +131,18 @@ impl<
     TBaseCaller: IBaseCaller<TCall, TReturnValue>,
 > FnData<TCall, TArgsChecker, TReturnValue, TBaseCaller>
 {
-    pub fn handle_base(&self, call: TCall) -> TReturnValue {
+    pub fn handle_base(&self, call: TCall) {
+        let fn_config = self
+            .try_get_matching_config(call.clone())
+            .expect("No fn configuration found for this call! TODO: write call description");
+        self.register_call(call.clone());
+        fn_config.borrow_mut().register_call(call.clone());
+        if let Some(call_base) = fn_config.borrow().get_base_caller() {
+            call_base.borrow_mut().call_base(call);
+        }
+    }
+
+    pub fn handle_base_returning(&self, call: TCall) -> TReturnValue {
         let fn_config = self
             .try_get_matching_config(call.clone())
             .expect("No fn configuration found for this call! TODO: write call description");

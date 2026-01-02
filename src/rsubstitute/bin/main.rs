@@ -489,7 +489,7 @@ mod global {
             phantom_lifetime: PhantomData,
             number,
         };
-        return global_MOCK.data.global_data.handle_base(call);
+        return global_MOCK.data.global_data.handle_base_returning(call);
     }
 
     fn base_global(number: i32) -> String {
