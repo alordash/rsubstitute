@@ -431,7 +431,7 @@ mod global {
 
     pub struct global_CallBase;
 
-    impl<'a> ICallBase<global_Call<'a>, String> for global_CallBase {
+    impl<'a> IBaseCaller<global_Call<'a>, String> for global_CallBase {
         fn new() -> Self {
             Self
         }

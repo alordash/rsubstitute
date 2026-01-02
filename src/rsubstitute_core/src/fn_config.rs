@@ -1,4 +1,4 @@
-use crate::ICallBase;
+use crate::IBaseCaller;
 use crate::args_matching::{ArgCheckResult, IArgsChecker};
 use std::cell::RefCell;
 use std::collections::VecDeque;
@@ -7,8 +7,8 @@ use std::sync::Arc;
 pub struct FnConfig<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TCallBase> {
     args_checker: TArgsChecker,
     return_values: VecDeque<TReturnValue>,
-    callback: Option<Box<dyn FnMut()>>,
     calls: Vec<TCall>,
+    callback: Option<Box<dyn FnMut()>>,
     call_base: Option<Arc<RefCell<TCallBase>>>,
 }
 
@@ -19,8 +19,8 @@ impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TCallBase>
         FnConfig {
             args_checker,
             return_values: VecDeque::new(),
-            callback: None,
             calls: Vec::new(),
+            callback: None,
             call_base: None,
         }
     }
@@ -60,7 +60,7 @@ impl<
     TCall,
     TArgsChecker: IArgsChecker<TCall>,
     TReturnValue,
-    TCallBase: ICallBase<TCall, TReturnValue>,
+    TCallBase: IBaseCaller<TCall, TReturnValue>,
 > FnConfig<TCall, TArgsChecker, TReturnValue, TCallBase>
 {
     pub fn set_call_base(&mut self, call_base: Arc<RefCell<TCallBase>>) {

@@ -1,5 +1,5 @@
 use crate::args_matching::IArgsChecker;
-use crate::{FnConfig, ICallBase};
+use crate::{FnConfig, IBaseCaller};
 use std::cell::RefCell;
 use std::marker::PhantomData;
 use std::sync::Arc;
@@ -67,7 +67,7 @@ impl<
     TArgsChecker: IArgsChecker<TCall>,
     TReturnValue,
     TOwner,
-    TCallBase: ICallBase<TCall, TReturnValue>,
+    TCallBase: IBaseCaller<TCall, TReturnValue>,
 > SharedFnConfig<'a, TCall, TArgsChecker, TReturnValue, TOwner, TCallBase>
 {
     pub fn call_base(&self) -> &'a TOwner {

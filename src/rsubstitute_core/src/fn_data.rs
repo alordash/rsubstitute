@@ -1,7 +1,7 @@
 use crate::args_matching::{ArgCheckResult, IArgsChecker};
 use crate::di::ServiceCollection;
 use crate::error_printer::IErrorPrinter;
-use crate::{FnConfig, ICallBase, Times};
+use crate::{FnConfig, IBaseCaller, Times};
 use std::cell::RefCell;
 use std::sync::Arc;
 
@@ -128,7 +128,7 @@ impl<
     TCall: Clone,
     TArgsChecker: IArgsChecker<TCall>,
     TReturnValue: Clone,
-    TCallBase: ICallBase<TCall, TReturnValue>,
+    TCallBase: IBaseCaller<TCall, TReturnValue>,
 > FnData<TCall, TArgsChecker, TReturnValue, TCallBase>
 {
     pub fn handle_base(&self, call: TCall) -> TReturnValue {
