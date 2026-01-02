@@ -379,6 +379,7 @@ mod global {
     #[allow(non_camel_case_types)]
     pub struct global_Setup<'a> {
         data: Arc<global_Data<'a>>,
+        global_call_base: Arc<RefCell<global_CallBase>>,
     }
 
     #[allow(non_camel_case_types)]
@@ -476,7 +477,10 @@ mod global {
             global_data: FnData::new("global", &SERVICES),
         });
         return global_Mock {
-            setup: global_Setup { data: data.clone() },
+            setup: global_Setup {
+                data: data.clone(),
+                global_call_base: Arc::new(RefCell::new(global_CallBase)),
+            },
             received: global_Received { data: data.clone() },
             data,
         };

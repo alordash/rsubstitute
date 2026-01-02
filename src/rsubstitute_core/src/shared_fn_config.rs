@@ -4,8 +4,14 @@ use std::cell::RefCell;
 use std::marker::PhantomData;
 use std::sync::Arc;
 
-pub struct SharedFnConfig<'a, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TOwner, TCallBase>
-{
+pub struct SharedFnConfig<
+    'a,
+    TCall,
+    TArgsChecker: IArgsChecker<TCall>,
+    TReturnValue,
+    TOwner,
+    TCallBase,
+> {
     _phantom_base_caller: PhantomData<TCallBase>,
     shared_fn_config: Arc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue, TCallBase>>>,
     owner: &'a TOwner,
@@ -65,7 +71,7 @@ impl<
 > SharedFnConfig<'a, TCall, TArgsChecker, TReturnValue, TOwner, TCallBase>
 {
     pub fn call_base(&self) -> &'a TOwner {
-        let call_base = TCallBase::new();
+        let call_base = Arc::new(RefCell::new(TCallBase::new()));
         self.shared_fn_config.borrow_mut().set_call_base(call_base);
         return self.owner;
     }

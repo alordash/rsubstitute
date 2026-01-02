@@ -137,8 +137,8 @@ impl<
             .expect("No fn configuration found for this call! TODO: write call description");
         self.register_call(call.clone());
         fn_config.borrow_mut().register_call(call.clone());
-        if let Some(call_base) = fn_config.borrow_mut().get_call_base() {
-            return call_base.call_base(call);
+        if let Some(call_base) = fn_config.borrow().get_call_base() {
+            return call_base.borrow_mut().call_base(call);
         }
         let return_value = fn_config
             .borrow_mut()
