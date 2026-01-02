@@ -234,7 +234,7 @@ mod generated {
                 value,
             };
             let fn_config = self.data.work_data.add_config(work_args_checker);
-            let shared_fn_config = SharedFnConfig::new(fn_config, self);
+            let shared_fn_config = SharedFnConfig::new(fn_config, self, None);
             return shared_fn_config;
         }
 
@@ -263,7 +263,7 @@ mod generated {
                 .data
                 .another_work_data
                 .add_config(another_work_args_checker);
-            let shared_fn_config = SharedFnConfig::new(fn_config, self);
+            let shared_fn_config = SharedFnConfig::new(fn_config, self, None);
             return shared_fn_config;
         }
 
@@ -274,7 +274,7 @@ mod generated {
                 phantom_lifetime: PhantomData,
             };
             let fn_config = self.data.get_data.add_config(get_args_checker);
-            let shared_fn_config = SharedFnConfig::new(fn_config, self);
+            let shared_fn_config = SharedFnConfig::new(fn_config, self, None);
             return shared_fn_config;
         }
     }
@@ -371,15 +371,24 @@ mod global {
     }
 
     #[allow(non_camel_case_types)]
+    pub struct global_BaseCaller;
+
+    impl<'a> IBaseCaller<global_Call<'a>, String> for global_BaseCaller {
+        fn call_base(&self, call: global_Call) -> String {
+            return base_global(call.number);
+        }
+    }
+
+    #[allow(non_camel_case_types)]
     pub struct global_Data<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
-        global_data: FnData<global_Call<'a>, global_ArgsChecker<'a>, String, global_CallBase>,
+        base_caller: Arc<RefCell<global_BaseCaller>>,
+        global_data: FnData<global_Call<'a>, global_ArgsChecker<'a>, String, global_BaseCaller>,
     }
 
     #[allow(non_camel_case_types)]
     pub struct global_Setup<'a> {
         data: Arc<global_Data<'a>>,
-        global_call_base: Arc<RefCell<global_CallBase>>,
     }
 
     #[allow(non_camel_case_types)]
@@ -397,14 +406,15 @@ mod global {
             global_ArgsChecker<'a>,
             String,
             Self,
-            global_CallBase,
+            global_BaseCaller,
         > {
             let global_args_checker = global_ArgsChecker {
                 phantom_lifetime: PhantomData,
                 number,
             };
             let fn_config = self.data.global_data.add_config(global_args_checker);
-            let shared_fn_config = SharedFnConfig::new(fn_config, self);
+            let shared_fn_config =
+                SharedFnConfig::new(fn_config, self, Some(self.data.base_caller.clone()));
             return shared_fn_config;
         }
     }
@@ -429,18 +439,6 @@ mod global {
         data: Arc<global_Data<'a>>,
     }
 
-    pub struct global_CallBase;
-
-    impl<'a> IBaseCaller<global_Call<'a>, String> for global_CallBase {
-        fn new() -> Self {
-            Self
-        }
-
-        fn call_base(&self, call: global_Call) -> String {
-            return base_global(call.number);
-        }
-    }
-
     unsafe impl<'a> Send for global_Data<'a> {}
     unsafe impl<'a> Sync for global_Data<'a> {}
 
@@ -461,7 +459,7 @@ mod global {
         global_ArgsChecker<'static>,
         String,
         global_Setup<'static>,
-        global_CallBase,
+        global_BaseCaller,
     > {
         return (*global_MOCK).setup.setup(number);
     }
@@ -474,12 +472,12 @@ mod global {
     static global_MOCK: LazyLock<global_Mock> = LazyLock::new(|| {
         let data = Arc::new(global_Data {
             _phantom_lifetime: PhantomData,
+            base_caller: Arc::new(RefCell::new(global_BaseCaller)),
             global_data: FnData::new("global", &SERVICES),
         });
         return global_Mock {
             setup: global_Setup {
                 data: data.clone(),
-                global_call_base: Arc::new(RefCell::new(global_CallBase)),
             },
             received: global_Received { data: data.clone() },
             data,
@@ -502,7 +500,7 @@ mod global {
 #[cfg(test)]
 mod tests {
     use crate::global;
-    use crate::global::global_CallBase;
+    use crate::global::global_BaseCaller;
     use rsubstitute_core::Times;
     use rsubstitute_core::args_matching::Arg;
 

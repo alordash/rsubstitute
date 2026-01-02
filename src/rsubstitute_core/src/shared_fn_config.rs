@@ -10,43 +10,46 @@ pub struct SharedFnConfig<
     TArgsChecker: IArgsChecker<TCall>,
     TReturnValue,
     TOwner,
-    TCallBase,
+    TBaseCaller,
 > {
-    _phantom_base_caller: PhantomData<TCallBase>,
-    shared_fn_config: Arc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue, TCallBase>>>,
+    _phantom_base_caller: PhantomData<TBaseCaller>,
+    fn_config: Arc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue, TBaseCaller>>>,
     owner: &'a TOwner,
+    base_caller: Option<Arc<RefCell<TBaseCaller>>>,
 }
 
-impl<'a, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TOwner, TCallBase>
-    SharedFnConfig<'a, TCall, TArgsChecker, TReturnValue, TOwner, TCallBase>
+impl<'a, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TOwner, TBaseCaller>
+    SharedFnConfig<'a, TCall, TArgsChecker, TReturnValue, TOwner, TBaseCaller>
 {
     pub fn new(
-        shared_fn_config: Arc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue, TCallBase>>>,
+        shared_fn_config: Arc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue, TBaseCaller>>>,
         owner: &'a TOwner,
+        base_caller: Option<Arc<RefCell<TBaseCaller>>>,
     ) -> Self {
         Self {
             _phantom_base_caller: PhantomData,
-            shared_fn_config,
+            fn_config: shared_fn_config,
             owner,
+            base_caller,
         }
     }
 
     pub fn returns(&self, return_value: TReturnValue) -> &'a TOwner {
-        self.shared_fn_config
+        self.fn_config
             .borrow_mut()
             .add_return_value(return_value);
         return self.owner;
     }
 
     pub fn returns_many(&self, return_values: &[TReturnValue]) -> &'a TOwner {
-        self.shared_fn_config
+        self.fn_config
             .borrow_mut()
             .add_return_values(return_values);
         return self.owner;
     }
 
     pub fn does(&self, callback: impl FnMut() + 'static) -> &'a TOwner {
-        self.shared_fn_config.borrow_mut().set_callback(callback);
+        self.fn_config.borrow_mut().set_callback(callback);
         return self.owner;
     }
 
@@ -67,12 +70,18 @@ impl<
     TArgsChecker: IArgsChecker<TCall>,
     TReturnValue,
     TOwner,
-    TCallBase: IBaseCaller<TCall, TReturnValue>,
-> SharedFnConfig<'a, TCall, TArgsChecker, TReturnValue, TOwner, TCallBase>
+    TBaseCaller: IBaseCaller<TCall, TReturnValue>,
+> SharedFnConfig<'a, TCall, TArgsChecker, TReturnValue, TOwner, TBaseCaller>
 {
     pub fn call_base(&self) -> &'a TOwner {
-        let call_base = Arc::new(RefCell::new(TCallBase::new()));
-        self.shared_fn_config.borrow_mut().set_call_base(call_base);
+        let base_caller = self
+            .base_caller
+            .as_ref()
+            .expect("Base caller should be set since it implements `IBaseCaller`.")
+            .clone();
+        self.fn_config
+            .borrow_mut()
+            .set_base_caller(base_caller);
         return self.owner;
     }
 }

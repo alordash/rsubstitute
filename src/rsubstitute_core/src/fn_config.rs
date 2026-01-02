@@ -4,16 +4,16 @@ use std::cell::RefCell;
 use std::collections::VecDeque;
 use std::sync::Arc;
 
-pub struct FnConfig<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TCallBase> {
+pub struct FnConfig<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TBaseCaller> {
     args_checker: TArgsChecker,
     return_values: VecDeque<TReturnValue>,
     calls: Vec<TCall>,
     callback: Option<Box<dyn FnMut()>>,
-    call_base: Option<Arc<RefCell<TCallBase>>>,
+    base_caller: Option<Arc<RefCell<TBaseCaller>>>,
 }
 
-impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TCallBase>
-    FnConfig<TCall, TArgsChecker, TReturnValue, TCallBase>
+impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TBaseCaller>
+    FnConfig<TCall, TArgsChecker, TReturnValue, TBaseCaller>
 {
     pub fn new(args_checker: TArgsChecker) -> Self {
         FnConfig {
@@ -21,7 +21,7 @@ impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TCallBase>
             return_values: VecDeque::new(),
             calls: Vec::new(),
             callback: None,
-            call_base: None,
+            base_caller: None,
         }
     }
 
@@ -60,14 +60,14 @@ impl<
     TCall,
     TArgsChecker: IArgsChecker<TCall>,
     TReturnValue,
-    TCallBase: IBaseCaller<TCall, TReturnValue>,
-> FnConfig<TCall, TArgsChecker, TReturnValue, TCallBase>
+    TBaseCaller: IBaseCaller<TCall, TReturnValue>,
+> FnConfig<TCall, TArgsChecker, TReturnValue, TBaseCaller>
 {
-    pub fn set_call_base(&mut self, call_base: Arc<RefCell<TCallBase>>) {
-        self.call_base = Some(call_base);
+    pub fn set_base_caller(&mut self, base_caller: Arc<RefCell<TBaseCaller>>) {
+        self.base_caller = Some(base_caller);
     }
 
-    pub fn get_call_base(&self) -> Option<Arc<RefCell<TCallBase>>> {
-        self.call_base.clone()
+    pub fn get_base_caller(&self) -> Option<Arc<RefCell<TBaseCaller>>> {
+        self.base_caller.clone()
     }
 }
