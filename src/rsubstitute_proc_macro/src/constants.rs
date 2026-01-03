@@ -386,3 +386,9 @@ pub const DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE: LazyCell<FieldValue> = LazyCel
     };
     return field_value;
 });
+
+pub const OPTION_NONE_PATH: LazyCell<Path> = LazyCell::new(|| {
+    let path_factory = &SERVICES.path_factory;
+    let result = path_factory.create(format_ident!("None"));
+    return result;
+});

@@ -83,6 +83,7 @@ impl MockDataStructGenerator {
                                     ),
                                 ),
                                 GenericArgument::Type(fn_info.parent.get_return_value_type()),
+                                GenericArgument::Type(constants::VOID_TYPE.clone())
                             ]
                             .into_iter()
                             .collect(),

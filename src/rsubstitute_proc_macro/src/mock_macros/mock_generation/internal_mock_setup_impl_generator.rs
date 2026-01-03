@@ -41,7 +41,9 @@ impl IInternalMockSetupImplGenerator for InternalMockSetupImplGenerator {
             .map(|x| ImplItem::Fn(self.generate_fn_setup(x)))
             .collect();
 
-        let item_impl = self.impl_factory.create_with_default_lifetime(self_ty, fn_setups);
+        let item_impl = self
+            .impl_factory
+            .create_with_default_lifetime(self_ty, fn_setups);
         let internal_mock_setup_impl = InternalMockSetupImpl { item_impl };
         return internal_mock_setup_impl;
     }
@@ -95,6 +97,7 @@ impl InternalMockSetupImplGenerator {
                                             fn_info.parent.get_return_value_type(),
                                         ),
                                         GenericArgument::Type(constants::SELF_TYPE.clone()),
+                                        GenericArgument::Type(constants::VOID_TYPE.clone()),
                                     ]
                                     .into_iter()
                                     .collect(),
@@ -180,6 +183,11 @@ impl InternalMockSetupImplGenerator {
                                 attrs: Vec::new(),
                                 qself: None,
                                 path: constants::SELF_IDENT_PATH.clone(),
+                            }),
+                            Expr::Path(ExprPath {
+                                attrs: Vec::new(),
+                                qself: None,
+                                path: constants::OPTION_NONE_PATH.clone(),
                             }),
                         ]
                         .into_iter()
