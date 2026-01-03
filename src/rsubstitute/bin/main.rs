@@ -439,15 +439,6 @@ mod global {
         data: Arc<global_Data<'a>>,
     }
 
-    unsafe impl<'a> Send for global_Data<'a> {}
-    unsafe impl<'a> Sync for global_Data<'a> {}
-
-    unsafe impl<'a> Send for global_Setup<'a> {}
-    unsafe impl<'a> Sync for global_Setup<'a> {}
-
-    unsafe impl<'a> Send for global_Received<'a> {}
-    unsafe impl<'a> Sync for global_Received<'a> {}
-
     unsafe impl<'a> Send for global_Mock<'a> {}
     unsafe impl<'a> Sync for global_Mock<'a> {}
 
