@@ -123,7 +123,6 @@ impl IModGenerator for ModGenerator {
             constants::USE_SUPER.clone(),
             constants::USE_FOR_GENERATED.clone(),
         ];
-        let ident = format_ident!("{}_{}", Self::GENERATED_MOD_IDENT.clone(), fn_ident);
         let items = usings
             .into_iter()
             .map(|x| Item::Use(x))
@@ -143,7 +142,7 @@ impl IModGenerator for ModGenerator {
             vis: Visibility::Inherited,
             unsafety: None,
             mod_token: Default::default(),
-            ident: ident.clone(),
+            ident: fn_ident.clone(),
             content: Some((Default::default(), items)),
             semi: None,
         };
@@ -153,7 +152,7 @@ impl IModGenerator for ModGenerator {
             use_token: Default::default(),
             leading_colon: None,
             tree: UseTree::Path(UsePath {
-                ident,
+                ident: fn_ident.clone(),
                 colon2_token: Default::default(),
                 tree: Box::new(UseTree::Name(UseName { ident: fn_ident })),
             }),
