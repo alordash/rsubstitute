@@ -35,16 +35,12 @@ impl<'a, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TOwner, 
     }
 
     pub fn returns(&self, return_value: TReturnValue) -> &'a TOwner {
-        self.fn_config
-            .borrow_mut()
-            .add_return_value(return_value);
+        self.fn_config.borrow_mut().add_return_value(return_value);
         return self.owner;
     }
 
     pub fn returns_many(&self, return_values: &[TReturnValue]) -> &'a TOwner {
-        self.fn_config
-            .borrow_mut()
-            .add_return_values(return_values);
+        self.fn_config.borrow_mut().add_return_values(return_values);
         return self.owner;
     }
 
@@ -59,6 +55,16 @@ impl<'a, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TOwner, 
         callback: impl FnMut() + 'static,
     ) -> &'a TOwner {
         self.returns(return_value);
+        self.does(callback);
+        return self.owner;
+    }
+
+    pub fn returns_many_and_does(
+        &self,
+        return_values: &[TReturnValue],
+        callback: impl FnMut() + 'static,
+    ) -> &'a TOwner {
+        self.returns_many(return_values);
         self.does(callback);
         return self.owner;
     }
@@ -79,9 +85,7 @@ impl<
             .as_ref()
             .expect("Base caller should be set since it implements `IBaseCaller`.")
             .clone();
-        self.fn_config
-            .borrow_mut()
-            .set_base_caller(base_caller);
+        self.fn_config.borrow_mut().set_base_caller(base_caller);
         return self.owner;
     }
 }
