@@ -1,3 +1,6 @@
+mod base_caller_impl;
+mod base_caller_struct;
+mod base_fn;
 mod internal_mock_impl;
 mod internal_mock_received_impl;
 mod internal_mock_setup_impl;
@@ -7,6 +10,9 @@ mod mock_received_struct;
 mod mock_setup_struct;
 mod mock_struct;
 
+pub use base_caller_impl::*;
+pub use base_caller_struct::*;
+pub use base_fn::*;
 pub use internal_mock_impl::*;
 pub use internal_mock_received_impl::*;
 pub use internal_mock_setup_impl::*;

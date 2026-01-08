@@ -4,7 +4,7 @@ use syn::*;
 pub trait IFnDeclExtractor {
     fn extract(&self, items: &[TraitItem]) -> Vec<FnDecl>;
 
-    fn extract_fn(&self, item_fn: ItemFn) -> FnDecl;
+    fn extract_fn(&self, item_fn: &ItemFn) -> FnDecl;
 }
 
 pub struct FnDeclExtractor;
@@ -18,7 +18,7 @@ impl IFnDeclExtractor for FnDeclExtractor {
         return fn_decls;
     }
 
-    fn extract_fn(&self, item_fn: ItemFn) -> FnDecl {
+    fn extract_fn(&self, item_fn: &ItemFn) -> FnDecl {
         let fn_decl = FnDecl {
             ident: item_fn.sig.ident.clone(),
             arguments: item_fn.sig.inputs.iter().cloned().collect(),

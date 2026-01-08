@@ -8,6 +8,9 @@ use __rsubstitute_generated_global::global;
 mod __rsubstitute_generated_global {
     use super::*;
     use rsubstitute::for_generated::*;
+    
+    // TODO - add fn base_global
+    
     #[allow(non_camel_case_types)]
     #[derive(Clone)]
     pub struct global_Call<'__rsubstitute_arg_field_lifetime> {
@@ -64,5 +67,4 @@ mod __rsubstitute_generated_global {
     // * pub fn received
     // * static global_MOCK
     // * pub fn global()
-    // * fn base_global
 }

@@ -350,6 +350,10 @@ mod global {
     use super::*;
     use rsubstitute::for_generated::*;
 
+    fn base_global(number: i32) -> String {
+        return format!("actual number: {number}");
+    }
+
     #[allow(non_camel_case_types)]
     #[derive(Clone)]
     pub struct global_Call<'a> {
@@ -371,32 +375,32 @@ mod global {
     }
 
     #[allow(non_camel_case_types)]
-    pub struct global_BaseCaller;
+    pub struct globalBaseCaller;
 
-    impl<'a> IBaseCaller<global_Call<'a>, String> for global_BaseCaller {
+    impl<'a> IBaseCaller<global_Call<'a>, String> for globalBaseCaller {
         fn call_base(&self, call: global_Call) -> String {
             return base_global(call.number);
         }
     }
 
     #[allow(non_camel_case_types)]
-    pub struct global_Data<'a> {
+    pub struct globalData<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
-        base_caller: Arc<RefCell<global_BaseCaller>>,
-        global_data: FnData<global_Call<'a>, global_ArgsChecker<'a>, String, global_BaseCaller>,
+        base_caller: Arc<RefCell<globalBaseCaller>>,
+        global_data: FnData<global_Call<'a>, global_ArgsChecker<'a>, String, globalBaseCaller>,
     }
 
     #[allow(non_camel_case_types)]
-    pub struct global_Setup<'a> {
-        data: Arc<global_Data<'a>>,
+    pub struct globalSetup<'a> {
+        data: Arc<globalData<'a>>,
     }
 
     #[allow(non_camel_case_types)]
-    pub struct global_Received<'a> {
-        data: Arc<global_Data<'a>>,
+    pub struct globalReceived<'a> {
+        data: Arc<globalData<'a>>,
     }
 
-    impl<'a> global_Setup<'a> {
+    impl<'a> globalSetup<'a> {
         pub fn setup(
             &'a self,
             number: Arg<'a, i32>,
@@ -406,7 +410,7 @@ mod global {
             global_ArgsChecker<'a>,
             String,
             Self,
-            global_BaseCaller,
+            globalBaseCaller,
         > {
             let global_args_checker = global_ArgsChecker {
                 phantom_lifetime: PhantomData,
@@ -419,7 +423,7 @@ mod global {
         }
     }
 
-    impl<'a> global_Received<'a> {
+    impl<'a> globalReceived<'a> {
         pub fn received(&'a self, number: Arg<'a, i32>, times: Times) -> &'a Self {
             let global_args_checker = global_ArgsChecker {
                 phantom_lifetime: PhantomData,
@@ -433,14 +437,14 @@ mod global {
     }
 
     #[allow(non_camel_case_types)]
-    pub struct global_Mock<'a> {
-        pub setup: global_Setup<'a>,
-        pub received: global_Received<'a>,
-        data: Arc<global_Data<'a>>,
+    pub struct globalMock<'a> {
+        pub setup: globalSetup<'a>,
+        pub received: globalReceived<'a>,
+        data: Arc<globalData<'a>>,
     }
 
-    unsafe impl<'a> Send for global_Mock<'a> {}
-    unsafe impl<'a> Sync for global_Mock<'a> {}
+    unsafe impl<'a> Send for globalMock<'a> {}
+    unsafe impl<'a> Sync for globalMock<'a> {}
 
     pub fn setup(
         number: Arg<'static, i32>,
@@ -449,28 +453,26 @@ mod global {
         global_Call<'static>,
         global_ArgsChecker<'static>,
         String,
-        global_Setup<'static>,
-        global_BaseCaller,
+        globalSetup<'static>,
+        globalBaseCaller,
     > {
         return (*global_MOCK).setup.setup(number);
     }
 
-    pub fn received(number: Arg<'static, i32>, times: Times) -> &'static global_Received<'static> {
+    pub fn received(number: Arg<'static, i32>, times: Times) -> &'static globalReceived<'static> {
         return (*global_MOCK).received.received(number, times);
     }
 
     #[allow(non_upper_case_globals)]
-    static global_MOCK: LazyLock<global_Mock> = LazyLock::new(|| {
-        let data = Arc::new(global_Data {
+    static global_MOCK: LazyLock<globalMock> = LazyLock::new(|| {
+        let data = Arc::new(globalData {
             _phantom_lifetime: PhantomData,
-            base_caller: Arc::new(RefCell::new(global_BaseCaller)),
+            base_caller: Arc::new(RefCell::new(globalBaseCaller)),
             global_data: FnData::new("global", &SERVICES),
         });
-        return global_Mock {
-            setup: global_Setup {
-                data: data.clone(),
-            },
-            received: global_Received { data: data.clone() },
+        return globalMock {
+            setup: globalSetup { data: data.clone() },
+            received: globalReceived { data: data.clone() },
             data,
         };
     });
@@ -482,16 +484,12 @@ mod global {
         };
         return global_MOCK.data.global_data.handle_base_returning(call);
     }
-
-    fn base_global(number: i32) -> String {
-        return format!("actual number: {number}");
-    }
 }
 
 #[cfg(test)]
 mod tests {
     use crate::global;
-    use crate::global::global_BaseCaller;
+    use crate::global::globalBaseCaller;
     use rsubstitute_core::Times;
     use rsubstitute_core::args_matching::Arg;
 

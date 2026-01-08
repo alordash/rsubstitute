@@ -13,8 +13,11 @@ pub trait IItemFnHandler {
 }
 
 pub(crate) struct ItemFnHandler {
+    pub base_fn_generator: Arc<dyn IBaseFnGenerator>,
     pub fn_decl_extractor: Arc<dyn IFnDeclExtractor>,
     pub fn_info_generator: Arc<dyn IFnInfoGenerator>,
+    pub base_caller_struct_generator: Arc<dyn IBaseCallerStructGenerator>,
+    pub base_caller_impl_generator: Arc<dyn IBaseCallerImplGenerator>,
     pub mock_data_struct_generator: Arc<dyn IMockDataStructGenerator>,
     pub mock_setup_struct_generator: Arc<dyn IMockSetupStructGenerator>,
     pub mock_received_struct_generator: Arc<dyn IMockReceivedStructGenerator>,
@@ -30,8 +33,16 @@ impl IItemFnHandler for ItemFnHandler {
             item_fn.sig.ident,
             constants::MOCK_STRUCT_IDENT_PREFIX
         );
-        let fn_decl = self.fn_decl_extractor.extract_fn(item_fn.clone());
+        let base_fn = self.base_fn_generator.generate(item_fn.clone());
+        let fn_decl = self.fn_decl_extractor.extract_fn(&item_fn);
         let fn_info = self.fn_info_generator.generate(&fn_decl);
+        let base_caller_struct = self.base_caller_struct_generator.generate(&fn_decl);
+        let base_caller_impl = self.base_caller_impl_generator.generate(
+            &base_caller_struct,
+            &fn_info.call_struct,
+            &fn_decl,
+            &base_fn,
+        );
         let fn_infos = [fn_info];
         let mock_data_struct = self
             .mock_data_struct_generator
@@ -52,7 +63,10 @@ impl IItemFnHandler for ItemFnHandler {
         let [fn_info] = fn_infos;
         let generated_mod = self.mod_generator.generate_fn(
             &item_fn,
+            base_fn,
             fn_info,
+            base_caller_struct,
+            base_caller_impl,
             mock_data_struct,
             mock_setup_struct,
             mock_received_struct,

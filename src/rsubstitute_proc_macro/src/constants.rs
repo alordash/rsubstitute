@@ -46,6 +46,14 @@ pub const I_ARGS_FORMATTER_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_i
 pub const I_ARGS_CHECKER_TRAIT_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("IArgsChecker"));
 
+// TODO - add test that it's equal to rsubstitute_core::IBaseCaller
+pub const I_BASE_CALLER_TRAIT_IDENT: LazyCell<Ident> =
+    LazyCell::new(|| format_ident!("IBaseCaller"));
+
+// TODO - add test that it's equal to rsubstitute_core::IBaseCaller::call_base
+pub const I_BASE_CALLER_CALL_BASE_FN_IDENT: LazyCell<Ident> =
+    LazyCell::new(|| format_ident!("call_base"));
+
 // TODO - add test that it's equal to rsubstitute_core::FnData
 pub const FN_DATA_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("FnData"));
 

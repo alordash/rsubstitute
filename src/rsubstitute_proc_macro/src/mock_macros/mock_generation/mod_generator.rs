@@ -25,7 +25,10 @@ pub trait IModGenerator {
     fn generate_fn(
         &self,
         item_fn: &ItemFn,
+        base_fn: BaseFn,
         fn_info: FnInfo,
+        base_caller_struct: BaseCallerStruct,
+        base_caller_impl: BaseCallerImpl,
         mock_data_struct: MockDataStruct,
         mock_setup_struct: MockSetupStruct,
         mock_received_struct: MockReceivedStruct,
@@ -110,7 +113,10 @@ impl IModGenerator for ModGenerator {
     fn generate_fn(
         &self,
         item_fn: &ItemFn,
+        base_fn: BaseFn,
         fn_info: FnInfo,
+        base_caller_struct: BaseCallerStruct,
+        base_caller_impl: BaseCallerImpl,
         mock_data_struct: MockDataStruct,
         mock_setup_struct: MockSetupStruct,
         mock_received_struct: MockReceivedStruct,
@@ -127,9 +133,12 @@ impl IModGenerator for ModGenerator {
             .into_iter()
             .map(|x| Item::Use(x))
             .chain([
+                Item::Fn(base_fn.item_fn),
                 Item::Struct(fn_info.call_struct.item_struct),
                 Item::Struct(fn_info.args_checker_struct.item_struct),
                 Item::Impl(fn_info.args_checker_impl.item_impl),
+                Item::Struct(base_caller_struct.item_struct),
+                Item::Impl(base_caller_impl.item_impl),
                 Item::Struct(mock_data_struct.item_struct),
                 Item::Struct(mock_setup_struct.item_struct),
                 Item::Struct(mock_received_struct.item_struct),

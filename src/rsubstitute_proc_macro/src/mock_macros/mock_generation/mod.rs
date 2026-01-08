@@ -1,5 +1,8 @@
 pub mod models;
 
+mod base_caller_impl_generator;
+mod base_caller_struct_generator;
+mod base_fn_generator;
 mod input_args_generator;
 mod internal_mock_impl_generator;
 mod internal_mock_received_impl_generator;
@@ -11,6 +14,9 @@ mod mock_setup_struct_generator;
 mod mock_struct_generator;
 mod mod_generator;
 
+pub use base_caller_impl_generator::*;
+pub use base_caller_struct_generator::*;
+pub use base_fn_generator::*;
 pub use input_args_generator::*;
 pub use internal_mock_impl_generator::*;
 pub use internal_mock_received_impl_generator::*;

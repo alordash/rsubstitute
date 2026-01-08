@@ -19,6 +19,7 @@ pub(crate) struct ServiceCollection {
 }
 
 fn create_services() -> ServiceCollection {
+    let base_fn_generator = Arc::new(BaseFnGenerator);
     let fn_decl_extractor = Arc::new(FnDeclExtractor);
     let generic_argument_factory_cell = Arc::new(OnceCell::new());
     let path_factory = Arc::new(PathFactory {
@@ -64,6 +65,12 @@ fn create_services() -> ServiceCollection {
         call_struct_generator: call_struct_generator.clone(),
         args_checker_generator: args_checker_generator.clone(),
         args_checker_impl_generator: args_checker_impl_generator.clone(),
+    });
+    let base_caller_struct_generator = Arc::new(BaseCallerStructGenerator);
+    let base_caller_impl_generator = Arc::new(BaseCallerImplGenerator {
+        type_factory: type_factory.clone(),
+        path_factory: path_factory.clone(),
+        field_access_expr_factory: field_access_expr_factory.clone(),
     });
     let mock_data_struct_generator = Arc::new(MockDataStructGenerator {
         type_factory: type_factory.clone(),
@@ -153,8 +160,11 @@ fn create_services() -> ServiceCollection {
     });
 
     let item_fn_handler = Arc::new(ItemFnHandler {
+        base_fn_generator: base_fn_generator.clone(),
         fn_decl_extractor: fn_decl_extractor.clone(),
         fn_info_generator: fn_info_generator.clone(),
+        base_caller_struct_generator: base_caller_struct_generator.clone(),
+        base_caller_impl_generator: base_caller_impl_generator.clone(),
         mock_data_struct_generator: mock_data_struct_generator.clone(),
         mock_setup_struct_generator: mock_setup_struct_generator.clone(),
         mock_received_struct_generator: mock_received_struct_generator.clone(),
