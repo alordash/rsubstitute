@@ -400,3 +400,6 @@ pub const OPTION_NONE_PATH: LazyCell<Path> = LazyCell::new(|| {
     let result = path_factory.create(format_ident!("None"));
     return result;
 });
+
+pub const SEND_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Send"));
+pub const SYNC_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Sync"));

@@ -55,10 +55,9 @@ mod __rsubstitute_generated_global {
             return self;
         }
     }
-    
-    // * impl Send/Sync for globalMock
+
+    // * static global_MOCK
     // * pub fn setup
     // * pub fn received
-    // * static global_MOCK
     // * pub fn global()
 }

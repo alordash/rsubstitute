@@ -9,6 +9,7 @@ mod mock_impl;
 mod mock_received_struct;
 mod mock_setup_struct;
 mod mock_struct;
+mod send_sync_impls;
 
 pub use base_caller_impl::*;
 pub use base_caller_struct::*;
@@ -21,3 +22,4 @@ pub use mock_impl::*;
 pub use mock_received_struct::*;
 pub use mock_setup_struct::*;
 pub use mock_struct::*;
+pub use send_sync_impls::*;

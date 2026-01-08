@@ -400,6 +400,16 @@ mod global {
         data: Arc<globalData<'a>>,
     }
 
+    #[allow(non_camel_case_types)]
+    pub struct globalMock<'a> {
+        pub setup: globalSetup<'a>,
+        pub received: globalReceived<'a>,
+        data: Arc<globalData<'a>>,
+    }
+
+    unsafe impl<'a> Send for globalMock<'a> {}
+    unsafe impl<'a> Sync for globalMock<'a> {}
+
     impl<'a> globalSetup<'a> {
         pub fn setup(
             &'a self,
@@ -436,15 +446,19 @@ mod global {
         }
     }
 
-    #[allow(non_camel_case_types)]
-    pub struct globalMock<'a> {
-        pub setup: globalSetup<'a>,
-        pub received: globalReceived<'a>,
-        data: Arc<globalData<'a>>,
-    }
-
-    unsafe impl<'a> Send for globalMock<'a> {}
-    unsafe impl<'a> Sync for globalMock<'a> {}
+    #[allow(non_upper_case_globals)]
+    static global_MOCK: LazyLock<globalMock> = LazyLock::new(|| {
+        let data = Arc::new(globalData {
+            _phantom_lifetime: PhantomData,
+            base_caller: Arc::new(RefCell::new(globalBaseCaller)),
+            global_data: FnData::new("global", &SERVICES),
+        });
+        return globalMock {
+            setup: globalSetup { data: data.clone() },
+            received: globalReceived { data: data.clone() },
+            data,
+        };
+    });
 
     pub fn setup(
         number: Arg<'static, i32>,
@@ -462,20 +476,6 @@ mod global {
     pub fn received(number: Arg<'static, i32>, times: Times) -> &'static globalReceived<'static> {
         return (*global_MOCK).received.received(number, times);
     }
-
-    #[allow(non_upper_case_globals)]
-    static global_MOCK: LazyLock<globalMock> = LazyLock::new(|| {
-        let data = Arc::new(globalData {
-            _phantom_lifetime: PhantomData,
-            base_caller: Arc::new(RefCell::new(globalBaseCaller)),
-            global_data: FnData::new("global", &SERVICES),
-        });
-        return globalMock {
-            setup: globalSetup { data: data.clone() },
-            received: globalReceived { data: data.clone() },
-            data,
-        };
-    });
 
     pub fn global(number: i32) -> String {
         let call = global_Call {

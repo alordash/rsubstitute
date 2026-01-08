@@ -6,7 +6,7 @@ pub trait IBaseFnGenerator {
     fn generate(&self, item_fn: ItemFn) -> BaseFn;
 }
 
-pub struct BaseFnGenerator;
+pub(crate) struct BaseFnGenerator;
 
 impl IBaseFnGenerator for BaseFnGenerator {
     fn generate(&self, mut item_fn: ItemFn) -> BaseFn {

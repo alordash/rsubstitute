@@ -13,6 +13,7 @@ mod mock_received_struct_generator;
 mod mock_setup_struct_generator;
 mod mock_struct_generator;
 mod mod_generator;
+mod send_sync_impls_generator;
 
 pub use base_caller_impl_generator::*;
 pub use base_caller_struct_generator::*;
@@ -27,3 +28,4 @@ pub use mock_received_struct_generator::*;
 pub use mock_setup_struct_generator::*;
 pub use mock_struct_generator::*;
 pub use mod_generator::*;
+pub use send_sync_impls_generator::*;

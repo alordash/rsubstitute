@@ -19,9 +19,9 @@ pub trait IBaseCallerImplGenerator {
 }
 
 pub(crate) struct BaseCallerImplGenerator {
-    pub(crate) type_factory: Arc<dyn ITypeFactory>,
-    pub(crate) path_factory: Arc<dyn IPathFactory>,
-    pub(crate) field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
+    pub type_factory: Arc<dyn ITypeFactory>,
+    pub path_factory: Arc<dyn IPathFactory>,
+    pub field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
 }
 
 impl IBaseCallerImplGenerator for BaseCallerImplGenerator {
