@@ -56,7 +56,6 @@ mod __rsubstitute_generated_global {
         }
     }
     
-    // TODO - add * globalMock
     // * impl Send/Sync for globalMock
     // * pub fn setup
     // * pub fn received

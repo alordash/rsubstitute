@@ -168,6 +168,7 @@ fn create_services() -> ServiceCollection {
         mock_data_struct_generator: mock_data_struct_generator.clone(),
         mock_setup_struct_generator: mock_setup_struct_generator.clone(),
         mock_received_struct_generator: mock_received_struct_generator.clone(),
+        mock_struct_generator: mock_struct_generator.clone(),
         internal_mock_setup_impl_generator: internal_mock_setup_impl_generator.clone(),
         internal_mock_received_impl_generator: internal_mock_received_impl_generator.clone(),
         mod_generator: mod_generator.clone(),

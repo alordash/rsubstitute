@@ -32,6 +32,7 @@ pub trait IModGenerator {
         mock_data_struct: MockDataStruct,
         mock_setup_struct: MockSetupStruct,
         mock_received_struct: MockReceivedStruct,
+        mock_struct: MockStruct,
         internal_mock_setup_impl: InternalMockSetupImpl,
         internal_mock_received_impl: InternalMockReceivedImpl,
     ) -> GeneratedMod;
@@ -120,6 +121,7 @@ impl IModGenerator for ModGenerator {
         mock_data_struct: MockDataStruct,
         mock_setup_struct: MockSetupStruct,
         mock_received_struct: MockReceivedStruct,
+        mock_struct: MockStruct,
         internal_mock_setup_impl: InternalMockSetupImpl,
         internal_mock_received_impl: InternalMockReceivedImpl,
     ) -> GeneratedMod {
@@ -142,6 +144,7 @@ impl IModGenerator for ModGenerator {
                 Item::Struct(mock_data_struct.item_struct),
                 Item::Struct(mock_setup_struct.item_struct),
                 Item::Struct(mock_received_struct.item_struct),
+                Item::Struct(mock_struct.item_struct),
                 Item::Impl(internal_mock_setup_impl.item_impl),
                 Item::Impl(internal_mock_received_impl.item_impl),
             ])
