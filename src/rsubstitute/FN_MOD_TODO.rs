@@ -9,8 +9,6 @@ mod __rsubstitute_generated_global {
     use super::*;
     use rsubstitute::for_generated::*;
     
-    // TODO - add fn base_global
-    
     #[allow(non_camel_case_types)]
     #[derive(Clone)]
     pub struct global_Call<'__rsubstitute_arg_field_lifetime> {
@@ -24,9 +22,6 @@ mod __rsubstitute_generated_global {
         number: Arg::<'__rsubstitute_arg_field_lifetime, i32>
     }
     impl<'__rsubstitute_arg_field_lifetime> IArgsChecker<global_Call<'__rsubstitute_arg_field_lifetime>> for global_ArgsChecker<'__rsubstitute_arg_field_lifetime> { fn check(&self, call: global_Call<'__rsubstitute_arg_field_lifetime>) -> Vec<ArgCheckResult> { vec![self.number.check("number", call.number)] } }
-    
-    // TODO - add globalBaseCaller;
-    // impl IBaseCaller for globalBaseCaller
     
     #[allow(non_camel_case_types)]
     pub struct globalMockData<'__rsubstitute_arg_field_lifetime> {
