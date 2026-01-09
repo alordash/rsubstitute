@@ -56,7 +56,6 @@ mod __rsubstitute_generated_global {
         }
     }
 
-    // * static global_MOCK
     // * pub fn setup
     // * pub fn received
     // * pub fn global()
