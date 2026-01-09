@@ -36,6 +36,7 @@ pub trait IModGenerator {
         send_sync_impls: SendSyncImpls,
         internal_mock_setup_impl: InternalMockSetupImpl,
         internal_mock_received_impl: InternalMockReceivedImpl,
+        static_mock: StaticMock,
     ) -> GeneratedMod;
 }
 
@@ -126,6 +127,7 @@ impl IModGenerator for ModGenerator {
         send_sync_impls: SendSyncImpls,
         internal_mock_setup_impl: InternalMockSetupImpl,
         internal_mock_received_impl: InternalMockReceivedImpl,
+        static_mock: StaticMock,
     ) -> GeneratedMod {
         let fn_ident = item_fn.sig.ident.clone();
         let attrs = vec![constants::ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE.clone()];
@@ -151,6 +153,7 @@ impl IModGenerator for ModGenerator {
                 Item::Impl(send_sync_impls.sync_impl),
                 Item::Impl(internal_mock_setup_impl.item_impl),
                 Item::Impl(internal_mock_received_impl.item_impl),
+                Item::Static(static_mock.item_static),
             ])
             .collect();
         let item_mod = ItemMod {

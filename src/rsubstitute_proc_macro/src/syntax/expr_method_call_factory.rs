@@ -4,11 +4,14 @@ use std::sync::Arc;
 use syn::{Expr, ExprMethodCall, ExprPath};
 
 pub trait IExprMethodCallFactory {
-    fn create(
+    fn create(&self, members_idents: Vec<Ident>, method: Ident, args: Vec<Ident>)
+    -> ExprMethodCall;
+
+    fn create_with_expr_args(
         &self,
-        members_idents: &[Ident],
-        method_ident: Ident,
-        args: &[Ident],
+        members_idents: Vec<Ident>,
+        method: Ident,
+        args: Vec<Expr>,
     ) -> ExprMethodCall;
 }
 
@@ -18,17 +21,16 @@ pub struct ExprMethodCallFactory {
 }
 
 impl IExprMethodCallFactory for ExprMethodCallFactory {
-    fn create(&self, members_idents: &[Ident], method: Ident, args: &[Ident]) -> ExprMethodCall {
-        let receiver = self.field_access_expr_factory.create(members_idents);
-        let expr_method_call = ExprMethodCall {
-            attrs: Vec::new(),
-            receiver: Box::new(receiver),
-            dot_token: Default::default(),
+    fn create(
+        &self,
+        members_idents: Vec<Ident>,
+        method: Ident,
+        args: Vec<Ident>,
+    ) -> ExprMethodCall {
+        let result = self.create_with_expr_args(
+            members_idents,
             method,
-            turbofish: None,
-            paren_token: Default::default(),
-            args: args
-                .iter()
+            args.into_iter()
                 .map(|arg| {
                     Expr::Path(ExprPath {
                         attrs: Vec::new(),
@@ -37,6 +39,25 @@ impl IExprMethodCallFactory for ExprMethodCallFactory {
                     })
                 })
                 .collect(),
+        );
+        return result;
+    }
+
+    fn create_with_expr_args(
+        &self,
+        members_idents: Vec<Ident>,
+        method: Ident,
+        args: Vec<Expr>,
+    ) -> ExprMethodCall {
+        let receiver = self.field_access_expr_factory.create(members_idents);
+        let expr_method_call = ExprMethodCall {
+            attrs: Vec::new(),
+            receiver: Box::new(receiver),
+            dot_token: Default::default(),
+            method,
+            turbofish: None,
+            paren_token: Default::default(),
+            args: args.into_iter().collect(),
         };
         return expr_method_call;
     }

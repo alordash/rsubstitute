@@ -4,7 +4,7 @@ use std::sync::Arc;
 use syn::{Expr, ExprField, ExprPath, Member};
 
 pub trait IFieldAccessExprFactory {
-    fn create(&self, members_idents: &[Ident]) -> Expr;
+    fn create(&self, members_idents: Vec<Ident>) -> Expr;
 }
 
 pub struct FieldAccessExprFactory {
@@ -12,7 +12,7 @@ pub struct FieldAccessExprFactory {
 }
 
 impl IFieldAccessExprFactory for FieldAccessExprFactory {
-    fn create(&self, members_idents: &[Ident]) -> Expr {
+    fn create(&self, members_idents: Vec<Ident>) -> Expr {
         let base_expr = members_idents
             .first()
             .map(|first_ident| {
@@ -24,9 +24,8 @@ impl IFieldAccessExprFactory for FieldAccessExprFactory {
             })
             .expect("`idents` should contain at least one ident.");
         let receiver = members_idents
-            .iter()
+            .into_iter()
             .skip(1)
-            .cloned()
             .fold(base_expr, |acc, x| {
                 Expr::Field(ExprField {
                     attrs: Vec::new(),

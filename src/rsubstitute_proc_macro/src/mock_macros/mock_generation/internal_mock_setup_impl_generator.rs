@@ -134,13 +134,13 @@ impl InternalMockSetupImplGenerator {
             LocalInit {
                 eq_token: Default::default(),
                 expr: Box::new(Expr::MethodCall(self.expr_method_call_factory.create(
-                    &[
+                    vec![
                         constants::SELF_IDENT.clone(),
                         constants::DATA_IDENT.clone(),
                         fn_info.data_field_ident.clone(),
                     ],
                     constants::FN_DATA_ADD_CONFIG_FN_IDENT.clone(),
-                    &[args_checker_var_ident],
+                    vec![args_checker_var_ident],
                 ))),
                 diverge: None,
             },

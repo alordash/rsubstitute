@@ -25,6 +25,7 @@ pub(crate) struct ItemFnHandler {
     pub send_sync_impls_generator: Arc<dyn ISendSyncImplsGenerator>,
     pub internal_mock_setup_impl_generator: Arc<dyn IInternalMockSetupImplGenerator>,
     pub internal_mock_received_impl_generator: Arc<dyn IInternalMockReceivedImplGenerator>,
+    pub static_mock_generator: Arc<dyn IStaticMockGenerator>,
     pub mod_generator: Arc<dyn IModGenerator>,
 }
 
@@ -61,13 +62,22 @@ impl IItemFnHandler for ItemFnHandler {
             &mock_received_struct,
             &mock_data_struct,
         );
-        let send_sync_impls = self.send_sync_impls_generator.generate(&mock_struct.item_struct);
+        let send_sync_impls = self
+            .send_sync_impls_generator
+            .generate(&mock_struct.item_struct);
         let internal_mock_setup_impl = self
             .internal_mock_setup_impl_generator
             .generate(&mock_setup_struct, &fn_infos);
         let internal_mock_received_impl = self
             .internal_mock_received_impl_generator
             .generate(&mock_received_struct, &fn_infos);
+        let static_mock = self.static_mock_generator.generate(
+            &fn_decl,
+            &mock_struct,
+            &mock_data_struct,
+            &mock_setup_struct,
+            &mock_received_struct,
+        );
 
         let [fn_info] = fn_infos;
         let generated_mod = self.mod_generator.generate_fn(
@@ -83,6 +93,7 @@ impl IItemFnHandler for ItemFnHandler {
             send_sync_impls,
             internal_mock_setup_impl,
             internal_mock_received_impl,
+            static_mock,
         );
         let GeneratedMod {
             item_mod,

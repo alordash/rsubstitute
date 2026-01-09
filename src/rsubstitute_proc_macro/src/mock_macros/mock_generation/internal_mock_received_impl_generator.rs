@@ -108,13 +108,13 @@ impl InternalMockReceivedImplGenerator {
             .generate_args_checker_var_ident_and_decl_stmt(fn_info);
         let verify_received_stmt = Stmt::Expr(
             Expr::MethodCall(self.expr_method_call_factory.create(
-                &[
+                vec![
                     constants::SELF_IDENT.clone(),
                     constants::DATA_IDENT.clone(),
                     fn_info.data_field_ident.clone(),
                 ],
                 constants::FN_DATA_VERIFY_RECEIVED_FN_IDENT.clone(),
-                &[args_checker_var_ident, Self::TIMES_ARG_IDENT.clone()],
+                vec![args_checker_var_ident, Self::TIMES_ARG_IDENT.clone()],
             )),
             Some(Default::default()),
         );

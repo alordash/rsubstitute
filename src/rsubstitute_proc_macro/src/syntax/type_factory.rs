@@ -16,6 +16,8 @@ pub trait ITypeFactory {
     // TODO - replace most `create_with_generics` with this method
     fn create_from_struct(&self, item_struct: &ItemStruct) -> Type;
 
+    fn wrap_in(&self, ty: Type, wrapper: Ident) -> Type;
+
     fn wrap_in_arc(&self, ty: Type) -> Type;
 }
 
@@ -41,12 +43,17 @@ impl ITypeFactory for TypeFactory {
     }
 
     fn wrap_in_arc(&self, ty: Type) -> Type {
+        let result = self.wrap_in(ty, constants::ARC_IDENT.clone());
+        return result;
+    }
+
+    fn wrap_in(&self, ty: Type, wrapper: Ident) -> Type {
         let result = Type::Path(TypePath {
             qself: None,
             path: Path {
                 leading_colon: None,
                 segments: [PathSegment {
-                    ident: constants::ARC_IDENT.clone(),
+                    ident: wrapper,
                     arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
                         colon2_token: None,
                         lt_token: Default::default(),

@@ -87,9 +87,9 @@ pub const DATA_FIELD_VALUE: LazyCell<FieldValue> = LazyCell::new(|| {
         member: Member::Named(DATA_IDENT.clone()),
         colon_token: Some(Default::default()),
         expr: Expr::MethodCall(expr_method_call_factory.create(
-            &[DATA_IDENT.clone()],
+            vec![DATA_IDENT.clone()],
             format_ident!("clone"),
-            &[],
+            Vec::new(),
         )),
     };
     return result;
@@ -149,6 +149,12 @@ pub const ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE: LazyCell<Attribute> = La
 pub const ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     let attribute_factory = &SERVICES.attribute_factory;
     let result = attribute_factory.create(ALLOW_IDENT.clone(), "non_camel_case_types");
+    return result;
+});
+
+pub const ALLOW_NON_UPPER_CASE_GLOBALS_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+    let attribute_factory = &SERVICES.attribute_factory;
+    let result = attribute_factory.create(ALLOW_IDENT.clone(), "non_upper_case_globals");
     return result;
 });
 
@@ -231,25 +237,7 @@ pub const STRING_TYPE: LazyCell<Type> = LazyCell::new(|| {
 pub const VEC_OF_ARG_CHECK_RESULT_TYPE: LazyCell<Type> = LazyCell::new(|| {
     let type_factory = &SERVICES.type_factory;
     let arg_check_result_type = type_factory.create(format_ident!("ArgCheckResult"));
-    let result = Type::Path(TypePath {
-        qself: None,
-        path: Path {
-            leading_colon: None,
-            segments: [PathSegment {
-                ident: format_ident!("Vec"),
-                arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
-                    colon2_token: None,
-                    lt_token: Default::default(),
-                    args: [GenericArgument::Type(arg_check_result_type)]
-                        .into_iter()
-                        .collect(),
-                    gt_token: Default::default(),
-                }),
-            }]
-            .into_iter()
-            .collect(),
-        },
-    });
+    let result = type_factory.wrap_in(arg_check_result_type, format_ident!("Vec"));
     return result;
 });
 
@@ -403,3 +391,5 @@ pub const OPTION_NONE_PATH: LazyCell<Path> = LazyCell::new(|| {
 
 pub const SEND_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Send"));
 pub const SYNC_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Sync"));
+
+pub const LAZY_LOCK_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("LazyLock"));

@@ -224,7 +224,7 @@ impl MockImplGenerator {
     }
 
     fn generate_handle_expr(&self, fn_info: &FnInfo) -> Expr {
-        let idents = [
+        let idents = vec![
             constants::SELF_IDENT.clone(),
             constants::DATA_IDENT.clone(),
             fn_info.data_field_ident.clone(),
@@ -235,9 +235,9 @@ impl MockImplGenerator {
             Self::HANDLE_METHOD_IDENT.clone()
         };
         let expr_method_call = self.expr_method_call_factory.create(
-            &idents,
+            idents,
             method,
-            &[Self::CALL_VARIABLE_IDENT.clone()],
+            vec![Self::CALL_VARIABLE_IDENT.clone()],
         );
         let expr = Expr::MethodCall(expr_method_call);
         return expr;

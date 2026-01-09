@@ -114,10 +114,13 @@ fn create_services() -> ServiceCollection {
         reference_type_crawler: reference_type_crawler.clone(),
     });
     let local_factory = Arc::new(LocalFactory);
-    let internal_mock_impl_generator = Arc::new(InternalMockImplGenerator {
+    let mock_constructor_block_generator = Arc::new(MockConstructorBlockGenerator {
         path_factory: path_factory.clone(),
+    });
+    let internal_mock_impl_generator = Arc::new(InternalMockImplGenerator {
         type_factory: type_factory.clone(),
         reference_normalizer: reference_normalizer.clone(),
+        mock_constructor_block_generator: mock_constructor_block_generator.clone(),
     });
     let input_args_generator = Arc::new(InputArgsGenerator {
         path_factory: path_factory.clone(),
@@ -140,6 +143,11 @@ fn create_services() -> ServiceCollection {
         impl_factory: impl_factory.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
         input_args_generator: input_args_generator.clone(),
+    });
+    let static_mock_generator = Arc::new(StaticMockGenerator {
+        type_factory: type_factory.clone(),
+        path_factory: path_factory.clone(),
+        mock_constructor_block_generator: mock_constructor_block_generator.clone(),
     });
     let mod_generator = Arc::new(ModGenerator);
 
@@ -176,6 +184,7 @@ fn create_services() -> ServiceCollection {
         send_sync_impls_generator: send_sync_impls_generator.clone(),
         internal_mock_setup_impl_generator: internal_mock_setup_impl_generator.clone(),
         internal_mock_received_impl_generator: internal_mock_received_impl_generator.clone(),
+        static_mock_generator: static_mock_generator.clone(),
         mod_generator: mod_generator.clone(),
     });
 

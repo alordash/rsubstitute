@@ -162,14 +162,14 @@ impl ArgsCheckerImplGenerator {
             .expect("Call struct fields should have ident.");
         let receiver = self
             .field_access_expr_factory
-            .create(&[constants::SELF_IDENT.clone(), field_ident.clone()]);
+            .create(vec![constants::SELF_IDENT.clone(), field_ident.clone()]);
         let field_name_arg = Expr::Lit(ExprLit {
             attrs: Vec::new(),
             lit: Lit::Str(LitStr::new(&field_ident.to_string(), Span::call_site())),
         });
         let field_access_arg = self
             .field_access_expr_factory
-            .create(&[Self::CALL_ARG_IDENT.clone(), field_ident]);
+            .create(vec![Self::CALL_ARG_IDENT.clone(), field_ident]);
         let method = self.get_check_fn_ident(&field.ty);
         let expr = Expr::MethodCall(ExprMethodCall {
             attrs: Vec::new(),

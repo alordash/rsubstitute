@@ -86,7 +86,7 @@ impl DeriveArgsFormatterMacroHandler {
             .iter()
             .skip(1)
             .map(|field| {
-                self.field_access_expr_factory.create(&[
+                self.field_access_expr_factory.create(vec![
                     constants::SELF_IDENT.clone(),
                     field.ident.clone().expect("TODO"),
                 ])
