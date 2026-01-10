@@ -1,7 +1,8 @@
 use crate::constants;
-use crate::mock_macros::fn_info_generation::models::FnInfo;
-use crate::mock_macros::mock_generation::input_args_generator::IInputArgsGenerator;
+use crate::mock_macros::fn_info_generation::models::*;
+use crate::mock_macros::mock_generation::input_args_generator::*;
 use crate::mock_macros::mock_generation::models::*;
+use crate::mock_macros::mock_generation::*;
 use crate::syntax::*;
 use proc_macro2::Ident;
 use quote::format_ident;
@@ -25,6 +26,7 @@ pub(crate) struct InternalMockSetupImplGenerator {
     pub local_factory: Arc<dyn ILocalFactory>,
     pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
     pub input_args_generator: Arc<dyn IInputArgsGenerator>,
+    pub fn_setup_output_generator: Arc<dyn IFnSetupOutputGenerator>,
 }
 
 impl IInternalMockSetupImplGenerator for InternalMockSetupImplGenerator {
@@ -55,6 +57,7 @@ impl InternalMockSetupImplGenerator {
         LazyCell::new(|| format_ident!("shared_fn_config"));
 
     fn generate_fn_setup(&self, fn_info: &FnInfo) -> ImplItemFn {
+        let output = self.fn_setup_output_generator.generate_for_struct(fn_info);
         let sig = Signature {
             // TODO - all these `None` should be actually mapped to souarce fns signature
             constness: None,
@@ -69,47 +72,7 @@ impl InternalMockSetupImplGenerator {
                 .chain(self.input_args_generator.generate_input_args(fn_info))
                 .collect(),
             variadic: None,
-            output: ReturnType::Type(
-                Default::default(),
-                Box::new(Type::Path(TypePath {
-                    qself: None,
-                    path: Path {
-                        leading_colon: None,
-                        segments: [PathSegment {
-                            ident: constants::SHARED_FN_CONFIG_TYPE_IDENT.clone(),
-                            arguments: PathArguments::AngleBracketed(
-                                AngleBracketedGenericArguments {
-                                    colon2_token: None,
-                                    lt_token: Default::default(),
-                                    args: [
-                                        GenericArgument::Lifetime(
-                                            constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
-                                        ),
-                                        GenericArgument::Type(
-                                            self.type_factory.create(
-                                                fn_info.call_struct.item_struct.ident.clone(),
-                                            ),
-                                        ),
-                                        GenericArgument::Type(self.type_factory.create(
-                                            fn_info.args_checker_struct.item_struct.ident.clone(),
-                                        )),
-                                        GenericArgument::Type(
-                                            fn_info.parent.get_return_value_type(),
-                                        ),
-                                        GenericArgument::Type(constants::SELF_TYPE.clone()),
-                                        GenericArgument::Type(constants::VOID_TYPE.clone()),
-                                    ]
-                                    .into_iter()
-                                    .collect(),
-                                    gt_token: Default::default(),
-                                },
-                            ),
-                        }]
-                        .into_iter()
-                        .collect(),
-                    },
-                })),
-            ),
+            output,
         };
         let block = self.generate_fn_setup_block(fn_info);
         let impl_item_fn = ImplItemFn {

@@ -126,8 +126,13 @@ fn create_services() -> ServiceCollection {
         path_factory: path_factory.clone(),
         field_value_factory: field_value_factory.clone(),
         local_factory: local_factory.clone(),
+        reference_normalizer: reference_normalizer.clone(),
     });
     let impl_factory = Arc::new(ImplFactory {
+        reference_normalizer: reference_normalizer.clone(),
+    });
+    let fn_setup_output_generator = Arc::new(FnSetupOutputGenerator {
+        type_factory: type_factory.clone(),
         reference_normalizer: reference_normalizer.clone(),
     });
     let internal_mock_setup_impl_generator = Arc::new(InternalMockSetupImplGenerator {
@@ -137,6 +142,7 @@ fn create_services() -> ServiceCollection {
         local_factory: local_factory.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
         input_args_generator: input_args_generator.clone(),
+        fn_setup_output_generator: fn_setup_output_generator.clone(),
     });
     let internal_mock_received_impl_generator = Arc::new(InternalMockReceivedImplGenerator {
         type_factory: type_factory.clone(),
@@ -155,6 +161,12 @@ fn create_services() -> ServiceCollection {
         path_factory: path_factory.clone(),
         type_factory: type_factory.clone(),
         field_access_expr_factory: field_access_expr_factory.clone(),
+    });
+
+    let fn_setup_generator = Arc::new(FnSetupGenerator {
+        input_args_generator: input_args_generator.clone(),
+        fn_setup_output_generator: fn_setup_output_generator.clone(),
+        expr_method_call_factory: expr_method_call_factory.clone(),
     });
 
     let item_trait_handler = Arc::new(ItemTraitHandler {
@@ -186,6 +198,7 @@ fn create_services() -> ServiceCollection {
         internal_mock_received_impl_generator: internal_mock_received_impl_generator.clone(),
         static_mock_generator: static_mock_generator.clone(),
         mod_generator: mod_generator.clone(),
+        fn_setup_generator: fn_setup_generator.clone(),
     });
 
     let mock_macro_handler = Arc::new(MockMacroHandler {

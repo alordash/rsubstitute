@@ -5,6 +5,7 @@ mod derive_args_formatter_macro_handler;
 mod di;
 mod mock_macros;
 mod syntax;
+mod lifetime_ref;
 
 #[proc_macro_attribute]
 pub fn mock(

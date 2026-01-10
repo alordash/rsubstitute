@@ -9,6 +9,8 @@ pub trait IReferenceNormalizer {
     fn normalize_in_struct(&self, item_struct: &mut ItemStruct);
 
     fn normalize_in_impl(&self, lifetime: Lifetime, item_impl: &mut ItemImpl);
+
+    fn staticify(&self, ty: &mut Type);
 }
 
 pub(crate) struct ReferenceNormalizer {
@@ -21,7 +23,7 @@ impl IReferenceNormalizer for ReferenceNormalizer {
     }
 
     fn normalize_in_struct(&self, item_struct: &mut ItemStruct) {
-        let type_references: Vec<_> = item_struct
+        let lifetime_refs: Vec<_> = item_struct
             .fields
             .iter_mut()
             .flat_map(|field| {
@@ -29,8 +31,8 @@ impl IReferenceNormalizer for ReferenceNormalizer {
                     .get_all_type_references(&mut field.ty)
             })
             .collect();
-        for type_reference in type_references {
-            type_reference.lifetime = Some(self.get_normalized_lifetime());
+        for lifetime_ref in lifetime_refs {
+            lifetime_ref.set_lifetime(self.get_normalized_lifetime());
         }
     }
 
@@ -56,6 +58,14 @@ impl IReferenceNormalizer for ReferenceNormalizer {
                         })
                 }
             };
+        }
+    }
+
+    fn staticify(&self, ty: &mut Type) {
+        let lifetime_refs: Vec<_> = self.reference_type_crawler.get_all_type_references(ty);
+
+        for lifetime_ref in lifetime_refs {
+            lifetime_ref.set_lifetime(constants::STATIC_LIFETIME.clone());
         }
     }
 }

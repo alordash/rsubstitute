@@ -1,13 +1,15 @@
+use crate::constants;
+use crate::lifetime_ref::LifetimeRef;
 use syn::*;
 
 pub trait IReferenceTypeCrawler {
-    fn get_all_type_references<'a>(&self, ty: &'a mut Type) -> Vec<&'a mut TypeReference>;
+    fn get_all_type_references<'a>(&self, ty: &'a mut Type) -> Vec<LifetimeRef<'a>>;
 }
 
 pub struct ReferenceTypeCrawler;
 
 impl IReferenceTypeCrawler for ReferenceTypeCrawler {
-    fn get_all_type_references<'a>(&self, ty: &'a mut Type) -> Vec<&'a mut TypeReference> {
+    fn get_all_type_references<'a>(&self, ty: &'a mut Type) -> Vec<LifetimeRef<'a>> {
         let mut result = Vec::new();
         self.recursive_get_all_type_references(&mut result, ty);
         return result;
@@ -17,7 +19,7 @@ impl IReferenceTypeCrawler for ReferenceTypeCrawler {
 impl ReferenceTypeCrawler {
     fn recursive_get_all_type_references<'a>(
         &self,
-        result: &mut Vec<&'a mut TypeReference>,
+        result: &mut Vec<LifetimeRef<'a>>,
         ty: &'a mut Type,
     ) {
         match ty {
@@ -32,12 +34,13 @@ impl ReferenceTypeCrawler {
             }
             Type::Reference(type_reference) => {
                 // TODO - cursed. Maybe store only &mut Lifetime in result vector.
-                let copy_mut_ref: &mut TypeReference = unsafe {
-                    let ptr = type_reference as *mut TypeReference;
+                let copy_mut_ref: &mut Option<Lifetime> = unsafe {
+                    let ptr = &mut type_reference.lifetime as *mut Option<Lifetime>;
                     std::mem::transmute(ptr)
                 };
+                let lifetime_ref = LifetimeRef::Optional(copy_mut_ref);
                 self.recursive_get_all_type_references_from_box(result, &mut type_reference.elem);
-                result.push(copy_mut_ref);
+                result.push(lifetime_ref);
             }
             Type::Slice(type_slice) => {
                 self.recursive_get_all_type_references(result, type_slice.elem.as_mut())
@@ -51,7 +54,7 @@ impl ReferenceTypeCrawler {
 
     fn recursive_get_all_type_references_from_box<'a>(
         &self,
-        result: &mut Vec<&'a mut TypeReference>,
+        result: &mut Vec<LifetimeRef<'a>>,
         boxed_ty: &'a mut Box<Type>,
     ) {
         let ty = boxed_ty.as_mut();
@@ -60,7 +63,7 @@ impl ReferenceTypeCrawler {
 
     fn recursive_get_all_type_references_from_path<'a>(
         &self,
-        result: &mut Vec<&'a mut TypeReference>,
+        result: &mut Vec<LifetimeRef<'a>>,
         type_path: &'a mut TypePath,
     ) {
         for path_segment in type_path.path.segments.iter_mut() {
@@ -68,6 +71,9 @@ impl ReferenceTypeCrawler {
                 PathArguments::AngleBracketed(generic_arguments) => {
                     for generic_argument in generic_arguments.args.iter_mut() {
                         match generic_argument {
+                            GenericArgument::Lifetime(lifetime) => {
+                                result.push(LifetimeRef::Required(lifetime))
+                            }
                             GenericArgument::Type(ty) => {
                                 self.recursive_get_all_type_references(result, ty)
                             }
@@ -85,7 +91,7 @@ impl ReferenceTypeCrawler {
 
     fn recursive_get_all_type_references_from_tuple<'a>(
         &self,
-        result: &mut Vec<&'a mut TypeReference>,
+        result: &mut Vec<LifetimeRef<'a>>,
         type_tuple: &'a mut TypeTuple,
     ) {
         for elem_type in type_tuple.elems.iter_mut() {

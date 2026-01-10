@@ -354,6 +354,11 @@ pub const DEFAULT_ARG_FIELD_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Life
     ident: format_ident!("__rsubstitute_arg_field_lifetime"),
 });
 
+pub const STATIC_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
+    apostrophe: Span::call_site(),
+    ident: format_ident!("static"),
+});
+
 pub const DEFAULT_ARG_FIELD_LIFETIME_GENERIC: LazyCell<Generics> = LazyCell::new(|| Generics {
     lt_token: Some(Default::default()),
     params: [GenericParam::Lifetime(LifetimeParam {

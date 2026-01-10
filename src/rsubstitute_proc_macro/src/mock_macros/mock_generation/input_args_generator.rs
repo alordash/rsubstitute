@@ -2,12 +2,14 @@ use crate::constants;
 use crate::mock_macros::fn_info_generation::models::FnInfo;
 use crate::syntax::*;
 use proc_macro2::Ident;
-use quote::format_ident;
+use quote::{ToTokens, format_ident};
 use std::sync::Arc;
 use syn::*;
 
 pub trait IInputArgsGenerator {
     fn generate_input_args(&self, fn_info: &FnInfo) -> Vec<FnArg>;
+
+    fn generate_input_args_with_static_lifetimes(&self, fn_info: &FnInfo) -> Vec<FnArg>;
 
     fn generate_args_checker_var_ident_and_decl_stmt(&self, fn_info: &FnInfo) -> (Ident, Stmt);
 }
@@ -16,6 +18,7 @@ pub(crate) struct InputArgsGenerator {
     pub path_factory: Arc<dyn IPathFactory>,
     pub field_value_factory: Arc<dyn IFieldValueFactory>,
     pub local_factory: Arc<dyn ILocalFactory>,
+    pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
 }
 
 impl IInputArgsGenerator for InputArgsGenerator {
@@ -45,6 +48,16 @@ impl IInputArgsGenerator for InputArgsGenerator {
             })
             .collect();
         return result;
+    }
+
+    fn generate_input_args_with_static_lifetimes(&self, fn_info: &FnInfo) -> Vec<FnArg> {
+        let mut fn_args = self.generate_input_args(fn_info);
+        for fn_arg in fn_args.iter_mut() {
+            if let FnArg::Typed(pat_type) = fn_arg {
+                self.reference_normalizer.staticify(&mut pat_type.ty);
+            }
+        }
+        return fn_args;
     }
 
     fn generate_args_checker_var_ident_and_decl_stmt(&self, fn_info: &FnInfo) -> (Ident, Stmt) {

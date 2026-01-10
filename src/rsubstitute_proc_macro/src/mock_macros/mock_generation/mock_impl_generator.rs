@@ -1,4 +1,5 @@
 use crate::constants;
+use crate::lifetime_ref::LifetimeRef;
 use crate::mock_macros::fn_info_generation::models::FnInfo;
 use crate::mock_macros::mock_generation::models::{MockImpl, MockStruct};
 use crate::syntax::*;
@@ -120,21 +121,23 @@ impl MockImplGenerator {
         let ty = match fn_arg {
             FnArg::Receiver(receiver) => {
                 if let Some((_, lifetime)) = &mut receiver.reference {
-                    self.anonymize_input_reference_lifetime(lifetime);
+                    self.anonymize_input_reference_lifetime(LifetimeRef::Optional(lifetime));
                 }
                 receiver.ty.as_mut()
             }
             FnArg::Typed(pat_type) => pat_type.ty.as_mut(),
         };
-        let type_references = self.reference_type_crawler.get_all_type_references(ty);
-        for type_reference in type_references {
-            self.anonymize_input_reference_lifetime(&mut type_reference.lifetime);
+        let lifetime_refs = self.reference_type_crawler.get_all_type_references(ty);
+        for lifetime_ref in lifetime_refs {
+            self.anonymize_input_reference_lifetime(lifetime_ref);
         }
     }
 
-    fn anonymize_input_reference_lifetime(&self, lifetime: &mut Option<Lifetime>) {
-        if lifetime.is_none() {
-            *lifetime = Some(constants::ANONYMOUS_LIFETIME.clone());
+    fn anonymize_input_reference_lifetime(&self, lifetime_ref: LifetimeRef) {
+        if let LifetimeRef::Optional(optional_lifetime) = lifetime_ref
+            && optional_lifetime.is_none()
+        {
+            *optional_lifetime = Some(constants::ANONYMOUS_LIFETIME.clone());
         }
     }
 

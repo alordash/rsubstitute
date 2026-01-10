@@ -26,6 +26,7 @@ pub(crate) struct ItemFnHandler {
     pub internal_mock_setup_impl_generator: Arc<dyn IInternalMockSetupImplGenerator>,
     pub internal_mock_received_impl_generator: Arc<dyn IInternalMockReceivedImplGenerator>,
     pub static_mock_generator: Arc<dyn IStaticMockGenerator>,
+    pub fn_setup_generator: Arc<dyn IFnSetupGenerator>,
     pub mod_generator: Arc<dyn IModGenerator>,
 }
 
@@ -78,8 +79,14 @@ impl IItemFnHandler for ItemFnHandler {
             &mock_setup_struct,
             &mock_received_struct,
         );
-
         let [fn_info] = fn_infos;
+        let fn_setup = self.fn_setup_generator.generate(
+            &fn_info,
+            &static_mock,
+            &mock_setup_struct,
+            &base_caller_struct,
+        );
+
         let generated_mod = self.mod_generator.generate_fn(
             &item_fn,
             base_fn,
@@ -94,6 +101,7 @@ impl IItemFnHandler for ItemFnHandler {
             internal_mock_setup_impl,
             internal_mock_received_impl,
             static_mock,
+            fn_setup,
         );
         let GeneratedMod {
             item_mod,
