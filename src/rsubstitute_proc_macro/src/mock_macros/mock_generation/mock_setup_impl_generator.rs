@@ -12,10 +12,17 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait IMockSetupImplGenerator {
-    fn generate(
+    fn generate_for_struct(
         &self,
         mock_setup_struct: &MockSetupStruct,
         fn_infos: &[FnInfo],
+    ) -> MockSetupImpl;
+
+    fn generate_for_static(
+        &self,
+        mock_setup_struct: &MockSetupStruct,
+        fn_info: &FnInfo,
+        base_caller_struct: &BaseCallerStruct,
     ) -> MockSetupImpl;
 }
 
@@ -30,7 +37,7 @@ pub(crate) struct MockSetupImplGenerator {
 }
 
 impl IMockSetupImplGenerator for MockSetupImplGenerator {
-    fn generate(
+    fn generate_for_struct(
         &self,
         mock_setup_struct: &MockSetupStruct,
         fn_infos: &[FnInfo],
@@ -38,14 +45,50 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
         let self_ty = self
             .type_factory
             .create(mock_setup_struct.item_struct.ident.clone());
+        let use_fn_info_ident_as_method_ident = true;
         let fn_setups = fn_infos
             .iter()
-            .map(|x| ImplItem::Fn(self.generate_fn_setup(x)))
+            .map(|x| {
+                let output = self.setup_output_generator.generate_for_struct(x);
+                return ImplItem::Fn(self.generate_fn_setup(
+                    x,
+                    use_fn_info_ident_as_method_ident,
+                    output,
+                ));
+            })
             .collect();
 
         let item_impl = self
             .impl_factory
             .create_with_default_lifetime(self_ty, fn_setups);
+        let mock_setup_impl = MockSetupImpl { item_impl };
+        return mock_setup_impl;
+    }
+
+    fn generate_for_static(
+        &self,
+        mock_setup_struct: &MockSetupStruct,
+        fn_info: &FnInfo,
+        base_caller_struct: &BaseCallerStruct,
+    ) -> MockSetupImpl {
+        let self_ty = self
+            .type_factory
+            .create(mock_setup_struct.item_struct.ident.clone());
+        let use_fn_info_ident_as_method_ident = false;
+        let output = self.setup_output_generator.generate_for_static(
+            fn_info,
+            mock_setup_struct,
+            base_caller_struct,
+        );
+        let fn_setup = ImplItem::Fn(self.generate_fn_setup(
+            fn_info,
+            use_fn_info_ident_as_method_ident,
+            output,
+        ));
+
+        let item_impl = self
+            .impl_factory
+            .create_with_default_lifetime(self_ty, vec![fn_setup]);
         let mock_setup_impl = MockSetupImpl { item_impl };
         return mock_setup_impl;
     }
@@ -56,8 +99,12 @@ impl MockSetupImplGenerator {
     const SHARED_FN_CONFIG_VAR_IDENT: LazyCell<Ident> =
         LazyCell::new(|| format_ident!("shared_fn_config"));
 
-    fn generate_fn_setup(&self, fn_info: &FnInfo) -> ImplItemFn {
-        let output = self.setup_output_generator.generate_for_struct(fn_info);
+    fn generate_fn_setup(
+        &self,
+        fn_info: &FnInfo,
+        use_fn_info_ident_as_method_ident: bool,
+        output: ReturnType,
+    ) -> ImplItemFn {
         let sig = Signature {
             // TODO - all these `None` should be actually mapped to souarce fns signature
             constness: None,
@@ -65,7 +112,11 @@ impl MockSetupImplGenerator {
             unsafety: None,
             abi: None,
             fn_token: Default::default(),
-            ident: fn_info.parent.ident.clone(),
+            ident: if use_fn_info_ident_as_method_ident {
+                fn_info.parent.ident.clone()
+            } else {
+                constants::MOCK_SETUP_FIELD_IDENT.clone()
+            },
             generics: Generics::default(),
             paren_token: Default::default(),
             inputs: iter::once(constants::REF_SELF_ARG_WITH_LIFETIME.clone())

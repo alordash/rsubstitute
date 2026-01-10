@@ -40,7 +40,13 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
             mutability: None,
             elem: Box::new(constants::SELF_TYPE.clone()),
         });
-        let result = self.generate(fn_info, fn_info.parent.ident.clone(), true, return_ty);
+        let prepend_ref_self_arg = true;
+        let result = self.generate(
+            fn_info,
+            fn_info.parent.ident.clone(),
+            prepend_ref_self_arg,
+            return_ty,
+        );
         return result;
     }
 
@@ -59,10 +65,11 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
             mutability: None,
             elem: Box::new(return_ty),
         });
+        let prepend_ref_self_arg = false;
         let mut result = self.generate(
             fn_info,
             constants::MOCK_RECEIVED_FIELD_IDENT.clone(),
-            false,
+            prepend_ref_self_arg,
             return_ty_reference,
         );
         for input in result.inputs.iter_mut() {

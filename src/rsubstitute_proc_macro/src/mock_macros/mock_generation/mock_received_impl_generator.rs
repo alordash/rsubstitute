@@ -8,10 +8,16 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait IMockReceivedImplGenerator {
-    fn generate(
+    fn generate_for_struct(
         &self,
         mock_received_struct: &MockReceivedStruct,
         fn_infos: &[FnInfo],
+    ) -> MockReceivedImpl;
+
+    fn generate_for_static(
+        &self,
+        mock_received_struct: &MockReceivedStruct,
+        fn_info: &FnInfo,
     ) -> MockReceivedImpl;
 }
 
@@ -24,7 +30,7 @@ pub(crate) struct MockReceivedImplGenerator {
 }
 
 impl IMockReceivedImplGenerator for MockReceivedImplGenerator {
-    fn generate(
+    fn generate_for_struct(
         &self,
         mock_received_struct: &MockReceivedStruct,
         fn_infos: &[FnInfo],
@@ -43,11 +49,31 @@ impl IMockReceivedImplGenerator for MockReceivedImplGenerator {
         let mock_received_impl = MockReceivedImpl { item_impl };
         return mock_received_impl;
     }
+
+    fn generate_for_static(
+        &self,
+        mock_received_struct: &MockReceivedStruct,
+        fn_info: &FnInfo,
+    ) -> MockReceivedImpl {
+        let self_ty = self
+            .type_factory
+            .create(mock_received_struct.item_struct.ident.clone());
+        let mut fn_received = self.generate_fn_received(fn_info);
+        fn_received.sig.ident = constants::MOCK_RECEIVED_FIELD_IDENT.clone();
+
+        let item_impl = self
+            .impl_factory
+            .create_with_default_lifetime(self_ty, vec![ImplItem::Fn(fn_received)]);
+        let mock_received_impl = MockReceivedImpl { item_impl };
+        return mock_received_impl;
+    }
 }
 
 impl MockReceivedImplGenerator {
     fn generate_fn_received(&self, fn_info: &FnInfo) -> ImplItemFn {
-        let sig = self.received_signature_generator.generate_for_struct(fn_info);
+        let sig = self
+            .received_signature_generator
+            .generate_for_struct(fn_info);
         let block = self.generate_fn_received_block(fn_info);
         let impl_item_fn = ImplItemFn {
             attrs: vec![

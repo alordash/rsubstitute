@@ -67,12 +67,15 @@ impl IItemFnHandler for ItemFnHandler {
         let send_sync_impls = self
             .send_sync_impls_generator
             .generate(&mock_struct.item_struct);
-        let mock_setup_impl = self
-            .mock_setup_impl_generator
-            .generate(&mock_setup_struct, &fn_infos);
+        let [fn_info] = fn_infos;
+        let mock_setup_impl = self.mock_setup_impl_generator.generate_for_static(
+            &mock_setup_struct,
+            &fn_info,
+            &base_caller_struct,
+        );
         let mock_received_impl = self
             .mock_received_impl_generator
-            .generate(&mock_received_struct, &fn_infos);
+            .generate_for_static(&mock_received_struct, &fn_info);
         let static_mock = self.static_mock_generator.generate(
             &fn_decl,
             &mock_struct,
@@ -80,7 +83,6 @@ impl IItemFnHandler for ItemFnHandler {
             &mock_setup_struct,
             &mock_received_struct,
         );
-        let [fn_info] = fn_infos;
         let fn_setup = self.fn_setup_generator.generate(
             &fn_info,
             &static_mock,
