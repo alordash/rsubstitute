@@ -18,7 +18,7 @@ pub trait IFnSetupGenerator {
 
 pub(crate) struct FnSetupGenerator {
     pub input_args_generator: Arc<dyn IInputArgsGenerator>,
-    pub fn_setup_output_generator: Arc<dyn IFnSetupOutputGenerator>,
+    pub setup_output_generator: Arc<dyn ISetupOutputGenerator>,
     pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
 }
 
@@ -30,7 +30,7 @@ impl IFnSetupGenerator for FnSetupGenerator {
         mock_setup_struct: &MockSetupStruct,
         base_caller_struct: &BaseCallerStruct,
     ) -> ItemFn {
-        let output = self.fn_setup_output_generator.generate_for_static(
+        let output = self.setup_output_generator.generate_for_static(
             fn_info,
             mock_setup_struct,
             base_caller_struct,

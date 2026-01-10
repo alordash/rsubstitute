@@ -5,7 +5,7 @@ use crate::syntax::*;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IFnSetupOutputGenerator {
+pub trait ISetupOutputGenerator {
     fn generate_for_struct(&self, fn_info: &FnInfo) -> ReturnType;
 
     fn generate_for_static(
@@ -16,14 +16,14 @@ pub trait IFnSetupOutputGenerator {
     ) -> ReturnType;
 }
 
-pub(crate) struct FnSetupOutputGenerator {
+pub(crate) struct SetupOutputGenerator {
     pub type_factory: Arc<dyn ITypeFactory>,
     pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
 }
 
-impl IFnSetupOutputGenerator for FnSetupOutputGenerator {
+impl ISetupOutputGenerator for SetupOutputGenerator {
     fn generate_for_struct(&self, fn_info: &FnInfo) -> ReturnType {
-        let ty = self.generate_with_parameters(
+        let ty = self.generate(
             fn_info,
             constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
             constants::SELF_TYPE.clone(),
@@ -45,7 +45,7 @@ impl IFnSetupOutputGenerator for FnSetupOutputGenerator {
         let base_caller_type = self
             .type_factory
             .create_from_struct(&base_caller_struct.item_struct.clone());
-        let mut ty = self.generate_with_parameters(
+        let mut ty = self.generate(
             fn_info,
             constants::STATIC_LIFETIME.clone(),
             owner_type,
@@ -57,8 +57,8 @@ impl IFnSetupOutputGenerator for FnSetupOutputGenerator {
     }
 }
 
-impl FnSetupOutputGenerator {
-    fn generate_with_parameters(
+impl SetupOutputGenerator {
+    fn generate(
         &self,
         fn_info: &FnInfo,
         lifetime: Lifetime,

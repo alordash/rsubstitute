@@ -131,7 +131,7 @@ fn create_services() -> ServiceCollection {
     let impl_factory = Arc::new(ImplFactory {
         reference_normalizer: reference_normalizer.clone(),
     });
-    let fn_setup_output_generator = Arc::new(FnSetupOutputGenerator {
+    let setup_output_generator = Arc::new(SetupOutputGenerator {
         type_factory: type_factory.clone(),
         reference_normalizer: reference_normalizer.clone(),
     });
@@ -142,13 +142,19 @@ fn create_services() -> ServiceCollection {
         local_factory: local_factory.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
         input_args_generator: input_args_generator.clone(),
-        fn_setup_output_generator: fn_setup_output_generator.clone(),
+        setup_output_generator: setup_output_generator.clone(),
+    });
+    let received_signature_generator = Arc::new(ReceivedSignatureGenerator {
+        type_factory: type_factory.clone(),
+        input_args_generator: input_args_generator.clone(),
+        reference_normalizer: reference_normalizer.clone(),
     });
     let mock_received_impl_generator = Arc::new(MockReceivedImplGenerator {
         type_factory: type_factory.clone(),
         impl_factory: impl_factory.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
         input_args_generator: input_args_generator.clone(),
+        received_signature_generator: received_signature_generator.clone(),
     });
     let static_mock_generator = Arc::new(StaticMockGenerator {
         type_factory: type_factory.clone(),
@@ -165,7 +171,11 @@ fn create_services() -> ServiceCollection {
 
     let fn_setup_generator = Arc::new(FnSetupGenerator {
         input_args_generator: input_args_generator.clone(),
-        fn_setup_output_generator: fn_setup_output_generator.clone(),
+        setup_output_generator: setup_output_generator.clone(),
+        expr_method_call_factory: expr_method_call_factory.clone(),
+    });
+    let fn_received_generator = Arc::new(FnReceivedGenerator {
+        received_signature_generator: received_signature_generator.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
     });
 
@@ -199,6 +209,7 @@ fn create_services() -> ServiceCollection {
         static_mock_generator: static_mock_generator.clone(),
         mod_generator: mod_generator.clone(),
         fn_setup_generator: fn_setup_generator.clone(),
+        fn_received_generator: fn_received_generator.clone(),
     });
 
     let mock_macro_handler = Arc::new(MockMacroHandler {

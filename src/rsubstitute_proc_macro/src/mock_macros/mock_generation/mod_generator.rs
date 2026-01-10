@@ -38,6 +38,7 @@ pub trait IModGenerator {
         mock_received_impl: MockReceivedImpl,
         static_mock: StaticMock,
         fn_setup: ItemFn,
+        fn_received: ItemFn,
     ) -> GeneratedMod;
 }
 
@@ -130,6 +131,7 @@ impl IModGenerator for ModGenerator {
         mock_received_impl: MockReceivedImpl,
         static_mock: StaticMock,
         fn_setup: ItemFn,
+        fn_received: ItemFn,
     ) -> GeneratedMod {
         let fn_ident = item_fn.sig.ident.clone();
         let attrs = vec![constants::ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE.clone()];
@@ -156,7 +158,8 @@ impl IModGenerator for ModGenerator {
                 Item::Impl(mock_setup_impl.item_impl),
                 Item::Impl(mock_received_impl.item_impl),
                 Item::Static(static_mock.item_static),
-                Item::Fn(fn_setup)
+                Item::Fn(fn_setup),
+                Item::Fn(fn_received),
             ])
             .collect();
         let item_mod = ItemMod {

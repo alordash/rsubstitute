@@ -26,7 +26,7 @@ pub(crate) struct MockSetupImplGenerator {
     pub local_factory: Arc<dyn ILocalFactory>,
     pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
     pub input_args_generator: Arc<dyn IInputArgsGenerator>,
-    pub fn_setup_output_generator: Arc<dyn IFnSetupOutputGenerator>,
+    pub setup_output_generator: Arc<dyn ISetupOutputGenerator>,
 }
 
 impl IMockSetupImplGenerator for MockSetupImplGenerator {
@@ -57,7 +57,7 @@ impl MockSetupImplGenerator {
         LazyCell::new(|| format_ident!("shared_fn_config"));
 
     fn generate_fn_setup(&self, fn_info: &FnInfo) -> ImplItemFn {
-        let output = self.fn_setup_output_generator.generate_for_struct(fn_info);
+        let output = self.setup_output_generator.generate_for_struct(fn_info);
         let sig = Signature {
             // TODO - all these `None` should be actually mapped to souarce fns signature
             constness: None,

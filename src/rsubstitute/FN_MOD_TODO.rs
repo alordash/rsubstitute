@@ -56,6 +56,5 @@ mod __rsubstitute_generated_global {
         }
     }
 
-    // * pub fn received
     // * pub fn global()
 }
