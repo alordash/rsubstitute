@@ -11,15 +11,15 @@ use std::iter;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IInternalMockSetupImplGenerator {
+pub trait IMockSetupImplGenerator {
     fn generate(
         &self,
         mock_setup_struct: &MockSetupStruct,
         fn_infos: &[FnInfo],
-    ) -> InternalMockSetupImpl;
+    ) -> MockSetupImpl;
 }
 
-pub(crate) struct InternalMockSetupImplGenerator {
+pub(crate) struct MockSetupImplGenerator {
     pub path_factory: Arc<dyn IPathFactory>,
     pub type_factory: Arc<dyn ITypeFactory>,
     pub impl_factory: Arc<dyn IImplFactory>,
@@ -29,12 +29,12 @@ pub(crate) struct InternalMockSetupImplGenerator {
     pub fn_setup_output_generator: Arc<dyn IFnSetupOutputGenerator>,
 }
 
-impl IInternalMockSetupImplGenerator for InternalMockSetupImplGenerator {
+impl IMockSetupImplGenerator for MockSetupImplGenerator {
     fn generate(
         &self,
         mock_setup_struct: &MockSetupStruct,
         fn_infos: &[FnInfo],
-    ) -> InternalMockSetupImpl {
+    ) -> MockSetupImpl {
         let self_ty = self
             .type_factory
             .create(mock_setup_struct.item_struct.ident.clone());
@@ -46,12 +46,12 @@ impl IInternalMockSetupImplGenerator for InternalMockSetupImplGenerator {
         let item_impl = self
             .impl_factory
             .create_with_default_lifetime(self_ty, fn_setups);
-        let internal_mock_setup_impl = InternalMockSetupImpl { item_impl };
-        return internal_mock_setup_impl;
+        let mock_setup_impl = MockSetupImpl { item_impl };
+        return mock_setup_impl;
     }
 }
 
-impl InternalMockSetupImplGenerator {
+impl MockSetupImplGenerator {
     const FN_CONFIG_VAR_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("fn_config"));
     const SHARED_FN_CONFIG_VAR_IDENT: LazyCell<Ident> =
         LazyCell::new(|| format_ident!("shared_fn_config"));

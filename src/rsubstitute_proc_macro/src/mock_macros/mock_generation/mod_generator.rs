@@ -16,10 +16,10 @@ pub trait IModGenerator {
         mock_setup_struct: MockSetupStruct,
         mock_received_struct: MockReceivedStruct,
         mock_struct: MockStruct,
+        mock_trait_impl: MockTraitImpl,
         mock_impl: MockImpl,
-        internal_mock_impl: InternalMockImpl,
-        internal_mock_setup_impl: InternalMockSetupImpl,
-        internal_mock_received_impl: InternalMockReceivedImpl,
+        mock_setup_impl: MockSetupImpl,
+        mock_received_impl: MockReceivedImpl,
     ) -> GeneratedMod;
 
     fn generate_fn(
@@ -34,8 +34,8 @@ pub trait IModGenerator {
         mock_received_struct: MockReceivedStruct,
         mock_struct: MockStruct,
         send_sync_impls: SendSyncImpls,
-        internal_mock_setup_impl: InternalMockSetupImpl,
-        internal_mock_received_impl: InternalMockReceivedImpl,
+        mock_setup_impl: MockSetupImpl,
+        mock_received_impl: MockReceivedImpl,
         static_mock: StaticMock,
         fn_setup: ItemFn,
     ) -> GeneratedMod;
@@ -52,10 +52,10 @@ impl IModGenerator for ModGenerator {
         mock_setup_struct: MockSetupStruct,
         mock_received_struct: MockReceivedStruct,
         mock_struct: MockStruct,
+        mock_trait_impl: MockTraitImpl,
         mock_impl: MockImpl,
-        internal_mock_impl: InternalMockImpl,
-        internal_mock_setup_impl: InternalMockSetupImpl,
-        internal_mock_received_impl: InternalMockReceivedImpl,
+        mock_setup_impl: MockSetupImpl,
+        mock_received_impl: MockReceivedImpl,
     ) -> GeneratedMod {
         let attrs = vec![constants::ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE.clone()];
         let usings = [
@@ -78,10 +78,10 @@ impl IModGenerator for ModGenerator {
                 Item::Struct(mock_setup_struct.item_struct),
                 Item::Struct(mock_received_struct.item_struct),
                 Item::Struct(mock_struct.item_struct),
+                Item::Impl(mock_trait_impl.item_impl),
                 Item::Impl(mock_impl.item_impl),
-                Item::Impl(internal_mock_impl.item_impl),
-                Item::Impl(internal_mock_setup_impl.item_impl),
-                Item::Impl(internal_mock_received_impl.item_impl),
+                Item::Impl(mock_setup_impl.item_impl),
+                Item::Impl(mock_received_impl.item_impl),
             ])
             .collect();
         let item_mod = ItemMod {
@@ -126,8 +126,8 @@ impl IModGenerator for ModGenerator {
         mock_received_struct: MockReceivedStruct,
         mock_struct: MockStruct,
         send_sync_impls: SendSyncImpls,
-        internal_mock_setup_impl: InternalMockSetupImpl,
-        internal_mock_received_impl: InternalMockReceivedImpl,
+        mock_setup_impl: MockSetupImpl,
+        mock_received_impl: MockReceivedImpl,
         static_mock: StaticMock,
         fn_setup: ItemFn,
     ) -> GeneratedMod {
@@ -153,8 +153,8 @@ impl IModGenerator for ModGenerator {
                 Item::Struct(mock_struct.item_struct),
                 Item::Impl(send_sync_impls.send_impl),
                 Item::Impl(send_sync_impls.sync_impl),
-                Item::Impl(internal_mock_setup_impl.item_impl),
-                Item::Impl(internal_mock_received_impl.item_impl),
+                Item::Impl(mock_setup_impl.item_impl),
+                Item::Impl(mock_received_impl.item_impl),
                 Item::Static(static_mock.item_static),
                 Item::Fn(fn_setup)
             ])

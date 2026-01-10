@@ -10,27 +10,27 @@ use std::iter;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IInternalMockReceivedImplGenerator {
+pub trait IMockReceivedImplGenerator {
     fn generate(
         &self,
         mock_received_struct: &MockReceivedStruct,
         fn_infos: &[FnInfo],
-    ) -> InternalMockReceivedImpl;
+    ) -> MockReceivedImpl;
 }
 
-pub(crate) struct InternalMockReceivedImplGenerator {
+pub(crate) struct MockReceivedImplGenerator {
     pub type_factory: Arc<dyn ITypeFactory>,
     pub impl_factory: Arc<dyn IImplFactory>,
     pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
     pub input_args_generator: Arc<dyn IInputArgsGenerator>,
 }
 
-impl IInternalMockReceivedImplGenerator for InternalMockReceivedImplGenerator {
+impl IMockReceivedImplGenerator for MockReceivedImplGenerator {
     fn generate(
         &self,
         mock_received_struct: &MockReceivedStruct,
         fn_infos: &[FnInfo],
-    ) -> InternalMockReceivedImpl {
+    ) -> MockReceivedImpl {
         let self_ty = self
             .type_factory
             .create(mock_received_struct.item_struct.ident.clone());
@@ -42,12 +42,12 @@ impl IInternalMockReceivedImplGenerator for InternalMockReceivedImplGenerator {
         let item_impl = self
             .impl_factory
             .create_with_default_lifetime(self_ty, fn_receiveds);
-        let internal_mock_received_impl = InternalMockReceivedImpl { item_impl };
-        return internal_mock_received_impl;
+        let mock_received_impl = MockReceivedImpl { item_impl };
+        return mock_received_impl;
     }
 }
 
-impl InternalMockReceivedImplGenerator {
+impl MockReceivedImplGenerator {
     const TIMES_ARG_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("times"));
     const TIMES_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Times"));
 

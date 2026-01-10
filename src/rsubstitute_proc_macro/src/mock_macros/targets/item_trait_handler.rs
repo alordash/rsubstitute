@@ -19,10 +19,10 @@ pub(crate) struct ItemTraitHandler {
     pub mock_setup_struct_generator: Arc<dyn IMockSetupStructGenerator>,
     pub mock_received_struct_generator: Arc<dyn IMockReceivedStructGenerator>,
     pub mock_struct_generator: Arc<dyn IMockStructGenerator>,
+    pub mock_trait_impl_generator: Arc<dyn IMockTraitImplGenerator>,
     pub mock_impl_generator: Arc<dyn IMockImplGenerator>,
-    pub internal_mock_impl_generator: Arc<dyn IInternalMockImplGenerator>,
-    pub internal_mock_setup_impl_generator: Arc<dyn IInternalMockSetupImplGenerator>,
-    pub internal_mock_received_impl_generator: Arc<dyn IInternalMockReceivedImplGenerator>,
+    pub mock_setup_impl_generator: Arc<dyn IMockSetupImplGenerator>,
+    pub mock_received_impl_generator: Arc<dyn IMockReceivedImplGenerator>,
     pub mod_generator: Arc<dyn IModGenerator>,
 }
 
@@ -54,20 +54,20 @@ impl IItemTraitHandler for ItemTraitHandler {
             &mock_received_struct,
             &mock_data_struct,
         );
-        let mock_impl =
-            self.mock_impl_generator
+        let mock_trait_impl =
+            self.mock_trait_impl_generator
                 .generate(target_ident.clone(), &mock_struct, &fn_infos);
-        let internal_mock_impl = self.internal_mock_impl_generator.generate(
+        let mock_impl = self.mock_impl_generator.generate(
             &mock_struct,
             &mock_data_struct,
             &mock_setup_struct,
             &mock_received_struct,
         );
-        let internal_mock_setup_impl = self
-            .internal_mock_setup_impl_generator
+        let mock_setup_impl = self
+            .mock_setup_impl_generator
             .generate(&mock_setup_struct, &fn_infos);
-        let internal_mock_received_impl = self
-            .internal_mock_received_impl_generator
+        let mock_received_impl = self
+            .mock_received_impl_generator
             .generate(&mock_received_struct, &fn_infos);
         let generated_mod = self.mod_generator.generate_trait(
             target_ident,
@@ -76,10 +76,10 @@ impl IItemTraitHandler for ItemTraitHandler {
             mock_setup_struct,
             mock_received_struct,
             mock_struct,
+            mock_trait_impl,
             mock_impl,
-            internal_mock_impl,
-            internal_mock_setup_impl,
-            internal_mock_received_impl,
+            mock_setup_impl,
+            mock_received_impl,
         );
 
         let GeneratedMod {

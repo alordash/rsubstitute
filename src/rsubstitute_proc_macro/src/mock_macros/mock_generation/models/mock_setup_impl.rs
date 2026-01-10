@@ -1,5 +1,5 @@
 use syn::ItemImpl;
 
-pub struct InternalMockImpl {
+pub struct MockSetupImpl {
     pub item_impl: ItemImpl,
 }

@@ -105,7 +105,7 @@ fn create_services() -> ServiceCollection {
     let std_mem_transmute_expr_factory = Arc::new(StdMemTransmuteExprFactory {
         path_factory: path_factory.clone(),
     });
-    let mock_impl_generator = Arc::new(MockImplGenerator {
+    let mock_trait_impl_generator = Arc::new(MockTraitImplGenerator {
         path_factory: path_factory.clone(),
         type_factory: type_factory.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
@@ -117,7 +117,7 @@ fn create_services() -> ServiceCollection {
     let mock_constructor_block_generator = Arc::new(MockConstructorBlockGenerator {
         path_factory: path_factory.clone(),
     });
-    let internal_mock_impl_generator = Arc::new(InternalMockImplGenerator {
+    let mock_impl_generator = Arc::new(MockImplGenerator {
         type_factory: type_factory.clone(),
         reference_normalizer: reference_normalizer.clone(),
         mock_constructor_block_generator: mock_constructor_block_generator.clone(),
@@ -135,7 +135,7 @@ fn create_services() -> ServiceCollection {
         type_factory: type_factory.clone(),
         reference_normalizer: reference_normalizer.clone(),
     });
-    let internal_mock_setup_impl_generator = Arc::new(InternalMockSetupImplGenerator {
+    let mock_setup_impl_generator = Arc::new(MockSetupImplGenerator {
         path_factory: path_factory.clone(),
         type_factory: type_factory.clone(),
         impl_factory: impl_factory.clone(),
@@ -144,7 +144,7 @@ fn create_services() -> ServiceCollection {
         input_args_generator: input_args_generator.clone(),
         fn_setup_output_generator: fn_setup_output_generator.clone(),
     });
-    let internal_mock_received_impl_generator = Arc::new(InternalMockReceivedImplGenerator {
+    let mock_received_impl_generator = Arc::new(MockReceivedImplGenerator {
         type_factory: type_factory.clone(),
         impl_factory: impl_factory.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
@@ -176,10 +176,10 @@ fn create_services() -> ServiceCollection {
         mock_setup_struct_generator: mock_setup_struct_generator.clone(),
         mock_received_struct_generator: mock_received_struct_generator.clone(),
         mock_struct_generator: mock_struct_generator.clone(),
+        mock_trait_impl_generator: mock_trait_impl_generator.clone(),
         mock_impl_generator: mock_impl_generator.clone(),
-        internal_mock_impl_generator: internal_mock_impl_generator.clone(),
-        internal_mock_setup_impl_generator: internal_mock_setup_impl_generator.clone(),
-        internal_mock_received_impl_generator: internal_mock_received_impl_generator.clone(),
+        mock_setup_impl_generator: mock_setup_impl_generator.clone(),
+        mock_received_impl_generator: mock_received_impl_generator.clone(),
         mod_generator: mod_generator.clone(),
     });
 
@@ -194,8 +194,8 @@ fn create_services() -> ServiceCollection {
         mock_received_struct_generator: mock_received_struct_generator.clone(),
         mock_struct_generator: mock_struct_generator.clone(),
         send_sync_impls_generator: send_sync_impls_generator.clone(),
-        internal_mock_setup_impl_generator: internal_mock_setup_impl_generator.clone(),
-        internal_mock_received_impl_generator: internal_mock_received_impl_generator.clone(),
+        mock_setup_impl_generator: mock_setup_impl_generator.clone(),
+        mock_received_impl_generator: mock_received_impl_generator.clone(),
         static_mock_generator: static_mock_generator.clone(),
         mod_generator: mod_generator.clone(),
         fn_setup_generator: fn_setup_generator.clone(),
