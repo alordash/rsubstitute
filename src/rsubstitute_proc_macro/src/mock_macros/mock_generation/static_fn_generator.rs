@@ -3,70 +3,22 @@ use crate::lifetime_ref::LifetimeRef;
 use crate::mock_macros::fn_info_generation::models::*;
 use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::mock_generation::*;
-use crate::syntax::*;
-use proc_macro2::Ident;
+use crate::syntax::IReferenceTypeCrawler;
 use std::sync::Arc;
 use syn::punctuated::Punctuated;
 use syn::*;
 
-pub trait IMockTraitImplGenerator {
-    fn generate(
-        &self,
-        target_ident: Ident,
-        mock_struct: &MockStruct,
-        fn_infos: &[FnInfo],
-    ) -> MockTraitImpl;
+pub trait IStaticFnGenerator {
+    fn generate(&self, fn_info: &FnInfo, static_mock: &StaticMock) -> StaticFn;
 }
 
-pub(crate) struct MockTraitImplGenerator {
-    pub path_factory: Arc<dyn IPathFactory>,
-    pub type_factory: Arc<dyn ITypeFactory>,
-    pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
-    pub std_mem_transmute_expr_factory: Arc<dyn IStdMemTransmuteExprFactory>,
-    pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
-    pub reference_type_crawler: Arc<dyn IReferenceTypeCrawler>,
+pub(crate) struct StaticFnGenerator {
     pub mock_fn_block_generator: Arc<dyn IMockFnBlockGenerator>,
+    pub reference_type_crawler: Arc<dyn IReferenceTypeCrawler>,
 }
 
-impl IMockTraitImplGenerator for MockTraitImplGenerator {
-    fn generate(
-        &self,
-        target_ident: Ident,
-        mock_struct: &MockStruct,
-        fn_infos: &[FnInfo],
-    ) -> MockTraitImpl {
-        let trait_ = self.path_factory.create(target_ident);
-        let self_ty = self
-            .type_factory
-            .create(mock_struct.item_struct.ident.clone());
-        let items = fn_infos
-            .iter()
-            .map(|x| self.generate_impl_item_fn(x))
-            .map(ImplItem::Fn)
-            .collect();
-
-        let mut item_impl = ItemImpl {
-            attrs: Vec::new(),
-            defaultness: None,
-            unsafety: None,
-            impl_token: Default::default(),
-            generics: constants::DEFAULT_ARG_FIELD_LIFETIME_GENERIC.clone(),
-            trait_: Some((None, trait_, Default::default())),
-            self_ty: Box::new(self_ty),
-            brace_token: Default::default(),
-            items,
-        };
-        self.reference_normalizer.normalize_in_impl(
-            constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
-            &mut item_impl,
-        );
-        let mock_impl = MockTraitImpl { item_impl };
-        return mock_impl;
-    }
-}
-
-impl MockTraitImplGenerator {
-    fn generate_impl_item_fn(&self, fn_info: &FnInfo) -> ImplItemFn {
+impl IStaticFnGenerator for StaticFnGenerator {
+    fn generate(&self, fn_info: &FnInfo, static_mock: &StaticMock) -> StaticFn {
         let sig = Signature {
             constness: None,
             asyncness: None,
@@ -101,17 +53,21 @@ impl MockTraitImplGenerator {
             variadic: None,
             output: fn_info.parent.return_value.clone(),
         };
-        let block = self.mock_fn_block_generator.generate_for_struct(fn_info);
-        let impl_item_fn = ImplItemFn {
+        let block = self
+            .mock_fn_block_generator
+            .generate_for_static(fn_info, static_mock);
+        let item_fn = ItemFn {
             attrs: Vec::new(),
-            vis: Visibility::Inherited,
-            defaultness: None,
+            vis: Visibility::Public(Default::default()),
             sig,
-            block,
+            block: Box::new(block),
         };
-        return impl_item_fn;
+        let static_fn = StaticFn { item_fn };
+        return static_fn;
     }
+}
 
+impl StaticFnGenerator {
     fn convert_input_reference(&self, fn_arg: &mut FnArg) {
         let ty = match fn_arg {
             FnArg::Receiver(receiver) => {

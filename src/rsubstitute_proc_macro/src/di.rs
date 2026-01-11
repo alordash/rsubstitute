@@ -105,6 +105,11 @@ fn create_services() -> ServiceCollection {
     let std_mem_transmute_expr_factory = Arc::new(StdMemTransmuteExprFactory {
         path_factory: path_factory.clone(),
     });
+    let mock_fn_block_generator = Arc::new(MockFnBlockGenerator {
+        path_factory: path_factory.clone(),
+        expr_method_call_factory: expr_method_call_factory.clone(),
+        std_mem_transmute_expr_factory: std_mem_transmute_expr_factory.clone(),
+    });
     let mock_trait_impl_generator = Arc::new(MockTraitImplGenerator {
         path_factory: path_factory.clone(),
         type_factory: type_factory.clone(),
@@ -112,6 +117,7 @@ fn create_services() -> ServiceCollection {
         std_mem_transmute_expr_factory: std_mem_transmute_expr_factory.clone(),
         reference_normalizer: reference_normalizer.clone(),
         reference_type_crawler: reference_type_crawler.clone(),
+        mock_fn_block_generator: mock_fn_block_generator.clone(),
     });
     let local_factory = Arc::new(LocalFactory);
     let mock_constructor_block_generator = Arc::new(MockConstructorBlockGenerator {
@@ -178,6 +184,10 @@ fn create_services() -> ServiceCollection {
         received_signature_generator: received_signature_generator.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
     });
+    let static_fn_generator = Arc::new(StaticFnGenerator {
+        mock_fn_block_generator: mock_fn_block_generator.clone(),
+        reference_type_crawler: reference_type_crawler.clone(),
+    });
 
     let item_trait_handler = Arc::new(ItemTraitHandler {
         fn_decl_extractor: fn_decl_extractor.clone(),
@@ -210,6 +220,7 @@ fn create_services() -> ServiceCollection {
         mod_generator: mod_generator.clone(),
         fn_setup_generator: fn_setup_generator.clone(),
         fn_received_generator: fn_received_generator.clone(),
+        static_fn_generator: static_fn_generator.clone(),
     });
 
     let mock_macro_handler = Arc::new(MockMacroHandler {
