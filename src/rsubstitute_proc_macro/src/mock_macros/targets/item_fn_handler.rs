@@ -50,9 +50,11 @@ impl IItemFnHandler for ItemFnHandler {
             &base_fn,
         );
         let fn_infos = [fn_info];
-        let mock_data_struct = self
-            .mock_data_struct_generator
-            .generate_with_non_camel_case_allowed(&mock_ident, &fn_infos);
+        let mock_data_struct = self.mock_data_struct_generator.generate_for_static(
+            &mock_ident,
+            &fn_infos,
+            &base_caller_struct,
+        );
         let mock_setup_struct = self
             .mock_setup_struct_generator
             .generate_with_non_camel_case_allowed(&mock_ident, &mock_data_struct);
@@ -111,7 +113,7 @@ impl IItemFnHandler for ItemFnHandler {
             static_mock,
             fn_setup,
             fn_received,
-            static_fn
+            static_fn,
         );
         let GeneratedMod {
             item_mod,
