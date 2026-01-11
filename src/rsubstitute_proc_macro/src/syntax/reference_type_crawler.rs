@@ -1,4 +1,3 @@
-use crate::constants;
 use crate::lifetime_ref::LifetimeRef;
 use syn::*;
 

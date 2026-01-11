@@ -6,7 +6,7 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait ISetupOutputGenerator {
-    fn generate_for_struct(
+    fn generate_for_trait(
         &self,
         fn_info: &FnInfo,
         maybe_base_caller_struct: Option<&BaseCallerStruct>,
@@ -26,7 +26,7 @@ pub(crate) struct SetupOutputGenerator {
 }
 
 impl ISetupOutputGenerator for SetupOutputGenerator {
-    fn generate_for_struct(
+    fn generate_for_trait(
         &self,
         fn_info: &FnInfo,
         maybe_base_caller_struct: Option<&BaseCallerStruct>,

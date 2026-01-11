@@ -2,7 +2,7 @@ use crate::constants;
 use crate::mock_macros::fn_info_generation::models::FnInfo;
 use crate::syntax::*;
 use proc_macro2::Ident;
-use quote::{ToTokens, format_ident};
+use quote::format_ident;
 use std::sync::Arc;
 use syn::*;
 

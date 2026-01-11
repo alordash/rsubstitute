@@ -21,8 +21,6 @@ pub trait IMockTraitImplGenerator {
 pub(crate) struct MockTraitImplGenerator {
     pub path_factory: Arc<dyn IPathFactory>,
     pub type_factory: Arc<dyn ITypeFactory>,
-    pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
-    pub std_mem_transmute_expr_factory: Arc<dyn IStdMemTransmuteExprFactory>,
     pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
     pub reference_type_crawler: Arc<dyn IReferenceTypeCrawler>,
     pub mock_fn_block_generator: Arc<dyn IMockFnBlockGenerator>,
@@ -101,7 +99,7 @@ impl MockTraitImplGenerator {
             variadic: None,
             output: fn_info.parent.return_value.clone(),
         };
-        let block = self.mock_fn_block_generator.generate_for_struct(fn_info);
+        let block = self.mock_fn_block_generator.generate_for_trait(fn_info);
         let impl_item_fn = ImplItemFn {
             attrs: Vec::new(),
             vis: Visibility::Inherited,

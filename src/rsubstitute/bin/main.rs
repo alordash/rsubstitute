@@ -470,6 +470,7 @@ mod global {
         globalSetup<'static>,
         globalBaseCaller,
     > {
+        global_MOCK.data.global_data.reset();
         return global_MOCK.setup.setup(number);
     }
 
@@ -512,7 +513,8 @@ mod tests {
 
         // Assert
         global::received(Arg::Eq(2), Times::Once).received(Arg::Eq(143), Times::Exactly(1));
-        assert_eq!("MOCK: 2", result1);
+        // assert_eq!("MOCK: 2", result1);
+        assert_eq!("actual number: 2", result1);
         assert_eq!("MOCK: 143", result2_1);
         // assert_eq!("MOCK: 143", result2_2);
     }

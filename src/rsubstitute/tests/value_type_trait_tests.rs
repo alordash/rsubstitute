@@ -60,10 +60,10 @@ fn accept_value_ArgAny_OkPanics() {
         || mock.received.accept_value(Arg::Any, Times::Never),
         format!(
             r#"Expected to never receive a call matching:
-	accept_value_data((i32): any)
+	accept_value((i32): any)
 Actually received 2 matching calls:
-	accept_value_data({first_value})
-	accept_value_data({second_value})
+	accept_value({first_value})
+	accept_value({second_value})
 Received no non-matching calls"#
         ),
     );
@@ -71,10 +71,10 @@ Received no non-matching calls"#
         || mock.received.accept_value(Arg::Any, Times::Once),
         format!(
             r#"Expected to receive a call exactly once matching:
-	accept_value_data((i32): any)
+	accept_value((i32): any)
 Actually received 2 matching calls:
-	accept_value_data({first_value})
-	accept_value_data({second_value})
+	accept_value({first_value})
+	accept_value({second_value})
 Received no non-matching calls"#
         ),
     );
@@ -82,10 +82,10 @@ Received no non-matching calls"#
         || mock.received.accept_value(Arg::Any, Times::Exactly(3)),
         format!(
             r#"Expected to receive a call 3 times matching:
-	accept_value_data((i32): any)
+	accept_value((i32): any)
 Actually received 2 matching calls:
-	accept_value_data({first_value})
-	accept_value_data({second_value})
+	accept_value({first_value})
+	accept_value({second_value})
 Received no non-matching calls"#
         ),
     );
@@ -110,11 +110,11 @@ fn accept_value_ArgEq_OkPanics() {
         },
         format!(
             r#"Expected to never receive a call matching:
-	accept_value_data((i32): equal to {first_value})
+	accept_value((i32): equal to {first_value})
 Actually received 1 matching call:
-	accept_value_data({first_value})
+	accept_value({first_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-accept_value_data(*{second_value}*)
+accept_value(*{second_value}*)
 	1. v (i32):
 		Expected: {first_value}
 		Actual:   {second_value}"#
@@ -127,11 +127,11 @@ accept_value_data(*{second_value}*)
         },
         format!(
             r#"Expected to receive a call 3 times matching:
-	accept_value_data((i32): equal to {first_value})
+	accept_value((i32): equal to {first_value})
 Actually received 1 matching call:
-	accept_value_data({first_value})
+	accept_value({first_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-accept_value_data(*{second_value}*)
+accept_value(*{second_value}*)
 	1. v (i32):
 		Expected: {first_value}
 		Actual:   {second_value}"#
@@ -144,11 +144,11 @@ accept_value_data(*{second_value}*)
         },
         format!(
             r#"Expected to never receive a call matching:
-	accept_value_data((i32): equal to {second_value})
+	accept_value((i32): equal to {second_value})
 Actually received 1 matching call:
-	accept_value_data({second_value})
+	accept_value({second_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-accept_value_data(*{first_value}*)
+accept_value(*{first_value}*)
 	1. v (i32):
 		Expected: {second_value}
 		Actual:   {first_value}"#
@@ -161,11 +161,11 @@ accept_value_data(*{first_value}*)
         },
         format!(
             r#"Expected to receive a call 3 times matching:
-	accept_value_data((i32): equal to {second_value})
+	accept_value((i32): equal to {second_value})
 Actually received 1 matching call:
-	accept_value_data({second_value})
+	accept_value({second_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-accept_value_data(*{first_value}*)
+accept_value(*{first_value}*)
 	1. v (i32):
 		Expected: {second_value}
 		Actual:   {first_value}"#
@@ -194,11 +194,11 @@ fn accept_value_ArgIs_OkPanics() {
         },
         format!(
             r#"Expected to never receive a call matching:
-	accept_value_data((i32): custom predicate)
+	accept_value((i32): custom predicate)
 Actually received 1 matching call:
-	accept_value_data({first_value})
+	accept_value({first_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-accept_value_data(*{second_value}*)
+accept_value(*{second_value}*)
 	1. v (i32):
 		Custom predicate didn't match passed value. Received value: {second_value}"#
         ),
@@ -212,11 +212,11 @@ accept_value_data(*{second_value}*)
         },
         format!(
             r#"Expected to receive a call 3 times matching:
-	accept_value_data((i32): custom predicate)
+	accept_value((i32): custom predicate)
 Actually received 1 matching call:
-	accept_value_data({first_value})
+	accept_value({first_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-accept_value_data(*{second_value}*)
+accept_value(*{second_value}*)
 	1. v (i32):
 		Custom predicate didn't match passed value. Received value: {second_value}"#
         ),
@@ -230,11 +230,11 @@ accept_value_data(*{second_value}*)
         },
         format!(
             r#"Expected to never receive a call matching:
-	accept_value_data((i32): custom predicate)
+	accept_value((i32): custom predicate)
 Actually received 1 matching call:
-	accept_value_data({second_value})
+	accept_value({second_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-accept_value_data(*{first_value}*)
+accept_value(*{first_value}*)
 	1. v (i32):
 		Custom predicate didn't match passed value. Received value: {first_value}"#
         ),
@@ -248,11 +248,11 @@ accept_value_data(*{first_value}*)
         },
         format!(
             r#"Expected to receive a call 3 times matching:
-	accept_value_data((i32): custom predicate)
+	accept_value((i32): custom predicate)
 Actually received 1 matching call:
-	accept_value_data({second_value})
+	accept_value({second_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-accept_value_data(*{first_value}*)
+accept_value(*{first_value}*)
 	1. v (i32):
 		Custom predicate didn't match passed value. Received value: {first_value}"#
         ),

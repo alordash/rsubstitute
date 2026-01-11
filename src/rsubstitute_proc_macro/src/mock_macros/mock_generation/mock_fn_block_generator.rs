@@ -8,7 +8,7 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait IMockFnBlockGenerator {
-    fn generate_for_struct(&self, fn_info: &FnInfo) -> Block;
+    fn generate_for_trait(&self, fn_info: &FnInfo) -> Block;
 
     fn generate_for_static(&self, fn_info: &FnInfo, static_mock: &StaticMock) -> Block;
 }
@@ -20,7 +20,7 @@ pub(crate) struct MockFnBlockGenerator {
 }
 
 impl IMockFnBlockGenerator for MockFnBlockGenerator {
-    fn generate_for_struct(&self, fn_info: &FnInfo) -> Block {
+    fn generate_for_trait(&self, fn_info: &FnInfo) -> Block {
         let call_stmt = self.generate_call_stmt(fn_info);
         let last_stmt = self.generate_last_stmt(fn_info, ReturnAccessor::SelfRef);
         let stmts = vec![call_stmt, last_stmt];

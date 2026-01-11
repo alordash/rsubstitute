@@ -8,7 +8,7 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait IMockReceivedImplGenerator {
-    fn generate_for_struct(
+    fn generate_for_trait(
         &self,
         mock_received_struct: &MockReceivedStruct,
         fn_infos: &[FnInfo],
@@ -30,7 +30,7 @@ pub(crate) struct MockReceivedImplGenerator {
 }
 
 impl IMockReceivedImplGenerator for MockReceivedImplGenerator {
-    fn generate_for_struct(
+    fn generate_for_trait(
         &self,
         mock_received_struct: &MockReceivedStruct,
         fn_infos: &[FnInfo],
@@ -73,7 +73,7 @@ impl MockReceivedImplGenerator {
     fn generate_fn_received(&self, fn_info: &FnInfo) -> ImplItemFn {
         let sig = self
             .received_signature_generator
-            .generate_for_struct(fn_info);
+            .generate_for_trait(fn_info);
         let block = self.generate_fn_received_block(fn_info);
         let impl_item_fn = ImplItemFn {
             attrs: vec![

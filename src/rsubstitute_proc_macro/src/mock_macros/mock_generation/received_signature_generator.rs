@@ -1,8 +1,8 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::*;
-use crate::mock_macros::mock_generation::IInputArgsGenerator;
 use crate::mock_macros::mock_generation::models::*;
-use crate::syntax::{IReferenceNormalizer, ITypeFactory, ReferenceNormalizer};
+use crate::mock_macros::mock_generation::IInputArgsGenerator;
+use crate::syntax::{IReferenceNormalizer, ITypeFactory};
 use proc_macro2::Ident;
 use quote::format_ident;
 use std::cell::LazyCell;
@@ -13,7 +13,7 @@ use syn::*;
 pub trait IReceivedSignatureGenerator {
     fn get_times_arg_ident(&self) -> Ident;
 
-    fn generate_for_struct(&self, fn_info: &FnInfo) -> Signature;
+    fn generate_for_trait(&self, fn_info: &FnInfo) -> Signature;
 
     fn generate_for_static(
         &self,
@@ -33,7 +33,7 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
         format_ident!("times")
     }
 
-    fn generate_for_struct(&self, fn_info: &FnInfo) -> Signature {
+    fn generate_for_trait(&self, fn_info: &FnInfo) -> Signature {
         let return_ty = Type::Reference(TypeReference {
             and_token: Default::default(),
             lifetime: Some(constants::DEFAULT_ARG_FIELD_LIFETIME.clone()),

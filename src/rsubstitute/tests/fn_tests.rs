@@ -1,6 +1,4 @@
 use rsubstitute::macros::mock;
-use rsubstitute_core::Times;
-use rsubstitute_core::args_matching::Arg;
 
 #[mock]
 fn f(number: i32) -> String {
@@ -12,44 +10,49 @@ fn g(number: i32) -> String {
     return f(number);
 }
 
-#[test]
-fn f_Ok() {
-    // Arrange
-    f::setup(Arg::Any).returns(String::from("amogus"));
+mod tests {
+    use crate::{f, g};
+    use rsubstitute_core::args_matching::Arg;
+    use rsubstitute_core::Times;
 
-    // Act
-    let result = f(2);
+    #[test]
+    fn f_Ok() {
+        // Arrange
+        f::setup(Arg::Any).returns(String::from("amogus"));
 
-    // Assert
-    assert_eq!("amogus", result);
-    f::received(Arg::Eq(2), Times::Once);
-}
+        // Act
+        let result = f(2);
 
-#[test]
-fn g_Ok() {
-    // Arrange
-    g::setup(Arg::Eq(1)).returns(String::from("g1"));
+        // Assert
+        assert_eq!("amogus", result);
+        f::received(Arg::Eq(2), Times::Once);
+    }
 
-    // Act
-    let result = g(1);
+    #[test]
+    fn g_Ok() {
+        // Arrange
+        g::setup(Arg::Eq(1)).returns(String::from("g1"));
 
-    // Assert
-    assert_eq!("g1", result);
-    g::received(Arg::Eq(1), Times::Once);
-}
+        // Act
+        let result = g(1);
 
-// TODO
-#[test]
-fn g_CallBase_Ok() {
-    // Arrange
-    g::setup(Arg::Any).call_base();
-    f::setup(Arg::Any).returns(String::from("quo vadis"));
+        // Assert
+        assert_eq!("g1", result);
+        g::received(Arg::Eq(1), Times::Once);
+    }
 
-    // Act
-    let result = g(3);
+    #[test]
+    fn g_CallBase_Ok() {
+        // Arrange
+        g::setup(Arg::Any).call_base();
+        f::setup(Arg::Any).returns(String::from("quo vadis"));
 
-    // Assert
-    assert_eq!("quo vadis", result);
-    g::received(Arg::Eq(3), Times::Once);
-    f::received(Arg::Eq(3), Times::Once);
+        // Act
+        let result = g(3);
+
+        // Assert
+        assert_eq!("quo vadis", result);
+        g::received(Arg::Eq(3), Times::Once);
+        f::received(Arg::Eq(3), Times::Once);
+    }
 }

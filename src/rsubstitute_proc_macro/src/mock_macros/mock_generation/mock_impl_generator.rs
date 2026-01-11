@@ -1,8 +1,8 @@
 use crate::constants;
-use crate::mock_macros::mock_generation::IMockConstructorBlockGenerator;
 use crate::mock_macros::mock_generation::models::*;
+use crate::mock_macros::mock_generation::IMockConstructorBlockGenerator;
 use crate::syntax::*;
-use proc_macro2::{Ident, Span};
+use proc_macro2::Ident;
 use quote::format_ident;
 use std::cell::LazyCell;
 use std::sync::Arc;
@@ -73,7 +73,7 @@ impl MockImplGenerator {
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
     ) -> ImplItem {
-        let block = self.mock_constructor_block_generator.generate_for_struct(
+        let block = self.mock_constructor_block_generator.generate_for_trait(
             mock_struct,
             mock_data_struct,
             mock_setup_struct,

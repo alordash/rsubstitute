@@ -8,7 +8,7 @@ use std::sync::Arc;
 pub struct FnData<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TBaseCaller> {
     fn_name: &'static str,
     calls: RefCell<Vec<TCall>>,
-    configs: RefCell<Vec<Arc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue, TBaseCaller>>>>>,
+    configs: *mut Vec<Arc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue, TBaseCaller>>>>,
     error_printer: Arc<dyn IErrorPrinter>,
 }
 
@@ -19,9 +19,14 @@ impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TBaseCaller>
         Self {
             fn_name,
             calls: RefCell::new(Vec::new()),
-            configs: RefCell::new(Vec::new()),
+            configs: Box::leak(Box::new(Vec::new())) as *mut Vec<_>,
             error_printer: services.error_printer.clone(),
         }
+    }
+
+    pub fn reset(&self) {
+        self.calls.borrow_mut().clear();
+        unsafe { (*self.configs).clear() };
     }
 }
 
@@ -39,7 +44,9 @@ impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TBase
     ) -> Arc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue, TBaseCaller>>> {
         let config = FnConfig::new(args_checker);
         let shared_config = Arc::new(RefCell::new(config));
-        self.configs.borrow_mut().push(shared_config.clone());
+        unsafe {
+            (*self.configs).push(shared_config.clone());
+        }
         return shared_config;
     }
 
@@ -49,7 +56,7 @@ impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TBase
         if let Some(fn_config) = maybe_fn_config {
             fn_config.borrow_mut().register_call(call);
             if let Some(callback) = fn_config.borrow_mut().get_callback() {
-                callback();
+                callback.borrow_mut()();
             }
         }
     }
@@ -61,7 +68,7 @@ impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TBase
         self.register_call(call.clone());
         fn_config.borrow_mut().register_call(call);
         if let Some(callback) = fn_config.borrow_mut().get_callback() {
-            callback();
+            callback.borrow_mut()();
         }
         let return_value = fn_config
             .borrow_mut()
@@ -90,7 +97,7 @@ impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TBase
         &self,
         call: TCall,
     ) -> Option<Arc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue, TBaseCaller>>>> {
-        let configs = self.configs.borrow();
+        let configs = unsafe { &*self.configs };
         let maybe_fn_config = configs
             .iter()
             .find(|config| {
@@ -132,13 +139,16 @@ impl<
 > FnData<TCall, TArgsChecker, TReturnValue, TBaseCaller>
 {
     pub fn handle_base(&self, call: TCall) {
-        let fn_config = self
-            .try_get_matching_config(call.clone())
-            .expect("No fn configuration found for this call! TODO: write call description");
+        let maybe_fn_config = self.try_get_matching_config(call.clone());
         self.register_call(call.clone());
-        fn_config.borrow_mut().register_call(call.clone());
-        if let Some(call_base) = fn_config.borrow().get_base_caller() {
-            call_base.borrow_mut().call_base(call);
+        if let Some(fn_config) = maybe_fn_config {
+            fn_config.borrow_mut().register_call(call.clone());
+            if let Some(call_base) = fn_config.borrow().get_base_caller() {
+                call_base.borrow_mut().call_base(call);
+            }
+            if let Some(callback) = fn_config.borrow().get_callback() {
+                callback.borrow_mut()();
+            }
         }
     }
 
@@ -150,6 +160,9 @@ impl<
         fn_config.borrow_mut().register_call(call.clone());
         if let Some(call_base) = fn_config.borrow().get_base_caller() {
             return call_base.borrow_mut().call_base(call);
+        }
+        if let Some(callback) = fn_config.borrow().get_callback() {
+            callback.borrow_mut()();
         }
         let return_value = fn_config
             .borrow_mut()

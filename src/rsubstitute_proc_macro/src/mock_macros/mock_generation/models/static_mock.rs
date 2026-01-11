@@ -1,5 +1,5 @@
 use syn::ItemStatic;
 
-pub(crate) struct StaticMock {
+pub struct StaticMock {
     pub item_static: ItemStatic
 }

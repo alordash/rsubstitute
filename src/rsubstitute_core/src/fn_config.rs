@@ -8,7 +8,7 @@ pub struct FnConfig<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TBas
     args_checker: TArgsChecker,
     return_values: VecDeque<TReturnValue>,
     calls: Vec<TCall>,
-    callback: Option<Box<dyn FnMut()>>,
+    callback: Option<Arc<RefCell<dyn FnMut()>>>,
     base_caller: Option<Arc<RefCell<TBaseCaller>>>,
 }
 
@@ -36,7 +36,7 @@ impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TBaseCaller>
     }
 
     pub fn set_callback(&mut self, callback: impl FnMut() + 'static) {
-        self.callback = Some(Box::new(callback));
+        self.callback = Some(Arc::new(RefCell::new(callback)));
     }
 
     pub fn register_call(&mut self, call: TCall) {
@@ -51,8 +51,8 @@ impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TBaseCaller>
         self.return_values.pop_front()
     }
 
-    pub fn get_callback(&mut self) -> Option<&mut Box<dyn FnMut()>> {
-        self.callback.as_mut()
+    pub fn get_callback(&self) -> Option<Arc<RefCell<dyn FnMut()>>> {
+        self.callback.clone()
     }
 }
 

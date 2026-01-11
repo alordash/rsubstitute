@@ -12,7 +12,7 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait IMockSetupImplGenerator {
-    fn generate_for_struct(
+    fn generate_for_trait(
         &self,
         mock_setup_struct: &MockSetupStruct,
         fn_infos: &[FnInfo],
@@ -37,7 +37,7 @@ pub(crate) struct MockSetupImplGenerator {
 }
 
 impl IMockSetupImplGenerator for MockSetupImplGenerator {
-    fn generate_for_struct(
+    fn generate_for_trait(
         &self,
         mock_setup_struct: &MockSetupStruct,
         fn_infos: &[FnInfo],
@@ -49,7 +49,7 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
         let fn_setups = fn_infos
             .iter()
             .map(|x| {
-                let output = self.setup_output_generator.generate_for_struct(x, None);
+                let output = self.setup_output_generator.generate_for_trait(x, None);
                 return ImplItem::Fn(self.generate_fn_setup(
                     x,
                     use_fn_info_ident_as_method_ident,
@@ -78,7 +78,7 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
         let use_fn_info_ident_as_method_ident = false;
         let output = self
             .setup_output_generator
-            .generate_for_struct(fn_info, Some(base_caller_struct));
+            .generate_for_trait(fn_info, Some(base_caller_struct));
         let fn_setup = ImplItem::Fn(self.generate_fn_setup(
             fn_info,
             use_fn_info_ident_as_method_ident,

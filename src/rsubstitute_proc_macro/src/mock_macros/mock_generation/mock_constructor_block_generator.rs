@@ -8,7 +8,7 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait IMockConstructorBlockGenerator {
-    fn generate_for_struct(
+    fn generate_for_trait(
         &self,
         mock_struct: &MockStruct,
         mock_data_struct: &MockDataStruct,
@@ -28,11 +28,10 @@ pub trait IMockConstructorBlockGenerator {
 
 pub(crate) struct MockConstructorBlockGenerator {
     pub path_factory: Arc<dyn IPathFactory>,
-    pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
 }
 
 impl IMockConstructorBlockGenerator for MockConstructorBlockGenerator {
-    fn generate_for_struct(
+    fn generate_for_trait(
         &self,
         mock_struct: &MockStruct,
         mock_data_struct: &MockDataStruct,
@@ -81,19 +80,9 @@ impl MockConstructorBlockGenerator {
     ) -> Block {
         let phantom_lifetime_field = constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE.clone();
         let mut data_fields: Vec<_> = mock_data_struct
-            .item_struct
-            .fields
+            .field_and_fn_idents
             .iter()
-            .skip(if maybe_base_caller_struct.is_some() {
-                2
-            } else {
-                1
-            }) // First is phantom data
-            .map(|field| {
-                let field_ident = field
-                    .ident
-                    .clone()
-                    .expect("Field in call struct should be named");
+            .map(|(field_ident, fn_ident)| {
                 FieldValue {
                     attrs: Vec::new(),
                     // TODO - do something with this "expect", it appears more than one time
@@ -125,7 +114,7 @@ impl MockConstructorBlockGenerator {
                             Expr::Lit(ExprLit {
                                 attrs: Vec::new(),
                                 lit: Lit::Str(LitStr::new(
-                                    &field_ident.to_string(),
+                                    &fn_ident.to_string(),
                                     Span::call_site(),
                                 )),
                             }),
@@ -172,11 +161,11 @@ impl MockConstructorBlockGenerator {
                                 .path_factory
                                 .create(base_caller_struct.item_struct.ident.clone()),
                         })]
-                            .into_iter()
-                            .collect(),
-                    })]
                         .into_iter()
                         .collect(),
+                    })]
+                    .into_iter()
+                    .collect(),
                 }),
             };
             data_fields.insert(1, base_caller_field);

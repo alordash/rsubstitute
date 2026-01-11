@@ -408,3 +408,5 @@ pub const LAZY_LOCK_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Laz
 pub const BASE_CALLER_FIELD_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("base_caller"));
 
 pub const CLONE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("clone"));
+
+pub const RESET_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("reset"));

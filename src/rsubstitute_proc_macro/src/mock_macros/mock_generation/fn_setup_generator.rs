@@ -66,6 +66,18 @@ impl IFnSetupGenerator for FnSetupGenerator {
 
 impl FnSetupGenerator {
     fn generate_fn_setup_block(&self, static_mock: &StaticMock, fn_info: &FnInfo) -> Block {
+        let reset_stmt = Stmt::Expr(
+            Expr::MethodCall(self.expr_method_call_factory.create(
+                vec![
+                    static_mock.item_static.ident.clone(),
+                    constants::DATA_IDENT.clone(),
+                    fn_info.data_field_ident.clone(),
+                ],
+                constants::RESET_IDENT.clone(),
+                Vec::new(),
+            )),
+            Some(Default::default()),
+        );
         let return_stmt = Stmt::Expr(
             Expr::Return(ExprReturn {
                 attrs: Vec::new(),
@@ -91,7 +103,7 @@ impl FnSetupGenerator {
             }),
             Some(Default::default()),
         );
-        let stmts = vec![return_stmt];
+        let stmts = vec![reset_stmt, return_stmt];
         let block = Block {
             brace_token: Default::default(),
             stmts,
