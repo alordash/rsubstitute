@@ -16,6 +16,7 @@ pub trait IStaticMockGenerator {
         mock_data_struct: &MockDataStruct,
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
+        base_caller_struct: &BaseCallerStruct
     ) -> StaticMock;
 }
 
@@ -33,6 +34,7 @@ impl IStaticMockGenerator for StaticMockGenerator {
         mock_data_struct: &MockDataStruct,
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
+        base_caller_struct: &BaseCallerStruct
     ) -> StaticMock {
         let ident = format_ident!("{}_{}", fn_decl.ident, Self::IDENT_SUFFIX);
         let ty = self.type_factory.wrap_in(
@@ -40,11 +42,12 @@ impl IStaticMockGenerator for StaticMockGenerator {
                 .create(mock_struct.item_struct.ident.clone()),
             constants::LAZY_LOCK_IDENT.clone(),
         );
-        let block = self.mock_constructor_block_generator.generate(
+        let block = self.mock_constructor_block_generator.generate_for_static(
             mock_struct,
             mock_data_struct,
             mock_setup_struct,
             mock_received_struct,
+            base_caller_struct
         );
         let call = ExprCall {
             attrs: Vec::new(),

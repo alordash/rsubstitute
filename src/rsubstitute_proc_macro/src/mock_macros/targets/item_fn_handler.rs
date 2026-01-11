@@ -85,6 +85,7 @@ impl IItemFnHandler for ItemFnHandler {
             &mock_data_struct,
             &mock_setup_struct,
             &mock_received_struct,
+            &base_caller_struct,
         );
         let fn_setup = self.fn_setup_generator.generate(
             &fn_info,

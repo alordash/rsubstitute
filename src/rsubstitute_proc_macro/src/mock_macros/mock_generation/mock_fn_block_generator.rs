@@ -51,6 +51,10 @@ impl MockFnBlockGenerator {
     const HANDLE_METHOD_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("handle")); // TODO - add test that it equals to FnData::handle
     const HANDLE_RETURNING_METHOD_IDENT: LazyCell<Ident> =
         LazyCell::new(|| format_ident!("handle_returning")); // TODO - add test that it equals to FnData::handle_returning
+    const HANDLE_BASE_METHOD_IDENT: LazyCell<Ident> =
+        LazyCell::new(|| format_ident!("handle_base")); // TODO - add test that it equals to FnData::handle
+    const HANDLE_BASE_RETURNING_METHOD_IDENT: LazyCell<Ident> =
+        LazyCell::new(|| format_ident!("handle_base_returning")); // TODO - add test that it equals to FnData::handle_returning
 
     fn generate_call_stmt(&self, fn_info: &FnInfo) -> Stmt {
         let fn_fields: Vec<_> = fn_info
@@ -127,19 +131,20 @@ impl MockFnBlockGenerator {
     }
 
     fn generate_handle_expr(&self, fn_info: &FnInfo, return_accessor: ReturnAccessor) -> Expr {
-        let return_accessor_ident = match return_accessor {
+        let return_accessor_ident = match &return_accessor {
             ReturnAccessor::SelfRef => constants::SELF_IDENT.clone(),
-            ReturnAccessor::Static(static_mock_ident) => static_mock_ident,
+            ReturnAccessor::Static(static_mock_ident) => static_mock_ident.clone(),
         };
         let idents = vec![
             return_accessor_ident,
             constants::DATA_IDENT.clone(),
             fn_info.data_field_ident.clone(),
         ];
-        let method = if fn_info.parent.has_return_value() {
-            Self::HANDLE_RETURNING_METHOD_IDENT.clone()
-        } else {
-            Self::HANDLE_METHOD_IDENT.clone()
+        let method = match (return_accessor, fn_info.parent.has_return_value()) {
+            (ReturnAccessor::SelfRef, true) => Self::HANDLE_RETURNING_METHOD_IDENT.clone(),
+            (ReturnAccessor::SelfRef, false) => Self::HANDLE_METHOD_IDENT.clone(),
+            (ReturnAccessor::Static(_), true) => Self::HANDLE_BASE_RETURNING_METHOD_IDENT.clone(),
+            (ReturnAccessor::Static(_), false) => Self::HANDLE_BASE_METHOD_IDENT.clone(),
         };
         let expr_method_call = self.expr_method_call_factory.create(
             idents,

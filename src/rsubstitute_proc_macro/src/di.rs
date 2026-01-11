@@ -122,6 +122,7 @@ fn create_services() -> ServiceCollection {
     let local_factory = Arc::new(LocalFactory);
     let mock_constructor_block_generator = Arc::new(MockConstructorBlockGenerator {
         path_factory: path_factory.clone(),
+        expr_method_call_factory: expr_method_call_factory.clone(),
     });
     let mock_impl_generator = Arc::new(MockImplGenerator {
         type_factory: type_factory.clone(),

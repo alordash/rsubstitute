@@ -1,8 +1,6 @@
 use crate::constants;
-use crate::mock_macros::mock_generation::models::{
-    MockDataStruct, MockReceivedStruct, MockSetupStruct, MockStruct,
-};
-use crate::syntax::{IPathFactory, ITypeFactory};
+use crate::mock_macros::mock_generation::models::*;
+use crate::syntax::*;
 use proc_macro2::Span;
 use quote::format_ident;
 use std::cell::LazyCell;
@@ -10,33 +8,87 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait IMockConstructorBlockGenerator {
-    fn generate(
+    fn generate_for_struct(
         &self,
         mock_struct: &MockStruct,
         mock_data_struct: &MockDataStruct,
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
     ) -> Block;
+
+    fn generate_for_static(
+        &self,
+        mock_struct: &MockStruct,
+        mock_data_struct: &MockDataStruct,
+        mock_setup_struct: &MockSetupStruct,
+        mock_received_struct: &MockReceivedStruct,
+        base_caller_struct: &BaseCallerStruct,
+    ) -> Block;
 }
 
 pub(crate) struct MockConstructorBlockGenerator {
     pub path_factory: Arc<dyn IPathFactory>,
+    pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
 }
 
 impl IMockConstructorBlockGenerator for MockConstructorBlockGenerator {
-    fn generate(
+    fn generate_for_struct(
         &self,
         mock_struct: &MockStruct,
         mock_data_struct: &MockDataStruct,
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
     ) -> Block {
+        let result = self.generate(
+            mock_struct,
+            mock_data_struct,
+            mock_setup_struct,
+            mock_received_struct,
+            None,
+        );
+        return result;
+    }
+
+    fn generate_for_static(
+        &self,
+        mock_struct: &MockStruct,
+        mock_data_struct: &MockDataStruct,
+        mock_setup_struct: &MockSetupStruct,
+        mock_received_struct: &MockReceivedStruct,
+        base_caller_struct: &BaseCallerStruct,
+    ) -> Block {
+        let result = self.generate(
+            mock_struct,
+            mock_data_struct,
+            mock_setup_struct,
+            mock_received_struct,
+            Some(base_caller_struct),
+        );
+        return result;
+    }
+}
+
+impl MockConstructorBlockGenerator {
+    const DATA_VAR_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("data"));
+
+    fn generate(
+        &self,
+        mock_struct: &MockStruct,
+        mock_data_struct: &MockDataStruct,
+        mock_setup_struct: &MockSetupStruct,
+        mock_received_struct: &MockReceivedStruct,
+        maybe_base_caller_struct: Option<&BaseCallerStruct>,
+    ) -> Block {
         let phantom_lifetime_field = constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE.clone();
-        let data_fields = mock_data_struct
+        let mut data_fields: Vec<_> = mock_data_struct
             .item_struct
             .fields
             .iter()
-            .skip(1) // First is phantom data
+            .skip(if maybe_base_caller_struct.is_some() {
+                2
+            } else {
+                1
+            }) // First is phantom data
             .map(|field| {
                 let field_ident = field
                     .ident
@@ -83,7 +135,52 @@ impl IMockConstructorBlockGenerator for MockConstructorBlockGenerator {
                         .collect(),
                     }),
                 }
-            });
+            })
+            .collect();
+        data_fields.insert(0, phantom_lifetime_field);
+        if let Some(base_caller_struct) = maybe_base_caller_struct {
+            let base_caller_field = FieldValue {
+                attrs: Vec::new(),
+                member: Member::Named(constants::BASE_CALLER_FIELD_IDENT.clone()),
+                colon_token: Some(Default::default()),
+                expr: Expr::Call(ExprCall {
+                    attrs: Vec::new(),
+                    func: Box::new(Expr::Path(ExprPath {
+                        attrs: Vec::new(),
+                        qself: None,
+                        path: self.path_factory.create_from_parts(&[
+                            constants::ARC_IDENT.clone(),
+                            constants::NEW_IDENT.clone(),
+                        ]),
+                    })),
+                    paren_token: Default::default(),
+                    args: [Expr::Call(ExprCall {
+                        attrs: Vec::new(),
+                        func: Box::new(Expr::Path(ExprPath {
+                            attrs: Vec::new(),
+                            qself: None,
+                            path: self.path_factory.create_from_parts(&[
+                                constants::REF_CELL_IDENT.clone(),
+                                constants::NEW_IDENT.clone(),
+                            ]),
+                        })),
+                        paren_token: Default::default(),
+                        args: [Expr::Path(ExprPath {
+                            attrs: Vec::new(),
+                            qself: None,
+                            path: self
+                                .path_factory
+                                .create(base_caller_struct.item_struct.ident.clone()),
+                        })]
+                            .into_iter()
+                            .collect(),
+                    })]
+                        .into_iter()
+                        .collect(),
+                }),
+            };
+            data_fields.insert(1, base_caller_field);
+        }
         let data_stmt = Stmt::Local(Local {
             attrs: Vec::new(),
             let_token: Default::default(),
@@ -114,9 +211,7 @@ impl IMockConstructorBlockGenerator for MockConstructorBlockGenerator {
                             .path_factory
                             .create(mock_data_struct.item_struct.ident.clone()),
                         brace_token: Default::default(),
-                        fields: std::iter::once(phantom_lifetime_field)
-                            .chain(data_fields)
-                            .collect(),
+                        fields: data_fields.into_iter().collect(),
                         dot2_token: None,
                         rest: None,
                     })]
@@ -188,8 +283,4 @@ impl IMockConstructorBlockGenerator for MockConstructorBlockGenerator {
         };
         return block;
     }
-}
-
-impl MockConstructorBlockGenerator {
-    const DATA_VAR_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("data"));
 }

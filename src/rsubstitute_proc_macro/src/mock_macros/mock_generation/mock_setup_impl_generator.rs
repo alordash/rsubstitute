@@ -54,6 +54,7 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
                     x,
                     use_fn_info_ident_as_method_ident,
                     output,
+                    None,
                 ));
             })
             .collect();
@@ -82,6 +83,7 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
             fn_info,
             use_fn_info_ident_as_method_ident,
             output,
+            Some(base_caller_struct),
         ));
 
         let item_impl = self
@@ -102,6 +104,7 @@ impl MockSetupImplGenerator {
         fn_info: &FnInfo,
         use_fn_info_ident_as_method_ident: bool,
         output: ReturnType,
+        maybe_base_caller_struct: Option<&BaseCallerStruct>,
     ) -> ImplItemFn {
         let sig = Signature {
             // TODO - all these `None` should be actually mapped to souarce fns signature
@@ -123,7 +126,7 @@ impl MockSetupImplGenerator {
             variadic: None,
             output,
         };
-        let block = self.generate_fn_setup_block(fn_info);
+        let block = self.generate_fn_setup_block(fn_info, maybe_base_caller_struct);
         let impl_item_fn = ImplItemFn {
             attrs: vec![
                 constants::ALLOW_UNUSED_ATTRIBUTE.clone(),
@@ -137,7 +140,11 @@ impl MockSetupImplGenerator {
         return impl_item_fn;
     }
 
-    fn generate_fn_setup_block(&self, fn_info: &FnInfo) -> Block {
+    fn generate_fn_setup_block(
+        &self,
+        fn_info: &FnInfo,
+        maybe_base_caller_struct: Option<&BaseCallerStruct>,
+    ) -> Block {
         let (args_checker_var_ident, args_checker_decl_stmt) = self
             .input_args_generator
             .generate_args_checker_var_ident_and_decl_stmt(fn_info);
@@ -157,6 +164,34 @@ impl MockSetupImplGenerator {
                 diverge: None,
             },
         ));
+        let base_caller_path = if maybe_base_caller_struct.is_some() {
+            Expr::Call(ExprCall {
+                attrs: Vec::new(),
+                func: Box::new(Expr::Path(ExprPath {
+                    attrs: Vec::new(),
+                    qself: None,
+                    path: constants::OPTION_SOME_PATH.clone(),
+                })),
+                paren_token: Default::default(),
+                args: [Expr::MethodCall(self.expr_method_call_factory.create(
+                    vec![
+                        constants::SELF_IDENT.clone(),
+                        constants::DATA_IDENT.clone(),
+                        constants::BASE_CALLER_FIELD_IDENT.clone(),
+                    ],
+                    constants::CLONE_IDENT.clone(),
+                    Vec::new(),
+                ))]
+                .into_iter()
+                .collect(),
+            })
+        } else {
+            Expr::Path(ExprPath {
+                attrs: Vec::new(),
+                qself: None,
+                path: constants::OPTION_NONE_PATH.clone(),
+            })
+        };
         let shared_fn_config_decl_stmt = Stmt::Local(
             self.local_factory.create(
                 Self::SHARED_FN_CONFIG_VAR_IDENT.clone(),
@@ -196,11 +231,7 @@ impl MockSetupImplGenerator {
                                 qself: None,
                                 path: constants::SELF_IDENT_PATH.clone(),
                             }),
-                            Expr::Path(ExprPath {
-                                attrs: Vec::new(),
-                                qself: None,
-                                path: constants::OPTION_NONE_PATH.clone(),
-                            }),
+                            base_caller_path,
                         ]
                         .into_iter()
                         .collect(),

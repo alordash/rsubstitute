@@ -9,6 +9,7 @@ pub mod for_generated {
     pub use crate::*;
     pub use macros::*;
     pub use std::cell::LazyCell;
+    pub use std::cell::RefCell;
     pub use std::marker::PhantomData;
     pub use std::sync::Arc;
     pub use std::sync::LazyLock;

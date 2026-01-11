@@ -242,6 +242,7 @@ pub const VEC_OF_ARG_CHECK_RESULT_TYPE: LazyCell<Type> = LazyCell::new(|| {
 });
 
 pub const ARC_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Arc"));
+pub const REF_CELL_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("RefCell"));
 
 pub const REF_SELF_ARG: LazyCell<FnArg> = LazyCell::new(|| {
     let result = FnArg::Receiver(Receiver {
@@ -394,7 +395,16 @@ pub const OPTION_NONE_PATH: LazyCell<Path> = LazyCell::new(|| {
     return result;
 });
 
+pub const OPTION_SOME_PATH: LazyCell<Path> = LazyCell::new(|| {
+    let path_factory = &SERVICES.path_factory;
+    let result = path_factory.create(format_ident!("Some"));
+    return result;
+});
+
 pub const SEND_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Send"));
 pub const SYNC_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Sync"));
 
 pub const LAZY_LOCK_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("LazyLock"));
+pub const BASE_CALLER_FIELD_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("base_caller"));
+
+pub const CLONE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("clone"));

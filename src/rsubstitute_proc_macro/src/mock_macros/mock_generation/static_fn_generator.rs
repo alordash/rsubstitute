@@ -68,6 +68,7 @@ impl IStaticFnGenerator for StaticFnGenerator {
 }
 
 impl StaticFnGenerator {
+    // TODO - remove duplicates
     fn convert_input_reference(&self, fn_arg: &mut FnArg) {
         let ty = match fn_arg {
             FnArg::Receiver(receiver) => {

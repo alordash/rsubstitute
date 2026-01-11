@@ -51,13 +51,17 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
         let base_caller_ty = self
             .type_factory
             .create_from_struct(&base_caller_struct.item_struct);
-        let fields = std::iter::once(constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD.clone())
-            .chain(
-                fn_infos
-                    .iter()
-                    .map(|x| self.generate_field(x, Some(base_caller_ty.clone()))),
-            )
-            .collect();
+        let fields = [
+            constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD.clone(),
+            self.generate_base_caller_field(base_caller_struct),
+        ]
+        .into_iter()
+        .chain(
+            fn_infos
+                .iter()
+                .map(|x| self.generate_field(x, Some(base_caller_ty.clone()))),
+        )
+        .collect();
         let fields_named = FieldsNamed {
             brace_token: Default::default(),
             named: fields,
@@ -112,6 +116,24 @@ impl MockDataStructGenerator {
                     .collect(),
                 },
             }),
+        };
+        return field;
+    }
+
+    fn generate_base_caller_field(&self, base_caller_struct: &BaseCallerStruct) -> Field {
+        let field = Field {
+            attrs: Vec::new(),
+            vis: Visibility::Inherited,
+            mutability: FieldMutability::None,
+            ident: Some(constants::BASE_CALLER_FIELD_IDENT.clone()),
+            colon_token: Some(Default::default()),
+            ty: self.type_factory.wrap_in_arc(
+                self.type_factory.wrap_in(
+                    self.type_factory
+                        .create_from_struct(&base_caller_struct.item_struct),
+                    constants::REF_CELL_IDENT.clone(),
+                ),
+            ),
         };
         return field;
     }
