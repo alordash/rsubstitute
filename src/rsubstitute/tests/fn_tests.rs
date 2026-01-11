@@ -1,16 +1,21 @@
 use rsubstitute::macros::mock;
+use rsubstitute_core::Times;
 use rsubstitute_core::args_matching::Arg;
 
 #[mock]
-fn global(number: i32) -> String {
+fn f(number: i32) -> String {
     return format!("REAL number is: {number}");
 }
 
 #[test]
-fn compile() {
-    global::setup(Arg::Any).returns(String::from("amogus"));
+fn f_ok() {
+    // Arrange
+    f::setup(Arg::Any).returns(String::from("amogus"));
 
-    let result = global(2);
+    // Act
+    let result = f(2);
 
+    // Assert
     assert_eq!("amogus", result);
+    f::received(Arg::Eq(2), Times::Once);
 }

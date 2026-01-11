@@ -6,7 +6,11 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait ISetupOutputGenerator {
-    fn generate_for_struct(&self, fn_info: &FnInfo) -> ReturnType;
+    fn generate_for_struct(
+        &self,
+        fn_info: &FnInfo,
+        maybe_base_caller_struct: Option<&BaseCallerStruct>,
+    ) -> ReturnType;
 
     fn generate_for_static(
         &self,
@@ -22,12 +26,19 @@ pub(crate) struct SetupOutputGenerator {
 }
 
 impl ISetupOutputGenerator for SetupOutputGenerator {
-    fn generate_for_struct(&self, fn_info: &FnInfo) -> ReturnType {
+    fn generate_for_struct(
+        &self,
+        fn_info: &FnInfo,
+        maybe_base_caller_struct: Option<&BaseCallerStruct>,
+    ) -> ReturnType {
+        let base_caller_type = maybe_base_caller_struct
+            .map(|x| self.type_factory.create_from_struct(&x.item_struct))
+            .unwrap_or(constants::VOID_TYPE.clone());
         let ty = self.generate(
             fn_info,
             constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
             constants::SELF_TYPE.clone(),
-            constants::VOID_TYPE.clone(),
+            base_caller_type,
         );
         let result = ReturnType::Type(Default::default(), Box::new(ty));
         return result;
