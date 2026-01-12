@@ -349,8 +349,6 @@ use global::global;
 mod global {
     use super::*;
     use rsubstitute::for_generated::*;
-    use std::ops::Deref;
-    use std::thread::LocalKey;
 
     fn base_global(number: i32) -> String {
         return format!("actual number: {number}");
@@ -462,14 +460,6 @@ mod global {
                 data,
             };
         });
-    }
-
-    fn flex<T>(local_key: &'static LocalKey<LazyLock<T>>) -> &'static LazyLock<T> {
-        let reference = local_key.with(|x| {
-            let magic: &'static LazyLock<T> = unsafe { std::mem::transmute(x) };
-            return magic;
-        });
-        return reference;
     }
 
     pub fn setup(
