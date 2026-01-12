@@ -482,14 +482,11 @@ mod global {
         globalSetup<'static>,
         globalBaseCaller,
     > {
-        let mock = flex(&global_MOCK);
-        mock.data.global_data.reset();
-        return mock.setup.setup(number);
+        return global_MOCK.magic().setup.setup(number);
     }
 
     pub fn received(number: Arg<'static, i32>, times: Times) -> &'static globalReceived<'static> {
-        let mock = flex(&global_MOCK);
-        return mock.received.received(number, times);
+        return global_MOCK.magic().received.received(number, times);
     }
 
     pub fn global(number: i32) -> String {
@@ -497,8 +494,11 @@ mod global {
             phantom_lifetime: PhantomData,
             number,
         };
-        let mock = flex(&global_MOCK);
-        return mock.data.global_data.handle_base_returning(call);
+        return global_MOCK
+            .magic()
+            .data
+            .global_data
+            .handle_base_returning(call);
     }
 }
 

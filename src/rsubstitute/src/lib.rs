@@ -1,5 +1,7 @@
 pub use rsubstitute_core::args_matching::*;
 pub use rsubstitute_core::*;
+use std::ops::Deref;
+use std::thread::LocalKey;
 
 pub mod macros {
     pub use rsubstitute_proc_macro::*;
@@ -17,3 +19,16 @@ pub mod for_generated {
 
 // TODO - move to separate crate?
 pub mod assertions;
+
+pub trait Flex<T> {
+    fn magic(&'static self) -> &'static T;
+}
+
+impl<T> Flex<T> for LocalKey<T> {
+    fn magic(&'static self) -> &'static T {
+        return self.with(|x| {
+            let magic: &'static T = unsafe { std::mem::transmute(x) };
+            return magic;
+        });
+    }
+}
