@@ -482,11 +482,11 @@ mod global {
         globalSetup<'static>,
         globalBaseCaller,
     > {
-        return global_MOCK.magic().setup.setup(number);
+        return global_MOCK.as_static().setup.setup(number);
     }
 
     pub fn received(number: Arg<'static, i32>, times: Times) -> &'static globalReceived<'static> {
-        return global_MOCK.magic().received.received(number, times);
+        return global_MOCK.as_static().received.received(number, times);
     }
 
     pub fn global(number: i32) -> String {
@@ -495,7 +495,7 @@ mod global {
             number,
         };
         return global_MOCK
-            .magic()
+            .as_static()
             .data
             .global_data
             .handle_base_returning(call);
