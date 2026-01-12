@@ -349,6 +349,8 @@ use global::global;
 mod global {
     use super::*;
     use rsubstitute::for_generated::*;
+    use std::ops::Deref;
+    use std::thread::LocalKey;
 
     fn base_global(number: i32) -> String {
         return format!("actual number: {number}");
@@ -401,14 +403,14 @@ mod global {
     }
 
     #[allow(non_camel_case_types)]
-    pub struct globalMock<'a> {
-        pub setup: globalSetup<'a>,
-        pub received: globalReceived<'a>,
-        data: Arc<globalData<'a>>,
+    pub struct globalMock {
+        pub setup: globalSetup<'static>,
+        pub received: globalReceived<'static>,
+        data: Arc<globalData<'static>>,
     }
 
-    unsafe impl<'a> Send for globalMock<'a> {}
-    unsafe impl<'a> Sync for globalMock<'a> {}
+    unsafe impl Send for globalMock {}
+    unsafe impl Sync for globalMock {}
 
     impl<'a> globalSetup<'a> {
         pub fn setup(
@@ -446,19 +448,29 @@ mod global {
         }
     }
 
-    #[allow(non_upper_case_globals)]
-    static global_MOCK: LazyLock<globalMock> = LazyLock::new(|| {
-        let data = Arc::new(globalData {
-            _phantom_lifetime: PhantomData,
-            base_caller: Arc::new(RefCell::new(globalBaseCaller)),
-            global_data: FnData::new("global", &SERVICES),
+    thread_local! {
+        #[allow(non_upper_case_globals)]
+        pub static global_MOCK: LazyLock<globalMock> = LazyLock::new(|| {
+            let data = Arc::new(globalData {
+                _phantom_lifetime: PhantomData,
+                base_caller: Arc::new(RefCell::new(globalBaseCaller)),
+                global_data: FnData::new("global", &SERVICES),
+            });
+            return globalMock {
+                setup: globalSetup { data: data.clone() },
+                received: globalReceived { data: data.clone() },
+                data,
+            };
         });
-        return globalMock {
-            setup: globalSetup { data: data.clone() },
-            received: globalReceived { data: data.clone() },
-            data,
-        };
-    });
+    }
+
+    fn flex<T>(local_key: &'static LocalKey<LazyLock<T>>) -> &'static LazyLock<T> {
+        let reference = local_key.with(|x| {
+            let magic: &'static LazyLock<T> = unsafe { std::mem::transmute(x) };
+            return magic;
+        });
+        return reference;
+    }
 
     pub fn setup(
         number: Arg<'static, i32>,
@@ -470,12 +482,14 @@ mod global {
         globalSetup<'static>,
         globalBaseCaller,
     > {
-        global_MOCK.data.global_data.reset();
-        return global_MOCK.setup.setup(number);
+        let mock = flex(&global_MOCK);
+        mock.data.global_data.reset();
+        return mock.setup.setup(number);
     }
 
     pub fn received(number: Arg<'static, i32>, times: Times) -> &'static globalReceived<'static> {
-        return global_MOCK.received.received(number, times);
+        let mock = flex(&global_MOCK);
+        return mock.received.received(number, times);
     }
 
     pub fn global(number: i32) -> String {
@@ -483,7 +497,8 @@ mod global {
             phantom_lifetime: PhantomData,
             number,
         };
-        return global_MOCK.data.global_data.handle_base_returning(call);
+        let mock = flex(&global_MOCK);
+        return mock.data.global_data.handle_base_returning(call);
     }
 }
 
@@ -516,6 +531,31 @@ mod tests {
         // assert_eq!("MOCK: 2", result1);
         assert_eq!("actual number: 2", result1);
         assert_eq!("MOCK: 143", result2_1);
+        // assert_eq!("MOCK: 143", result2_2);
+    }
+
+    #[test]
+    pub fn global_test2() {
+        // Arrange
+        global::setup(Arg::Eq(11))
+            .call_base()
+            .setup(Arg::Eq(33))
+            .returns("MOCK: 33".to_string());
+
+        // Act
+        let result1 = global(11);
+        let result2_1 = global(33);
+        // TODO - check how NSubstitute behaves.
+        // I think like this:
+        // 1. If return only one argument - keep returning it
+        // 2. If return many arguments - return only them until ran out of them, then throw
+        // let result2_2 = global(143);
+
+        // Assert
+        global::received(Arg::Eq(11), Times::Once).received(Arg::Eq(33), Times::Exactly(1));
+        // assert_eq!("MOCK: 2", result1);
+        assert_eq!("actual number: 11", result1);
+        assert_eq!("MOCK: 33", result2_1);
         // assert_eq!("MOCK: 143", result2_2);
     }
 }
