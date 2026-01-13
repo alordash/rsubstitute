@@ -10,6 +10,3 @@ path = "bin/main.rs"
 [dependencies]
 rsubstitute_core = { workspace = true }
 rsubstitute_proc_macro = { workspace = true }
-
-[dev-dependencies]
-serial_test = "3.3.1"

@@ -3,13 +3,11 @@ use rsubstitute_core::Times;
 use rsubstitute_proc_macro::mock;
 use std::cell::RefCell;
 use std::sync::Arc;
-use serial_test::serial;
 
 #[mock]
 fn f() {}
 
 #[test]
-#[serial]
 fn f_Ok() {
     // Arrange
     let callback_flag = Arc::new(RefCell::new(false));
@@ -26,7 +24,6 @@ fn f_Ok() {
 }
 
 #[test]
-#[serial]
 fn f_NoConfig_Ok() {
     // Arrange
     f::setup();
@@ -40,7 +37,6 @@ fn f_NoConfig_Ok() {
 }
 
 #[test]
-#[serial]
 fn f_MultipleTime_Ok() {
     // Arrange
     f::setup();
@@ -59,7 +55,6 @@ fn f_MultipleTime_Ok() {
 }
 
 #[test]
-#[serial]
 fn f_MultipleTimes_OkPanics() {
     // Arrange
     f::setup();
