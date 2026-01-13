@@ -26,19 +26,7 @@ impl IStaticFnGenerator for StaticFnGenerator {
             abi: None,
             fn_token: Default::default(),
             ident: fn_info.parent.ident.clone(),
-            generics: Generics {
-                lt_token: Some(Default::default()),
-                params: [GenericParam::Lifetime(LifetimeParam {
-                    attrs: Vec::new(),
-                    lifetime: constants::ANONYMOUS_LIFETIME.clone(),
-                    colon_token: None,
-                    bounds: Punctuated::new(),
-                })]
-                .into_iter()
-                .collect(),
-                gt_token: Some(Default::default()),
-                where_clause: None,
-            },
+            generics: Generics::default(),
             paren_token: Default::default(),
             inputs: fn_info
                 .parent

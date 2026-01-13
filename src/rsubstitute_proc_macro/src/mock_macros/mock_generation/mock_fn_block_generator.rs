@@ -32,11 +32,13 @@ impl IMockFnBlockGenerator for MockFnBlockGenerator {
     }
 
     fn generate_for_static(&self, fn_info: &FnInfo, static_mock: &StaticMock) -> Block {
+        let static_mock_expr = Expr::MethodCall(self.expr_method_call_factory.create(
+            vec![static_mock.item_static.ident.clone()],
+            constants::AS_STATIC_METHOD_IDENT.clone(),
+            vec![],
+        ));
         let call_stmt = self.generate_call_stmt(fn_info);
-        let last_stmt = self.generate_last_stmt(
-            fn_info,
-            ReturnAccessor::Static(static_mock.item_static.ident.clone()),
-        );
+        let last_stmt = self.generate_last_stmt(fn_info, ReturnAccessor::Static(static_mock_expr));
         let stmts = vec![call_stmt, last_stmt];
         let block = Block {
             brace_token: Default::default(),
@@ -131,12 +133,15 @@ impl MockFnBlockGenerator {
     }
 
     fn generate_handle_expr(&self, fn_info: &FnInfo, return_accessor: ReturnAccessor) -> Expr {
-        let return_accessor_ident = match &return_accessor {
-            ReturnAccessor::SelfRef => constants::SELF_IDENT.clone(),
+        let base_receiver = match &return_accessor {
+            ReturnAccessor::SelfRef => Expr::Path(ExprPath {
+                attrs: Vec::new(),
+                qself: None,
+                path: self.path_factory.create(constants::SELF_IDENT.clone()),
+            }),
             ReturnAccessor::Static(static_mock_ident) => static_mock_ident.clone(),
         };
         let idents = vec![
-            return_accessor_ident,
             constants::DATA_IDENT.clone(),
             fn_info.data_field_ident.clone(),
         ];
@@ -146,7 +151,8 @@ impl MockFnBlockGenerator {
             (ReturnAccessor::Static(_), true) => Self::HANDLE_BASE_RETURNING_METHOD_IDENT.clone(),
             (ReturnAccessor::Static(_), false) => Self::HANDLE_BASE_METHOD_IDENT.clone(),
         };
-        let expr_method_call = self.expr_method_call_factory.create(
+        let expr_method_call = self.expr_method_call_factory.create_with_base_receiver(
+            base_receiver,
             idents,
             method,
             vec![Self::CALL_VARIABLE_IDENT.clone()],
@@ -158,5 +164,5 @@ impl MockFnBlockGenerator {
 
 enum ReturnAccessor {
     SelfRef,
-    Static(Ident),
+    Static(Expr),
 }

@@ -345,6 +345,8 @@ fn global(number: i32) -> String {
 
 #[cfg(test)]
 use global::global;
+use rsubstitute_proc_macro::mock;
+
 #[cfg(test)]
 mod global {
     use super::*;
@@ -448,7 +450,7 @@ mod global {
 
     thread_local! {
         #[allow(non_upper_case_globals)]
-        pub static global_MOCK: LazyLock<globalMock> = LazyLock::new(|| {
+        static global_MOCK: LazyLock<globalMock> = LazyLock::new(|| {
             let data = Arc::new(globalData {
                 _phantom_lifetime: PhantomData,
                 base_caller: Arc::new(RefCell::new(globalBaseCaller)),
@@ -490,6 +492,11 @@ mod global {
             .global_data
             .handle_base_returning(call);
     }
+}
+
+#[mock]
+fn gre() -> i32 {
+    return 5423;
 }
 
 #[cfg(test)]

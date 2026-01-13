@@ -43,16 +43,19 @@ impl IFnReceivedGenerator for FnReceivedGenerator {
 
 impl FnReceivedGenerator {
     fn generate_fn_received_block(&self, fn_info: &FnInfo, static_mock: &StaticMock) -> Block {
+        let static_mock_expr = Expr::MethodCall(self.expr_method_call_factory.create(
+            vec![static_mock.item_static.ident.clone()],
+            constants::AS_STATIC_METHOD_IDENT.clone(),
+            vec![],
+        ));
         let return_stmt = Stmt::Expr(
             Expr::Return(ExprReturn {
                 attrs: Vec::new(),
                 return_token: Default::default(),
                 expr: Some(Box::new(Expr::MethodCall(
-                    self.expr_method_call_factory.create(
-                        vec![
-                            static_mock.item_static.ident.clone(),
-                            constants::MOCK_RECEIVED_FIELD_IDENT.clone(),
-                        ],
+                    self.expr_method_call_factory.create_with_base_receiver(
+                        static_mock_expr,
+                        vec![constants::MOCK_RECEIVED_FIELD_IDENT.clone()],
                         constants::MOCK_RECEIVED_FIELD_IDENT.clone(),
                         fn_info
                             .args_checker_struct

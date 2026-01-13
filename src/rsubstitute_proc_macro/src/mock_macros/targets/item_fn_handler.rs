@@ -61,7 +61,7 @@ impl IItemFnHandler for ItemFnHandler {
         let mock_received_struct = self
             .mock_received_struct_generator
             .generate_with_non_camel_case_allowed(&mock_ident, &mock_data_struct);
-        let mock_struct = self.mock_struct_generator.generate(
+        let mock_struct = self.mock_struct_generator.generate_for_static(
             mock_ident.clone(),
             &mock_setup_struct,
             &mock_received_struct,

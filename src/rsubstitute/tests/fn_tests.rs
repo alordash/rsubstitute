@@ -12,8 +12,8 @@ fn g(number: i32) -> String {
 
 mod tests {
     use crate::{f, g};
-    use rsubstitute_core::args_matching::Arg;
     use rsubstitute_core::Times;
+    use rsubstitute_core::args_matching::Arg;
 
     #[test]
     fn f_Ok() {

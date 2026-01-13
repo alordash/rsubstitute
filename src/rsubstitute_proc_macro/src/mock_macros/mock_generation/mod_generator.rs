@@ -2,9 +2,11 @@ use crate::constants;
 use crate::mock_macros::fn_info_generation::models::FnInfo;
 use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::models::GeneratedMod;
+use crate::syntax::IPathFactory;
 use proc_macro2::Ident;
-use quote::format_ident;
+use quote::{ToTokens, format_ident};
 use std::cell::LazyCell;
+use std::sync::Arc;
 use syn::*;
 
 pub trait IModGenerator {
@@ -39,11 +41,13 @@ pub trait IModGenerator {
         static_mock: StaticMock,
         fn_setup: ItemFn,
         fn_received: ItemFn,
-        static_fn: StaticFn
+        static_fn: StaticFn,
     ) -> GeneratedMod;
 }
 
-pub struct ModGenerator;
+pub(crate) struct ModGenerator {
+    pub path_factory: Arc<dyn IPathFactory>,
+}
 
 impl IModGenerator for ModGenerator {
     fn generate_trait(
@@ -133,7 +137,7 @@ impl IModGenerator for ModGenerator {
         static_mock: StaticMock,
         fn_setup: ItemFn,
         fn_received: ItemFn,
-        static_fn: StaticFn
+        static_fn: StaticFn,
     ) -> GeneratedMod {
         let fn_ident = item_fn.sig.ident.clone();
         let attrs = vec![constants::ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE.clone()];
@@ -141,6 +145,19 @@ impl IModGenerator for ModGenerator {
             constants::USE_SUPER.clone(),
             constants::USE_FOR_GENERATED.clone(),
         ];
+        let thread_local_static_mock = ItemMacro {
+            attrs: Vec::new(),
+            ident: None,
+            mac: Macro {
+                path: self
+                    .path_factory
+                    .create(constants::THREAD_LOCAL_MACROS_IDENT.clone()),
+                bang_token: Default::default(),
+                delimiter: MacroDelimiter::Brace(Default::default()),
+                tokens: static_mock.item_static.to_token_stream(),
+            },
+            semi_token: None,
+        };
         let items = usings
             .into_iter()
             .map(|x| Item::Use(x))
@@ -159,10 +176,10 @@ impl IModGenerator for ModGenerator {
                 Item::Impl(send_sync_impls.sync_impl),
                 Item::Impl(mock_setup_impl.item_impl),
                 Item::Impl(mock_received_impl.item_impl),
-                Item::Static(static_mock.item_static),
+                Item::Macro(thread_local_static_mock),
                 Item::Fn(fn_setup),
                 Item::Fn(fn_received),
-                Item::Fn(static_fn.item_fn)
+                Item::Fn(static_fn.item_fn),
             ])
             .collect();
         let item_mod = ItemMod {

@@ -9,6 +9,7 @@ use syn::*;
 pub trait IMockReceivedStructGenerator {
     fn generate(&self, mock_ident: &Ident, mock_data_struct: &MockDataStruct)
     -> MockReceivedStruct;
+
     fn generate_with_non_camel_case_allowed(
         &self,
         mock_ident: &Ident,
@@ -46,6 +47,7 @@ impl IMockReceivedStructGenerator for MockReceivedStructGenerator {
         let mock_received_struct = MockReceivedStruct { item_struct };
         return mock_received_struct;
     }
+
     fn generate_with_non_camel_case_allowed(
         &self,
         mock_ident: &Ident,

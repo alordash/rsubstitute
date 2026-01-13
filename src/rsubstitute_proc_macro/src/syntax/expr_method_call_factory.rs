@@ -1,7 +1,7 @@
 use crate::syntax::{IFieldAccessExprFactory, IPathFactory};
 use proc_macro2::Ident;
 use std::sync::Arc;
-use syn::{Expr, ExprMethodCall, ExprPath};
+use syn::*;
 
 pub trait IExprMethodCallFactory {
     fn create(&self, members_idents: Vec<Ident>, method: Ident, args: Vec<Ident>)
@@ -12,6 +12,14 @@ pub trait IExprMethodCallFactory {
         members_idents: Vec<Ident>,
         method: Ident,
         args: Vec<Expr>,
+    ) -> ExprMethodCall;
+
+    fn create_with_base_receiver(
+        &self,
+        receiver: Expr,
+        members_idents: Vec<Ident>,
+        method: Ident,
+        args: Vec<Ident>,
     ) -> ExprMethodCall;
 }
 
@@ -27,19 +35,7 @@ impl IExprMethodCallFactory for ExprMethodCallFactory {
         method: Ident,
         args: Vec<Ident>,
     ) -> ExprMethodCall {
-        let result = self.create_with_expr_args(
-            members_idents,
-            method,
-            args.into_iter()
-                .map(|arg| {
-                    Expr::Path(ExprPath {
-                        attrs: Vec::new(),
-                        qself: None,
-                        path: self.path_factory.create(arg.clone()),
-                    })
-                })
-                .collect(),
-        );
+        let result = self.create_with_expr_args(members_idents, method, self.convert_args(args));
         return result;
     }
 
@@ -60,5 +56,43 @@ impl IExprMethodCallFactory for ExprMethodCallFactory {
             args: args.into_iter().collect(),
         };
         return expr_method_call;
+    }
+
+    fn create_with_base_receiver(
+        &self,
+        receiver: Expr,
+        members_idents: Vec<Ident>,
+        method: Ident,
+        args: Vec<Ident>,
+    ) -> ExprMethodCall {
+        let actual_receiver = self
+            .field_access_expr_factory
+            .create_with_base_expr(receiver, members_idents);
+        let expr_method_call = ExprMethodCall {
+            attrs: Vec::new(),
+            receiver: Box::new(actual_receiver),
+            dot_token: Default::default(),
+            method,
+            turbofish: None,
+            paren_token: Default::default(),
+            args: self.convert_args(args).into_iter().collect(),
+        };
+        return expr_method_call;
+    }
+}
+
+impl ExprMethodCallFactory {
+    fn convert_args(&self, args: Vec<Ident>) -> Vec<Expr> {
+        let expr_args = args
+            .into_iter()
+            .map(|arg| {
+                Expr::Path(ExprPath {
+                    attrs: Vec::new(),
+                    qself: None,
+                    path: self.path_factory.create(arg.clone()),
+                })
+            })
+            .collect();
+        return expr_args;
     }
 }

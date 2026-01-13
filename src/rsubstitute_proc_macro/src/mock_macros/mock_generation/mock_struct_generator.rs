@@ -13,6 +13,14 @@ pub trait IMockStructGenerator {
         mock_received_struct: &MockReceivedStruct,
         mock_data_struct: &MockDataStruct,
     ) -> MockStruct;
+
+    fn generate_for_static(
+        &self,
+        mock_ident: Ident,
+        mock_setup_struct: &MockSetupStruct,
+        mock_received_struct: &MockReceivedStruct,
+        mock_data_struct: &MockDataStruct,
+    ) -> MockStruct;
 }
 
 // TODO - make service impls internal
@@ -20,6 +28,7 @@ pub(crate) struct MockStructGenerator {
     pub field_factory: Arc<dyn IFieldFactory>,
     pub type_factory: Arc<dyn ITypeFactory>,
     pub struct_factory: Arc<dyn IStructFactory>,
+    pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
 }
 
 impl IMockStructGenerator for MockStructGenerator {
@@ -57,5 +66,32 @@ impl IMockStructGenerator for MockStructGenerator {
         let item_struct = self.struct_factory.create(attrs, mock_ident, fields);
         let result = MockStruct { item_struct };
         return result;
+    }
+
+    fn generate_for_static(
+        &self,
+        mock_ident: Ident,
+        mock_setup_struct: &MockSetupStruct,
+        mock_received_struct: &MockReceivedStruct,
+        mock_data_struct: &MockDataStruct,
+    ) -> MockStruct {
+        let mut mock_struct = self.generate(
+            mock_ident,
+            mock_setup_struct,
+            mock_received_struct,
+            mock_data_struct,
+        );
+        mock_struct.item_struct.generics.params = mock_struct
+            .item_struct
+            .generics
+            .params
+            .into_iter()
+            .skip(1)
+            .collect();
+        for field in mock_struct.item_struct.fields.iter_mut() {
+            self.reference_normalizer.staticify(&mut field.ty);
+        }
+
+        return mock_struct;
     }
 }

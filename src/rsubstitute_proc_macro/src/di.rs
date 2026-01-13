@@ -90,6 +90,7 @@ fn create_services() -> ServiceCollection {
         type_factory: type_factory.clone(),
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
+        reference_normalizer: reference_normalizer.clone(),
     });
     let send_sync_impls_generator = Arc::new(SendSyncImplsGenerator {
         path_factory: path_factory.clone(),
@@ -165,7 +166,9 @@ fn create_services() -> ServiceCollection {
         path_factory: path_factory.clone(),
         mock_constructor_block_generator: mock_constructor_block_generator.clone(),
     });
-    let mod_generator = Arc::new(ModGenerator);
+    let mod_generator = Arc::new(ModGenerator {
+        path_factory: path_factory.clone(),
+    });
 
     let derive_args_formatter_macro_handler = Arc::new(DeriveArgsFormatterMacroHandler {
         path_factory: path_factory.clone(),

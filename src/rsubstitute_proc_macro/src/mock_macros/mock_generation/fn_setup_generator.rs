@@ -66,10 +66,15 @@ impl IFnSetupGenerator for FnSetupGenerator {
 
 impl FnSetupGenerator {
     fn generate_fn_setup_block(&self, static_mock: &StaticMock, fn_info: &FnInfo) -> Block {
+        let static_mock_expr = Expr::MethodCall(self.expr_method_call_factory.create(
+            vec![static_mock.item_static.ident.clone()],
+            constants::AS_STATIC_METHOD_IDENT.clone(),
+            vec![],
+        ));
         let reset_stmt = Stmt::Expr(
-            Expr::MethodCall(self.expr_method_call_factory.create(
+            Expr::MethodCall(self.expr_method_call_factory.create_with_base_receiver(
+                static_mock_expr.clone(),
                 vec![
-                    static_mock.item_static.ident.clone(),
                     constants::DATA_IDENT.clone(),
                     fn_info.data_field_ident.clone(),
                 ],
@@ -83,11 +88,9 @@ impl FnSetupGenerator {
                 attrs: Vec::new(),
                 return_token: Default::default(),
                 expr: Some(Box::new(Expr::MethodCall(
-                    self.expr_method_call_factory.create(
-                        vec![
-                            static_mock.item_static.ident.clone(),
-                            constants::MOCK_SETUP_FIELD_IDENT.clone(),
-                        ],
+                    self.expr_method_call_factory.create_with_base_receiver(
+                        static_mock_expr,
+                        vec![constants::MOCK_SETUP_FIELD_IDENT.clone()],
                         constants::MOCK_SETUP_FIELD_IDENT.clone(),
                         fn_info
                             .args_checker_struct

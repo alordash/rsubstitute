@@ -406,7 +406,11 @@ pub const SYNC_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Sy
 
 pub const LAZY_LOCK_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("LazyLock"));
 pub const BASE_CALLER_FIELD_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("base_caller"));
+pub const AS_STATIC_METHOD_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("as_static"));
 
 pub const CLONE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("clone"));
 
 pub const RESET_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("reset"));
+
+pub const THREAD_LOCAL_MACROS_IDENT: LazyCell<Ident> =
+    LazyCell::new(|| format_ident!("thread_local"));

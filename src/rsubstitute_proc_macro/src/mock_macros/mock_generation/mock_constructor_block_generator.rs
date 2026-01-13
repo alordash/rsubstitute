@@ -78,7 +78,6 @@ impl MockConstructorBlockGenerator {
         mock_received_struct: &MockReceivedStruct,
         maybe_base_caller_struct: Option<&BaseCallerStruct>,
     ) -> Block {
-        let phantom_lifetime_field = constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE.clone();
         let mut data_fields: Vec<_> = mock_data_struct
             .field_and_fn_idents
             .iter()
@@ -126,6 +125,7 @@ impl MockConstructorBlockGenerator {
                 }
             })
             .collect();
+        let phantom_lifetime_field = constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE.clone();
         data_fields.insert(0, phantom_lifetime_field);
         if let Some(base_caller_struct) = maybe_base_caller_struct {
             let base_caller_field = FieldValue {
