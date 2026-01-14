@@ -72,7 +72,7 @@ impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TBase
         }
         let return_value = fn_config
             .borrow_mut()
-            .take_return_value()
+            .get_return_value()
             .expect("No return value configured for 'another_work'! TODO: write call description?");
         return return_value;
     }
@@ -100,6 +100,7 @@ impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TBase
         let configs = unsafe { &*self.configs };
         let maybe_fn_config = configs
             .iter()
+            .rev()
             .find(|config| {
                 config
                     .borrow()
@@ -166,7 +167,7 @@ impl<
         }
         let return_value = fn_config
             .borrow_mut()
-            .take_return_value()
+            .get_return_value()
             .expect("No return value configured for 'another_work'! TODO: write call description?");
         return return_value;
     }

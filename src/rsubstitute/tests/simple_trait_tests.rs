@@ -4,8 +4,6 @@ use rsubstitute::macros::mock;
 #[mock]
 trait Trait {
     fn f(&self);
-
-    fn many(&self) -> i32;
 }
 
 #[mock]
@@ -124,24 +122,4 @@ Actually received 3 matching calls:
 	f()
 Received no non-matching calls"#,
     );
-}
-
-// TODO - move to value_type_trait_tests
-#[test]
-fn return_many_correct() {
-    // Arrange
-    let mock = TraitMock::new();
-
-    let return_values = [1, 2, 4, 5];
-    mock.setup.many().returns_many(&return_values);
-
-    // Act
-    let first_value = mock.many();
-    let second_value = mock.many();
-    let third_value = mock.many();
-    let fourth_value = mock.many();
-
-    // Assert
-    let actual_values = [first_value, second_value, third_value, fourth_value];
-    assert_eq!(return_values, actual_values);
 }

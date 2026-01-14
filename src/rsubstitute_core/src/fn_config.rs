@@ -6,6 +6,7 @@ use std::sync::Arc;
 
 pub struct FnConfig<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TBaseCaller> {
     args_checker: TArgsChecker,
+    current_return_value_index: usize,
     return_values: VecDeque<TReturnValue>,
     calls: Vec<TCall>,
     callback: Option<Arc<RefCell<dyn FnMut()>>>,
@@ -18,6 +19,7 @@ impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TBaseCaller>
     pub fn new(args_checker: TArgsChecker) -> Self {
         FnConfig {
             args_checker,
+            current_return_value_index: 0,
             return_values: VecDeque::new(),
             calls: Vec::new(),
             callback: None,
@@ -47,8 +49,14 @@ impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TBaseCaller>
         self.args_checker.check(call)
     }
 
-    pub fn take_return_value(&mut self) -> Option<TReturnValue> {
-        self.return_values.pop_front()
+    pub fn get_return_value(&mut self) -> Option<TReturnValue> {
+        let return_value = self
+            .return_values
+            .get(self.current_return_value_index)
+            .cloned();
+        self.current_return_value_index =
+            (self.current_return_value_index + 1).min(self.return_values.len() - 1);
+        return return_value;
     }
 
     pub fn get_callback(&self) -> Option<Arc<RefCell<dyn FnMut()>>> {
