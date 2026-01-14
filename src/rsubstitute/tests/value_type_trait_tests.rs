@@ -285,26 +285,46 @@ mod return_value {
     #[test]
     fn return_value_UsesLastConfiguration_Ok() {
         // Arrange
+        #[derive(Debug, PartialEq)]
+        enum Result {
+            DidNotChange,
+            SecondConfigChanged,
+            ThirdConfigChanged,
+        }
+
         let mock = TraitMock::new();
         let first_value = 10;
         let second_value = 22;
+        let third_value = 333;
+        let callback_result = Arc::new(RefCell::new(Result::DidNotChange));
+        let first_callback_counter_clone = callback_result.clone();
+        let second_callback_counter_clone = callback_result.clone();
         mock.setup
             .return_value()
             .returns(first_value)
             .return_value()
-            .returns(second_value);
+            .returns_and_does(second_value, move || {
+                *first_callback_counter_clone.borrow_mut() = Result::SecondConfigChanged
+            })
+            .return_value()
+            .returns_and_does(third_value, move || {
+                *second_callback_counter_clone.borrow_mut() = Result::ThirdConfigChanged
+            });
 
         // Act
         let actual_first_value = mock.return_value();
         let actual_second_value = mock.return_value();
+        let actual_third_value = mock.return_value();
 
         // Assert
-        assert_eq!(second_value, actual_first_value);
-        assert_eq!(second_value, actual_second_value);
+        assert_eq!(third_value, actual_first_value);
+        assert_eq!(third_value, actual_second_value);
+        assert_eq!(third_value, actual_third_value);
+        assert_eq!(Result::ThirdConfigChanged, *callback_result.borrow());
     }
 
     #[test]
-    fn return_value_Multiple_Ok() {
+    fn return_value_Many_Ok() {
         // Arrange
         let mock = TraitMock::new();
         let first_value = 10;
@@ -328,7 +348,7 @@ mod return_value {
     }
 
     #[test]
-    fn return_value_MultipleToSingle_Ok() {
+    fn return_value_ManyToSingle_Ok() {
         // Arrange
         let mock = TraitMock::new();
         let second_value = 22;

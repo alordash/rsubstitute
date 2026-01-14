@@ -44,18 +44,13 @@ impl<'a, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TOwner, 
         return self.owner;
     }
 
-    pub fn does(&self, callback: impl FnMut() + 'static) -> &'a TOwner {
-        self.fn_config.borrow_mut().set_callback(callback);
-        return self.owner;
-    }
-
     pub fn returns_and_does(
         &self,
         return_value: TReturnValue,
         callback: impl FnMut() + 'static,
     ) -> &'a TOwner {
         self.returns(return_value);
-        self.does(callback);
+        self.fn_config.borrow_mut().set_callback(callback);
         return self.owner;
     }
 
@@ -65,11 +60,19 @@ impl<'a, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TOwner, 
         callback: impl FnMut() + 'static,
     ) -> &'a TOwner {
         self.returns_many(return_values);
-        self.does(callback);
+        self.fn_config.borrow_mut().set_callback(callback);
         return self.owner;
     }
 }
 
+impl<'a, TCall, TArgsChecker: IArgsChecker<TCall>, TOwner, TBaseCaller>
+    SharedFnConfig<'a, TCall, TArgsChecker, (), TOwner, TBaseCaller>
+{
+    pub fn does(&self, callback: impl FnMut() + 'static) -> &'a TOwner {
+        self.fn_config.borrow_mut().set_callback(callback);
+        return self.owner;
+    }
+}
 impl<
     'a,
     TCall,
