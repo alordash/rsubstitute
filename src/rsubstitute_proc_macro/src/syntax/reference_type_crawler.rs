@@ -29,7 +29,7 @@ impl ReferenceTypeCrawler {
                 self.recursive_get_all_type_references(result, type_paren.elem.as_mut())
             }
             Type::Path(type_path) => {
-                self.recursive_get_all_type_references_from_path(result, type_path)
+                self.recursive_get_all_type_references_from_path(result, &mut type_path.path)
             }
             Type::Reference(type_reference) => {
                 // TODO - cursed. Maybe store only &mut Lifetime in result vector.
@@ -47,6 +47,9 @@ impl ReferenceTypeCrawler {
             Type::Tuple(type_tuple) => {
                 self.recursive_get_all_type_references_from_tuple(result, type_tuple)
             }
+            Type::ImplTrait(type_impl_trait) => {
+                self.recursive_get_all_type_references_from_type_impl_trait(result, type_impl_trait)
+            }
             _ => (),
         };
     }
@@ -63,9 +66,9 @@ impl ReferenceTypeCrawler {
     fn recursive_get_all_type_references_from_path<'a>(
         &self,
         result: &mut Vec<LifetimeRef<'a>>,
-        type_path: &'a mut TypePath,
+        path: &'a mut Path,
     ) {
-        for path_segment in type_path.path.segments.iter_mut() {
+        for path_segment in path.segments.iter_mut() {
             match &mut path_segment.arguments {
                 PathArguments::AngleBracketed(generic_arguments) => {
                     for generic_argument in generic_arguments.args.iter_mut() {
@@ -95,6 +98,32 @@ impl ReferenceTypeCrawler {
     ) {
         for elem_type in type_tuple.elems.iter_mut() {
             self.recursive_get_all_type_references(result, elem_type);
+        }
+    }
+
+    fn recursive_get_all_type_references_from_type_impl_trait<'a>(
+        &self,
+        result: &mut Vec<LifetimeRef<'a>>,
+        type_impl_trait: &'a mut TypeImplTrait,
+    ) {
+        for type_param_bound in type_impl_trait.bounds.iter_mut() {
+            match type_param_bound {
+                TypeParamBound::Trait(r#trait) => {
+                    self.recursive_get_all_type_references_from_path(result, &mut r#trait.path);
+                }
+                TypeParamBound::Lifetime(lifetime) => result.push(LifetimeRef::Required(lifetime)),
+                TypeParamBound::PreciseCapture(precise_capture) => {
+                    for param in precise_capture.params.iter_mut() {
+                        match param {
+                            CapturedParam::Lifetime(lifetime) => {
+                                result.push(LifetimeRef::Required(lifetime))
+                            }
+                            _ => (),
+                        }
+                    }
+                }
+                _ => (),
+            }
         }
     }
 }

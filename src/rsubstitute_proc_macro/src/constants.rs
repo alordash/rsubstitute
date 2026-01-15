@@ -415,4 +415,5 @@ pub const RESET_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("reset")
 pub const THREAD_LOCAL_MACROS_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("thread_local"));
 
-pub const INTO_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Into"));
+pub const INTO_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Into"));
+pub const INTO_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("into"));

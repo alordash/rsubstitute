@@ -52,7 +52,7 @@ impl IInputArgsGenerator for InputArgsGenerator {
                             path: Path {
                                 leading_colon: None,
                                 segments: [PathSegment {
-                                    ident: constants::INTO_IDENT.clone(),
+                                    ident: constants::INTO_TRAIT_IDENT.clone(),
                                     arguments: PathArguments::AngleBracketed(
                                         AngleBracketedGenericArguments {
                                             colon2_token: None,
@@ -99,7 +99,7 @@ impl IInputArgsGenerator for InputArgsGenerator {
             .fields
             .iter()
             .skip(1)
-            .map(|field| self.field_value_factory.create(field))
+            .map(|field| self.field_value_factory.create_with_into_conversion(field))
             .collect();
         let args_checker_decl_stmt = Stmt::Local(
             self.local_factory.create(

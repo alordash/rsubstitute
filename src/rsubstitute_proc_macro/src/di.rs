@@ -96,12 +96,12 @@ fn create_services() -> ServiceCollection {
         path_factory: path_factory.clone(),
         type_factory: type_factory.clone(),
     });
-    let field_value_factory = Arc::new(FieldValueFactory {
-        path_factory: path_factory.clone(),
-    });
     let expr_method_call_factory = Arc::new(ExprMethodCallFactory {
         path_factory: path_factory.clone(),
         field_access_expr_factory: field_access_expr_factory.clone(),
+    });
+    let field_value_factory = Arc::new(FieldValueFactory {
+        expr_method_call_factory: expr_method_call_factory.clone(),
     });
     let std_mem_transmute_expr_factory = Arc::new(StdMemTransmuteExprFactory {
         path_factory: path_factory.clone(),

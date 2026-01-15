@@ -37,7 +37,7 @@ mod accept_value {
         // Assert
         mock.received
             .accept_value(Arg::Any, Times::Exactly(3))
-            .accept_value(Arg::Eq(first_value), Times::Once)
+            .accept_value(first_value, Times::Once)
             .accept_value(
                 Arg::Is(|actual_value| actual_value == first_value),
                 Times::Once,
@@ -448,11 +448,11 @@ mod accept_value_return_value {
         assert_eq!(third_returned_value, actual_third_returned_value);
 
         mock.received
-            .accept_value_return_value(Arg::Eq(first_accepted_value), Times::Once);
+            .accept_value_return_value(first_accepted_value, Times::Once);
         mock.received
-            .accept_value_return_value(Arg::Eq(second_accepted_value), Times::Once);
+            .accept_value_return_value(second_accepted_value, Times::Once);
         mock.received
-            .accept_value_return_value(Arg::Eq(third_accepted_value), Times::Once);
+            .accept_value_return_value(third_accepted_value, Times::Once);
     }
 
     #[test]
@@ -484,8 +484,8 @@ mod accept_value_return_value {
         assert_eq!(third_returned_value, actual_third_returned_value);
 
         mock.received
-            .accept_value_return_value(Arg::Eq(single_accepted_value), Times::Once)
-            .accept_value_return_value(Arg::Eq(double_accepted_value), Times::Exactly(2));
+            .accept_value_return_value(single_accepted_value, Times::Once)
+            .accept_value_return_value(double_accepted_value, Times::Exactly(2));
     }
 
     #[test]
@@ -558,6 +558,10 @@ mod accept_value_return_value {
             second_third_returned_value,
             actual_second_fourth_returned_value
         );
+
+        mock.received
+            .accept_value_return_value(first_accepted_value, Times::Exactly(3))
+            .accept_value_return_value(second_accepted_value, Times::Exactly(4));
     }
 
     #[test]
@@ -594,9 +598,9 @@ mod accept_value_return_value {
         assert_eq!(2, *second_callback_number.borrow());
 
         mock.received
-            .accept_value_return_value(Arg::Eq(first_accepted_value), Times::Once);
+            .accept_value_return_value(first_accepted_value, Times::Once);
         mock.received
-            .accept_value_return_value(Arg::Eq(second_accepted_value), Times::Once);
+            .accept_value_return_value(second_accepted_value, Times::Once);
     }
 }
 
@@ -615,6 +619,6 @@ mod accept_two_values {
 
         // Assert
         mock.received
-            .accept_two_values(Arg::Eq(v1), Arg::Eq(v2), Times::Once);
+            .accept_two_values(v1, v2, Times::Once);
     }
 }
