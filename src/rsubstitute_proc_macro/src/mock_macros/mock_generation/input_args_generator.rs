@@ -43,7 +43,34 @@ impl IInputArgsGenerator for InputArgsGenerator {
                         subpat: None,
                     })),
                     colon_token: Default::default(),
-                    ty: Box::new(field.ty.clone()),
+                    ty: Box::new(Type::ImplTrait(TypeImplTrait {
+                        impl_token: Default::default(),
+                        bounds: [TypeParamBound::Trait(TraitBound {
+                            paren_token: None,
+                            modifier: TraitBoundModifier::None,
+                            lifetimes: None,
+                            path: Path {
+                                leading_colon: None,
+                                segments: [PathSegment {
+                                    ident: constants::INTO_IDENT.clone(),
+                                    arguments: PathArguments::AngleBracketed(
+                                        AngleBracketedGenericArguments {
+                                            colon2_token: None,
+                                            lt_token: Default::default(),
+                                            args: [GenericArgument::Type(field.ty.clone())]
+                                                .into_iter()
+                                                .collect(),
+                                            gt_token: Default::default(),
+                                        },
+                                    ),
+                                }]
+                                .into_iter()
+                                .collect(),
+                            },
+                        })]
+                        .into_iter()
+                        .collect(),
+                    })),
                 })
             })
             .collect();
