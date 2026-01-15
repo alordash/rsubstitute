@@ -73,6 +73,7 @@ impl<'a, TCall, TArgsChecker: IArgsChecker<TCall>, TOwner, TBaseCaller>
         return self.owner;
     }
 }
+
 impl<
     'a,
     TCall,

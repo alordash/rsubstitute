@@ -394,3 +394,43 @@ mod return_value {
         assert_eq!(second_value, actual_third_value);
     }
 }
+
+mod accept_value_return_value {
+    use super::*;
+
+    #[test]
+    fn accept_value_return_value_Ok() {
+        // Arrange
+        let mock = TraitMock::new();
+        let first_accepted_value = 10;
+        let first_returned_value = 11.1;
+        let second_accepted_value = 20;
+        let second_returned_value = 22.2;
+        let third_accepted_value = 30;
+        let third_returned_value = 33.3;
+        mock.setup
+            .accept_value_return_value(Arg::Any)
+            .returns(first_returned_value)
+            .accept_value_return_value(Arg::Eq(second_accepted_value))
+            .returns(second_returned_value)
+            .accept_value_return_value(Arg::Is(|x| x == third_accepted_value))
+            .returns(third_returned_value);
+
+        // Act
+        let actual_first_returned_value = mock.accept_value_return_value(first_accepted_value);
+        let actual_second_returned_value = mock.accept_value_return_value(second_accepted_value);
+        let actual_third_returned_value = mock.accept_value_return_value(third_accepted_value);
+
+        // Assert
+        assert_eq!(first_returned_value, actual_first_returned_value);
+        assert_eq!(second_returned_value, actual_second_returned_value);
+        assert_eq!(third_returned_value, actual_third_returned_value);
+
+        mock.received
+            .accept_value_return_value(Arg::Eq(first_accepted_value), Times::Once);
+        mock.received
+            .accept_value_return_value(Arg::Eq(second_accepted_value), Times::Once);
+        mock.received
+            .accept_value_return_value(Arg::Eq(third_accepted_value), Times::Once);
+    }
+}
