@@ -227,11 +227,11 @@ mod generated {
     impl<'a> MyTraitMockSetup<'a> {
         pub fn work(
             &'a self,
-            value: Arg<'a, i32>,
+            value: impl Into<Arg<'a, i32>>,
         ) -> SharedFnConfig<'a, work_Call<'a>, work_ArgsChecker<'a>, (), Self, ()> {
             let work_args_checker = work_ArgsChecker {
                 phantom_lifetime: PhantomData,
-                value,
+                value: value.into(),
             };
             let fn_config = self.data.work_data.add_config(work_args_checker);
             let shared_fn_config = SharedFnConfig::new(fn_config, self, None);
@@ -240,10 +240,10 @@ mod generated {
 
         pub fn another_work(
             &'a self,
-            string: Arg<'a, &'a str>,
-            something: Arg<'a, &'a &'a [u8]>,
-            dyn_obj: Arg<'a, &'a dyn IFoo>,
-            arc: Arg<'a, Arc<dyn IFoo>>,
+            string: impl Into<Arg<'a, &'a str>>,
+            something: impl Into<Arg<'a, &'a &'a [u8]>>,
+            dyn_obj: impl Into<Arg<'a, &'a dyn IFoo>>,
+            arc: impl Into<Arg<'a, Arc<dyn IFoo>>>,
         ) -> SharedFnConfig<
             'a,
             another_work_Call<'a>,
@@ -254,10 +254,10 @@ mod generated {
         > {
             let another_work_args_checker = another_work_ArgsChecker {
                 phantom_lifetime: PhantomData,
-                string,
-                something,
-                dyn_obj,
-                arc,
+                string: string.into(),
+                something: something.into(),
+                dyn_obj: dyn_obj.into(),
+                arc: arc.into(),
             };
             let fn_config = self
                 .data
@@ -280,10 +280,10 @@ mod generated {
     }
 
     impl<'a> MyTraitMockReceived<'a> {
-        pub fn work(&'a self, value: Arg<'a, i32>, times: Times) -> &'a Self {
+        pub fn work(&'a self, value: impl Into<Arg<'a, i32>>, times: Times) -> &'a Self {
             let work_args_checker = work_ArgsChecker {
                 phantom_lifetime: PhantomData,
-                value,
+                value: value.into(),
             };
             self.data
                 .work_data
@@ -293,18 +293,18 @@ mod generated {
 
         pub fn another_work(
             &'a self,
-            string: Arg<'a, &'a str>,
-            something: Arg<'a, &'a &'a [u8]>,
-            dyn_obj: Arg<'a, &'a dyn IFoo>,
-            arc: Arg<'a, Arc<dyn IFoo>>,
+            string: impl Into<Arg<'a, &'a str>>,
+            something: impl Into<Arg<'a, &'a &'a [u8]>>,
+            dyn_obj: impl Into<Arg<'a, &'a dyn IFoo>>,
+            arc: impl Into<Arg<'a, Arc<dyn IFoo>>>,
             times: Times,
         ) -> &'a Self {
             let another_work_args_checker = another_work_ArgsChecker {
                 phantom_lifetime: PhantomData,
-                string,
-                something,
-                dyn_obj,
-                arc,
+                string: string.into(),
+                something: something.into(),
+                dyn_obj: dyn_obj.into(),
+                arc: arc.into(),
             };
             self.data
                 .another_work_data
@@ -575,7 +575,7 @@ fn main() {
         .work(Arg::Is(|value| value == 32))
         .does(|| println!("work mock called"))
         .another_work(
-            Arg::Eq(string),
+            Arg::Eq(string as &str),
             Arg::Eq(something),
             Arg::Any,
             Arg::Eq(arc_foo1.clone()),
@@ -612,10 +612,10 @@ fn main() {
     my_trait_mock.received.work(Arg::Eq(11111), Times::Once);
     my_trait_mock.received.work(Arg::Any, Times::Exactly(2));
     my_trait_mock.received.another_work(
-        Arg::Eq("que"),
+        "que",
         Arg::Any,
         Arg::Is(|_| false),
-        Arg::Eq(Arc::new(Foo(44))),
+        Arc::new(Foo(44)) as Arc<dyn IFoo>,
         Times::Exactly(22),
     );
     my_trait_mock.received.get(Times::Exactly(2));

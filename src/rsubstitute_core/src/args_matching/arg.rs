@@ -14,6 +14,12 @@ pub enum Arg<'a, T> {
     PrivateIs(&'a dyn Fn(T) -> bool, Private),
 }
 
+impl<'a, T> From<T> for Arg<'a, T> {
+    fn from(value: T) -> Self {
+        Self::Eq(value)
+    }
+}
+
 impl<'a, T: Debug> Debug for Arg<'a, T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         // TODO - extract to const field when std::any::type_name becomes stabilized as const fn
@@ -28,7 +34,7 @@ impl<'a, T: Debug> Debug for Arg<'a, T> {
 }
 
 impl<'a, T> Arg<'a, T> {
-    #[allow(non_snake_case)]    // beautify API ✨
+    #[allow(non_snake_case)] // beautify API ✨
     pub fn Is(predicate: impl Fn(T) -> bool + 'a) -> Self {
         let reference = Box::leak(Box::new(predicate));
         return Self::PrivateIs(reference, Private);
