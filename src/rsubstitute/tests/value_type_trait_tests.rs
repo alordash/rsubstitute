@@ -456,7 +456,7 @@ mod accept_value_return_value {
     }
 
     #[test]
-    fn accept_value_return_value_Many_Ok() {
+    fn accept_value_return_value_Many1_Ok() {
         // Arrange
         let mock = TraitMock::new();
         let single_accepted_value = 10;
@@ -486,6 +486,78 @@ mod accept_value_return_value {
         mock.received
             .accept_value_return_value(Arg::Eq(single_accepted_value), Times::Once)
             .accept_value_return_value(Arg::Eq(double_accepted_value), Times::Exactly(2));
+    }
+
+    #[test]
+    fn accept_value_return_value_Many2_Ok() {
+        // Arrange
+        let mock = TraitMock::new();
+        let first_accepted_value = 10;
+        let first_first_returned_value = 11.1;
+        let first_second_returned_value = 22.2;
+
+        let second_accepted_value = 200;
+        let second_first_returned_value = 201.1;
+        let second_second_returned_value = 202.2;
+        let second_third_returned_value = 203.3;
+
+        mock.setup
+            .accept_value_return_value(Arg::Eq(first_accepted_value))
+            .returns_many(&[first_first_returned_value, first_second_returned_value])
+            .accept_value_return_value(Arg::Eq(second_accepted_value))
+            .returns_many(&[
+                second_first_returned_value,
+                second_second_returned_value,
+                second_third_returned_value,
+            ]);
+
+        // Act
+        let actual_first_first_returned_value =
+            mock.accept_value_return_value(first_accepted_value);
+        let actual_first_second_returned_value =
+            mock.accept_value_return_value(first_accepted_value);
+        let actual_first_third_returned_value =
+            mock.accept_value_return_value(first_accepted_value);
+
+        let actual_second_first_returned_value =
+            mock.accept_value_return_value(second_accepted_value);
+        let actual_second_second_returned_value =
+            mock.accept_value_return_value(second_accepted_value);
+        let actual_second_third_returned_value =
+            mock.accept_value_return_value(second_accepted_value);
+        let actual_second_fourth_returned_value =
+            mock.accept_value_return_value(second_accepted_value);
+
+        // Assert
+        assert_eq!(
+            first_first_returned_value,
+            actual_first_first_returned_value
+        );
+        assert_eq!(
+            first_second_returned_value,
+            actual_first_second_returned_value
+        );
+        assert_eq!(
+            first_second_returned_value,
+            actual_first_third_returned_value
+        );
+
+        assert_eq!(
+            second_first_returned_value,
+            actual_second_first_returned_value
+        );
+        assert_eq!(
+            second_second_returned_value,
+            actual_second_second_returned_value
+        );
+        assert_eq!(
+            second_third_returned_value,
+            actual_second_third_returned_value
+        );
+        assert_eq!(
+            second_third_returned_value,
+            actual_second_fourth_returned_value
+        );
     }
 
     #[test]
