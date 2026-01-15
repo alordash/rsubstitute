@@ -19,6 +19,8 @@ trait Trait {
 
 mod accept_value {
     use super::*;
+    use std::cell::RefCell;
+    use std::sync::Arc;
 
     #[test]
     fn accept_value_Ok() {
@@ -45,6 +47,22 @@ mod accept_value {
                 Arg::Is(|actual_value| actual_value == second_value),
                 Times::Exactly(2),
             );
+    }
+
+    fn accept_value_Callback_ok() {
+        // Arrange
+        let mock = TraitMock::new();
+        let callback_flag = Arc::new(RefCell::new(false));
+        let callback_flag_clone = callback_flag.clone();
+        mock.setup
+            .accept_value(Arg::Any)
+            .does(move || *callback_flag_clone.borrow_mut() = true);
+
+        // Act
+        mock.accept_value(1);
+
+        // Assert
+        assert!(*callback_flag.borrow());
     }
 
     #[test]
@@ -397,6 +415,8 @@ mod return_value {
 
 mod accept_value_return_value {
     use super::*;
+    use std::cell::RefCell;
+    use std::sync::Arc;
 
     #[test]
     fn accept_value_return_value_Ok() {
@@ -432,5 +452,77 @@ mod accept_value_return_value {
             .accept_value_return_value(Arg::Eq(second_accepted_value), Times::Once);
         mock.received
             .accept_value_return_value(Arg::Eq(third_accepted_value), Times::Once);
+    }
+
+    #[test]
+    fn accept_value_return_value_Many_Ok() {
+        // Arrange
+        let mock = TraitMock::new();
+        let single_accepted_value = 10;
+        let double_accepted_value = 20;
+        let first_returned_value = 11.1;
+        let second_returned_value = 22.2;
+        let third_returned_value = 33.3;
+
+        mock.setup
+            .accept_value_return_value(Arg::Any)
+            .returns_many(&[
+                first_returned_value,
+                second_returned_value,
+                third_returned_value,
+            ]);
+
+        // Act
+        let actual_first_returned_value = mock.accept_value_return_value(single_accepted_value);
+        let actual_second_returned_value = mock.accept_value_return_value(double_accepted_value);
+        let actual_third_returned_value = mock.accept_value_return_value(double_accepted_value);
+
+        // Assert
+        assert_eq!(first_returned_value, actual_first_returned_value);
+        assert_eq!(second_returned_value, actual_second_returned_value);
+        assert_eq!(third_returned_value, actual_third_returned_value);
+
+        mock.received
+            .accept_value_return_value(Arg::Eq(single_accepted_value), Times::Once)
+            .accept_value_return_value(Arg::Eq(double_accepted_value), Times::Exactly(2));
+    }
+
+    #[test]
+    fn accept_value_return_value_Callback_Ok() {
+        // Arrange
+        let mock = TraitMock::new();
+        let first_accepted_value = 10;
+        let first_callback_number = Arc::new(RefCell::new(0));
+        let first_callback_number_clone = first_callback_number.clone();
+        let first_returned_value = 11.1;
+        let second_accepted_value = 20;
+        let second_callback_number = Arc::new(RefCell::new(1));
+        let second_callback_number_clone = second_callback_number.clone();
+        let second_returned_value = 22.2;
+        mock.setup
+            .accept_value_return_value(Arg::Eq(first_accepted_value))
+            .returns_and_does(first_returned_value, move || {
+                *first_callback_number_clone.borrow_mut() = 1;
+            })
+            .accept_value_return_value(Arg::Eq(second_accepted_value))
+            .returns_and_does(second_returned_value, move || {
+                *second_callback_number_clone.borrow_mut() = 2;
+            });
+
+        // Act
+        let actual_first_returned_value = mock.accept_value_return_value(first_accepted_value);
+        let actual_second_returned_value = mock.accept_value_return_value(second_accepted_value);
+
+        // Assert
+        assert_eq!(first_returned_value, actual_first_returned_value);
+        assert_eq!(second_returned_value, actual_second_returned_value);
+
+        assert_eq!(1, *first_callback_number.borrow());
+        assert_eq!(2, *second_callback_number.borrow());
+
+        mock.received
+            .accept_value_return_value(Arg::Eq(first_accepted_value), Times::Once);
+        mock.received
+            .accept_value_return_value(Arg::Eq(second_accepted_value), Times::Once);
     }
 }
