@@ -49,6 +49,7 @@ mod accept_value {
             );
     }
 
+    #[test]
     fn accept_value_Callback_ok() {
         // Arrange
         let mock = TraitMock::new();
