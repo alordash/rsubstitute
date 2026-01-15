@@ -599,3 +599,22 @@ mod accept_value_return_value {
             .accept_value_return_value(Arg::Eq(second_accepted_value), Times::Once);
     }
 }
+
+mod accept_two_values {
+    use super::*;
+
+    #[test]
+    fn accept_two_value_Correct() {
+        // Arrange
+        let mock = TraitMock::new();
+        let v1 = 10;
+        let v2 = 20.2;
+
+        // Act
+        mock.accept_two_values(v1, v2);
+
+        // Assert
+        mock.received
+            .accept_two_values(Arg::Eq(v1), Arg::Eq(v2), Times::Once);
+    }
+}
