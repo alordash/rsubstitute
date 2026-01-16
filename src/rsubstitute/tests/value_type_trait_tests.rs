@@ -618,7 +618,31 @@ mod accept_two_values {
         mock.accept_two_values(v1, v2);
 
         // Assert
+        mock.received.accept_two_values(v1, v2, Times::Once);
+    }
+}
+
+mod accept_two_values_return_value {
+    use super::*;
+
+    #[test]
+    fn accept_two_values_return_value_Correct() {
+        // Arrange
+        let mock = TraitMock::new();
+        let v1 = 10;
+        let v2 = 20.2;
+        let returned_value = String::from("quo vadis");
+        mock.setup
+            .accept_two_values_return_value(v1, v2)
+            .returns(returned_value.clone());
+
+        // Act
+        let actual_returned_value = mock.accept_two_values_return_value(v1, v2);
+
+        // Assert
+        assert_eq!(returned_value, actual_returned_value);
+
         mock.received
-            .accept_two_values(v1, v2, Times::Once);
+            .accept_two_values_return_value(v1, v2, Times::Once);
     }
 }
