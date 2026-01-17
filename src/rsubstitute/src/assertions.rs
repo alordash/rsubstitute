@@ -8,13 +8,18 @@ fn catch_unwind_silent<F: FnOnce() -> R + panic::UnwindSafe, R>(f: F) -> std::th
     result
 }
 
-pub fn assert_panics<T, TStr: AsRef<str>>(
-    callback: impl FnOnce() -> T,
-    expected_error_message: TStr,
-) {
+pub fn assert_panics<T>(callback: impl FnOnce() -> T, expected_error_message: impl AsRef<str>) {
     let panic_error = catch_unwind_silent(panic::AssertUnwindSafe(callback));
     if let Some(actual_error) = panic_error.err().as_deref() {
         let actual_error_message = actual_error.downcast_ref::<String>().unwrap();
+        let expected_error_message_str = expected_error_message.as_ref();
+        if expected_error_message_str != actual_error_message {
+            panic!(
+                r#"Wrong panic message.
+Expected: {expected_error_message_str:?}
+  Actual: {actual_error_message:?}"#
+            );
+        }
         assert_eq!(expected_error_message.as_ref(), actual_error_message);
     } else {
         panic!(

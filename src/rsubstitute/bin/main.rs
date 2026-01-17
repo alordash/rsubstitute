@@ -2,7 +2,7 @@
 
 use rsubstitute_core::Times;
 use rsubstitute_core::args_matching::Arg;
-use std::cell::RefCell;
+use std::cell::{LazyCell, RefCell};
 use std::fmt::Debug;
 use std::sync::Arc;
 
