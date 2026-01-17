@@ -1,7 +1,7 @@
 #![allow(non_snake_case)]
 use rsubstitute::assertions::assert_panics;
-use rsubstitute_core::Times;
 use rsubstitute_core::args_matching::Arg;
+use rsubstitute_core::Times;
 use rsubstitute_proc_macro::mock;
 
 #[mock]

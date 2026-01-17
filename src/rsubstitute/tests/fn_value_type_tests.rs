@@ -1,12 +1,11 @@
 #![allow(non_snake_case)]
 
 use rsubstitute::assertions::assert_panics;
-use rsubstitute_core::Times;
 use rsubstitute_core::args_matching::Arg;
+use rsubstitute_core::Times;
 use rsubstitute_proc_macro::mock;
 use std::cell::{Cell, RefCell};
 use std::sync::Arc;
-use std::sync::atomic::Ordering;
 
 thread_local! {
     pub static BASE_CALLED_FLAG: Cell   <bool> = Cell::new(false);
