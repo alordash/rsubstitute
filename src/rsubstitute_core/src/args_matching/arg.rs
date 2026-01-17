@@ -8,6 +8,7 @@ struct Private;
 pub enum Arg<'a, T> {
     Any,
     Eq(T),
+    NotEq(T),
     // Private for cleaner API: just pass closure without having to box or reference it.
     #[allow(private_interfaces)]
     #[doc(hidden)]
@@ -28,6 +29,9 @@ impl<'a, T: Debug> Debug for Arg<'a, T> {
         match self {
             Arg::Any => write!(f, "({arg_type_name}): any"),
             Arg::Eq(expected_value) => write!(f, "({arg_type_name}): equal to {expected_value:?}"),
+            Arg::NotEq(not_expected_value) => {
+                write!(f, "({arg_type_name}): NOT equal to {not_expected_value:?}")
+            }
             Arg::PrivateIs(_, _) => write!(f, "({arg_type_name}): custom predicate"),
         }
     }
@@ -45,13 +49,23 @@ impl<'a, T: Debug + PartialOrd + Clone + 'a> Arg<'a, T> {
     pub fn check(&self, arg_name: &'static str, actual_value: T) -> ArgCheckResult<'a> {
         let arg_info = ArgInfo::new(arg_name, actual_value.clone());
         match self {
-            Arg::Eq(expected_value) if !actual_value.eq(expected_value) => {
-                return ArgCheckResult::Err(ArgCheckResultErr {
-                    arg_info,
-                    error_msg: format!(
-                        "\t\tExpected: {expected_value:?}\n\t\tActual:   {actual_value:?}"
-                    ),
-                });
+            Arg::Eq(expected_value) => {
+                if !actual_value.eq(expected_value) {
+                    return ArgCheckResult::Err(ArgCheckResultErr {
+                        arg_info,
+                        error_msg: format!(
+                            "\t\tExpected: {expected_value:?}\n\t\tActual:   {actual_value:?}"
+                        ),
+                    });
+                }
+            }
+            Arg::NotEq(not_expected_value) => {
+                if actual_value.eq(not_expected_value) {
+                    return ArgCheckResult::Err(ArgCheckResultErr {
+                        arg_info,
+                        error_msg: format!("\t\tDid not expect to be {not_expected_value:?}"),
+                    });
+                }
             }
             Arg::PrivateIs(predicate, _) => {
                 let actual_value_str = format!("{:?}", actual_value);
@@ -64,7 +78,7 @@ impl<'a, T: Debug + PartialOrd + Clone + 'a> Arg<'a, T> {
                     });
                 }
             }
-            _ => (),
+            Arg::Any => (),
         };
         return ArgCheckResult::Ok(ArgCheckResultOk { arg_info });
     }
@@ -86,15 +100,28 @@ impl<'a, T: Debug + ?Sized> Arg<'a, &'a T> {
                     });
                 }
             }
-            Arg::PrivateIs(predicate, _) if !predicate(actual_value) => {
-                return ArgCheckResult::Err(ArgCheckResultErr {
-                    arg_info,
-                    error_msg: format!(
-                        "\t\tCustom predicate didn't match passed reference value. Received value (ptr: {actual_ptr:?}): {actual_value:?}"
-                    ),
-                });
+            Arg::NotEq(not_expected_value) => {
+                let not_expected_ptr = std::ptr::from_ref(*not_expected_value);
+                if std::ptr::eq(actual_ptr, not_expected_ptr) {
+                    return ArgCheckResult::Err(ArgCheckResultErr {
+                        arg_info,
+                        error_msg: format!(
+                            "\t\tDid not expect reference (ptr: {not_expected_ptr:?}): {not_expected_value:?}"
+                        ),
+                    });
+                }
             }
-            _ => (),
+            Arg::PrivateIs(predicate, _) => {
+                if !predicate(actual_value) {
+                    return ArgCheckResult::Err(ArgCheckResultErr {
+                        arg_info,
+                        error_msg: format!(
+                            "\t\tCustom predicate didn't match passed reference value. Received value (ptr: {actual_ptr:?}): {actual_value:?}"
+                        ),
+                    });
+                }
+            }
+            Arg::Any => {}
         };
         return ArgCheckResult::Ok(ArgCheckResultOk { arg_info });
     }
@@ -116,6 +143,17 @@ impl<'a, T: Debug + ?Sized + 'a> Arg<'a, Rc<T>> {
                     });
                 }
             }
+            Arg::NotEq(not_expected_value) => {
+                let not_expected_ptr = Rc::as_ptr(not_expected_value);
+                if std::ptr::eq(actual_ptr, not_expected_ptr) {
+                    return ArgCheckResult::Err(ArgCheckResultErr {
+                        arg_info,
+                        error_msg: format!(
+                            "\t\tDid not expect Rc (ptr: {not_expected_ptr:?}): {not_expected_value:?}"
+                        ),
+                    });
+                }
+            }
             Arg::PrivateIs(predicate, _) => {
                 let actual_value_str = format!("{:?}", actual_value);
                 if !predicate(actual_value) {
@@ -127,7 +165,7 @@ impl<'a, T: Debug + ?Sized + 'a> Arg<'a, Rc<T>> {
                     });
                 }
             }
-            _ => (),
+            Arg::Any => {}
         };
         return ArgCheckResult::Ok(ArgCheckResultOk { arg_info });
     }
@@ -149,18 +187,29 @@ impl<'a, T: Debug + ?Sized + 'a> Arg<'a, Arc<T>> {
                     });
                 }
             }
+            Arg::NotEq(not_expected_value) => {
+                let not_expected_ptr = Arc::as_ptr(not_expected_value);
+                if std::ptr::eq(actual_ptr, not_expected_ptr) {
+                    return ArgCheckResult::Err(ArgCheckResultErr {
+                        arg_info,
+                        error_msg: format!(
+                            "\t\tDid not expect Arc (ptr: {not_expected_ptr:?}): {not_expected_value:?}"
+                        ),
+                    });
+                }
+            }
             Arg::PrivateIs(predicate, _) => {
                 let actual_value_str = format!("{:?}", actual_value);
                 if !predicate(actual_value) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
-                            "\t\tCustom predicate didn't match passed Rc. Received value (ptr: {actual_ptr:?}): {actual_value_str}"
+                            "\t\tCustom predicate didn't match passed Arc. Received value (ptr: {actual_ptr:?}): {actual_value_str}"
                         ),
                     });
                 }
             }
-            _ => (),
+            Arg::Any => {}
         }
         return ArgCheckResult::Ok(ArgCheckResultOk { arg_info });
     }
