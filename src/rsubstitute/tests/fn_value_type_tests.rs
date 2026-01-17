@@ -42,7 +42,6 @@ fn accept_two_values_return_value(v1: i32, v2: f32) -> &'static str {
     return BASE_ACCEPT_TWO_VALUES_RETURN_VALUE;
 }
 
-#[cfg(test)]
 mod accept_value_tests {
     use super::*;
     use std::cell::RefCell;
@@ -89,7 +88,7 @@ mod accept_value_tests {
     }
 
     #[test]
-    fn accept_value_Callback_ok() {
+    fn accept_value_Callback_Ok() {
         // Arrange
         let callback_flag = Arc::new(RefCell::new(false));
         let callback_flag_clone = callback_flag.clone();
@@ -116,34 +115,34 @@ mod accept_value_tests {
         assert_panics(
             || accept_value::received(Arg::Any, Times::Never),
             format!(
-                r#"Expected to never receive a call matching:
+                r"Expected to never receive a call matching:
 	accept_value((i32): any)
 Actually received 2 matching calls:
 	accept_value({first_value})
 	accept_value({second_value})
-Received no non-matching calls"#
+Received no non-matching calls"
             ),
         );
         assert_panics(
             || accept_value::received(Arg::Any, Times::Once),
             format!(
-                r#"Expected to receive a call exactly once matching:
+                r"Expected to receive a call exactly once matching:
 	accept_value((i32): any)
 Actually received 2 matching calls:
 	accept_value({first_value})
 	accept_value({second_value})
-Received no non-matching calls"#
+Received no non-matching calls"
             ),
         );
         assert_panics(
             || accept_value::received(Arg::Any, Times::Exactly(3)),
             format!(
-                r#"Expected to receive a call 3 times matching:
+                r"Expected to receive a call 3 times matching:
 	accept_value((i32): any)
 Actually received 2 matching calls:
 	accept_value({first_value})
 	accept_value({second_value})
-Received no non-matching calls"#
+Received no non-matching calls"
             ),
         );
     }
@@ -162,7 +161,7 @@ Received no non-matching calls"#
         assert_panics(
             || accept_value::received(Arg::Eq(first_value), Times::Never),
             format!(
-                r#"Expected to never receive a call matching:
+                r"Expected to never receive a call matching:
 	accept_value((i32): equal to {first_value})
 Actually received 1 matching call:
 	accept_value({first_value})
@@ -170,13 +169,13 @@ Received 1 non-matching call (non-matching arguments indicated with '*' characte
 accept_value(*{second_value}*)
 	1. v (i32):
 		Expected: {first_value}
-		Actual:   {second_value}"#
+		Actual:   {second_value}"
             ),
         );
         assert_panics(
             || accept_value::received(Arg::Eq(first_value), Times::Exactly(3)),
             format!(
-                r#"Expected to receive a call 3 times matching:
+                r"Expected to receive a call 3 times matching:
 	accept_value((i32): equal to {first_value})
 Actually received 1 matching call:
 	accept_value({first_value})
@@ -184,13 +183,13 @@ Received 1 non-matching call (non-matching arguments indicated with '*' characte
 accept_value(*{second_value}*)
 	1. v (i32):
 		Expected: {first_value}
-		Actual:   {second_value}"#
+		Actual:   {second_value}"
             ),
         );
         assert_panics(
             || accept_value::received(Arg::Eq(second_value), Times::Never),
             format!(
-                r#"Expected to never receive a call matching:
+                r"Expected to never receive a call matching:
 	accept_value((i32): equal to {second_value})
 Actually received 1 matching call:
 	accept_value({second_value})
@@ -198,13 +197,13 @@ Received 1 non-matching call (non-matching arguments indicated with '*' characte
 accept_value(*{first_value}*)
 	1. v (i32):
 		Expected: {second_value}
-		Actual:   {first_value}"#
+		Actual:   {first_value}"
             ),
         );
         assert_panics(
             || accept_value::received(Arg::Eq(second_value), Times::Exactly(3)),
             format!(
-                r#"Expected to receive a call 3 times matching:
+                r"Expected to receive a call 3 times matching:
 	accept_value((i32): equal to {second_value})
 Actually received 1 matching call:
 	accept_value({second_value})
@@ -212,7 +211,7 @@ Received 1 non-matching call (non-matching arguments indicated with '*' characte
 accept_value(*{first_value}*)
 	1. v (i32):
 		Expected: {second_value}
-		Actual:   {first_value}"#
+		Actual:   {first_value}"
             ),
         );
     }
@@ -236,14 +235,14 @@ accept_value(*{first_value}*)
                 )
             },
             format!(
-                r#"Expected to never receive a call matching:
+                r"Expected to never receive a call matching:
 	accept_value((i32): custom predicate)
 Actually received 1 matching call:
 	accept_value({first_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
 accept_value(*{second_value}*)
 	1. v (i32):
-		Custom predicate didn't match passed value. Received value: {second_value}"#
+		Custom predicate didn't match passed value. Received value: {second_value}"
             ),
         );
         assert_panics(
@@ -254,14 +253,14 @@ accept_value(*{second_value}*)
                 )
             },
             format!(
-                r#"Expected to receive a call 3 times matching:
+                r"Expected to receive a call 3 times matching:
 	accept_value((i32): custom predicate)
 Actually received 1 matching call:
 	accept_value({first_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
 accept_value(*{second_value}*)
 	1. v (i32):
-		Custom predicate didn't match passed value. Received value: {second_value}"#
+		Custom predicate didn't match passed value. Received value: {second_value}"
             ),
         );
         assert_panics(
@@ -272,14 +271,14 @@ accept_value(*{second_value}*)
                 )
             },
             format!(
-                r#"Expected to never receive a call matching:
+                r"Expected to never receive a call matching:
 	accept_value((i32): custom predicate)
 Actually received 1 matching call:
 	accept_value({second_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
 accept_value(*{first_value}*)
 	1. v (i32):
-		Custom predicate didn't match passed value. Received value: {first_value}"#
+		Custom predicate didn't match passed value. Received value: {first_value}"
             ),
         );
         assert_panics(
@@ -290,20 +289,19 @@ accept_value(*{first_value}*)
                 )
             },
             format!(
-                r#"Expected to receive a call 3 times matching:
+                r"Expected to receive a call 3 times matching:
 	accept_value((i32): custom predicate)
 Actually received 1 matching call:
 	accept_value({second_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
 accept_value(*{first_value}*)
 	1. v (i32):
-		Custom predicate didn't match passed value. Received value: {first_value}"#
+		Custom predicate didn't match passed value. Received value: {first_value}"
             ),
         );
     }
 }
 
-#[cfg(test)]
 mod return_value_tests {
     use super::*;
     use std::cell::RefCell;
@@ -440,7 +438,6 @@ mod return_value_tests {
     }
 }
 
-#[cfg(test)]
 mod accept_value_return_value_tests {
     use super::*;
     use std::cell::RefCell;
@@ -625,7 +622,6 @@ mod accept_value_return_value_tests {
     }
 }
 
-#[cfg(test)]
 mod accept_two_values_tests {
     use super::*;
 
@@ -659,7 +655,6 @@ mod accept_two_values_tests {
     }
 }
 
-#[cfg(test)]
 mod accept_two_values_return_value_tests {
     use super::*;
 
@@ -697,22 +692,22 @@ mod accept_two_values_return_value_tests {
         assert_panics(
             || accept_two_values_return_value::received(v1, v2, Times::Never),
             format!(
-                r#"Expected to never receive a call matching:
+                r"Expected to never receive a call matching:
 	accept_two_values_return_value((i32): equal to {v1}, (f32): equal to {v2})
 Actually received 1 matching call:
 	accept_two_values_return_value({v1}, {v2})
-Received no non-matching calls"#
+Received no non-matching calls"
             ),
         );
 
         assert_panics(
             || accept_two_values_return_value::received(v1, v2, Times::Exactly(3)),
             format!(
-                r#"Expected to receive a call 3 times matching:
+                r"Expected to receive a call 3 times matching:
 	accept_two_values_return_value((i32): equal to {v1}, (f32): equal to {v2})
 Actually received 1 matching call:
 	accept_two_values_return_value({v1}, {v2})
-Received no non-matching calls"#
+Received no non-matching calls"
             ),
         );
 
@@ -727,7 +722,7 @@ Received no non-matching calls"#
                 )
             },
             format!(
-                r#"Expected to receive a call exactly once matching:
+                r"Expected to receive a call exactly once matching:
 	accept_two_values_return_value((i32): equal to {invalid_expected_v1}, (f32): equal to {invalid_expected_v2})
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
@@ -737,7 +732,7 @@ accept_two_values_return_value(*10*, *20.2*)
 		Actual:   10
 	2. v2 (f32):
 		Expected: 21.2
-		Actual:   20.2"#
+		Actual:   20.2"
             ),
         );
     }

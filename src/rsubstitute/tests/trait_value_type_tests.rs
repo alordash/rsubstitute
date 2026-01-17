@@ -17,7 +17,6 @@ trait Trait {
     fn accept_two_values_return_value(&self, v1: i32, v2: f32) -> String;
 }
 
-#[cfg(test)]
 mod accept_value_tests {
     use super::*;
     use std::cell::RefCell;
@@ -283,7 +282,6 @@ accept_value(*{first_value}*)
     }
 }
 
-#[cfg(test)]
 mod return_value_tests {
     use super::*;
     use std::cell::RefCell;
@@ -416,7 +414,6 @@ mod return_value_tests {
     }
 }
 
-#[cfg(test)]
 mod accept_value_return_value_tests {
     use super::*;
     use std::cell::RefCell;
@@ -607,7 +604,6 @@ mod accept_value_return_value_tests {
     }
 }
 
-#[cfg(test)]
 mod accept_two_values_tests {
     use super::*;
 
@@ -626,7 +622,6 @@ mod accept_two_values_tests {
     }
 }
 
-#[cfg(test)]
 mod accept_two_values_return_value_tests {
     use super::*;
 
