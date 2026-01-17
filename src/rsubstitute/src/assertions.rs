@@ -24,7 +24,7 @@ Expected: {expected_error_message_str:?}
     } else {
         panic!(
             r#"Expected to panic with following error message:
-{}"#,
+{:?}"#,
             expected_error_message.as_ref()
         );
     }

@@ -1,8 +1,8 @@
 #![allow(non_snake_case)]
 
 use rsubstitute::assertions::assert_panics;
-use rsubstitute_core::args_matching::Arg;
 use rsubstitute_core::Times;
+use rsubstitute_core::args_matching::Arg;
 use rsubstitute_proc_macro::mock;
 use std::cell::{Cell, RefCell};
 use std::sync::Arc;
@@ -298,6 +298,30 @@ accept_value(*{first_value}*)
 	1. v (i32):
 		Custom predicate didn't match passed value. Received value: {first_value}"
             ),
+        );
+    }
+
+    #[test]
+    fn accept_value_ArgNotEq_PanicsOk() {
+        // Arrange
+        let first_value = 10;
+        let second_value = 22;
+
+        // Act
+        accept_value(first_value);
+        accept_value(second_value);
+
+        // Assert
+        assert_panics(
+            || accept_value::received(Arg::NotEq(first_value), Times::Never),
+            format!(r"Expected to never receive a call matching:
+	accept_value((i32): NOT equal to {first_value})
+Actually received 1 matching call:
+	accept_value({second_value})
+Received 1 non-matching call (non-matching arguments indicated with '*' characters):
+accept_value(*{first_value}*)
+	1. v (i32):
+		Did not expect to be {first_value}"),
         );
     }
 }
