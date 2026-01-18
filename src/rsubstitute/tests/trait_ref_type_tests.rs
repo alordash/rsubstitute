@@ -39,7 +39,7 @@ mod accept_ref_tests {
     }
 
     #[test]
-    fn accept_value_PanicsOk() {
+    fn accept_rc_PanicsOk() {
         // Arrange
         let mock = TraitMock::new();
         let r = &11;
