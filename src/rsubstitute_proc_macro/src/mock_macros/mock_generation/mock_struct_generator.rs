@@ -9,6 +9,7 @@ pub trait IMockStructGenerator {
     fn generate(
         &self,
         mock_ident: Ident,
+        mock_generics: &MockGenerics,
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
         mock_data_struct: &MockDataStruct,
@@ -17,6 +18,7 @@ pub trait IMockStructGenerator {
     fn generate_for_static(
         &self,
         mock_ident: Ident,
+        mock_generics: &MockGenerics,
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
         mock_data_struct: &MockDataStruct,
@@ -35,6 +37,7 @@ impl IMockStructGenerator for MockStructGenerator {
     fn generate(
         &self,
         mock_ident: Ident,
+        mock_generics: &MockGenerics,
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
         mock_data_struct: &MockDataStruct,
@@ -63,7 +66,7 @@ impl IMockStructGenerator for MockStructGenerator {
             .into_iter()
             .collect(),
         };
-        let item_struct = self.struct_factory.create(attrs, mock_ident, fields);
+        let item_struct = self.struct_factory.create(attrs, mock_ident, &mock_generics, fields);
         let result = MockStruct { item_struct };
         return result;
     }
@@ -71,12 +74,14 @@ impl IMockStructGenerator for MockStructGenerator {
     fn generate_for_static(
         &self,
         mock_ident: Ident,
+        mock_generics: &MockGenerics,
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
         mock_data_struct: &MockDataStruct,
     ) -> MockStruct {
         let mut mock_struct = self.generate(
             mock_ident,
+            mock_generics,
             mock_setup_struct,
             mock_received_struct,
             mock_data_struct,

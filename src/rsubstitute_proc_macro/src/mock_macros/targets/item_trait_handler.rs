@@ -14,6 +14,7 @@ pub trait IItemTraitHandler {
 
 pub(crate) struct ItemTraitHandler {
     pub fn_decl_extractor: Arc<dyn IFnDeclExtractor>,
+    pub mock_generics_generator: Arc<dyn IMockGenericsGenerator>,
     pub fn_info_generator: Arc<dyn IFnInfoGenerator>,
     pub mock_data_struct_generator: Arc<dyn IMockDataStructGenerator>,
     pub mock_setup_struct_generator: Arc<dyn IMockSetupStructGenerator>,
@@ -35,23 +36,29 @@ impl IItemTraitHandler for ItemTraitHandler {
         );
         let fn_decls = self.fn_decl_extractor.extract(&item_trait.items);
         let target_ident = item_trait.ident.clone();
+        let mock_generics = self.mock_generics_generator.generate(&item_trait.generics);
         let fn_infos: Vec<_> = fn_decls
             .iter()
-            .map(|x| self.fn_info_generator.generate(x))
+            .map(|x| self.fn_info_generator.generate(x, &mock_generics))
             .collect();
         let mock_data_struct = self.mock_data_struct_generator.generate_for_trait(
             &mock_ident,
-            &item_trait.generics,
+            &mock_generics,
             &fn_infos,
         );
-        let mock_setup_struct = self
-            .mock_setup_struct_generator
-            .generate(&mock_ident, &mock_data_struct);
-        let mock_received_struct = self
-            .mock_received_struct_generator
-            .generate(&mock_ident, &mock_data_struct);
+        let mock_setup_struct = self.mock_setup_struct_generator.generate(
+            &mock_ident,
+            &mock_generics,
+            &mock_data_struct,
+        );
+        let mock_received_struct = self.mock_received_struct_generator.generate(
+            &mock_ident,
+            &mock_generics,
+            &mock_data_struct,
+        );
         let mock_struct = self.mock_struct_generator.generate(
             mock_ident.clone(),
+            &mock_generics,
             &mock_setup_struct,
             &mock_received_struct,
             &mock_data_struct,

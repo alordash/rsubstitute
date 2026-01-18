@@ -7,10 +7,17 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait IMockSetupStructGenerator {
-    fn generate(&self, mock_ident: &Ident, mock_data_struct: &MockDataStruct) -> MockSetupStruct;
+    fn generate(
+        &self,
+        mock_ident: &Ident,
+        mock_generics: &MockGenerics,
+        mock_data_struct: &MockDataStruct,
+    ) -> MockSetupStruct;
+
     fn generate_with_non_camel_case_allowed(
         &self,
         mock_ident: &Ident,
+        mock_generics: &MockGenerics,
         mock_data_struct: &MockDataStruct,
     ) -> MockSetupStruct;
 }
@@ -22,7 +29,12 @@ pub(crate) struct MockSetupStructGenerator {
 }
 
 impl IMockSetupStructGenerator for MockSetupStructGenerator {
-    fn generate(&self, mock_ident: &Ident, mock_data_struct: &MockDataStruct) -> MockSetupStruct {
+    fn generate(
+        &self,
+        mock_ident: &Ident,
+        mock_generics: &MockGenerics,
+        mock_data_struct: &MockDataStruct,
+    ) -> MockSetupStruct {
         let attrs = Vec::new();
         let ident = format_ident!("{}{}", mock_ident, Self::MOCK_SETUP_STRUCT_IDENT_SUFFIX);
         let data_type = self
@@ -37,7 +49,9 @@ impl IMockSetupStructGenerator for MockSetupStructGenerator {
             .into_iter()
             .collect(),
         };
-        let item_struct = self.struct_factory.create(attrs, ident, fields);
+        let item_struct = self
+            .struct_factory
+            .create(attrs, ident, &mock_generics, fields);
         let mock_setup_struct = MockSetupStruct { item_struct };
         return mock_setup_struct;
     }
@@ -45,9 +59,10 @@ impl IMockSetupStructGenerator for MockSetupStructGenerator {
     fn generate_with_non_camel_case_allowed(
         &self,
         mock_ident: &Ident,
+        mock_generics: &MockGenerics,
         mock_data_struct: &MockDataStruct,
     ) -> MockSetupStruct {
-        let mut result = self.generate(mock_ident, mock_data_struct);
+        let mut result = self.generate(mock_ident, &mock_generics, mock_data_struct);
         result
             .item_struct
             .attrs

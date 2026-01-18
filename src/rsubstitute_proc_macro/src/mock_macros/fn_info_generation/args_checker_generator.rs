@@ -1,14 +1,15 @@
 use crate::constants;
-use crate::mock_macros::fn_info_generation::models::ArgsCheckerStruct;
-use crate::mock_macros::models::FnDecl;
-use crate::syntax::{IArgTypeFactory, IFieldFactory, IReferenceNormalizer, IStructFactory};
+use crate::mock_macros::fn_info_generation::models::*;
+use crate::mock_macros::mock_generation::models::*;
+use crate::mock_macros::models::*;
+use crate::syntax::*;
 use proc_macro2::Ident;
 use quote::{ToTokens, format_ident};
 use std::sync::Arc;
-use syn::{Field, FieldsNamed, FnArg, PatType};
+use syn::*;
 
 pub trait IArgsCheckerGenerator {
-    fn generate(&self, fn_decl: &FnDecl) -> ArgsCheckerStruct;
+    fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> ArgsCheckerStruct;
 }
 
 pub struct ArgsCheckerGenerator {
@@ -19,7 +20,7 @@ pub struct ArgsCheckerGenerator {
 }
 
 impl IArgsCheckerGenerator for ArgsCheckerGenerator {
-    fn generate(&self, fn_decl: &FnDecl) -> ArgsCheckerStruct {
+    fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> ArgsCheckerStruct {
         let attrs = vec![
             constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone(),
             constants::DERIVE_DEBUG_AND_I_ARGS_FORMATTER_ATTRIBUTE.clone(),
@@ -38,7 +39,9 @@ impl IArgsCheckerGenerator for ArgsCheckerGenerator {
             named: struct_fields,
         };
 
-        let mut item_struct = self.struct_factory.create(attrs, ident, fields_named);
+        let mut item_struct = self
+            .struct_factory
+            .create(attrs, ident, mock_generics, fields_named);
         self.reference_normalizer
             .normalize_in_struct(&mut item_struct);
         let args_checker_struct = ArgsCheckerStruct { item_struct };

@@ -1,14 +1,15 @@
 use crate::constants;
-use crate::mock_macros::fn_info_generation::models::CallStruct;
-use crate::mock_macros::models::FnDecl;
-use crate::syntax::{IFieldFactory, IReferenceNormalizer, IStructFactory};
+use crate::mock_macros::fn_info_generation::models::*;
+use crate::mock_macros::mock_generation::models::MockGenerics;
+use crate::mock_macros::models::*;
+use crate::syntax::*;
 use proc_macro2::Ident;
 use quote::{ToTokens, format_ident};
 use std::sync::Arc;
-use syn::{Field, FieldsNamed, FnArg, PatType};
+use syn::*;
 
 pub trait ICallStructGenerator {
-    fn generate(&self, fn_decl: &FnDecl) -> CallStruct;
+    fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> CallStruct;
 }
 
 pub struct CallStructGenerator {
@@ -18,7 +19,7 @@ pub struct CallStructGenerator {
 }
 
 impl ICallStructGenerator for CallStructGenerator {
-    fn generate(&self, fn_decl: &FnDecl) -> CallStruct {
+    fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> CallStruct {
         let attrs = vec![
             constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone(),
             constants::DERIVE_CLONE_ATTRIBUTE.clone(),
@@ -36,7 +37,9 @@ impl ICallStructGenerator for CallStructGenerator {
             named: struct_fields,
         };
 
-        let mut item_struct = self.struct_factory.create(attrs, ident, fields_named);
+        let mut item_struct = self
+            .struct_factory
+            .create(attrs, ident, mock_generics, fields_named);
         self.reference_normalizer
             .normalize_in_struct(&mut item_struct);
         let call_struct = CallStruct { item_struct };

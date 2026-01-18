@@ -28,7 +28,7 @@ fn create_services() -> ServiceCollection {
     let type_factory = Arc::new(TypeFactory {
         path_factory: path_factory.clone(),
     });
-
+    let generics_merger = Arc::new(GenericsMerger);
     let field_factory = Arc::new(FieldFactory {
         type_factory: type_factory.clone(),
     });
@@ -60,6 +60,9 @@ fn create_services() -> ServiceCollection {
     let args_checker_impl_generator = Arc::new(ArgsCheckerImplGenerator {
         type_factory: type_factory.clone(),
         field_access_expr_factory: field_access_expr_factory.clone(),
+    });
+    let mock_generics_generator = Arc::new(MockGenericsGenerator {
+        generics_merger: generics_merger.clone(),
     });
     let fn_info_generator = Arc::new(FnInfoGenerator {
         call_struct_generator: call_struct_generator.clone(),
@@ -192,6 +195,7 @@ fn create_services() -> ServiceCollection {
 
     let item_trait_handler = Arc::new(ItemTraitHandler {
         fn_decl_extractor: fn_decl_extractor.clone(),
+        mock_generics_generator: mock_generics_generator.clone(),
         fn_info_generator: fn_info_generator.clone(),
         mock_data_struct_generator: mock_data_struct_generator.clone(),
         mock_setup_struct_generator: mock_setup_struct_generator.clone(),
@@ -207,6 +211,7 @@ fn create_services() -> ServiceCollection {
     let item_fn_handler = Arc::new(ItemFnHandler {
         base_fn_generator: base_fn_generator.clone(),
         fn_decl_extractor: fn_decl_extractor.clone(),
+        mock_generics_generator: mock_generics_generator.clone(),
         fn_info_generator: fn_info_generator.clone(),
         base_caller_struct_generator: base_caller_struct_generator.clone(),
         base_caller_impl_generator: base_caller_impl_generator.clone(),

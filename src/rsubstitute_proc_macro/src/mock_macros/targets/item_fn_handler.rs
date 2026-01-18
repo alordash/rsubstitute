@@ -15,6 +15,7 @@ pub trait IItemFnHandler {
 pub(crate) struct ItemFnHandler {
     pub base_fn_generator: Arc<dyn IBaseFnGenerator>,
     pub fn_decl_extractor: Arc<dyn IFnDeclExtractor>,
+    pub mock_generics_generator: Arc<dyn IMockGenericsGenerator>,
     pub fn_info_generator: Arc<dyn IFnInfoGenerator>,
     pub base_caller_struct_generator: Arc<dyn IBaseCallerStructGenerator>,
     pub base_caller_impl_generator: Arc<dyn IBaseCallerImplGenerator>,
@@ -41,7 +42,8 @@ impl IItemFnHandler for ItemFnHandler {
         );
         let base_fn = self.base_fn_generator.generate(item_fn.clone());
         let fn_decl = self.fn_decl_extractor.extract_fn(&item_fn);
-        let fn_info = self.fn_info_generator.generate(&fn_decl);
+        let mock_generics = self.mock_generics_generator.generate(&item_fn.sig.generics);
+        let fn_info = self.fn_info_generator.generate(&fn_decl, &mock_generics);
         let base_caller_struct = self.base_caller_struct_generator.generate(&fn_decl);
         let base_caller_impl = self.base_caller_impl_generator.generate(
             &base_caller_struct,
@@ -52,17 +54,19 @@ impl IItemFnHandler for ItemFnHandler {
         let fn_infos = [fn_info];
         let mock_data_struct = self.mock_data_struct_generator.generate_for_static(
             &mock_ident,
+            &mock_generics,
             &fn_infos,
             &base_caller_struct,
         );
         let mock_setup_struct = self
             .mock_setup_struct_generator
-            .generate_with_non_camel_case_allowed(&mock_ident, &mock_data_struct);
+            .generate_with_non_camel_case_allowed(&mock_ident, &mock_generics, &mock_data_struct);
         let mock_received_struct = self
             .mock_received_struct_generator
-            .generate_with_non_camel_case_allowed(&mock_ident, &mock_data_struct);
+            .generate_with_non_camel_case_allowed(&mock_ident, &mock_generics, &mock_data_struct);
         let mock_struct = self.mock_struct_generator.generate_for_static(
             mock_ident.clone(),
+            &mock_generics,
             &mock_setup_struct,
             &mock_received_struct,
             &mock_data_struct,

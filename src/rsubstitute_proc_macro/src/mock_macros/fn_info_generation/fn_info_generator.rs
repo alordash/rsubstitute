@@ -1,13 +1,14 @@
 use crate::mock_macros::fn_info_generation::call_generator::ICallStructGenerator;
 use crate::mock_macros::fn_info_generation::models::FnInfo;
 use crate::mock_macros::fn_info_generation::{IArgsCheckerGenerator, IArgsCheckerImplGenerator};
+use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::models::FnDecl;
 use proc_macro2::Ident;
 use quote::format_ident;
 use std::sync::Arc;
 
 pub trait IFnInfoGenerator {
-    fn generate<'a>(&self, fn_decl: &'a FnDecl) -> FnInfo<'a>;
+    fn generate<'a>(&self, fn_decl: &'a FnDecl, mock_generics: &MockGenerics) -> FnInfo<'a>;
 }
 
 pub struct FnInfoGenerator {
@@ -17,9 +18,9 @@ pub struct FnInfoGenerator {
 }
 
 impl IFnInfoGenerator for FnInfoGenerator {
-    fn generate<'a>(&self, fn_decl: &'a FnDecl) -> FnInfo<'a> {
-        let call_struct = self.call_struct_generator.generate(fn_decl);
-        let args_checker_struct = self.args_checker_generator.generate(fn_decl);
+    fn generate<'a>(&self, fn_decl: &'a FnDecl, mock_generics: &MockGenerics) -> FnInfo<'a> {
+        let call_struct = self.call_struct_generator.generate(fn_decl, mock_generics);
+        let args_checker_struct = self.args_checker_generator.generate(fn_decl, mock_generics);
         let args_checker_impl = self
             .args_checker_impl_generator
             .generate(&call_struct, &args_checker_struct);

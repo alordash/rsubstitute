@@ -1,17 +1,23 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::FnInfo;
-use crate::mock_macros::mock_generation::models::{BaseCallerStruct, MockDataStruct};
+use crate::mock_macros::mock_generation::models::*;
 use crate::syntax::{IStructFactory, ITypeFactory};
 use quote::format_ident;
 use std::sync::Arc;
 use syn::*;
 
 pub trait IMockDataStructGenerator {
-    fn generate_for_trait(&self, mock_ident: &Ident, generics: &Generics, fn_infos: &[FnInfo]) -> MockDataStruct;
+    fn generate_for_trait(
+        &self,
+        mock_ident: &Ident,
+        mock_generics: &MockGenerics,
+        fn_infos: &[FnInfo],
+    ) -> MockDataStruct;
 
     fn generate_for_static(
         &self,
         mock_ident: &Ident,
+        mock_generics: &MockGenerics,
         fn_infos: &[FnInfo],
         base_caller_struct: &BaseCallerStruct,
     ) -> MockDataStruct;
@@ -24,7 +30,12 @@ pub(crate) struct MockDataStructGenerator {
 }
 
 impl IMockDataStructGenerator for MockDataStructGenerator {
-    fn generate_for_trait(&self, mock_ident: &Ident, generics: &Generics, fn_infos: &[FnInfo]) -> MockDataStruct {
+    fn generate_for_trait(
+        &self,
+        mock_ident: &Ident,
+        mock_generics: &MockGenerics,
+        fn_infos: &[FnInfo],
+    ) -> MockDataStruct {
         let attrs = Vec::new();
         let ident = format_ident!("{}{}", mock_ident, Self::MOCK_DATA_STRUCT_IDENT_SUFFIX);
         let fn_fields: Vec<_> = fn_infos
@@ -44,7 +55,9 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
             named: fields,
         };
 
-        let item_struct = self.struct_factory.create(attrs, ident, fields_named);
+        let item_struct = self
+            .struct_factory
+            .create(attrs, ident, mock_generics, fields_named);
         let mock_struct = MockDataStruct {
             item_struct,
             field_and_fn_idents,
@@ -55,6 +68,7 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
     fn generate_for_static(
         &self,
         mock_ident: &Ident,
+        mock_generics: &MockGenerics,
         fn_infos: &[FnInfo],
         base_caller_struct: &BaseCallerStruct,
     ) -> MockDataStruct {
@@ -84,7 +98,9 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
             named: fields,
         };
 
-        let item_struct = self.struct_factory.create(attrs, ident, fields_named);
+        let item_struct = self
+            .struct_factory
+            .create(attrs, ident, mock_generics, fields_named);
         let mock_struct = MockDataStruct {
             item_struct,
             field_and_fn_idents,
