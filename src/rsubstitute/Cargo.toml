@@ -4,8 +4,16 @@ version = "0.1.0"
 edition = "2024"
 
 [[bin]]
-name = "sandbox"
-path = "bin/main.rs"
+name = "trait"
+path = "bin/trait.rs"
+
+[[bin]]
+name = "trait_generics"
+path = "bin/trait_generics.rs"
+
+[[bin]]
+name = "fn"
+path = "bin/fn.rs"
 
 [dependencies]
 rsubstitute_core = { workspace = true }

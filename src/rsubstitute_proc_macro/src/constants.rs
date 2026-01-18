@@ -158,17 +158,48 @@ pub const ALLOW_NON_UPPER_CASE_GLOBALS_ATTRIBUTE: LazyCell<Attribute> = LazyCell
     return result;
 });
 
-pub const DERIVE_CLONE_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
-    let attribute_factory = &SERVICES.attribute_factory;
-    let ident = format_ident!("derive");
-    let result = attribute_factory.create(ident, "Clone");
-    return result;
-});
-
 pub const DERIVE_DEBUG_AND_I_ARGS_FORMATTER_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     let attribute_factory = &SERVICES.attribute_factory;
     let ident = format_ident!("derive");
     let result = attribute_factory.create(ident, "Debug, IArgsFormatter");
+    return result;
+});
+pub const DEBUG_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Debug"));
+pub const DEBUG_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
+    let path_factory = &SERVICES.path_factory;
+    let result = path_factory.create_from_parts(&[
+        format_ident!("std"),
+        format_ident!("fmt"),
+        DEBUG_TRAIT_IDENT.clone(),
+    ]);
+    return result;
+});
+
+pub const PARTIAL_ORD_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("PartialOrd"));
+pub const PARTIAL_ORD_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
+    let path_factory = &SERVICES.path_factory;
+    let result = path_factory.create_from_parts(&[
+        format_ident!("core"),
+        format_ident!("cmp"),
+        PARTIAL_ORD_TRAIT_IDENT.clone(),
+    ]);
+    return result;
+});
+
+pub const CLONE_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Clone"));
+pub const CLONE_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
+    let path_factory = &SERVICES.path_factory;
+    let result = path_factory.create_from_parts(&[
+        format_ident!("core"),
+        format_ident!("clone"),
+        CLONE_TRAIT_IDENT.clone(),
+    ]);
+    return result;
+});
+
+pub const DERIVE_CLONE_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+    let attribute_factory = &SERVICES.attribute_factory;
+    let result = attribute_factory.create(format_ident!("derive"), &CLONE_TRAIT_IDENT.to_string());
     return result;
 });
 
