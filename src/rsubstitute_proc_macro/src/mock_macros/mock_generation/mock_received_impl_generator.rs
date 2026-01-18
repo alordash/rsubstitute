@@ -10,12 +10,14 @@ use syn::*;
 pub trait IMockReceivedImplGenerator {
     fn generate_for_trait(
         &self,
+        mock_generics: &MockGenerics,
         mock_received_struct: &MockReceivedStruct,
         fn_infos: &[FnInfo],
     ) -> MockReceivedImpl;
 
     fn generate_for_static(
         &self,
+        mock_generics: &MockGenerics,
         mock_received_struct: &MockReceivedStruct,
         fn_info: &FnInfo,
     ) -> MockReceivedImpl;
@@ -32,38 +34,44 @@ pub(crate) struct MockReceivedImplGenerator {
 impl IMockReceivedImplGenerator for MockReceivedImplGenerator {
     fn generate_for_trait(
         &self,
+        mock_generics: &MockGenerics,
         mock_received_struct: &MockReceivedStruct,
         fn_infos: &[FnInfo],
     ) -> MockReceivedImpl {
-        let self_ty = self
-            .type_factory
-            .create(mock_received_struct.item_struct.ident.clone());
+        let self_ty = self.type_factory.create_with_generics(
+            mock_received_struct.item_struct.ident.clone(),
+            mock_generics.impl_generics.clone(),
+        );
         let fn_receiveds = fn_infos
             .iter()
             .map(|x| ImplItem::Fn(self.generate_fn_received(x)))
             .collect();
 
-        let item_impl = self
-            .impl_factory
-            .create_with_default_lifetime(self_ty, fn_receiveds);
+        let item_impl =
+            self.impl_factory
+                .create_with_default_lifetime(mock_generics, self_ty, fn_receiveds);
         let mock_received_impl = MockReceivedImpl { item_impl };
         return mock_received_impl;
     }
 
     fn generate_for_static(
         &self,
+        mock_generics: &MockGenerics,
         mock_received_struct: &MockReceivedStruct,
         fn_info: &FnInfo,
     ) -> MockReceivedImpl {
-        let self_ty = self
-            .type_factory
-            .create(mock_received_struct.item_struct.ident.clone());
+        let self_ty = self.type_factory.create_with_generics(
+            mock_received_struct.item_struct.ident.clone(),
+            mock_generics.impl_generics.clone(),
+        );
         let mut fn_received = self.generate_fn_received(fn_info);
         fn_received.sig.ident = constants::MOCK_RECEIVED_FIELD_IDENT.clone();
 
-        let item_impl = self
-            .impl_factory
-            .create_with_default_lifetime(self_ty, vec![ImplItem::Fn(fn_received)]);
+        let item_impl = self.impl_factory.create_with_default_lifetime(
+            mock_generics,
+            self_ty,
+            vec![ImplItem::Fn(fn_received)],
+        );
         let mock_received_impl = MockReceivedImpl { item_impl };
         return mock_received_impl;
     }

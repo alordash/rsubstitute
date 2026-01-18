@@ -22,7 +22,8 @@ impl IMockGenericsGenerator for MockGenericsGenerator {
             &modified_source_generics,
         );
         let mock_generics = MockGenerics {
-            generics: result_generics,
+            source_generics: source_generics.clone(),
+            impl_generics: result_generics,
         };
         return mock_generics;
     }

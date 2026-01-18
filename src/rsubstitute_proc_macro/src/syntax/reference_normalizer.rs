@@ -8,8 +8,6 @@ pub trait IReferenceNormalizer {
 
     fn normalize_in_struct(&self, item_struct: &mut ItemStruct);
 
-    fn normalize_in_impl(&self, lifetime: Lifetime, item_impl: &mut ItemImpl);
-
     fn staticify(&self, ty: &mut Type);
 }
 
@@ -33,31 +31,6 @@ impl IReferenceNormalizer for ReferenceNormalizer {
             .collect();
         for lifetime_ref in lifetime_refs {
             lifetime_ref.set_lifetime(self.get_normalized_lifetime());
-        }
-    }
-
-    fn normalize_in_impl(&self, lifetime: Lifetime, item_impl: &mut ItemImpl) {
-        if let Type::Path(type_path) = item_impl.self_ty.as_mut() {
-            let last_segment = type_path
-                .path
-                .segments
-                .last_mut()
-                .expect("impl must have self_ty with non-empty path");
-            let generic_argument = GenericArgument::Lifetime(lifetime);
-            match &mut last_segment.arguments {
-                PathArguments::AngleBracketed(angle_bracketed) => {
-                    angle_bracketed.args.push(generic_argument)
-                }
-                _ => {
-                    last_segment.arguments =
-                        PathArguments::AngleBracketed(AngleBracketedGenericArguments {
-                            colon2_token: None,
-                            lt_token: Default::default(),
-                            args: [generic_argument].into_iter().collect(),
-                            gt_token: Default::default(),
-                        })
-                }
-            };
         }
     }
 

@@ -1,5 +1,6 @@
 use syn::*;
 
 pub struct MockGenerics {
-    pub generics: Generics,
+    pub source_generics: Generics,
+    pub impl_generics: Generics,
 }

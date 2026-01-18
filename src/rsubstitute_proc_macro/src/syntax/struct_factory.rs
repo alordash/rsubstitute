@@ -27,7 +27,7 @@ impl IStructFactory for StructFactory {
             vis: Visibility::Public(Default::default()),
             struct_token: Default::default(),
             ident,
-            generics: mock_generics.generics.clone(),
+            generics: mock_generics.impl_generics.clone(),
             // generics: constants::DEFAULT_ARG_FIELD_LIFETIME_GENERIC.clone(),
             fields: Fields::Named(fields_named),
             semi_token: Default::default(),

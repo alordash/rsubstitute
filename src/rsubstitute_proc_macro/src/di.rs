@@ -127,7 +127,6 @@ fn create_services() -> ServiceCollection {
     });
     let mock_impl_generator = Arc::new(MockImplGenerator {
         type_factory: type_factory.clone(),
-        reference_normalizer: reference_normalizer.clone(),
         mock_constructor_block_generator: mock_constructor_block_generator.clone(),
     });
     let input_args_generator = Arc::new(InputArgsGenerator {
@@ -136,9 +135,7 @@ fn create_services() -> ServiceCollection {
         local_factory: local_factory.clone(),
         reference_normalizer: reference_normalizer.clone(),
     });
-    let impl_factory = Arc::new(ImplFactory {
-        reference_normalizer: reference_normalizer.clone(),
-    });
+    let impl_factory = Arc::new(ImplFactory);
     let setup_output_generator = Arc::new(SetupOutputGenerator {
         type_factory: type_factory.clone(),
         reference_normalizer: reference_normalizer.clone(),

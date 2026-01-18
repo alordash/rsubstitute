@@ -63,21 +63,29 @@ impl IItemTraitHandler for ItemTraitHandler {
             &mock_received_struct,
             &mock_data_struct,
         );
-        let mock_trait_impl =
-            self.mock_trait_impl_generator
-                .generate(target_ident.clone(), &mock_struct, &fn_infos);
+        let mock_trait_impl = self.mock_trait_impl_generator.generate(
+            target_ident.clone(),
+            &mock_generics,
+            &mock_struct,
+            &fn_infos,
+        );
         let mock_impl = self.mock_impl_generator.generate(
+            &mock_generics,
             &mock_struct,
             &mock_data_struct,
             &mock_setup_struct,
             &mock_received_struct,
         );
-        let mock_setup_impl = self
-            .mock_setup_impl_generator
-            .generate_for_trait(&mock_setup_struct, &fn_infos);
-        let mock_received_impl = self
-            .mock_received_impl_generator
-            .generate_for_trait(&mock_received_struct, &fn_infos);
+        let mock_setup_impl = self.mock_setup_impl_generator.generate_for_trait(
+            &mock_generics,
+            &mock_setup_struct,
+            &fn_infos,
+        );
+        let mock_received_impl = self.mock_received_impl_generator.generate_for_trait(
+            &mock_generics,
+            &mock_received_struct,
+            &fn_infos,
+        );
         let generated_mod = self.mod_generator.generate_trait(
             target_ident,
             fn_infos,

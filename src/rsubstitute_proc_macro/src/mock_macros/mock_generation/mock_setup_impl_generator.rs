@@ -14,12 +14,14 @@ use syn::*;
 pub trait IMockSetupImplGenerator {
     fn generate_for_trait(
         &self,
+        mock_generics: &MockGenerics,
         mock_setup_struct: &MockSetupStruct,
         fn_infos: &[FnInfo],
     ) -> MockSetupImpl;
 
     fn generate_for_static(
         &self,
+        mock_generics: &MockGenerics,
         mock_setup_struct: &MockSetupStruct,
         fn_info: &FnInfo,
         base_caller_struct: &BaseCallerStruct,
@@ -39,12 +41,14 @@ pub(crate) struct MockSetupImplGenerator {
 impl IMockSetupImplGenerator for MockSetupImplGenerator {
     fn generate_for_trait(
         &self,
+        mock_generics: &MockGenerics,
         mock_setup_struct: &MockSetupStruct,
         fn_infos: &[FnInfo],
     ) -> MockSetupImpl {
-        let self_ty = self
-            .type_factory
-            .create(mock_setup_struct.item_struct.ident.clone());
+        let self_ty = self.type_factory.create_with_generics(
+            mock_setup_struct.item_struct.ident.clone(),
+            mock_generics.impl_generics.clone(),
+        );
         let use_fn_info_ident_as_method_ident = true;
         let fn_setups = fn_infos
             .iter()
@@ -59,22 +63,24 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
             })
             .collect();
 
-        let item_impl = self
-            .impl_factory
-            .create_with_default_lifetime(self_ty, fn_setups);
+        let item_impl =
+            self.impl_factory
+                .create_with_default_lifetime(mock_generics, self_ty, fn_setups);
         let mock_setup_impl = MockSetupImpl { item_impl };
         return mock_setup_impl;
     }
 
     fn generate_for_static(
         &self,
+        mock_generics: &MockGenerics,
         mock_setup_struct: &MockSetupStruct,
         fn_info: &FnInfo,
         base_caller_struct: &BaseCallerStruct,
     ) -> MockSetupImpl {
-        let self_ty = self
-            .type_factory
-            .create(mock_setup_struct.item_struct.ident.clone());
+        let self_ty = self.type_factory.create_with_generics(
+            mock_setup_struct.item_struct.ident.clone(),
+            mock_generics.impl_generics.clone(),
+        );
         let use_fn_info_ident_as_method_ident = false;
         let output = self
             .setup_output_generator
@@ -86,9 +92,9 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
             Some(base_caller_struct),
         ));
 
-        let item_impl = self
-            .impl_factory
-            .create_with_default_lifetime(self_ty, vec![fn_setup]);
+        let item_impl =
+            self.impl_factory
+                .create_with_default_lifetime(mock_generics, self_ty, vec![fn_setup]);
         let mock_setup_impl = MockSetupImpl { item_impl };
         return mock_setup_impl;
     }

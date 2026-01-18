@@ -1,5 +1,6 @@
 use crate::syntax::IPathFactory;
 use proc_macro2::Ident;
+use quote::ToTokens;
 use std::sync::Arc;
 // TODO - replace everywhere with `use syn::*`
 use crate::constants;

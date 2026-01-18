@@ -1,33 +1,36 @@
-use crate::constants;
+use crate::mock_macros::mock_generation::models::*;
 use crate::syntax::*;
-use std::sync::Arc;
 use syn::*;
 
 pub trait IImplFactory {
-    fn create_with_default_lifetime(&self, self_ty: Type, items: Vec<ImplItem>) -> ItemImpl;
+    fn create_with_default_lifetime(
+        &self,
+        mock_generics: &MockGenerics,
+        self_ty: Type,
+        items: Vec<ImplItem>,
+    ) -> ItemImpl;
 }
 
-pub(crate) struct ImplFactory {
-    pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
-}
+pub(crate) struct ImplFactory;
 
 impl IImplFactory for ImplFactory {
-    fn create_with_default_lifetime(&self, self_ty: Type, items: Vec<ImplItem>) -> ItemImpl {
+    fn create_with_default_lifetime(
+        &self,
+        mock_generics: &MockGenerics,
+        self_ty: Type,
+        items: Vec<ImplItem>,
+    ) -> ItemImpl {
         let mut item_impl = ItemImpl {
             attrs: Vec::new(),
             defaultness: None,
             unsafety: None,
             impl_token: Default::default(),
-            generics: constants::DEFAULT_ARG_FIELD_LIFETIME_GENERIC.clone(),
+            generics: mock_generics.impl_generics.clone(),
             trait_: None,
             self_ty: Box::new(self_ty),
             brace_token: Default::default(),
             items,
         };
-        self.reference_normalizer.normalize_in_impl(
-            constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
-            &mut item_impl,
-        );
         return item_impl;
     }
 }

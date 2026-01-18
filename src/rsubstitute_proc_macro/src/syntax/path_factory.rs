@@ -2,6 +2,7 @@ use crate::syntax::IGenericArgumentFactory;
 use proc_macro2::Ident;
 use std::cell::OnceCell;
 use std::sync::Arc;
+use quote::ToTokens;
 use syn::*;
 
 pub trait IPathFactory {
@@ -31,21 +32,20 @@ impl IPathFactory for PathFactory {
     }
 
     fn create_with_generics(&self, ident: Ident, generics: Generics) -> Path {
-        let arguments = if generics.params.empty_or_trailing() {
+        let arguments = if generics.params.is_empty() {
             PathArguments::None
         } else {
+            let generic_argument_factory = self
+                .generic_argument_factory
+                .get()
+                .expect("generic_argument_factory should be set at this point");
             PathArguments::AngleBracketed(AngleBracketedGenericArguments {
                 colon2_token: None,
                 lt_token: Default::default(),
                 args: generics
                     .params
                     .iter()
-                    .map(|x| {
-                        self.generic_argument_factory
-                            .get()
-                            .expect("generic_argument_factory should be set at this point")
-                            .create(x.clone())
-                    })
+                    .map(|x| generic_argument_factory.create(x.clone()))
                     .collect(),
                 gt_token: Default::default(),
             })

@@ -5,6 +5,7 @@ use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::mock_generation::*;
 use crate::syntax::*;
 use proc_macro2::Ident;
+use quote::{format_ident, ToTokens};
 use std::sync::Arc;
 use syn::punctuated::Punctuated;
 use syn::*;
@@ -13,6 +14,7 @@ pub trait IMockTraitImplGenerator {
     fn generate(
         &self,
         target_ident: Ident,
+        mock_generics: &MockGenerics,
         mock_struct: &MockStruct,
         fn_infos: &[FnInfo],
     ) -> MockTraitImpl;
@@ -30,34 +32,34 @@ impl IMockTraitImplGenerator for MockTraitImplGenerator {
     fn generate(
         &self,
         target_ident: Ident,
+        mock_generics: &MockGenerics,
         mock_struct: &MockStruct,
         fn_infos: &[FnInfo],
     ) -> MockTraitImpl {
-        let trait_ = self.path_factory.create(target_ident);
-        let self_ty = self
-            .type_factory
-            .create(mock_struct.item_struct.ident.clone());
+        let trait_ = self
+            .path_factory
+            .create_with_generics(target_ident, mock_generics.source_generics.clone());
+        let self_ty = self.type_factory.create_with_generics(
+            mock_struct.item_struct.ident.clone(),
+            mock_generics.impl_generics.clone(),
+        );
         let items = fn_infos
             .iter()
             .map(|x| self.generate_impl_item_fn(x))
             .map(ImplItem::Fn)
             .collect();
 
-        let mut item_impl = ItemImpl {
+        let item_impl = ItemImpl {
             attrs: Vec::new(),
             defaultness: None,
             unsafety: None,
             impl_token: Default::default(),
-            generics: constants::DEFAULT_ARG_FIELD_LIFETIME_GENERIC.clone(),
+            generics: mock_generics.impl_generics.clone(),
             trait_: Some((None, trait_, Default::default())),
             self_ty: Box::new(self_ty),
             brace_token: Default::default(),
             items,
         };
-        self.reference_normalizer.normalize_in_impl(
-            constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
-            &mut item_impl,
-        );
         let mock_impl = MockTraitImpl { item_impl };
         return mock_impl;
     }

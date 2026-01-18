@@ -1,6 +1,6 @@
 use crate::constants;
-use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::mock_generation::IMockConstructorBlockGenerator;
+use crate::mock_macros::mock_generation::models::*;
 use crate::syntax::*;
 use proc_macro2::Ident;
 use quote::format_ident;
@@ -12,6 +12,7 @@ use syn::*;
 pub trait IMockImplGenerator {
     fn generate(
         &self,
+        mock_generics: &MockGenerics,
         mock_struct: &MockStruct,
         mock_data_struct: &MockDataStruct,
         mock_setup_struct: &MockSetupStruct,
@@ -21,21 +22,22 @@ pub trait IMockImplGenerator {
 
 pub(crate) struct MockImplGenerator {
     pub type_factory: Arc<dyn ITypeFactory>,
-    pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
     pub mock_constructor_block_generator: Arc<dyn IMockConstructorBlockGenerator>,
 }
 
 impl IMockImplGenerator for MockImplGenerator {
     fn generate(
         &self,
+        mock_generics: &MockGenerics,
         mock_struct: &MockStruct,
         mock_data_struct: &MockDataStruct,
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
     ) -> MockImpl {
-        let self_ty = self
-            .type_factory
-            .create(mock_struct.item_struct.ident.clone());
+        let self_ty = self.type_factory.create_with_generics(
+            mock_struct.item_struct.ident.clone(),
+            mock_generics.impl_generics.clone(),
+        );
         let constructor = self.generate_constructor(
             mock_struct,
             mock_data_struct,
@@ -43,21 +45,17 @@ impl IMockImplGenerator for MockImplGenerator {
             mock_received_struct,
         );
 
-        let mut item_impl = ItemImpl {
+        let item_impl = ItemImpl {
             attrs: Vec::new(),
             defaultness: None,
             unsafety: None,
             impl_token: Default::default(),
-            generics: constants::DEFAULT_ARG_FIELD_LIFETIME_GENERIC.clone(),
+            generics: mock_generics.impl_generics.clone(),
             trait_: None,
             self_ty: Box::new(self_ty),
             brace_token: Default::default(),
             items: [constructor].into_iter().collect(),
         };
-        self.reference_normalizer.normalize_in_impl(
-            constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
-            &mut item_impl,
-        );
         let mock_impl = MockImpl { item_impl };
         return mock_impl;
     }
