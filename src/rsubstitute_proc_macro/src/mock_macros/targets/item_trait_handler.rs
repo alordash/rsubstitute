@@ -1,7 +1,7 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::IFnInfoGenerator;
+use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::mock_generation::*;
-use crate::mock_macros::models::GeneratedMod;
 use crate::mock_macros::*;
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
@@ -39,9 +39,11 @@ impl IItemTraitHandler for ItemTraitHandler {
             .iter()
             .map(|x| self.fn_info_generator.generate(x))
             .collect();
-        let mock_data_struct = self
-            .mock_data_struct_generator
-            .generate_for_trait(&mock_ident, &fn_infos);
+        let mock_data_struct = self.mock_data_struct_generator.generate_for_trait(
+            &mock_ident,
+            &item_trait.generics,
+            &fn_infos,
+        );
         let mock_setup_struct = self
             .mock_setup_struct_generator
             .generate(&mock_ident, &mock_data_struct);

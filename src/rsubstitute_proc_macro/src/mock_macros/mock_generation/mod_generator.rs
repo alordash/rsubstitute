@@ -1,7 +1,6 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::FnInfo;
 use crate::mock_macros::mock_generation::models::*;
-use crate::mock_macros::models::GeneratedMod;
 use crate::syntax::IPathFactory;
 use proc_macro2::Ident;
 use quote::{ToTokens, format_ident};

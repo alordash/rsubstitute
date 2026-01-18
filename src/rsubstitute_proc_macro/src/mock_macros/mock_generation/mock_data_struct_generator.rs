@@ -7,7 +7,7 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait IMockDataStructGenerator {
-    fn generate_for_trait(&self, mock_ident: &Ident, fn_infos: &[FnInfo]) -> MockDataStruct;
+    fn generate_for_trait(&self, mock_ident: &Ident, generics: &Generics, fn_infos: &[FnInfo]) -> MockDataStruct;
 
     fn generate_for_static(
         &self,
@@ -24,7 +24,7 @@ pub(crate) struct MockDataStructGenerator {
 }
 
 impl IMockDataStructGenerator for MockDataStructGenerator {
-    fn generate_for_trait(&self, mock_ident: &Ident, fn_infos: &[FnInfo]) -> MockDataStruct {
+    fn generate_for_trait(&self, mock_ident: &Ident, generics: &Generics, fn_infos: &[FnInfo]) -> MockDataStruct {
         let attrs = Vec::new();
         let ident = format_ident!("{}{}", mock_ident, Self::MOCK_DATA_STRUCT_IDENT_SUFFIX);
         let fn_fields: Vec<_> = fn_infos

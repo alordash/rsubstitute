@@ -13,6 +13,7 @@ mod reference_type_crawler;
 mod std_mem_transmute_expr_factory;
 mod struct_factory;
 mod type_factory;
+mod generics_merger;
 
 pub use arg_type_factory::*;
 pub use attribute_factory::*;
@@ -29,3 +30,4 @@ pub use reference_type_crawler::*;
 pub use std_mem_transmute_expr_factory::*;
 pub use struct_factory::*;
 pub use type_factory::*;
+pub use generics_merger::*;

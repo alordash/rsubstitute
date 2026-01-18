@@ -1,7 +1,7 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::IFnInfoGenerator;
+use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::mock_generation::*;
-use crate::mock_macros::models::*;
 use crate::mock_macros::*;
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
