@@ -33,6 +33,16 @@ mod global {
         pub number: i32,
     }
 
+    impl<'a> IArgInfosProvider for global_Call<'a> {
+        fn get_fn_name(&self) -> &'static str {
+            return "global";
+        }
+
+        fn get_arg_infos(&self) -> Vec<ArgInfo> {
+            return vec![ArgInfo::new("number", self.number.clone())];
+        }
+    }
+
     #[allow(non_camel_case_types)]
     #[derive(Debug, IArgsFormatter)]
     pub struct global_ArgsChecker<'a> {

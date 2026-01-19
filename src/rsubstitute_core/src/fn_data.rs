@@ -1,19 +1,24 @@
-use crate::args_matching::{ArgCheckResult, IArgsChecker};
+use crate::args_matching::*;
 use crate::call_info::CallInfo;
 use crate::di::ServiceCollection;
 use crate::error_printer::IErrorPrinter;
-use crate::{FnConfig, IBaseCaller, Times};
+use crate::{FnCallInfo, FnConfig, IBaseCaller, Times};
 use std::cell::RefCell;
 use std::sync::Arc;
 
-pub struct FnData<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TBaseCaller> {
+pub struct FnData<
+    TCall: IArgInfosProvider,
+    TArgsChecker: IArgsChecker<TCall>,
+    TReturnValue,
+    TBaseCaller,
+> {
     fn_name: &'static str,
     call_infos: RefCell<Vec<CallInfo<TCall>>>,
     configs: *mut Vec<Arc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue, TBaseCaller>>>>,
     error_printer: Arc<dyn IErrorPrinter>,
 }
 
-impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TBaseCaller>
+impl<TCall: IArgInfosProvider, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TBaseCaller>
     FnData<TCall, TArgsChecker, TReturnValue, TBaseCaller>
 {
     pub fn new(fn_name: &'static str, services: &ServiceCollection) -> Self {
@@ -31,8 +36,12 @@ impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TBaseCaller>
     }
 }
 
-impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TBaseCaller>
-    FnData<TCall, TArgsChecker, TReturnValue, TBaseCaller>
+impl<
+    TCall: IArgInfosProvider + Clone,
+    TArgsChecker: IArgsChecker<TCall>,
+    TReturnValue: Clone,
+    TBaseCaller,
+> FnData<TCall, TArgsChecker, TReturnValue, TBaseCaller>
 {
     pub fn register_call(&self, call: TCall) -> &Self {
         self.call_infos.borrow_mut().push(CallInfo::new(call));
@@ -94,6 +103,23 @@ impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TBase
         }
     }
 
+    pub fn verify_received_nothing_else(&self) {
+        let call_infos = self.call_infos.borrow();
+        let unexpected_call_infos: Vec<_> = call_infos.iter().filter(|x| x.is_verified()).collect();
+        if unexpected_call_infos.is_empty() {
+            return;
+        }
+        let unexpected_fn_call_infos = unexpected_call_infos
+            .into_iter()
+            .map(|x| {
+                let call = x.get_call();
+                return FnCallInfo::new(call.get_fn_name(), call.get_arg_infos());
+            })
+            .collect();
+        self.error_printer
+            .print_received_unexpected_calls_error(unexpected_fn_call_infos);
+    }
+
     fn try_get_matching_config(
         &self,
         call: TCall,
@@ -135,7 +161,7 @@ impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TBase
 }
 
 impl<
-    TCall: Clone,
+    TCall: IArgInfosProvider + Clone,
     TArgsChecker: IArgsChecker<TCall>,
     TReturnValue: Clone,
     TBaseCaller: IBaseCaller<TCall, TReturnValue>,

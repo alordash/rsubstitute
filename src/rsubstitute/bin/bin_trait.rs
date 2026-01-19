@@ -56,6 +56,16 @@ mod generated {
         pub value: i32,
     }
 
+    impl<'a> IArgInfosProvider for work_Call<'a> {
+        fn get_fn_name(&self) -> &'static str {
+            return "work";
+        }
+
+        fn get_arg_infos(&self) -> Vec<ArgInfo> {
+            return vec![ArgInfo::new("value", self.value.clone())];
+        }
+    }
+
     #[allow(non_camel_case_types)]
     #[derive(Debug, IArgsFormatter)]
     pub struct work_ArgsChecker<'a> {
@@ -77,6 +87,21 @@ mod generated {
         pub something: &'a &'a [u8],
         pub dyn_obj: &'a dyn IFoo,
         pub arc: Arc<dyn IFoo>,
+    }
+
+    impl<'a> IArgInfosProvider for another_work_Call<'a> {
+        fn get_fn_name(&self) -> &'static str {
+            return "another_work";
+        }
+
+        fn get_arg_infos(&self) -> Vec<ArgInfo> {
+            return vec![
+                ArgInfo::new("string", self.string.clone()),
+                ArgInfo::new("something", self.something.clone()),
+                ArgInfo::new("dyn_obj", self.dyn_obj.clone()),
+                ArgInfo::new("arc", self.arc.clone()),
+            ];
+        }
     }
 
     #[allow(non_camel_case_types)]
@@ -106,6 +131,16 @@ mod generated {
         phantom_lifetime: PhantomData<&'a ()>,
     }
 
+    impl<'a> IArgInfosProvider for get_Call<'a> {
+        fn get_fn_name(&self) -> &'static str {
+            return "get";
+        }
+
+        fn get_arg_infos(&self) -> Vec<ArgInfo> {
+            return vec![];
+        }
+    }
+
     #[allow(non_camel_case_types)]
     #[derive(Debug, IArgsFormatter)]
     pub struct get_ArgsChecker<'a> {
@@ -123,6 +158,16 @@ mod generated {
     pub struct standalone_Call<'a> {
         phantom_lifetime: PhantomData<&'a ()>,
         number: i32,
+    }
+
+    impl<'a> IArgInfosProvider for standalone_Call<'a> {
+        fn get_fn_name(&self) -> &'static str {
+            return "standalone";
+        }
+
+        fn get_arg_infos(&self) -> Vec<ArgInfo> {
+            return vec![ArgInfo::new("number", self.number.clone())];
+        }
     }
 
     #[allow(non_camel_case_types)]

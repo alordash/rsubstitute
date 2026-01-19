@@ -46,6 +46,10 @@ pub const I_ARGS_FORMATTER_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_i
 pub const I_ARGS_CHECKER_TRAIT_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("IArgsChecker"));
 
+// TODO - add test that it's equal to rsubstitute_core::arguments_matching::IArgschecker
+pub const I_ARG_INFOS_PROVIDER_TRAIT_IDENT: LazyCell<Ident> =
+    LazyCell::new(|| format_ident!("IArgInfosProvider"));
+
 // TODO - add test that it's equal to rsubstitute_core::IBaseCaller
 pub const I_BASE_CALLER_TRAIT_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("IBaseCaller"));
@@ -264,10 +268,33 @@ pub const STRING_TYPE: LazyCell<Type> = LazyCell::new(|| {
     return result;
 });
 
+pub const STATIC_STR_TYPE: LazyCell<Type> = LazyCell::new(|| {
+    let path_factory = &SERVICES.path_factory;
+    let str_path = path_factory.create(format_ident!("str"));
+    let result = Type::Reference(TypeReference {
+        and_token: Default::default(),
+        lifetime: Some(STATIC_LIFETIME.clone()),
+        mutability: None,
+        elem: Box::new(Type::Path(TypePath {
+            qself: None,
+            path: str_path,
+        })),
+    });
+    return result;
+});
+
 // TODO - add tests to verify that ArgCheckResult ident is correct
 pub const VEC_OF_ARG_CHECK_RESULT_TYPE: LazyCell<Type> = LazyCell::new(|| {
     let type_factory = &SERVICES.type_factory;
     let arg_check_result_type = type_factory.create(format_ident!("ArgCheckResult"));
+    let result = type_factory.wrap_in(arg_check_result_type, format_ident!("Vec"));
+    return result;
+});
+
+// TODO - add tests to verify that ArgInfo ident is correct
+pub const VEC_OF_ARG_INFO_RESULT_TYPE: LazyCell<Type> = LazyCell::new(|| {
+    let type_factory = &SERVICES.type_factory;
+    let arg_check_result_type = type_factory.create(format_ident!("ArgInfo"));
     let result = type_factory.wrap_in(arg_check_result_type, format_ident!("Vec"));
     return result;
 });

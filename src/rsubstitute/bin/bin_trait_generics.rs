@@ -40,6 +40,16 @@ mod generated {
         pub value: T,
     }
 
+    impl<'a, T: Debug + PartialOrd + Clone> IArgInfosProvider for work_Call<'a, T> {
+        fn get_fn_name(&self) -> &'static str {
+            return "work";
+        }
+
+        fn get_arg_infos(&self) -> Vec<ArgInfo> {
+            return vec![ArgInfo::new("value", self.value.clone())];
+        }
+    }
+
     #[allow(non_camel_case_types)]
     #[derive(Debug, IArgsFormatter)]
     pub struct work_ArgsChecker<'a, T: Debug + PartialOrd + Clone> {
@@ -60,6 +70,16 @@ mod generated {
         phantom_lifetime: PhantomData<&'a ()>,
         phantom_T: PhantomData<T>,
         pub string: &'a str,
+    }
+
+    impl<'a, T: Debug + PartialOrd + Clone> IArgInfosProvider for another_work_Call<'a, T> {
+        fn get_fn_name(&self) -> &'static str {
+            return "another_work";
+        }
+
+        fn get_arg_infos(&self) -> Vec<ArgInfo> {
+            return vec![ArgInfo::new("string", self.string.clone())];
+        }
     }
 
     #[allow(non_camel_case_types)]
@@ -83,6 +103,16 @@ mod generated {
     pub struct get_Call<'a, T: Debug + PartialOrd + Clone> {
         phantom_lifetime: PhantomData<&'a ()>,
         phantom_T: PhantomData<T>,
+    }
+
+    impl<'a, T: Debug + PartialOrd + Clone> IArgInfosProvider for get_Call<'a, T> {
+        fn get_fn_name(&self) -> &'static str {
+            return "get";
+        }
+
+        fn get_arg_infos(&self) -> Vec<ArgInfo> {
+            return vec![];
+        }
     }
 
     #[allow(non_camel_case_types)]

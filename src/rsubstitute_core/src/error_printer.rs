@@ -1,5 +1,6 @@
-use crate::args_matching::{ArgCheckResult, IArgsFormatter};
-use crate::Times;
+use crate::args_matching::{ArgCheckResult, ArgInfo, IArgsFormatter};
+use crate::call_info::CallInfo;
+use crate::{FnCallInfo, Times};
 
 pub trait IErrorPrinter {
     fn print_received_verification_error(
@@ -10,6 +11,8 @@ pub trait IErrorPrinter {
         non_matching_calls: Vec<Vec<ArgCheckResult>>,
         times: Times,
     ) -> !;
+
+    fn print_received_unexpected_calls_error(&self, unexpected_calls: Vec<FnCallInfo>) -> !;
 }
 
 pub(crate) struct ErrorPrinter;
@@ -65,13 +68,40 @@ impl IErrorPrinter for ErrorPrinter {
 {non_matching_calls_args_msg}"
             )
         };
-        let msg = format!(
+        let error_msg = format!(
             r#"{times} matching:
 {expected_call_msg}
 {matching_calls_report}
 {non_matching_calls_report}"#
         );
-        panic!("{msg}");
+        panic!("{error_msg}");
+    }
+
+    fn print_received_unexpected_calls_error(&self, unexpected_calls: Vec<FnCallInfo>) -> ! {
+        let unexpected_calls_count = unexpected_calls.len();
+        let call_fmt = self.fmt_calls(unexpected_calls_count);
+        let unexpected_calls_msgs: Vec<_> = unexpected_calls
+            .into_iter()
+            .enumerate()
+            .map(|(i, fn_call_info)| {
+                let call_number = i + 1;
+                let fn_name = fn_call_info.fn_name;
+                let call_args = fn_call_info.call_args;
+                let call_args_msgs: Vec<_> = call_args
+                    .into_iter()
+                    .map(|call_arg| call_arg.arg_name())
+                    .collect();
+                let call_args_msg = call_args_msgs.join(", ");
+                let unexpected_calls_msg = format!("{call_number}. {fn_name}({call_args_msg})");
+                return unexpected_calls_msg;
+            })
+            .collect();
+        let unexpected_calls_msg = unexpected_calls_msgs.join("\n");
+        let error_msg = format!(
+            r"Did not expect to receive ant other calls. Received {unexpected_calls_count} {call_fmt}:
+{unexpected_calls_msg}"
+        );
+        panic!("{error_msg}");
     }
 }
 

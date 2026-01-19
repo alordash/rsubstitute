@@ -9,25 +9,25 @@ use syn::punctuated::Punctuated;
 use syn::token::Bracket;
 use syn::*;
 
-pub trait IArgsCheckerImplGenerator {
+pub trait IArgsCheckerTraitImplGenerator {
     fn generate(
         &self,
         call_struct: &CallStruct,
         args_checker_struct: &ArgsCheckerStruct,
-    ) -> ArgsCheckerImpl;
+    ) -> ArgsCheckerTraitImpl;
 }
 
-pub struct ArgsCheckerImplGenerator {
+pub struct ArgsCheckerTraitImplGenerator {
     pub(crate) type_factory: Arc<dyn ITypeFactory>,
     pub(crate) field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
 }
 
-impl IArgsCheckerImplGenerator for ArgsCheckerImplGenerator {
+impl IArgsCheckerTraitImplGenerator for ArgsCheckerTraitImplGenerator {
     fn generate(
         &self,
         call_struct: &CallStruct,
         args_checker_struct: &ArgsCheckerStruct,
-    ) -> ArgsCheckerImpl {
+    ) -> ArgsCheckerTraitImpl {
         let trait_ident = constants::I_ARGS_CHECKER_TRAIT_IDENT.clone();
         let trait_path = Path {
             leading_colon: None,
@@ -68,12 +68,12 @@ impl IArgsCheckerImplGenerator for ArgsCheckerImplGenerator {
             brace_token: Default::default(),
             items: vec![items],
         };
-        let args_checker_impl = ArgsCheckerImpl { item_impl };
+        let args_checker_impl = ArgsCheckerTraitImpl { item_impl };
         return args_checker_impl;
     }
 }
 
-impl ArgsCheckerImplGenerator {
+impl ArgsCheckerTraitImplGenerator {
     const CHECK_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("check"));
 
     // TODO - test that equals to Arg::check

@@ -57,7 +57,16 @@ fn create_services() -> ServiceCollection {
     let field_access_expr_factory = Arc::new(FieldAccessExprFactory {
         path_factory: path_factory.clone(),
     });
-    let args_checker_impl_generator = Arc::new(ArgsCheckerImplGenerator {
+    let expr_method_call_factory = Arc::new(ExprMethodCallFactory {
+        path_factory: path_factory.clone(),
+        field_access_expr_factory: field_access_expr_factory.clone(),
+    });
+    let call_arg_infos_provider_impl_generator = Arc::new(CallArgInfosProviderImplGenerator {
+        path_factory: path_factory.clone(),
+        type_factory: type_factory.clone(),
+        expr_method_call_factory: expr_method_call_factory.clone(),
+    });
+    let args_checker_impl_generator = Arc::new(ArgsCheckerTraitImplGenerator {
         type_factory: type_factory.clone(),
         field_access_expr_factory: field_access_expr_factory.clone(),
     });
@@ -66,6 +75,7 @@ fn create_services() -> ServiceCollection {
     });
     let fn_info_generator = Arc::new(FnInfoGenerator {
         call_struct_generator: call_struct_generator.clone(),
+        call_arg_infos_provider_impl_generator: call_arg_infos_provider_impl_generator.clone(),
         args_checker_generator: args_checker_generator.clone(),
         args_checker_impl_generator: args_checker_impl_generator.clone(),
     });
@@ -98,10 +108,6 @@ fn create_services() -> ServiceCollection {
     let send_sync_impls_generator = Arc::new(SendSyncImplsGenerator {
         path_factory: path_factory.clone(),
         type_factory: type_factory.clone(),
-    });
-    let expr_method_call_factory = Arc::new(ExprMethodCallFactory {
-        path_factory: path_factory.clone(),
-        field_access_expr_factory: field_access_expr_factory.clone(),
     });
     let field_value_factory = Arc::new(FieldValueFactory {
         expr_method_call_factory: expr_method_call_factory.clone(),
