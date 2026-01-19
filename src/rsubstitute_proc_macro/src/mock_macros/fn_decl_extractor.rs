@@ -31,7 +31,16 @@ impl IFnDeclExtractor for FnDeclExtractor {
 impl FnDeclExtractor {
     fn try_map(&self, trait_item: &TraitItem) -> Option<FnDecl> {
         match trait_item {
-            TraitItem::Fn(trait_item_fn) => Some(self.map(trait_item_fn)),
+            TraitItem::Fn(trait_item_fn) => {
+                // TODO - add test that with generics it doesnt compile?
+                if !trait_item_fn.sig.generics.params.is_empty() {
+                    panic!("Generic type parameters for trait functions are not supported.");
+                }
+                if trait_item_fn.sig.generics.where_clause.is_some() {
+                    panic!("'where' clause for trait functions is not currently supported.")
+                }
+                Some(self.map(trait_item_fn))
+            }
             _ => None,
         }
     }
