@@ -38,6 +38,7 @@ trait MyTrait {
 }
 
 pub use generated::*;
+use rsubstitute::assertions::assert_panics;
 
 mod generated {
     use super::*;
@@ -57,10 +58,6 @@ mod generated {
     }
 
     impl<'a> IArgInfosProvider for work_Call<'a> {
-        fn get_fn_name(&self) -> &'static str {
-            return "work";
-        }
-
         fn get_arg_infos(&self) -> Vec<ArgInfo> {
             return vec![ArgInfo::new("value", self.value.clone())];
         }
@@ -90,10 +87,6 @@ mod generated {
     }
 
     impl<'a> IArgInfosProvider for another_work_Call<'a> {
-        fn get_fn_name(&self) -> &'static str {
-            return "another_work";
-        }
-
         fn get_arg_infos(&self) -> Vec<ArgInfo> {
             return vec![
                 ArgInfo::new("string", self.string.clone()),
@@ -132,10 +125,6 @@ mod generated {
     }
 
     impl<'a> IArgInfosProvider for get_Call<'a> {
-        fn get_fn_name(&self) -> &'static str {
-            return "get";
-        }
-
         fn get_arg_infos(&self) -> Vec<ArgInfo> {
             return vec![];
         }
@@ -161,10 +150,6 @@ mod generated {
     }
 
     impl<'a> IArgInfosProvider for standalone_Call<'a> {
-        fn get_fn_name(&self) -> &'static str {
-            return "standalone";
-        }
-
         fn get_arg_infos(&self) -> Vec<ArgInfo> {
             return vec![ArgInfo::new("number", self.number.clone())];
         }
@@ -190,6 +175,16 @@ mod generated {
         work_data: FnData<work_Call<'a>, work_ArgsChecker<'a>, (), ()>,
         another_work_data: FnData<another_work_Call<'a>, another_work_ArgsChecker<'a>, Vec<u8>, ()>,
         get_data: FnData<get_Call<'a>, get_ArgsChecker<'a>, i32, ()>,
+    }
+
+    impl<'a> IMockData for MyTraitMockData<'a> {
+        fn get_received_nothing_else_error_msgs(&self) -> Vec<Vec<String>> {
+            return vec![
+                self.work_data.get_unexpected_calls_error_msgs(),
+                self.another_work_data.get_unexpected_calls_error_msgs(),
+                self.get_data.get_unexpected_calls_error_msgs(),
+            ];
+        }
     }
 
     pub struct MyTraitMockSetup<'a> {
@@ -366,6 +361,11 @@ mod generated {
             return self;
         }
 
+        pub fn only(&self) -> &Self {
+            self.data.verify_received_nothing_else();
+            return self;
+        }
+
         // #[allow(non_upper_case_globals)]
         // const standalone_data: LazyCell<
         //     FnData<standalone_Call<'a>, standalone_ArgsChecker<'a>, f32>,
@@ -382,6 +382,45 @@ mod generated {
     }
 
     // end - Mock
+}
+
+#[test]
+fn received_nothing_else_Ok() {
+    // Arrange
+    let mock = MyTraitMock::new();
+    let returned_value = 11;
+    mock.setup.get().returns(returned_value);
+
+    // Act
+    let actual_returned_value = mock.get();
+
+    // Assert
+    assert_eq!(returned_value, actual_returned_value);
+
+    mock.received.get(Times::Once).only();
+}
+
+#[test]
+fn received_nothing_else_PanicsOk() {
+    // Arrange
+    let mock = MyTraitMock::new();
+    let returned_value = 11;
+    let work_arguments = 45;
+    mock.setup.get().returns(returned_value);
+    mock.setup.work(Arg::Any);
+
+    // Act
+    let actual_returned_value = mock.get();
+    mock.work(work_arguments);
+
+    // Assert
+    assert_eq!(returned_value, actual_returned_value);
+
+    assert_panics(
+        || mock.received.get(Times::Once).only(),
+        format!(r"Did not expect to receive any other calls. Received 1 call:
+1. work({work_arguments})"),
+    );
 }
 
 fn main() {

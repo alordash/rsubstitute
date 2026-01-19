@@ -1,6 +1,5 @@
+use crate::Times;
 use crate::args_matching::{ArgCheckResult, ArgInfo, IArgsFormatter};
-use crate::call_info::CallInfo;
-use crate::{FnCallInfo, Times};
 
 pub trait IErrorPrinter {
     fn print_received_verification_error(
@@ -12,7 +11,13 @@ pub trait IErrorPrinter {
         times: Times,
     ) -> !;
 
-    fn print_received_unexpected_calls_error(&self, unexpected_calls: Vec<FnCallInfo>) -> !;
+    fn format_received_unexpected_call_error(
+        &self,
+        fn_name: &'static str,
+        unexpected_call: Vec<ArgInfo>,
+    ) -> String;
+
+    fn print_received_unexpected_calls_error(&self, error_msgs: Vec<String>) -> !;
 }
 
 pub(crate) struct ErrorPrinter;
@@ -77,28 +82,34 @@ impl IErrorPrinter for ErrorPrinter {
         panic!("{error_msg}");
     }
 
-    fn print_received_unexpected_calls_error(&self, unexpected_calls: Vec<FnCallInfo>) -> ! {
-        let unexpected_calls_count = unexpected_calls.len();
+    fn format_received_unexpected_call_error(
+        &self,
+        fn_name: &'static str,
+        call_args: Vec<ArgInfo>,
+    ) -> String {
+        let call_args_msgs: Vec<_> = call_args
+            .into_iter()
+            .map(|call_arg| format!("{:?}", call_arg.arg_value()))
+            .collect();
+        let call_args_msg = call_args_msgs.join(", ");
+        let error_msg = format!("{fn_name}({call_args_msg})");
+        return error_msg;
+    }
+
+    fn print_received_unexpected_calls_error(&self, error_msgs: Vec<String>) -> ! {
+        let unexpected_calls_count = error_msgs.len();
         let call_fmt = self.fmt_calls(unexpected_calls_count);
-        let unexpected_calls_msgs: Vec<_> = unexpected_calls
+        let unexpected_calls_msgs: Vec<_> = error_msgs
             .into_iter()
             .enumerate()
-            .map(|(i, fn_call_info)| {
-                let call_number = i + 1;
-                let fn_name = fn_call_info.fn_name;
-                let call_args = fn_call_info.call_args;
-                let call_args_msgs: Vec<_> = call_args
-                    .into_iter()
-                    .map(|call_arg| call_arg.arg_name())
-                    .collect();
-                let call_args_msg = call_args_msgs.join(", ");
-                let unexpected_calls_msg = format!("{call_number}. {fn_name}({call_args_msg})");
-                return unexpected_calls_msg;
+            .map(|(i, error_msg)| {
+                let error_number = i + 1;
+                return format!("{error_number}. {error_msg}");
             })
             .collect();
         let unexpected_calls_msg = unexpected_calls_msgs.join("\n");
         let error_msg = format!(
-            r"Did not expect to receive ant other calls. Received {unexpected_calls_count} {call_fmt}:
+            r"Did not expect to receive any other calls. Received {unexpected_calls_count} {call_fmt}:
 {unexpected_calls_msg}"
         );
         panic!("{error_msg}");

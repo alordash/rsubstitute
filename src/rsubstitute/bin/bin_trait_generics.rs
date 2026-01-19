@@ -41,10 +41,6 @@ mod generated {
     }
 
     impl<'a, T: Debug + PartialOrd + Clone> IArgInfosProvider for work_Call<'a, T> {
-        fn get_fn_name(&self) -> &'static str {
-            return "work";
-        }
-
         fn get_arg_infos(&self) -> Vec<ArgInfo> {
             return vec![ArgInfo::new("value", self.value.clone())];
         }
@@ -73,10 +69,6 @@ mod generated {
     }
 
     impl<'a, T: Debug + PartialOrd + Clone> IArgInfosProvider for another_work_Call<'a, T> {
-        fn get_fn_name(&self) -> &'static str {
-            return "another_work";
-        }
-
         fn get_arg_infos(&self) -> Vec<ArgInfo> {
             return vec![ArgInfo::new("string", self.string.clone())];
         }
@@ -106,10 +98,6 @@ mod generated {
     }
 
     impl<'a, T: Debug + PartialOrd + Clone> IArgInfosProvider for get_Call<'a, T> {
-        fn get_fn_name(&self) -> &'static str {
-            return "get";
-        }
-
         fn get_arg_infos(&self) -> Vec<ArgInfo> {
             return vec![];
         }

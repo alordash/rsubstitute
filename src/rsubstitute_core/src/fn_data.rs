@@ -2,7 +2,7 @@ use crate::args_matching::*;
 use crate::call_info::CallInfo;
 use crate::di::ServiceCollection;
 use crate::error_printer::IErrorPrinter;
-use crate::{FnCallInfo, FnConfig, IBaseCaller, Times};
+use crate::*;
 use std::cell::RefCell;
 use std::sync::Arc;
 
@@ -103,21 +103,23 @@ impl<
         }
     }
 
-    pub fn verify_received_nothing_else(&self) {
+    pub fn get_unexpected_calls_error_msgs(&self) -> Vec<String> {
         let call_infos = self.call_infos.borrow();
-        let unexpected_call_infos: Vec<_> = call_infos.iter().filter(|x| x.is_verified()).collect();
+        let unexpected_call_infos: Vec<_> =
+            call_infos.iter().filter(|x| x.is_not_verified()).collect();
         if unexpected_call_infos.is_empty() {
-            return;
+            return Vec::new();
         }
-        let unexpected_fn_call_infos = unexpected_call_infos
+        let unexpected_call_arg_infos = unexpected_call_infos
             .into_iter()
             .map(|x| {
-                let call = x.get_call();
-                return FnCallInfo::new(call.get_fn_name(), call.get_arg_infos());
+                self.error_printer.format_received_unexpected_call_error(
+                    self.fn_name,
+                    x.get_call().get_arg_infos(),
+                )
             })
             .collect();
-        self.error_printer
-            .print_received_unexpected_calls_error(unexpected_fn_call_infos);
+        return unexpected_call_arg_infos;
     }
 
     fn try_get_matching_config(

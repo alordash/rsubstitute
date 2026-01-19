@@ -23,7 +23,7 @@ impl IFnInfoGenerator for FnInfoGenerator {
         let call_struct = self.call_struct_generator.generate(fn_decl, mock_generics);
         let call_arg_infos_provider_impl = self
             .call_arg_infos_provider_impl_generator
-            .generate(fn_decl, &call_struct);
+            .generate(&call_struct);
         let args_checker_struct = self.args_checker_generator.generate(fn_decl, mock_generics);
         let args_checker_impl = self
             .args_checker_impl_generator

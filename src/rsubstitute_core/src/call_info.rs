@@ -15,8 +15,8 @@ impl<TCall> CallInfo<TCall> {
         self.verified = true;
     }
 
-    pub fn is_verified(&self) -> bool {
-        self.verified
+    pub fn is_not_verified(&self) -> bool {
+        !self.verified
     }
 
     pub fn get_call(&self) -> &TCall {
