@@ -1,4 +1,5 @@
 use crate::derive_args_formatter_macro_handler::*;
+use crate::derive_mock_data_macro_handler::*;
 use crate::mock_macros::fn_info_generation::*;
 use crate::mock_macros::mock_generation::*;
 use crate::mock_macros::targets::{ItemFnHandler, ItemTraitHandler};
@@ -15,6 +16,7 @@ pub(crate) struct ServiceCollection {
     pub type_factory: Arc<dyn ITypeFactory>,
     pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
     pub derive_args_formatter_macro_handler: Arc<dyn IDeriveArgsFormatterMacroHandler>,
+    pub derive_mock_data_macro_handler: Arc<dyn IDeriveMockDataMacroHandler>,
     pub mock_macro_handler: Arc<dyn IMockMacroHandler>,
 }
 
@@ -180,6 +182,11 @@ fn create_services() -> ServiceCollection {
         type_factory: type_factory.clone(),
         field_access_expr_factory: field_access_expr_factory.clone(),
     });
+    let derive_mock_data_macro_handler = Arc::new(DeriveMockDataMacroHandler {
+        path_factory: path_factory.clone(),
+        type_factory: type_factory.clone(),
+        expr_method_call_factory: expr_method_call_factory.clone()
+    });
 
     let fn_setup_generator = Arc::new(FnSetupGenerator {
         input_args_generator: input_args_generator.clone(),
@@ -244,6 +251,7 @@ fn create_services() -> ServiceCollection {
         type_factory,
         expr_method_call_factory,
         derive_args_formatter_macro_handler,
+        derive_mock_data_macro_handler,
         mock_macro_handler,
     };
 

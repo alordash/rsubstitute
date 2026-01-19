@@ -58,6 +58,31 @@ pub const I_BASE_CALLER_TRAIT_IDENT: LazyCell<Ident> =
 pub const I_BASE_CALLER_CALL_BASE_FN_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("call_base"));
 
+// TODO - add test that it's equal to rsubstitute_core::arguments_matching::IArgsFormatter
+pub const I_MOCK_DATA_TRAIT_IDENT: LazyCell<Ident> =
+    LazyCell::new(|| format_ident!("IMockData"));
+
+pub const I_MOCK_DATA_GET_RECEIVED_NOTHING_ELSE_ERROR_MSGS_FN_SIGNATURE: LazyCell<Signature> =
+    LazyCell::new(|| {
+        let signature = Signature {
+            constness: None,
+            asyncness: None,
+            unsafety: None,
+            abi: None,
+            fn_token: Default::default(),
+            ident: format_ident!("get_received_nothing_else_error_msgs"),
+            generics: Generics::default(),
+            paren_token: Default::default(),
+            inputs: [REF_SELF_ARG.clone()].into_iter().collect(),
+            variadic: None,
+            output: ReturnType::Type(
+                Default::default(),
+                Box::new(VEC_OF_VEC_OF_STRINGS_TYPE.clone()),
+            ),
+        };
+        return signature;
+    });
+
 // TODO - add test that it's equal to rsubstitute_core::FnData
 pub const FN_DATA_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("FnData"));
 
@@ -296,6 +321,15 @@ pub const VEC_OF_ARG_INFO_RESULT_TYPE: LazyCell<Type> = LazyCell::new(|| {
     let type_factory = &SERVICES.type_factory;
     let arg_check_result_type = type_factory.create(format_ident!("ArgInfo"));
     let result = type_factory.wrap_in(arg_check_result_type, format_ident!("Vec"));
+    return result;
+});
+
+pub const VEC_OF_VEC_OF_STRINGS_TYPE: LazyCell<Type> = LazyCell::new(|| {
+    let type_factory = &SERVICES.type_factory;
+    let result = type_factory.wrap_in(
+        type_factory.wrap_in(STRING_TYPE.clone(), format_ident!("Vec")),
+        format_ident!("Vec"),
+    );
     return result;
 });
 

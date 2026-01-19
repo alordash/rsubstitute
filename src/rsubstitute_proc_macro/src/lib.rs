@@ -2,10 +2,11 @@ use crate::di::SERVICES;
 
 mod constants;
 mod derive_args_formatter_macro_handler;
+mod derive_mock_data_macro_handler;
 mod di;
+mod lifetime_ref;
 mod mock_macros;
 mod syntax;
-mod lifetime_ref;
 
 #[proc_macro_attribute]
 pub fn mock(
@@ -22,4 +23,11 @@ pub fn derive_args_formatter(item: proc_macro::TokenStream) -> proc_macro::Token
     let derive_args_formatter_macro_handler = &SERVICES.derive_args_formatter_macro_handler;
 
     return derive_args_formatter_macro_handler.handle(item);
+}
+
+#[proc_macro_derive(IMockData)]
+pub fn derive_mock_data(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let derive_mock_data_macro_handler = &SERVICES.derive_mock_data_macro_handler;
+
+    return derive_mock_data_macro_handler.handle(item);
 }

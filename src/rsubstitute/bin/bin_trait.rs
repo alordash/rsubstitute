@@ -44,6 +44,7 @@ mod generated {
     use super::*;
     use rsubstitute::*;
     use rsubstitute_proc_macro::IArgsFormatter;
+    use rsubstitute_proc_macro::IMockData;
     use std::cell::LazyCell;
     use std::fmt::Debug;
     use std::marker::PhantomData;
@@ -170,21 +171,12 @@ mod generated {
 
     // end - Calls
     // start - Mock
+    #[derive(IMockData)]
     struct MyTraitMockData<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
         work_data: FnData<work_Call<'a>, work_ArgsChecker<'a>, (), ()>,
         another_work_data: FnData<another_work_Call<'a>, another_work_ArgsChecker<'a>, Vec<u8>, ()>,
         get_data: FnData<get_Call<'a>, get_ArgsChecker<'a>, i32, ()>,
-    }
-
-    impl<'a> IMockData for MyTraitMockData<'a> {
-        fn get_received_nothing_else_error_msgs(&self) -> Vec<Vec<String>> {
-            return vec![
-                self.work_data.get_unexpected_calls_error_msgs(),
-                self.another_work_data.get_unexpected_calls_error_msgs(),
-                self.get_data.get_unexpected_calls_error_msgs(),
-            ];
-        }
     }
 
     pub struct MyTraitMockSetup<'a> {
