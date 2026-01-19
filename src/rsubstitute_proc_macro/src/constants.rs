@@ -232,6 +232,12 @@ pub const DERIVE_CLONE_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     return result;
 });
 
+pub const DERIVE_MOCK_DATA_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+    let attribute_factory = &SERVICES.attribute_factory;
+    let result = attribute_factory.create(format_ident!("derive"), &I_MOCK_DATA_TRAIT_IDENT.to_string());
+    return result;
+});
+
 pub const CFG_TEST_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     let attribute_factory = &SERVICES.attribute_factory;
     let ident = format_ident!("cfg");
