@@ -1,5 +1,4 @@
 use crate::mock_macros::mock_generation::models::*;
-use crate::syntax::*;
 use syn::*;
 
 pub trait IImplFactory {
@@ -20,7 +19,7 @@ impl IImplFactory for ImplFactory {
         self_ty: Type,
         items: Vec<ImplItem>,
     ) -> ItemImpl {
-        let mut item_impl = ItemImpl {
+        let item_impl = ItemImpl {
             attrs: Vec::new(),
             defaultness: None,
             unsafety: None,

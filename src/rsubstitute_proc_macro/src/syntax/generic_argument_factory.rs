@@ -1,5 +1,4 @@
 use crate::syntax::{IPathFactory, ITypeFactory};
-use quote::ToTokens;
 use std::sync::Arc;
 use syn::*;
 

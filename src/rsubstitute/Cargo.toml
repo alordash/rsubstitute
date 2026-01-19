@@ -5,15 +5,15 @@ edition = "2024"
 
 [[bin]]
 name = "trait"
-path = "bin/trait.rs"
+path = "bin/bin_trait.rs"
 
 [[bin]]
 name = "trait_generics"
-path = "bin/trait_generics.rs"
+path = "bin/bin_trait_generics.rs"
 
 [[bin]]
 name = "fn"
-path = "bin/fn.rs"
+path = "bin/bin_fn.rs"
 
 [dependencies]
 rsubstitute_core = { workspace = true }

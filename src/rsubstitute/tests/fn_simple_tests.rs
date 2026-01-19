@@ -1,3 +1,6 @@
+#![allow(unused_variables)]
+#![allow(non_snake_case)]
+
 use rsubstitute::assertions::assert_panics;
 use rsubstitute_core::Times;
 use rsubstitute_proc_macro::mock;

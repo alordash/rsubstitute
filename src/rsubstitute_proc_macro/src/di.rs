@@ -117,7 +117,6 @@ fn create_services() -> ServiceCollection {
     let mock_trait_impl_generator = Arc::new(MockTraitImplGenerator {
         path_factory: path_factory.clone(),
         type_factory: type_factory.clone(),
-        reference_normalizer: reference_normalizer.clone(),
         reference_type_crawler: reference_type_crawler.clone(),
         mock_fn_block_generator: mock_fn_block_generator.clone(),
     });

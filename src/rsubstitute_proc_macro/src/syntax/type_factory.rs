@@ -1,13 +1,9 @@
-use crate::syntax::IPathFactory;
-use proc_macro2::Ident;
-use quote::ToTokens;
-use std::sync::Arc;
 // TODO - replace everywhere with `use syn::*`
 use crate::constants;
-use syn::{
-    AngleBracketedGenericArguments, GenericArgument, Generics, ItemStruct, Path, PathArguments,
-    PathSegment, Type, TypePath,
-};
+use crate::syntax::IPathFactory;
+use proc_macro2::Ident;
+use std::sync::Arc;
+use syn::*;
 
 pub trait ITypeFactory {
     fn create(&self, ident: Ident) -> Type;

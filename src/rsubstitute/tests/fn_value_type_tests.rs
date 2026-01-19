@@ -1,3 +1,4 @@
+#![allow(unused_variables)]
 #![allow(non_snake_case)]
 
 use rsubstitute::assertions::assert_panics;
@@ -705,7 +706,7 @@ mod accept_two_values_return_value_tests {
         let v1 = 10;
         let v2 = 20.2;
         let returned_value = "veridis quo";
-        accept_two_values_return_value::setup(Arg::Any, Arg::Any).returns(returned_value.clone());
+        accept_two_values_return_value::setup(Arg::Any, Arg::Any).returns(returned_value);
 
         // Act
         let actual_returned_value = accept_two_values_return_value(v1, v2);

@@ -1,4 +1,5 @@
 use crate::args_matching::{ArgCheckResult, IArgsChecker};
+use crate::call_info::CallInfo;
 use crate::di::ServiceCollection;
 use crate::error_printer::IErrorPrinter;
 use crate::{FnConfig, IBaseCaller, Times};
@@ -7,7 +8,7 @@ use std::sync::Arc;
 
 pub struct FnData<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TBaseCaller> {
     fn_name: &'static str,
-    calls: RefCell<Vec<TCall>>,
+    call_infos: RefCell<Vec<CallInfo<TCall>>>,
     configs: *mut Vec<Arc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue, TBaseCaller>>>>,
     error_printer: Arc<dyn IErrorPrinter>,
 }
@@ -18,14 +19,14 @@ impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TBaseCaller>
     pub fn new(fn_name: &'static str, services: &ServiceCollection) -> Self {
         Self {
             fn_name,
-            calls: RefCell::new(Vec::new()),
+            call_infos: RefCell::new(Vec::new()),
             configs: Box::leak(Box::new(Vec::new())) as *mut Vec<_>,
             error_printer: services.error_printer.clone(),
         }
     }
 
     pub fn reset(&self) {
-        self.calls.borrow_mut().clear();
+        self.call_infos.borrow_mut().clear();
         unsafe { (*self.configs).clear() };
     }
 }
@@ -34,7 +35,7 @@ impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TBase
     FnData<TCall, TArgsChecker, TReturnValue, TBaseCaller>
 {
     pub fn register_call(&self, call: TCall) -> &Self {
-        self.calls.borrow_mut().push(call);
+        self.call_infos.borrow_mut().push(CallInfo::new(call));
         self
     }
 
@@ -118,9 +119,10 @@ impl<TCall: Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TBase
     ) -> (Vec<Vec<ArgCheckResult<'a>>>, Vec<Vec<ArgCheckResult<'a>>>) {
         let mut matching_calls = Vec::new();
         let mut non_matching_calls = Vec::new();
-        let calls = self.calls.borrow();
-        for call in calls.iter() {
-            let call_matching_result = args_checker.check((*call).clone());
+        let mut call_infos = self.call_infos.borrow_mut();
+        for call_info in call_infos.iter_mut() {
+            call_info.verify();
+            let call_matching_result = args_checker.check(call_info.get_call().clone());
             let is_matching = call_matching_result.iter().all(ArgCheckResult::is_ok);
             if is_matching {
                 matching_calls.push(call_matching_result);

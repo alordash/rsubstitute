@@ -1,3 +1,7 @@
+#![allow(unused_variables)]
+#![allow(non_snake_case)]
+#![allow(unused)]
+
 use rsubstitute_proc_macro::mock;
 use std::fmt::Debug;
 use std::sync::Arc;

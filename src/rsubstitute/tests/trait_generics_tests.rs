@@ -1,10 +1,13 @@
+#![allow(unused_variables)]
+#![allow(non_snake_case)]
+
 use rsubstitute_proc_macro::mock;
 
 #[mock]
 trait Trait<T> {
     fn work(&self, value: T) -> T;
 
-    fn flex(&self) -> T;
+    // fn flex(&self) -> T;
 }
 
 mod trait_generic_tests {

@@ -2,7 +2,6 @@ use crate::syntax::IGenericArgumentFactory;
 use proc_macro2::Ident;
 use std::cell::OnceCell;
 use std::sync::Arc;
-use quote::ToTokens;
 use syn::*;
 
 pub trait IPathFactory {

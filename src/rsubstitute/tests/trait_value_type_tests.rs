@@ -1,7 +1,9 @@
+#![allow(unused_variables)]
 #![allow(non_snake_case)]
+
 use rsubstitute::assertions::assert_panics;
-use rsubstitute_core::args_matching::Arg;
 use rsubstitute_core::Times;
+use rsubstitute_core::args_matching::Arg;
 use rsubstitute_proc_macro::mock;
 
 #[mock]
@@ -668,11 +670,13 @@ mod accept_two_values_return_value_tests {
                 mock.received
                     .accept_two_values_return_value(v1, v2, Times::Never)
             },
-            format!(r#"Expected to never receive a call matching:
+            format!(
+                r#"Expected to never receive a call matching:
 	accept_two_values_return_value((i32): equal to {v1}, (f32): equal to {v2})
 Actually received 1 matching call:
 	accept_two_values_return_value({v1}, {v2})
-Received no non-matching calls"#),
+Received no non-matching calls"#
+            ),
         );
 
         assert_panics(
@@ -680,21 +684,27 @@ Received no non-matching calls"#),
                 mock.received
                     .accept_two_values_return_value(v1, v2, Times::Exactly(3))
             },
-            format!(r#"Expected to receive a call 3 times matching:
+            format!(
+                r#"Expected to receive a call 3 times matching:
 	accept_two_values_return_value((i32): equal to {v1}, (f32): equal to {v2})
 Actually received 1 matching call:
 	accept_two_values_return_value({v1}, {v2})
-Received no non-matching calls"#),
+Received no non-matching calls"#
+            ),
         );
 
         let invalid_expected_v1 = v1 + 1;
         let invalid_expected_v2 = v2 + 1.0;
         assert_panics(
             || {
-                mock.received
-                    .accept_two_values_return_value(invalid_expected_v1, invalid_expected_v2, Times::Once)
+                mock.received.accept_two_values_return_value(
+                    invalid_expected_v1,
+                    invalid_expected_v2,
+                    Times::Once,
+                )
             },
-            format!(r#"Expected to receive a call exactly once matching:
+            format!(
+                r#"Expected to receive a call exactly once matching:
 	accept_two_values_return_value((i32): equal to {invalid_expected_v1}, (f32): equal to {invalid_expected_v2})
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
@@ -704,7 +714,8 @@ accept_two_values_return_value(*10*, *20.2*)
 		Actual:   10
 	2. v2 (f32):
 		Expected: 21.2
-		Actual:   20.2"#),
+		Actual:   20.2"#
+            ),
         );
     }
 }

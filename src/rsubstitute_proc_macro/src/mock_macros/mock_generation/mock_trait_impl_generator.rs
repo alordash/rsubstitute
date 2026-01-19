@@ -5,7 +5,6 @@ use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::mock_generation::*;
 use crate::syntax::*;
 use proc_macro2::Ident;
-use quote::{format_ident, ToTokens};
 use std::sync::Arc;
 use syn::punctuated::Punctuated;
 use syn::*;
@@ -23,7 +22,6 @@ pub trait IMockTraitImplGenerator {
 pub(crate) struct MockTraitImplGenerator {
     pub path_factory: Arc<dyn IPathFactory>,
     pub type_factory: Arc<dyn ITypeFactory>,
-    pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
     pub reference_type_crawler: Arc<dyn IReferenceTypeCrawler>,
     pub mock_fn_block_generator: Arc<dyn IMockFnBlockGenerator>,
 }
