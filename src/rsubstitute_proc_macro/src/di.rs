@@ -122,6 +122,7 @@ fn create_services() -> ServiceCollection {
         path_factory: path_factory.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
         std_mem_transmute_expr_factory: std_mem_transmute_expr_factory.clone(),
+        field_value_factory: field_value_factory.clone(),
     });
     let mock_trait_impl_generator = Arc::new(MockTraitImplGenerator {
         path_factory: path_factory.clone(),
@@ -132,6 +133,7 @@ fn create_services() -> ServiceCollection {
     let local_factory = Arc::new(LocalFactory);
     let mock_constructor_block_generator = Arc::new(MockConstructorBlockGenerator {
         path_factory: path_factory.clone(),
+        field_value_factory: field_value_factory.clone(),
     });
     let mock_impl_generator = Arc::new(MockImplGenerator {
         type_factory: type_factory.clone(),

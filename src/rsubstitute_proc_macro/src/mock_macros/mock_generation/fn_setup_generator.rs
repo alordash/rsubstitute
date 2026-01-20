@@ -1,6 +1,8 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::*;
-use crate::mock_macros::mock_generation::models::{BaseCallerStruct, MockSetupStruct, StaticMock};
+use crate::mock_macros::mock_generation::models::{
+    BaseCallerStruct, MockGenerics, MockSetupStruct, StaticMock,
+};
 use crate::mock_macros::mock_generation::*;
 use crate::syntax::*;
 use std::sync::Arc;
@@ -13,7 +15,7 @@ pub trait IFnSetupGenerator {
         static_mock: &StaticMock,
         mock_setup_struct: &MockSetupStruct,
         base_caller_struct: &BaseCallerStruct,
-        phantom_types_count: usize,
+        mock_generics: &MockGenerics,
     ) -> ItemFn;
 }
 
@@ -30,13 +32,14 @@ impl IFnSetupGenerator for FnSetupGenerator {
         static_mock: &StaticMock,
         mock_setup_struct: &MockSetupStruct,
         base_caller_struct: &BaseCallerStruct,
-        phantom_types_count: usize,
+        mock_generics: &MockGenerics,
     ) -> ItemFn {
         let output = self.setup_output_generator.generate_for_static(
             fn_info,
             mock_setup_struct,
             base_caller_struct,
         );
+        let phantom_types_count = mock_generics.get_phantom_types_count();
         let sig = Signature {
             // TODO - all these `None` should be actually mapped to souarce fns signature
             constness: None,
@@ -45,7 +48,7 @@ impl IFnSetupGenerator for FnSetupGenerator {
             abi: None,
             fn_token: Default::default(),
             ident: constants::MOCK_SETUP_FIELD_IDENT.clone(),
-            generics: Generics::default(),
+            generics: mock_generics.impl_generics.clone(),
             paren_token: Default::default(),
             inputs: self
                 .input_args_generator
@@ -55,7 +58,7 @@ impl IFnSetupGenerator for FnSetupGenerator {
             variadic: None,
             output,
         };
-        let block = self.generate_fn_setup_block(static_mock, fn_info);
+        let block = self.generate_fn_setup_block(static_mock, fn_info, phantom_types_count);
         let item_fn = ItemFn {
             attrs: Vec::new(),
             vis: Visibility::Public(Default::default()),
@@ -67,7 +70,12 @@ impl IFnSetupGenerator for FnSetupGenerator {
 }
 
 impl FnSetupGenerator {
-    fn generate_fn_setup_block(&self, static_mock: &StaticMock, fn_info: &FnInfo) -> Block {
+    fn generate_fn_setup_block(
+        &self,
+        static_mock: &StaticMock,
+        fn_info: &FnInfo,
+        phantom_types_count: usize,
+    ) -> Block {
         let static_mock_expr = Expr::MethodCall(self.expr_method_call_factory.create(
             vec![static_mock.item_static.ident.clone()],
             constants::AS_STATIC_METHOD_IDENT.clone(),
@@ -98,9 +106,8 @@ impl FnSetupGenerator {
                             .args_checker_struct
                             .item_struct
                             .fields
-                            // TODO - make some method that returns only valuable fields from struct? without _phantom_lifetime
                             .iter()
-                            .skip(1)
+                            .skip(1 + phantom_types_count)
                             .map(|field| field.ident.clone().expect("TODO"))
                             .collect(),
                     ),

@@ -1,7 +1,9 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::*;
 use crate::mock_macros::mock_generation::models::*;
-use crate::syntax::{IExprMethodCallFactory, IPathFactory, IStdMemTransmuteExprFactory};
+use crate::syntax::{
+    IExprMethodCallFactory, IFieldValueFactory, IPathFactory, IStdMemTransmuteExprFactory,
+};
 use quote::{ToTokens, format_ident};
 use std::cell::LazyCell;
 use std::sync::Arc;
@@ -17,6 +19,7 @@ pub(crate) struct MockFnBlockGenerator {
     pub path_factory: Arc<dyn IPathFactory>,
     pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
     pub std_mem_transmute_expr_factory: Arc<dyn IStdMemTransmuteExprFactory>,
+    pub field_value_factory: Arc<dyn IFieldValueFactory>,
 }
 
 impl IMockFnBlockGenerator for MockFnBlockGenerator {
@@ -70,17 +73,7 @@ impl MockFnBlockGenerator {
                     && let Some(first_path_segment) = type_path.path.segments.first()
                     && first_path_segment.ident == constants::PHANTOM_DATA_IDENT.clone()
                 {
-                    let phantom_field_value = FieldValue {
-                        attrs: Vec::new(),
-                        member: Member::Named(field_ident),
-                        colon_token: Some(Default::default()),
-                        expr: Expr::Path(ExprPath {
-                            attrs: Vec::new(),
-                            qself: None,
-                            path: constants::PHANTOM_DATA_PATH.clone(),
-                        }),
-                    };
-                    return phantom_field_value;
+                    return self.field_value_factory.create_as_phantom_data(field_ident);
                 }
                 let field_value = FieldValue {
                     attrs: Vec::new(),

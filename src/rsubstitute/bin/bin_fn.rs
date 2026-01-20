@@ -13,6 +13,7 @@ fn global(number: i32) -> String {
     return format!("actual number: {number}");
 }
 
+use crate::generic_fn::do_flex;
 #[cfg(test)]
 use global::global;
 use rsubstitute_proc_macro::mock;
@@ -232,5 +233,85 @@ fn main() {
     let global_result = global(22);
     println!("global_result: {global_result}");
 
+    let flex_i32 = do_flex(2);
+    dbg!(flex_i32);
+
+    #[derive(Debug)]
+    struct WithRef<'a> {
+        number: &'a i32,
+    }
+
+    let flex_with_ref = do_flex(WithRef { number: &5 });
+    dbg!(flex_with_ref);
+
+    let local_number = 44;
+    let flex_with_local_ref = do_flex(WithRef {
+        number: &local_number,
+    });
+    dbg!(flex_with_local_ref);
+
     println!("Done");
+}
+
+mod generic_fn {
+    use std::any::TypeId;
+    use std::cell::{RefCell, UnsafeCell};
+    use std::collections::HashMap;
+    use std::marker::PhantomData;
+    use std::sync::{Arc, LazyLock};
+    use transient::{Any, Downcast, Transient};
+
+    #[derive(Transient)]
+    struct Mock<T> {
+        _phantom_T: PhantomData<T>,
+    }
+
+    impl<T> Default for Mock<T> {
+        fn default() -> Self {
+            Self {
+                _phantom_T: PhantomData,
+            }
+        }
+    }
+
+    impl<T> Mock<T> {
+        pub fn flex(&self, value: T) -> T {
+            flex(value)
+        }
+    }
+
+    #[derive(Default)]
+    struct MocksMap {
+        pub map: Arc<RefCell<HashMap<TypeId, *const ()>>>,
+    }
+
+    unsafe impl Send for MocksMap {}
+    unsafe impl Sync for MocksMap {}
+
+    thread_local! {
+        static MOCKS_MAP: LazyLock<MocksMap> = LazyLock::new(Default::default);
+    }
+
+    fn flex<T>(value: T) -> T {
+        value
+    }
+
+    fn get_mock<T>() -> *const Mock<T> {
+        let arc_map = MOCKS_MAP.with(|x| x.map.clone());
+        let mut map = arc_map.borrow_mut();
+
+        let type_id = typeid::of::<T>();
+        let raw_ptr = map
+            .entry(type_id)
+            .or_insert(Box::leak(Box::new(Mock::<T>::default())) as *const _ as *const ());
+        let mock_ptr = *raw_ptr as *const Mock<T>;
+        return mock_ptr;
+    }
+
+    pub fn do_flex<T>(value: T) -> T {
+        let mock = get_mock();
+        unsafe {
+            return (*mock).flex(value);
+        }
+    }
 }

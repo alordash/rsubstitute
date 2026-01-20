@@ -28,6 +28,7 @@ pub trait IMockConstructorBlockGenerator {
 
 pub(crate) struct MockConstructorBlockGenerator {
     pub path_factory: Arc<dyn IPathFactory>,
+    pub field_value_factory: Arc<dyn IFieldValueFactory>,
 }
 
 impl IMockConstructorBlockGenerator for MockConstructorBlockGenerator {
@@ -128,6 +129,27 @@ impl MockConstructorBlockGenerator {
         let phantom_lifetime_field = constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE.clone();
         data_fields.insert(0, phantom_lifetime_field);
         if let Some(base_caller_struct) = maybe_base_caller_struct {
+            let base_caller_struct_fields = base_caller_struct
+                .item_struct
+                .fields
+                .iter()
+                .map(|field| {
+                    // Assume all fields are PhantomData
+                    let field_ident = field.ident.clone().expect("TODO");
+                    return self.field_value_factory.create_as_phantom_data(field_ident);
+                })
+                .collect();
+            let base_caller_struct_construction = Expr::Struct(ExprStruct {
+                attrs: Vec::new(),
+                qself: None,
+                path: self
+                    .path_factory
+                    .create(base_caller_struct.item_struct.ident.clone()),
+                brace_token: Default::default(),
+                fields : base_caller_struct_fields,
+                dot2_token: None,
+                rest: None,
+            });
             let base_caller_field = FieldValue {
                 attrs: Vec::new(),
                 member: Member::Named(constants::BASE_CALLER_FIELD_IDENT.clone()),
@@ -154,15 +176,7 @@ impl MockConstructorBlockGenerator {
                             ]),
                         })),
                         paren_token: Default::default(),
-                        args: [Expr::Path(ExprPath {
-                            attrs: Vec::new(),
-                            qself: None,
-                            path: self
-                                .path_factory
-                                .create(base_caller_struct.item_struct.ident.clone()),
-                        })]
-                        .into_iter()
-                        .collect(),
+                        args: [base_caller_struct_construction].into_iter().collect(),
                     })]
                     .into_iter()
                     .collect(),

@@ -15,6 +15,7 @@ pub trait IBaseCallerImplGenerator {
         call_struct: &CallStruct,
         fn_decl: &FnDecl,
         base_fn: &BaseFn,
+        phantom_types_count: usize,
     ) -> BaseCallerImpl;
 }
 
@@ -31,6 +32,7 @@ impl IBaseCallerImplGenerator for BaseCallerImplGenerator {
         call_struct: &CallStruct,
         fn_decl: &FnDecl,
         base_fn: &BaseFn,
+        phantom_types_count: usize,
     ) -> BaseCallerImpl {
         let trait_path = Path {
             leading_colon: None,
@@ -57,7 +59,7 @@ impl IBaseCallerImplGenerator for BaseCallerImplGenerator {
         let self_ty = self
             .type_factory
             .create_from_struct(&base_caller_struct.item_struct);
-        let items = self.generate_impl_items(fn_decl, call_struct, base_fn);
+        let items = self.generate_impl_items(fn_decl, call_struct, base_fn, phantom_types_count);
         let item_impl = ItemImpl {
             attrs: Vec::new(),
             defaultness: None,
@@ -82,6 +84,7 @@ impl BaseCallerImplGenerator {
         fn_decl: &FnDecl,
         call_struct: &CallStruct,
         base_fn: &BaseFn,
+        phantom_types_count: usize,
     ) -> Vec<ImplItem> {
         let impl_item_fn = ImplItemFn {
             attrs: Vec::new(),
@@ -137,7 +140,7 @@ impl BaseCallerImplGenerator {
                                 .item_struct
                                 .fields
                                 .iter()
-                                .skip(1)
+                                .skip(1 + phantom_types_count)
                                 .map(|field| {
                                     self.field_access_expr_factory.create(vec![
                                         Self::CALL_ARG_IDENT.clone(),

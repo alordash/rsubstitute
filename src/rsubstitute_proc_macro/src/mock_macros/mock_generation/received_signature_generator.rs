@@ -13,13 +13,13 @@ use syn::*;
 pub trait IReceivedSignatureGenerator {
     fn get_times_arg_ident(&self) -> Ident;
 
-    fn generate_for_trait(&self, fn_info: &FnInfo, phantom_types_count: usize) -> Signature;
+    fn generate_for_trait(&self, fn_info: &FnInfo, mock_generics: &MockGenerics) -> Signature;
 
     fn generate_for_static(
         &self,
         fn_info: &FnInfo,
         mock_received_struct: &MockReceivedStruct,
-        phantom_types_count: usize,
+        mock_generics: &MockGenerics,
     ) -> Signature;
 }
 
@@ -34,7 +34,7 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
         format_ident!("times")
     }
 
-    fn generate_for_trait(&self, fn_info: &FnInfo, phantom_types_count: usize) -> Signature {
+    fn generate_for_trait(&self, fn_info: &FnInfo, mock_generics: &MockGenerics) -> Signature {
         let return_ty = Type::Reference(TypeReference {
             and_token: Default::default(),
             lifetime: Some(constants::DEFAULT_ARG_FIELD_LIFETIME.clone()),
@@ -47,7 +47,7 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
             fn_info.parent.ident.clone(),
             prepend_ref_self_arg,
             return_ty,
-            phantom_types_count,
+            MockGenericsUsage::JustGetPhantomTypesCount(mock_generics),
         );
         return result;
     }
@@ -56,7 +56,7 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
         &self,
         fn_info: &FnInfo,
         mock_received_struct: &MockReceivedStruct,
-        phantom_types_count: usize,
+        mock_generics: &MockGenerics,
     ) -> Signature {
         let mut return_ty = self
             .type_factory
@@ -74,7 +74,7 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
             constants::MOCK_RECEIVED_FIELD_IDENT.clone(),
             prepend_ref_self_arg,
             return_ty_reference,
-            phantom_types_count,
+            MockGenericsUsage::UseAsGenerics(mock_generics),
         );
         for input in result.inputs.iter_mut() {
             if let FnArg::Typed(pat_type) = input {
@@ -94,7 +94,7 @@ impl ReceivedSignatureGenerator {
         fn_ident: Ident,
         prepend_ref_self_arg: bool,
         return_ty: Type,
-        phantom_types_count: usize,
+        mock_generics_usage: MockGenericsUsage,
     ) -> Signature {
         let times_arg = FnArg::Typed(PatType {
             attrs: Vec::new(),
@@ -110,13 +110,17 @@ impl ReceivedSignatureGenerator {
         });
         let mut inputs: Vec<_> = self
             .input_args_generator
-            .generate_input_args(fn_info, phantom_types_count)
+            .generate_input_args(fn_info, mock_generics_usage.get_phantom_types_count())
             .into_iter()
             .chain(iter::once(times_arg))
             .collect();
         if prepend_ref_self_arg {
             inputs.insert(0, constants::REF_SELF_ARG_WITH_LIFETIME.clone());
         }
+        let generics = match mock_generics_usage {
+            MockGenericsUsage::JustGetPhantomTypesCount(_) => Generics::default(),
+            MockGenericsUsage::UseAsGenerics(mock_generics) => mock_generics.source_generics.clone(),
+        };
         let signature = Signature {
             constness: None,
             asyncness: None,
@@ -124,12 +128,30 @@ impl ReceivedSignatureGenerator {
             abi: None,
             fn_token: Default::default(),
             ident: fn_ident,
-            generics: Generics::default(),
+            generics,
             paren_token: Default::default(),
             inputs: inputs.into_iter().collect(),
             variadic: None,
             output: ReturnType::Type(Default::default(), Box::new(return_ty)),
         };
         return signature;
+    }
+}
+
+enum MockGenericsUsage<'a> {
+    JustGetPhantomTypesCount(&'a MockGenerics),
+    UseAsGenerics(&'a MockGenerics),
+}
+
+impl<'a> MockGenericsUsage<'a> {
+    fn get_phantom_types_count(&self) -> usize {
+        match self {
+            MockGenericsUsage::JustGetPhantomTypesCount(mock_generics) => {
+                mock_generics.get_phantom_types_count()
+            }
+            MockGenericsUsage::UseAsGenerics(mock_generics) => {
+                mock_generics.get_phantom_types_count()
+            }
+        }
     }
 }

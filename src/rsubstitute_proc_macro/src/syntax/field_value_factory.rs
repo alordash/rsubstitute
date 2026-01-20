@@ -5,6 +5,8 @@ use syn::*;
 
 pub trait IFieldValueFactory {
     fn create_with_into_conversion(&self, field: &Field) -> FieldValue;
+
+    fn create_as_phantom_data(&self, field_ident: Ident) -> FieldValue;
 }
 
 pub(crate) struct FieldValueFactory {
@@ -28,6 +30,20 @@ impl IFieldValueFactory for FieldValueFactory {
             )),
         };
 
+        return field_value;
+    }
+
+    fn create_as_phantom_data(&self, field_ident: Ident) -> FieldValue {
+        let field_value = FieldValue {
+            attrs: Vec::new(),
+            member: Member::Named(field_ident),
+            colon_token: Some(Default::default()),
+            expr: Expr::Path(ExprPath {
+                attrs: Vec::new(),
+                qself: None,
+                path: constants::PHANTOM_DATA_PATH.clone(),
+            }),
+        };
         return field_value;
     }
 }

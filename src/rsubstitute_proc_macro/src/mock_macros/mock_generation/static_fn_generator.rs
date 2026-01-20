@@ -9,7 +9,12 @@ use syn::punctuated::Punctuated;
 use syn::*;
 
 pub trait IStaticFnGenerator {
-    fn generate(&self, fn_info: &FnInfo, static_mock: &StaticMock) -> StaticFn;
+    fn generate(
+        &self,
+        fn_info: &FnInfo,
+        static_mock: &StaticMock,
+        mock_generics: &MockGenerics,
+    ) -> StaticFn;
 }
 
 pub(crate) struct StaticFnGenerator {
@@ -18,7 +23,12 @@ pub(crate) struct StaticFnGenerator {
 }
 
 impl IStaticFnGenerator for StaticFnGenerator {
-    fn generate(&self, fn_info: &FnInfo, static_mock: &StaticMock) -> StaticFn {
+    fn generate(
+        &self,
+        fn_info: &FnInfo,
+        static_mock: &StaticMock,
+        mock_generics: &MockGenerics,
+    ) -> StaticFn {
         let sig = Signature {
             constness: None,
             asyncness: None,
@@ -26,19 +36,7 @@ impl IStaticFnGenerator for StaticFnGenerator {
             abi: None,
             fn_token: Default::default(),
             ident: fn_info.parent.ident.clone(),
-            generics: Generics {
-                lt_token: Some(Default::default()),
-                params: [GenericParam::Lifetime(LifetimeParam {
-                    attrs: Vec::new(),
-                    lifetime: constants::ANONYMOUS_LIFETIME.clone(),
-                    colon_token: None,
-                    bounds: Punctuated::new(),
-                })]
-                .into_iter()
-                .collect(),
-                gt_token: Some(Default::default()),
-                where_clause: None,
-            },
+            generics: mock_generics.impl_generics.clone(),
             paren_token: Default::default(),
             inputs: fn_info
                 .parent

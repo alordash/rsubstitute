@@ -45,12 +45,15 @@ impl IItemFnHandler for ItemFnHandler {
         let mock_generics = self.mock_generics_generator.generate(&item_fn.sig.generics);
         let phantom_types_count = mock_generics.get_phantom_types_count();
         let fn_info = self.fn_info_generator.generate(&fn_decl, &mock_generics);
-        let base_caller_struct = self.base_caller_struct_generator.generate(&fn_decl);
+        let base_caller_struct = self
+            .base_caller_struct_generator
+            .generate(&fn_decl, &mock_generics);
         let base_caller_impl = self.base_caller_impl_generator.generate(
             &base_caller_struct,
             &fn_info.call_struct,
             &fn_decl,
             &base_fn,
+            phantom_types_count,
         );
         let fn_infos = [fn_info];
         let mock_data_struct = self.mock_data_struct_generator.generate_for_static(
@@ -100,15 +103,17 @@ impl IItemFnHandler for ItemFnHandler {
             &static_mock,
             &mock_setup_struct,
             &base_caller_struct,
-            phantom_types_count,
+            &mock_generics,
         );
         let fn_received = self.fn_received_generator.generate(
             &fn_info,
             &mock_received_struct,
             &static_mock,
-            phantom_types_count,
+            &mock_generics,
         );
-        let static_fn = self.static_fn_generator.generate(&fn_info, &static_mock);
+        let static_fn = self
+            .static_fn_generator
+            .generate(&fn_info, &static_mock, &mock_generics);
 
         let generated_mod = self.mod_generator.generate_fn(
             &item_fn,

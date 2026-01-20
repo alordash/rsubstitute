@@ -12,7 +12,7 @@ pub trait IFnReceivedGenerator {
         fn_info: &FnInfo,
         mock_received_struct: &MockReceivedStruct,
         static_mock: &StaticMock,
-        phantom_types_count: usize,
+        mock_generics: &MockGenerics,
     ) -> ItemFn;
 }
 
@@ -27,14 +27,18 @@ impl IFnReceivedGenerator for FnReceivedGenerator {
         fn_info: &FnInfo,
         mock_received_struct: &MockReceivedStruct,
         static_mock: &StaticMock,
-        phantom_types_count: usize,
+        mock_generics: &MockGenerics,
     ) -> ItemFn {
         let sig = self.received_signature_generator.generate_for_static(
             fn_info,
             mock_received_struct,
-            phantom_types_count,
+            mock_generics,
         );
-        let block = self.generate_fn_received_block(fn_info, static_mock);
+        let block = self.generate_fn_received_block(
+            fn_info,
+            static_mock,
+            mock_generics.get_phantom_types_count(),
+        );
         let item_fn = ItemFn {
             attrs: Vec::new(),
             vis: Visibility::Public(Default::default()),
@@ -46,7 +50,12 @@ impl IFnReceivedGenerator for FnReceivedGenerator {
 }
 
 impl FnReceivedGenerator {
-    fn generate_fn_received_block(&self, fn_info: &FnInfo, static_mock: &StaticMock) -> Block {
+    fn generate_fn_received_block(
+        &self,
+        fn_info: &FnInfo,
+        static_mock: &StaticMock,
+        phantom_types_count: usize,
+    ) -> Block {
         let static_mock_expr = Expr::MethodCall(self.expr_method_call_factory.create(
             vec![static_mock.item_static.ident.clone()],
             constants::AS_STATIC_METHOD_IDENT.clone(),
@@ -66,7 +75,7 @@ impl FnReceivedGenerator {
                             .item_struct
                             .fields
                             .iter()
-                            .skip(1)
+                            .skip(1 + phantom_types_count)
                             .map(|field| field.ident.clone().expect("TODO"))
                             .chain(std::iter::once(
                                 self.received_signature_generator.get_times_arg_ident(),
