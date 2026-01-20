@@ -151,7 +151,7 @@ impl MockReceivedImplGenerator {
                 unsafety: None,
                 abi: None,
                 fn_token: Default::default(),
-                ident: format_ident!("only"),
+                ident: format_ident!("no_other_calls"),
                 generics: Generics::default(),
                 paren_token: Default::default(),
                 inputs: [constants::REF_SELF_ARG_WITH_LIFETIME.clone()]

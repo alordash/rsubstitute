@@ -33,7 +33,7 @@ mod accept_arc_tests {
         mock.accept_arc(r.clone());
 
         // Assert
-        mock.received.accept_arc(r, Times::Once).only();
+        mock.received.accept_arc(r, Times::Once).no_other_calls();
     }
 
     #[test]
@@ -129,7 +129,7 @@ mod accept_arc_return_arc_tests {
         mock.received
             .accept_arc_return_arc(accepted_r.clone(), Times::Once)
             .accept_arc_return_arc(Arg::NotEq(accepted_r), Times::Never)
-            .only();
+            .no_other_calls();
     }
 }
 
@@ -152,7 +152,7 @@ mod accept_two_arcs_tests {
         mock.received
             .accept_two_arcs(r1.clone(), r2.clone(), Times::Once)
             .accept_two_arcs(Arg::NotEq(r1), Arg::NotEq(r2), Times::Never)
-            .only();
+            .no_other_calls();
     }
 }
 
@@ -179,6 +179,6 @@ mod accept_two_arcs_return_arc_tests {
 
         mock.received
             .accept_two_arcs_return_arc(r1, r2, Times::Once)
-            .only();
+            .no_other_calls();
     }
 }

@@ -353,7 +353,7 @@ mod generated {
             return self;
         }
 
-        pub fn only(&self) {
+        pub fn no_other_calls(&self) {
             self.data.verify_received_nothing_else();
         }
 
@@ -388,7 +388,7 @@ fn received_nothing_else_Ok() {
     // Assert
     assert_eq!(returned_value, actual_returned_value);
 
-    mock.received.get(Times::Once).only();
+    mock.received.get(Times::Once).no_other_calls();
 }
 
 #[test]
@@ -408,7 +408,7 @@ fn received_nothing_else_PanicsOk() {
     assert_eq!(returned_value, actual_returned_value);
 
     assert_panics(
-        || mock.received.get(Times::Once).only(),
+        || mock.received.get(Times::Once).no_other_calls(),
         format!(
             r"Did not expect to receive any other calls. Received 1 call:
 1. work({work_arguments})"

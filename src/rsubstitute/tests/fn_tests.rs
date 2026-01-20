@@ -28,7 +28,7 @@ mod tests {
 
         // Assert
         assert_eq!("amogus", result);
-        f::received(Arg::Eq(2), Times::Once).only();
+        f::received(Arg::Eq(2), Times::Once).no_other_calls();
     }
 
     #[test]
@@ -41,7 +41,7 @@ mod tests {
 
         // Assert
         assert_eq!("g1", result);
-        g::received(Arg::Eq(1), Times::Once).only();
+        g::received(Arg::Eq(1), Times::Once).no_other_calls();
     }
 
     #[test]
@@ -55,7 +55,7 @@ mod tests {
 
         // Assert
         assert_eq!("quo vadis", result);
-        g::received(Arg::Eq(3), Times::Once).only();
-        f::received(Arg::Eq(3), Times::Once).only();
+        g::received(Arg::Eq(3), Times::Once).no_other_calls();
+        f::received(Arg::Eq(3), Times::Once).no_other_calls();
     }
 }

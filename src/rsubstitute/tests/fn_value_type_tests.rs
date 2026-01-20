@@ -71,7 +71,7 @@ mod accept_value_tests {
                 Arg::Is(move |actual_value| actual_value == second_value),
                 Times::Exactly(2),
             )
-            .only();
+            .no_other_calls();
     }
 
     #[test]
@@ -86,7 +86,7 @@ mod accept_value_tests {
 
         // Assert
         assert!(BASE_CALLED_FLAG.get());
-        accept_value::received(v, Times::Once).only();
+        accept_value::received(v, Times::Once).no_other_calls();
     }
 
     #[test]
@@ -360,7 +360,7 @@ mod return_value_tests {
         // Assert
         assert_eq!(BASE_RETURN_VALUE, actual_value);
         assert!(BASE_CALLED_FLAG.get());
-        return_value::received(Times::Once).only();
+        return_value::received(Times::Once).no_other_calls();
     }
 
     #[test]
@@ -497,9 +497,9 @@ mod accept_value_return_value_tests {
         assert_eq!(second_returned_value, actual_second_returned_value);
         assert_eq!(third_returned_value, actual_third_returned_value);
 
-        accept_value_return_value::received(first_accepted_value, Times::Once).only();
-        accept_value_return_value::received(second_accepted_value, Times::Once).only();
-        accept_value_return_value::received(third_accepted_value, Times::Once).only();
+        accept_value_return_value::received(first_accepted_value, Times::Once).no_other_calls();
+        accept_value_return_value::received(second_accepted_value, Times::Once).no_other_calls();
+        accept_value_return_value::received(third_accepted_value, Times::Once).no_other_calls();
     }
 
     #[test]
@@ -516,7 +516,7 @@ mod accept_value_return_value_tests {
         assert_eq!(BASE_ACCEPT_VALUE_RETURN_VALUE, actual_value);
         assert!(BASE_CALLED_FLAG.get());
 
-        accept_value_return_value::received(v, Times::Once).only();
+        accept_value_return_value::received(v, Times::Once).no_other_calls();
     }
 
     #[test]
@@ -546,7 +546,7 @@ mod accept_value_return_value_tests {
 
         accept_value_return_value::received(single_accepted_value, Times::Once)
             .received(double_accepted_value, Times::Exactly(2))
-            .only();
+            .no_other_calls();
     }
 
     #[test]
@@ -613,7 +613,7 @@ mod accept_value_return_value_tests {
 
         accept_value_return_value::received(first_accepted_value, Times::Exactly(3))
             .received(second_accepted_value, Times::Exactly(4))
-            .only();
+            .no_other_calls();
     }
 
     #[test]
@@ -647,8 +647,8 @@ mod accept_value_return_value_tests {
         assert_eq!(1, *first_callback_number.borrow());
         assert_eq!(2, *second_callback_number.borrow());
 
-        accept_value_return_value::received(first_accepted_value, Times::Once).only();
-        accept_value_return_value::received(second_accepted_value, Times::Once).only();
+        accept_value_return_value::received(first_accepted_value, Times::Once).no_other_calls();
+        accept_value_return_value::received(second_accepted_value, Times::Once).no_other_calls();
     }
 }
 
@@ -665,7 +665,7 @@ mod accept_two_values_tests {
         accept_two_values(v1, v2);
 
         // Assert
-        accept_two_values::received(v1, v2, Times::Once).only();
+        accept_two_values::received(v1, v2, Times::Once).no_other_calls();
     }
 
     #[test]
@@ -681,7 +681,7 @@ mod accept_two_values_tests {
 
         // Assert
         assert!(BASE_CALLED_FLAG.get());
-        accept_two_values::received(v1, v2, Times::Once).only();
+        accept_two_values::received(v1, v2, Times::Once).no_other_calls();
     }
 }
 
@@ -702,7 +702,7 @@ mod accept_two_values_return_value_tests {
         // Assert
         assert_eq!(returned_value, actual_returned_value);
 
-        accept_two_values_return_value::received(v1, v2, Times::Once).only();
+        accept_two_values_return_value::received(v1, v2, Times::Once).no_other_calls();
     }
 
     #[test]
@@ -782,6 +782,6 @@ accept_two_values_return_value(*10*, *20.2*)
         assert_eq!(BASE_ACCEPT_TWO_VALUES_RETURN_VALUE, actual_returned_value);
         assert!(BASE_CALLED_FLAG.get());
 
-        accept_two_values_return_value::received(v1, v2, Times::Once).only();
+        accept_two_values_return_value::received(v1, v2, Times::Once).no_other_calls();
     }
 }

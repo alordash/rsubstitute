@@ -39,7 +39,7 @@ mod accept_rc_tests {
         mock.accept_rc(r.clone());
 
         // Assert
-        mock.received.accept_rc(r, Times::Once).only();
+        mock.received.accept_rc(r, Times::Once).no_other_calls();
     }
 
     #[test]
@@ -135,7 +135,7 @@ mod accept_rc_return_rc_tests {
         mock.received
             .accept_rc_return_rc(accepted_r.clone(), Times::Once)
             .accept_rc_return_rc(Arg::NotEq(accepted_r), Times::Never)
-            .only();
+            .no_other_calls();
     }
 }
 
@@ -158,7 +158,7 @@ mod accept_two_rcs_tests {
         mock.received
             .accept_two_rcs(r1.clone(), r2.clone(), Times::Once)
             .accept_two_rcs(Arg::NotEq(r1), Arg::NotEq(r2), Times::Never)
-            .only();
+            .no_other_calls();
     }
 }
 
@@ -185,6 +185,6 @@ mod accept_two_rcs_return_rc_tests {
 
         mock.received
             .accept_two_rcs_return_rc(r1, r2, Times::Once)
-            .only();
+            .no_other_calls();
     }
 }

@@ -49,7 +49,7 @@ mod accept_ref_tests {
         accept_ref(r);
 
         // Assert
-        accept_ref::received(r, Times::Once).only();
+        accept_ref::received(r, Times::Once).no_other_calls();
     }
 
     #[test]
@@ -151,7 +151,7 @@ mod accept_ref_return_ref_tests {
 
         accept_ref_return_ref::received(accepted_r, Times::Once)
             .received(Arg::NotEq(accepted_r), Times::Never)
-            .only();
+            .no_other_calls();
     }
 
     #[test]
@@ -165,7 +165,7 @@ mod accept_ref_return_ref_tests {
 
         // Assert
         assert_eq!(BASE_ACCEPT_REF_RETURN_REF, actual_returned_r);
-        accept_ref_return_ref::received(accepted_r, Times::Once).only();
+        accept_ref_return_ref::received(accepted_r, Times::Once).no_other_calls();
     }
 }
 
@@ -186,7 +186,7 @@ mod accept_two_refs_tests {
         // Assert
         accept_two_refs::received(r1, r2, Times::Once)
             .received(Arg::NotEq(r1), Arg::NotEq(r2), Times::Never)
-            .only();
+            .no_other_calls();
     }
 }
 
@@ -208,7 +208,7 @@ mod accept_two_refs_return_ref_tests {
         // Assert
         assert_eq!(returned_r, actual_returned_r);
 
-        accept_two_refs_return_ref::received(r1, r2, Times::Once).only();
+        accept_two_refs_return_ref::received(r1, r2, Times::Once).no_other_calls();
     }
 
     #[test]
@@ -224,6 +224,6 @@ mod accept_two_refs_return_ref_tests {
         // Assert
         assert_eq!(ACCEPT_TWO_REFS_RETURN_REF, actual_returned_r);
 
-        accept_two_refs_return_ref::received(r1, r2, Times::Once).only();
+        accept_two_refs_return_ref::received(r1, r2, Times::Once).no_other_calls();
     }
 }

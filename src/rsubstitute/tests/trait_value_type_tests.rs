@@ -49,7 +49,7 @@ mod accept_value_tests {
                 Arg::Is(|actual_value| actual_value == second_value),
                 Times::Exactly(2),
             )
-            .only();
+            .no_other_calls();
     }
 
     #[test]
@@ -454,7 +454,7 @@ mod accept_value_return_value_tests {
             .accept_value_return_value(first_accepted_value, Times::Once)
             .accept_value_return_value(second_accepted_value, Times::Once)
             .accept_value_return_value(third_accepted_value, Times::Once)
-            .only();
+            .no_other_calls();
     }
 
     #[test]
@@ -487,7 +487,7 @@ mod accept_value_return_value_tests {
 
         mock.received
             .accept_value_return_value(single_accepted_value, Times::Once)
-            .accept_value_return_value(double_accepted_value, Times::Exactly(2)).only();
+            .accept_value_return_value(double_accepted_value, Times::Exactly(2)).no_other_calls();
     }
 
     #[test]
@@ -563,7 +563,7 @@ mod accept_value_return_value_tests {
 
         mock.received
             .accept_value_return_value(first_accepted_value, Times::Exactly(3))
-            .accept_value_return_value(second_accepted_value, Times::Exactly(4)).only();
+            .accept_value_return_value(second_accepted_value, Times::Exactly(4)).no_other_calls();
     }
 
     #[test]
@@ -601,7 +601,7 @@ mod accept_value_return_value_tests {
 
         mock.received
             .accept_value_return_value(first_accepted_value, Times::Once)
-            .accept_value_return_value(second_accepted_value, Times::Once).only();
+            .accept_value_return_value(second_accepted_value, Times::Once).no_other_calls();
     }
 }
 
@@ -619,7 +619,7 @@ mod accept_two_values_tests {
         mock.accept_two_values(v1, v2);
 
         // Assert
-        mock.received.accept_two_values(v1, v2, Times::Once).only();
+        mock.received.accept_two_values(v1, v2, Times::Once).no_other_calls();
     }
 }
 
@@ -644,7 +644,7 @@ mod accept_two_values_return_value_tests {
         assert_eq!(returned_value, actual_returned_value);
 
         mock.received
-            .accept_two_values_return_value(v1, v2, Times::Once).only();
+            .accept_two_values_return_value(v1, v2, Times::Once).no_other_calls();
     }
 
     #[test]

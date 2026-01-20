@@ -35,7 +35,7 @@ fn work() {
 
     my_trait_mock.work(20);
 
-    my_trait_mock.received.work(Arg::Eq(20), Times::Once).only();
+    my_trait_mock.received.work(Arg::Eq(20), Times::Once).no_other_calls();
 }
 
 #[test]
