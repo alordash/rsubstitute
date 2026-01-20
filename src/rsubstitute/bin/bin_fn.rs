@@ -254,6 +254,7 @@ fn main() {
 }
 
 mod generic_fn {
+    use rsubstitute::for_generated::IStaticLocalKey;
     use std::any::TypeId;
     use std::cell::{RefCell, UnsafeCell};
     use std::collections::HashMap;
@@ -282,7 +283,7 @@ mod generic_fn {
 
     #[derive(Default)]
     struct MocksMap {
-        pub map: Arc<RefCell<HashMap<TypeId, *const ()>>>,
+        pub map: RefCell<HashMap<TypeId, *const ()>>,
     }
 
     unsafe impl Send for MocksMap {}
@@ -297,8 +298,8 @@ mod generic_fn {
     }
 
     fn get_mock<T>() -> *const Mock<T> {
-        let arc_map = MOCKS_MAP.with(|x| x.map.clone());
-        let mut map = arc_map.borrow_mut();
+        let ref_map = &MOCKS_MAP.as_static().map;
+        let mut map = ref_map.borrow_mut();
 
         let type_id = typeid::of::<T>();
         let raw_ptr = map
