@@ -1,8 +1,8 @@
 #![allow(unused_variables)]
 #![allow(non_snake_case)]
 
-use std::sync::Arc;
 use rsubstitute_proc_macro::mock;
+use std::sync::Arc;
 
 #[mock]
 trait Trait {
@@ -10,16 +10,10 @@ trait Trait {
 
     fn return_arc(&self) -> Arc<i32>;
 
-    // TODO - support various lifetimes via generics
-    // TODO - make test that returns same lifetime as the one accepted
     fn accept_arc_return_arc(&self, r: Arc<i32>) -> Arc<i32>;
 
     fn accept_two_arcs(&self, r1: Arc<i32>, r2: Arc<f32>);
 
-    // TODO - support various lifetimes via generics
-    // fn accept_two_arcs_with_different_lifetimes<'a, 'b>(&self, r1: &'a i32, r2: &'b f32);
-
-    // TODO - make test that returns same lifetime as the one accepted
     fn accept_two_arcs_return_arc(&self, r1: Arc<i32>, r2: Arc<f32>) -> Arc<String>;
 }
 
@@ -39,7 +33,7 @@ mod accept_arc_tests {
         mock.accept_arc(r.clone());
 
         // Assert
-        mock.received.accept_arc(r, Times::Once);
+        mock.received.accept_arc(r, Times::Once).only();
     }
 
     #[test]
@@ -134,7 +128,8 @@ mod accept_arc_return_arc_tests {
 
         mock.received
             .accept_arc_return_arc(accepted_r.clone(), Times::Once)
-            .accept_arc_return_arc(Arg::NotEq(accepted_r), Times::Never);
+            .accept_arc_return_arc(Arg::NotEq(accepted_r), Times::Never)
+            .only();
     }
 }
 
@@ -156,12 +151,8 @@ mod accept_two_arcs_tests {
         // Assert
         mock.received
             .accept_two_arcs(r1.clone(), r2.clone(), Times::Once)
-            .accept_two_arcs(
-                // TODO - maybe add received_only ?
-                Arg::NotEq(r1),
-                Arg::NotEq(r2),
-                Times::Never,
-            );
+            .accept_two_arcs(Arg::NotEq(r1), Arg::NotEq(r2), Times::Never)
+            .only();
     }
 }
 
@@ -186,6 +177,8 @@ mod accept_two_arcs_return_arc_tests {
         // Assert
         assert_eq!(returned_r, actual_returned_r);
 
-        mock.received.accept_two_arcs_return_arc(r1, r2, Times::Once);
+        mock.received
+            .accept_two_arcs_return_arc(r1, r2, Times::Once)
+            .only();
     }
 }

@@ -28,7 +28,7 @@ mod trait_generic_tests {
         // Assert
         assert_eq!(returned_value, actual_returned_value);
 
-        mock.received.work(accepted_value, Times::Once);
+        mock.received.work(accepted_value, Times::Once).only();
     }
 
     #[test]
@@ -45,7 +45,7 @@ mod trait_generic_tests {
         // Assert
         assert_eq!(returned_value, actual_returned_value);
 
-        mock.received.work(accepted_value, Times::Once);
+        mock.received.work(accepted_value, Times::Once).only();
     }
 
     #[test]
@@ -62,6 +62,6 @@ mod trait_generic_tests {
         // Assert
         assert_eq!(returned_value, actual_returned_value);
 
-        mock.received.work(accepted_value, Times::Once);
+        mock.received.work(accepted_value, Times::Once).only();
     }
 }

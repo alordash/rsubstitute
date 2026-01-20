@@ -353,9 +353,8 @@ mod generated {
             return self;
         }
 
-        pub fn only(&self) -> &Self {
+        pub fn only(&self) {
             self.data.verify_received_nothing_else();
-            return self;
         }
 
         // #[allow(non_upper_case_globals)]
@@ -410,8 +409,10 @@ fn received_nothing_else_PanicsOk() {
 
     assert_panics(
         || mock.received.get(Times::Once).only(),
-        format!(r"Did not expect to receive any other calls. Received 1 call:
-1. work({work_arguments})"),
+        format!(
+            r"Did not expect to receive any other calls. Received 1 call:
+1. work({work_arguments})"
+        ),
     );
 }
 

@@ -4,6 +4,7 @@ use crate::mock_macros::mock_generation::input_args_generator::IInputArgsGenerat
 use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::mock_generation::*;
 use crate::syntax::*;
+use quote::format_ident;
 use std::sync::Arc;
 use syn::*;
 
@@ -42,14 +43,15 @@ impl IMockReceivedImplGenerator for MockReceivedImplGenerator {
             mock_received_struct.item_struct.ident.clone(),
             mock_generics.impl_generics.clone(),
         );
-        let fn_receiveds = fn_infos
+        let fns = fn_infos
             .iter()
             .map(|x| ImplItem::Fn(self.generate_fn_received(x)))
+            .chain(std::iter::once(self.generate_only_fn()))
             .collect();
 
-        let item_impl =
-            self.impl_factory
-                .create_with_default_lifetime(mock_generics, self_ty, fn_receiveds);
+        let item_impl = self
+            .impl_factory
+            .create_with_default_lifetime(mock_generics, self_ty, fns);
         let mock_received_impl = MockReceivedImpl { item_impl };
         return mock_received_impl;
     }
@@ -66,11 +68,12 @@ impl IMockReceivedImplGenerator for MockReceivedImplGenerator {
         );
         let mut fn_received = self.generate_fn_received(fn_info);
         fn_received.sig.ident = constants::MOCK_RECEIVED_FIELD_IDENT.clone();
+        let only_fn = self.generate_only_fn();
 
         let item_impl = self.impl_factory.create_with_default_lifetime(
             mock_generics,
             self_ty,
-            vec![ImplItem::Fn(fn_received)],
+            vec![ImplItem::Fn(fn_received), only_fn],
         );
         let mock_received_impl = MockReceivedImpl { item_impl };
         return mock_received_impl;
@@ -115,27 +118,51 @@ impl MockReceivedImplGenerator {
             )),
             Some(Default::default()),
         );
-        let return_self_stmt = Stmt::Expr(
-            Expr::Return(ExprReturn {
-                attrs: Vec::new(),
-                return_token: Default::default(),
-                expr: Some(Box::new(Expr::Path(ExprPath {
-                    attrs: Vec::new(),
-                    qself: None,
-                    path: constants::SELF_IDENT_PATH.clone(),
-                }))),
-            }),
-            Some(Default::default()),
-        );
         let stmts = vec![
             args_checker_decl_stmt,
             verify_received_stmt,
-            return_self_stmt,
+            constants::RETURN_SELF_STMT.clone(),
         ];
         let block = Block {
             brace_token: Default::default(),
             stmts,
         };
         return block;
+    }
+
+    fn generate_only_fn(&self) -> ImplItem {
+        let verify_received_nothing_else_stmt = Stmt::Expr(
+            Expr::MethodCall(self.expr_method_call_factory.create(
+                vec![constants::SELF_IDENT.clone(), constants::DATA_IDENT.clone()],
+                format_ident!("verify_received_nothing_else"),
+                Vec::new(),
+            )),
+            Some(Default::default()),
+        );
+        let impl_item_fn = ImplItemFn {
+            attrs: Vec::new(),
+            vis: Visibility::Public(Default::default()),
+            defaultness: None,
+            sig: Signature {
+                constness: None,
+                asyncness: None,
+                unsafety: None,
+                abi: None,
+                fn_token: Default::default(),
+                ident: format_ident!("only"),
+                generics: Generics::default(),
+                paren_token: Default::default(),
+                inputs: [constants::REF_SELF_ARG_WITH_LIFETIME.clone()]
+                    .into_iter()
+                    .collect(),
+                variadic: None,
+                output: ReturnType::Default,
+            },
+            block: Block {
+                brace_token: Default::default(),
+                stmts: vec![verify_received_nothing_else_stmt],
+            },
+        };
+        return ImplItem::Fn(impl_item_fn);
     }
 }

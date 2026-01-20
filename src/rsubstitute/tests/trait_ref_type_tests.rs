@@ -38,7 +38,7 @@ mod accept_ref_tests {
         mock.accept_ref(r);
 
         // Assert
-        mock.received.accept_ref(r, Times::Once);
+        mock.received.accept_ref(r, Times::Once).only();
     }
 
     #[test]
@@ -133,7 +133,8 @@ mod accept_ref_return_ref_tests {
 
         mock.received
             .accept_ref_return_ref(accepted_r, Times::Once)
-            .accept_ref_return_ref(Arg::NotEq(accepted_r), Times::Never);
+            .accept_ref_return_ref(Arg::NotEq(accepted_r), Times::Never)
+            .only();
     }
 }
 
@@ -155,12 +156,8 @@ mod accept_two_refs_tests {
         // Assert
         mock.received
             .accept_two_refs(r1, r2, Times::Once)
-            .accept_two_refs(
-                // TODO - maybe add received_only ?
-                Arg::NotEq(r1),
-                Arg::NotEq(r2),
-                Times::Never,
-            );
+            .accept_two_refs(Arg::NotEq(r1), Arg::NotEq(r2), Times::Never)
+            .only();
     }
 }
 
@@ -186,6 +183,7 @@ mod accept_two_refs_return_ref_tests {
         assert_eq!(returned_r, actual_returned_r);
 
         mock.received
-            .accept_two_refs_return_ref(r1, r2, Times::Once);
+            .accept_two_refs_return_ref(r1, r2, Times::Once)
+            .only();
     }
 }

@@ -23,7 +23,7 @@ fn f_Ok() {
     // Assert
     assert_eq!((), result);
     assert!(*callback_flag.borrow());
-    f::received(Times::Once);
+    f::received(Times::Once).only();
 }
 
 #[test]
@@ -36,7 +36,7 @@ fn f_NoConfig_Ok() {
 
     // Assert
     assert_eq!((), result);
-    f::received(Times::Once);
+    f::received(Times::Once).only();
 }
 
 #[test]
@@ -54,7 +54,7 @@ fn f_MultipleTime_Ok() {
     assert_eq!((), result2);
     assert_eq!((), result3);
 
-    f::received(Times::Exactly(3));
+    f::received(Times::Exactly(3)).only();
 }
 
 #[test]

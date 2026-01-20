@@ -36,7 +36,7 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
         mock_generics: &MockGenerics,
         fn_infos: &[FnInfo],
     ) -> MockDataStruct {
-        let attrs = Vec::new();
+        let attrs = vec![constants::DERIVE_MOCK_DATA_ATTRIBUTE.clone()];
         let ident = format_ident!("{}{}", mock_ident, Self::MOCK_DATA_STRUCT_IDENT_SUFFIX);
         let fn_fields: Vec<_> = fn_infos
             .iter()
@@ -72,7 +72,10 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
         fn_infos: &[FnInfo],
         base_caller_struct: &BaseCallerStruct,
     ) -> MockDataStruct {
-        let attrs = vec![constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone()];
+        let attrs = vec![
+            constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone(),
+            constants::DERIVE_MOCK_DATA_ATTRIBUTE.clone(),
+        ];
         let ident = format_ident!("{}{}", mock_ident, Self::MOCK_DATA_STRUCT_IDENT_SUFFIX);
         let base_caller_ty = self
             .type_factory

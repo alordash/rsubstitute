@@ -1,3 +1,4 @@
+use crate::constants;
 use crate::di::SERVICES;
 use proc_macro2::{Ident, Span};
 use quote::format_ident;
@@ -17,6 +18,22 @@ pub const SELF_IDENT_PATH: LazyCell<Path> = LazyCell::new(|| {
     let path_factory = &SERVICES.path_factory;
     let result = path_factory.create(SELF_IDENT.clone());
     return result;
+});
+
+pub const RETURN_SELF_STMT: LazyCell<Stmt> = LazyCell::new(|| {
+    let return_self_stmt = Stmt::Expr(
+        Expr::Return(ExprReturn {
+            attrs: Vec::new(),
+            return_token: Default::default(),
+            expr: Some(Box::new(Expr::Path(ExprPath {
+                attrs: Vec::new(),
+                qself: None,
+                path: constants::SELF_IDENT_PATH.clone(),
+            }))),
+        }),
+        Some(Default::default()),
+    );
+    return return_self_stmt;
 });
 
 pub const MACRO_VEC_PATH: LazyCell<Path> = LazyCell::new(|| {
@@ -59,8 +76,7 @@ pub const I_BASE_CALLER_CALL_BASE_FN_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("call_base"));
 
 // TODO - add test that it's equal to rsubstitute_core::arguments_matching::IArgsFormatter
-pub const I_MOCK_DATA_TRAIT_IDENT: LazyCell<Ident> =
-    LazyCell::new(|| format_ident!("IMockData"));
+pub const I_MOCK_DATA_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("IMockData"));
 
 pub const I_MOCK_DATA_GET_RECEIVED_NOTHING_ELSE_ERROR_MSGS_FN_SIGNATURE: LazyCell<Signature> =
     LazyCell::new(|| {
@@ -234,7 +250,10 @@ pub const DERIVE_CLONE_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
 
 pub const DERIVE_MOCK_DATA_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     let attribute_factory = &SERVICES.attribute_factory;
-    let result = attribute_factory.create(format_ident!("derive"), &I_MOCK_DATA_TRAIT_IDENT.to_string());
+    let result = attribute_factory.create(
+        format_ident!("derive"),
+        &I_MOCK_DATA_TRAIT_IDENT.to_string(),
+    );
     return result;
 });
 

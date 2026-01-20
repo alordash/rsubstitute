@@ -37,7 +37,7 @@ fn f_Ok() {
     // Assert
     assert_eq!((), result);
     assert!(*callback_flag.borrow());
-    mock.received.f(Times::Once);
+    mock.received.f(Times::Once).only();
 }
 
 #[test]
@@ -67,7 +67,7 @@ fn f_MultipleTimes_Ok() {
     assert_eq!((), result2);
     assert_eq!((), result3);
 
-    mock.received.f(Times::Exactly(3));
+    mock.received.f(Times::Exactly(3)).only();
 }
 
 #[test]
