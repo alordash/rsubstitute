@@ -29,6 +29,16 @@ impl IStaticFnGenerator for StaticFnGenerator {
         static_mock: &StaticMock,
         mock_generics: &MockGenerics,
     ) -> StaticFn {
+        let mut generics = mock_generics.impl_generics.clone();
+        generics.params.insert(
+            0,
+            GenericParam::Lifetime(LifetimeParam {
+                attrs: Vec::new(),
+                lifetime: constants::ANONYMOUS_LIFETIME.clone(),
+                colon_token: Default::default(),
+                bounds: Punctuated::new(),
+            }),
+        );
         let sig = Signature {
             constness: None,
             asyncness: None,
@@ -36,7 +46,7 @@ impl IStaticFnGenerator for StaticFnGenerator {
             abi: None,
             fn_token: Default::default(),
             ident: fn_info.parent.ident.clone(),
-            generics: mock_generics.impl_generics.clone(),
+            generics,
             paren_token: Default::default(),
             inputs: fn_info
                 .parent
