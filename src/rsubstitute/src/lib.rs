@@ -1,6 +1,7 @@
 pub use rsubstitute_core::args_matching::*;
 pub use rsubstitute_core::*;
 
+mod mocks_map;
 mod static_local_key;
 
 pub mod macros {
@@ -10,6 +11,7 @@ pub mod macros {
 pub mod for_generated {
     pub use crate::*;
     pub use macros::*;
+    pub use mocks_map::*;
     pub use static_local_key::*;
     pub use std::cell::LazyCell;
     pub use std::cell::RefCell;

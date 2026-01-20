@@ -254,7 +254,7 @@ fn main() {
 }
 
 mod generic_fn {
-    use rsubstitute::for_generated::IStaticLocalKey;
+    use rsubstitute::for_generated::{IStaticLocalKey, get_mock};
     use std::any::TypeId;
     use std::cell::{RefCell, UnsafeCell};
     use std::collections::HashMap;
@@ -275,42 +275,18 @@ mod generic_fn {
         }
     }
 
+    fn flex<T>(value: T) -> T {
+        value
+    }
+
     impl<T> Mock<T> {
         pub fn flex(&self, value: T) -> T {
             flex(value)
         }
     }
 
-    #[derive(Default)]
-    struct MocksMap {
-        pub map: RefCell<HashMap<TypeId, *const ()>>,
-    }
-
-    unsafe impl Send for MocksMap {}
-    unsafe impl Sync for MocksMap {}
-
-    thread_local! {
-        static MOCKS_MAP: LazyLock<MocksMap> = LazyLock::new(Default::default);
-    }
-
-    fn flex<T>(value: T) -> T {
-        value
-    }
-
-    fn get_mock<T>() -> *const Mock<T> {
-        let ref_map = &MOCKS_MAP.as_static().map;
-        let mut map = ref_map.borrow_mut();
-
-        let type_id = typeid::of::<T>();
-        let raw_ptr = map
-            .entry(type_id)
-            .or_insert(Box::leak(Box::new(Mock::<T>::default())) as *const _ as *const ());
-        let mock_ptr = *raw_ptr as *const Mock<T>;
-        return mock_ptr;
-    }
-
     pub fn do_flex<T>(value: T) -> T {
-        let mock = get_mock();
+        let mock: *const Mock<T> = get_mock();
         unsafe {
             return (*mock).flex(value);
         }
