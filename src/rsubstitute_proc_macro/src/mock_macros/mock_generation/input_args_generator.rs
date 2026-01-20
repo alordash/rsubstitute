@@ -7,9 +7,13 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait IInputArgsGenerator {
-    fn generate_input_args(&self, fn_info: &FnInfo) -> Vec<FnArg>;
+    fn generate_input_args(&self, fn_info: &FnInfo, phantom_types_count: usize) -> Vec<FnArg>;
 
-    fn generate_input_args_with_static_lifetimes(&self, fn_info: &FnInfo) -> Vec<FnArg>;
+    fn generate_input_args_with_static_lifetimes(
+        &self,
+        fn_info: &FnInfo,
+        phantom_types_count: usize,
+    ) -> Vec<FnArg>;
 
     fn generate_args_checker_var_ident_and_decl_stmt(&self, fn_info: &FnInfo) -> (Ident, Stmt);
 }
@@ -22,13 +26,13 @@ pub(crate) struct InputArgsGenerator {
 }
 
 impl IInputArgsGenerator for InputArgsGenerator {
-    fn generate_input_args(&self, fn_info: &FnInfo) -> Vec<FnArg> {
+    fn generate_input_args(&self, fn_info: &FnInfo, phantom_types_count: usize) -> Vec<FnArg> {
         let result = fn_info
             .args_checker_struct
             .item_struct
             .fields
             .iter()
-            .skip(1)
+            .skip(1 + phantom_types_count)
             .map(|field| {
                 FnArg::Typed(PatType {
                     attrs: Vec::new(),
@@ -77,8 +81,12 @@ impl IInputArgsGenerator for InputArgsGenerator {
         return result;
     }
 
-    fn generate_input_args_with_static_lifetimes(&self, fn_info: &FnInfo) -> Vec<FnArg> {
-        let mut fn_args = self.generate_input_args(fn_info);
+    fn generate_input_args_with_static_lifetimes(
+        &self,
+        fn_info: &FnInfo,
+        phantom_types_count: usize,
+    ) -> Vec<FnArg> {
+        let mut fn_args = self.generate_input_args(fn_info, phantom_types_count);
         for fn_arg in fn_args.iter_mut() {
             if let FnArg::Typed(pat_type) = fn_arg {
                 self.reference_normalizer.staticify(&mut pat_type.ty);
@@ -93,38 +101,57 @@ impl IInputArgsGenerator for InputArgsGenerator {
             fn_info.parent.ident,
             Self::ARGS_CHECKER_VARIABLE_SUFFIX
         );
-        let fn_fields: Vec<_> = fn_info
+        let field_values: Vec<_> = fn_info
             .args_checker_struct
             .item_struct
             .fields
             .iter()
-            .skip(1)
-            .map(|field| self.field_value_factory.create_with_into_conversion(field))
-            .collect();
-        let args_checker_decl_stmt = Stmt::Local(
-            self.local_factory.create(
-                args_checker_var_ident.clone(),
-                LocalInit {
-                    eq_token: Default::default(),
-                    expr: Box::new(Expr::Struct(ExprStruct {
+            .map(|field| {
+                // TODO - deduplicate this code, it's also used in mock_fn_block_generator
+                if let Type::Path(type_path) = &field.ty
+                    && let Some(first_path_segment) = type_path.path.segments.first()
+                    && first_path_segment.ident == constants::PHANTOM_DATA_IDENT.clone()
+                {
+                    let field_ident = field.ident.clone().expect("TODO field ident");
+                    let phantom_field_value = FieldValue {
                         attrs: Vec::new(),
-                        qself: None,
-                        path: self
-                            .path_factory
-                            .create(fn_info.args_checker_struct.item_struct.ident.clone()),
-                        brace_token: Default::default(),
-                        fields: std::iter::once(
-                            constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE.clone(),
-                        )
-                        .chain(fn_fields)
-                        .collect(),
-                        dot2_token: None,
-                        rest: None,
-                    })),
-                    diverge: None,
-                },
-            ),
-        );
+                        member: Member::Named(field_ident),
+                        colon_token: Some(Default::default()),
+                        expr: Expr::Path(ExprPath {
+                            attrs: Vec::new(),
+                            qself: None,
+                            path: constants::PHANTOM_DATA_PATH.clone(),
+                        }),
+                    };
+                    return phantom_field_value;
+                }
+                return self.field_value_factory.create_with_into_conversion(field);
+            })
+            .collect();
+        let args_checker_decl_stmt = Stmt::Local(self.local_factory.create(
+            args_checker_var_ident.clone(),
+            LocalInit {
+                eq_token: Default::default(),
+                expr:
+                    Box::new(
+                        Expr::Struct(
+                            ExprStruct {
+                                attrs: Vec::new(),
+                                qself: None,
+                                path:
+                                    self.path_factory.create(
+                                        fn_info.args_checker_struct.item_struct.ident.clone(),
+                                    ),
+                                brace_token: Default::default(),
+                                fields: field_values.into_iter().collect(),
+                                dot2_token: None,
+                                rest: None,
+                            },
+                        ),
+                    ),
+                diverge: None,
+            },
+        ));
         return (args_checker_var_ident, args_checker_decl_stmt);
     }
 }

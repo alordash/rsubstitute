@@ -14,6 +14,7 @@ pub trait IArgsCheckerTraitImplGenerator {
         &self,
         call_struct: &CallStruct,
         args_checker_struct: &ArgsCheckerStruct,
+        phantom_types_count: usize,
     ) -> ArgsCheckerTraitImpl;
 }
 
@@ -27,6 +28,7 @@ impl IArgsCheckerTraitImplGenerator for ArgsCheckerTraitImplGenerator {
         &self,
         call_struct: &CallStruct,
         args_checker_struct: &ArgsCheckerStruct,
+        phantom_types_count: usize,
     ) -> ArgsCheckerTraitImpl {
         let trait_ident = constants::I_ARGS_CHECKER_TRAIT_IDENT.clone();
         let trait_path = Path {
@@ -56,7 +58,7 @@ impl IArgsCheckerTraitImplGenerator for ArgsCheckerTraitImplGenerator {
             args_checker_struct.item_struct.ident.clone(),
             args_checker_struct.item_struct.generics.clone(),
         ));
-        let items = self.generate_check_fn(call_struct, call_ty);
+        let items = self.generate_check_fn(call_struct, call_ty, phantom_types_count);
         let item_impl = ItemImpl {
             attrs: Vec::new(),
             defaultness: None,
@@ -87,8 +89,13 @@ impl ArgsCheckerTraitImplGenerator {
 
     const CALL_ARG_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("call"));
 
-    fn generate_check_fn(&self, call_struct: &CallStruct, call_type: Box<Type>) -> ImplItem {
-        let check_stmt = self.generate_check_stmt(call_struct);
+    fn generate_check_fn(
+        &self,
+        call_struct: &CallStruct,
+        call_type: Box<Type>,
+        phantom_types_count: usize,
+    ) -> ImplItem {
+        let check_stmt = self.generate_check_stmt(call_struct, phantom_types_count);
         let block = Block {
             brace_token: Default::default(),
             stmts: vec![check_stmt],
@@ -134,12 +141,12 @@ impl ArgsCheckerTraitImplGenerator {
         return impl_item;
     }
 
-    fn generate_check_stmt(&self, call_struct: &CallStruct) -> Stmt {
+    fn generate_check_stmt(&self, call_struct: &CallStruct, phantom_types_count: usize) -> Stmt {
         let check_exprs: Punctuated<_, Token![,]> = call_struct
             .item_struct
             .fields
             .iter()
-            .skip(1)
+            .skip(1 + phantom_types_count)
             .map(|field| self.generate_check_exprs(field))
             .collect();
         let vec_expr = Expr::Macro(ExprMacro {

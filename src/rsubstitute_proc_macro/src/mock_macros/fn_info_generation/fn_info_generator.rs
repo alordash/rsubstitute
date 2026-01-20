@@ -21,13 +21,16 @@ pub struct FnInfoGenerator {
 impl IFnInfoGenerator for FnInfoGenerator {
     fn generate<'a>(&self, fn_decl: &'a FnDecl, mock_generics: &MockGenerics) -> FnInfo<'a> {
         let call_struct = self.call_struct_generator.generate(fn_decl, mock_generics);
+        let phantom_types_count = mock_generics.get_phantom_types_count();
         let call_arg_infos_provider_impl = self
             .call_arg_infos_provider_impl_generator
-            .generate(&call_struct);
+            .generate(&call_struct, phantom_types_count);
         let args_checker_struct = self.args_checker_generator.generate(fn_decl, mock_generics);
-        let args_checker_impl = self
-            .args_checker_impl_generator
-            .generate(&call_struct, &args_checker_struct);
+        let args_checker_impl = self.args_checker_impl_generator.generate(
+            &call_struct,
+            &args_checker_struct,
+            phantom_types_count,
+        );
         let data_field_ident = self.generate_data_field_ident(fn_decl);
         let fn_info = FnInfo {
             parent: fn_decl,

@@ -73,6 +73,7 @@ fn create_services() -> ServiceCollection {
         field_access_expr_factory: field_access_expr_factory.clone(),
     });
     let mock_generics_generator = Arc::new(MockGenericsGenerator {
+        type_factory: type_factory.clone(),
         generics_merger: generics_merger.clone(),
     });
     let fn_info_generator = Arc::new(FnInfoGenerator {
@@ -185,7 +186,7 @@ fn create_services() -> ServiceCollection {
     let derive_mock_data_macro_handler = Arc::new(DeriveMockDataMacroHandler {
         path_factory: path_factory.clone(),
         type_factory: type_factory.clone(),
-        expr_method_call_factory: expr_method_call_factory.clone()
+        expr_method_call_factory: expr_method_call_factory.clone(),
     });
 
     let fn_setup_generator = Arc::new(FnSetupGenerator {

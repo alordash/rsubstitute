@@ -43,9 +43,10 @@ impl IMockReceivedImplGenerator for MockReceivedImplGenerator {
             mock_received_struct.item_struct.ident.clone(),
             mock_generics.impl_generics.clone(),
         );
+        let phantom_types_count = mock_generics.get_phantom_types_count();
         let fns = fn_infos
             .iter()
-            .map(|x| ImplItem::Fn(self.generate_fn_received(x)))
+            .map(|x| ImplItem::Fn(self.generate_fn_received(x, phantom_types_count)))
             .chain(std::iter::once(self.generate_only_fn()))
             .collect();
 
@@ -66,7 +67,8 @@ impl IMockReceivedImplGenerator for MockReceivedImplGenerator {
             mock_received_struct.item_struct.ident.clone(),
             mock_generics.impl_generics.clone(),
         );
-        let mut fn_received = self.generate_fn_received(fn_info);
+        let mut fn_received =
+            self.generate_fn_received(fn_info, mock_generics.get_phantom_types_count());
         fn_received.sig.ident = constants::MOCK_RECEIVED_FIELD_IDENT.clone();
         let only_fn = self.generate_only_fn();
 
@@ -81,10 +83,10 @@ impl IMockReceivedImplGenerator for MockReceivedImplGenerator {
 }
 
 impl MockReceivedImplGenerator {
-    fn generate_fn_received(&self, fn_info: &FnInfo) -> ImplItemFn {
+    fn generate_fn_received(&self, fn_info: &FnInfo, phantom_types_count: usize) -> ImplItemFn {
         let sig = self
             .received_signature_generator
-            .generate_for_trait(fn_info);
+            .generate_for_trait(fn_info, phantom_types_count);
         let block = self.generate_fn_received_block(fn_info);
         let impl_item_fn = ImplItemFn {
             attrs: vec![

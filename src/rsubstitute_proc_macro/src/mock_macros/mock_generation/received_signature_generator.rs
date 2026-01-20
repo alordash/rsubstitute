@@ -1,7 +1,7 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::*;
-use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::mock_generation::IInputArgsGenerator;
+use crate::mock_macros::mock_generation::models::*;
 use crate::syntax::{IReferenceNormalizer, ITypeFactory};
 use proc_macro2::Ident;
 use quote::format_ident;
@@ -13,12 +13,13 @@ use syn::*;
 pub trait IReceivedSignatureGenerator {
     fn get_times_arg_ident(&self) -> Ident;
 
-    fn generate_for_trait(&self, fn_info: &FnInfo) -> Signature;
+    fn generate_for_trait(&self, fn_info: &FnInfo, phantom_types_count: usize) -> Signature;
 
     fn generate_for_static(
         &self,
         fn_info: &FnInfo,
         mock_received_struct: &MockReceivedStruct,
+        phantom_types_count: usize,
     ) -> Signature;
 }
 
@@ -33,7 +34,7 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
         format_ident!("times")
     }
 
-    fn generate_for_trait(&self, fn_info: &FnInfo) -> Signature {
+    fn generate_for_trait(&self, fn_info: &FnInfo, phantom_types_count: usize) -> Signature {
         let return_ty = Type::Reference(TypeReference {
             and_token: Default::default(),
             lifetime: Some(constants::DEFAULT_ARG_FIELD_LIFETIME.clone()),
@@ -46,6 +47,7 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
             fn_info.parent.ident.clone(),
             prepend_ref_self_arg,
             return_ty,
+            phantom_types_count,
         );
         return result;
     }
@@ -54,6 +56,7 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
         &self,
         fn_info: &FnInfo,
         mock_received_struct: &MockReceivedStruct,
+        phantom_types_count: usize,
     ) -> Signature {
         let mut return_ty = self
             .type_factory
@@ -71,6 +74,7 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
             constants::MOCK_RECEIVED_FIELD_IDENT.clone(),
             prepend_ref_self_arg,
             return_ty_reference,
+            phantom_types_count,
         );
         for input in result.inputs.iter_mut() {
             if let FnArg::Typed(pat_type) = input {
@@ -90,6 +94,7 @@ impl ReceivedSignatureGenerator {
         fn_ident: Ident,
         prepend_ref_self_arg: bool,
         return_ty: Type,
+        phantom_types_count: usize,
     ) -> Signature {
         let times_arg = FnArg::Typed(PatType {
             attrs: Vec::new(),
@@ -105,7 +110,7 @@ impl ReceivedSignatureGenerator {
         });
         let mut inputs: Vec<_> = self
             .input_args_generator
-            .generate_input_args(fn_info)
+            .generate_input_args(fn_info, phantom_types_count)
             .into_iter()
             .chain(iter::once(times_arg))
             .collect();

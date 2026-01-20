@@ -10,7 +10,11 @@ use syn::token::Bracket;
 use syn::*;
 
 pub trait ICallArgInfosProviderImplGenerator {
-    fn generate(&self, call_struct: &CallStruct) -> CallArgInfosProviderImpl;
+    fn generate(
+        &self,
+        call_struct: &CallStruct,
+        phantom_types_count: usize,
+    ) -> CallArgInfosProviderImpl;
 }
 
 pub struct CallArgInfosProviderImplGenerator {
@@ -20,7 +24,11 @@ pub struct CallArgInfosProviderImplGenerator {
 }
 
 impl ICallArgInfosProviderImplGenerator for CallArgInfosProviderImplGenerator {
-    fn generate(&self, call_struct: &CallStruct) -> CallArgInfosProviderImpl {
+    fn generate(
+        &self,
+        call_struct: &CallStruct,
+        phantom_types_count: usize,
+    ) -> CallArgInfosProviderImpl {
         let trait_path = self
             .path_factory
             .create(constants::I_ARG_INFOS_PROVIDER_TRAIT_IDENT.clone());
@@ -28,7 +36,7 @@ impl ICallArgInfosProviderImplGenerator for CallArgInfosProviderImplGenerator {
             call_struct.item_struct.ident.clone(),
             call_struct.item_struct.generics.clone(),
         ));
-        let get_arg_infos_fn = self.generate_get_arg_infos_fn(call_struct);
+        let get_arg_infos_fn = self.generate_get_arg_infos_fn(call_struct, phantom_types_count);
         let item_impl = ItemImpl {
             attrs: Vec::new(),
             defaultness: None,
@@ -69,8 +77,12 @@ impl CallArgInfosProviderImplGenerator {
     // TODO - add test that it equals to = args_matching::ArgInfo
     const ARG_INFO_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("ArgInfo"));
 
-    fn generate_get_arg_infos_fn(&self, call_struct: &CallStruct) -> ImplItem {
-        let return_stmt = self.generate_return_stmt(call_struct);
+    fn generate_get_arg_infos_fn(
+        &self,
+        call_struct: &CallStruct,
+        phantom_types_count: usize,
+    ) -> ImplItem {
+        let return_stmt = self.generate_return_stmt(call_struct, phantom_types_count);
         let block = Block {
             brace_token: Default::default(),
             stmts: vec![return_stmt],
@@ -85,12 +97,12 @@ impl CallArgInfosProviderImplGenerator {
         return impl_item;
     }
 
-    fn generate_return_stmt(&self, call_struct: &CallStruct) -> Stmt {
+    fn generate_return_stmt(&self, call_struct: &CallStruct, phantom_types_count: usize) -> Stmt {
         let check_exprs: Punctuated<_, Token![,]> = call_struct
             .item_struct
             .fields
             .iter()
-            .skip(1)
+            .skip(1 + phantom_types_count)
             .map(|field| self.generate_arg_info_new_expr(field))
             .collect();
         let vec_expr = Expr::Macro(ExprMacro {

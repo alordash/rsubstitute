@@ -59,6 +59,7 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
                     use_fn_info_ident_as_method_ident,
                     output,
                     None,
+                    mock_generics.get_phantom_types_count(),
                 ));
             })
             .collect();
@@ -90,6 +91,7 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
             use_fn_info_ident_as_method_ident,
             output,
             Some(base_caller_struct),
+            mock_generics.get_phantom_types_count(),
         ));
 
         let item_impl =
@@ -111,6 +113,7 @@ impl MockSetupImplGenerator {
         use_fn_info_ident_as_method_ident: bool,
         output: ReturnType,
         maybe_base_caller_struct: Option<&BaseCallerStruct>,
+        phantom_types_count: usize,
     ) -> ImplItemFn {
         let sig = Signature {
             // TODO - all these `None` should be actually mapped to souarce fns signature
@@ -127,7 +130,10 @@ impl MockSetupImplGenerator {
             generics: Generics::default(),
             paren_token: Default::default(),
             inputs: iter::once(constants::REF_SELF_ARG_WITH_LIFETIME.clone())
-                .chain(self.input_args_generator.generate_input_args(fn_info))
+                .chain(
+                    self.input_args_generator
+                        .generate_input_args(fn_info, phantom_types_count),
+                )
                 .collect(),
             variadic: None,
             output,

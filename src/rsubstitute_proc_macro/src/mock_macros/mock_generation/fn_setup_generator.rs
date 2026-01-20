@@ -13,6 +13,7 @@ pub trait IFnSetupGenerator {
         static_mock: &StaticMock,
         mock_setup_struct: &MockSetupStruct,
         base_caller_struct: &BaseCallerStruct,
+        phantom_types_count: usize,
     ) -> ItemFn;
 }
 
@@ -29,6 +30,7 @@ impl IFnSetupGenerator for FnSetupGenerator {
         static_mock: &StaticMock,
         mock_setup_struct: &MockSetupStruct,
         base_caller_struct: &BaseCallerStruct,
+        phantom_types_count: usize,
     ) -> ItemFn {
         let output = self.setup_output_generator.generate_for_static(
             fn_info,
@@ -47,7 +49,7 @@ impl IFnSetupGenerator for FnSetupGenerator {
             paren_token: Default::default(),
             inputs: self
                 .input_args_generator
-                .generate_input_args_with_static_lifetimes(fn_info)
+                .generate_input_args_with_static_lifetimes(fn_info, phantom_types_count)
                 .into_iter()
                 .collect(),
             variadic: None,

@@ -2,7 +2,7 @@ use crate::constants;
 use crate::mock_macros::fn_info_generation::models::*;
 use crate::mock_macros::mock_generation::models::*;
 use crate::syntax::{IExprMethodCallFactory, IPathFactory, IStdMemTransmuteExprFactory};
-use quote::format_ident;
+use quote::{ToTokens, format_ident};
 use std::cell::LazyCell;
 use std::sync::Arc;
 use syn::*;
@@ -59,20 +59,36 @@ impl MockFnBlockGenerator {
         LazyCell::new(|| format_ident!("handle_base_returning")); // TODO - add test that it equals to FnData::handle_returning
 
     fn generate_call_stmt(&self, fn_info: &FnInfo) -> Stmt {
-        let fn_fields: Vec<_> = fn_info
+        let field_values: Vec<_> = fn_info
             .call_struct
             .item_struct
             .fields
             .iter()
-            .skip(1)
             .map(|field| {
                 let field_ident = field.ident.clone().expect("TODO field ident");
-                FieldValue {
+                if let Type::Path(type_path) = &field.ty
+                    && let Some(first_path_segment) = type_path.path.segments.first()
+                    && first_path_segment.ident == constants::PHANTOM_DATA_IDENT.clone()
+                {
+                    let phantom_field_value = FieldValue {
+                        attrs: Vec::new(),
+                        member: Member::Named(field_ident),
+                        colon_token: Some(Default::default()),
+                        expr: Expr::Path(ExprPath {
+                            attrs: Vec::new(),
+                            qself: None,
+                            path: constants::PHANTOM_DATA_PATH.clone(),
+                        }),
+                    };
+                    return phantom_field_value;
+                }
+                let field_value = FieldValue {
                     attrs: Vec::new(),
                     member: Member::Named(field_ident.clone()),
                     colon_token: Some(Default::default()),
                     expr: self.std_mem_transmute_expr_factory.create(field_ident),
-                }
+                };
+                return field_value;
             })
             .collect();
         let call_stmt = Stmt::Local(Local {
@@ -98,11 +114,7 @@ impl MockFnBlockGenerator {
                                     .path_factory
                                     .create(fn_info.call_struct.item_struct.ident.clone()),
                                 brace_token: Default::default(),
-                                fields: std::iter::once(
-                                    constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE.clone(),
-                                )
-                                .chain(fn_fields)
-                                .collect(),
+                                fields: field_values.into_iter().collect(),
                                 dot2_token: None,
                                 rest: None,
                             }),

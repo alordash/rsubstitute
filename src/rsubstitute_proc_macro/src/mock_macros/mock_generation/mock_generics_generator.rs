@@ -1,6 +1,7 @@
 use crate::constants;
 use crate::mock_macros::mock_generation::models::*;
 use crate::syntax::*;
+use quote::format_ident;
 use std::sync::Arc;
 use syn::*;
 
@@ -9,6 +10,7 @@ pub trait IMockGenericsGenerator {
 }
 
 pub(crate) struct MockGenericsGenerator {
+    pub type_factory: Arc<dyn ITypeFactory>,
     pub generics_merger: Arc<dyn IGenericsMerger>,
 }
 
@@ -21,9 +23,14 @@ impl IMockGenericsGenerator for MockGenericsGenerator {
             &constants::DEFAULT_ARG_FIELD_LIFETIME_GENERIC,
             &modified_source_generics,
         );
+        let phantom_type_fields = source_generics
+            .type_params()
+            .map(|x| self.convert_type_param_to_phantom_field(&x))
+            .collect();
         let mock_generics = MockGenerics {
             source_generics: source_generics.clone(),
             impl_generics: result_generics,
+            phantom_type_fields,
         };
         return mock_generics;
     }
@@ -108,5 +115,20 @@ impl MockGenericsGenerator {
             }
             _ => false,
         }
+    }
+
+    fn convert_type_param_to_phantom_field(&self, type_param: &TypeParam) -> Field {
+        let result = Field {
+            attrs: Vec::new(),
+            vis: Visibility::Inherited,
+            mutability: FieldMutability::None,
+            ident: Some(format_ident!("_phantom_{}", type_param.ident)),
+            colon_token: Default::default(),
+            ty: self.type_factory.wrap_in(
+                self.type_factory.create(type_param.ident.clone()),
+                constants::PHANTOM_DATA_IDENT.clone(),
+            ),
+        };
+        return result;
     }
 }

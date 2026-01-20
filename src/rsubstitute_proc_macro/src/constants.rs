@@ -426,6 +426,11 @@ pub const USE_FOR_GENERATED: LazyCell<ItemUse> = LazyCell::new(|| {
 });
 
 pub const PHANTOM_DATA_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("PhantomData"));
+pub const PHANTOM_DATA_PATH: LazyCell<Path> = LazyCell::new(|| {
+    let path_factory = &SERVICES.path_factory;
+    let result = path_factory.create(PHANTOM_DATA_IDENT.clone());
+    return result;
+});
 
 pub const DEFAULT_ARG_FIELD_LIFETIME_FIELD_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("_phantom_lifetime"));
@@ -492,7 +497,6 @@ pub const DEFAULT_ARG_FIELD_LIFETIME_GENERIC: LazyCell<Generics> = LazyCell::new
 });
 
 pub const DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE: LazyCell<FieldValue> = LazyCell::new(|| {
-    let path_factory = &SERVICES.path_factory;
     let field_value = FieldValue {
         attrs: Vec::new(),
         member: Member::Named(DEFAULT_ARG_FIELD_LIFETIME_FIELD_IDENT.clone()),
@@ -500,7 +504,7 @@ pub const DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE: LazyCell<FieldValue> = LazyCel
         expr: Expr::Path(ExprPath {
             attrs: Vec::new(),
             qself: None,
-            path: path_factory.create(PHANTOM_DATA_IDENT.clone()),
+            path: PHANTOM_DATA_PATH.clone(),
         }),
     };
     return field_value;
