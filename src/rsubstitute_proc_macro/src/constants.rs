@@ -528,3 +528,5 @@ pub const DEFAULT_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
     let result = path_factory.create(format_ident!("Default"));
     return result;
 });
+
+pub const DEFAULT_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("default"));

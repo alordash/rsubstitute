@@ -143,6 +143,10 @@ fn create_services() -> ServiceCollection {
         type_factory: type_factory.clone(),
         mock_constructor_block_generator: mock_constructor_block_generator.clone(),
     });
+    let mock_struct_default_impl_generator = Arc::new(MockStructDefaultImplGenerator {
+        type_factory: type_factory.clone(),
+        mock_constructor_block_generator: mock_constructor_block_generator.clone(),
+    });
     let input_args_generator = Arc::new(InputArgsGenerator {
         path_factory: path_factory.clone(),
         field_value_factory: field_value_factory.clone(),
@@ -235,6 +239,7 @@ fn create_services() -> ServiceCollection {
         mock_received_struct_generator: mock_received_struct_generator.clone(),
         mock_struct_generator: mock_struct_generator.clone(),
         send_sync_impls_generator: send_sync_impls_generator.clone(),
+        mock_struct_default_impl_generator: mock_struct_default_impl_generator.clone(),
         mock_setup_impl_generator: mock_setup_impl_generator.clone(),
         mock_received_impl_generator: mock_received_impl_generator.clone(),
         mod_generator: mod_generator.clone(),
