@@ -26,7 +26,6 @@ version = "0.1.0"
 dependencies = [
  "rsubstitute_core",
  "rsubstitute_proc_macro",
- "transient",
  "typeid",
 ]
 
@@ -45,12 +44,6 @@ dependencies = [
 ]
 
 [[package]]
-name = "rustversion"
-version = "1.0.22"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b39cdef0fa800fc44525c84ccb54a029961a8215f9619753635a9c0d2538d46d"
-
-[[package]]
 name = "syn"
 version = "2.0.111"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -59,48 +52,6 @@ dependencies = [
  "proc-macro2",
  "quote",
  "unicode-ident",
-]
-
-[[package]]
-name = "thiserror"
-version = "1.0.69"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "b6aaf5339b578ea85b50e080feb250a3e8ae8cfcdff9a461c9ec2904bc923f52"
-dependencies = [
- "thiserror-impl",
-]
-
-[[package]]
-name = "thiserror-impl"
-version = "1.0.69"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "4fee6c4efc90059e10f81e6d42c60a18f76588c3d74cb83a0b242a2b6c7504c1"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
-]
-
-[[package]]
-name = "transient"
-version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "cdb61be2bc3753cfec3ea4a16753bb98322be47dac7b910ee3170a5307ba9341"
-dependencies = [
- "rustversion",
- "transient-derive",
-]
-
-[[package]]
-name = "transient-derive"
-version = "0.4.1"
-source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "045931745df1346c58e3d822f81f07cabbb515e737613d5c93d3a77c13b66cd8"
-dependencies = [
- "proc-macro2",
- "quote",
- "syn",
- "thiserror",
 ]
 
 [[package]]

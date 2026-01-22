@@ -1,6 +1,8 @@
 #![allow(unused_variables)]
 #![allow(non_snake_case)]
 #![allow(unused)]
+#![allow(noop_method_call)]
+#![allow(suspicious_double_ref_op)]
 
 use rsubstitute_core::Times;
 use rsubstitute_core::args_matching::Arg;

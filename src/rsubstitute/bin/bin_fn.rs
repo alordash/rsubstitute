@@ -89,6 +89,21 @@ mod global {
     unsafe impl Send for globalMock {}
     unsafe impl Sync for globalMock {}
 
+    impl Default for globalMock {
+        fn default() -> Self {
+            let data = Arc::new(globalData {
+                _phantom_lifetime: PhantomData,
+                base_caller: Arc::new(RefCell::new(globalBaseCaller)),
+                global_data: FnData::new("global", &SERVICES),
+            });
+            return globalMock {
+                setup: globalSetup { data: data.clone() },
+                received: globalReceived { data: data.clone() },
+                data,
+            };
+        }
+    }
+
     impl<'a> globalSetup<'a> {
         pub fn setup(
             &'a self,
@@ -125,22 +140,6 @@ mod global {
         }
     }
 
-    thread_local! {
-        #[allow(non_upper_case_globals)]
-        static global_MOCK: LazyLock<globalMock> = LazyLock::new(|| {
-            let data = Arc::new(globalData {
-                _phantom_lifetime: PhantomData,
-                base_caller: Arc::new(RefCell::new(globalBaseCaller)),
-                global_data: FnData::new("global", &SERVICES),
-            });
-            return globalMock {
-                setup: globalSetup { data: data.clone() },
-                received: globalReceived { data: data.clone() },
-                data,
-            };
-        });
-    }
-
     pub fn setup(
         number: Arg<'static, i32>,
     ) -> SharedFnConfig<
@@ -151,11 +150,11 @@ mod global {
         globalSetup<'static>,
         globalBaseCaller,
     > {
-        return global_MOCK.as_static().setup.setup(number);
+        return get_mock::<globalMock>().setup.setup(number);
     }
 
     pub fn received(number: Arg<'static, i32>, times: Times) -> &'static globalReceived<'static> {
-        return global_MOCK.as_static().received.received(number, times);
+        return get_mock::<globalMock>().received.received(number, times);
     }
 
     pub fn global(number: i32) -> String {
@@ -163,8 +162,7 @@ mod global {
             phantom_lifetime: PhantomData,
             number,
         };
-        return global_MOCK
-            .as_static()
+        return get_mock::<globalMock>()
             .data
             .global_data
             .handle_base_returning(call);
@@ -260,17 +258,18 @@ mod generic_fn {
     use std::collections::HashMap;
     use std::marker::PhantomData;
     use std::sync::{Arc, LazyLock};
-    use transient::{Any, Downcast, Transient};
 
-    #[derive(Transient)]
+    #[derive(Debug)]
     struct Mock<T> {
         _phantom_T: PhantomData<T>,
+        number: i32,
     }
 
     impl<T> Default for Mock<T> {
         fn default() -> Self {
             Self {
                 _phantom_T: PhantomData,
+                number: 332,
             }
         }
     }
@@ -286,9 +285,7 @@ mod generic_fn {
     }
 
     pub fn do_flex<T>(value: T) -> T {
-        let mock: *const Mock<T> = get_mock();
-        unsafe {
-            return (*mock).flex(value);
-        }
+        let mock: &Mock<T> = get_mock();
+        return mock.flex(value);
     }
 }

@@ -9,8 +9,7 @@ pub trait IMockData {
         if error_msgs.is_empty() {
             return;
         }
-        &SERVICES
-            .error_printer
-            .print_received_unexpected_calls_error(error_msgs);
+        let error_printer = &SERVICES.error_printer;
+        error_printer.print_received_unexpected_calls_error(error_msgs);
     }
 }

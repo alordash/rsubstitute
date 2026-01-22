@@ -318,21 +318,6 @@ pub const STRING_TYPE: LazyCell<Type> = LazyCell::new(|| {
     return result;
 });
 
-pub const STATIC_STR_TYPE: LazyCell<Type> = LazyCell::new(|| {
-    let path_factory = &SERVICES.path_factory;
-    let str_path = path_factory.create(format_ident!("str"));
-    let result = Type::Reference(TypeReference {
-        and_token: Default::default(),
-        lifetime: Some(STATIC_LIFETIME.clone()),
-        mutability: None,
-        elem: Box::new(Type::Path(TypePath {
-            qself: None,
-            path: str_path,
-        })),
-    });
-    return result;
-});
-
 // TODO - add tests to verify that ArgCheckResult ident is correct
 pub const VEC_OF_ARG_CHECK_RESULT_TYPE: LazyCell<Type> = LazyCell::new(|| {
     let type_factory = &SERVICES.type_factory;

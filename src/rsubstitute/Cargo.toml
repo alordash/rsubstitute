@@ -19,4 +19,3 @@ path = "bin/bin_fn.rs"
 rsubstitute_core = { workspace = true }
 rsubstitute_proc_macro = { workspace = true }
 typeid = "1.0.3"    # TODO - remove, it's for bin testing only
-transient = "0.4.1"
