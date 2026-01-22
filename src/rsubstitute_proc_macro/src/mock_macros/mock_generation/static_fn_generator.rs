@@ -12,7 +12,7 @@ pub trait IStaticFnGenerator {
     fn generate(
         &self,
         fn_info: &FnInfo,
-        static_mock: &StaticMock,
+        mock_struct: &MockStruct,
         mock_generics: &MockGenerics,
     ) -> StaticFn;
 }
@@ -26,7 +26,7 @@ impl IStaticFnGenerator for StaticFnGenerator {
     fn generate(
         &self,
         fn_info: &FnInfo,
-        static_mock: &StaticMock,
+        mock_struct: &MockStruct,
         mock_generics: &MockGenerics,
     ) -> StaticFn {
         let mut generics = mock_generics.impl_generics.clone();
@@ -63,7 +63,7 @@ impl IStaticFnGenerator for StaticFnGenerator {
         };
         let block = self
             .mock_fn_block_generator
-            .generate_for_static(fn_info, static_mock);
+            .generate_for_static(fn_info, mock_struct);
         let item_fn = ItemFn {
             attrs: Vec::new(),
             vis: Visibility::Public(Default::default()),

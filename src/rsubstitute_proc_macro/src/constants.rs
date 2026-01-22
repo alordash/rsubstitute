@@ -518,8 +518,13 @@ pub const CLONE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("clone")
 
 pub const RESET_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("reset"));
 
-pub const THREAD_LOCAL_MACROS_IDENT: LazyCell<Ident> =
-    LazyCell::new(|| format_ident!("thread_local"));
-
 pub const INTO_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Into"));
 pub const INTO_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("into"));
+
+pub const GET_GLOBAL_MOCK_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("get_global_mock"));
+
+pub const DEFAULT_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
+    let path_factory = &SERVICES.path_factory;
+    let result = path_factory.create(format_ident!("Default"));
+    return result;
+});

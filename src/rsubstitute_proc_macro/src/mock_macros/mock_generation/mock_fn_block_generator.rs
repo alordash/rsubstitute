@@ -1,9 +1,8 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::*;
 use crate::mock_macros::mock_generation::models::*;
-use crate::syntax::{
-    IExprMethodCallFactory, IFieldValueFactory, IPathFactory, IStdMemTransmuteExprFactory,
-};
+use crate::mock_macros::mock_generation::*;
+use crate::syntax::*;
 use quote::format_ident;
 use std::cell::LazyCell;
 use std::sync::Arc;
@@ -12,7 +11,7 @@ use syn::*;
 pub trait IMockFnBlockGenerator {
     fn generate_for_trait(&self, fn_info: &FnInfo) -> Block;
 
-    fn generate_for_static(&self, fn_info: &FnInfo, static_mock: &StaticMock) -> Block;
+    fn generate_for_static(&self, fn_info: &FnInfo, mock_struct: &MockStruct) -> Block;
 }
 
 pub(crate) struct MockFnBlockGenerator {
@@ -20,6 +19,7 @@ pub(crate) struct MockFnBlockGenerator {
     pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
     pub std_mem_transmute_expr_factory: Arc<dyn IStdMemTransmuteExprFactory>,
     pub field_value_factory: Arc<dyn IFieldValueFactory>,
+    pub get_global_mock_expr_generator: Arc<dyn IGetGlobalMockExprGenerator>,
 }
 
 impl IMockFnBlockGenerator for MockFnBlockGenerator {
@@ -34,12 +34,10 @@ impl IMockFnBlockGenerator for MockFnBlockGenerator {
         return block;
     }
 
-    fn generate_for_static(&self, fn_info: &FnInfo, static_mock: &StaticMock) -> Block {
-        let static_mock_expr = Expr::MethodCall(self.expr_method_call_factory.create(
-            vec![static_mock.item_static.ident.clone()],
-            constants::AS_STATIC_METHOD_IDENT.clone(),
-            vec![],
-        ));
+    fn generate_for_static(&self, fn_info: &FnInfo, mock_struct: &MockStruct) -> Block {
+        let static_mock_expr = self
+            .get_global_mock_expr_generator
+            .generate(&mock_struct.item_struct);
         let call_stmt = self.generate_call_stmt(fn_info);
         let last_stmt = self.generate_last_stmt(fn_info, ReturnAccessor::Static(static_mock_expr));
         let stmts = vec![call_stmt, last_stmt];

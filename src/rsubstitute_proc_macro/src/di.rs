@@ -118,11 +118,15 @@ fn create_services() -> ServiceCollection {
     let std_mem_transmute_expr_factory = Arc::new(StdMemTransmuteExprFactory {
         path_factory: path_factory.clone(),
     });
+    let get_global_mock_expr_generator = Arc::new(GetGlobalMockExprGenerator {
+        type_factory: type_factory.clone(),
+    });
     let mock_fn_block_generator = Arc::new(MockFnBlockGenerator {
         path_factory: path_factory.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
         std_mem_transmute_expr_factory: std_mem_transmute_expr_factory.clone(),
         field_value_factory: field_value_factory.clone(),
+        get_global_mock_expr_generator: get_global_mock_expr_generator.clone(),
     });
     let mock_trait_impl_generator = Arc::new(MockTraitImplGenerator {
         path_factory: path_factory.clone(),
@@ -171,11 +175,6 @@ fn create_services() -> ServiceCollection {
         input_args_generator: input_args_generator.clone(),
         received_signature_generator: received_signature_generator.clone(),
     });
-    let static_mock_generator = Arc::new(StaticMockGenerator {
-        type_factory: type_factory.clone(),
-        path_factory: path_factory.clone(),
-        mock_constructor_block_generator: mock_constructor_block_generator.clone(),
-    });
     let mod_generator = Arc::new(ModGenerator {
         path_factory: path_factory.clone(),
     });
@@ -195,10 +194,14 @@ fn create_services() -> ServiceCollection {
         input_args_generator: input_args_generator.clone(),
         setup_output_generator: setup_output_generator.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
+        local_factory: local_factory.clone(),
+        path_factory: path_factory.clone(),
+        get_global_mock_expr_generator: get_global_mock_expr_generator.clone(),
     });
     let fn_received_generator = Arc::new(FnReceivedGenerator {
         received_signature_generator: received_signature_generator.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
+        get_global_mock_expr_generator: get_global_mock_expr_generator.clone(),
     });
     let static_fn_generator = Arc::new(StaticFnGenerator {
         mock_fn_block_generator: mock_fn_block_generator.clone(),
@@ -234,7 +237,6 @@ fn create_services() -> ServiceCollection {
         send_sync_impls_generator: send_sync_impls_generator.clone(),
         mock_setup_impl_generator: mock_setup_impl_generator.clone(),
         mock_received_impl_generator: mock_received_impl_generator.clone(),
-        static_mock_generator: static_mock_generator.clone(),
         mod_generator: mod_generator.clone(),
         fn_setup_generator: fn_setup_generator.clone(),
         fn_received_generator: fn_received_generator.clone(),

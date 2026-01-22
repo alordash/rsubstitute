@@ -1,10 +1,10 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::*;
-use crate::mock_macros::mock_generation::models::{
-    BaseCallerStruct, MockGenerics, MockSetupStruct, StaticMock,
-};
+use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::mock_generation::*;
 use crate::syntax::*;
+use quote::format_ident;
+use std::cell::LazyCell;
 use std::sync::Arc;
 use syn::*;
 
@@ -12,7 +12,7 @@ pub trait IFnSetupGenerator {
     fn generate(
         &self,
         fn_info: &FnInfo,
-        static_mock: &StaticMock,
+        mock_struct: &MockStruct,
         mock_setup_struct: &MockSetupStruct,
         base_caller_struct: &BaseCallerStruct,
         mock_generics: &MockGenerics,
@@ -23,13 +23,16 @@ pub(crate) struct FnSetupGenerator {
     pub input_args_generator: Arc<dyn IInputArgsGenerator>,
     pub setup_output_generator: Arc<dyn ISetupOutputGenerator>,
     pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
+    pub local_factory: Arc<dyn ILocalFactory>,
+    pub path_factory: Arc<dyn IPathFactory>,
+    pub get_global_mock_expr_generator: Arc<dyn IGetGlobalMockExprGenerator>,
 }
 
 impl IFnSetupGenerator for FnSetupGenerator {
     fn generate(
         &self,
         fn_info: &FnInfo,
-        static_mock: &StaticMock,
+        mock_struct: &MockStruct,
         mock_setup_struct: &MockSetupStruct,
         base_caller_struct: &BaseCallerStruct,
         mock_generics: &MockGenerics,
@@ -58,7 +61,7 @@ impl IFnSetupGenerator for FnSetupGenerator {
             variadic: None,
             output,
         };
-        let block = self.generate_fn_setup_block(static_mock, fn_info, phantom_types_count);
+        let block = self.generate_fn_setup_block(fn_info, mock_struct, phantom_types_count);
         let item_fn = ItemFn {
             attrs: Vec::new(),
             vis: Visibility::Public(Default::default()),
@@ -70,20 +73,32 @@ impl IFnSetupGenerator for FnSetupGenerator {
 }
 
 impl FnSetupGenerator {
+    const MOCK_VAR_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("mock"));
+
     fn generate_fn_setup_block(
         &self,
-        static_mock: &StaticMock,
         fn_info: &FnInfo,
+        mock_struct: &MockStruct,
         phantom_types_count: usize,
     ) -> Block {
-        let static_mock_expr = Expr::MethodCall(self.expr_method_call_factory.create(
-            vec![static_mock.item_static.ident.clone()],
-            constants::AS_STATIC_METHOD_IDENT.clone(),
-            vec![],
-        ));
+        let mock_var_stmt = Stmt::Local(
+            self.local_factory.create(
+                Self::MOCK_VAR_IDENT.clone(),
+                LocalInit {
+                    eq_token: Default::default(),
+                    expr: Box::new(self.get_global_mock_expr_generator.generate(&mock_struct.item_struct)),
+                    diverge: None,
+                },
+            ),
+        );
+        let mock_var_expr = Expr::Path(ExprPath {
+            attrs: Vec::new(),
+            qself: None,
+            path: self.path_factory.create(Self::MOCK_VAR_IDENT.clone()),
+        });
         let reset_stmt = Stmt::Expr(
             Expr::MethodCall(self.expr_method_call_factory.create_with_base_receiver(
-                static_mock_expr.clone(),
+                mock_var_expr.clone(),
                 vec![
                     constants::DATA_IDENT.clone(),
                     fn_info.data_field_ident.clone(),
@@ -99,7 +114,7 @@ impl FnSetupGenerator {
                 return_token: Default::default(),
                 expr: Some(Box::new(Expr::MethodCall(
                     self.expr_method_call_factory.create_with_base_receiver(
-                        static_mock_expr,
+                        mock_var_expr.clone(),
                         vec![constants::MOCK_SETUP_FIELD_IDENT.clone()],
                         constants::MOCK_SETUP_FIELD_IDENT.clone(),
                         fn_info
@@ -115,7 +130,7 @@ impl FnSetupGenerator {
             }),
             Some(Default::default()),
         );
-        let stmts = vec![reset_stmt, return_stmt];
+        let stmts = vec![mock_var_stmt, reset_stmt, return_stmt];
         let block = Block {
             brace_token: Default::default(),
             stmts,

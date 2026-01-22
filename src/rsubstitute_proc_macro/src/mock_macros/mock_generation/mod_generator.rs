@@ -37,7 +37,6 @@ pub trait IModGenerator {
         send_sync_impls: SendSyncImpls,
         mock_setup_impl: MockSetupImpl,
         mock_received_impl: MockReceivedImpl,
-        static_mock: StaticMock,
         fn_setup: ItemFn,
         fn_received: ItemFn,
         static_fn: StaticFn,
@@ -134,7 +133,6 @@ impl IModGenerator for ModGenerator {
         send_sync_impls: SendSyncImpls,
         mock_setup_impl: MockSetupImpl,
         mock_received_impl: MockReceivedImpl,
-        static_mock: StaticMock,
         fn_setup: ItemFn,
         fn_received: ItemFn,
         static_fn: StaticFn,
@@ -145,19 +143,6 @@ impl IModGenerator for ModGenerator {
             constants::USE_SUPER.clone(),
             constants::USE_FOR_GENERATED.clone(),
         ];
-        let thread_local_static_mock = ItemMacro {
-            attrs: Vec::new(),
-            ident: None,
-            mac: Macro {
-                path: self
-                    .path_factory
-                    .create(constants::THREAD_LOCAL_MACROS_IDENT.clone()),
-                bang_token: Default::default(),
-                delimiter: MacroDelimiter::Brace(Default::default()),
-                tokens: static_mock.item_static.to_token_stream(),
-            },
-            semi_token: None,
-        };
         let items = usings
             .into_iter()
             .map(|x| Item::Use(x))
@@ -177,7 +162,6 @@ impl IModGenerator for ModGenerator {
                 Item::Impl(send_sync_impls.sync_impl),
                 Item::Impl(mock_setup_impl.item_impl),
                 Item::Impl(mock_received_impl.item_impl),
-                Item::Macro(thread_local_static_mock),
                 Item::Fn(fn_setup),
                 Item::Fn(fn_received),
                 Item::Fn(static_fn.item_fn),

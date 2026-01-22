@@ -16,7 +16,7 @@ thread_local! {
     pub static GLOBAL_MOCKS_MAP: LazyLock<GlobalMocksMap> = LazyLock::new(Default::default);
 }
 
-pub fn get_mock<'a, T: Default + ?Sized>() -> &'a T {
+pub fn get_global_mock<'a, T: Default + ?Sized>() -> &'a T {
     let ref_map = &GLOBAL_MOCKS_MAP.as_static().map;
     let mut map = ref_map.borrow_mut();
 
