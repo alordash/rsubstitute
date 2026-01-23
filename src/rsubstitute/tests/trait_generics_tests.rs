@@ -4,10 +4,9 @@ use rsubstitute::macros::mock;
 trait Trait<T1, T2> {
     fn get_return(&self, value: T1) -> T1;
 
-    // TODO - add support and write test for it
-    // fn return_where_constraint(&self) -> T1
-    // where
-    //     T1: Default;
+    fn return_where_constraint(&self) -> T1
+    where
+        T1: Default;
 
     fn get_return_different(&self, value: T1) -> T2;
 }
@@ -80,6 +79,35 @@ mod trait_generic_tests {
 
             mock.received
                 .get_return(accepted_value, Times::Once)
+                .no_other_calls();
+        }
+    }
+
+    mod return_where_constraint_tests {
+        use super::*;
+
+        #[test]
+        fn return_where_constraint_Ok() {
+            // Arrange
+            let mock = TraitMock::<_, ()>::new();
+
+            #[derive(Clone, PartialOrd, PartialEq, Debug, Default)]
+            struct Foo {
+                number: i32,
+            }
+
+            let returned_value = Foo { number: 100 };
+            mock.setup
+                .return_where_constraint()
+                .returns(returned_value.clone());
+
+            // Act
+            let actual_returned_value = mock.return_where_constraint();
+
+            // Assert
+            assert_eq!(returned_value, actual_returned_value);
+            mock.received
+                .return_where_constraint(Times::Once)
                 .no_other_calls();
         }
     }
