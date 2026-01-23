@@ -414,6 +414,20 @@ accept_value(*{first_value}*)
             assert_eq!(second_value, actual_second_value);
             assert_eq!(second_value, actual_third_value);
         }
+
+        #[test]
+        fn return_value_NoMatchingConfiguration_PanicsOk() {
+            // Arrange
+            let mock = TraitMock::new();
+            let first_value = 10;
+
+            // Act
+            // Assert
+            assert_panics(
+                || mock.return_value(),
+                "No fn configuration found for this call! TODO: write call description",
+            );
+        }
     }
 
     mod accept_value_return_value_tests {

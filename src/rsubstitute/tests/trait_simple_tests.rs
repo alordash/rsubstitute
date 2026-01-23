@@ -70,7 +70,7 @@ mod tests {
     }
 
     #[test]
-    fn fn_MultipleTimes_PanicsOk() {
+    fn f_MultipleTimes_PanicsOk() {
         // Arrange
         let mock = TraitMock::new();
 
