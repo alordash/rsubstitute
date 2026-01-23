@@ -214,5 +214,28 @@ mod tests {
             get_return_different::received::<_, Vec<i32>>(second_accepted_number, Times::Once)
                 .no_other_calls();
         }
+
+        #[test]
+        fn get_return_different_CallBase_Ok() {
+            // Arrange
+            let first_accepted_number = 10;
+            get_return_different::setup::<i32, String>(Arg::Is(|x| x == first_accepted_number))
+                .call_base();
+
+            let second_accepted_number = 20;
+            get_return_different::setup::<i32, Vec<i32>>(second_accepted_number).call_base();
+
+            // Act
+            let actual_returned_string: String = get_return_different(first_accepted_number);
+            let actual_returned_vec: Vec<i32> = get_return_different(second_accepted_number);
+
+            // Assert
+            assert_eq!(String::default(), actual_returned_string);
+            assert_eq!(Vec::<i32>::default(), actual_returned_vec);
+            get_return_different::received::<_, String>(first_accepted_number, Times::Once)
+                .no_other_calls();
+            get_return_different::received::<_, Vec<i32>>(second_accepted_number, Times::Once)
+                .no_other_calls();
+        }
     }
 }
