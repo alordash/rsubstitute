@@ -4,6 +4,7 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::sync::LazyLock;
 
+// Used for storing static functions' mocks instances.
 #[derive(Default)]
 struct GlobalMocksMap {
     pub map: RefCell<HashMap<TypeId, *const ()>>,

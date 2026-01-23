@@ -93,7 +93,7 @@ impl<
         let matching_calls_count = matching_calls.len();
         let valid = times.matches(matching_calls_count);
         if !valid {
-            self.error_printer.print_received_verification_error(
+            self.error_printer.panic_received_verification_error(
                 self.fn_name,
                 &args_checker,
                 matching_calls,

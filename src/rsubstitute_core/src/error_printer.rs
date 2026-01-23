@@ -2,7 +2,7 @@ use crate::Times;
 use crate::args_matching::{ArgCheckResult, ArgInfo, IArgsFormatter};
 
 pub trait IErrorPrinter {
-    fn print_received_verification_error(
+    fn panic_received_verification_error(
         &self,
         fn_name: &'static str,
         args_formatter: &dyn IArgsFormatter,
@@ -11,19 +11,21 @@ pub trait IErrorPrinter {
         times: Times,
     ) -> !;
 
+    fn panic_no_suitable_fn_configuration_found(&self) -> !;
+
     fn format_received_unexpected_call_error(
         &self,
         fn_name: &'static str,
         unexpected_call: Vec<ArgInfo>,
     ) -> String;
 
-    fn print_received_unexpected_calls_error(&self, error_msgs: Vec<String>) -> !;
+    fn panic_received_unexpected_calls_error(&self, error_msgs: Vec<String>) -> !;
 }
 
 pub(crate) struct ErrorPrinter;
 
 impl IErrorPrinter for ErrorPrinter {
-    fn print_received_verification_error(
+    fn panic_received_verification_error(
         &self,
         fn_name: &'static str,
         args_formatter: &dyn IArgsFormatter,
@@ -82,6 +84,10 @@ impl IErrorPrinter for ErrorPrinter {
         panic!("{error_msg}");
     }
 
+    fn panic_no_suitable_fn_configuration_found(&self) -> ! {
+        todo!()
+    }
+
     fn format_received_unexpected_call_error(
         &self,
         fn_name: &'static str,
@@ -96,7 +102,7 @@ impl IErrorPrinter for ErrorPrinter {
         return error_msg;
     }
 
-    fn print_received_unexpected_calls_error(&self, error_msgs: Vec<String>) -> ! {
+    fn panic_received_unexpected_calls_error(&self, error_msgs: Vec<String>) -> ! {
         let unexpected_calls_count = error_msgs.len();
         let call_fmt = self.fmt_calls(unexpected_calls_count);
         let unexpected_calls_msgs: Vec<_> = error_msgs

@@ -10,6 +10,6 @@ pub trait IMockData {
             return;
         }
         let error_printer = &SERVICES.error_printer;
-        error_printer.print_received_unexpected_calls_error(error_msgs);
+        error_printer.panic_received_unexpected_calls_error(error_msgs);
     }
 }
