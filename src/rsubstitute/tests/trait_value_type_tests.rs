@@ -14,7 +14,6 @@ trait Trait {
 }
 
 mod tests {
-    #![allow(unused_variables)]
     #![allow(non_snake_case)]
     use super::*;
     use rsubstitute::assertions::assert_panics;
@@ -419,7 +418,6 @@ accept_value(*{first_value}*)
         fn return_value_NoMatchingConfiguration_PanicsOk() {
             // Arrange
             let mock = TraitMock::new();
-            let first_value = 10;
 
             // Act
             // Assert

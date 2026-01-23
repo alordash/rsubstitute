@@ -10,7 +10,6 @@ trait Trait {
 trait AnotherTestTrait {}
 
 mod tests {
-    #![allow(unused_variables)]
     #![allow(non_snake_case)]
 
     use super::*;

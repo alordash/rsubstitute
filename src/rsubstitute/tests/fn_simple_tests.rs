@@ -6,7 +6,6 @@ use std::sync::Arc;
 fn f() {}
 
 mod tests {
-    #![allow(unused_variables)]
     #![allow(non_snake_case)]
     use super::*;
     use rsubstitute::assertions::assert_panics;

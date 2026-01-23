@@ -40,7 +40,6 @@ fn accept_two_values_return_value(v1: i32, v2: f32) -> &'static str {
 }
 
 mod tests {
-    #![allow(unused_variables)]
     #![allow(non_snake_case)]
     use super::*;
     use rsubstitute::assertions::assert_panics;

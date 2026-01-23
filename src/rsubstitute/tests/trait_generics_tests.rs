@@ -4,11 +4,15 @@ use rsubstitute::macros::mock;
 trait Trait<T1, T2> {
     fn get_return(&self, value: T1) -> T1;
 
+    // TODO - add support and write test for it
+    // fn return_where_constraint(&self) -> T1
+    // where
+    //     T1: Default;
+
     fn get_return_different(&self, value: T1) -> T2;
 }
 
 mod trait_generic_tests {
-    #![allow(unused_variables)]
     #![allow(non_snake_case)]
     use super::*;
     use rsubstitute::*;

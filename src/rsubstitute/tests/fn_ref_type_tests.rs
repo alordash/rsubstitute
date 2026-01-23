@@ -33,7 +33,6 @@ fn accept_two_refs_return_ref(r1: &i32, r2: &f32) -> &'static str {
 }
 
 mod tests {
-    #![allow(unused_variables)]
     #![allow(non_snake_case)]
     use super::*;
     use rsubstitute::assertions::assert_panics;
