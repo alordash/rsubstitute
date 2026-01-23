@@ -179,9 +179,7 @@ fn create_services() -> ServiceCollection {
         input_args_generator: input_args_generator.clone(),
         received_signature_generator: received_signature_generator.clone(),
     });
-    let mod_generator = Arc::new(ModGenerator {
-        path_factory: path_factory.clone(),
-    });
+    let mod_generator = Arc::new(ModGenerator);
 
     let derive_args_formatter_macro_handler = Arc::new(DeriveArgsFormatterMacroHandler {
         path_factory: path_factory.clone(),

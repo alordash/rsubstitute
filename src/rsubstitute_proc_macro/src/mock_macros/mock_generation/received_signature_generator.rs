@@ -119,7 +119,7 @@ impl ReceivedSignatureGenerator {
         }
         let generics = match mock_generics_usage {
             MockGenericsUsage::JustGetPhantomTypesCount(_) => Generics::default(),
-            MockGenericsUsage::UseAsGenerics(mock_generics) => mock_generics.source_generics.clone(),
+            MockGenericsUsage::UseAsGenerics(mock_generics) => mock_generics.impl_generics.clone(),
         };
         let signature = Signature {
             constness: None,

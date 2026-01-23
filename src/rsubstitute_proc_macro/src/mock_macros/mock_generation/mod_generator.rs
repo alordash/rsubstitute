@@ -1,11 +1,9 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::FnInfo;
 use crate::mock_macros::mock_generation::models::*;
-use crate::syntax::IPathFactory;
 use proc_macro2::Ident;
-use quote::{ToTokens, format_ident};
+use quote::format_ident;
 use std::cell::LazyCell;
-use std::sync::Arc;
 use syn::*;
 
 pub trait IModGenerator {
@@ -44,9 +42,7 @@ pub trait IModGenerator {
     ) -> GeneratedMod;
 }
 
-pub(crate) struct ModGenerator {
-    pub path_factory: Arc<dyn IPathFactory>,
-}
+pub(crate) struct ModGenerator;
 
 impl IModGenerator for ModGenerator {
     fn generate_trait(

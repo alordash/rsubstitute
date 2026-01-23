@@ -197,9 +197,9 @@ pub const ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE: LazyCell<Attribute> = LazyCell::
     return result;
 });
 
-pub const ALLOW_NON_UPPER_CASE_GLOBALS_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+pub const ALLOW_NON_SNAKE_CASE_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     let attribute_factory = &SERVICES.attribute_factory;
-    let result = attribute_factory.create(ALLOW_IDENT.clone(), "non_upper_case_globals");
+    let result = attribute_factory.create(ALLOW_IDENT.clone(), "non_snake_case");
     return result;
 });
 
@@ -510,9 +510,7 @@ pub const OPTION_SOME_PATH: LazyCell<Path> = LazyCell::new(|| {
 pub const SEND_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Send"));
 pub const SYNC_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Sync"));
 
-pub const LAZY_LOCK_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("LazyLock"));
 pub const BASE_CALLER_FIELD_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("base_caller"));
-pub const AS_STATIC_METHOD_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("as_static"));
 
 pub const CLONE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("clone"));
 
@@ -521,7 +519,8 @@ pub const RESET_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("reset")
 pub const INTO_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Into"));
 pub const INTO_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("into"));
 
-pub const GET_GLOBAL_MOCK_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("get_global_mock"));
+pub const GET_GLOBAL_MOCK_FN_IDENT: LazyCell<Ident> =
+    LazyCell::new(|| format_ident!("get_global_mock"));
 
 pub const DEFAULT_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
     let path_factory = &SERVICES.path_factory;

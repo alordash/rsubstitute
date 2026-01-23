@@ -1,8 +1,6 @@
-#![allow(unused_variables)]
-#![allow(non_snake_case)]
 #![allow(unused)]
 
-use rsubstitute_proc_macro::mock;
+use rsubstitute::macros::mock;
 use std::fmt::Debug;
 use std::sync::Arc;
 
@@ -23,24 +21,32 @@ trait MyTrait {
     ) -> Vec<u8>;
 }
 
-use rsubstitute::*;
+mod tests {
+    #![allow(unused_variables)]
+    #![allow(non_snake_case)]
+    use super::*;
+    use rsubstitute::*;
 
-#[test]
-fn work() {
-    let my_trait_mock = MyTraitMock::new();
-    my_trait_mock
-        .setup
-        .work(Arg::Any)
-        .does(|| println!("work 1"));
+    #[test]
+    fn work() {
+        let my_trait_mock = MyTraitMock::new();
+        my_trait_mock
+            .setup
+            .work(Arg::Any)
+            .does(|| println!("work 1"));
 
-    my_trait_mock.work(20);
+        my_trait_mock.work(20);
 
-    my_trait_mock.received.work(Arg::Eq(20), Times::Once).no_other_calls();
-}
+        my_trait_mock
+            .received
+            .work(Arg::Eq(20), Times::Once)
+            .no_other_calls();
+    }
 
-#[test]
-#[cfg(test)]
-fn another_work() {
-    let my_trait_mock = MyTraitMock::new();
-    // my_trait_mock.another_work(Arg::Any);
+    #[test]
+    #[cfg(test)]
+    fn another_work() {
+        let my_trait_mock = MyTraitMock::new();
+        // my_trait_mock.another_work(Arg::Any);
+    }
 }

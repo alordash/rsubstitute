@@ -14,7 +14,10 @@ impl IBaseCallerStructGenerator for BaseCallerStructGenerator {
     fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> BaseCallerStruct {
         let ident = format_ident!("{}{}", fn_decl.ident, Self::IDENT_SUFFIX);
         let item_struct = ItemStruct {
-            attrs: vec![constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone()],
+            attrs: vec![
+                constants::ALLOW_NON_SNAKE_CASE_ATTRIBUTE.clone(),
+                constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone(),
+            ],
             vis: Visibility::Public(Default::default()),
             struct_token: Default::default(),
             ident,

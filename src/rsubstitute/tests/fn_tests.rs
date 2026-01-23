@@ -1,6 +1,3 @@
-#![allow(unused_variables)]
-#![allow(non_snake_case)]
-
 use rsubstitute::macros::mock;
 
 #[mock]
@@ -14,9 +11,10 @@ fn g(number: i32) -> String {
 }
 
 mod tests {
-    use crate::{f, g};
-    use rsubstitute_core::Times;
-    use rsubstitute_core::args_matching::Arg;
+    #![allow(unused_variables)]
+    #![allow(non_snake_case)]
+    use super::*;
+    use rsubstitute::*;
 
     #[test]
     fn f_Ok() {

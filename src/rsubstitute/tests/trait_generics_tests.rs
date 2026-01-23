@@ -1,7 +1,4 @@
-#![allow(unused_variables)]
-#![allow(non_snake_case)]
-
-use rsubstitute_proc_macro::mock;
+use rsubstitute::macros::mock;
 
 #[mock]
 trait Trait<T1, T2> {
@@ -11,8 +8,10 @@ trait Trait<T1, T2> {
 }
 
 mod trait_generic_tests {
+    #![allow(unused_variables)]
+    #![allow(non_snake_case)]
     use super::*;
-    use rsubstitute_core::Times;
+    use rsubstitute::*;
 
     #[test]
     fn work_first_type_i32_Ok() {
@@ -28,7 +27,9 @@ mod trait_generic_tests {
         // Assert
         assert_eq!(returned_value, actual_returned_value);
 
-        mock.received.work(accepted_value, Times::Once).no_other_calls();
+        mock.received
+            .work(accepted_value, Times::Once)
+            .no_other_calls();
     }
 
     #[test]
@@ -45,7 +46,9 @@ mod trait_generic_tests {
         // Assert
         assert_eq!(returned_value, actual_returned_value);
 
-        mock.received.work(accepted_value, Times::Once).no_other_calls();
+        mock.received
+            .work(accepted_value, Times::Once)
+            .no_other_calls();
     }
 
     #[test]
@@ -62,7 +65,9 @@ mod trait_generic_tests {
         // Assert
         assert_eq!(returned_value, actual_returned_value);
 
-        mock.received.work(accepted_value, Times::Once).no_other_calls();
+        mock.received
+            .work(accepted_value, Times::Once)
+            .no_other_calls();
     }
 
     #[test]
