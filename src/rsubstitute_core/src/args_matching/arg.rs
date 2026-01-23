@@ -5,23 +5,23 @@ use std::sync::Arc;
 
 struct Private;
 
-pub enum Arg<'a, T> {
+pub enum Arg<T> {
     Any,
     Eq(T),
     NotEq(T),
     // Private for cleaner API: just pass closure without having to box or reference it.
     #[allow(private_interfaces)]
     #[doc(hidden)]
-    PrivateIs(&'a dyn Fn(T) -> bool, Private),
+    PrivateIs(Box<dyn Fn(T) -> bool>, Private),
 }
 
-impl<'a, T> From<T> for Arg<'a, T> {
+impl<T> From<T> for Arg<T> {
     fn from(value: T) -> Self {
         Self::Eq(value)
     }
 }
 
-impl<'a, T: Debug> Debug for Arg<'a, T> {
+impl<T: Debug> Debug for Arg<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         // TODO - extract to const field when std::any::type_name becomes stabilized as const fn
         // https://github.com/rust-lang/rust/issues/63084
@@ -37,16 +37,21 @@ impl<'a, T: Debug> Debug for Arg<'a, T> {
     }
 }
 
-impl<'a, T> Arg<'a, T> {
+impl<T> Arg<T> {
     #[allow(non_snake_case)] // beautify API ✨
-    pub fn Is(predicate: impl Fn(T) -> bool + 'a) -> Self {
-        let reference = Box::leak(Box::new(predicate));
-        return Self::PrivateIs(reference, Private);
+    pub fn Is<'a, TFn: Fn(T) -> bool + 'a>(predicate: TFn) -> Self {
+        let reference = Box::new(predicate) as Box<dyn Fn(T) -> bool + 'a>;
+        let static_reference: Box<dyn Fn(T) -> bool + 'static> =
+            unsafe { std::mem::transmute(reference) };
+        return Self::PrivateIs(static_reference, Private);
     }
 }
 
-impl<'a, T: Debug + PartialOrd + Clone + 'a> Arg<'a, T> {
-    pub fn check(&self, arg_name: &'static str, actual_value: T) -> ArgCheckResult<'a> {
+impl<T: Debug + PartialOrd + Clone> Arg<T> {
+    pub fn check<'a>(&self, arg_name: &'static str, actual_value: T) -> ArgCheckResult<'a>
+    where
+        T: 'a,
+    {
         let arg_info = ArgInfo::new(arg_name, actual_value.clone());
         match self {
             Arg::Eq(expected_value) => {
@@ -84,7 +89,7 @@ impl<'a, T: Debug + PartialOrd + Clone + 'a> Arg<'a, T> {
     }
 }
 
-impl<'a, T: Debug + ?Sized> Arg<'a, &'a T> {
+impl<'a, T: Debug + ?Sized> Arg<&'a T> {
     pub fn check_ref(&self, arg_name: &'static str, actual_value: &'a T) -> ArgCheckResult<'a> {
         let arg_info = ArgInfo::new(arg_name, actual_value);
         let actual_ptr = std::ptr::from_ref(actual_value);
@@ -127,8 +132,11 @@ impl<'a, T: Debug + ?Sized> Arg<'a, &'a T> {
     }
 }
 
-impl<'a, T: Debug + ?Sized + 'a> Arg<'a, Rc<T>> {
-    pub fn check_rc(&self, arg_name: &'static str, actual_value: Rc<T>) -> ArgCheckResult<'a> {
+impl<T: Debug + ?Sized> Arg<Rc<T>> {
+    pub fn check_rc<'a>(&self, arg_name: &'static str, actual_value: Rc<T>) -> ArgCheckResult<'a>
+    where
+        T: 'a,
+    {
         let arg_info = ArgInfo::new(arg_name, actual_value.clone());
         let actual_ptr = Rc::as_ptr(&actual_value);
         match self {
@@ -171,8 +179,11 @@ impl<'a, T: Debug + ?Sized + 'a> Arg<'a, Rc<T>> {
     }
 }
 
-impl<'a, T: Debug + ?Sized + 'a> Arg<'a, Arc<T>> {
-    pub fn check_arc(&self, arg_name: &'static str, actual_value: Arc<T>) -> ArgCheckResult<'a> {
+impl<T: Debug + ?Sized> Arg<Arc<T>> {
+    pub fn check_arc<'a>(&self, arg_name: &'static str, actual_value: Arc<T>) -> ArgCheckResult<'a>
+    where
+        T: 'a,
+    {
         let arg_info = ArgInfo::new(arg_name, actual_value.clone());
         let actual_ptr = Arc::as_ptr(&actual_value);
         match self {

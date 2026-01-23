@@ -70,7 +70,7 @@ mod generated {
     #[derive(Debug, IArgsFormatter)]
     pub struct work_ArgsChecker<'a> {
         phantom_lifetime: PhantomData<&'a ()>,
-        pub value: Arg<'a, i32>,
+        pub value: Arg<i32>,
     }
 
     impl<'a> IArgsChecker<work_Call<'a>> for work_ArgsChecker<'a> {
@@ -104,10 +104,10 @@ mod generated {
     #[derive(Debug, IArgsFormatter)]
     pub struct another_work_ArgsChecker<'a> {
         phantom_lifetime: PhantomData<&'a ()>,
-        pub string: Arg<'a, &'a str>,
-        pub something: Arg<'a, &'a &'a [u8]>,
-        pub dyn_obj: Arg<'a, &'a dyn IFoo>,
-        pub arc: Arg<'a, Arc<dyn IFoo>>,
+        pub string: Arg<&'a str>,
+        pub something: Arg<&'a &'a [u8]>,
+        pub dyn_obj: Arg<&'a dyn IFoo>,
+        pub arc: Arg<Arc<dyn IFoo>>,
     }
 
     impl<'a> IArgsChecker<another_work_Call<'a>> for another_work_ArgsChecker<'a> {
@@ -162,7 +162,7 @@ mod generated {
     #[derive(Debug, IArgsFormatter)]
     pub struct standalone_ArgsChecker<'a> {
         phantom_lifetime: PhantomData<&'a ()>,
-        number: Arg<'a, i32>,
+        number: Arg<i32>,
     }
 
     impl<'a> IArgsChecker<standalone_Call<'a>> for standalone_ArgsChecker<'a> {
@@ -262,7 +262,7 @@ mod generated {
     impl<'a> MyTraitMockSetup<'a> {
         pub fn work(
             &'a self,
-            value: impl Into<Arg<'a, i32>>,
+            value: impl Into<Arg<i32>>,
         ) -> SharedFnConfig<'a, work_Call<'a>, work_ArgsChecker<'a>, (), Self, ()> {
             let work_args_checker = work_ArgsChecker {
                 phantom_lifetime: PhantomData,
@@ -275,10 +275,10 @@ mod generated {
 
         pub fn another_work(
             &'a self,
-            string: impl Into<Arg<'a, &'a str>>,
-            something: impl Into<Arg<'a, &'a &'a [u8]>>,
-            dyn_obj: impl Into<Arg<'a, &'a dyn IFoo>>,
-            arc: impl Into<Arg<'a, Arc<dyn IFoo>>>,
+            string: impl Into<Arg<&'a str>>,
+            something: impl Into<Arg<&'a &'a [u8]>>,
+            dyn_obj: impl Into<Arg<&'a dyn IFoo>>,
+            arc: impl Into<Arg<Arc<dyn IFoo>>>,
         ) -> SharedFnConfig<
             'a,
             another_work_Call<'a>,
@@ -315,7 +315,7 @@ mod generated {
     }
 
     impl<'a> MyTraitMockReceived<'a> {
-        pub fn work(&'a self, value: impl Into<Arg<'a, i32>>, times: Times) -> &'a Self {
+        pub fn work(&'a self, value: impl Into<Arg<i32>>, times: Times) -> &'a Self {
             let work_args_checker = work_ArgsChecker {
                 phantom_lifetime: PhantomData,
                 value: value.into(),
@@ -328,10 +328,10 @@ mod generated {
 
         pub fn another_work(
             &'a self,
-            string: impl Into<Arg<'a, &'a str>>,
-            something: impl Into<Arg<'a, &'a &'a [u8]>>,
-            dyn_obj: impl Into<Arg<'a, &'a dyn IFoo>>,
-            arc: impl Into<Arg<'a, Arc<dyn IFoo>>>,
+            string: impl Into<Arg<&'a str>>,
+            something: impl Into<Arg<&'a &'a [u8]>>,
+            dyn_obj: impl Into<Arg<&'a dyn IFoo>>,
+            arc: impl Into<Arg<Arc<dyn IFoo>>>,
             times: Times,
         ) -> &'a Self {
             let another_work_args_checker = another_work_ArgsChecker {

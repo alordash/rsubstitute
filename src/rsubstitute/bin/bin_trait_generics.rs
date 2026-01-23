@@ -52,7 +52,7 @@ mod generated {
     pub struct work_ArgsChecker<'a, T: Debug + PartialOrd + Clone> {
         phantom_lifetime: PhantomData<&'a ()>,
         phantom_T: PhantomData<T>,
-        pub value: Arg<'a, T>,
+        pub value: Arg<T>,
     }
 
     impl<'a, T: Debug + PartialOrd + Clone> IArgsChecker<work_Call<'a, T>> for work_ArgsChecker<'a, T> {
@@ -80,7 +80,7 @@ mod generated {
     pub struct another_work_ArgsChecker<'a, T: Debug + PartialOrd + Clone> {
         phantom_lifetime: PhantomData<&'a ()>,
         phantom_T: PhantomData<T>,
-        pub string: Arg<'a, &'a str>,
+        pub string: Arg<&'a str>,
     }
 
     impl<'a, T: Debug + PartialOrd + Clone> IArgsChecker<another_work_Call<'a, T>>
@@ -199,7 +199,7 @@ mod generated {
     impl<'a, T: Debug + PartialOrd + Clone> MyTraitMockSetup<'a, T> {
         pub fn work(
             &'a self,
-            value: impl Into<Arg<'a, T>>,
+            value: impl Into<Arg<T>>,
         ) -> SharedFnConfig<'a, work_Call<'a, T>, work_ArgsChecker<'a, T>, (), Self, ()> {
             let work_args_checker = work_ArgsChecker {
                 phantom_lifetime: PhantomData,
@@ -213,7 +213,7 @@ mod generated {
 
         pub fn another_work(
             &'a self,
-            string: impl Into<Arg<'a, &'a str>>,
+            string: impl Into<Arg<&'a str>>,
         ) -> SharedFnConfig<
             'a,
             another_work_Call<'a, T>,
@@ -249,7 +249,7 @@ mod generated {
     }
 
     impl<'a, T: Debug + PartialOrd + Clone> MyTraitMockReceived<'a, T> {
-        pub fn work(&'a self, value: impl Into<Arg<'a, T>>, times: Times) -> &'a Self {
+        pub fn work(&'a self, value: impl Into<Arg<T>>, times: Times) -> &'a Self {
             let work_args_checker = work_ArgsChecker {
                 phantom_lifetime: PhantomData,
                 phantom_T: PhantomData,
@@ -263,7 +263,7 @@ mod generated {
 
         pub fn another_work(
             &'a self,
-            string: impl Into<Arg<'a, &'a str>>,
+            string: impl Into<Arg<&'a str>>,
             times: Times,
         ) -> &'a Self {
             let another_work_args_checker = another_work_ArgsChecker {

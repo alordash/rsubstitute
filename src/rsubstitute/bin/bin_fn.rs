@@ -44,7 +44,7 @@ mod global {
     #[derive(Debug, IArgsFormatter)]
     pub struct global_ArgsChecker<'a> {
         phantom_lifetime: PhantomData<&'a ()>,
-        pub number: Arg<'a, i32>,
+        pub number: Arg<i32>,
     }
 
     impl<'a> IArgsChecker<global_Call<'a>> for global_ArgsChecker<'a> {
@@ -107,7 +107,7 @@ mod global {
     impl<'a> globalSetup<'a> {
         pub fn setup(
             &'a self,
-            number: Arg<'a, i32>,
+            number: Arg<i32>,
         ) -> SharedFnConfig<
             'a,
             global_Call<'a>,
@@ -128,7 +128,7 @@ mod global {
     }
 
     impl<'a> globalReceived<'a> {
-        pub fn received(&'a self, number: Arg<'a, i32>, times: Times) -> &'a Self {
+        pub fn received(&'a self, number: Arg<i32>, times: Times) -> &'a Self {
             let global_args_checker = global_ArgsChecker {
                 phantom_lifetime: PhantomData,
                 number,
@@ -141,7 +141,7 @@ mod global {
     }
 
     pub fn setup(
-        number: Arg<'static, i32>,
+        number: Arg<i32>,
     ) -> SharedFnConfig<
         'static,
         global_Call<'static>,
@@ -153,8 +153,10 @@ mod global {
         return get_global_mock::<globalMock>().setup.setup(number);
     }
 
-    pub fn received(number: Arg<'static, i32>, times: Times) -> &'static globalReceived<'static> {
-        return get_global_mock::<globalMock>().received.received(number, times);
+    pub fn received(number: Arg<i32>, times: Times) -> &'static globalReceived<'static> {
+        return get_global_mock::<globalMock>()
+            .received
+            .received(number, times);
     }
 
     pub fn global(number: i32) -> String {
@@ -194,6 +196,8 @@ mod tests {
         // let result2_2 = global(143);
 
         // Assert
+        let expected_v = 2;
+        global::received(Arg::Is(|v| v == expected_v), Times::Once);
         global::received(Arg::Eq(2), Times::Once).received(Arg::Eq(143), Times::Exactly(1));
         // assert_eq!("MOCK: 2", result1);
         assert_eq!("actual number: 2", result1);
