@@ -48,7 +48,7 @@ mod global {
     }
 
     impl<'a> IArgsChecker<global_Call<'a>> for global_ArgsChecker<'a> {
-        fn check(&self, call: global_Call<'a>) -> Vec<ArgCheckResult<'_>> {
+        fn check(&self, call: global_Call<'a>) -> Vec<ArgCheckResult> {
             vec![self.number.check("number", call.number)]
         }
     }

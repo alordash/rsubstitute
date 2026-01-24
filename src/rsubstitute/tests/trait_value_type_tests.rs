@@ -423,7 +423,8 @@ accept_value(*{first_value}*)
             // Assert
             assert_panics(
                 || mock.return_value(),
-                "No fn configuration found for this call! TODO: write call description",
+                "Mock wasn't configured to handle following call:
+	return_value()",
             );
         }
     }

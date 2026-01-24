@@ -2,6 +2,7 @@ use crate::args_matching::*;
 use crate::call_info::CallInfo;
 use crate::di::ServiceCollection;
 use crate::error_printer::IErrorPrinter;
+use crate::matching_config_search_result::*;
 use crate::*;
 use std::cell::RefCell;
 use std::sync::Arc;
@@ -63,7 +64,7 @@ impl<
     pub fn handle(&self, call: TCall) {
         let maybe_fn_config = self.try_get_matching_config(call.clone());
         self.register_call(call.clone());
-        if let Some(fn_config) = maybe_fn_config {
+        if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
             fn_config.borrow_mut().register_call(call);
             if let Some(callback) = fn_config.borrow_mut().get_callback() {
                 callback.borrow_mut()();
@@ -72,9 +73,7 @@ impl<
     }
 
     pub fn handle_returning(&self, call: TCall) -> TReturnValue {
-        let fn_config = self
-            .try_get_matching_config(call.clone())
-            .expect("No fn configuration found for this call! TODO: write call description");
+        let fn_config = self.get_required_matching_config(call.clone());
         self.register_call(call.clone());
         fn_config.borrow_mut().register_call(call);
         if let Some(callback) = fn_config.borrow_mut().get_callback() {
@@ -122,29 +121,10 @@ impl<
         return unexpected_call_arg_infos;
     }
 
-    fn try_get_matching_config(
-        &self,
-        call: TCall,
-    ) -> Option<Arc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue, TBaseCaller>>>> {
-        let configs = unsafe { &*self.configs };
-        let maybe_fn_config = configs
-            .iter()
-            .rev()
-            .find(|config| {
-                config
-                    .borrow()
-                    .check(call.clone())
-                    .into_iter()
-                    .all(|x| x.is_ok())
-            })
-            .cloned();
-        return maybe_fn_config;
-    }
-
     fn get_matching_and_non_matching_calls<'a>(
         &'a self,
         args_checker: &'a TArgsChecker,
-    ) -> (Vec<Vec<ArgCheckResult<'a>>>, Vec<Vec<ArgCheckResult<'a>>>) {
+    ) -> (Vec<Vec<ArgCheckResult>>, Vec<Vec<ArgCheckResult>>) {
         let mut matching_calls = Vec::new();
         let mut non_matching_calls = Vec::new();
         let mut call_infos = self.call_infos.borrow_mut();
@@ -160,6 +140,48 @@ impl<
         }
         return (matching_calls, non_matching_calls);
     }
+
+    fn try_get_matching_config(
+        &self,
+        call: TCall,
+    ) -> MatchingConfigSearchResult<TCall, TArgsChecker, TReturnValue, TBaseCaller> {
+        let configs = unsafe { &*self.configs };
+        let mut args_check_results = Vec::with_capacity(configs.len());
+        for config in configs.iter().rev() {
+            // TODO - do I really want to clone call on each check?
+            let args_check_result = config.borrow().check(call.clone());
+            if args_check_result.iter().all(|x| x.is_ok()) {
+                return MatchingConfigSearchResult::Ok(config.clone());
+            }
+            args_check_results.push(args_check_result);
+        }
+        args_check_results.sort_by(|a, b| {
+            let a_matched_args_count = a.iter().filter(|x| x.is_ok()).count();
+            let b_matched_args_count = b.iter().filter(|x| x.is_ok()).count();
+            return b_matched_args_count.cmp(&a_matched_args_count);
+        });
+        return MatchingConfigSearchResult::Err(MatchingConfigSearchErr {
+            args_check_results_sorted_by_number_of_correctly_matched_args_descending:
+                args_check_results,
+        });
+    }
+
+    fn get_required_matching_config(
+        &self,
+        call: TCall,
+    ) -> Arc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue, TBaseCaller>>> {
+        let fn_config = match self.try_get_matching_config(call.clone()) {
+            MatchingConfigSearchResult::Ok(matching_config) => matching_config,
+            MatchingConfigSearchResult::Err(matching_config_search_err) => {
+                self.error_printer.panic_no_suitable_fn_configuration_found(
+                    self.fn_name,
+                    call.get_arg_infos(),
+                    matching_config_search_err,
+                )
+            }
+        };
+        return fn_config;
+    }
 }
 
 impl<
@@ -172,7 +194,7 @@ impl<
     pub fn handle_base(&self, call: TCall) {
         let maybe_fn_config = self.try_get_matching_config(call.clone());
         self.register_call(call.clone());
-        if let Some(fn_config) = maybe_fn_config {
+        if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
             fn_config.borrow_mut().register_call(call.clone());
             if let Some(call_base) = fn_config.borrow().get_base_caller() {
                 call_base.borrow_mut().call_base(call);
@@ -184,9 +206,7 @@ impl<
     }
 
     pub fn handle_base_returning(&self, call: TCall) -> TReturnValue {
-        let fn_config = self
-            .try_get_matching_config(call.clone())
-            .expect("No fn configuration found for this call! TODO: write call description");
+        let fn_config = self.get_required_matching_config(call.clone());
         self.register_call(call.clone());
         fn_config.borrow_mut().register_call(call.clone());
         if let Some(call_base) = fn_config.borrow().get_base_caller() {

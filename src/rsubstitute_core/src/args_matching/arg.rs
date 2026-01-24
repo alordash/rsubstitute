@@ -48,7 +48,7 @@ impl<T> Arg<T> {
 }
 
 impl<T: Debug + PartialOrd + Clone> Arg<T> {
-    pub fn check<'a>(&self, arg_name: &'static str, actual_value: T) -> ArgCheckResult<'a>
+    pub fn check<'a>(&self, arg_name: &'static str, actual_value: T) -> ArgCheckResult
     where
         T: 'a,
     {
@@ -90,7 +90,7 @@ impl<T: Debug + PartialOrd + Clone> Arg<T> {
 }
 
 impl<'a, T: Debug + ?Sized> Arg<&'a T> {
-    pub fn check_ref(&self, arg_name: &'static str, actual_value: &'a T) -> ArgCheckResult<'a> {
+    pub fn check_ref(&self, arg_name: &'static str, actual_value: &'a T) -> ArgCheckResult {
         let arg_info = ArgInfo::new(arg_name, actual_value);
         let actual_ptr = std::ptr::from_ref(actual_value);
         match self {
@@ -133,7 +133,7 @@ impl<'a, T: Debug + ?Sized> Arg<&'a T> {
 }
 
 impl<T: Debug + ?Sized> Arg<Rc<T>> {
-    pub fn check_rc<'a>(&self, arg_name: &'static str, actual_value: Rc<T>) -> ArgCheckResult<'a>
+    pub fn check_rc<'a>(&self, arg_name: &'static str, actual_value: Rc<T>) -> ArgCheckResult
     where
         T: 'a,
     {
@@ -180,7 +180,7 @@ impl<T: Debug + ?Sized> Arg<Rc<T>> {
 }
 
 impl<T: Debug + ?Sized> Arg<Arc<T>> {
-    pub fn check_arc<'a>(&self, arg_name: &'static str, actual_value: Arc<T>) -> ArgCheckResult<'a>
+    pub fn check_arc<'a>(&self, arg_name: &'static str, actual_value: Arc<T>) -> ArgCheckResult
     where
         T: 'a,
     {

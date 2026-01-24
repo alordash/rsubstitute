@@ -9,6 +9,7 @@ mod i_base_caller;
 mod i_mock_data;
 mod shared_fn_config;
 mod times;
+mod matching_config_search_result;
 
 pub use fn_config::*;
 pub use fn_data::*;

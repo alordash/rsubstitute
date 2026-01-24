@@ -86,7 +86,8 @@ mod tests {
             let actual_returned_number = get_return(accepted_number);
             assert_panics(
                 || get_return("str wasn't configured"),
-                "No fn configuration found for this call! TODO: write call description",
+                "Mock wasn't configured to handle following call:
+	get_return(\"str wasn't configured\")",
             );
 
             // Assert

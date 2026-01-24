@@ -1,5 +1,6 @@
 use crate::Times;
-use crate::args_matching::{ArgCheckResult, ArgInfo, IArgsFormatter};
+use crate::args_matching::{ArgCheckResult, ArgInfo, IArgsChecker, IArgsFormatter};
+use crate::matching_config_search_result::MatchingConfigSearchErr;
 
 pub trait IErrorPrinter {
     fn panic_received_verification_error(
@@ -11,7 +12,12 @@ pub trait IErrorPrinter {
         times: Times,
     ) -> !;
 
-    fn panic_no_suitable_fn_configuration_found(&self) -> !;
+    fn panic_no_suitable_fn_configuration_found(
+        &self,
+        fn_name: &'static str,
+        unexpected_call: Vec<ArgInfo>,
+        matching_config_search_err: MatchingConfigSearchErr,
+    ) -> !;
 
     fn format_received_unexpected_call_error(
         &self,
@@ -76,16 +82,50 @@ impl IErrorPrinter for ErrorPrinter {
             )
         };
         let error_msg = format!(
-            r#"{times} matching:
+            r"{times} matching:
 {expected_call_msg}
 {matching_calls_report}
-{non_matching_calls_report}"#
+{non_matching_calls_report}"
         );
         panic!("{error_msg}");
     }
 
-    fn panic_no_suitable_fn_configuration_found(&self) -> ! {
-        todo!()
+    fn panic_no_suitable_fn_configuration_found(
+        &self,
+        fn_name: &'static str,
+        unexpected_call: Vec<ArgInfo>,
+        matching_config_search_err: MatchingConfigSearchErr,
+    ) -> ! {
+        let call_msg = self.format_received_unexpected_call_error(fn_name, unexpected_call);
+        let configs_report = if matching_config_search_err
+            .args_check_results_sorted_by_number_of_correctly_matched_args_descending
+            .len()
+            > 0
+        {
+            let args_check_results_msgs: Vec<_> = matching_config_search_err
+                .args_check_results_sorted_by_number_of_correctly_matched_args_descending
+                .into_iter()
+                .enumerate()
+                .map(|(i, args_check_result)| {
+                    let number = i + 1;
+                    let args_msg = self.fmt_args_msg(fn_name, args_check_result);
+                    return format!("{number}. {args_msg}");
+                })
+                .collect();
+            let args_check_results_msg = args_check_results_msgs.join("\n\t");
+            format!(
+                "
+List of existing configuration ordered by number of correctly matched arguments (non-matching arguments indicated with '*' characters):
+\t{args_check_results_msg}"
+            )
+        } else {
+            String::new()
+        };
+        let error_msg = format!(
+            "Mock wasn't configured to handle following call:
+\t{call_msg}{configs_report}"
+        );
+        panic!("{error_msg}");
     }
 
     fn format_received_unexpected_call_error(
@@ -153,6 +193,11 @@ impl ErrorPrinter {
 \t{error_msgs_joined}"
             )
         };
+        let args_msg = self.fmt_args_msg(fn_name, call);
+        format!("{args_msg}{errors_report}")
+    }
+
+    fn fmt_args_msg(&self, fn_name: &'static str, call: Vec<ArgCheckResult>) -> String {
         let args_msgs: Vec<_> = call
             .into_iter()
             .map(|x| match x {
@@ -165,7 +210,8 @@ impl ErrorPrinter {
             })
             .collect();
         let args_msgs_joined = args_msgs.join(", ");
-        format!("{fn_name}({args_msgs_joined}){errors_report}")
+        let args_msg = format!("{fn_name}({args_msgs_joined})");
+        return args_msg;
     }
 
     fn fmt_calls(&self, calls_count: usize) -> &'static str {
