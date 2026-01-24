@@ -40,7 +40,7 @@ trait MyTrait {
 }
 
 pub use generated::*;
-use rsubstitute::assertions::assert_panics;
+use rsubstitute::assertions::{assert_panics, record_panic};
 
 mod generated {
     use super::*;
@@ -412,7 +412,7 @@ fn received_nothing_else_PanicsOk() {
     assert_panics(
         || mock.received.get(Times::Once).no_other_calls(),
         format!(
-            r"Did not expect to receive any other calls. Received 1 call:
+            "Did not expect to receive any other calls. Received 1 call:
 1. work({work_arguments})"
         ),
     );

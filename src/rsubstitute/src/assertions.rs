@@ -29,3 +29,15 @@ Expected: {expected_error_message_str:?}
         );
     }
 }
+
+pub fn record_panic<T>(callback: impl FnOnce() -> T) -> String {
+    let panic_error = catch_unwind_silent(panic::AssertUnwindSafe(callback));
+    if let Some(actual_error) = panic_error.err().as_deref() {
+        let error_message = actual_error.downcast_ref::<String>().expect("Panic's error should be string.");
+        return error_message.clone();
+    } else {
+        panic!(
+            r#"Expected to panic."#,
+        );
+    }
+}

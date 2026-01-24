@@ -31,7 +31,7 @@ where
 mod tests {
     #![allow(non_snake_case)]
     use super::*;
-    use rsubstitute::assertions::assert_panics;
+    use rsubstitute::assertions::*;
     use rsubstitute::*;
 
     mod get_return_tests {
@@ -85,15 +85,17 @@ mod tests {
 
             // Act
             let actual_returned_number = get_return(accepted_number);
-            assert_panics(
-                || get_return(accepted_str),
-                format!("Mock wasn't configured to handle following call:
-	get_return({accepted_str:?})"),
-            );
+            let actual_error_msg = record_panic(|| get_return(accepted_str));
 
             // Assert
             assert_eq!(returned_number, actual_returned_number);
             get_return::received(accepted_number, Times::Once).no_other_calls();
+
+            let expected_error_msg = format!(
+                "Mock wasn't configured to handle following call:
+	get_return({accepted_str:?})"
+            );
+            assert_eq!(expected_error_msg, actual_error_msg);
         }
 
         #[test]

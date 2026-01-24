@@ -23,7 +23,7 @@ trait Trait {
 mod tests {
     #![allow(non_snake_case)]
     use super::*;
-    use rsubstitute::assertions::assert_panics;
+    use rsubstitute::assertions::*;
     use rsubstitute::*;
 
     mod accept_rc_tests {
@@ -56,7 +56,7 @@ mod tests {
             assert_panics(
                 || mock.received.accept_rc(Arg::Any, Times::Never),
                 format!(
-                    r"Expected to never receive a call matching:
+                    "Expected to never receive a call matching:
 	accept_rc((alloc::rc::Rc<i32>): any)
 Actually received 1 matching call:
 	accept_rc({r})
@@ -67,7 +67,7 @@ Received no non-matching calls"
             assert_panics(
                 || mock.received.accept_rc(Arg::Any, Times::Exactly(3)),
                 format!(
-                    r"Expected to receive a call 3 times matching:
+                    "Expected to receive a call 3 times matching:
 	accept_rc((alloc::rc::Rc<i32>): any)
 Actually received 1 matching call:
 	accept_rc({r})
@@ -80,7 +80,7 @@ Received no non-matching calls"
             assert_panics(
                 || mock.received.accept_rc(invalid_r.clone(), Times::Once),
                 format!(
-                    r"Expected to receive a call exactly once matching:
+                    "Expected to receive a call exactly once matching:
 	accept_rc((alloc::rc::Rc<i32>): equal to {invalid_r})
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):

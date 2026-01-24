@@ -161,7 +161,7 @@ List of existing configuration ordered by number of correctly matched arguments 
             .collect();
         let unexpected_calls_msg = unexpected_calls_msgs.join("\n");
         let error_msg = format!(
-            r"Did not expect to receive any other calls. Received {unexpected_calls_count} {call_fmt}:
+            "Did not expect to receive any other calls. Received {unexpected_calls_count} {call_fmt}:
 {unexpected_calls_msg}"
         );
         panic!("{error_msg}");

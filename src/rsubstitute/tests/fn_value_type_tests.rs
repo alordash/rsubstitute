@@ -42,7 +42,7 @@ fn accept_two_values_return_value(v1: i32, v2: f32) -> &'static str {
 mod tests {
     #![allow(non_snake_case)]
     use super::*;
-    use rsubstitute::assertions::assert_panics;
+    use rsubstitute::assertions::*;
     use rsubstitute::*;
 
     mod accept_value_tests {
@@ -117,7 +117,7 @@ mod tests {
             assert_panics(
                 || accept_value::received(Arg::Any, Times::Never),
                 format!(
-                    r"Expected to never receive a call matching:
+                    "Expected to never receive a call matching:
 	accept_value((i32): any)
 Actually received 2 matching calls:
 	accept_value({first_value})
@@ -128,7 +128,7 @@ Received no non-matching calls"
             assert_panics(
                 || accept_value::received(Arg::Any, Times::Once),
                 format!(
-                    r"Expected to receive a call exactly once matching:
+                    "Expected to receive a call exactly once matching:
 	accept_value((i32): any)
 Actually received 2 matching calls:
 	accept_value({first_value})
@@ -139,7 +139,7 @@ Received no non-matching calls"
             assert_panics(
                 || accept_value::received(Arg::Any, Times::Exactly(3)),
                 format!(
-                    r"Expected to receive a call 3 times matching:
+                    "Expected to receive a call 3 times matching:
 	accept_value((i32): any)
 Actually received 2 matching calls:
 	accept_value({first_value})
@@ -163,7 +163,7 @@ Received no non-matching calls"
             assert_panics(
                 || accept_value::received(Arg::Eq(first_value), Times::Never),
                 format!(
-                    r"Expected to never receive a call matching:
+                    "Expected to never receive a call matching:
 	accept_value((i32): equal to {first_value})
 Actually received 1 matching call:
 	accept_value({first_value})
@@ -177,7 +177,7 @@ accept_value(*{second_value}*)
             assert_panics(
                 || accept_value::received(Arg::Eq(first_value), Times::Exactly(3)),
                 format!(
-                    r"Expected to receive a call 3 times matching:
+                    "Expected to receive a call 3 times matching:
 	accept_value((i32): equal to {first_value})
 Actually received 1 matching call:
 	accept_value({first_value})
@@ -191,7 +191,7 @@ accept_value(*{second_value}*)
             assert_panics(
                 || accept_value::received(Arg::Eq(second_value), Times::Never),
                 format!(
-                    r"Expected to never receive a call matching:
+                    "Expected to never receive a call matching:
 	accept_value((i32): equal to {second_value})
 Actually received 1 matching call:
 	accept_value({second_value})
@@ -205,7 +205,7 @@ accept_value(*{first_value}*)
             assert_panics(
                 || accept_value::received(Arg::Eq(second_value), Times::Exactly(3)),
                 format!(
-                    r"Expected to receive a call 3 times matching:
+                    "Expected to receive a call 3 times matching:
 	accept_value((i32): equal to {second_value})
 Actually received 1 matching call:
 	accept_value({second_value})
@@ -237,7 +237,7 @@ accept_value(*{first_value}*)
                     )
                 },
                 format!(
-                    r"Expected to never receive a call matching:
+                    "Expected to never receive a call matching:
 	accept_value((i32): custom predicate)
 Actually received 1 matching call:
 	accept_value({first_value})
@@ -255,7 +255,7 @@ accept_value(*{second_value}*)
                     )
                 },
                 format!(
-                    r"Expected to receive a call 3 times matching:
+                    "Expected to receive a call 3 times matching:
 	accept_value((i32): custom predicate)
 Actually received 1 matching call:
 	accept_value({first_value})
@@ -273,7 +273,7 @@ accept_value(*{second_value}*)
                     )
                 },
                 format!(
-                    r"Expected to never receive a call matching:
+                    "Expected to never receive a call matching:
 	accept_value((i32): custom predicate)
 Actually received 1 matching call:
 	accept_value({second_value})
@@ -291,7 +291,7 @@ accept_value(*{first_value}*)
                     )
                 },
                 format!(
-                    r"Expected to receive a call 3 times matching:
+                    "Expected to receive a call 3 times matching:
 	accept_value((i32): custom predicate)
 Actually received 1 matching call:
 	accept_value({second_value})
@@ -317,7 +317,7 @@ accept_value(*{first_value}*)
             assert_panics(
                 || accept_value::received(Arg::NotEq(first_value), Times::Never),
                 format!(
-                    r"Expected to never receive a call matching:
+                    "Expected to never receive a call matching:
 	accept_value((i32): NOT equal to {first_value})
 Actually received 1 matching call:
 	accept_value({second_value})
@@ -725,7 +725,7 @@ accept_value(*{first_value}*)
             assert_panics(
                 || accept_two_values_return_value::received(v1, v2, Times::Never),
                 format!(
-                    r"Expected to never receive a call matching:
+                    "Expected to never receive a call matching:
 	accept_two_values_return_value((i32): equal to {v1}, (f32): equal to {v2})
 Actually received 1 matching call:
 	accept_two_values_return_value({v1}, {v2})
@@ -736,7 +736,7 @@ Received no non-matching calls"
             assert_panics(
                 || accept_two_values_return_value::received(v1, v2, Times::Exactly(3)),
                 format!(
-                    r"Expected to receive a call 3 times matching:
+                    "Expected to receive a call 3 times matching:
 	accept_two_values_return_value((i32): equal to {v1}, (f32): equal to {v2})
 Actually received 1 matching call:
 	accept_two_values_return_value({v1}, {v2})
@@ -755,7 +755,7 @@ Received no non-matching calls"
                     )
                 },
                 format!(
-                    r"Expected to receive a call exactly once matching:
+                    "Expected to receive a call exactly once matching:
 	accept_two_values_return_value((i32): equal to {invalid_expected_v1}, (f32): equal to {invalid_expected_v2})
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):

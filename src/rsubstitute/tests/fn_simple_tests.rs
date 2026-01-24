@@ -8,7 +8,7 @@ fn f() {}
 mod tests {
     #![allow(non_snake_case)]
     use super::*;
-    use rsubstitute::assertions::assert_panics;
+    use rsubstitute::assertions::*;
     use rsubstitute::*;
 
     #[test]

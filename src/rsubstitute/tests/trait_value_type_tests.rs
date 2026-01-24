@@ -16,7 +16,7 @@ trait Trait {
 mod tests {
     #![allow(non_snake_case)]
     use super::*;
-    use rsubstitute::assertions::assert_panics;
+    use rsubstitute::assertions::*;
     use rsubstitute::*;
     use std::cell::RefCell;
     use std::sync::Arc;
@@ -420,12 +420,12 @@ accept_value(*{first_value}*)
             let mock = TraitMock::new();
 
             // Act
+            let actual_error_msg = record_panic(|| mock.return_value());
+
             // Assert
-            assert_panics(
-                || mock.return_value(),
-                "Mock wasn't configured to handle following call:
-	return_value()",
-            );
+            let expected_error_msg = "Mock wasn't configured to handle following call:
+	return_value()";
+            assert_eq!(expected_error_msg, actual_error_msg);
         }
     }
 
@@ -752,13 +752,14 @@ accept_two_values_return_value(*10*, *20.2*)
                 .returns(String::from("should not be returned"));
 
             // Act
+            let actual_error_msg =
+                record_panic(|| mock.accept_two_values_return_value(unexpected_v1, unexpected_v2));
+
             // Assert
-            assert_panics(
-                || mock.accept_two_values_return_value(unexpected_v1, unexpected_v2),
-                format!(
-                    "No return value was configured for following call: accept_two_values_return_value({unexpected_v1}, {unexpected_v2})"
-                ),
+            let expected_error_msg = format!(
+                "No return value was configured for following call: accept_two_values_return_value({unexpected_v1}, {unexpected_v2})"
             );
+            assert_eq!(expected_error_msg, actual_error_msg);
         }
     }
 }
