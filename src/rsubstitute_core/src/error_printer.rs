@@ -2,7 +2,7 @@ use crate::Times;
 use crate::args_matching::{ArgCheckResult, ArgInfo, IArgsChecker, IArgsFormatter};
 use crate::matching_config_search_result::MatchingConfigSearchErr;
 
-pub trait IErrorPrinter {
+pub(crate) trait IErrorPrinter {
     fn panic_received_verification_error(
         &self,
         fn_name: &'static str,

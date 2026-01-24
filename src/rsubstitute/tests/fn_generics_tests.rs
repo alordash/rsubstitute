@@ -81,13 +81,14 @@ mod tests {
             let accepted_number = 10;
             let returned_number = 20;
             get_return::setup(accepted_number).returns(returned_number);
+            let accepted_str = "str wasn't configured";
 
             // Act
             let actual_returned_number = get_return(accepted_number);
             assert_panics(
-                || get_return("str wasn't configured"),
-                "Mock wasn't configured to handle following call:
-	get_return(\"str wasn't configured\")",
+                || get_return(accepted_str),
+                format!("Mock wasn't configured to handle following call:
+	get_return({accepted_str:?})"),
             );
 
             // Assert
