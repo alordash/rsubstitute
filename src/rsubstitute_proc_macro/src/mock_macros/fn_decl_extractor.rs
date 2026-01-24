@@ -51,13 +51,3 @@ impl FnDeclExtractor {
         return fn_decl;
     }
 }
-
-trait Foo {
-    fn flex(&self) -> i32;
-}
-
-impl Foo for Field {
-    fn flex(&self) -> i32 {
-        todo!()
-    }
-}
