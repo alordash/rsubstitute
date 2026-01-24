@@ -78,13 +78,9 @@ impl IArgsCheckerTraitImplGenerator for ArgsCheckerTraitImplGenerator {
 impl ArgsCheckerTraitImplGenerator {
     const CHECK_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("check"));
 
-    // TODO - test that equals to Arg::check
     const ARG_CHECK_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("check"));
-    // TODO - test that equals to Arg::check_ref
     const ARG_CHECK_REF_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("check_ref"));
-    // TODO - test that equals to Arg::check_rc
     const ARG_CHECK_RC_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("check_rc"));
-    // TODO - test that equals to Arg::check_arc
     const ARG_CHECK_ARC_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("check_arc"));
 
     const CALL_ARG_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("call"));
