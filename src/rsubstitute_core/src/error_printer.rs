@@ -1,6 +1,7 @@
-use crate::args_matching::{ArgCheckResult, ArgInfo, IArgsFormatter};
-use crate::matching_config_search_result::MatchingConfigSearchErr;
 use crate::Times;
+use crate::args_matching::{ArgCheckResult, ArgInfo, IArgsFormatter};
+use crate::config::get_max_invalid_calls_listed_count;
+use crate::matching_config_search_result::MatchingConfigSearchErr;
 
 pub(crate) trait IErrorPrinter {
     fn panic_received_verification_error(
@@ -66,18 +67,16 @@ impl IErrorPrinter for ErrorPrinter {
         let non_matching_calls_report = if non_matching_calls_count == 0 {
             "Received no non-matching calls".to_string()
         } else {
+            let max_invalid_calls_listed_count = get_max_invalid_calls_listed_count();
             let call_fmt = self.fmt_calls(non_matching_calls_count);
             let non_matching_calls_args_msgs: Vec<_> = non_matching_calls
                 .into_iter()
-                .take(Self::MAX_INVALID_CALLS_LISTED_COUNT)
+                .take(max_invalid_calls_listed_count)
                 .map(|x| self.fmt_call(fn_name, x))
                 .collect();
             let trimmed_output_disclaimer =
-                if non_matching_calls_count > Self::MAX_INVALID_CALLS_LISTED_COUNT {
-                    format!(
-                        " (listing only first {})",
-                        Self::MAX_INVALID_CALLS_LISTED_COUNT
-                    )
+                if non_matching_calls_count > max_invalid_calls_listed_count {
+                    format!(" (listing only first {})", max_invalid_calls_listed_count)
                 } else {
                     String::new()
                 };
@@ -181,9 +180,6 @@ List of existing configuration ordered by number of correctly matched arguments 
 }
 
 impl ErrorPrinter {
-    // TODO - should be configurable
-    const MAX_INVALID_CALLS_LISTED_COUNT: usize = 10;
-
     fn fmt_call(&self, fn_name: &'static str, call: Vec<ArgCheckResult>) -> String {
         let error_msgs: Vec<_> = call
             .iter()
