@@ -57,7 +57,6 @@ impl FnReceivedGenerator {
         mock_struct: &MockStruct,
         phantom_types_count: usize,
     ) -> Block {
-        // TODO - turn this in some kind of syntax factory?
         let static_mock_expr = self
             .get_global_mock_expr_generator
             .generate(&mock_struct.item_struct);
