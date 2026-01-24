@@ -6,16 +6,10 @@ trait Trait {
 
     fn return_ref(&self) -> &'static i32;
 
-    // TODO - support various lifetimes via generics
-    // TODO - make test that returns same lifetime as the one accepted
     fn accept_ref_return_ref(&self, r: &i32) -> &'static i32;
 
     fn accept_two_refs(&self, r1: &i32, r2: &f32);
 
-    // TODO - support various lifetimes via generics
-    // fn accept_two_refs_with_different_lifetimes<'a, 'b>(&self, r1: &'a i32, r2: &'b f32);
-
-    // TODO - make test that returns same lifetime as the one accepted
     fn accept_two_refs_return_ref(&self, r1: &i32, r2: &f32) -> &'static str;
 }
 

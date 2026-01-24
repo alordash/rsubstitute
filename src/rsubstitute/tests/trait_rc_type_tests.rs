@@ -7,16 +7,10 @@ trait Trait {
 
     fn return_rc(&self) -> Rc<i32>;
 
-    // TODO - support various lifetimes via generics
-    // TODO - make test that returns same lifetime as the one accepted
     fn accept_rc_return_rc(&self, r: Rc<i32>) -> Rc<i32>;
 
     fn accept_two_rcs(&self, r1: Rc<i32>, r2: Rc<f32>);
 
-    // TODO - support various lifetimes via generics
-    // fn accept_two_rcs_with_different_lifetimes<'a, 'b>(&self, r1: &'a i32, r2: &'b f32);
-
-    // TODO - make test that returns same lifetime as the one accepted
     fn accept_two_rcs_return_rc(&self, r1: Rc<i32>, r2: Rc<f32>) -> Rc<String>;
 }
 

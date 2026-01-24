@@ -10,8 +10,6 @@ fn return_ref() -> &'static i32 {
     BASE_RETURN_REF
 }
 
-// TODO - support various lifetimes via generics
-// TODO - make test that returns same lifetime as the one accepted
 const BASE_ACCEPT_REF_RETURN_REF: &'static i32 = &2000;
 #[mock]
 fn accept_ref_return_ref(r: &i32) -> &'static i32 {
@@ -21,11 +19,6 @@ fn accept_ref_return_ref(r: &i32) -> &'static i32 {
 #[mock]
 fn accept_two_refs(r1: &i32, r2: &f32) {}
 
-// TODO - support various lifetimes via generics
-// #[mock]
-// fn accept_two_refs_with_different_lifetimes<'a, 'b>(r1: &'a i32, r2: &'b f32) {}
-
-// TODO - make test that returns same lifetime as the one accepted
 const ACCEPT_TWO_REFS_RETURN_REF: &'static str = "quo vadis";
 #[mock]
 fn accept_two_refs_return_ref(r1: &i32, r2: &f32) -> &'static str {
