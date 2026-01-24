@@ -1,6 +1,6 @@
-use crate::Times;
-use crate::args_matching::{ArgCheckResult, ArgInfo, IArgsChecker, IArgsFormatter};
+use crate::args_matching::{ArgCheckResult, ArgInfo, IArgsFormatter};
 use crate::matching_config_search_result::MatchingConfigSearchErr;
+use crate::Times;
 
 pub(crate) trait IErrorPrinter {
     fn panic_received_verification_error(
@@ -114,8 +114,10 @@ impl IErrorPrinter for ErrorPrinter {
                 .enumerate()
                 .map(|(i, args_check_result)| {
                     let number = i + 1;
+                    let matched_arguments_count = args_check_result.iter().filter(|x| x.is_ok()).count();
+                    let total_arguments_count = args_check_result.len();
                     let args_msg = self.fmt_args_msg(fn_name, args_check_result);
-                    return format!("{number}. {args_msg}");
+                    return format!("{number}. Matched {matched_arguments_count}/{total_arguments_count} arguments: {args_msg}");
                 })
                 .collect();
             let args_check_results_msg = args_check_results_msgs.join("\n\t");
