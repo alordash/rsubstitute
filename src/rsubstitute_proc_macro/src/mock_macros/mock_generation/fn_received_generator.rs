@@ -76,7 +76,7 @@ impl FnReceivedGenerator {
                             .fields
                             .iter()
                             .skip(1 + phantom_types_count)
-                            .map(|field| field.ident.clone().expect("TODO"))
+                            .map(IFieldRequiredIdentGetter::get_required_ident)
                             .chain(std::iter::once(
                                 self.received_signature_generator.get_times_arg_ident(),
                             ))

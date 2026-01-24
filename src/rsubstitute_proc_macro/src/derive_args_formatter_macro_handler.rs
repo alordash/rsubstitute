@@ -1,5 +1,5 @@
 use crate::constants;
-use crate::syntax::{IFieldAccessExprFactory, IPathFactory, ITypeFactory};
+use crate::syntax::{IFieldAccessExprFactory, IFieldRequiredIdentGetter, IPathFactory, ITypeFactory};
 use proc_macro::TokenStream;
 use proc_macro2::Literal;
 use quote::{ToTokens, quote};
@@ -88,7 +88,7 @@ impl DeriveArgsFormatterMacroHandler {
             .map(|field| {
                 self.field_access_expr_factory.create(vec![
                     constants::SELF_IDENT.clone(),
-                    field.ident.clone().expect("TODO"),
+                    field.get_required_ident(),
                 ])
             })
             .collect();

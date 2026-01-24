@@ -1,7 +1,7 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::FnInfo;
 use crate::mock_macros::mock_generation::models::*;
-use crate::syntax::{IStructFactory, ITypeFactory};
+use crate::syntax::{IFieldRequiredIdentGetter, IStructFactory, ITypeFactory};
 use quote::format_ident;
 use std::sync::Arc;
 use syn::*;
@@ -45,7 +45,7 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
         let field_and_fn_idents = fn_fields
             .iter()
             .zip(fn_infos)
-            .map(|(x, y)| (x.ident.clone().expect("TODO"), y.parent.ident.clone()))
+            .map(|(x, y)| (x.get_required_ident(), y.parent.ident.clone()))
             .collect();
         let fields = std::iter::once(constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD.clone())
             .chain(fn_fields)
@@ -87,7 +87,7 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
         let field_and_fn_idents = fn_fields
             .iter()
             .zip(fn_infos)
-            .map(|(x, y)| (x.ident.clone().expect("TODO"), y.parent.ident.clone()))
+            .map(|(x, y)| (x.get_required_ident(), y.parent.ident.clone()))
             .collect();
         let fields = [
             constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD.clone(),

@@ -74,7 +74,6 @@ impl CallArgInfosProviderImplGenerator {
         return signature;
     });
 
-    // TODO - add test that it equals to = args_matching::ArgInfo
     const ARG_INFO_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("ArgInfo"));
 
     fn generate_get_arg_infos_fn(

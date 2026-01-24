@@ -144,7 +144,7 @@ impl BaseCallerImplGenerator {
                                 .map(|field| {
                                     self.field_access_expr_factory.create(vec![
                                         Self::CALL_ARG_IDENT.clone(),
-                                        field.ident.clone().expect("TODO"),
+                                        field.get_required_ident(),
                                     ])
                                 })
                                 .collect(),

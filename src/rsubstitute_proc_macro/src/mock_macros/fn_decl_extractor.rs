@@ -32,7 +32,6 @@ impl FnDeclExtractor {
     fn try_map(&self, trait_item: &TraitItem) -> Option<FnDecl> {
         match trait_item {
             TraitItem::Fn(trait_item_fn) => {
-                // TODO - add test that with generics it doesnt compile?
                 if !trait_item_fn.sig.generics.params.is_empty() {
                     panic!("Generic type parameters for trait functions are not supported.");
                 }
@@ -50,5 +49,15 @@ impl FnDeclExtractor {
             return_value: sig.output.clone(),
         };
         return fn_decl;
+    }
+}
+
+trait Foo {
+    fn flex(&self) -> i32;
+}
+
+impl Foo for Field {
+    fn flex(&self) -> i32 {
+        todo!()
     }
 }

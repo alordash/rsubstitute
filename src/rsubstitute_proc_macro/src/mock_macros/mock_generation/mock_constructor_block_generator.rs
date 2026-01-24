@@ -85,7 +85,6 @@ impl MockConstructorBlockGenerator {
             .map(|(field_ident, fn_ident)| {
                 FieldValue {
                     attrs: Vec::new(),
-                    // TODO - do something with this "expect", it appears more than one time
                     member: Member::Named(field_ident.clone()),
                     colon_token: Some(Default::default()),
                     expr: Expr::Call(ExprCall {
@@ -135,7 +134,7 @@ impl MockConstructorBlockGenerator {
                 .iter()
                 .map(|field| {
                     // Assume all fields are PhantomData
-                    let field_ident = field.ident.clone().expect("TODO");
+                    let field_ident = field.get_required_ident();
                     return self.field_value_factory.create_as_phantom_data(field_ident);
                 })
                 .collect();

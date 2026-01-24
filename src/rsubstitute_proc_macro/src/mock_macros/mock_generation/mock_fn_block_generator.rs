@@ -51,13 +51,13 @@ impl IMockFnBlockGenerator for MockFnBlockGenerator {
 
 impl MockFnBlockGenerator {
     const CALL_VARIABLE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("call"));
-    const HANDLE_METHOD_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("handle")); // TODO - add test that it equals to FnData::handle
+    const HANDLE_METHOD_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("handle"));
     const HANDLE_RETURNING_METHOD_IDENT: LazyCell<Ident> =
-        LazyCell::new(|| format_ident!("handle_returning")); // TODO - add test that it equals to FnData::handle_returning
+        LazyCell::new(|| format_ident!("handle_returning"));
     const HANDLE_BASE_METHOD_IDENT: LazyCell<Ident> =
-        LazyCell::new(|| format_ident!("handle_base")); // TODO - add test that it equals to FnData::handle
+        LazyCell::new(|| format_ident!("handle_base"));
     const HANDLE_BASE_RETURNING_METHOD_IDENT: LazyCell<Ident> =
-        LazyCell::new(|| format_ident!("handle_base_returning")); // TODO - add test that it equals to FnData::handle_returning
+        LazyCell::new(|| format_ident!("handle_base_returning"));
 
     fn generate_call_stmt(&self, fn_info: &FnInfo) -> Stmt {
         let field_values: Vec<_> = fn_info
@@ -66,7 +66,7 @@ impl MockFnBlockGenerator {
             .fields
             .iter()
             .map(|field| {
-                let field_ident = field.ident.clone().expect("TODO field ident");
+                let field_ident = field.get_required_ident();
                 if let Type::Path(type_path) = &field.ty
                     && let Some(first_path_segment) = type_path.path.segments.first()
                     && first_path_segment.ident == constants::PHANTOM_DATA_IDENT.clone()

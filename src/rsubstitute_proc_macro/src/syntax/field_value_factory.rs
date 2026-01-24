@@ -15,10 +15,7 @@ pub(crate) struct FieldValueFactory {
 
 impl IFieldValueFactory for FieldValueFactory {
     fn create_with_into_conversion(&self, field: &Field) -> FieldValue {
-        let field_ident = field
-            .ident
-            .clone()
-            .expect("TODO: Field in call struct should be named");
+        let field_ident = field.get_required_ident();
         let field_value = FieldValue {
             attrs: Vec::new(),
             member: Member::Named(field_ident.clone()),

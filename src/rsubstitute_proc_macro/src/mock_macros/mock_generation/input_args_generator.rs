@@ -112,7 +112,7 @@ impl IInputArgsGenerator for InputArgsGenerator {
                     && let Some(first_path_segment) = type_path.path.segments.first()
                     && first_path_segment.ident == constants::PHANTOM_DATA_IDENT.clone()
                 {
-                    let field_ident = field.ident.clone().expect("TODO field ident");
+                    let field_ident = field.get_required_ident();
                     return self.field_value_factory.create_as_phantom_data(field_ident);
                 }
                 return self.field_value_factory.create_with_into_conversion(field);

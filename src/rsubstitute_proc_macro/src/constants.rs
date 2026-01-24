@@ -46,36 +46,27 @@ pub const SUPER_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("super")
 
 pub const FOR_GENERATED_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("for_generated"));
 
-// TODO - add test that it's equal to crate's name
 pub const CRATE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("rsubstitute"));
 
-// TODO - add test that it's equal to rsubstitute_core::arguments_matching::Argh
 pub const ARG_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Arg"));
 
-// TODO - add test that it's equal to rsubstitute_core::arguments_matching::IArgsFormatter
 pub const I_ARGS_FORMATTER_TRAIT_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("IArgsFormatter"));
 
-// TODO - add test that it's equal to rsubstitute_core::arguments_matching::IArgsFormatter::fmt_args
 pub const I_ARGS_FORMATTER_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("fmt_args"));
 
-// TODO - add test that it's equal to rsubstitute_core::arguments_matching::IArgschecker
 pub const I_ARGS_CHECKER_TRAIT_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("IArgsChecker"));
 
-// TODO - add test that it's equal to rsubstitute_core::arguments_matching::IArgschecker
 pub const I_ARG_INFOS_PROVIDER_TRAIT_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("IArgInfosProvider"));
 
-// TODO - add test that it's equal to rsubstitute_core::IBaseCaller
 pub const I_BASE_CALLER_TRAIT_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("IBaseCaller"));
 
-// TODO - add test that it's equal to rsubstitute_core::IBaseCaller::call_base
 pub const I_BASE_CALLER_CALL_BASE_FN_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("call_base"));
 
-// TODO - add test that it's equal to rsubstitute_core::arguments_matching::IArgsFormatter
 pub const I_MOCK_DATA_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("IMockData"));
 
 pub const I_MOCK_DATA_GET_RECEIVED_NOTHING_ELSE_ERROR_MSGS_FN_SIGNATURE: LazyCell<Signature> =
@@ -99,7 +90,6 @@ pub const I_MOCK_DATA_GET_RECEIVED_NOTHING_ELSE_ERROR_MSGS_FN_SIGNATURE: LazyCel
         return signature;
     });
 
-// TODO - add test that it's equal to rsubstitute_core::FnData
 pub const FN_DATA_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("FnData"));
 
 pub const NEW_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("new"));
@@ -140,11 +130,9 @@ pub const DATA_FIELD_VALUE: LazyCell<FieldValue> = LazyCell::new(|| {
     return result;
 });
 
-// TODO - add test that verifies that it's equal to rsubstitute_core::FnData::add_config
 pub const FN_DATA_ADD_CONFIG_FN_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("add_config"));
 
-// TODO - add test that verifies that it's equal to rsubstitute_core::FnData::verify_received
 pub const FN_DATA_VERIFY_RECEIVED_FN_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("verify_received"));
 
@@ -164,11 +152,9 @@ pub const SERVICES_REF_EXPR: LazyCell<Expr> = LazyCell::new(|| {
     return result;
 });
 
-// TODO - add test that it's equal to rsubstitute_core::SharedFnConfig
 pub const SHARED_FN_CONFIG_TYPE_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("SharedFnConfig"));
 
-// TODO - add test that it's equal to rsubstitute_core::SharedFnConfig::new
 pub const SHARED_FN_CONFIG_NEW_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("new"));
 
 pub const ALLOW_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("allow"));
@@ -318,7 +304,6 @@ pub const STRING_TYPE: LazyCell<Type> = LazyCell::new(|| {
     return result;
 });
 
-// TODO - add tests to verify that ArgCheckResult ident is correct
 pub const VEC_OF_ARG_CHECK_RESULT_TYPE: LazyCell<Type> = LazyCell::new(|| {
     let type_factory = &SERVICES.type_factory;
     let arg_check_result_type = type_factory.create(format_ident!("ArgCheckResult"));
@@ -326,7 +311,6 @@ pub const VEC_OF_ARG_CHECK_RESULT_TYPE: LazyCell<Type> = LazyCell::new(|| {
     return result;
 });
 
-// TODO - add tests to verify that ArgInfo ident is correct
 pub const VEC_OF_ARG_INFO_RESULT_TYPE: LazyCell<Type> = LazyCell::new(|| {
     let type_factory = &SERVICES.type_factory;
     let arg_check_result_type = type_factory.create(format_ident!("ArgInfo"));

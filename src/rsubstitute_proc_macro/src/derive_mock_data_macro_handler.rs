@@ -86,7 +86,7 @@ impl DeriveMockDataMacroHandler {
                 self.expr_method_call_factory.create(
                     vec![
                         constants::SELF_IDENT.clone(),
-                        field.ident.clone().expect("TODO"),
+                        field.get_required_ident(),
                     ],
                     Self::GET_UNEXPECTED_CALLS_ERROR_MSGS_FN_IDENT.clone(),
                     Vec::new(),
