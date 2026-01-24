@@ -667,7 +667,7 @@ accept_value(*{first_value}*)
         }
 
         #[test]
-        fn accept_two_value_return_value_PanicsOk() {
+        fn accept_two_values_return_value_PanicsOk() {
             // Arrange
             let mock = TraitMock::new();
             let v1 = 10;
@@ -733,6 +733,30 @@ accept_two_values_return_value(*10*, *20.2*)
 	2. v2 (f32):
 		Expected: 21.2
 		Actual:   20.2"#
+                ),
+            );
+        }
+
+        #[test]
+        fn accept_two_values_return_value_NoReturnValue_PanicsOk() {
+            // Arrange
+            let mock = TraitMock::new();
+            let unexpected_v1 = 10;
+            let unexpected_v2 = 22.2;
+            let expected_v1 = 30;
+            let expected_v2 = 44.4;
+            mock.setup
+                .accept_two_values_return_value(unexpected_v1, unexpected_v2);
+            mock.setup
+                .accept_two_values_return_value(expected_v1, expected_v2)
+                .returns(String::from("should not be returned"));
+
+            // Act
+            // Assert
+            assert_panics(
+                || mock.accept_two_values_return_value(unexpected_v1, unexpected_v2),
+                format!(
+                    "No return value was configured for following call: accept_two_values_return_value({unexpected_v1}, {unexpected_v2})"
                 ),
             );
         }

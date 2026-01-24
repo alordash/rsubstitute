@@ -15,6 +15,7 @@ pub struct FnData<
 > {
     fn_name: &'static str,
     call_infos: RefCell<Vec<CallInfo<TCall>>>,
+    // Behind a raw reference to lift 'static requirement from TCall, TArgsChecker, etc.
     configs: *mut Vec<Arc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue, TBaseCaller>>>>,
     error_printer: Arc<dyn IErrorPrinter>,
 }
@@ -75,14 +76,14 @@ impl<
     pub fn handle_returning(&self, call: TCall) -> TReturnValue {
         let fn_config = self.get_required_matching_config(call.clone());
         self.register_call(call.clone());
-        fn_config.borrow_mut().register_call(call);
+        fn_config.borrow_mut().register_call(call.clone());
         if let Some(callback) = fn_config.borrow_mut().get_callback() {
             callback.borrow_mut()();
         }
-        let return_value = fn_config
-            .borrow_mut()
-            .get_return_value()
-            .expect("No return value configured for 'another_work'! TODO: write call description?");
+        let Some(return_value) = fn_config.borrow_mut().get_return_value() else {
+            self.error_printer
+                .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
+        };
         return return_value;
     }
 
@@ -215,10 +216,10 @@ impl<
         if let Some(callback) = fn_config.borrow().get_callback() {
             callback.borrow_mut()();
         }
-        let return_value = fn_config
-            .borrow_mut()
-            .get_return_value()
-            .expect("No return value configured for 'another_work'! TODO: write call description?");
+        let Some(return_value) = fn_config.borrow_mut().get_return_value() else {
+            self.error_printer
+                .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
+        };
         return return_value;
     }
 }

@@ -54,8 +54,10 @@ impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TBaseCaller>
             .return_values
             .get(self.current_return_value_index)
             .cloned();
-        self.current_return_value_index =
-            (self.current_return_value_index + 1).min(self.return_values.len() - 1);
+        if return_value.is_some() {
+            self.current_return_value_index =
+                (self.current_return_value_index + 1).min(self.return_values.len() - 1);
+        }
         return return_value;
     }
 

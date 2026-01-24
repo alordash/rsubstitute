@@ -26,6 +26,12 @@ pub(crate) trait IErrorPrinter {
     ) -> String;
 
     fn panic_received_unexpected_calls_error(&self, error_msgs: Vec<String>) -> !;
+
+    fn panic_no_return_value_was_configured(
+        &self,
+        fn_name: &'static str,
+        call_args: Vec<ArgInfo>,
+    ) -> !;
 }
 
 pub(crate) struct ErrorPrinter;
@@ -158,6 +164,16 @@ List of existing configuration ordered by number of correctly matched arguments 
             r"Did not expect to receive any other calls. Received {unexpected_calls_count} {call_fmt}:
 {unexpected_calls_msg}"
         );
+        panic!("{error_msg}");
+    }
+
+    fn panic_no_return_value_was_configured(
+        &self,
+        fn_name: &'static str,
+        call_args: Vec<ArgInfo>,
+    ) -> ! {
+        let call_msg = self.format_received_unexpected_call_error(fn_name, call_args);
+        let error_msg = format!("No return value was configured for following call: {call_msg}");
         panic!("{error_msg}");
     }
 }
