@@ -9,8 +9,8 @@ pub mod macros {
 
 pub mod for_generated {
     pub use crate::*;
-    pub use macros::*;
     pub use global_mocks_map::*;
+    pub use macros::*;
     pub use rsubstitute_core::*;
     pub use std::cell::LazyCell;
     pub use std::cell::RefCell;
@@ -18,6 +18,3 @@ pub mod for_generated {
     pub use std::sync::Arc;
     pub use std::sync::LazyLock;
 }
-
-// TODO - move to separate crate?
-pub mod assertions;

@@ -13,7 +13,7 @@ mod tests {
     #![allow(non_snake_case)]
 
     use super::*;
-    use rsubstitute::assertions::*;
+    use not_enough_asserts::panics::*;
     use rsubstitute::*;
     use std::cell::RefCell;
     use std::sync::Arc;

@@ -3,6 +3,12 @@
 version = 4
 
 [[package]]
+name = "not_enough_asserts"
+version = "0.1.1"
+source = "registry+https://github.com/rust-lang/crates.io-index"
+checksum = "03f3c1d49bef838e0741551b7f9e15d94e3936799bdb997bfe276f3db1bd5411"
+
+[[package]]
 name = "proc-macro2"
 version = "1.0.104"
 source = "registry+https://github.com/rust-lang/crates.io-index"
@@ -24,6 +30,7 @@ dependencies = [
 name = "rsubstitute"
 version = "0.1.0"
 dependencies = [
+ "not_enough_asserts",
  "rsubstitute_core",
  "rsubstitute_proc_macro",
  "typeid",

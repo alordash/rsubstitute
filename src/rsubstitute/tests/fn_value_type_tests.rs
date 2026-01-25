@@ -42,7 +42,7 @@ fn accept_two_values_return_value(v1: i32, v2: f32) -> &'static str {
 mod tests {
     #![allow(non_snake_case)]
     use super::*;
-    use rsubstitute::assertions::*;
+    use not_enough_asserts::panics::*;
     use rsubstitute::*;
 
     mod accept_value_tests {

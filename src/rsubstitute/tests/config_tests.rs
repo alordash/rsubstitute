@@ -8,7 +8,7 @@ trait Trait {
 mod max_invalid_calls_listed_count_tests {
     #![allow(non_snake_case)]
     use super::*;
-    use rsubstitute::assertions::*;
+    use not_enough_asserts::panics::*;
     use rsubstitute::*;
 
     mod default {

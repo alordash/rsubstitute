@@ -40,7 +40,7 @@ trait MyTrait {
 }
 
 pub use generated::*;
-use rsubstitute::assertions::{assert_panics, record_panic};
+use not_enough_asserts::panics::*;
 
 mod generated {
     use super::*;

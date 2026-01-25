@@ -28,7 +28,7 @@ fn accept_two_refs_return_ref(r1: &i32, r2: &f32) -> &'static str {
 mod tests {
     #![allow(non_snake_case)]
     use super::*;
-    use rsubstitute::assertions::*;
+    use not_enough_asserts::panics::*;
     use rsubstitute::*;
 
     mod accept_ref_tests {

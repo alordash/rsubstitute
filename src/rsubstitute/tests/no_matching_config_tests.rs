@@ -15,7 +15,7 @@ mod tests {
 
     use super::*;
     use rsubstitute::Arg;
-    use rsubstitute::assertions::*;
+    use not_enough_asserts::panics::*;
 
     #[test]
     fn trait_work_PanicsOk() {
