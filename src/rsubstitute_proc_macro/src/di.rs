@@ -121,12 +121,14 @@ fn create_services() -> ServiceCollection {
     let get_global_mock_expr_generator = Arc::new(GetGlobalMockExprGenerator {
         type_factory: type_factory.clone(),
     });
+    let field_checker = Arc::new(FieldChecker);
     let mock_fn_block_generator = Arc::new(MockFnBlockGenerator {
         path_factory: path_factory.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
         std_mem_transmute_expr_factory: std_mem_transmute_expr_factory.clone(),
         field_value_factory: field_value_factory.clone(),
         get_global_mock_expr_generator: get_global_mock_expr_generator.clone(),
+        field_checker: field_checker.clone(),
     });
     let mock_trait_impl_generator = Arc::new(MockTraitImplGenerator {
         path_factory: path_factory.clone(),
@@ -152,6 +154,7 @@ fn create_services() -> ServiceCollection {
         field_value_factory: field_value_factory.clone(),
         local_factory: local_factory.clone(),
         reference_normalizer: reference_normalizer.clone(),
+        field_checker: field_checker.clone(),
     });
     let impl_factory = Arc::new(ImplFactory);
     let setup_output_generator = Arc::new(SetupOutputGenerator {

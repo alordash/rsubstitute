@@ -1,7 +1,7 @@
 use proc_macro2::Ident;
 use syn::Field;
 
-pub(crate) trait IFieldRequiredIdentGetter {
+pub trait IFieldRequiredIdentGetter {
     fn get_required_ident(&self) -> Ident;
 }
 

@@ -20,6 +20,7 @@ pub(crate) struct MockFnBlockGenerator {
     pub std_mem_transmute_expr_factory: Arc<dyn IStdMemTransmuteExprFactory>,
     pub field_value_factory: Arc<dyn IFieldValueFactory>,
     pub get_global_mock_expr_generator: Arc<dyn IGetGlobalMockExprGenerator>,
+    pub field_checker: Arc<dyn IFieldChecker>,
 }
 
 impl IMockFnBlockGenerator for MockFnBlockGenerator {
@@ -67,10 +68,7 @@ impl MockFnBlockGenerator {
             .iter()
             .map(|field| {
                 let field_ident = field.get_required_ident();
-                if let Type::Path(type_path) = &field.ty
-                    && let Some(first_path_segment) = type_path.path.segments.first()
-                    && first_path_segment.ident == constants::PHANTOM_DATA_IDENT.clone()
-                {
+                if self.field_checker.is_phantom_data(field) {
                     return self.field_value_factory.create_as_phantom_data(field_ident);
                 }
                 let field_value = FieldValue {

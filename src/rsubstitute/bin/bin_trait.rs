@@ -229,18 +229,6 @@ mod generated {
             };
             return self.data.get_data.handle_returning(call);
         }
-
-        // fn standalone(number: i32) -> f32 {
-        //     let call = standalone_Call {
-        //         phantom_lifetime: PhantomData,
-        //         number,
-        //     };
-        //     return Self::standalone_data.handle_returning(call);
-        // }
-        //
-        // fn standalone_with_ref(_number: &i32) -> f32 {
-        //     todo!()
-        // }
     }
 
     impl<'a> MyTraitMock<'a> {
@@ -358,20 +346,6 @@ mod generated {
         pub fn no_other_calls(&self) {
             self.data.verify_received_nothing_else();
         }
-
-        // #[allow(non_upper_case_globals)]
-        // const standalone_data: LazyCell<
-        //     FnData<standalone_Call<'a>, standalone_ArgsChecker<'a>, f32>,
-        // > = LazyCell::new(|| FnData::new("standalone", &SERVICES));
-        // pub fn standalone(number: Arg<i32>) -> f32 {
-        //     let standalone_args_checker = standalone_ArgsChecker {
-        //         phantom_lifetime: PhantomData,
-        //         number,
-        //     };
-        //     // let _fn_config = Self::standalone_data.add_config(standalone_args_checker);
-        //     // let shared_fn_config = SharedFnConfig::new()
-        //     todo!()
-        // }
     }
 
     // end - Mock

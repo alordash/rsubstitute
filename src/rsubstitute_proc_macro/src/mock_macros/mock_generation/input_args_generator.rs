@@ -23,6 +23,7 @@ pub(crate) struct InputArgsGenerator {
     pub field_value_factory: Arc<dyn IFieldValueFactory>,
     pub local_factory: Arc<dyn ILocalFactory>,
     pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
+    pub field_checker: Arc<dyn IFieldChecker>
 }
 
 impl IInputArgsGenerator for InputArgsGenerator {
@@ -107,11 +108,7 @@ impl IInputArgsGenerator for InputArgsGenerator {
             .fields
             .iter()
             .map(|field| {
-                // TODO - deduplicate this code, it's also used in mock_fn_block_generator
-                if let Type::Path(type_path) = &field.ty
-                    && let Some(first_path_segment) = type_path.path.segments.first()
-                    && first_path_segment.ident == constants::PHANTOM_DATA_IDENT.clone()
-                {
+                if self.field_checker.is_phantom_data(field) {
                     let field_ident = field.get_required_ident();
                     return self.field_value_factory.create_as_phantom_data(field_ident);
                 }
