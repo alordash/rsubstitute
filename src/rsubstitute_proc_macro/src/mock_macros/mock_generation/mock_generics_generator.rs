@@ -11,6 +11,7 @@ pub trait IMockGenericsGenerator {
 
 pub(crate) struct MockGenericsGenerator {
     pub type_factory: Arc<dyn ITypeFactory>,
+    pub field_factory: Arc<dyn IFieldFactory>,
     pub generics_merger: Arc<dyn IGenericsMerger>,
 }
 
@@ -118,17 +119,13 @@ impl MockGenericsGenerator {
     }
 
     fn convert_type_param_to_phantom_field(&self, type_param: &TypeParam) -> Field {
-        let result = Field {
-            attrs: Vec::new(),
-            vis: Visibility::Inherited,
-            mutability: FieldMutability::None,
-            ident: Some(format_ident!("_phantom_{}", type_param.ident)),
-            colon_token: Default::default(),
-            ty: self.type_factory.wrap_in(
-                self.type_factory.create(type_param.ident.clone()),
-                constants::PHANTOM_DATA_IDENT.clone(),
-            ),
-        };
-        return result;
+        let ty = self.type_factory.wrap_in(
+            self.type_factory.create(type_param.ident.clone()),
+            constants::PHANTOM_DATA_IDENT.clone(),
+        );
+        let field = self
+            .field_factory
+            .create(format_ident!("_phantom_{}", type_param.ident), ty);
+        return field;
     }
 }

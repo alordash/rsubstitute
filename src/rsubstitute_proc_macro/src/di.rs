@@ -74,6 +74,7 @@ fn create_services() -> ServiceCollection {
     });
     let mock_generics_generator = Arc::new(MockGenericsGenerator {
         type_factory: type_factory.clone(),
+        field_factory: field_factory.clone(),
         generics_merger: generics_merger.clone(),
     });
     let fn_info_generator = Arc::new(FnInfoGenerator {
@@ -90,6 +91,7 @@ fn create_services() -> ServiceCollection {
     });
     let mock_data_struct_generator = Arc::new(MockDataStructGenerator {
         type_factory: type_factory.clone(),
+        field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
     });
     let mock_setup_struct_generator = Arc::new(MockSetupStructGenerator {

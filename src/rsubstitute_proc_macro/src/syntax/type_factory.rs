@@ -15,7 +15,6 @@ pub trait ITypeFactory {
     fn wrap_in_arc(&self, ty: Type) -> Type;
 }
 
-// TODO - maybe store in mock structs their type counterparts lazily?
 pub struct TypeFactory {
     pub(crate) path_factory: Arc<dyn IPathFactory>,
 }

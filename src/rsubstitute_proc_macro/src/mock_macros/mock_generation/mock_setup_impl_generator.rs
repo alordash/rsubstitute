@@ -210,7 +210,6 @@ impl MockSetupImplGenerator {
                             constants::SHARED_FN_CONFIG_NEW_FN_IDENT.clone(),
                         ])),
                         paren_token: Default::default(),
-                        // TODO - add factory for ExprPath
                         args: [
                             self.path_factory
                                 .create_expr(Self::FN_CONFIG_VAR_IDENT.clone()),

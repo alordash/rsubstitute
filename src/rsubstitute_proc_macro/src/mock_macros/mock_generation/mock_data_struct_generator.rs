@@ -1,7 +1,7 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::FnInfo;
 use crate::mock_macros::mock_generation::models::*;
-use crate::syntax::{IFieldRequiredIdentGetter, IStructFactory, ITypeFactory};
+use crate::syntax::*;
 use quote::format_ident;
 use std::sync::Arc;
 use syn::*;
@@ -26,6 +26,7 @@ pub trait IMockDataStructGenerator {
 // TODO - verify all impls are internal
 pub(crate) struct MockDataStructGenerator {
     pub type_factory: Arc<dyn ITypeFactory>,
+    pub field_factory: Arc<dyn IFieldFactory>,
     pub struct_factory: Arc<dyn IStructFactory>,
 }
 
@@ -116,64 +117,55 @@ impl MockDataStructGenerator {
     const MOCK_DATA_STRUCT_IDENT_SUFFIX: &'static str = "Data";
 
     fn generate_field(&self, fn_info: &FnInfo, maybe_base_caller_ty: Option<Type>) -> Field {
-        let field = Field {
-            attrs: Vec::new(),
-            vis: Visibility::Inherited,
-            mutability: FieldMutability::None,
-            ident: Some(fn_info.data_field_ident.clone()),
-            colon_token: Default::default(),
-            ty: Type::Path(TypePath {
-                qself: None,
-                path: Path {
-                    leading_colon: None,
-                    segments: [PathSegment {
-                        ident: constants::FN_DATA_TYPE_IDENT.clone(),
-                        arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
-                            colon2_token: None,
-                            lt_token: Default::default(),
-                            args: [
-                                GenericArgument::Type(
-                                    self.type_factory
-                                        .create_from_struct(&fn_info.call_struct.item_struct),
-                                ),
-                                GenericArgument::Type(
-                                    self.type_factory.create_from_struct(
-                                        &fn_info.args_checker_struct.item_struct,
-                                    ),
-                                ),
-                                GenericArgument::Type(fn_info.parent.get_return_value_type()),
-                                GenericArgument::Type(
-                                    maybe_base_caller_ty.unwrap_or(constants::VOID_TYPE.clone()),
-                                ),
-                            ]
-                            .into_iter()
-                            .collect(),
-                            gt_token: Default::default(),
-                        }),
-                    }]
-                    .into_iter()
-                    .collect(),
-                },
-            }),
-        };
+        let ty = Type::Path(TypePath {
+            qself: None,
+            path: Path {
+                leading_colon: None,
+                segments: [PathSegment {
+                    ident: constants::FN_DATA_TYPE_IDENT.clone(),
+                    arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
+                        colon2_token: None,
+                        lt_token: Default::default(),
+                        args: [
+                            GenericArgument::Type(
+                                self.type_factory
+                                    .create_from_struct(&fn_info.call_struct.item_struct),
+                            ),
+                            GenericArgument::Type(
+                                self.type_factory
+                                    .create_from_struct(&fn_info.args_checker_struct.item_struct),
+                            ),
+                            GenericArgument::Type(fn_info.parent.get_return_value_type()),
+                            GenericArgument::Type(
+                                maybe_base_caller_ty.unwrap_or(constants::VOID_TYPE.clone()),
+                            ),
+                        ]
+                        .into_iter()
+                        .collect(),
+                        gt_token: Default::default(),
+                    }),
+                }]
+                .into_iter()
+                .collect(),
+            },
+        });
+        let field = self
+            .field_factory
+            .create(fn_info.data_field_ident.clone(), ty);
         return field;
     }
 
     fn generate_base_caller_field(&self, base_caller_struct: &BaseCallerStruct) -> Field {
-        let field = Field {
-            attrs: Vec::new(),
-            vis: Visibility::Inherited,
-            mutability: FieldMutability::None,
-            ident: Some(constants::BASE_CALLER_FIELD_IDENT.clone()),
-            colon_token: Some(Default::default()),
-            ty: self.type_factory.wrap_in_arc(
-                self.type_factory.wrap_in(
-                    self.type_factory
-                        .create_from_struct(&base_caller_struct.item_struct),
-                    constants::REF_CELL_IDENT.clone(),
-                ),
+        let ty = self.type_factory.wrap_in_arc(
+            self.type_factory.wrap_in(
+                self.type_factory
+                    .create_from_struct(&base_caller_struct.item_struct),
+                constants::REF_CELL_IDENT.clone(),
             ),
-        };
+        );
+        let field = self
+            .field_factory
+            .create(constants::BASE_CALLER_FIELD_IDENT.clone(), ty);
         return field;
     }
 }

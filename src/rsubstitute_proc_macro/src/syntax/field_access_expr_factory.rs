@@ -1,7 +1,7 @@
-use crate::syntax::IPathFactory;
+use crate::syntax::*;
 use proc_macro2::Ident;
 use std::sync::Arc;
-use syn::{Expr, ExprField, ExprPath, Member};
+use syn::*;
 
 pub trait IFieldAccessExprFactory {
     fn create(&self, members_idents: Vec<Ident>) -> Expr;
