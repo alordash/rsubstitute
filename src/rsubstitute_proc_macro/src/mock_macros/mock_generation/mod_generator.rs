@@ -58,7 +58,6 @@ impl IModGenerator for ModGenerator {
         mock_setup_impl: MockSetupImpl,
         mock_received_impl: MockReceivedImpl,
     ) -> GeneratedMod {
-        let attrs = vec![constants::ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE.clone()];
         let usings = [
             constants::USE_SUPER.clone(),
             constants::USE_FOR_GENERATED.clone(),
@@ -87,7 +86,7 @@ impl IModGenerator for ModGenerator {
             ])
             .collect();
         let item_mod = ItemMod {
-            attrs,
+            attrs: vec![constants::CFG_TEST_ATTRIBUTE.clone(), constants::ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE.clone()],
             vis: Visibility::Inherited,
             unsafety: None,
             mod_token: Default::default(),
@@ -96,7 +95,7 @@ impl IModGenerator for ModGenerator {
             semi: None,
         };
         let use_generated_mod = ItemUse {
-            attrs: Vec::new(),
+            attrs: vec![constants::CFG_TEST_ATTRIBUTE.clone()],
             vis: Visibility::Public(Default::default()),
             use_token: Default::default(),
             leading_colon: None,
@@ -136,7 +135,6 @@ impl IModGenerator for ModGenerator {
         static_fn: StaticFn,
     ) -> GeneratedMod {
         let fn_ident = item_fn.sig.ident.clone();
-        let attrs = vec![constants::ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE.clone()];
         let usings = [
             constants::USE_SUPER.clone(),
             constants::USE_FOR_GENERATED.clone(),
@@ -167,7 +165,10 @@ impl IModGenerator for ModGenerator {
             ])
             .collect();
         let item_mod = ItemMod {
-            attrs,
+            attrs: vec![
+                constants::CFG_TEST_ATTRIBUTE.clone(),
+                constants::ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE.clone(),
+            ],
             vis: Visibility::Inherited,
             unsafety: None,
             mod_token: Default::default(),
