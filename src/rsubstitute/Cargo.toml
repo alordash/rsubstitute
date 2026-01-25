@@ -15,6 +15,10 @@ path = "bin/bin_trait_generics.rs"
 name = "fn"
 path = "bin/bin_fn.rs"
 
+[[bin]]
+name = "struct"
+path = "bin/bin_struct.rs"
+
 [dependencies]
 rsubstitute_core = { workspace = true }
 rsubstitute_proc_macro = { workspace = true }
