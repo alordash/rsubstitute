@@ -22,7 +22,7 @@ pub trait IMockTraitImplGenerator {
 pub(crate) struct MockTraitImplGenerator {
     pub path_factory: Arc<dyn IPathFactory>,
     pub type_factory: Arc<dyn ITypeFactory>,
-    pub reference_type_crawler: Arc<dyn IReferenceTypeCrawler>,
+    pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
     pub mock_fn_block_generator: Arc<dyn IMockFnBlockGenerator>,
 }
 
@@ -92,7 +92,7 @@ impl MockTraitImplGenerator {
                 .clone()
                 .into_iter()
                 .map(|mut fn_arg| {
-                    self.convert_input_reference(&mut fn_arg);
+                    self.reference_normalizer.anonymize_fn_arg(&mut fn_arg);
                     return fn_arg;
                 })
                 .collect(),
@@ -108,29 +108,5 @@ impl MockTraitImplGenerator {
             block,
         };
         return impl_item_fn;
-    }
-
-    fn convert_input_reference(&self, fn_arg: &mut FnArg) {
-        let ty = match fn_arg {
-            FnArg::Receiver(receiver) => {
-                if let Some((_, lifetime)) = &mut receiver.reference {
-                    self.anonymize_input_reference_lifetime(LifetimeRef::Optional(lifetime));
-                }
-                receiver.ty.as_mut()
-            }
-            FnArg::Typed(pat_type) => pat_type.ty.as_mut(),
-        };
-        let lifetime_refs = self.reference_type_crawler.get_all_type_references(ty);
-        for lifetime_ref in lifetime_refs {
-            self.anonymize_input_reference_lifetime(lifetime_ref);
-        }
-    }
-
-    fn anonymize_input_reference_lifetime(&self, lifetime_ref: LifetimeRef) {
-        if let LifetimeRef::Optional(optional_lifetime) = lifetime_ref
-            && optional_lifetime.is_none()
-        {
-            *optional_lifetime = Some(constants::ANONYMOUS_LIFETIME.clone());
-        }
     }
 }

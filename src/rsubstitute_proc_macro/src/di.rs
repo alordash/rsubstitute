@@ -133,7 +133,7 @@ fn create_services() -> ServiceCollection {
     let mock_trait_impl_generator = Arc::new(MockTraitImplGenerator {
         path_factory: path_factory.clone(),
         type_factory: type_factory.clone(),
-        reference_type_crawler: reference_type_crawler.clone(),
+        reference_normalizer: reference_normalizer.clone(),
         mock_fn_block_generator: mock_fn_block_generator.clone(),
     });
     let local_factory = Arc::new(LocalFactory);
@@ -210,7 +210,7 @@ fn create_services() -> ServiceCollection {
     });
     let static_fn_generator = Arc::new(StaticFnGenerator {
         mock_fn_block_generator: mock_fn_block_generator.clone(),
-        reference_type_crawler: reference_type_crawler.clone(),
+        reference_normalizer: reference_normalizer.clone(),
     });
 
     let item_trait_handler = Arc::new(ItemTraitHandler {
