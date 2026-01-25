@@ -149,7 +149,6 @@ impl<
         let configs = unsafe { &*self.configs };
         let mut args_check_results = Vec::with_capacity(configs.len());
         for config in configs.iter().rev() {
-            // TODO - do I really want to clone call on each check?
             let args_check_result = config.borrow().check(call.clone());
             if args_check_result.iter().all(|x| x.is_ok()) {
                 return MatchingConfigSearchResult::Ok(config.clone());

@@ -24,7 +24,6 @@ pub trait IMockStructGenerator {
     ) -> MockStruct;
 }
 
-// TODO - make service impls internal
 pub(crate) struct MockStructGenerator {
     pub field_factory: Arc<dyn IFieldFactory>,
     pub type_factory: Arc<dyn ITypeFactory>,

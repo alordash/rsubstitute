@@ -44,7 +44,6 @@ impl IFnSetupGenerator for FnSetupGenerator {
         );
         let phantom_types_count = mock_generics.get_phantom_types_count();
         let sig = Signature {
-            // TODO - all these `None` should be actually mapped to souarce fns signature
             constness: None,
             asyncness: None,
             unsafety: None,

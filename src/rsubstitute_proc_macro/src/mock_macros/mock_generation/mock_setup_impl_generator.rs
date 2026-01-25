@@ -114,7 +114,6 @@ impl MockSetupImplGenerator {
         phantom_types_count: usize,
     ) -> ImplItemFn {
         let sig = Signature {
-            // TODO - all these `None` should be actually mapped to souarce fns signature
             constness: None,
             asyncness: None,
             unsafety: None,

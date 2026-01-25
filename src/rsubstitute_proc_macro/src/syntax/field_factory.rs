@@ -3,7 +3,6 @@ use proc_macro2::Ident;
 use std::sync::Arc;
 use syn::*;
 
-// TODO - review code where fields are created manually, this could be used in many places
 pub trait IFieldFactory {
     fn create(&self, ident: Ident, ty: Type) -> Field;
 
