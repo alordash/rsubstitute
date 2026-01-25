@@ -32,12 +32,8 @@ impl ReferenceTypeCrawler {
                 self.recursive_get_all_type_references_from_path(result, &mut type_path.path)
             }
             Type::Reference(type_reference) => {
-                // TODO - cursed. Maybe store only &mut Lifetime in result vector.
-                let copy_mut_ref: &mut Option<Lifetime> = unsafe {
-                    let ptr = &mut type_reference.lifetime as *mut Option<Lifetime>;
-                    std::mem::transmute(ptr)
-                };
-                let lifetime_ref = LifetimeRef::Optional(copy_mut_ref);
+                let mut_lifetime_ref = &mut type_reference.lifetime;
+                let lifetime_ref = LifetimeRef::Optional(mut_lifetime_ref);
                 self.recursive_get_all_type_references_from_box(result, &mut type_reference.elem);
                 result.push(lifetime_ref);
             }
