@@ -1,5 +1,7 @@
 use crate::constants;
-use crate::syntax::{IFieldAccessExprFactory, IFieldRequiredIdentGetter, IPathFactory, ITypeFactory};
+use crate::syntax::{
+    IFieldAccessExprFactory, IFieldRequiredIdentGetter, IPathFactory, ITypeFactory,
+};
 use proc_macro::TokenStream;
 use proc_macro2::Literal;
 use quote::{ToTokens, quote};
@@ -34,10 +36,7 @@ impl IDeriveArgsFormatterMacroHandler for DeriveArgsFormatterMacroHandler {
                     .create(constants::I_ARGS_FORMATTER_TRAIT_IDENT.clone()),
                 Default::default(),
             )),
-            self_ty: Box::new(
-                self.type_factory
-                    .create_with_generics(item_struct.ident.clone(), item_struct.generics.clone()),
-            ),
+            self_ty: Box::new(self.type_factory.create_from_struct(&item_struct)),
             brace_token: Default::default(),
             items: vec![fmt_args_impl],
         };

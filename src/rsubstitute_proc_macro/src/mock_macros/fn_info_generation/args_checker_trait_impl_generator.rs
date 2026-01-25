@@ -54,10 +54,10 @@ impl IArgsCheckerTraitImplGenerator for ArgsCheckerTraitImplGenerator {
             self.type_factory
                 .create_from_struct(&call_struct.item_struct),
         );
-        let self_ty = Box::new(self.type_factory.create_with_generics(
-            args_checker_struct.item_struct.ident.clone(),
-            args_checker_struct.item_struct.generics.clone(),
-        ));
+        let self_ty = Box::new(
+            self.type_factory
+                .create_from_struct(&args_checker_struct.item_struct),
+        );
         let items = self.generate_check_fn(call_struct, call_ty, phantom_types_count);
         let item_impl = ItemImpl {
             attrs: Vec::new(),

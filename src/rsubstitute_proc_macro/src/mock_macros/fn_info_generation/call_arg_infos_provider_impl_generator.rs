@@ -32,10 +32,10 @@ impl ICallArgInfosProviderImplGenerator for CallArgInfosProviderImplGenerator {
         let trait_path = self
             .path_factory
             .create(constants::I_ARG_INFOS_PROVIDER_TRAIT_IDENT.clone());
-        let self_ty = Box::new(self.type_factory.create_with_generics(
-            call_struct.item_struct.ident.clone(),
-            call_struct.item_struct.generics.clone(),
-        ));
+        let self_ty = Box::new(
+            self.type_factory
+                .create_from_struct(&call_struct.item_struct),
+        );
         let get_arg_infos_fn = self.generate_get_arg_infos_fn(call_struct, phantom_types_count);
         let item_impl = ItemImpl {
             attrs: Vec::new(),
