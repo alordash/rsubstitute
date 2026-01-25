@@ -82,47 +82,27 @@ impl MockConstructorBlockGenerator {
         let mut data_fields: Vec<_> = mock_data_struct
             .field_and_fn_idents
             .iter()
-            .map(|(field_ident, fn_ident)| {
-                FieldValue {
+            .map(|(field_ident, fn_ident)| FieldValue {
+                attrs: Vec::new(),
+                member: Member::Named(field_ident.clone()),
+                colon_token: Some(Default::default()),
+                expr: Expr::Call(ExprCall {
                     attrs: Vec::new(),
-                    member: Member::Named(field_ident.clone()),
-                    colon_token: Some(Default::default()),
-                    expr: Expr::Call(ExprCall {
-                        attrs: Vec::new(),
-                        func: Box::new(Expr::Path(ExprPath {
+                    func: Box::new(self.path_factory.create_expr_from_parts(vec![
+                        constants::FN_DATA_TYPE_IDENT.clone(),
+                        constants::NEW_IDENT.clone(),
+                    ])),
+                    paren_token: Default::default(),
+                    args: [
+                        Expr::Lit(ExprLit {
                             attrs: Vec::new(),
-                            qself: None,
-                            path: Path {
-                                leading_colon: None,
-                                segments: [
-                                    PathSegment {
-                                        ident: constants::FN_DATA_TYPE_IDENT.clone(),
-                                        arguments: PathArguments::None,
-                                    },
-                                    PathSegment {
-                                        ident: constants::NEW_IDENT.clone(),
-                                        arguments: PathArguments::None,
-                                    },
-                                ]
-                                .into_iter()
-                                .collect(),
-                            },
-                        })),
-                        paren_token: Default::default(),
-                        args: [
-                            Expr::Lit(ExprLit {
-                                attrs: Vec::new(),
-                                lit: Lit::Str(LitStr::new(
-                                    &fn_ident.to_string(),
-                                    Span::call_site(),
-                                )),
-                            }),
-                            constants::SERVICES_REF_EXPR.clone(),
-                        ]
-                        .into_iter()
-                        .collect(),
-                    }),
-                }
+                            lit: Lit::Str(LitStr::new(&fn_ident.to_string(), Span::call_site())),
+                        }),
+                        constants::SERVICES_REF_EXPR.clone(),
+                    ]
+                    .into_iter()
+                    .collect(),
+                }),
             })
             .collect();
         let phantom_lifetime_field = constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE.clone();
@@ -145,7 +125,7 @@ impl MockConstructorBlockGenerator {
                     .path_factory
                     .create(base_caller_struct.item_struct.ident.clone()),
                 brace_token: Default::default(),
-                fields : base_caller_struct_fields,
+                fields: base_caller_struct_fields,
                 dot2_token: None,
                 rest: None,
             });
@@ -155,25 +135,17 @@ impl MockConstructorBlockGenerator {
                 colon_token: Some(Default::default()),
                 expr: Expr::Call(ExprCall {
                     attrs: Vec::new(),
-                    func: Box::new(Expr::Path(ExprPath {
-                        attrs: Vec::new(),
-                        qself: None,
-                        path: self.path_factory.create_from_parts(&[
-                            constants::ARC_IDENT.clone(),
-                            constants::NEW_IDENT.clone(),
-                        ]),
-                    })),
+                    func: Box::new(self.path_factory.create_expr_from_parts(vec![
+                        constants::ARC_IDENT.clone(),
+                        constants::NEW_IDENT.clone(),
+                    ])),
                     paren_token: Default::default(),
                     args: [Expr::Call(ExprCall {
                         attrs: Vec::new(),
-                        func: Box::new(Expr::Path(ExprPath {
-                            attrs: Vec::new(),
-                            qself: None,
-                            path: self.path_factory.create_from_parts(&[
-                                constants::REF_CELL_IDENT.clone(),
-                                constants::NEW_IDENT.clone(),
-                            ]),
-                        })),
+                        func: Box::new(self.path_factory.create_expr_from_parts(vec![
+                            constants::REF_CELL_IDENT.clone(),
+                            constants::NEW_IDENT.clone(),
+                        ])),
                         paren_token: Default::default(),
                         args: [base_caller_struct_construction].into_iter().collect(),
                     })]
@@ -197,14 +169,10 @@ impl MockConstructorBlockGenerator {
                 eq_token: Default::default(),
                 expr: Box::new(Expr::Call(ExprCall {
                     attrs: Vec::new(),
-                    func: Box::new(Expr::Path(ExprPath {
-                        attrs: Vec::new(),
-                        qself: None,
-                        path: self.path_factory.create_from_parts(&[
-                            constants::ARC_IDENT.clone(),
-                            constants::NEW_IDENT.clone(),
-                        ]),
-                    })),
+                    func: Box::new(self.path_factory.create_expr_from_parts(vec![
+                        constants::ARC_IDENT.clone(),
+                        constants::NEW_IDENT.clone(),
+                    ])),
                     paren_token: Default::default(),
                     args: [Expr::Struct(ExprStruct {
                         attrs: Vec::new(),

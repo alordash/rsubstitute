@@ -130,11 +130,10 @@ impl BaseCallerImplGenerator {
                         return_token: Default::default(),
                         expr: Some(Box::new(Expr::Call(ExprCall {
                             attrs: Vec::new(),
-                            func: Box::new(Expr::Path(ExprPath {
-                                attrs: Vec::new(),
-                                qself: None,
-                                path: self.path_factory.create(base_fn.item_fn.sig.ident.clone()),
-                            })),
+                            func: Box::new(
+                                self.path_factory
+                                    .create_expr(base_fn.item_fn.sig.ident.clone()),
+                            ),
                             paren_token: Default::default(),
                             args: call_struct
                                 .item_struct

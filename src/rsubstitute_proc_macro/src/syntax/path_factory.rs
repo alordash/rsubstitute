@@ -9,7 +9,11 @@ pub trait IPathFactory {
 
     fn create_with_generics(&self, ident: Ident, generics: Generics) -> Path;
 
-    fn create_from_parts(&self, idents: &[Ident]) -> Path;
+    fn create_from_parts(&self, idents: Vec<Ident>) -> Path;
+
+    fn create_expr(&self, ident: Ident) -> Expr;
+
+    fn create_expr_from_parts(&self, idents: Vec<Ident>) -> Expr;
 }
 
 pub(crate) struct PathFactory {
@@ -56,17 +60,36 @@ impl IPathFactory for PathFactory {
         return result;
     }
 
-    fn create_from_parts(&self, idents: &[Ident]) -> Path {
+    fn create_from_parts(&self, idents: Vec<Ident>) -> Path {
         let result = Path {
             leading_colon: None,
             segments: idents
-                .iter()
+                .into_iter()
                 .map(|ident| PathSegment {
-                    ident: ident.clone(),
+                    ident,
                     arguments: PathArguments::None,
                 })
                 .collect(),
         };
         return result;
+    }
+
+    fn create_expr(&self, ident: Ident) -> Expr {
+        self.to_expr(self.create(ident))
+    }
+
+    fn create_expr_from_parts(&self, idents: Vec<Ident>) -> Expr {
+        self.to_expr(self.create_from_parts(idents))
+    }
+}
+
+impl PathFactory {
+    fn to_expr(&self, path: Path) -> Expr {
+        let expr = Expr::Path(ExprPath {
+            attrs: Vec::new(),
+            qself: None,
+            path,
+        });
+        return expr;
     }
 }

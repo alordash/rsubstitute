@@ -86,16 +86,15 @@ impl FnSetupGenerator {
                 Self::MOCK_VAR_IDENT.clone(),
                 LocalInit {
                     eq_token: Default::default(),
-                    expr: Box::new(self.get_global_mock_expr_generator.generate(&mock_struct.item_struct)),
+                    expr: Box::new(
+                        self.get_global_mock_expr_generator
+                            .generate(&mock_struct.item_struct),
+                    ),
                     diverge: None,
                 },
             ),
         );
-        let mock_var_expr = Expr::Path(ExprPath {
-            attrs: Vec::new(),
-            qself: None,
-            path: self.path_factory.create(Self::MOCK_VAR_IDENT.clone()),
-        });
+        let mock_var_expr = self.path_factory.create_expr(Self::MOCK_VAR_IDENT.clone());
         let reset_stmt = Stmt::Expr(
             Expr::MethodCall(self.expr_method_call_factory.create_with_base_receiver(
                 mock_var_expr.clone(),

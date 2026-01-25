@@ -179,11 +179,10 @@ impl MockSetupImplGenerator {
         let base_caller_path = if maybe_base_caller_struct.is_some() {
             Expr::Call(ExprCall {
                 attrs: Vec::new(),
-                func: Box::new(Expr::Path(ExprPath {
-                    attrs: Vec::new(),
-                    qself: None,
-                    path: constants::OPTION_SOME_PATH.clone(),
-                })),
+                func: Box::new(
+                    self.path_factory
+                        .create_expr(constants::OPTION_SOME_IDENT.clone()),
+                ),
                 paren_token: Default::default(),
                 args: [Expr::MethodCall(self.expr_method_call_factory.create(
                     vec![
@@ -198,11 +197,8 @@ impl MockSetupImplGenerator {
                 .collect(),
             })
         } else {
-            Expr::Path(ExprPath {
-                attrs: Vec::new(),
-                qself: None,
-                path: constants::OPTION_NONE_PATH.clone(),
-            })
+            self.path_factory
+                .create_expr(constants::OPTION_NONE_IDENT.clone())
         };
         let shared_fn_config_decl_stmt = Stmt::Local(
             self.local_factory.create(
@@ -211,25 +207,10 @@ impl MockSetupImplGenerator {
                     eq_token: Default::default(),
                     expr: Box::new(Expr::Call(ExprCall {
                         attrs: Vec::new(),
-                        func: Box::new(Expr::Path(ExprPath {
-                            attrs: Vec::new(),
-                            qself: None,
-                            path: Path {
-                                leading_colon: None,
-                                segments: [
-                                    PathSegment {
-                                        ident: constants::SHARED_FN_CONFIG_TYPE_IDENT.clone(),
-                                        arguments: PathArguments::None,
-                                    },
-                                    PathSegment {
-                                        ident: constants::SHARED_FN_CONFIG_NEW_FN_IDENT.clone(),
-                                        arguments: PathArguments::None,
-                                    },
-                                ]
-                                .into_iter()
-                                .collect(),
-                            },
-                        })),
+                        func: Box::new(self.path_factory.create_expr_from_parts(vec![
+                            constants::SHARED_FN_CONFIG_TYPE_IDENT.clone(),
+                            constants::SHARED_FN_CONFIG_NEW_FN_IDENT.clone(),
+                        ])),
                         paren_token: Default::default(),
                         // TODO - add factory for ExprPath
                         args: [

@@ -1,4 +1,3 @@
-use crate::constants;
 use crate::di::SERVICES;
 use proc_macro2::{Ident, Span};
 use quote::format_ident;
@@ -21,15 +20,12 @@ pub const SELF_IDENT_PATH: LazyCell<Path> = LazyCell::new(|| {
 });
 
 pub const RETURN_SELF_STMT: LazyCell<Stmt> = LazyCell::new(|| {
+    let path_factory = &SERVICES.path_factory;
     let return_self_stmt = Stmt::Expr(
         Expr::Return(ExprReturn {
             attrs: Vec::new(),
             return_token: Default::default(),
-            expr: Some(Box::new(Expr::Path(ExprPath {
-                attrs: Vec::new(),
-                qself: None,
-                path: constants::SELF_IDENT_PATH.clone(),
-            }))),
+            expr: Some(Box::new(path_factory.create_expr(SELF_IDENT.clone()))),
         }),
         Some(Default::default()),
     );
@@ -138,16 +134,11 @@ pub const FN_DATA_VERIFY_RECEIVED_FN_IDENT: LazyCell<Ident> =
 
 pub const SERVICES_REF_EXPR: LazyCell<Expr> = LazyCell::new(|| {
     let path_factory = &SERVICES.path_factory;
-    let path = path_factory.create(format_ident!("SERVICES"));
     let result = Expr::Reference(ExprReference {
         attrs: Vec::new(),
         and_token: Default::default(),
         mutability: None,
-        expr: Box::new(Expr::Path(ExprPath {
-            attrs: Vec::new(),
-            qself: None,
-            path,
-        })),
+        expr: Box::new(path_factory.create_expr(format_ident!("SERVICES"))),
     });
     return result;
 });
@@ -198,7 +189,7 @@ pub const DERIVE_DEBUG_AND_I_ARGS_FORMATTER_ATTRIBUTE: LazyCell<Attribute> = Laz
 pub const DEBUG_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Debug"));
 pub const DEBUG_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
     let path_factory = &SERVICES.path_factory;
-    let result = path_factory.create_from_parts(&[
+    let result = path_factory.create_from_parts(vec![
         format_ident!("std"),
         format_ident!("fmt"),
         DEBUG_TRAIT_IDENT.clone(),
@@ -209,7 +200,7 @@ pub const DEBUG_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
 pub const PARTIAL_ORD_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("PartialOrd"));
 pub const PARTIAL_ORD_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
     let path_factory = &SERVICES.path_factory;
-    let result = path_factory.create_from_parts(&[
+    let result = path_factory.create_from_parts(vec![
         format_ident!("core"),
         format_ident!("cmp"),
         PARTIAL_ORD_TRAIT_IDENT.clone(),
@@ -220,7 +211,7 @@ pub const PARTIAL_ORD_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
 pub const CLONE_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Clone"));
 pub const CLONE_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
     let path_factory = &SERVICES.path_factory;
-    let result = path_factory.create_from_parts(&[
+    let result = path_factory.create_from_parts(vec![
         format_ident!("core"),
         format_ident!("clone"),
         CLONE_TRAIT_IDENT.clone(),
@@ -395,9 +386,9 @@ pub const USE_FOR_GENERATED: LazyCell<ItemUse> = LazyCell::new(|| {
 });
 
 pub const PHANTOM_DATA_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("PhantomData"));
-pub const PHANTOM_DATA_PATH: LazyCell<Path> = LazyCell::new(|| {
+pub const PHANTOM_DATA_EXPR_PATH: LazyCell<Expr> = LazyCell::new(|| {
     let path_factory = &SERVICES.path_factory;
-    let result = path_factory.create(PHANTOM_DATA_IDENT.clone());
+    let result = path_factory.create_expr(PHANTOM_DATA_IDENT.clone());
     return result;
 });
 
@@ -466,30 +457,18 @@ pub const DEFAULT_ARG_FIELD_LIFETIME_GENERIC: LazyCell<Generics> = LazyCell::new
 });
 
 pub const DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE: LazyCell<FieldValue> = LazyCell::new(|| {
+    let path_factory = &SERVICES.path_factory;
     let field_value = FieldValue {
         attrs: Vec::new(),
         member: Member::Named(DEFAULT_ARG_FIELD_LIFETIME_FIELD_IDENT.clone()),
         colon_token: Some(Default::default()),
-        expr: Expr::Path(ExprPath {
-            attrs: Vec::new(),
-            qself: None,
-            path: PHANTOM_DATA_PATH.clone(),
-        }),
+        expr: path_factory.create_expr(PHANTOM_DATA_IDENT.clone()),
     };
     return field_value;
 });
 
-pub const OPTION_NONE_PATH: LazyCell<Path> = LazyCell::new(|| {
-    let path_factory = &SERVICES.path_factory;
-    let result = path_factory.create(format_ident!("None"));
-    return result;
-});
-
-pub const OPTION_SOME_PATH: LazyCell<Path> = LazyCell::new(|| {
-    let path_factory = &SERVICES.path_factory;
-    let result = path_factory.create(format_ident!("Some"));
-    return result;
-});
+pub const OPTION_NONE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("None"));
+pub const OPTION_SOME_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Some"));
 
 pub const SEND_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Send"));
 pub const SYNC_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Sync"));

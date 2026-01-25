@@ -35,11 +35,7 @@ impl IFieldValueFactory for FieldValueFactory {
             attrs: Vec::new(),
             member: Member::Named(field_ident),
             colon_token: Some(Default::default()),
-            expr: Expr::Path(ExprPath {
-                attrs: Vec::new(),
-                qself: None,
-                path: constants::PHANTOM_DATA_PATH.clone(),
-            }),
+            expr: constants::PHANTOM_DATA_EXPR_PATH.clone(),
         };
         return field_value;
     }

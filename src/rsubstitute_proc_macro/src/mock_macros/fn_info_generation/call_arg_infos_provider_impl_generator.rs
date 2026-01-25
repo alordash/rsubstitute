@@ -132,17 +132,12 @@ impl CallArgInfosProviderImplGenerator {
             Vec::new(),
         ));
 
-        let func_path = self.path_factory.create_from_parts(&[
-            Self::ARG_INFO_TYPE_IDENT.clone(),
-            constants::NEW_IDENT.clone(),
-        ]);
         let expr = Expr::Call(ExprCall {
             attrs: Vec::new(),
-            func: Box::new(Expr::Path(ExprPath {
-                attrs: Vec::new(),
-                qself: None,
-                path: func_path,
-            })),
+            func: Box::new(self.path_factory.create_expr_from_parts(vec![
+                Self::ARG_INFO_TYPE_IDENT.clone(),
+                constants::NEW_IDENT.clone(),
+            ])),
             paren_token: Default::default(),
             args: [field_name_arg, field_access_arg].into_iter().collect(),
         });

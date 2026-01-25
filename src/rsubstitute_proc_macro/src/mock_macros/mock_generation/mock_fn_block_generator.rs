@@ -135,11 +135,7 @@ impl MockFnBlockGenerator {
 
     fn generate_handle_expr(&self, fn_info: &FnInfo, return_accessor: ReturnAccessor) -> Expr {
         let base_receiver = match &return_accessor {
-            ReturnAccessor::SelfRef => Expr::Path(ExprPath {
-                attrs: Vec::new(),
-                qself: None,
-                path: self.path_factory.create(constants::SELF_IDENT.clone()),
-            }),
+            ReturnAccessor::SelfRef => self.path_factory.create_expr(constants::SELF_IDENT.clone()),
             ReturnAccessor::Static(static_mock_ident) => static_mock_ident.clone(),
         };
         let idents = vec![
