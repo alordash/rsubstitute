@@ -37,10 +37,9 @@ impl IMockTraitImplGenerator for MockTraitImplGenerator {
         let trait_ = self
             .path_factory
             .create_with_generics(target_ident, mock_generics.source_generics.clone());
-        let self_ty = self.type_factory.create_with_generics(
-            mock_struct.item_struct.ident.clone(),
-            mock_generics.impl_generics.clone(),
-        );
+        let self_ty = self
+            .type_factory
+            .create_from_struct(&mock_struct.item_struct);
         let items = fn_infos
             .iter()
             .map(|x| self.generate_impl_item_fn(x))

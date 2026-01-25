@@ -34,10 +34,7 @@ impl IMockImplGenerator for MockImplGenerator {
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
     ) -> MockImpl {
-        let self_ty = self.type_factory.create_with_generics(
-            mock_struct.item_struct.ident.clone(),
-            mock_generics.impl_generics.clone(),
-        );
+        let self_ty = self.type_factory.create_from_struct(&mock_struct.item_struct);
         let constructor = self.generate_constructor(
             mock_struct,
             mock_data_struct,
