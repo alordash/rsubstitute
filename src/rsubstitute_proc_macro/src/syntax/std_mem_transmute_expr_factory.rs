@@ -20,13 +20,7 @@ impl IStdMemTransmuteExprFactory for StdMemTransmuteExprFactory {
             attrs: Vec::new(),
             func: Box::new(Self::STD_MEM_TRANSMUTE_FUNC_PATH_EXPR.clone()),
             paren_token: Default::default(),
-            args: [Expr::Path(ExprPath {
-                attrs: Vec::new(),
-                qself: None,
-                path: self.path_factory.create(ident),
-            })]
-            .into_iter()
-            .collect(),
+            args: [self.path_factory.create_expr(ident)].into_iter().collect(),
         });
         return expr;
     }
@@ -35,16 +29,11 @@ impl IStdMemTransmuteExprFactory for StdMemTransmuteExprFactory {
 impl StdMemTransmuteExprFactory {
     const STD_MEM_TRANSMUTE_FUNC_PATH_EXPR: LazyCell<Expr> = LazyCell::new(|| {
         let path_factory = &SERVICES.path_factory;
-        let path = path_factory.create_from_parts(&[
+        let expr = path_factory.create_expr_from_parts(vec![
             format_ident!("std"),
             format_ident!("mem"),
             format_ident!("transmute"),
         ]);
-        let expr = Expr::Path(ExprPath {
-            attrs: Vec::new(),
-            qself: None,
-            path,
-        });
         return expr;
     });
 }

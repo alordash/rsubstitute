@@ -214,16 +214,9 @@ impl MockSetupImplGenerator {
                         paren_token: Default::default(),
                         // TODO - add factory for ExprPath
                         args: [
-                            Expr::Path(ExprPath {
-                                attrs: Vec::new(),
-                                qself: None,
-                                path: self.path_factory.create(Self::FN_CONFIG_VAR_IDENT.clone()),
-                            }),
-                            Expr::Path(ExprPath {
-                                attrs: Vec::new(),
-                                qself: None,
-                                path: constants::SELF_IDENT_PATH.clone(),
-                            }),
+                            self.path_factory
+                                .create_expr(Self::FN_CONFIG_VAR_IDENT.clone()),
+                            self.path_factory.create_expr(constants::SELF_IDENT.clone()),
                             base_caller_path,
                         ]
                         .into_iter()
@@ -237,13 +230,10 @@ impl MockSetupImplGenerator {
             Expr::Return(ExprReturn {
                 attrs: Vec::new(),
                 return_token: Default::default(),
-                expr: Some(Box::new(Expr::Path(ExprPath {
-                    attrs: Vec::new(),
-                    qself: None,
-                    path: self
-                        .path_factory
-                        .create(Self::SHARED_FN_CONFIG_VAR_IDENT.clone()),
-                }))),
+                expr: Some(Box::new(
+                    self.path_factory
+                        .create_expr(Self::SHARED_FN_CONFIG_VAR_IDENT.clone()),
+                )),
             }),
             Some(Default::default()),
         );

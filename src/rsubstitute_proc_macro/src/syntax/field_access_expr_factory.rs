@@ -16,11 +16,7 @@ pub struct FieldAccessExprFactory {
 impl IFieldAccessExprFactory for FieldAccessExprFactory {
     fn create(&self, mut members_idents: Vec<Ident>) -> Expr {
         let first_ident = members_idents.remove(0);
-        let base_expr = Expr::Path(ExprPath {
-            attrs: Vec::new(),
-            qself: None,
-            path: self.path_factory.create(first_ident.clone()),
-        });
+        let base_expr = self.path_factory.create_expr(first_ident.clone());
         let result = self.create_with_base_expr(base_expr, members_idents);
         return result;
     }

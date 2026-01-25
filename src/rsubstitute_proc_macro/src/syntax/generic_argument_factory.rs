@@ -20,11 +20,9 @@ impl IGenericArgumentFactory for GenericArgumentFactory {
             GenericParam::Type(type_param) => {
                 GenericArgument::Type(self.type_factory.create(type_param.ident.clone()))
             }
-            GenericParam::Const(const_param) => GenericArgument::Const(Expr::Path(ExprPath {
-                attrs: Vec::new(),
-                qself: None,
-                path: self.path_factory.create(const_param.ident.clone()),
-            })),
+            GenericParam::Const(const_param) => {
+                GenericArgument::Const(self.path_factory.create_expr(const_param.ident.clone()))
+            }
         };
         return result;
     }

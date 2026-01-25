@@ -85,13 +85,7 @@ impl ExprMethodCallFactory {
     fn convert_args(&self, args: Vec<Ident>) -> Vec<Expr> {
         let expr_args = args
             .into_iter()
-            .map(|arg| {
-                Expr::Path(ExprPath {
-                    attrs: Vec::new(),
-                    qself: None,
-                    path: self.path_factory.create(arg.clone()),
-                })
-            })
+            .map(|arg| self.path_factory.create_expr(arg.clone()))
             .collect();
         return expr_args;
     }

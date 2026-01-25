@@ -13,11 +13,6 @@ pub const MOCK_SETUP_FIELD_IDENT: LazyCell<Ident> = LazyCell::new(|| format_iden
 pub const MOCK_RECEIVED_FIELD_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("received"));
 
 pub const SELF_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("self"));
-pub const SELF_IDENT_PATH: LazyCell<Path> = LazyCell::new(|| {
-    let path_factory = &SERVICES.path_factory;
-    let result = path_factory.create(SELF_IDENT.clone());
-    return result;
-});
 
 pub const RETURN_SELF_STMT: LazyCell<Stmt> = LazyCell::new(|| {
     let path_factory = &SERVICES.path_factory;
