@@ -120,9 +120,14 @@ mod generated {
     // end - Calls
     // start - Mock
     struct MyTraitMockData<'a, T: Debug + PartialOrd + Clone> {
-        work_data: FnData<work_Call<'a, T>, work_ArgsChecker<'a, T>, (), ()>,
-        another_work_data: FnData<another_work_Call<'a, T>, another_work_ArgsChecker<'a, T>, T, ()>,
-        get_data: FnData<get_Call<'a, T>, get_ArgsChecker<'a, T>, T, ()>,
+        work_data: FnData<MyTraitMock<'a, T>, work_Call<'a, T>, work_ArgsChecker<'a, T>, ()>,
+        another_work_data: FnData<
+            MyTraitMock<'a, T>,
+            another_work_Call<'a, T>,
+            another_work_ArgsChecker<'a, T>,
+            T,
+        >,
+        get_data: FnData<MyTraitMock<'a, T>, get_Call<'a, T>, get_ArgsChecker<'a, T>, T>,
     }
 
     pub struct MyTraitMockSetup<'a, T: Debug + PartialOrd + Clone> {
@@ -188,14 +193,14 @@ mod generated {
         pub fn work(
             &'a self,
             value: impl Into<Arg<T>>,
-        ) -> SharedFnConfig<'a, work_Call<'a, T>, work_ArgsChecker<'a, T>, (), Self, ()> {
+        ) -> SharedFnConfig<'a, MyTraitMock<'a, T>, work_Call<'a, T>, work_ArgsChecker<'a, T>, (), Self> {
             let work_args_checker = work_ArgsChecker {
                 phantom_lifetime: PhantomData,
                 phantom_T: PhantomData,
                 value: value.into(),
             };
             let fn_config = self.data.work_data.add_config(work_args_checker);
-            let shared_fn_config = SharedFnConfig::new(fn_config, self, None);
+            let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
         }
 
@@ -204,11 +209,11 @@ mod generated {
             string: impl Into<Arg<&'a str>>,
         ) -> SharedFnConfig<
             'a,
+            MyTraitMock<'a, T>,
             another_work_Call<'a, T>,
             another_work_ArgsChecker<'a, T>,
             T,
             Self,
-            (),
         > {
             let another_work_args_checker = another_work_ArgsChecker {
                 phantom_lifetime: PhantomData,
@@ -219,19 +224,19 @@ mod generated {
                 .data
                 .another_work_data
                 .add_config(another_work_args_checker);
-            let shared_fn_config = SharedFnConfig::new(fn_config, self, None);
+            let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
         }
 
         pub fn get(
             &'a self,
-        ) -> SharedFnConfig<'a, get_Call<'a, T>, get_ArgsChecker<'a, T>, T, Self, ()> {
+        ) -> SharedFnConfig<'a, MyTraitMock<'a, T>, get_Call<'a, T>, get_ArgsChecker<'a, T>, T, Self> {
             let get_args_checker = get_ArgsChecker {
                 phantom_lifetime: PhantomData,
                 phantom_T: PhantomData,
             };
             let fn_config = self.data.get_data.add_config(get_args_checker);
-            let shared_fn_config = SharedFnConfig::new(fn_config, self, None);
+            let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
         }
     }
@@ -249,11 +254,7 @@ mod generated {
             return self;
         }
 
-        pub fn another_work(
-            &'a self,
-            string: impl Into<Arg<&'a str>>,
-            times: Times,
-        ) -> &'a Self {
+        pub fn another_work(&'a self, string: impl Into<Arg<&'a str>>, times: Times) -> &'a Self {
             let another_work_args_checker = another_work_ArgsChecker {
                 phantom_lifetime: PhantomData,
                 phantom_T: PhantomData,

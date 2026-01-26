@@ -54,19 +54,9 @@ mod global {
     }
 
     #[allow(non_camel_case_types)]
-    pub struct globalBaseCaller;
-
-    impl<'a> IBaseCaller<global_Call<'a>, String> for globalBaseCaller {
-        fn call_base(&self, call: global_Call) -> String {
-            return base_global(call.number);
-        }
-    }
-
-    #[allow(non_camel_case_types)]
     pub struct globalData<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
-        base_caller: Arc<RefCell<globalBaseCaller>>,
-        global_data: FnData<global_Call<'a>, global_ArgsChecker<'a>, String, globalBaseCaller>,
+        global_data: FnData<globalMock, global_Call<'a>, global_ArgsChecker<'a>, String>,
     }
 
     #[allow(non_camel_case_types)]
@@ -86,6 +76,12 @@ mod global {
         data: Arc<globalData<'static>>,
     }
 
+    impl<'a> IBaseCaller<global_Call<'a>, String> for globalMock {
+        fn call_base(&self, call: global_Call) -> String {
+            return base_global(call.number);
+        }
+    }
+
     unsafe impl Send for globalMock {}
     unsafe impl Sync for globalMock {}
 
@@ -93,7 +89,6 @@ mod global {
         fn default() -> Self {
             let data = Arc::new(globalData {
                 _phantom_lifetime: PhantomData,
-                base_caller: Arc::new(RefCell::new(globalBaseCaller)),
                 global_data: FnData::new("global", &SERVICES),
             });
             return globalMock {
@@ -108,21 +103,14 @@ mod global {
         pub fn setup(
             &'a self,
             number: Arg<i32>,
-        ) -> SharedFnConfig<
-            'a,
-            global_Call<'a>,
-            global_ArgsChecker<'a>,
-            String,
-            Self,
-            globalBaseCaller,
-        > {
+        ) -> SharedFnConfig<'a, globalMock, global_Call<'a>, global_ArgsChecker<'a>, String, Self>
+        {
             let global_args_checker = global_ArgsChecker {
                 phantom_lifetime: PhantomData,
                 number,
             };
             let fn_config = self.data.global_data.add_config(global_args_checker);
-            let shared_fn_config =
-                SharedFnConfig::new(fn_config, self, Some(self.data.base_caller.clone()));
+            let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
         }
     }
@@ -144,11 +132,11 @@ mod global {
         number: Arg<i32>,
     ) -> SharedFnConfig<
         'static,
+        globalMock,
         global_Call<'static>,
         global_ArgsChecker<'static>,
         String,
         globalSetup<'static>,
-        globalBaseCaller,
     > {
         return get_global_mock::<globalMock>().setup.setup(number);
     }
@@ -164,17 +152,14 @@ mod global {
             phantom_lifetime: PhantomData,
             number,
         };
-        return get_global_mock::<globalMock>()
-            .data
-            .global_data
-            .handle_base_returning(call);
+        let mock = get_global_mock::<globalMock>();
+        return mock.data.global_data.handle_base_returning(mock, call);
     }
 }
 
 #[cfg(test)]
 mod tests {
     use crate::global;
-    use crate::global::globalBaseCaller;
     use rsubstitute_core::Times;
     use rsubstitute_core::args_matching::Arg;
 

@@ -55,7 +55,7 @@ mod __rsubstitute_generated_Struct {
             vec![]
         }
     }
-    
+
     #[derive(Clone)]
     pub struct get_number_Call<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
@@ -65,18 +65,18 @@ mod __rsubstitute_generated_Struct {
             vec![]
         }
     }
-    
+
     #[derive(Debug, IArgsFormatter)]
     pub struct get_number_ArgsChecker<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
     }
-    
+
     impl<'a> IArgsChecker<get_number_Call<'a>> for get_number_ArgsChecker<'a> {
         fn check(&self, call: get_number_Call<'a>) -> Vec<ArgCheckResult> {
             vec![]
         }
     }
-    
+
     #[derive(Clone)]
     pub struct format_Call<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
@@ -86,44 +86,46 @@ mod __rsubstitute_generated_Struct {
             vec![]
         }
     }
-    
+
     #[derive(Debug, IArgsFormatter)]
     pub struct format_ArgsChecker<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
     }
-    
+
     impl<'a> IArgsChecker<format_Call<'a>> for format_ArgsChecker<'a> {
         fn check(&self, call: format_Call<'a>) -> Vec<ArgCheckResult> {
             vec![]
         }
     }
-    
+
     #[derive(IMockData)]
     pub struct StructMockData<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
-        Trait_work_data: FnData<Trait_work_Call<'a>, Trait_work_ArgsChecker<'a>, (), ()>,
-        get_number_data: FnData<get_number_Call<'a>, get_number_ArgsChecker<'a>, i32, ()>,
-        format_data: FnData<format_Call<'a>, format_ArgsChecker<'a>, String, ()>,
+        Trait_work_data:
+            FnData<StructMock<'a>, Trait_work_Call<'a>, Trait_work_ArgsChecker<'a>, ()>,
+        get_number_data:
+            FnData<StructMock<'a>, get_number_Call<'a>, get_number_ArgsChecker<'a>, i32>,
+        format_data: FnData<StructMock<'a>, format_Call<'a>, format_ArgsChecker<'a>, String>,
     }
-    
+
     pub struct StructMockSetup<'a> {
         data: Arc<StructMockData<'a>>,
     }
-    
+
     pub struct StructMockReceived<'a> {
         data: Arc<StructMockData<'a>>,
     }
-    
+
     struct StructInnerData {
         number: i32,
     }
-    
+
     impl StructInnerData {
         fn new(number: i32) -> Self {
-            Self {number}
+            Self { number }
         }
     }
-    
+
     #[allow(non_camel_case_types)]
     pub struct StructMock<'a> {
         pub setup: StructMockSetup<'a>,
@@ -131,7 +133,7 @@ mod __rsubstitute_generated_Struct {
         data: Arc<StructMockData<'a>>,
         inner_data: StructInnerData,
     }
-    
+
     // impl<'a> Struct for StructMock<'a> {
     //     fn get_number<'__rsubstitute_arg_anonymous>(&'__rsubstitute_arg_anonymous self) -> i32 {
     //         let call = unsafe {
@@ -150,7 +152,7 @@ mod __rsubstitute_generated_Struct {
     //         return self.data.format_data.handle_returning(call);
     //     }
     // }
-    
+
     impl<'a> StructMock<'a> {
         #[allow(dead_code)]
         pub fn new(number: i32) -> Self {
@@ -165,18 +167,24 @@ mod __rsubstitute_generated_Struct {
                 setup: StructMockSetup { data: data.clone() },
                 received: StructMockReceived { data: data.clone() },
                 data,
-                inner_data
+                inner_data,
             };
         }
     }
-    
+
     impl<'a> StructMockSetup<'a> {
         #[allow(dead_code)]
         #[allow(elided_named_lifetimes)]
         pub fn get_number(
             &'a self,
-        ) -> SharedFnConfig<'a, get_number_Call<'a>, get_number_ArgsChecker<'a>, i32, Self, ()>
-        {
+        ) -> SharedFnConfig<
+            'a,
+            StructMock<'a>,
+            get_number_Call<'a>,
+            get_number_ArgsChecker<'a>,
+            i32,
+            Self,
+        > {
             let get_number_args_checker = get_number_ArgsChecker {
                 _phantom_lifetime: PhantomData,
             };
@@ -184,23 +192,24 @@ mod __rsubstitute_generated_Struct {
                 .data
                 .get_number_data
                 .add_config(get_number_args_checker);
-            let shared_fn_config = SharedFnConfig::new(fn_config, self, None);
+            let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
         }
         #[allow(dead_code)]
         #[allow(elided_named_lifetimes)]
         pub fn format(
             &'a self,
-        ) -> SharedFnConfig<'a, format_Call<'a>, format_ArgsChecker<'a>, String, Self, ()> {
+        ) -> SharedFnConfig<'a, StructMock<'a>, format_Call<'a>, format_ArgsChecker<'a>, String, Self>
+        {
             let format_args_checker = format_ArgsChecker {
                 _phantom_lifetime: PhantomData,
             };
             let fn_config = self.data.format_data.add_config(format_args_checker);
-            let shared_fn_config = SharedFnConfig::new(fn_config, self, None);
+            let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
         }
     }
-    
+
     impl<'a> StructMockReceived<'a> {
         #[allow(dead_code)]
         #[allow(elided_named_lifetimes)]
