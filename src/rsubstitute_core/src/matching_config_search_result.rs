@@ -8,9 +8,8 @@ pub(crate) enum MatchingConfigSearchResult<
     TCall,
     TArgsChecker: IArgsChecker<TCall>,
     TReturnValue,
-    TBaseCaller,
 > {
-    Ok(Arc<RefCell<FnConfig<TMock, TCall, TArgsChecker, TReturnValue, TBaseCaller>>>),
+    Ok(Arc<RefCell<FnConfig<TMock, TCall, TArgsChecker, TReturnValue>>>),
     Err(MatchingConfigSearchErr),
 }
 

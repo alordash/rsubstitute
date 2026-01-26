@@ -13,18 +13,17 @@ pub struct FnData<
     TCall: IArgInfosProvider,
     TArgsChecker: IArgsChecker<TCall>,
     TReturnValue,
-    TBaseCaller,
 > {
     fn_name: &'static str,
     call_infos: RefCell<Vec<CallInfo<TCall>>>,
     // Behind a raw reference to lift 'static requirement from TCall, TArgsChecker, etc.
     configs:
-        *mut Vec<Arc<RefCell<FnConfig<TMock, TCall, TArgsChecker, TReturnValue, TBaseCaller>>>>,
+        *mut Vec<Arc<RefCell<FnConfig<TMock, TCall, TArgsChecker, TReturnValue>>>>,
     error_printer: Arc<dyn IErrorPrinter>,
 }
 
-impl<TMock, TCall: IArgInfosProvider, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TBaseCaller>
-    FnData<TMock, TCall, TArgsChecker, TReturnValue, TBaseCaller>
+impl<TMock, TCall: IArgInfosProvider, TArgsChecker: IArgsChecker<TCall>, TReturnValue>
+    FnData<TMock, TCall, TArgsChecker, TReturnValue>
 {
     pub fn new(fn_name: &'static str, services: &ServiceCollection) -> Self {
         Self {
@@ -46,8 +45,7 @@ impl<
     TCall: IArgInfosProvider + Clone,
     TArgsChecker: IArgsChecker<TCall>,
     TReturnValue: Clone,
-    TBaseCaller,
-> FnData<TMock, TCall, TArgsChecker, TReturnValue, TBaseCaller>
+> FnData<TMock, TCall, TArgsChecker, TReturnValue>
 {
     pub fn register_call(&self, call: TCall) -> &Self {
         self.call_infos.borrow_mut().push(CallInfo::new(call));
@@ -57,7 +55,7 @@ impl<
     pub fn add_config(
         &self,
         args_checker: TArgsChecker,
-    ) -> Arc<RefCell<FnConfig<TMock, TCall, TArgsChecker, TReturnValue, TBaseCaller>>> {
+    ) -> Arc<RefCell<FnConfig<TMock, TCall, TArgsChecker, TReturnValue>>> {
         let config = FnConfig::new(args_checker);
         let shared_config = Arc::new(RefCell::new(config));
         unsafe {
@@ -149,7 +147,7 @@ impl<
     fn try_get_matching_config(
         &self,
         call: TCall,
-    ) -> MatchingConfigSearchResult<TMock, TCall, TArgsChecker, TReturnValue, TBaseCaller> {
+    ) -> MatchingConfigSearchResult<TMock, TCall, TArgsChecker, TReturnValue> {
         let configs = unsafe { &*self.configs };
         dbg!(configs.len());
         let mut args_check_results = Vec::with_capacity(configs.len());
@@ -174,7 +172,7 @@ impl<
     fn get_required_matching_config(
         &self,
         call: TCall,
-    ) -> Arc<RefCell<FnConfig<TMock, TCall, TArgsChecker, TReturnValue, TBaseCaller>>> {
+    ) -> Arc<RefCell<FnConfig<TMock, TCall, TArgsChecker, TReturnValue>>> {
         let fn_config = match self.try_get_matching_config(call.clone()) {
             MatchingConfigSearchResult::Ok(matching_config) => matching_config,
             MatchingConfigSearchResult::Err(matching_config_search_err) => {
@@ -190,20 +188,19 @@ impl<
 }
 
 impl<
-    TMock,
+    TMock: IBaseCaller<TCall, TReturnValue>,
     TCall: IArgInfosProvider + Clone,
     TArgsChecker: IArgsChecker<TCall>,
     TReturnValue: Clone,
-    TBaseCaller: IBaseCaller<TMock, TCall, TReturnValue>,
-> FnData<TMock, TCall, TArgsChecker, TReturnValue, TBaseCaller>
+> FnData<TMock, TCall, TArgsChecker, TReturnValue>
 {
     pub fn handle_base(&self, mock: &TMock, call: TCall) {
         let maybe_fn_config = self.try_get_matching_config(call.clone());
         self.register_call(call.clone());
         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
             fn_config.borrow_mut().register_call(call.clone());
-            if let Some(call_base) = fn_config.borrow().get_base_caller() {
-                call_base.borrow_mut().call_base(mock, call);
+            if fn_config.borrow().should_call_base() {
+                mock.call_base(call);
             }
             if let Some(callback) = fn_config.borrow().get_callback() {
                 callback.borrow_mut()();
@@ -214,9 +211,10 @@ impl<
     pub fn handle_base_returning(&self, mock: &TMock, call: TCall) -> TReturnValue {
         let fn_config = self.get_required_matching_config(call.clone());
         self.register_call(call.clone());
+        // TODO - ain't too many fn_config.borrows? Maybe borrow once and reuse borrow?
         fn_config.borrow_mut().register_call(call.clone());
-        if let Some(call_base) = fn_config.borrow().get_base_caller() {
-            return call_base.borrow_mut().call_base(mock, call);
+        if fn_config.borrow().should_call_base() {
+            return mock.call_base(call);
         }
         if let Some(callback) = fn_config.borrow().get_callback() {
             callback.borrow_mut()();

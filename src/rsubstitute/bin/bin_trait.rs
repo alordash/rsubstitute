@@ -149,34 +149,15 @@ mod generated {
         }
     }
 
-    #[allow(non_camel_case_types)]
-    pub struct get_BaseCaller;
-
-    impl<'a> IBaseCaller<MyTraitMock<'a>, get_Call<'a>, i32> for get_BaseCaller {
-        fn call_base(&self, mock: &MyTraitMock<'a>, call: get_Call<'a>) -> i32 {
-            let value = 10;
-            mock.work(10);
-            return value;
-        }
-    }
-
     // end - Calls
     // start - Mock
     #[derive(IMockData)]
     struct MyTraitMockData<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
-        work_data: FnData<MyTraitMock<'a>, work_Call<'a>, work_ArgsChecker<'a>, (), ()>,
-        another_work_data: FnData<
-            MyTraitMock<'a>,
-            another_work_Call<'a>,
-            another_work_ArgsChecker<'a>,
-            Vec<u8>,
-            (),
-        >,
-        get_data:
-            FnData<MyTraitMock<'a>, get_Call<'a>, get_ArgsChecker<'a>, i32, get_BaseCaller>,
-
-        get_base_caller: Arc<RefCell<get_BaseCaller>>,
+        work_data: FnData<MyTraitMock<'a>, work_Call<'a>, work_ArgsChecker<'a>, ()>,
+        another_work_data:
+            FnData<MyTraitMock<'a>, another_work_Call<'a>, another_work_ArgsChecker<'a>, Vec<u8>>,
+        get_data: FnData<MyTraitMock<'a>, get_Call<'a>, get_ArgsChecker<'a>, i32>,
     }
 
     pub struct MyTraitMockSetup<'a> {
@@ -191,6 +172,14 @@ mod generated {
         pub setup: MyTraitMockSetup<'a>,
         pub received: MyTraitMockReceived<'a>,
         data: Arc<MyTraitMockData<'a>>,
+    }
+
+    impl<'a> IBaseCaller<get_Call<'a>, i32> for MyTraitMock<'a> {
+        fn call_base(&self, call: get_Call<'a>) -> i32 {
+            let value = 10;
+            self.work(10);
+            return value;
+        }
     }
 
     impl<'a> MyTrait for MyTraitMock<'a> {
@@ -236,9 +225,8 @@ mod generated {
                 work_data: FnData::new("work", &SERVICES),
                 another_work_data: FnData::new("another_work", &SERVICES),
                 get_data: FnData::new("get", &SERVICES),
-                get_base_caller: Arc::new(RefCell::new(get_BaseCaller)),
             });
-            let mut mock = Self {
+            let mock = Self {
                 setup: MyTraitMockSetup { data: data.clone() },
                 received: MyTraitMockReceived { data: data.clone() },
                 data,
@@ -251,14 +239,14 @@ mod generated {
         pub fn work(
             &'a self,
             value: impl Into<Arg<i32>>,
-        ) -> SharedFnConfig<'a, MyTraitMock<'a>, work_Call<'a>, work_ArgsChecker<'a>, (), Self, ()>
+        ) -> SharedFnConfig<'a, MyTraitMock<'a>, work_Call<'a>, work_ArgsChecker<'a>, (), Self>
         {
             let work_args_checker = work_ArgsChecker {
                 phantom_lifetime: PhantomData,
                 value: value.into(),
             };
             let fn_config = self.data.work_data.add_config(work_args_checker);
-            let shared_fn_config = SharedFnConfig::new(fn_config, self, None);
+            let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
         }
 
@@ -275,7 +263,6 @@ mod generated {
             another_work_ArgsChecker<'a>,
             Vec<u8>,
             Self,
-            (),
         > {
             let another_work_args_checker = another_work_ArgsChecker {
                 phantom_lifetime: PhantomData,
@@ -288,27 +275,19 @@ mod generated {
                 .data
                 .another_work_data
                 .add_config(another_work_args_checker);
-            let shared_fn_config = SharedFnConfig::new(fn_config, self, None);
+            let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
         }
 
         pub fn get(
             &'a self,
-        ) -> SharedFnConfig<
-            'a,
-            MyTraitMock<'a>,
-            get_Call<'a>,
-            get_ArgsChecker<'a>,
-            i32,
-            Self,
-            get_BaseCaller,
-        > {
+        ) -> SharedFnConfig<'a, MyTraitMock<'a>, get_Call<'a>, get_ArgsChecker<'a>, i32, Self>
+        {
             let get_args_checker = get_ArgsChecker {
                 phantom_lifetime: PhantomData,
             };
             let fn_config = self.data.get_data.add_config(get_args_checker);
-            let shared_fn_config =
-                SharedFnConfig::new(fn_config, self, Some(self.data.get_base_caller.clone()));
+            let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
         }
     }
