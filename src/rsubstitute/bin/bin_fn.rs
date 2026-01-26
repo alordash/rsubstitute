@@ -78,7 +78,8 @@ mod global {
 
     impl<'a> IBaseCaller<global_Call<'a>, String> for globalMock {
         fn call_base(&self, call: global_Call) -> String {
-            return base_global(call.number);
+            let global_Call { number, .. } = call;
+            return format!("actual number: {number}");
         }
     }
 

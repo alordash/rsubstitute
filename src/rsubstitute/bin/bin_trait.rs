@@ -176,6 +176,7 @@ mod generated {
 
     impl<'a> IBaseCaller<get_Call<'a>, i32> for MyTraitMock<'a> {
         fn call_base(&self, call: get_Call<'a>) -> i32 {
+            let get_Call { .. } = call;
             let value = 10;
             self.work(10);
             return value;
