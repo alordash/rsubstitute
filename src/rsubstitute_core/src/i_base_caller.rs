@@ -1,3 +1,3 @@
-pub trait IBaseCaller<TCall, TReturnValue> {
-    fn call_base(&self, call: TCall) -> TReturnValue;
+pub trait IBaseCaller<TMock, TCall, TReturnValue> {
+    fn call_base(&self, mock: &TMock, call: TCall) -> TReturnValue;
 }

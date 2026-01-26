@@ -13,14 +13,17 @@ use std::sync::Arc;
 pub trait IFoo: Debug {
     fn get_value(&self) -> i32;
 }
+
 #[derive(Debug)]
 struct Foo(i32);
+
 impl IFoo for Foo {
     fn get_value(&self) -> i32 {
         self.0
     }
 }
 
+const DEFAULT_MY_TRAIT_GET: i32 = 10;
 trait MyTrait {
     fn work(&self, value: i32);
 
@@ -32,11 +35,11 @@ trait MyTrait {
         arc: Arc<dyn IFoo>,
     ) -> Vec<u8>;
 
-    fn get(&self) -> i32;
-
-    // fn standalone(number: i32) -> f32;
-    //
-    // fn standalone_with_ref(number: &i32) -> f32;
+    fn get(&self) -> i32 {
+        let value = DEFAULT_MY_TRAIT_GET;
+        self.work(value);
+        return value;
+    }
 }
 
 pub use generated::*;
@@ -147,28 +150,13 @@ mod generated {
     }
 
     #[allow(non_camel_case_types)]
-    #[derive(Clone)]
-    pub struct standalone_Call<'a> {
-        phantom_lifetime: PhantomData<&'a ()>,
-        number: i32,
-    }
+    pub struct get_BaseCaller;
 
-    impl<'a> IArgInfosProvider for standalone_Call<'a> {
-        fn get_arg_infos(&self) -> Vec<ArgInfo> {
-            return vec![ArgInfo::new("number", self.number.clone())];
-        }
-    }
-
-    #[allow(non_camel_case_types)]
-    #[derive(Debug, IArgsFormatter)]
-    pub struct standalone_ArgsChecker<'a> {
-        phantom_lifetime: PhantomData<&'a ()>,
-        number: Arg<i32>,
-    }
-
-    impl<'a> IArgsChecker<standalone_Call<'a>> for standalone_ArgsChecker<'a> {
-        fn check(&'_ self, call: standalone_Call) -> Vec<ArgCheckResult> {
-            vec![self.number.check("number", call.number)]
+    impl<'a> IBaseCaller<MyTraitMock<'a>, get_Call<'a>, i32> for get_BaseCaller {
+        fn call_base(&self, mock: &MyTraitMock<'a>, call: get_Call<'a>) -> i32 {
+            let value = 10;
+            mock.work(10);
+            return value;
         }
     }
 
@@ -177,9 +165,18 @@ mod generated {
     #[derive(IMockData)]
     struct MyTraitMockData<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
-        work_data: FnData<work_Call<'a>, work_ArgsChecker<'a>, (), ()>,
-        another_work_data: FnData<another_work_Call<'a>, another_work_ArgsChecker<'a>, Vec<u8>, ()>,
-        get_data: FnData<get_Call<'a>, get_ArgsChecker<'a>, i32, ()>,
+        work_data: FnData<MyTraitMock<'a>, work_Call<'a>, work_ArgsChecker<'a>, (), ()>,
+        another_work_data: FnData<
+            MyTraitMock<'a>,
+            another_work_Call<'a>,
+            another_work_ArgsChecker<'a>,
+            Vec<u8>,
+            (),
+        >,
+        get_data:
+            FnData<MyTraitMock<'a>, get_Call<'a>, get_ArgsChecker<'a>, i32, get_BaseCaller>,
+
+        get_base_caller: Arc<RefCell<get_BaseCaller>>,
     }
 
     pub struct MyTraitMockSetup<'a> {
@@ -228,7 +225,7 @@ mod generated {
             let call = get_Call {
                 phantom_lifetime: PhantomData,
             };
-            return self.data.get_data.handle_returning(call);
+            return self.data.get_data.handle_base_returning(&self, call);
         }
     }
 
@@ -239,12 +236,14 @@ mod generated {
                 work_data: FnData::new("work", &SERVICES),
                 another_work_data: FnData::new("another_work", &SERVICES),
                 get_data: FnData::new("get", &SERVICES),
+                get_base_caller: Arc::new(RefCell::new(get_BaseCaller)),
             });
-            return Self {
+            let mut mock = Self {
                 setup: MyTraitMockSetup { data: data.clone() },
                 received: MyTraitMockReceived { data: data.clone() },
                 data,
             };
+            return mock;
         }
     }
 
@@ -252,7 +251,8 @@ mod generated {
         pub fn work(
             &'a self,
             value: impl Into<Arg<i32>>,
-        ) -> SharedFnConfig<'a, work_Call<'a>, work_ArgsChecker<'a>, (), Self, ()> {
+        ) -> SharedFnConfig<'a, MyTraitMock<'a>, work_Call<'a>, work_ArgsChecker<'a>, (), Self, ()>
+        {
             let work_args_checker = work_ArgsChecker {
                 phantom_lifetime: PhantomData,
                 value: value.into(),
@@ -270,6 +270,7 @@ mod generated {
             arc: impl Into<Arg<Arc<dyn IFoo>>>,
         ) -> SharedFnConfig<
             'a,
+            MyTraitMock<'a>,
             another_work_Call<'a>,
             another_work_ArgsChecker<'a>,
             Vec<u8>,
@@ -293,12 +294,21 @@ mod generated {
 
         pub fn get(
             &'a self,
-        ) -> SharedFnConfig<'a, get_Call<'a>, get_ArgsChecker<'a>, i32, Self, ()> {
+        ) -> SharedFnConfig<
+            'a,
+            MyTraitMock<'a>,
+            get_Call<'a>,
+            get_ArgsChecker<'a>,
+            i32,
+            Self,
+            get_BaseCaller,
+        > {
             let get_args_checker = get_ArgsChecker {
                 phantom_lifetime: PhantomData,
             };
             let fn_config = self.data.get_data.add_config(get_args_checker);
-            let shared_fn_config = SharedFnConfig::new(fn_config, self, None);
+            let shared_fn_config =
+                SharedFnConfig::new(fn_config, self, Some(self.data.get_base_caller.clone()));
             return shared_fn_config;
         }
     }
@@ -391,6 +401,23 @@ fn received_nothing_else_PanicsOk() {
 1. work({work_arguments})"
         ),
     );
+}
+
+#[test]
+fn get_CallBase_Ok() {
+    // Arrange
+    let mock = MyTraitMock::new();
+    mock.setup.get().call_base();
+
+    // Act
+    let actual_value = mock.get();
+
+    // Assert
+    assert_eq!(DEFAULT_MY_TRAIT_GET, actual_value);
+    mock.received
+        .get(Times::Once)
+        .work(actual_value, Times::Once)
+        .no_other_calls();
 }
 
 fn main() {

@@ -6,6 +6,7 @@ use std::sync::Arc;
 
 pub struct SharedFnConfig<
     'a,
+    TMock,
     TCall,
     TArgsChecker: IArgsChecker<TCall>,
     TReturnValue,
@@ -13,16 +14,16 @@ pub struct SharedFnConfig<
     TBaseCaller,
 > {
     _phantom_base_caller: PhantomData<TBaseCaller>,
-    fn_config: Arc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue, TBaseCaller>>>,
+    fn_config: Arc<RefCell<FnConfig<TMock, TCall, TArgsChecker, TReturnValue, TBaseCaller>>>,
     owner: &'a TOwner,
     base_caller: Option<Arc<RefCell<TBaseCaller>>>,
 }
 
-impl<'a, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TOwner, TBaseCaller>
-    SharedFnConfig<'a, TCall, TArgsChecker, TReturnValue, TOwner, TBaseCaller>
+impl<'a, TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TOwner, TBaseCaller>
+    SharedFnConfig<'a, TMock, TCall, TArgsChecker, TReturnValue, TOwner, TBaseCaller>
 {
     pub fn new(
-        shared_fn_config: Arc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue, TBaseCaller>>>,
+        shared_fn_config: Arc<RefCell<FnConfig<TMock, TCall, TArgsChecker, TReturnValue, TBaseCaller>>>,
         owner: &'a TOwner,
         base_caller: Option<Arc<RefCell<TBaseCaller>>>,
     ) -> Self {
@@ -65,8 +66,8 @@ impl<'a, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TOwner, 
     }
 }
 
-impl<'a, TCall, TArgsChecker: IArgsChecker<TCall>, TOwner, TBaseCaller>
-    SharedFnConfig<'a, TCall, TArgsChecker, (), TOwner, TBaseCaller>
+impl<'a, TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TOwner, TBaseCaller>
+    SharedFnConfig<'a, TMock, TCall, TArgsChecker, (), TOwner, TBaseCaller>
 {
     pub fn does(&self, callback: impl FnMut() + 'static) -> &'a TOwner {
         self.fn_config.borrow_mut().set_callback(callback);
@@ -76,12 +77,13 @@ impl<'a, TCall, TArgsChecker: IArgsChecker<TCall>, TOwner, TBaseCaller>
 
 impl<
     'a,
+    TMock,
     TCall,
     TArgsChecker: IArgsChecker<TCall>,
     TReturnValue,
     TOwner,
-    TBaseCaller: IBaseCaller<TCall, TReturnValue>,
-> SharedFnConfig<'a, TCall, TArgsChecker, TReturnValue, TOwner, TBaseCaller>
+    TBaseCaller: IBaseCaller<TMock, TCall, TReturnValue>,
+> SharedFnConfig<'a, TMock, TCall, TArgsChecker, TReturnValue, TOwner, TBaseCaller>
 {
     pub fn call_base(&self) -> &'a TOwner {
         let base_caller = self

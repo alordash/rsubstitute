@@ -2,9 +2,11 @@ use crate::IBaseCaller;
 use crate::args_matching::{ArgCheckResult, IArgsChecker};
 use std::cell::RefCell;
 use std::collections::VecDeque;
+use std::marker::PhantomData;
 use std::sync::Arc;
 
-pub struct FnConfig<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TBaseCaller> {
+pub struct FnConfig<TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TBaseCaller> {
+    _phantom_mock: PhantomData<TMock>,
     args_checker: TArgsChecker,
     current_return_value_index: usize,
     return_values: VecDeque<TReturnValue>,
@@ -13,11 +15,12 @@ pub struct FnConfig<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TBas
     base_caller: Option<Arc<RefCell<TBaseCaller>>>,
 }
 
-impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TBaseCaller>
-    FnConfig<TCall, TArgsChecker, TReturnValue, TBaseCaller>
+impl<TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TBaseCaller>
+    FnConfig<TMock, TCall, TArgsChecker, TReturnValue, TBaseCaller>
 {
     pub fn new(args_checker: TArgsChecker) -> Self {
         FnConfig {
+            _phantom_mock: PhantomData,
             args_checker,
             current_return_value_index: 0,
             return_values: VecDeque::new(),
@@ -67,11 +70,12 @@ impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TBaseCaller>
 }
 
 impl<
+    TMock,
     TCall,
     TArgsChecker: IArgsChecker<TCall>,
     TReturnValue,
-    TBaseCaller: IBaseCaller<TCall, TReturnValue>,
-> FnConfig<TCall, TArgsChecker, TReturnValue, TBaseCaller>
+    TBaseCaller: IBaseCaller<TMock, TCall, TReturnValue>,
+> FnConfig<TMock, TCall, TArgsChecker, TReturnValue, TBaseCaller>
 {
     pub fn set_base_caller(&mut self, base_caller: Arc<RefCell<TBaseCaller>>) {
         self.base_caller = Some(base_caller);
