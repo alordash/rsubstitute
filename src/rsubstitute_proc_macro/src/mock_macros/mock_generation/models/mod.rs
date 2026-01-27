@@ -12,6 +12,7 @@ mod mock_setup_struct;
 mod mock_struct;
 mod mock_struct_default_impl;
 mod mock_trait_impl;
+mod mock_type;
 mod send_sync_impls;
 mod static_fn;
 
@@ -29,5 +30,6 @@ pub use mock_setup_struct::*;
 pub use mock_struct::*;
 pub use mock_struct_default_impl::*;
 pub use mock_trait_impl::*;
+pub use mock_type::*;
 pub use send_sync_impls::*;
 pub use static_fn::*;

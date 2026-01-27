@@ -51,7 +51,7 @@ impl IMockReceivedStructGenerator for MockReceivedStructGenerator {
         };
         let item_struct = self
             .struct_factory
-            .create(attrs, ident, &mock_generics, fields);
+            .create(attrs, ident, mock_generics.impl_generics.clone(), fields);
         let mock_received_struct = MockReceivedStruct { item_struct };
         return mock_received_struct;
     }

@@ -56,9 +56,12 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
             named: fields,
         };
 
-        let item_struct = self
-            .struct_factory
-            .create(attrs, ident, mock_generics, fields_named);
+        let item_struct = self.struct_factory.create(
+            attrs,
+            ident,
+            mock_generics.impl_generics.clone(),
+            fields_named,
+        );
         let mock_struct = MockDataStruct {
             item_struct,
             field_and_fn_idents,
@@ -90,21 +93,21 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
             .zip(fn_infos)
             .map(|(x, y)| (x.get_required_ident(), y.parent.ident.clone()))
             .collect();
-        let fields = [
-            constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD.clone(),
-            self.generate_base_caller_field(base_caller_struct),
-        ]
-        .into_iter()
-        .chain(fn_fields)
-        .collect();
+        let fields = [constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD.clone()]
+            .into_iter()
+            .chain(fn_fields)
+            .collect();
         let fields_named = FieldsNamed {
             brace_token: Default::default(),
             named: fields,
         };
 
-        let item_struct = self
-            .struct_factory
-            .create(attrs, ident, mock_generics, fields_named);
+        let item_struct = self.struct_factory.create(
+            attrs,
+            ident,
+            mock_generics.impl_generics.clone(),
+            fields_named,
+        );
         let mock_struct = MockDataStruct {
             item_struct,
             field_and_fn_idents,
@@ -152,20 +155,6 @@ impl MockDataStructGenerator {
         let field = self
             .field_factory
             .create(fn_info.data_field_ident.clone(), ty);
-        return field;
-    }
-
-    fn generate_base_caller_field(&self, base_caller_struct: &BaseCallerStruct) -> Field {
-        let ty = self.type_factory.wrap_in_arc(
-            self.type_factory.wrap_in(
-                self.type_factory
-                    .create_from_struct(&base_caller_struct.item_struct),
-                constants::REF_CELL_IDENT.clone(),
-            ),
-        );
-        let field = self
-            .field_factory
-            .create(constants::BASE_CALLER_FIELD_IDENT.clone(), ty);
         return field;
     }
 }

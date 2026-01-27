@@ -49,9 +49,9 @@ impl IMockSetupStructGenerator for MockSetupStructGenerator {
             .into_iter()
             .collect(),
         };
-        let item_struct = self
-            .struct_factory
-            .create(attrs, ident, &mock_generics, fields);
+        let item_struct =
+            self.struct_factory
+                .create(attrs, ident, mock_generics.impl_generics.clone(), fields);
         let mock_setup_struct = MockSetupStruct { item_struct };
         return mock_setup_struct;
     }

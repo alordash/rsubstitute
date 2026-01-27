@@ -8,6 +8,8 @@ use syn::*;
 pub trait ITypeFactory {
     fn create(&self, ident: Ident) -> Type;
 
+    fn create_with_generics(&self, ident: Ident, generics: Generics) -> Type;
+
     fn create_from_struct(&self, item_struct: &ItemStruct) -> Type;
 
     fn wrap_in(&self, ty: Type, wrapper: Ident) -> Type;
@@ -26,14 +28,15 @@ impl ITypeFactory for TypeFactory {
         return result;
     }
 
-    fn create_from_struct(&self, item_struct: &ItemStruct) -> Type {
-        let path = self.path_factory.create_with_generics(item_struct.ident.clone(), item_struct.generics.clone());
+    fn create_with_generics(&self, ident: Ident, generics: Generics) -> Type {
+        let path = self.path_factory.create_with_generics(ident, generics);
         let result = Type::Path(TypePath { qself: None, path });
         return result;
     }
 
-    fn wrap_in_arc(&self, ty: Type) -> Type {
-        let result = self.wrap_in(ty, constants::ARC_IDENT.clone());
+    fn create_from_struct(&self, item_struct: &ItemStruct) -> Type {
+        let result =
+            self.create_with_generics(item_struct.ident.clone(), item_struct.generics.clone());
         return result;
     }
 
@@ -55,6 +58,11 @@ impl ITypeFactory for TypeFactory {
                 .collect(),
             },
         });
+        return result;
+    }
+
+    fn wrap_in_arc(&self, ty: Type) -> Type {
+        let result = self.wrap_in(ty, constants::ARC_IDENT.clone());
         return result;
     }
 }
