@@ -8,21 +8,12 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait IMockConstructorBlockGenerator {
-    fn generate_for_trait(
+    fn generate(
         &self,
         mock_struct: &MockStruct,
         mock_data_struct: &MockDataStruct,
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
-    ) -> Block;
-
-    fn generate_for_static(
-        &self,
-        mock_struct: &MockStruct,
-        mock_data_struct: &MockDataStruct,
-        mock_setup_struct: &MockSetupStruct,
-        mock_received_struct: &MockReceivedStruct,
-        base_caller_struct: &BaseCallerStruct,
     ) -> Block;
 }
 
@@ -32,7 +23,7 @@ pub(crate) struct MockConstructorBlockGenerator {
 }
 
 impl IMockConstructorBlockGenerator for MockConstructorBlockGenerator {
-    fn generate_for_trait(
+    fn generate(
         &self,
         mock_struct: &MockStruct,
         mock_data_struct: &MockDataStruct,
@@ -44,25 +35,6 @@ impl IMockConstructorBlockGenerator for MockConstructorBlockGenerator {
             mock_data_struct,
             mock_setup_struct,
             mock_received_struct,
-            None,
-        );
-        return result;
-    }
-
-    fn generate_for_static(
-        &self,
-        mock_struct: &MockStruct,
-        mock_data_struct: &MockDataStruct,
-        mock_setup_struct: &MockSetupStruct,
-        mock_received_struct: &MockReceivedStruct,
-        base_caller_struct: &BaseCallerStruct,
-    ) -> Block {
-        let result = self.generate(
-            mock_struct,
-            mock_data_struct,
-            mock_setup_struct,
-            mock_received_struct,
-            Some(base_caller_struct),
         );
         return result;
     }
@@ -77,7 +49,6 @@ impl MockConstructorBlockGenerator {
         mock_data_struct: &MockDataStruct,
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
-        maybe_base_caller_struct: Option<&BaseCallerStruct>,
     ) -> Block {
         let mut data_fields: Vec<_> = mock_data_struct
             .field_and_fn_idents
@@ -107,54 +78,55 @@ impl MockConstructorBlockGenerator {
             .collect();
         let phantom_lifetime_field = constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE.clone();
         data_fields.insert(0, phantom_lifetime_field);
-        if let Some(base_caller_struct) = maybe_base_caller_struct {
-            let base_caller_struct_fields = base_caller_struct
-                .item_struct
-                .fields
-                .iter()
-                .map(|field| {
-                    // Assume all fields are PhantomData
-                    let field_ident = field.get_required_ident();
-                    return self.field_value_factory.create_as_phantom_data(field_ident);
-                })
-                .collect();
-            let base_caller_struct_construction = Expr::Struct(ExprStruct {
-                attrs: Vec::new(),
-                qself: None,
-                path: self
-                    .path_factory
-                    .create(base_caller_struct.item_struct.ident.clone()),
-                brace_token: Default::default(),
-                fields: base_caller_struct_fields,
-                dot2_token: None,
-                rest: None,
-            });
-            let base_caller_field = FieldValue {
-                attrs: Vec::new(),
-                member: Member::Named(constants::BASE_CALLER_FIELD_IDENT.clone()),
-                colon_token: Some(Default::default()),
-                expr: Expr::Call(ExprCall {
-                    attrs: Vec::new(),
-                    func: Box::new(self.path_factory.create_expr_from_parts(vec![
-                        constants::ARC_IDENT.clone(),
-                        constants::NEW_IDENT.clone(),
-                    ])),
-                    paren_token: Default::default(),
-                    args: [Expr::Call(ExprCall {
-                        attrs: Vec::new(),
-                        func: Box::new(self.path_factory.create_expr_from_parts(vec![
-                            constants::REF_CELL_IDENT.clone(),
-                            constants::NEW_IDENT.clone(),
-                        ])),
-                        paren_token: Default::default(),
-                        args: [base_caller_struct_construction].into_iter().collect(),
-                    })]
-                    .into_iter()
-                    .collect(),
-                }),
-            };
-            data_fields.insert(1, base_caller_field);
-        }
+        // TODO - remove?
+        // if let Some(base_caller_struct) = maybe_base_caller_struct {
+        //     let base_caller_struct_fields = base_caller_struct
+        //         .item_struct
+        //         .fields
+        //         .iter()
+        //         .map(|field| {
+        //             // Assume all fields are PhantomData
+        //             let field_ident = field.get_required_ident();
+        //             return self.field_value_factory.create_as_phantom_data(field_ident);
+        //         })
+        //         .collect();
+        //     let base_caller_struct_construction = Expr::Struct(ExprStruct {
+        //         attrs: Vec::new(),
+        //         qself: None,
+        //         path: self
+        //             .path_factory
+        //             .create(base_caller_struct.item_struct.ident.clone()),
+        //         brace_token: Default::default(),
+        //         fields: base_caller_struct_fields,
+        //         dot2_token: None,
+        //         rest: None,
+        //     });
+        //     let base_caller_field = FieldValue {
+        //         attrs: Vec::new(),
+        //         member: Member::Named(constants::BASE_CALLER_FIELD_IDENT.clone()),
+        //         colon_token: Some(Default::default()),
+        //         expr: Expr::Call(ExprCall {
+        //             attrs: Vec::new(),
+        //             func: Box::new(self.path_factory.create_expr_from_parts(vec![
+        //                 constants::ARC_IDENT.clone(),
+        //                 constants::NEW_IDENT.clone(),
+        //             ])),
+        //             paren_token: Default::default(),
+        //             args: [Expr::Call(ExprCall {
+        //                 attrs: Vec::new(),
+        //                 func: Box::new(self.path_factory.create_expr_from_parts(vec![
+        //                     constants::REF_CELL_IDENT.clone(),
+        //                     constants::NEW_IDENT.clone(),
+        //                 ])),
+        //                 paren_token: Default::default(),
+        //                 args: [base_caller_struct_construction].into_iter().collect(),
+        //             })]
+        //             .into_iter()
+        //             .collect(),
+        //         }),
+        //     };
+        //     data_fields.insert(1, base_caller_field);
+        // }
         let data_stmt = Stmt::Local(Local {
             attrs: Vec::new(),
             let_token: Default::default(),

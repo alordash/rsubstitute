@@ -19,6 +19,7 @@ pub(crate) struct ItemFnHandler {
     pub fn_info_generator: Arc<dyn IFnInfoGenerator>,
     pub base_caller_struct_generator: Arc<dyn IBaseCallerStructGenerator>,
     pub base_caller_impl_generator: Arc<dyn IBaseCallerImplGenerator>,
+    pub mock_type_generator: Arc<dyn IMockTypeGenerator>,
     pub mock_data_struct_generator: Arc<dyn IMockDataStructGenerator>,
     pub mock_setup_struct_generator: Arc<dyn IMockSetupStructGenerator>,
     pub mock_received_struct_generator: Arc<dyn IMockReceivedStructGenerator>,
@@ -56,9 +57,11 @@ impl IItemFnHandler for ItemFnHandler {
             phantom_types_count,
         );
         let fn_infos = [fn_info];
+        let mock_type = self
+            .mock_type_generator
+            .generate(mock_ident.clone(), &mock_generics);
         let mock_data_struct = self.mock_data_struct_generator.generate_for_static(
-            &mock_ident,
-            &mock_generics,
+            &mock_type,
             &fn_infos,
             &base_caller_struct,
         );
@@ -69,8 +72,7 @@ impl IItemFnHandler for ItemFnHandler {
             .mock_received_struct_generator
             .generate_with_non_camel_case_allowed(&mock_ident, &mock_generics, &mock_data_struct);
         let mock_struct = self.mock_struct_generator.generate_for_static(
-            mock_ident.clone(),
-            &mock_generics,
+            &mock_type,
             &mock_setup_struct,
             &mock_received_struct,
             &mock_data_struct,

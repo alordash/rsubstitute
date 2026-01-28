@@ -14,7 +14,6 @@ pub trait IFnSetupGenerator {
         fn_info: &FnInfo,
         mock_struct: &MockStruct,
         mock_setup_struct: &MockSetupStruct,
-        base_caller_struct: &BaseCallerStruct,
         mock_generics: &MockGenerics,
     ) -> ItemFn;
 }
@@ -34,13 +33,11 @@ impl IFnSetupGenerator for FnSetupGenerator {
         fn_info: &FnInfo,
         mock_struct: &MockStruct,
         mock_setup_struct: &MockSetupStruct,
-        base_caller_struct: &BaseCallerStruct,
         mock_generics: &MockGenerics,
     ) -> ItemFn {
         let output = self.setup_output_generator.generate_for_static(
             fn_info,
             mock_setup_struct,
-            base_caller_struct,
         );
         let phantom_types_count = mock_generics.get_phantom_types_count();
         let sig = Signature {

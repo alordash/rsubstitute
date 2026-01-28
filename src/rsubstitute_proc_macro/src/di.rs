@@ -104,6 +104,7 @@ fn create_services() -> ServiceCollection {
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
     });
+    let mock_type_generator = Arc::new(MockTypeGenerator);
     let mock_struct_generator = Arc::new(MockStructGenerator {
         type_factory: type_factory.clone(),
         field_factory: field_factory.clone(),
@@ -222,6 +223,7 @@ fn create_services() -> ServiceCollection {
         mock_data_struct_generator: mock_data_struct_generator.clone(),
         mock_setup_struct_generator: mock_setup_struct_generator.clone(),
         mock_received_struct_generator: mock_received_struct_generator.clone(),
+        mock_type_generator: mock_type_generator.clone(),
         mock_struct_generator: mock_struct_generator.clone(),
         mock_trait_impl_generator: mock_trait_impl_generator.clone(),
         mock_impl_generator: mock_impl_generator.clone(),
@@ -240,6 +242,7 @@ fn create_services() -> ServiceCollection {
         mock_data_struct_generator: mock_data_struct_generator.clone(),
         mock_setup_struct_generator: mock_setup_struct_generator.clone(),
         mock_received_struct_generator: mock_received_struct_generator.clone(),
+        mock_type_generator: mock_type_generator.clone(),
         mock_struct_generator: mock_struct_generator.clone(),
         send_sync_impls_generator: send_sync_impls_generator.clone(),
         mock_struct_default_impl_generator: mock_struct_default_impl_generator.clone(),

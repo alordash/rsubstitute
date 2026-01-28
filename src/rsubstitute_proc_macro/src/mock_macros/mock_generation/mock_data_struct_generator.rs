@@ -7,20 +7,9 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait IMockDataStructGenerator {
-    fn generate_for_trait(
-        &self,
-        mock_ident: &Ident,
-        mock_generics: &MockGenerics,
-        fn_infos: &[FnInfo],
-    ) -> MockDataStruct;
+    fn generate_for_trait(&self, mock_type: &MockType, fn_infos: &[FnInfo]) -> MockDataStruct;
 
-    fn generate_for_static(
-        &self,
-        mock_ident: &Ident,
-        mock_generics: &MockGenerics,
-        fn_infos: &[FnInfo],
-        base_caller_struct: &BaseCallerStruct,
-    ) -> MockDataStruct;
+    fn generate_for_static(&self, mock_type: &MockType, fn_infos: &[FnInfo]) -> MockDataStruct;
 }
 
 // TODO - verify all impls are internal
@@ -31,17 +20,16 @@ pub(crate) struct MockDataStructGenerator {
 }
 
 impl IMockDataStructGenerator for MockDataStructGenerator {
-    fn generate_for_trait(
-        &self,
-        mock_ident: &Ident,
-        mock_generics: &MockGenerics,
-        fn_infos: &[FnInfo],
-    ) -> MockDataStruct {
+    fn generate_for_trait(&self, mock_type: &MockType, fn_infos: &[FnInfo]) -> MockDataStruct {
         let attrs = vec![constants::DERIVE_MOCK_DATA_ATTRIBUTE.clone()];
-        let ident = format_ident!("{}{}", mock_ident, Self::MOCK_DATA_STRUCT_IDENT_SUFFIX);
+        let ident = format_ident!(
+            "{}{}",
+            mock_type.ident.clone(),
+            Self::MOCK_DATA_STRUCT_IDENT_SUFFIX
+        );
         let fn_fields: Vec<_> = fn_infos
             .iter()
-            .map(|x| self.generate_field(x, None))
+            .map(|x| self.generate_field(x, mock_type))
             .collect();
         let field_and_fn_idents = fn_fields
             .iter()
@@ -56,12 +44,9 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
             named: fields,
         };
 
-        let item_struct = self.struct_factory.create(
-            attrs,
-            ident,
-            mock_generics.impl_generics.clone(),
-            fields_named,
-        );
+        let item_struct =
+            self.struct_factory
+                .create(attrs, ident, mock_type.generics.clone(), fields_named);
         let mock_struct = MockDataStruct {
             item_struct,
             field_and_fn_idents,
@@ -69,24 +54,19 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
         return mock_struct;
     }
 
-    fn generate_for_static(
-        &self,
-        mock_ident: &Ident,
-        mock_generics: &MockGenerics,
-        fn_infos: &[FnInfo],
-        base_caller_struct: &BaseCallerStruct,
-    ) -> MockDataStruct {
+    fn generate_for_static(&self, mock_type: &MockType, fn_infos: &[FnInfo]) -> MockDataStruct {
         let attrs = vec![
             constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone(),
             constants::DERIVE_MOCK_DATA_ATTRIBUTE.clone(),
         ];
-        let ident = format_ident!("{}{}", mock_ident, Self::MOCK_DATA_STRUCT_IDENT_SUFFIX);
-        let base_caller_ty = self
-            .type_factory
-            .create_from_struct(&base_caller_struct.item_struct);
+        let ident = format_ident!(
+            "{}{}",
+            mock_type.ident.clone(),
+            Self::MOCK_DATA_STRUCT_IDENT_SUFFIX
+        );
         let fn_fields: Vec<_> = fn_infos
             .iter()
-            .map(|x| self.generate_field(x, Some(base_caller_ty.clone())))
+            .map(|x| self.generate_field(x, mock_type))
             .collect();
         let field_and_fn_idents = fn_fields
             .iter()
@@ -102,12 +82,9 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
             named: fields,
         };
 
-        let item_struct = self.struct_factory.create(
-            attrs,
-            ident,
-            mock_generics.impl_generics.clone(),
-            fields_named,
-        );
+        let item_struct =
+            self.struct_factory
+                .create(attrs, ident, mock_type.generics.clone(), fields_named);
         let mock_struct = MockDataStruct {
             item_struct,
             field_and_fn_idents,
@@ -119,7 +96,7 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
 impl MockDataStructGenerator {
     const MOCK_DATA_STRUCT_IDENT_SUFFIX: &'static str = "Data";
 
-    fn generate_field(&self, fn_info: &FnInfo, maybe_base_caller_ty: Option<Type>) -> Field {
+    fn generate_field(&self, fn_info: &FnInfo, mock_type: &MockType) -> Field {
         let ty = Type::Path(TypePath {
             qself: None,
             path: Path {
@@ -130,6 +107,10 @@ impl MockDataStructGenerator {
                         colon2_token: None,
                         lt_token: Default::default(),
                         args: [
+                            GenericArgument::Type(self.type_factory.create_with_generics(
+                                mock_type.ident.clone(),
+                                mock_type.generics.clone(),
+                            )),
                             GenericArgument::Type(
                                 self.type_factory
                                     .create_from_struct(&fn_info.call_struct.item_struct),
@@ -139,9 +120,6 @@ impl MockDataStructGenerator {
                                     .create_from_struct(&fn_info.args_checker_struct.item_struct),
                             ),
                             GenericArgument::Type(fn_info.parent.get_return_value_type()),
-                            GenericArgument::Type(
-                                maybe_base_caller_ty.unwrap_or(constants::VOID_TYPE.clone()),
-                            ),
                         ]
                         .into_iter()
                         .collect(),

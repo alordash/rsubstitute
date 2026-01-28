@@ -61,9 +61,12 @@ impl IMockStructGenerator for MockStructGenerator {
             .into_iter()
             .collect(),
         };
-        let item_struct = self
-            .struct_factory
-            .create(attrs, mock_ident, &mock_generics, fields);
+        let item_struct = self.struct_factory.create(
+            attrs,
+            mock_type.ident.clone(),
+            mock_type.generics.clone(),
+            fields,
+        );
         let result = MockStruct { item_struct };
         return result;
     }
