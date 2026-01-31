@@ -3,7 +3,7 @@ use std::cell::RefCell;
 use std::sync::Arc;
 
 #[mock]
-fn fer() {}
+fn grrg() {}
 
 mod tests {
     #![allow(non_snake_case)]

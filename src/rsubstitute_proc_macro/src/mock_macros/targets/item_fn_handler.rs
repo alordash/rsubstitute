@@ -17,8 +17,6 @@ pub(crate) struct ItemFnHandler {
     pub fn_decl_extractor: Arc<dyn IFnDeclExtractor>,
     pub mock_generics_generator: Arc<dyn IMockGenericsGenerator>,
     pub fn_info_generator: Arc<dyn IFnInfoGenerator>,
-    pub base_caller_struct_generator: Arc<dyn IBaseCallerStructGenerator>,
-    pub base_caller_impl_generator: Arc<dyn IBaseCallerImplGenerator>,
     pub mock_type_generator: Arc<dyn IMockTypeGenerator>,
     pub mock_data_struct_generator: Arc<dyn IMockDataStructGenerator>,
     pub mock_setup_struct_generator: Arc<dyn IMockSetupStructGenerator>,
@@ -44,27 +42,14 @@ impl IItemFnHandler for ItemFnHandler {
         let base_fn = self.base_fn_generator.generate(item_fn.clone());
         let fn_decl = self.fn_decl_extractor.extract_fn(&item_fn);
         let mock_generics = self.mock_generics_generator.generate(&item_fn.sig.generics);
-        let phantom_types_count = mock_generics.get_phantom_types_count();
         let fn_info = self.fn_info_generator.generate(&fn_decl, &mock_generics);
-        let base_caller_struct = self
-            .base_caller_struct_generator
-            .generate(&fn_decl, &mock_generics);
-        let base_caller_impl = self.base_caller_impl_generator.generate(
-            &base_caller_struct,
-            &fn_info.call_struct,
-            &fn_decl,
-            &base_fn,
-            phantom_types_count,
-        );
         let fn_infos = [fn_info];
         let mock_type = self
             .mock_type_generator
             .generate(mock_ident.clone(), &mock_generics);
-        let mock_data_struct = self.mock_data_struct_generator.generate_for_static(
-            &mock_type,
-            &fn_infos,
-            &base_caller_struct,
-        );
+        let mock_data_struct = self
+            .mock_data_struct_generator
+            .generate_for_static(&mock_type, &fn_infos);
         let mock_setup_struct = self
             .mock_setup_struct_generator
             .generate_with_non_camel_case_allowed(&mock_ident, &mock_generics, &mock_data_struct);
@@ -85,15 +70,14 @@ impl IItemFnHandler for ItemFnHandler {
             &mock_data_struct,
             &mock_setup_struct,
             &mock_received_struct,
-            &base_caller_struct,
             &mock_generics,
         );
         let [fn_info] = fn_infos;
         let mock_setup_impl = self.mock_setup_impl_generator.generate_for_static(
+            &mock_struct,
             &mock_generics,
             &mock_setup_struct,
             &fn_info,
-            &base_caller_struct,
         );
         let mock_received_impl = self.mock_received_impl_generator.generate_for_static(
             &mock_generics,
@@ -104,7 +88,6 @@ impl IItemFnHandler for ItemFnHandler {
             &fn_info,
             &mock_struct,
             &mock_setup_struct,
-            &base_caller_struct,
             &mock_generics,
         );
         let fn_received = self.fn_received_generator.generate(
@@ -121,8 +104,6 @@ impl IItemFnHandler for ItemFnHandler {
             &item_fn,
             base_fn,
             fn_info,
-            base_caller_struct,
-            base_caller_impl,
             mock_data_struct,
             mock_setup_struct,
             mock_received_struct,

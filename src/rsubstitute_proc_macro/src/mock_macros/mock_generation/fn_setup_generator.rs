@@ -37,6 +37,7 @@ impl IFnSetupGenerator for FnSetupGenerator {
     ) -> ItemFn {
         let output = self.setup_output_generator.generate_for_static(
             fn_info,
+            mock_struct,
             mock_setup_struct,
         );
         let phantom_types_count = mock_generics.get_phantom_types_count();

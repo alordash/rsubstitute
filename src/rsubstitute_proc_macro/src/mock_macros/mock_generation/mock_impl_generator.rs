@@ -68,7 +68,7 @@ impl MockImplGenerator {
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
     ) -> ImplItem {
-        let block = self.mock_constructor_block_generator.generate_for_trait(
+        let block = self.mock_constructor_block_generator.generate(
             mock_struct,
             mock_data_struct,
             mock_setup_struct,

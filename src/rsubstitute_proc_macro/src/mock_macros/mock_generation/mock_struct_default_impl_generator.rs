@@ -13,7 +13,6 @@ pub trait IMockStructDefaultImplGenerator {
         mock_data_struct: &MockDataStruct,
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
-        base_caller_struct: &BaseCallerStruct,
         mock_generics: &MockGenerics,
     ) -> MockStructDefaultImpl;
 }
@@ -30,18 +29,16 @@ impl IMockStructDefaultImplGenerator for MockStructDefaultImplGenerator {
         mock_data_struct: &MockDataStruct,
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
-        base_caller_struct: &BaseCallerStruct,
         mock_generics: &MockGenerics,
     ) -> MockStructDefaultImpl {
         let self_ty = self
             .type_factory
             .create_from_struct(&mock_struct.item_struct);
-        let block = self.mock_constructor_block_generator.generate_for_static(
+        let block = self.mock_constructor_block_generator.generate(
             mock_struct,
             mock_data_struct,
             mock_setup_struct,
             mock_received_struct,
-            base_caller_struct,
         );
         let default_fn = ImplItemFn {
             attrs: Vec::new(),
