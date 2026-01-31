@@ -15,7 +15,7 @@ pub trait IMockSetupImplGenerator {
     fn generate_for_trait(
         &self,
         mock_struct: &MockStruct,
-        mock_generics: &MockGenerics,
+        mock_type: &MockType,
         mock_setup_struct: &MockSetupStruct,
         fn_infos: &[FnInfo],
     ) -> MockSetupImpl;
@@ -23,7 +23,7 @@ pub trait IMockSetupImplGenerator {
     fn generate_for_static(
         &self,
         mock_struct: &MockStruct,
-        mock_generics: &MockGenerics,
+        mock_type: &MockType,
         mock_setup_struct: &MockSetupStruct,
         fn_info: &FnInfo,
     ) -> MockSetupImpl;
@@ -43,7 +43,7 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
     fn generate_for_trait(
         &self,
         mock_struct: &MockStruct,
-        mock_generics: &MockGenerics,
+        mock_type: &MockType,
         mock_setup_struct: &MockSetupStruct,
         fn_infos: &[FnInfo],
     ) -> MockSetupImpl {
@@ -61,14 +61,14 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
                     x,
                     use_fn_info_ident_as_method_ident,
                     output,
-                    mock_generics.get_phantom_types_count(),
+                    mock_type.generics.get_phantom_types_count(),
                 ));
             })
             .collect();
 
-        let item_impl =
-            self.impl_factory
-                .create_with_default_lifetime(mock_generics, self_ty, fn_setups);
+        let item_impl = self
+            .impl_factory
+            .create_with_default_lifetime(mock_type, self_ty, fn_setups);
         let mock_setup_impl = MockSetupImpl { item_impl };
         return mock_setup_impl;
     }
@@ -76,7 +76,7 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
     fn generate_for_static(
         &self,
         mock_struct: &MockStruct,
-        mock_generics: &MockGenerics,
+        mock_type: &MockType,
         mock_setup_struct: &MockSetupStruct,
         fn_info: &FnInfo,
     ) -> MockSetupImpl {
@@ -91,12 +91,12 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
             fn_info,
             use_fn_info_ident_as_method_ident,
             output,
-            mock_generics.get_phantom_types_count(),
+            mock_type.generics.get_phantom_types_count(),
         ));
 
         let item_impl =
             self.impl_factory
-                .create_with_default_lifetime(mock_generics, self_ty, vec![fn_setup]);
+                .create_with_default_lifetime(mock_type, self_ty, vec![fn_setup]);
         let mock_setup_impl = MockSetupImpl { item_impl };
         return mock_setup_impl;
     }

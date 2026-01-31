@@ -1,5 +1,4 @@
 use crate::constants;
-use crate::lifetime_ref::LifetimeRef;
 use crate::mock_macros::fn_info_generation::models::*;
 use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::mock_generation::*;
@@ -13,7 +12,7 @@ pub trait IStaticFnGenerator {
         &self,
         fn_info: &FnInfo,
         mock_struct: &MockStruct,
-        mock_generics: &MockGenerics,
+        mock_type: &MockType,
     ) -> StaticFn;
 }
 
@@ -27,9 +26,9 @@ impl IStaticFnGenerator for StaticFnGenerator {
         &self,
         fn_info: &FnInfo,
         mock_struct: &MockStruct,
-        mock_generics: &MockGenerics,
+        mock_type: &MockType,
     ) -> StaticFn {
-        let mut generics = mock_generics.impl_generics.clone();
+        let mut generics = mock_type.generics.impl_generics.clone();
         generics.params.insert(
             0,
             GenericParam::Lifetime(LifetimeParam {

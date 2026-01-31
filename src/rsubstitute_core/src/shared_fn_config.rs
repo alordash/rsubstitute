@@ -1,7 +1,6 @@
 use crate::args_matching::IArgsChecker;
 use crate::{FnConfig, IBaseCaller};
 use std::cell::RefCell;
-use std::marker::PhantomData;
 use std::sync::Arc;
 
 pub struct SharedFnConfig<'a, TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TOwner>

@@ -13,7 +13,7 @@ pub trait IMockStructDefaultImplGenerator {
         mock_data_struct: &MockDataStruct,
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
-        mock_generics: &MockGenerics,
+        mock_type: &MockType,
     ) -> MockStructDefaultImpl;
 }
 
@@ -29,7 +29,7 @@ impl IMockStructDefaultImplGenerator for MockStructDefaultImplGenerator {
         mock_data_struct: &MockDataStruct,
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
-        mock_generics: &MockGenerics,
+        mock_type: &MockType,
     ) -> MockStructDefaultImpl {
         let self_ty = self
             .type_factory
@@ -67,7 +67,7 @@ impl IMockStructDefaultImplGenerator for MockStructDefaultImplGenerator {
             defaultness: None,
             unsafety: None,
             impl_token: Default::default(),
-            generics: mock_generics.impl_generics.clone(),
+            generics: mock_type.generics.impl_generics.clone(),
             trait_: Some((
                 None,
                 constants::DEFAULT_TRAIT_PATH.clone(),

@@ -19,7 +19,6 @@ pub trait IMockConstructorBlockGenerator {
 
 pub(crate) struct MockConstructorBlockGenerator {
     pub path_factory: Arc<dyn IPathFactory>,
-    pub field_value_factory: Arc<dyn IFieldValueFactory>,   // TODO - REMOVE ALL UNUSED
 }
 
 impl IMockConstructorBlockGenerator for MockConstructorBlockGenerator {

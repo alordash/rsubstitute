@@ -5,7 +5,6 @@ use crate::error_printer::IErrorPrinter;
 use crate::matching_config_search_result::*;
 use crate::*;
 use std::cell::RefCell;
-use std::marker::PhantomData;
 use std::sync::Arc;
 
 pub struct FnData<

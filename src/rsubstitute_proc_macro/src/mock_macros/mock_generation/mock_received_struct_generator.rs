@@ -10,14 +10,14 @@ pub trait IMockReceivedStructGenerator {
     fn generate(
         &self,
         mock_ident: &Ident,
-        mock_generics: &MockGenerics,
+        mock_type: &MockType,
         mock_data_struct: &MockDataStruct,
     ) -> MockReceivedStruct;
 
     fn generate_with_non_camel_case_allowed(
         &self,
         mock_ident: &Ident,
-        mock_generics: &MockGenerics,
+        mock_type: &MockType,
         mock_data_struct: &MockDataStruct,
     ) -> MockReceivedStruct;
 }
@@ -32,7 +32,7 @@ impl IMockReceivedStructGenerator for MockReceivedStructGenerator {
     fn generate(
         &self,
         mock_ident: &Ident,
-        mock_generics: &MockGenerics,
+        mock_type: &MockType,
         mock_data_struct: &MockDataStruct,
     ) -> MockReceivedStruct {
         let attrs = Vec::new();
@@ -49,9 +49,12 @@ impl IMockReceivedStructGenerator for MockReceivedStructGenerator {
             .into_iter()
             .collect(),
         };
-        let item_struct = self
-            .struct_factory
-            .create(attrs, ident, mock_generics.impl_generics.clone(), fields);
+        let item_struct = self.struct_factory.create(
+            attrs,
+            ident,
+            mock_type.generics.impl_generics.clone(),
+            fields,
+        );
         let mock_received_struct = MockReceivedStruct { item_struct };
         return mock_received_struct;
     }
@@ -59,10 +62,10 @@ impl IMockReceivedStructGenerator for MockReceivedStructGenerator {
     fn generate_with_non_camel_case_allowed(
         &self,
         mock_ident: &Ident,
-        mock_generics: &MockGenerics,
+        mock_type: &MockType,
         mock_data_struct: &MockDataStruct,
     ) -> MockReceivedStruct {
-        let mut result = self.generate(mock_ident, &mock_generics, mock_data_struct);
+        let mut result = self.generate(mock_ident, mock_type, mock_data_struct);
         result
             .item_struct
             .attrs
