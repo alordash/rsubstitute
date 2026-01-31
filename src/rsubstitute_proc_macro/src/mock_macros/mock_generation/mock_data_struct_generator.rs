@@ -96,7 +96,16 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
 impl MockDataStructGenerator {
     const MOCK_DATA_STRUCT_IDENT_SUFFIX: &'static str = "Data";
 
-    fn generate_field(&self, fn_info: &FnInfo, mock_type: &MockType) -> Field {
+    fn generate_field(
+        &self,
+        fn_info: &FnInfo,
+        mock_type: &MockType,
+        mock_type_generics_lifetime_options: MockTypeGenericsLifetimeOptions,
+    ) -> Field {
+        let mock_type_generics = match mock_type_generics_lifetime_options {
+            MockTypeGenericsLifetimeOptions::WithDefaultArgLifetime => {}
+            MockTypeGenericsLifetimeOptions::WithoutDefaultArgLifetime => {}
+        };
         let ty = Type::Path(TypePath {
             qself: None,
             path: Path {
@@ -135,4 +144,9 @@ impl MockDataStructGenerator {
             .create(fn_info.data_field_ident.clone(), ty);
         return field;
     }
+}
+
+enum MockTypeGenericsLifetimeOptions {
+    WithDefaultArgLifetime,
+    WithoutDefaultArgLifetime,
 }

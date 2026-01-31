@@ -45,10 +45,9 @@ impl IItemTraitHandler for ItemTraitHandler {
         let mock_type = self
             .mock_type_generator
             .generate(mock_ident.clone(), &mock_generics);
-        let mock_data_struct = self.mock_data_struct_generator.generate_for_trait(
-            &mock_type,
-            &fn_infos,
-        );
+        let mock_data_struct = self
+            .mock_data_struct_generator
+            .generate_for_trait(&mock_type, &fn_infos);
         let mock_setup_struct = self.mock_setup_struct_generator.generate(
             &mock_ident,
             &mock_generics,
