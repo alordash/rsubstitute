@@ -3,7 +3,6 @@ use crate::mock_macros::fn_info_generation::models::*;
 use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::models::FnDecl;
 use crate::syntax::*;
-use proc_macro2::TokenStream;
 use quote::format_ident;
 use std::cell::LazyCell;
 use std::sync::Arc;

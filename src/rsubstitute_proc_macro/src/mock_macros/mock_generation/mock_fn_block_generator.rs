@@ -122,7 +122,7 @@ impl MockFnBlockGenerator {
             ReturnAccessor::SelfRef => constants::SELF_IDENT.clone(),
             ReturnAccessor::Static(_) => Self::MOCK_VARIABLE_IDENT.clone(),
         });
-        let mut handle_expr = self.generate_handle_expr(fn_info, base_receiver, return_accessor);
+        let mut handle_expr = self.generate_handle_expr(fn_info, base_receiver);
         if fn_info.parent.has_return_value() {
             handle_expr = Expr::Return(ExprReturn {
                 attrs: Vec::new(),
@@ -153,44 +153,40 @@ impl MockFnBlockGenerator {
         return last_stmts;
     }
 
-    fn generate_handle_expr(
-        &self,
-        fn_info: &FnInfo,
-        base_receiver: Expr,
-        return_accessor: ReturnAccessor,
-    ) -> Expr {
+    fn generate_handle_expr(&self, fn_info: &FnInfo, base_receiver: Expr) -> Expr {
         let idents = vec![
             constants::DATA_IDENT.clone(),
             fn_info.data_field_ident.clone(),
         ];
-        let method = match (return_accessor, fn_info.parent.has_return_value()) {
-            (ReturnAccessor::SelfRef, true) => Self::HANDLE_RETURNING_METHOD_IDENT.clone(),
-            (ReturnAccessor::SelfRef, false) => Self::HANDLE_METHOD_IDENT.clone(),
-            (ReturnAccessor::Static(_), true) => Self::HANDLE_BASE_RETURNING_METHOD_IDENT.clone(),
-            (ReturnAccessor::Static(_), false) => Self::HANDLE_BASE_METHOD_IDENT.clone(),
+        let method_name = match (
+            fn_info.maybe_base_caller_impl.is_some(),
+            fn_info.parent.has_return_value(),
+        ) {
+            (false, false) => Self::HANDLE_METHOD_IDENT.clone(),
+            (false, true) => Self::HANDLE_RETURNING_METHOD_IDENT.clone(),
+            (true, false) => Self::HANDLE_BASE_METHOD_IDENT.clone(),
+            (true, true) => Self::HANDLE_BASE_RETURNING_METHOD_IDENT.clone(),
         };
-        let args = match return_accessor {
-            ReturnAccessor::SelfRef => vec![
-                self.path_factory
-                    .create_expr(Self::CALL_VARIABLE_IDENT.clone()),
-            ],
-            ReturnAccessor::Static(_) => vec![
+        let args = if fn_info.maybe_base_caller_impl.is_some() {
+            vec![
                 Expr::Reference(ExprReference {
                     attrs: Vec::new(),
                     and_token: Default::default(),
                     mutability: None,
-                    expr: Box::new(
-                        self.path_factory
-                            .create_expr(Self::MOCK_VARIABLE_IDENT.clone()),
-                    ),
+                    expr: Box::new(base_receiver.clone()),
                 }),
                 self.path_factory
                     .create_expr(Self::CALL_VARIABLE_IDENT.clone()),
-            ],
+            ]
+        } else {
+            vec![
+                self.path_factory
+                    .create_expr(Self::CALL_VARIABLE_IDENT.clone()),
+            ]
         };
         let expr_method_call = self
             .expr_method_call_factory
-            .create_with_base_receiver_and_expr_args(base_receiver, idents, method, args);
+            .create_with_base_receiver_and_expr_args(base_receiver, idents, method_name, args);
         let expr = Expr::MethodCall(expr_method_call);
         return expr;
     }

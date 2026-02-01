@@ -3,13 +3,13 @@ use crate::mock_macros::models::FnDecl;
 use proc_macro2::Ident;
 
 // TODO - make all models internal
-pub struct FnInfo<'a> {
+pub(crate) struct FnInfo<'a> {
     // TODO - remove this field or use it instead of FnDecl everywhere
-    pub(crate) parent: &'a FnDecl,
-    pub(crate) call_struct: CallStruct,
-    pub(crate) call_arg_infos_provider_impl: CallArgInfosProviderImpl,
-    pub(crate) args_checker_struct: ArgsCheckerStruct,
-    pub(crate) args_checker_impl: ArgsCheckerTraitImpl,
-    pub(crate) data_field_ident: Ident,
-    pub(crate) maybe_base_caller_impl: Option<BaseCallerImpl>
+    pub parent: &'a FnDecl,
+    pub call_struct: CallStruct,
+    pub call_arg_infos_provider_impl: CallArgInfosProviderImpl,
+    pub args_checker_struct: ArgsCheckerStruct,
+    pub args_checker_impl: ArgsCheckerTraitImpl,
+    pub data_field_ident: Ident,
+    pub maybe_base_caller_impl: Option<BaseCallerImpl>
 }

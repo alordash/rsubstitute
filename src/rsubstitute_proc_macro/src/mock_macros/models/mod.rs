@@ -1,3 +1,3 @@
 mod fn_decl;
 
-pub use fn_decl::*;
+pub(crate) use fn_decl::*;
