@@ -3,6 +3,7 @@ use crate::mock_macros::fn_info_generation::models::*;
 use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::models::FnDecl;
 use crate::syntax::*;
+use proc_macro2::TokenStream;
 use quote::format_ident;
 use std::cell::LazyCell;
 use std::sync::Arc;
@@ -138,14 +139,18 @@ impl BaseCallerImplGenerator {
             .iter()
             // TODO - replace it with just get_phantom_types_count? I think I know that there's always one extra phantom for lifetime and can add it in get_phantom_types_count()?
             .skip(1 + mock_type.generics.get_phantom_types_count())
-            .map(|field| FieldPat {
-                attrs: Vec::new(),
-                member: Member::Named(field.get_required_ident()),
-                colon_token: None,
-                pat: Box::new(Pat::Wild(PatWild {
+            .map(|field| {
+                let field_ident = field.get_required_ident();
+                FieldPat {
                     attrs: Vec::new(),
-                    underscore_token: Default::default(),
-                })),
+                    member: Member::Named(field_ident.clone()),
+                    colon_token: None,
+                    pat: Box::new(Pat::Path(PatPath {
+                        attrs: Vec::new(),
+                        qself: None,
+                        path: self.path_factory.create(field_ident),
+                    })),
+                }
             })
             .collect();
         let deconstruct_call_stmt = Stmt::Local(Local {
