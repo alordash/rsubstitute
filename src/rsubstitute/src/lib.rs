@@ -7,6 +7,7 @@ pub mod macros {
     pub use rsubstitute_proc_macro::*;
 }
 
+#[allow(unused_imports)]
 pub mod for_generated {
     pub use crate::*;
     pub use global_mocks_map::*;

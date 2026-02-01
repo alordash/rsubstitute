@@ -1,11 +1,12 @@
 use crate::constants;
 use proc_macro2::Ident;
-use syn::{FnArg, ReturnType, Type};
+use syn::*;
 
-pub struct FnDecl {
-    pub(crate) ident: Ident,
-    pub(crate) arguments: Vec<FnArg>,
-    pub(crate) return_value: ReturnType,
+pub(crate) struct FnDecl {
+    pub ident: Ident,
+    pub arguments: Vec<FnArg>,
+    pub return_value: ReturnType,
+    pub maybe_base_fn_block: Option<Block>,
 }
 
 impl FnDecl {

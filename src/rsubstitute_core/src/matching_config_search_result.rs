@@ -4,12 +4,12 @@ use std::cell::RefCell;
 use std::sync::Arc;
 
 pub(crate) enum MatchingConfigSearchResult<
+    TMock,
     TCall,
     TArgsChecker: IArgsChecker<TCall>,
     TReturnValue,
-    TBaseCaller,
 > {
-    Ok(Arc<RefCell<FnConfig<TCall, TArgsChecker, TReturnValue, TBaseCaller>>>),
+    Ok(Arc<RefCell<FnConfig<TMock, TCall, TArgsChecker, TReturnValue>>>),
     Err(MatchingConfigSearchErr),
 }
 

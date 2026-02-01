@@ -12,7 +12,7 @@ pub trait IFnReceivedGenerator {
         fn_info: &FnInfo,
         mock_struct: &MockStruct,
         mock_received_struct: &MockReceivedStruct,
-        mock_generics: &MockGenerics,
+        mock_type: &MockType,
     ) -> ItemFn;
 }
 
@@ -28,17 +28,17 @@ impl IFnReceivedGenerator for FnReceivedGenerator {
         fn_info: &FnInfo,
         mock_struct: &MockStruct,
         mock_received_struct: &MockReceivedStruct,
-        mock_generics: &MockGenerics,
+        mock_type: &MockType,
     ) -> ItemFn {
         let sig = self.received_signature_generator.generate_for_static(
             fn_info,
             mock_received_struct,
-            mock_generics,
+            mock_type,
         );
         let block = self.generate_fn_received_block(
             fn_info,
             mock_struct,
-            mock_generics.get_phantom_types_count(),
+            mock_type.generics.get_phantom_types_count(),
         );
         let item_fn = ItemFn {
             attrs: Vec::new(),

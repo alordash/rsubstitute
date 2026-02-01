@@ -13,13 +13,13 @@ use syn::*;
 pub trait IReceivedSignatureGenerator {
     fn get_times_arg_ident(&self) -> Ident;
 
-    fn generate_for_trait(&self, fn_info: &FnInfo, mock_generics: &MockGenerics) -> Signature;
+    fn generate_for_trait(&self, fn_info: &FnInfo, mock_type: &MockType) -> Signature;
 
     fn generate_for_static(
         &self,
         fn_info: &FnInfo,
         mock_received_struct: &MockReceivedStruct,
-        mock_generics: &MockGenerics,
+        mock_type: &MockType,
     ) -> Signature;
 }
 
@@ -34,7 +34,7 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
         format_ident!("times")
     }
 
-    fn generate_for_trait(&self, fn_info: &FnInfo, mock_generics: &MockGenerics) -> Signature {
+    fn generate_for_trait(&self, fn_info: &FnInfo, mock_type: &MockType) -> Signature {
         let return_ty = Type::Reference(TypeReference {
             and_token: Default::default(),
             lifetime: Some(constants::DEFAULT_ARG_FIELD_LIFETIME.clone()),
@@ -47,7 +47,7 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
             fn_info.parent.ident.clone(),
             prepend_ref_self_arg,
             return_ty,
-            MockGenericsUsage::JustGetPhantomTypesCount(mock_generics),
+            MockGenericsUsage::JustGetPhantomTypesCount(&mock_type.generics),
         );
         return result;
     }
@@ -56,7 +56,7 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
         &self,
         fn_info: &FnInfo,
         mock_received_struct: &MockReceivedStruct,
-        mock_generics: &MockGenerics,
+        mock_type: &MockType,
     ) -> Signature {
         let mut return_ty = self
             .type_factory
@@ -74,7 +74,7 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
             constants::MOCK_RECEIVED_FIELD_IDENT.clone(),
             prepend_ref_self_arg,
             return_ty_reference,
-            MockGenericsUsage::UseAsGenerics(mock_generics),
+            MockGenericsUsage::UseAsGenerics(&mock_type.generics),
         );
         for input in result.inputs.iter_mut() {
             if let FnArg::Typed(pat_type) = input {

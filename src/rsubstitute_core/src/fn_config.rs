@@ -2,28 +2,31 @@ use crate::IBaseCaller;
 use crate::args_matching::{ArgCheckResult, IArgsChecker};
 use std::cell::RefCell;
 use std::collections::VecDeque;
+use std::marker::PhantomData;
 use std::sync::Arc;
 
-pub struct FnConfig<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TBaseCaller> {
+pub struct FnConfig<TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue> {
+    _phantom_mock: PhantomData<TMock>,
     args_checker: TArgsChecker,
     current_return_value_index: usize,
     return_values: VecDeque<TReturnValue>,
     calls: Vec<TCall>,
     callback: Option<Arc<RefCell<dyn FnMut()>>>,
-    base_caller: Option<Arc<RefCell<TBaseCaller>>>,
+    call_base: bool,
 }
 
-impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TBaseCaller>
-    FnConfig<TCall, TArgsChecker, TReturnValue, TBaseCaller>
+impl<TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
+    FnConfig<TMock, TCall, TArgsChecker, TReturnValue>
 {
     pub fn new(args_checker: TArgsChecker) -> Self {
         FnConfig {
+            _phantom_mock: PhantomData,
             args_checker,
             current_return_value_index: 0,
             return_values: VecDeque::new(),
             calls: Vec::new(),
             callback: None,
-            base_caller: None,
+            call_base: false,
         }
     }
 
@@ -67,17 +70,17 @@ impl<TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TBaseCaller>
 }
 
 impl<
+    TMock: IBaseCaller<TCall, TReturnValue>,
     TCall,
     TArgsChecker: IArgsChecker<TCall>,
     TReturnValue,
-    TBaseCaller: IBaseCaller<TCall, TReturnValue>,
-> FnConfig<TCall, TArgsChecker, TReturnValue, TBaseCaller>
+> FnConfig<TMock, TCall, TArgsChecker, TReturnValue>
 {
-    pub fn set_base_caller(&mut self, base_caller: Arc<RefCell<TBaseCaller>>) {
-        self.base_caller = Some(base_caller);
+    pub fn set_call_base(&mut self) {
+        self.call_base = true;
     }
 
-    pub fn get_base_caller(&self) -> Option<Arc<RefCell<TBaseCaller>>> {
-        self.base_caller.clone()
+    pub fn should_call_base(&self) -> bool {
+        self.call_base
     }
 }

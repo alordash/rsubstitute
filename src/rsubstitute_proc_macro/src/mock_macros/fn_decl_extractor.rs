@@ -23,6 +23,7 @@ impl IFnDeclExtractor for FnDeclExtractor {
             ident: item_fn.sig.ident.clone(),
             arguments: item_fn.sig.inputs.iter().cloned().collect(),
             return_value: item_fn.sig.output.clone(),
+            maybe_base_fn_block: Some(*item_fn.block.clone()),
         };
         return fn_decl;
     }
@@ -47,6 +48,7 @@ impl FnDeclExtractor {
             ident: sig.ident.clone(),
             arguments: sig.inputs.iter().cloned().collect(),
             return_value: sig.output.clone(),
+            maybe_base_fn_block: trait_item_fn.default.clone(),
         };
         return fn_decl;
     }

@@ -1,5 +1,4 @@
 use crate::constants;
-use crate::lifetime_ref::LifetimeRef;
 use crate::mock_macros::fn_info_generation::models::*;
 use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::mock_generation::*;
@@ -13,7 +12,7 @@ pub trait IMockTraitImplGenerator {
     fn generate(
         &self,
         target_ident: Ident,
-        mock_generics: &MockGenerics,
+        mock_type: &MockType,
         mock_struct: &MockStruct,
         fn_infos: &[FnInfo],
     ) -> MockTraitImpl;
@@ -30,13 +29,13 @@ impl IMockTraitImplGenerator for MockTraitImplGenerator {
     fn generate(
         &self,
         target_ident: Ident,
-        mock_generics: &MockGenerics,
+        mock_type: &MockType,
         mock_struct: &MockStruct,
         fn_infos: &[FnInfo],
     ) -> MockTraitImpl {
         let trait_ = self
             .path_factory
-            .create_with_generics(target_ident, mock_generics.source_generics.clone());
+            .create_with_generics(target_ident, mock_type.generics.source_generics.clone());
         let self_ty = self
             .type_factory
             .create_from_struct(&mock_struct.item_struct);
@@ -51,7 +50,7 @@ impl IMockTraitImplGenerator for MockTraitImplGenerator {
             defaultness: None,
             unsafety: None,
             impl_token: Default::default(),
-            generics: mock_generics.impl_generics.clone(),
+            generics: mock_type.generics.impl_generics.clone(),
             trait_: Some((None, trait_, Default::default())),
             self_ty: Box::new(self_ty),
             brace_token: Default::default(),

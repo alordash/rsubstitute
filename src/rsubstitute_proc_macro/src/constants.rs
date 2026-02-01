@@ -314,7 +314,6 @@ pub const VEC_OF_VEC_OF_STRINGS_TYPE: LazyCell<Type> = LazyCell::new(|| {
 });
 
 pub const ARC_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Arc"));
-pub const REF_CELL_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("RefCell"));
 
 pub const REF_SELF_ARG: LazyCell<FnArg> = LazyCell::new(|| {
     let result = FnArg::Receiver(Receiver {
@@ -462,13 +461,8 @@ pub const DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE: LazyCell<FieldValue> = LazyCel
     return field_value;
 });
 
-pub const OPTION_NONE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("None"));
-pub const OPTION_SOME_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Some"));
-
 pub const SEND_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Send"));
 pub const SYNC_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Sync"));
-
-pub const BASE_CALLER_FIELD_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("base_caller"));
 
 pub const CLONE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("clone"));
 

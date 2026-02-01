@@ -1,4 +1,5 @@
 use crate::SERVICES;
+use std::sync::Arc;
 
 pub trait IMockData {
     fn get_received_nothing_else_error_msgs(&self) -> Vec<Vec<String>>;

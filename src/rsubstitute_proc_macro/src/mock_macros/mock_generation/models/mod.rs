@@ -1,6 +1,3 @@
-mod base_caller_impl;
-mod base_caller_struct;
-mod base_fn;
 mod generated_mod;
 mod mock_data_struct;
 mod mock_generics;
@@ -12,12 +9,10 @@ mod mock_setup_struct;
 mod mock_struct;
 mod mock_struct_default_impl;
 mod mock_trait_impl;
+mod mock_type;
 mod send_sync_impls;
 mod static_fn;
 
-pub use base_caller_impl::*;
-pub use base_caller_struct::*;
-pub use base_fn::*;
 pub use generated_mod::*;
 pub use mock_data_struct::*;
 pub use mock_generics::*;
@@ -29,5 +24,6 @@ pub use mock_setup_struct::*;
 pub use mock_struct::*;
 pub use mock_struct_default_impl::*;
 pub use mock_trait_impl::*;
+pub use mock_type::*;
 pub use send_sync_impls::*;
 pub use static_fn::*;

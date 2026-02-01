@@ -1,4 +1,3 @@
-use crate::mock_macros::mock_generation::models::*;
 use proc_macro2::Ident;
 use syn::*;
 
@@ -7,7 +6,7 @@ pub trait IStructFactory {
         &self,
         attrs: Vec<Attribute>,
         ident: Ident,
-        mock_generics: &MockGenerics,
+        generics: Generics,
         fields_named: FieldsNamed,
     ) -> ItemStruct;
 }
@@ -19,7 +18,7 @@ impl IStructFactory for StructFactory {
         &self,
         attrs: Vec<Attribute>,
         ident: Ident,
-        mock_generics: &MockGenerics,
+        generics: Generics,
         fields_named: FieldsNamed,
     ) -> ItemStruct {
         let result = ItemStruct {
@@ -27,8 +26,7 @@ impl IStructFactory for StructFactory {
             vis: Visibility::Public(Default::default()),
             struct_token: Default::default(),
             ident,
-            generics: mock_generics.impl_generics.clone(),
-            // generics: constants::DEFAULT_ARG_FIELD_LIFETIME_GENERIC.clone(),
+            generics,
             fields: Fields::Named(fields_named),
             semi_token: Default::default(),
         };

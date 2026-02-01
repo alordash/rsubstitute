@@ -39,9 +39,12 @@ impl ICallStructGenerator for CallStructGenerator {
             named: struct_fields,
         };
 
-        let mut item_struct = self
-            .struct_factory
-            .create(attrs, ident, mock_generics, fields_named);
+        let mut item_struct = self.struct_factory.create(
+            attrs,
+            ident,
+            mock_generics.impl_generics.clone(),
+            fields_named,
+        );
         self.reference_normalizer
             .normalize_in_struct(&mut item_struct);
         let call_struct = CallStruct { item_struct };

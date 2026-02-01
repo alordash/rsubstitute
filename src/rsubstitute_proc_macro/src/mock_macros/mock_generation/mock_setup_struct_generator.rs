@@ -10,14 +10,14 @@ pub trait IMockSetupStructGenerator {
     fn generate(
         &self,
         mock_ident: &Ident,
-        mock_generics: &MockGenerics,
+        mock_type: &MockType,
         mock_data_struct: &MockDataStruct,
     ) -> MockSetupStruct;
 
     fn generate_with_non_camel_case_allowed(
         &self,
         mock_ident: &Ident,
-        mock_generics: &MockGenerics,
+        mock_type: &MockType,
         mock_data_struct: &MockDataStruct,
     ) -> MockSetupStruct;
 }
@@ -32,7 +32,7 @@ impl IMockSetupStructGenerator for MockSetupStructGenerator {
     fn generate(
         &self,
         mock_ident: &Ident,
-        mock_generics: &MockGenerics,
+        mock_type: &MockType,
         mock_data_struct: &MockDataStruct,
     ) -> MockSetupStruct {
         let attrs = Vec::new();
@@ -49,9 +49,12 @@ impl IMockSetupStructGenerator for MockSetupStructGenerator {
             .into_iter()
             .collect(),
         };
-        let item_struct = self
-            .struct_factory
-            .create(attrs, ident, &mock_generics, fields);
+        let item_struct = self.struct_factory.create(
+            attrs,
+            ident,
+            mock_type.generics.impl_generics.clone(),
+            fields,
+        );
         let mock_setup_struct = MockSetupStruct { item_struct };
         return mock_setup_struct;
     }
@@ -59,10 +62,10 @@ impl IMockSetupStructGenerator for MockSetupStructGenerator {
     fn generate_with_non_camel_case_allowed(
         &self,
         mock_ident: &Ident,
-        mock_generics: &MockGenerics,
+        mock_type: &MockType,
         mock_data_struct: &MockDataStruct,
     ) -> MockSetupStruct {
-        let mut result = self.generate(mock_ident, &mock_generics, mock_data_struct);
+        let mut result = self.generate(mock_ident, mock_type, mock_data_struct);
         result
             .item_struct
             .attrs

@@ -21,6 +21,14 @@ pub trait IExprMethodCallFactory {
         method: Ident,
         args: Vec<Ident>,
     ) -> ExprMethodCall;
+
+    fn create_with_base_receiver_and_expr_args(
+        &self,
+        receiver: Expr,
+        members_idents: Vec<Ident>,
+        method: Ident,
+        args: Vec<Expr>,
+    ) -> ExprMethodCall;
 }
 
 pub struct ExprMethodCallFactory {
@@ -46,15 +54,7 @@ impl IExprMethodCallFactory for ExprMethodCallFactory {
         args: Vec<Expr>,
     ) -> ExprMethodCall {
         let receiver = self.field_access_expr_factory.create(members_idents);
-        let expr_method_call = ExprMethodCall {
-            attrs: Vec::new(),
-            receiver: Box::new(receiver),
-            dot_token: Default::default(),
-            method,
-            turbofish: None,
-            paren_token: Default::default(),
-            args: args.into_iter().collect(),
-        };
+        let expr_method_call = self.create(receiver, method, args);
         return expr_method_call;
     }
 
@@ -65,18 +65,26 @@ impl IExprMethodCallFactory for ExprMethodCallFactory {
         method: Ident,
         args: Vec<Ident>,
     ) -> ExprMethodCall {
+        let expr_method_call = self.create_with_base_receiver_and_expr_args(
+            receiver,
+            members_idents,
+            method,
+            self.convert_args(args),
+        );
+        return expr_method_call;
+    }
+
+    fn create_with_base_receiver_and_expr_args(
+        &self,
+        receiver: Expr,
+        members_idents: Vec<Ident>,
+        method: Ident,
+        args: Vec<Expr>,
+    ) -> ExprMethodCall {
         let actual_receiver = self
             .field_access_expr_factory
             .create_with_base_expr(receiver, members_idents);
-        let expr_method_call = ExprMethodCall {
-            attrs: Vec::new(),
-            receiver: Box::new(actual_receiver),
-            dot_token: Default::default(),
-            method,
-            turbofish: None,
-            paren_token: Default::default(),
-            args: self.convert_args(args).into_iter().collect(),
-        };
+        let expr_method_call = self.create(actual_receiver, method, args);
         return expr_method_call;
     }
 }
@@ -88,5 +96,18 @@ impl ExprMethodCallFactory {
             .map(|arg| self.path_factory.create_expr(arg.clone()))
             .collect();
         return expr_args;
+    }
+
+    fn create(&self, receiver: Expr, method: Ident, args: Vec<Expr>) -> ExprMethodCall {
+        let expr_method_call = ExprMethodCall {
+            attrs: Vec::new(),
+            receiver: Box::new(receiver),
+            dot_token: Default::default(),
+            method,
+            turbofish: None,
+            paren_token: Default::default(),
+            args: args.into_iter().collect(),
+        };
+        return expr_method_call;
     }
 }

@@ -21,7 +21,6 @@ pub(crate) struct ServiceCollection {
 }
 
 fn create_services() -> ServiceCollection {
-    let base_fn_generator = Arc::new(BaseFnGenerator);
     let fn_decl_extractor = Arc::new(FnDeclExtractor);
     let generic_argument_factory_cell = Arc::new(OnceCell::new());
     let path_factory = Arc::new(PathFactory {
@@ -77,17 +76,16 @@ fn create_services() -> ServiceCollection {
         field_factory: field_factory.clone(),
         generics_merger: generics_merger.clone(),
     });
+    let base_caller_impl_generator = Arc::new(BaseCallerImplGenerator {
+        type_factory: type_factory.clone(),
+        path_factory: path_factory.clone(),
+    });
     let fn_info_generator = Arc::new(FnInfoGenerator {
         call_struct_generator: call_struct_generator.clone(),
         call_arg_infos_provider_impl_generator: call_arg_infos_provider_impl_generator.clone(),
         args_checker_generator: args_checker_generator.clone(),
         args_checker_impl_generator: args_checker_impl_generator.clone(),
-    });
-    let base_caller_struct_generator = Arc::new(BaseCallerStructGenerator);
-    let base_caller_impl_generator = Arc::new(BaseCallerImplGenerator {
-        type_factory: type_factory.clone(),
-        path_factory: path_factory.clone(),
-        field_access_expr_factory: field_access_expr_factory.clone(),
+        base_caller_impl_generator: base_caller_impl_generator.clone(),
     });
     let mock_data_struct_generator = Arc::new(MockDataStructGenerator {
         type_factory: type_factory.clone(),
@@ -103,6 +101,9 @@ fn create_services() -> ServiceCollection {
         type_factory: type_factory.clone(),
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
+    });
+    let mock_type_generator = Arc::new(MockTypeGenerator {
+        type_factory: type_factory.clone(),
     });
     let mock_struct_generator = Arc::new(MockStructGenerator {
         type_factory: type_factory.clone(),
@@ -124,6 +125,7 @@ fn create_services() -> ServiceCollection {
         type_factory: type_factory.clone(),
     });
     let field_checker = Arc::new(FieldChecker);
+    let local_factory = Arc::new(LocalFactory);
     let mock_fn_block_generator = Arc::new(MockFnBlockGenerator {
         path_factory: path_factory.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
@@ -131,6 +133,7 @@ fn create_services() -> ServiceCollection {
         field_value_factory: field_value_factory.clone(),
         get_global_mock_expr_generator: get_global_mock_expr_generator.clone(),
         field_checker: field_checker.clone(),
+        local_factory: local_factory.clone(),
     });
     let mock_trait_impl_generator = Arc::new(MockTraitImplGenerator {
         path_factory: path_factory.clone(),
@@ -138,10 +141,8 @@ fn create_services() -> ServiceCollection {
         reference_normalizer: reference_normalizer.clone(),
         mock_fn_block_generator: mock_fn_block_generator.clone(),
     });
-    let local_factory = Arc::new(LocalFactory);
     let mock_constructor_block_generator = Arc::new(MockConstructorBlockGenerator {
         path_factory: path_factory.clone(),
-        field_value_factory: field_value_factory.clone(),
     });
     let mock_impl_generator = Arc::new(MockImplGenerator {
         type_factory: type_factory.clone(),
@@ -222,6 +223,7 @@ fn create_services() -> ServiceCollection {
         mock_data_struct_generator: mock_data_struct_generator.clone(),
         mock_setup_struct_generator: mock_setup_struct_generator.clone(),
         mock_received_struct_generator: mock_received_struct_generator.clone(),
+        mock_type_generator: mock_type_generator.clone(),
         mock_struct_generator: mock_struct_generator.clone(),
         mock_trait_impl_generator: mock_trait_impl_generator.clone(),
         mock_impl_generator: mock_impl_generator.clone(),
@@ -231,15 +233,13 @@ fn create_services() -> ServiceCollection {
     });
 
     let item_fn_handler = Arc::new(ItemFnHandler {
-        base_fn_generator: base_fn_generator.clone(),
         fn_decl_extractor: fn_decl_extractor.clone(),
         mock_generics_generator: mock_generics_generator.clone(),
         fn_info_generator: fn_info_generator.clone(),
-        base_caller_struct_generator: base_caller_struct_generator.clone(),
-        base_caller_impl_generator: base_caller_impl_generator.clone(),
         mock_data_struct_generator: mock_data_struct_generator.clone(),
         mock_setup_struct_generator: mock_setup_struct_generator.clone(),
         mock_received_struct_generator: mock_received_struct_generator.clone(),
+        mock_type_generator: mock_type_generator.clone(),
         mock_struct_generator: mock_struct_generator.clone(),
         send_sync_impls_generator: send_sync_impls_generator.clone(),
         mock_struct_default_impl_generator: mock_struct_default_impl_generator.clone(),

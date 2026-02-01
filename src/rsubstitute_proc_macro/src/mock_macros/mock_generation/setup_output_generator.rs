@@ -6,17 +6,13 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait ISetupOutputGenerator {
-    fn generate_for_trait(
-        &self,
-        fn_info: &FnInfo,
-        maybe_base_caller_struct: Option<&BaseCallerStruct>,
-    ) -> ReturnType;
+    fn generate_for_trait(&self, fn_info: &FnInfo, mock_struct: &MockStruct) -> ReturnType;
 
     fn generate_for_static(
         &self,
         fn_info: &FnInfo,
+        mock_struct: &MockStruct,
         mock_setup_struct: &MockSetupStruct,
-        base_caller_struct: &BaseCallerStruct,
     ) -> ReturnType;
 }
 
@@ -26,19 +22,12 @@ pub(crate) struct SetupOutputGenerator {
 }
 
 impl ISetupOutputGenerator for SetupOutputGenerator {
-    fn generate_for_trait(
-        &self,
-        fn_info: &FnInfo,
-        maybe_base_caller_struct: Option<&BaseCallerStruct>,
-    ) -> ReturnType {
-        let base_caller_type = maybe_base_caller_struct
-            .map(|x| self.type_factory.create_from_struct(&x.item_struct))
-            .unwrap_or(constants::VOID_TYPE.clone());
+    fn generate_for_trait(&self, fn_info: &FnInfo, mock_struct: &MockStruct) -> ReturnType {
         let ty = self.generate(
             fn_info,
+            mock_struct,
             constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
             constants::SELF_TYPE.clone(),
-            base_caller_type,
         );
         let result = ReturnType::Type(Default::default(), Box::new(ty));
         return result;
@@ -47,20 +36,17 @@ impl ISetupOutputGenerator for SetupOutputGenerator {
     fn generate_for_static(
         &self,
         fn_info: &FnInfo,
+        mock_struct: &MockStruct,
         mock_setup_struct: &MockSetupStruct,
-        base_caller_struct: &BaseCallerStruct,
     ) -> ReturnType {
         let owner_type = self
             .type_factory
             .create_from_struct(&mock_setup_struct.item_struct);
-        let base_caller_type = self
-            .type_factory
-            .create_from_struct(&base_caller_struct.item_struct.clone());
         let mut ty = self.generate(
             fn_info,
+            mock_struct,
             constants::STATIC_LIFETIME.clone(),
             owner_type,
-            base_caller_type,
         );
         self.reference_normalizer.staticify(&mut ty);
         let result = ReturnType::Type(Default::default(), Box::new(ty));
@@ -72,9 +58,9 @@ impl SetupOutputGenerator {
     fn generate(
         &self,
         fn_info: &FnInfo,
+        mock_struct: &MockStruct,
         lifetime: Lifetime,
         owner_type: Type,
-        base_caller_type: Type,
     ) -> Type {
         let result = Type::Path(TypePath {
             qself: None,
@@ -89,6 +75,10 @@ impl SetupOutputGenerator {
                             GenericArgument::Lifetime(lifetime),
                             GenericArgument::Type(
                                 self.type_factory
+                                    .create_from_struct(&mock_struct.item_struct),
+                            ),
+                            GenericArgument::Type(
+                                self.type_factory
                                     .create_from_struct(&fn_info.call_struct.item_struct),
                             ),
                             GenericArgument::Type(
@@ -97,7 +87,6 @@ impl SetupOutputGenerator {
                             ),
                             GenericArgument::Type(fn_info.parent.get_return_value_type()),
                             GenericArgument::Type(owner_type),
-                            GenericArgument::Type(base_caller_type),
                         ]
                         .into_iter()
                         .collect(),

@@ -12,7 +12,7 @@ use syn::*;
 pub trait IMockImplGenerator {
     fn generate(
         &self,
-        mock_generics: &MockGenerics,
+        mock_type: &MockType,
         mock_struct: &MockStruct,
         mock_data_struct: &MockDataStruct,
         mock_setup_struct: &MockSetupStruct,
@@ -28,7 +28,7 @@ pub(crate) struct MockImplGenerator {
 impl IMockImplGenerator for MockImplGenerator {
     fn generate(
         &self,
-        mock_generics: &MockGenerics,
+        mock_type: &MockType,
         mock_struct: &MockStruct,
         mock_data_struct: &MockDataStruct,
         mock_setup_struct: &MockSetupStruct,
@@ -47,7 +47,7 @@ impl IMockImplGenerator for MockImplGenerator {
             defaultness: None,
             unsafety: None,
             impl_token: Default::default(),
-            generics: mock_generics.impl_generics.clone(),
+            generics: mock_type.generics.impl_generics.clone(),
             trait_: None,
             self_ty: Box::new(self_ty),
             brace_token: Default::default(),
@@ -68,7 +68,7 @@ impl MockImplGenerator {
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
     ) -> ImplItem {
-        let block = self.mock_constructor_block_generator.generate_for_trait(
+        let block = self.mock_constructor_block_generator.generate(
             mock_struct,
             mock_data_struct,
             mock_setup_struct,
