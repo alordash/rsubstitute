@@ -40,19 +40,17 @@ impl IItemTraitHandler for ItemTraitHandler {
         let mock_generics = self.mock_generics_generator.generate(&item_trait.generics);
         let mock_type = self
             .mock_type_generator
-            .generate(mock_ident.clone(), mock_generics);
+            .generate_for_trait(mock_ident.clone(), mock_generics);
         let fn_infos: Vec<_> = fn_decls
             .iter()
-            .map(|x| self.fn_info_generator.generate(x, &mock_type))
+            .map(|x| self.fn_info_generator.generate(x, &mock_type, None))
             .collect();
         let mock_data_struct = self
             .mock_data_struct_generator
             .generate_for_trait(&mock_type, &fn_infos);
-        let mock_setup_struct = self.mock_setup_struct_generator.generate(
-            &mock_ident,
-            &mock_type,
-            &mock_data_struct,
-        );
+        let mock_setup_struct =
+            self.mock_setup_struct_generator
+                .generate(&mock_ident, &mock_type, &mock_data_struct);
         let mock_received_struct = self.mock_received_struct_generator.generate(
             &mock_ident,
             &mock_type,

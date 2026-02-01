@@ -5,9 +5,10 @@ mod call_arg_infos_provider_impl;
 mod call_struct;
 mod fn_info;
 
-pub use args_checker_struct::*;
-pub use args_checker_trait_impl::*;
-pub use base_caller_impl::*;
-pub use call_arg_infos_provider_impl::*;
-pub use call_struct::*;
-pub use fn_info::*;
+// TODO - re-export everything as internal?
+pub(crate) use args_checker_struct::*;
+pub(crate) use args_checker_trait_impl::*;
+pub(crate) use base_caller_impl::*;
+pub(crate) use call_arg_infos_provider_impl::*;
+pub(crate) use call_struct::*;
+pub(crate) use fn_info::*;

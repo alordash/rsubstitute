@@ -1,21 +1,20 @@
 #[cfg(not(test))]
-fn brпr() {}
+fn gffw() {}
 #[cfg(test)]
-use brпr::brпr;
+use gffw::gffw;
 #[cfg(test)]
 #[allow(mismatched_lifetime_syntaxes)]
-mod brпr {
+mod gffw {
     use super::*;
     use rsubstitute::for_generated::*;
-    fn base_brпr() {}
     #[allow(non_camel_case_types)]
     #[allow(non_snake_case)]
     #[derive(Clone)]
-    pub struct brпr_Call<'__rsubstitute_arg_field_lifetime> {
+    pub struct gffw_Call<'__rsubstitute_arg_field_lifetime> {
         _phantom_lifetime: PhantomData<&'__rsubstitute_arg_field_lifetime ()>,
     }
     impl<'__rsubstitute_arg_field_lifetime> IArgInfosProvider
-        for brпr_Call<'__rsubstitute_arg_field_lifetime>
+        for gffw_Call<'__rsubstitute_arg_field_lifetime>
     {
         fn get_arg_infos(&self) -> Vec<ArgInfo> {
             vec![]
@@ -24,93 +23,98 @@ mod brпr {
     #[allow(non_camel_case_types)]
     #[allow(non_snake_case)]
     #[derive(Debug, IArgsFormatter)]
-    pub struct brпr_ArgsChecker<'__rsubstitute_arg_field_lifetime> {
+    pub struct gffw_ArgsChecker<'__rsubstitute_arg_field_lifetime> {
         _phantom_lifetime: PhantomData<&'__rsubstitute_arg_field_lifetime ()>,
     }
     impl<'__rsubstitute_arg_field_lifetime>
-        IArgsChecker<brпr_Call<'__rsubstitute_arg_field_lifetime>>
-        for brпr_ArgsChecker<'__rsubstitute_arg_field_lifetime>
+        IArgsChecker<gffw_Call<'__rsubstitute_arg_field_lifetime>>
+        for gffw_ArgsChecker<'__rsubstitute_arg_field_lifetime>
     {
-        fn check(
-            &self, call: brпr_Call<'__rsubstitute_arg_field_lifetime>
-        ) -> Vec<ArgCheckResult> {
+        fn check(&self, call: gffw_Call<'__rsubstitute_arg_field_lifetime>) -> Vec<ArgCheckResult> {
             vec![]
+        }
+    }
+    impl<'__rsubstitute_arg_field_lifetime>
+        IBaseCaller<gffw_Call<'__rsubstitute_arg_field_lifetime>, ()> for gffwMock
+    {
+        fn call_base(&self, call: gffw_Call<'__rsubstitute_arg_field_lifetime>) {
+            let gffw_Call { .. } = call;
         }
     }
     #[allow(non_camel_case_types)]
     #[derive(IMockData)]
-    pub struct brпrMockData<'__rsubstitute_arg_field_lifetime> {
+    pub struct gffwMockData<'__rsubstitute_arg_field_lifetime> {
         _phantom_lifetime: PhantomData<&'__rsubstitute_arg_field_lifetime ()>,
-        brпr_data: FnData<
-            brпrMock,
-            brпr_Call<'__rsubstitute_arg_field_lifetime>,
-            brпr_ArgsChecker<'__rsubstitute_arg_field_lifetime>,
+        gffw_data: FnData<
+            gffwMock,
+            gffw_Call<'__rsubstitute_arg_field_lifetime>,
+            gffw_ArgsChecker<'__rsubstitute_arg_field_lifetime>,
             (),
         >,
     }
     #[allow(non_camel_case_types)]
-    pub struct brпrMockSetup<'__rsubstitute_arg_field_lifetime> {
-        data: Arc<brпrMockData<'__rsubstitute_arg_field_lifetime>>,
+    pub struct gffwMockSetup<'__rsubstitute_arg_field_lifetime> {
+        data: Arc<gffwMockData<'__rsubstitute_arg_field_lifetime>>,
     }
     #[allow(non_camel_case_types)]
-    pub struct brпrMockReceived<'__rsubstitute_arg_field_lifetime> {
-        data: Arc<brпrMockData<'__rsubstitute_arg_field_lifetime>>,
+    pub struct gffwMockReceived<'__rsubstitute_arg_field_lifetime> {
+        data: Arc<gffwMockData<'__rsubstitute_arg_field_lifetime>>,
     }
     #[allow(non_camel_case_types)]
-    pub struct brпrMock {
-        pub setup: brпrMockSetup<'static>,
-        pub received: brпrMockReceived<'static>,
-        data: Arc<brпrMockData<'static>>,
+    pub struct gffwMock {
+        pub setup: gffwMockSetup<'static>,
+        pub received: gffwMockReceived<'static>,
+        data: Arc<gffwMockData<'static>>,
     }
-    unsafe impl Send for brпrMock {}
-    unsafe impl Sync for brпrMock {}
-    impl<'__rsubstitute_arg_field_lifetime> Default for brпrMock {
+    unsafe impl Send for gffwMock {}
+    unsafe impl Sync for gffwMock {}
+    impl<'__rsubstitute_arg_field_lifetime> Default for gffwMock {
         fn default() -> Self {
-            let data = Arc::new(brпrMockData {
+            let data = Arc::new(gffwMockData {
                 _phantom_lifetime: PhantomData,
-                brпr_data: FnData::new("brпr", &SERVICES),
+                gffw_data: FnData::new("gffw", &SERVICES),
             });
-            return brпrMock {
-                setup: brпrMockSetup { data: data.clone() },
-                received: brпrMockReceived { data: data.clone() },
+            return gffwMock {
+                setup: gffwMockSetup { data: data.clone() },
+                received: gffwMockReceived { data: data.clone() },
                 data,
             };
         }
     }
-    impl<'__rsubstitute_arg_field_lifetime> brпrMockSetup<'__rsubstitute_arg_field_lifetime> {
+    impl<'__rsubstitute_arg_field_lifetime> gffwMockSetup<'__rsubstitute_arg_field_lifetime> {
         #[allow(dead_code)]
         #[allow(elided_named_lifetimes)]
         pub fn setup(
             &'__rsubstitute_arg_field_lifetime self,
         ) -> SharedFnConfig<
             '__rsubstitute_arg_field_lifetime,
-            brпrMock,
-            brпr_Call<'__rsubstitute_arg_field_lifetime>,
-            brпr_ArgsChecker<'__rsubstitute_arg_field_lifetime>,
+            gffwMock,
+            gffw_Call<'__rsubstitute_arg_field_lifetime>,
+            gffw_ArgsChecker<'__rsubstitute_arg_field_lifetime>,
             (),
             Self,
         > {
-            let brпr_args_checker = brпr_ArgsChecker {
+            let gffw_args_checker = gffw_ArgsChecker {
                 _phantom_lifetime: PhantomData,
             };
-            let fn_config = self.data.brпr_data.add_config(brпr_args_checker);
+            let fn_config = self.data.gffw_data.add_config(gffw_args_checker);
             let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
         }
     }
-    impl<'__rsubstitute_arg_field_lifetime> brпrMockReceived<'__rsubstitute_arg_field_lifetime> {
+    impl<'__rsubstitute_arg_field_lifetime> gffwMockReceived<'__rsubstitute_arg_field_lifetime> {
         #[allow(dead_code)]
         #[allow(elided_named_lifetimes)]
         pub fn received(
             &'__rsubstitute_arg_field_lifetime self,
             times: Times,
         ) -> &'__rsubstitute_arg_field_lifetime Self {
-            let brпr_args_checker = brпr_ArgsChecker {
+            let gffw_args_checker = gffw_ArgsChecker {
                 _phantom_lifetime: PhantomData,
             };
             self.data
-                .brпr_data
-                .verify_received(brпr_args_checker, times);
+                .gffw_data
+                .verify_received(gffw_args_checker, times);
             return self;
         }
         pub fn no_other_calls(&'__rsubstitute_arg_field_lifetime self) {
@@ -119,30 +123,28 @@ mod brпr {
     }
     pub fn setup<'__rsubstitute_arg_field_lifetime>() -> SharedFnConfig<
         'static,
-        brпrMock,
-        brпr_Call<'static>,
-        brпr_ArgsChecker<'static>,
+        gffwMock,
+        gffw_Call<'static>,
+        gffw_ArgsChecker<'static>,
         (),
-        brпrMockSetup<'static>,
+        gffwMockSetup<'static>,
     > {
-        let mock = get_global_mock::<brпrMock>();
-        mock.data.brпr_data.reset();
+        let mock = get_global_mock::<gffwMock>();
+        mock.data.gffw_data.reset();
         return mock.setup.setup();
     }
     pub fn received<'__rsubstitute_arg_field_lifetime>(
         times: Times,
-    ) -> &'static brпrMockReceived<'static> {
-        return get_global_mock::<brпrMock>().received.received(times);
+    ) -> &'static gffwMockReceived<'static> {
+        return get_global_mock::<gffwMock>().received.received(times);
     }
-    pub fn brпr<'__rsubstitute_arg_anonymous, '__rsubstitute_arg_field_lifetime>() {
+    pub fn gffw<'__rsubstitute_arg_anonymous, '__rsubstitute_arg_field_lifetime>() {
         let call = unsafe {
-            brпr_Call {
+            gffw_Call {
                 _phantom_lifetime: PhantomData,
             }
         };
-        get_global_mock::<brпrMock>()
-            .data
-            .brпr_data
-            .handle_base(call);
+        let mock = get_global_mock::<gffwMock>();
+        mock.data.gffw_data.handle_base(&mock, call);
     }
 }

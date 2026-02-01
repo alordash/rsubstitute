@@ -48,8 +48,10 @@ impl IFnInfoGenerator for FnInfoGenerator {
             phantom_types_count,
         );
         let data_field_ident = self.generate_data_field_ident(fn_decl);
-        let maybe_base_caller_impl = maybe_base_impl_fn_block
-            .map(|x| self.base_caller_impl_generator.generate(mock_type, x));
+        let maybe_base_caller_impl = maybe_base_impl_fn_block.map(|x| {
+            self.base_caller_impl_generator
+                .generate(mock_type, fn_decl, &call_struct, x)
+        });
         let fn_info = FnInfo {
             parent: fn_decl,
             call_struct,
@@ -69,9 +71,5 @@ impl FnInfoGenerator {
     fn generate_data_field_ident(&self, fn_decl: &FnDecl) -> Ident {
         let data_field_ident = format_ident!("{}_{}", fn_decl.ident, Self::DATA_FIELD_IDENT_SUFFIX);
         return data_field_ident;
-    }
-
-    fn generate_base_caller_impl(&self) {
-        todo!()
     }
 }

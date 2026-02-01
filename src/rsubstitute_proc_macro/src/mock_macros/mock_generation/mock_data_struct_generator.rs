@@ -29,13 +29,7 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
         );
         let fn_fields: Vec<_> = fn_infos
             .iter()
-            .map(|x| {
-                self.generate_field(
-                    x,
-                    mock_type,
-                    MockTypeGenericsLifetimeOptions::WithDefaultArgLifetime,
-                )
-            })
+            .map(|x| self.generate_field(x, mock_type))
             .collect();
         let field_and_fn_idents = fn_fields
             .iter()
@@ -75,13 +69,7 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
         );
         let fn_fields: Vec<_> = fn_infos
             .iter()
-            .map(|x| {
-                self.generate_field(
-                    x,
-                    mock_type,
-                    MockTypeGenericsLifetimeOptions::WithoutDefaultArgLifetime,
-                )
-            })
+            .map(|x| self.generate_field(x, mock_type))
             .collect();
         let field_and_fn_idents = fn_fields
             .iter()
@@ -114,23 +102,7 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
 impl MockDataStructGenerator {
     const MOCK_DATA_STRUCT_IDENT_SUFFIX: &'static str = "Data";
 
-    fn generate_field(
-        &self,
-        fn_info: &FnInfo,
-        mock_type: &MockType,
-        mock_type_generics_lifetime_options: MockTypeGenericsLifetimeOptions,
-    ) -> Field {
-        let mock_type_generics = match mock_type_generics_lifetime_options {
-            MockTypeGenericsLifetimeOptions::WithDefaultArgLifetime => {
-                mock_type.generics.impl_generics.clone()
-            }
-            MockTypeGenericsLifetimeOptions::WithoutDefaultArgLifetime => {
-                let mut new_mock_type_generics = mock_type.generics.impl_generics.clone();
-                new_mock_type_generics.params =
-                    new_mock_type_generics.params.into_iter().skip(1).collect();
-                new_mock_type_generics
-            }
-        };
+    fn generate_field(&self, fn_info: &FnInfo, mock_type: &MockType) -> Field {
         let ty = Type::Path(TypePath {
             qself: None,
             path: Path {
@@ -141,12 +113,7 @@ impl MockDataStructGenerator {
                         colon2_token: None,
                         lt_token: Default::default(),
                         args: [
-                            GenericArgument::Type(
-                                self.type_factory.create_with_generics(
-                                    mock_type.ident.clone(),
-                                    mock_type_generics,
-                                ),
-                            ),
+                            GenericArgument::Type(mock_type.ty.clone()),
                             GenericArgument::Type(
                                 self.type_factory
                                     .create_from_struct(&fn_info.call_struct.item_struct),
@@ -171,9 +138,4 @@ impl MockDataStructGenerator {
             .create(fn_info.data_field_ident.clone(), ty);
         return field;
     }
-}
-
-enum MockTypeGenericsLifetimeOptions {
-    WithDefaultArgLifetime,
-    WithoutDefaultArgLifetime,
 }

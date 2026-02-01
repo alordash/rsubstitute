@@ -35,6 +35,7 @@ trait MyTrait {
         arc: Arc<dyn IFoo>,
     ) -> Vec<u8>;
 
+    // TODO - support this (pass as base caller fn block)
     fn get(&self) -> i32 {
         let value = DEFAULT_MY_TRAIT_GET;
         self.work(value);

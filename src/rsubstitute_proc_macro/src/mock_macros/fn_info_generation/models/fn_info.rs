@@ -1,10 +1,10 @@
 use crate::mock_macros::fn_info_generation::models::*;
 use crate::mock_macros::models::FnDecl;
 use proc_macro2::Ident;
-use syn::ImplItem;
 
 // TODO - make all models internal
 pub struct FnInfo<'a> {
+    // TODO - remove this field or use it instead of FnDecl everywhere
     pub(crate) parent: &'a FnDecl,
     pub(crate) call_struct: CallStruct,
     pub(crate) call_arg_infos_provider_impl: CallArgInfosProviderImpl,

@@ -23,8 +23,7 @@ pub trait IModGenerator {
 
     fn generate_fn(
         &self,
-        item_fn: &ItemFn,
-        base_fn: BaseFn,
+        fn_ident: Ident,
         fn_info: FnInfo,
         mock_data_struct: MockDataStruct,
         mock_setup_struct: MockSetupStruct,
@@ -71,6 +70,12 @@ impl IModGenerator for ModGenerator {
                     Item::Struct(x.args_checker_struct.item_struct),
                     Item::Impl(x.args_checker_impl.item_impl),
                 ]
+                .into_iter()
+                .chain(
+                    x.maybe_base_caller_impl
+                        .map(|base_caller_impl| Item::Impl(base_caller_impl.item_impl))
+                        .into_iter(),
+                )
             }))
             .chain([
                 Item::Struct(mock_data_struct.item_struct),
@@ -84,7 +89,10 @@ impl IModGenerator for ModGenerator {
             ])
             .collect();
         let item_mod = ItemMod {
-            attrs: vec![constants::CFG_TEST_ATTRIBUTE.clone(), constants::ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE.clone()],
+            attrs: vec![
+                constants::CFG_TEST_ATTRIBUTE.clone(),
+                constants::ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE.clone(),
+            ],
             vis: Visibility::Inherited,
             unsafety: None,
             mod_token: Default::default(),
@@ -115,8 +123,7 @@ impl IModGenerator for ModGenerator {
 
     fn generate_fn(
         &self,
-        item_fn: &ItemFn,
-        base_fn: BaseFn,
+        fn_ident: Ident,
         fn_info: FnInfo,
         mock_data_struct: MockDataStruct,
         mock_setup_struct: MockSetupStruct,
@@ -130,7 +137,6 @@ impl IModGenerator for ModGenerator {
         fn_received: ItemFn,
         static_fn: StaticFn,
     ) -> GeneratedMod {
-        let fn_ident = item_fn.sig.ident.clone();
         let usings = [
             constants::USE_SUPER.clone(),
             constants::USE_FOR_GENERATED.clone(),
@@ -139,11 +145,18 @@ impl IModGenerator for ModGenerator {
             .into_iter()
             .map(|x| Item::Use(x))
             .chain([
-                Item::Fn(base_fn.item_fn),
                 Item::Struct(fn_info.call_struct.item_struct),
                 Item::Impl(fn_info.call_arg_infos_provider_impl.item_impl),
                 Item::Struct(fn_info.args_checker_struct.item_struct),
                 Item::Impl(fn_info.args_checker_impl.item_impl),
+            ])
+            .chain(
+                fn_info
+                    .maybe_base_caller_impl
+                    .map(|base_caller_impl| Item::Impl(base_caller_impl.item_impl))
+                    .into_iter(),
+            )
+            .chain([
                 Item::Struct(mock_data_struct.item_struct),
                 Item::Struct(mock_setup_struct.item_struct),
                 Item::Struct(mock_received_struct.item_struct),

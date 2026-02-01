@@ -1,4 +1,3 @@
-mod base_fn;
 mod generated_mod;
 mod mock_data_struct;
 mod mock_generics;
@@ -14,7 +13,6 @@ mod mock_type;
 mod send_sync_impls;
 mod static_fn;
 
-pub use base_fn::*;
 pub use generated_mod::*;
 pub use mock_data_struct::*;
 pub use mock_generics::*;
