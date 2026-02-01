@@ -493,10 +493,10 @@ accept_value(*{first_value}*)
             assert_eq!(second_returned_value, actual_second_returned_value);
             assert_eq!(third_returned_value, actual_third_returned_value);
 
-            accept_value_return_value::received(first_accepted_value, Times::Once).no_other_calls();
-            accept_value_return_value::received(second_accepted_value, Times::Once)
+            accept_value_return_value::received(first_accepted_value, Times::Once)
+                .received(second_accepted_value, Times::Once)
+                .received(third_accepted_value, Times::Once)
                 .no_other_calls();
-            accept_value_return_value::received(third_accepted_value, Times::Once).no_other_calls();
         }
 
         #[test]
@@ -649,8 +649,8 @@ accept_value(*{first_value}*)
             assert_eq!(1, *first_callback_number.borrow());
             assert_eq!(2, *second_callback_number.borrow());
 
-            accept_value_return_value::received(first_accepted_value, Times::Once).no_other_calls();
-            accept_value_return_value::received(second_accepted_value, Times::Once)
+            accept_value_return_value::received(first_accepted_value, Times::Once)
+                .received(second_accepted_value, Times::Once)
                 .no_other_calls();
         }
     }

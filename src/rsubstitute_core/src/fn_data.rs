@@ -7,17 +7,12 @@ use crate::*;
 use std::cell::RefCell;
 use std::sync::Arc;
 
-pub struct FnData<
-    TMock,
-    TCall: IArgInfosProvider,
-    TArgsChecker: IArgsChecker<TCall>,
-    TReturnValue,
-> {
+pub struct FnData<TMock, TCall: IArgInfosProvider, TArgsChecker: IArgsChecker<TCall>, TReturnValue>
+{
     fn_name: &'static str,
     call_infos: RefCell<Vec<CallInfo<TCall>>>,
     // Behind a raw reference to lift 'static requirement from TCall, TArgsChecker, etc.
-    configs:
-        *mut Vec<Arc<RefCell<FnConfig<TMock, TCall, TArgsChecker, TReturnValue>>>>,
+    configs: *mut Vec<Arc<RefCell<FnConfig<TMock, TCall, TArgsChecker, TReturnValue>>>>,
     error_printer: Arc<dyn IErrorPrinter>,
 }
 
@@ -131,10 +126,10 @@ impl<
         let mut non_matching_calls = Vec::new();
         let mut call_infos = self.call_infos.borrow_mut();
         for call_info in call_infos.iter_mut() {
-            call_info.verify();
             let call_matching_result = args_checker.check(call_info.get_call().clone());
             let is_matching = call_matching_result.iter().all(ArgCheckResult::is_ok);
             if is_matching {
+                call_info.verify();
                 matching_calls.push(call_matching_result);
             } else {
                 non_matching_calls.push(call_matching_result);
