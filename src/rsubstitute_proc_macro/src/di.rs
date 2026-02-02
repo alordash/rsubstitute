@@ -17,7 +17,7 @@ pub(crate) struct ServiceCollection {
     pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
     pub derive_args_formatter_macro_handler: Arc<dyn IDeriveArgsFormatterMacroHandler>,
     pub derive_mock_data_macro_handler: Arc<dyn IDeriveMockDataMacroHandler>,
-    pub mock_macro_handler: Arc<dyn IMockMacroHandler>,
+    pub mock_macro_handler: Arc<dyn IAttributeMockMacroHandler>,
 }
 
 fn create_services() -> ServiceCollection {
@@ -251,7 +251,7 @@ fn create_services() -> ServiceCollection {
         static_fn_generator: static_fn_generator.clone(),
     });
 
-    let mock_macro_handler = Arc::new(MockMacroHandler {
+    let mock_macro_handler = Arc::new(AttributeMockMacroHandler {
         item_trait_handler,
         item_fn_handler,
     });
