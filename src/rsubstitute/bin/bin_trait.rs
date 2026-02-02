@@ -360,7 +360,7 @@ fn received_nothing_else_Ok() {
 }
 
 #[test]
-fn received_nothing_else_PanicsOk() {
+fn received_nothing_else_Panics() {
     // Arrange
     let mock = MyTraitMock::new();
     let returned_value = 11;
@@ -378,7 +378,7 @@ fn received_nothing_else_PanicsOk() {
     assert_panics(
         || mock.received.get(Times::Once).no_other_calls(),
         format!(
-            "Did not expect to receive any other calls. Received 1 call:
+            "Did not expect to receive any other calls. Received 1 unexpected call:
 1. work({work_arguments})"
         ),
     );

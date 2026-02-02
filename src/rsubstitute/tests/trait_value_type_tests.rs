@@ -70,7 +70,7 @@ mod tests {
         }
 
         #[test]
-        fn accept_value_ArgAny_PanicsOk() {
+        fn accept_value_ArgAny_Panics() {
             // Arrange
             let mock = TraitMock::new();
             let first_value = 10;
@@ -117,7 +117,7 @@ Received no non-matching calls"#
         }
 
         #[test]
-        fn accept_value_ArgEq_PanicsOk() {
+        fn accept_value_ArgEq_Panics() {
             // Arrange
             let mock = TraitMock::new();
             let first_value = 10;
@@ -199,7 +199,7 @@ accept_value(*{first_value}*)
         }
 
         #[test]
-        fn accept_value_ArgIs_PanicsOk() {
+        fn accept_value_ArgIs_Panics() {
             // Arrange
             let mock = TraitMock::new();
             let first_value = 10;
@@ -280,6 +280,46 @@ Received 1 non-matching call (non-matching arguments indicated with '*' characte
 accept_value(*{first_value}*)
 	1. v (i32):
 		Custom predicate didn't match passed value. Received value: {first_value}"#
+                ),
+            );
+        }
+
+        #[test]
+        fn accept_value_NoOtherCallsWithoutOtherCalls_Ok() {
+            // Arrange
+            let mock = TraitMock::new();
+            let value = 10;
+
+            // Act
+            mock.accept_value(value);
+
+            // Assert
+            mock.received
+                .accept_value(value, Times::Once)
+                .no_other_calls();
+        }
+
+        #[test]
+        fn accept_value_NoOtherCallsWithOtherCalls_Panics() {
+            // Arrange
+            let mock = TraitMock::new();
+            let first_value = 10;
+            let second_value = 22;
+
+            // Act
+            mock.accept_value(first_value);
+            mock.accept_value(second_value);
+
+            // Assert
+            assert_panics(
+                || {
+                    mock.received
+                        .accept_value(first_value, Times::Once)
+                        .no_other_calls()
+                },
+                format!(
+                    "Did not expect to receive any other calls. Received 1 unexpected call:
+1. accept_value({second_value})"
                 ),
             );
         }
@@ -415,7 +455,7 @@ accept_value(*{first_value}*)
         }
 
         #[test]
-        fn return_value_NoMatchingConfiguration_PanicsOk() {
+        fn return_value_NoMatchingConfiguration_Panics() {
             // Arrange
             let mock = TraitMock::new();
 
@@ -667,7 +707,7 @@ accept_value(*{first_value}*)
         }
 
         #[test]
-        fn accept_two_values_return_value_PanicsOk() {
+        fn accept_two_values_return_value_Panics() {
             // Arrange
             let mock = TraitMock::new();
             let v1 = 10;
@@ -738,7 +778,7 @@ accept_two_values_return_value(*10*, *20.2*)
         }
 
         #[test]
-        fn accept_two_values_return_value_NoReturnValue_PanicsOk() {
+        fn accept_two_values_return_value_NoReturnValue_Panics() {
             // Arrange
             let mock = TraitMock::new();
             let unexpected_v1 = 10;

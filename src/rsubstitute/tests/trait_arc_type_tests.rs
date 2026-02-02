@@ -37,7 +37,7 @@ mod tests {
         }
 
         #[test]
-        fn accept_arc_PanicsOk() {
+        fn accept_arc_Panics() {
             // Arrange
             let mock = TraitMock::new();
             let r = Arc::new(11);

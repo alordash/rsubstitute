@@ -59,7 +59,7 @@ mod tests {
     }
 
     #[test]
-    fn f_MultipleTimes_PanicsOk() {
+    fn f_MultipleTimes_Panics() {
         // Arrange
         f::setup();
 

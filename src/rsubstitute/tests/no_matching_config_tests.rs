@@ -18,7 +18,7 @@ mod tests {
     use not_enough_asserts::panics::*;
 
     #[test]
-    fn trait_work_PanicsOk() {
+    fn trait_work_Panics() {
         // Arrange
         let mock = TraitMock::new();
         let (v1, v2, v3, v4) = (10, 20, 30, 40);
@@ -57,7 +57,7 @@ List of existing configuration ordered by number of correctly matched arguments 
     }
 
     #[test]
-    fn fn_work_PanicsOk() {
+    fn fn_work_Panics() {
         // Arrange
         let (v1, v2, v3, v4) = (10, 20, 30, 40);
         work::setup(Arg::Any, Arg::Any, Arg::Any, Arg::Is(|_| false))

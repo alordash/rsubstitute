@@ -47,7 +47,7 @@ mod tests {
         }
 
         #[test]
-        fn accept_value_PanicsOk() {
+        fn accept_value_Panics() {
             // Arrange
             let r = &11;
             let r_ptr = std::ptr::from_ref(r);

@@ -104,7 +104,7 @@ mod tests {
         }
 
         #[test]
-        fn accept_value_ArgAny_PanicsOk() {
+        fn accept_value_ArgAny_Panics() {
             // Arrange
             let first_value = 10;
             let second_value = 22;
@@ -150,7 +150,7 @@ Received no non-matching calls"
         }
 
         #[test]
-        fn accept_value_ArgEq_PanicsOk() {
+        fn accept_value_ArgEq_Panics() {
             // Arrange
             let first_value = 10;
             let second_value = 22;
@@ -219,7 +219,7 @@ accept_value(*{first_value}*)
         }
 
         #[test]
-        fn accept_value_ArgIs_PanicsOk() {
+        fn accept_value_ArgIs_Panics() {
             // Arrange
             let first_value = 10;
             let second_value = 22;
@@ -304,7 +304,7 @@ accept_value(*{first_value}*)
         }
 
         #[test]
-        fn accept_value_ArgNotEq_PanicsOk() {
+        fn accept_value_ArgNotEq_Panics() {
             // Arrange
             let first_value = 10;
             let second_value = 22;
@@ -326,6 +326,36 @@ accept_value(*{first_value}*)
 	1. v (i32):
 		Did not expect to be {first_value}"
                 ),
+            );
+        }
+
+        #[test]
+        fn accept_value_NoOtherCallsWithoutOtherCalls_Ok() {
+            // Arrange
+            let value = 10;
+
+            // Act
+            accept_value(value);
+
+            // Assert
+            accept_value::received(value, Times::Once).no_other_calls();
+        }
+
+        #[test]
+        fn accept_value_NoOtherCallsWithOtherCalls_Panics() {
+            // Arrange
+            let first_value = 10;
+            let second_value = 22;
+
+            // Act
+            accept_value(first_value);
+            accept_value(second_value);
+
+            // Assert
+            assert_panics(
+                || accept_value::received(first_value, Times::Once).no_other_calls(),
+                format!("Did not expect to receive any other calls. Received 1 unexpected call:
+1. accept_value({second_value})"),
             );
         }
     }
@@ -709,7 +739,7 @@ accept_value(*{first_value}*)
         }
 
         #[test]
-        fn accept_two_value_return_value_PanicsOk() {
+        fn accept_two_value_return_value_Panics() {
             // Arrange
             let v1 = 10;
             let v2 = 20.2;

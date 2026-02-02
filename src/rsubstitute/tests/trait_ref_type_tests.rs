@@ -36,7 +36,7 @@ mod tests {
         }
 
         #[test]
-        fn accept_rc_PanicsOk() {
+        fn accept_rc_Panics() {
             // Arrange
             let mock = TraitMock::new();
             let r = &11;

@@ -76,7 +76,7 @@ mod tests {
         }
 
         #[test]
-        fn get_return_UnconfiguredType_PanicsOk() {
+        fn get_return_UnconfiguredType_Panics() {
             // Arrange
             let accepted_number = 10;
             let returned_number = 20;
