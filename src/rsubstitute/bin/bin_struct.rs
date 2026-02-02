@@ -23,7 +23,8 @@ impl Struct {
 
     pub fn format(&self) -> String {
         let number = self.get_number();
-        let result = format!("Struct, number = {number}");
+        let work_result = self.work(number);
+        let result = format!("Struct, number = {number}, work_result = {work_result}");
         return result;
     }
 }
@@ -31,19 +32,70 @@ impl Struct {
 #[cfg(test)]
 mod tests {
     use crate::StructMock;
+    use rsubstitute_core::Times;
     use rsubstitute_core::args_matching::Arg;
 
     fn struct_test() {
         // Arrange
-        let mock = StructMock::new(3);
+        let mock_number = 10;
+        let mock = StructMock::new(mock_number);
 
-        mock.setup.get_number().returns(4).format().call_base();
+        let get_number_returned_value = 22;
+        mock.setup
+            .get_number()
+            .returns(get_number_returned_value)
+            .format()
+            .call_base();
+
+        let my_trait_work_returned_value_for_format = "for format!".to_owned();
+        let my_trait_work_accepted_value_for_call_base = 333;
+        let my_trait_work_returned_value_for_mock = "Mocked value!".to_owned();
+        let my_trait_work_accepted_value_for_mock = 4;
         mock.setup
             .MyTrait
-            .work(10)
+            .work(get_number_returned_value)
+            .returns(my_trait_work_returned_value_for_format.clone())
+            .work(my_trait_work_accepted_value_for_call_base)
             .call_base()
-            .work(20)
-            .returns("Mocked value!".to_owned());
+            .work(my_trait_work_accepted_value_for_mock)
+            .returns(my_trait_work_returned_value_for_mock);
+
+        // Act
+        let actual_get_number_returned_value = mock.get_number();
+        let actual_format_value = mock.format();
+
+        let actual_my_trait_work_call_base_value =
+            mock.work(my_trait_work_accepted_value_for_call_base);
+        let actual_my_trait_work_returned_value_for_mock =
+            mock.work(my_trait_work_accepted_value_for_mock);
+
+        // Assert
+        assert_eq!(get_number_returned_value, actual_get_number_returned_value);
+        let expected_format_value = format!(
+            "Struct, number = {get_number_returned_value}, work_result = {my_trait_work_returned_value_for_format}"
+        );
+        assert_eq!(expected_format_value, actual_format_value);
+
+        let expected_my_trait_work_call_base_value = "working...".to_owned();
+        assert_eq!(
+            expected_my_trait_work_call_base_value,
+            actual_my_trait_work_call_base_value
+        );
+        assert_eq!(
+            my_trait_work_returned_value_for_mock,
+            actual_my_trait_work_returned_value_for_mock
+        );
+
+        mock.received
+            .get_number(Times::Exactly(2))
+            .format(Times::Once)
+            .no_other_calls();
+        mock.received
+            .MyTrait
+            .work(my_trait_work_accepted_value_for_call_base, Times::Once)
+            .work(my_trait_work_accepted_value_for_mock, Times::Once)
+            .work(get_number_returned_value, Times::Once)
+            .no_other_calls();
     }
 }
 
@@ -54,7 +106,6 @@ mod __rsubstitute_generated_Struct {
     use super::*;
     use rsubstitute::for_generated::*;
 
-    
     #[derive(Clone)]
     pub struct MyTrait_work_Call<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
@@ -78,7 +129,6 @@ mod __rsubstitute_generated_Struct {
         }
     }
 
-    
     #[derive(Clone)]
     pub struct get_number_Call<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
@@ -130,9 +180,9 @@ mod __rsubstitute_generated_Struct {
             FnData<StructMock<'a>, get_number_Call<'a>, get_number_ArgsChecker<'a>, i32>,
         format_data: FnData<StructMock<'a>, format_Call<'a>, format_ArgsChecker<'a>, String>,
     }
-    
+
     pub struct MyTraitSetup<'a> {
-        data: Arc<StructMockData<'a>>
+        data: Arc<StructMockData<'a>>,
     }
 
     pub struct StructMockSetup<'a> {
