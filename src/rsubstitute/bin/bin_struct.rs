@@ -124,6 +124,14 @@ mod __rsubstitute_generated_Struct {
         pub value: Arg<i32>,
     }
 
+    pub struct MyTraitSetup<'a> {
+        data: Arc<StructMockData<'a>>,
+    }
+
+    pub struct MyTraitReceived<'a> {
+        data: Arc<StructMockData<'a>>,
+    }
+
     impl<'a> IArgsChecker<MyTrait_work_Call<'a>> for MyTrait_work_ArgsChecker<'a> {
         fn check(&self, call: MyTrait_work_Call<'a>) -> Vec<ArgCheckResult> {
             vec![self.value.check("value", call.value)]
@@ -136,6 +144,50 @@ mod __rsubstitute_generated_Struct {
             return "working...".to_owned();
         }
     }
+
+    impl<'a> MyTraitSetup<'a> {
+        #[allow(dead_code)]
+        #[allow(elided_named_lifetimes)]
+        pub fn work(
+            &'a self,
+            value: impl Into<Arg<i32>>,
+        ) -> SharedFnConfig<
+            'a,
+            StructMock<'a>,
+            MyTrait_work_Call<'a>,
+            MyTrait_work_ArgsChecker<'a>,
+            String,
+            Self,
+        > {
+            let MyTrait_work_ArgsChecker = MyTrait_work_ArgsChecker {
+                _phantom_lifetime: PhantomData,
+                value: value.into(),
+            };
+            let fn_config = self.data.MyTrait_work_data.add_config(MyTrait_work_ArgsChecker);
+            let shared_fn_config = SharedFnConfig::new(fn_config, self);
+            return shared_fn_config;
+        }
+    }
+
+    impl<'a> MyTraitReceived<'a> {
+        #[allow(dead_code)]
+        #[allow(elided_named_lifetimes)]
+        pub fn work(&'a self, value: impl Into<Arg<i32>>, times: Times) -> &'a Self {
+            let MyTrait_work_ArgsChecker = MyTrait_work_ArgsChecker {
+                _phantom_lifetime: PhantomData,
+                value: value.into(),
+            };
+            self.data
+                .MyTrait_work_data
+                .verify_received(MyTrait_work_ArgsChecker, times);
+            return self;
+        }
+
+        pub fn no_other_calls(&self) {
+            self.data.verify_received_nothing_else()
+        }
+    }
+    
 
     #[derive(Clone)]
     pub struct get_number_Call<'a> {
@@ -204,14 +256,6 @@ mod __rsubstitute_generated_Struct {
         get_number_data:
             FnData<StructMock<'a>, get_number_Call<'a>, get_number_ArgsChecker<'a>, i32>,
         format_data: FnData<StructMock<'a>, format_Call<'a>, format_ArgsChecker<'a>, String>,
-    }
-
-    pub struct MyTraitSetup<'a> {
-        data: Arc<StructMockData<'a>>,
-    }
-
-    pub struct MyTraitReceived<'a> {
-        data: Arc<StructMockData<'a>>,
     }
 
     pub struct StructMockSetup<'a> {
@@ -310,30 +354,6 @@ mod __rsubstitute_generated_Struct {
         }
     }
 
-    impl<'a> MyTraitSetup<'a> {
-        #[allow(dead_code)]
-        #[allow(elided_named_lifetimes)]
-        pub fn work(
-            &'a self,
-            value: impl Into<Arg<i32>>,
-        ) -> SharedFnConfig<
-            'a,
-            StructMock<'a>,
-            MyTrait_work_Call<'a>,
-            MyTrait_work_ArgsChecker<'a>,
-            String,
-            Self,
-        > {
-            let work_args_checker = MyTrait_work_ArgsChecker {
-                _phantom_lifetime: PhantomData,
-                value: value.into(),
-            };
-            let fn_config = self.data.MyTrait_work_data.add_config(work_args_checker);
-            let shared_fn_config = SharedFnConfig::new(fn_config, self);
-            return shared_fn_config;
-        }
-    }
-
     impl<'a> StructMockSetup<'a> {
         #[allow(dead_code)]
         #[allow(elided_named_lifetimes)]
@@ -369,25 +389,6 @@ mod __rsubstitute_generated_Struct {
             let fn_config = self.data.format_data.add_config(format_args_checker);
             let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
-        }
-    }
-
-    impl<'a> MyTraitReceived<'a> {
-        #[allow(dead_code)]
-        #[allow(elided_named_lifetimes)]
-        pub fn work(&'a self, value: impl Into<Arg<i32>>, times: Times) -> &'a Self {
-            let MyTrait_work_ArgsChecker = MyTrait_work_ArgsChecker {
-                _phantom_lifetime: PhantomData,
-                value: value.into(),
-            };
-            self.data
-                .MyTrait_work_data
-                .verify_received(MyTrait_work_ArgsChecker, times);
-            return self;
-        }
-
-        pub fn no_other_calls(&self) {
-            self.data.verify_received_nothing_else()
         }
     }
 
