@@ -31,10 +31,10 @@ impl Struct {
 
 #[cfg(test)]
 mod tests {
-    use crate::StructMock;
+    use crate::{MyTrait, StructMock};
     use rsubstitute_core::Times;
-    use rsubstitute_core::args_matching::Arg;
 
+    #[test]
     fn struct_test() {
         // Arrange
         let mock_number = 10;
@@ -58,7 +58,7 @@ mod tests {
             .work(my_trait_work_accepted_value_for_call_base)
             .call_base()
             .work(my_trait_work_accepted_value_for_mock)
-            .returns(my_trait_work_returned_value_for_mock);
+            .returns(my_trait_work_returned_value_for_mock.clone());
 
         // Act
         let actual_get_number_returned_value = mock.get_number();
@@ -88,8 +88,7 @@ mod tests {
 
         mock.received
             .get_number(Times::Exactly(2))
-            .format(Times::Once)
-            .no_other_calls();
+            .format(Times::Once);
         mock.received
             .MyTrait
             .work(my_trait_work_accepted_value_for_call_base, Times::Once)
@@ -103,8 +102,10 @@ pub use __rsubstitute_generated_Struct::*;
 mod __rsubstitute_generated_Struct {
     #![allow(non_camel_case_types)]
     #![allow(non_snake_case)]
+
     use super::*;
     use rsubstitute::for_generated::*;
+    use std::ops::Deref;
 
     #[derive(Clone)]
     pub struct MyTrait_work_Call<'a> {
@@ -129,6 +130,13 @@ mod __rsubstitute_generated_Struct {
         }
     }
 
+    impl<'a> IBaseCaller<MyTrait_work_Call<'a>, String> for StructMock<'a> {
+        fn call_base(&self, call: MyTrait_work_Call<'a>) -> String {
+            let MyTrait_work_Call { value, .. } = call;
+            return "working...".to_owned();
+        }
+    }
+
     #[derive(Clone)]
     pub struct get_number_Call<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
@@ -147,6 +155,13 @@ mod __rsubstitute_generated_Struct {
     impl<'a> IArgsChecker<get_number_Call<'a>> for get_number_ArgsChecker<'a> {
         fn check(&self, call: get_number_Call<'a>) -> Vec<ArgCheckResult> {
             vec![]
+        }
+    }
+
+    impl<'a> IBaseCaller<get_number_Call<'a>, i32> for StructMock<'a> {
+        fn call_base(&self, call: get_number_Call<'a>) -> i32 {
+            let get_number_Call { .. } = call;
+            return self.number;
         }
     }
 
@@ -171,11 +186,21 @@ mod __rsubstitute_generated_Struct {
         }
     }
 
+    impl<'a> IBaseCaller<format_Call<'a>, String> for StructMock<'a> {
+        fn call_base(&self, call: format_Call<'a>) -> String {
+            let format_Call { .. } = call;
+            let number = self.get_number();
+            let work_result = self.work(number);
+            let result = format!("Struct, number = {number}, work_result = {work_result}");
+            return result;
+        }
+    }
+
     #[derive(IMockData)]
     pub struct StructMockData<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
         MyTrait_work_data:
-            FnData<StructMock<'a>, MyTrait_work_Call<'a>, MyTrait_work_ArgsChecker<'a>, ()>,
+            FnData<StructMock<'a>, MyTrait_work_Call<'a>, MyTrait_work_ArgsChecker<'a>, String>,
         get_number_data:
             FnData<StructMock<'a>, get_number_Call<'a>, get_number_ArgsChecker<'a>, i32>,
         format_data: FnData<StructMock<'a>, format_Call<'a>, format_ArgsChecker<'a>, String>,
@@ -185,15 +210,21 @@ mod __rsubstitute_generated_Struct {
         data: Arc<StructMockData<'a>>,
     }
 
+    pub struct MyTraitReceived<'a> {
+        data: Arc<StructMockData<'a>>,
+    }
+
     pub struct StructMockSetup<'a> {
+        pub MyTrait: MyTraitSetup<'a>,
         data: Arc<StructMockData<'a>>,
     }
 
     pub struct StructMockReceived<'a> {
+        pub MyTrait: MyTraitReceived<'a>,
         data: Arc<StructMockData<'a>>,
     }
 
-    struct Struct_InnerData {
+    pub struct Struct_InnerData {
         number: i32,
     }
 
@@ -211,24 +242,48 @@ mod __rsubstitute_generated_Struct {
         inner_data: Struct_InnerData,
     }
 
-    // impl<'a> Struct for StructMock<'a> {
-    //     fn get_number<'__rsubstitute_arg_anonymous>(&'__rsubstitute_arg_anonymous self) -> i32 {
-    //         let call = unsafe {
-    //             get_number_Call {
-    //                 _phantom_lifetime: PhantomData,
-    //             }
-    //         };
-    //         return self.data.get_number_data.handle_returning(call);
-    //     }
-    //     fn format<'__rsubstitute_arg_anonymous>(&'__rsubstitute_arg_anonymous self) -> String {
-    //         let call = unsafe {
-    //             format_Call {
-    //                 _phantom_lifetime: PhantomData,
-    //             }
-    //         };
-    //         return self.data.format_data.handle_returning(call);
-    //     }
-    // }
+    impl<'a> Deref for StructMock<'a> {
+        type Target = Struct_InnerData;
+
+        fn deref(&self) -> &Self::Target {
+            &self.inner_data
+        }
+    }
+
+    impl<'a> MyTrait for StructMock<'a> {
+        fn work(&self, value: i32) -> String {
+            let call = unsafe {
+                MyTrait_work_Call {
+                    _phantom_lifetime: PhantomData,
+                    value,
+                }
+            };
+            return self
+                .data
+                .MyTrait_work_data
+                .handle_base_returning(self, call);
+        }
+    }
+
+    impl<'a> StructMock<'a> {
+        pub fn get_number<'__rsubstitute_arg_anonymous>(&'__rsubstitute_arg_anonymous self) -> i32 {
+            let call = unsafe {
+                get_number_Call {
+                    _phantom_lifetime: PhantomData,
+                }
+            };
+            return self.data.get_number_data.handle_base_returning(self, call);
+        }
+
+        pub fn format<'__rsubstitute_arg_anonymous>(&'__rsubstitute_arg_anonymous self) -> String {
+            let call = unsafe {
+                format_Call {
+                    _phantom_lifetime: PhantomData,
+                }
+            };
+            return self.data.format_data.handle_base_returning(self, call);
+        }
+    }
 
     impl<'a> StructMock<'a> {
         #[allow(dead_code)]
@@ -241,11 +296,41 @@ mod __rsubstitute_generated_Struct {
             });
             let inner_data = Struct_InnerData::new(number);
             return StructMock {
-                setup: StructMockSetup { data: data.clone() },
-                received: StructMockReceived { data: data.clone() },
+                setup: StructMockSetup {
+                    MyTrait: MyTraitSetup { data: data.clone() },
+                    data: data.clone(),
+                },
+                received: StructMockReceived {
+                    MyTrait: MyTraitReceived { data: data.clone() },
+                    data: data.clone(),
+                },
                 data,
                 inner_data,
             };
+        }
+    }
+
+    impl<'a> MyTraitSetup<'a> {
+        #[allow(dead_code)]
+        #[allow(elided_named_lifetimes)]
+        pub fn work(
+            &'a self,
+            value: impl Into<Arg<i32>>,
+        ) -> SharedFnConfig<
+            'a,
+            StructMock<'a>,
+            MyTrait_work_Call<'a>,
+            MyTrait_work_ArgsChecker<'a>,
+            String,
+            Self,
+        > {
+            let work_args_checker = MyTrait_work_ArgsChecker {
+                _phantom_lifetime: PhantomData,
+                value: value.into(),
+            };
+            let fn_config = self.data.MyTrait_work_data.add_config(work_args_checker);
+            let shared_fn_config = SharedFnConfig::new(fn_config, self);
+            return shared_fn_config;
         }
     }
 
@@ -284,6 +369,25 @@ mod __rsubstitute_generated_Struct {
             let fn_config = self.data.format_data.add_config(format_args_checker);
             let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
+        }
+    }
+
+    impl<'a> MyTraitReceived<'a> {
+        #[allow(dead_code)]
+        #[allow(elided_named_lifetimes)]
+        pub fn work(&'a self, value: impl Into<Arg<i32>>, times: Times) -> &'a Self {
+            let MyTrait_work_ArgsChecker = MyTrait_work_ArgsChecker {
+                _phantom_lifetime: PhantomData,
+                value: value.into(),
+            };
+            self.data
+                .MyTrait_work_data
+                .verify_received(MyTrait_work_ArgsChecker, times);
+            return self;
+        }
+
+        pub fn no_other_calls(&self) {
+            self.data.verify_received_nothing_else()
         }
     }
 
