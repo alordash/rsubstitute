@@ -143,7 +143,6 @@ impl<
         call: TCall,
     ) -> MatchingConfigSearchResult<TMock, TCall, TArgsChecker, TReturnValue> {
         let configs = unsafe { &*self.configs };
-        dbg!(configs.len());
         let mut args_check_results = Vec::with_capacity(configs.len());
         for config in configs.iter().rev() {
             let args_check_result = config.borrow().check(call.clone());

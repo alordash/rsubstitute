@@ -300,7 +300,7 @@ accept_value(*{first_value}*)
         }
 
         #[test]
-        fn accept_value_NoOtherCallsWithOtherCalls_Panics() {
+        fn accept_value_NoOtherCallsWithOneOtherCall_Panics() {
             // Arrange
             let mock = TraitMock::new();
             let first_value = 10;
@@ -320,6 +320,34 @@ accept_value(*{first_value}*)
                 format!(
                     "Did not expect to receive any other calls. Received 1 unexpected call:
 1. accept_value({second_value})"
+                ),
+            );
+        }
+
+        #[test]
+        fn accept_value_NoOtherCallsWithManyOtherCalls_Panics() {
+            // Arrange
+            let mock = TraitMock::new();
+            let first_value = 10;
+            let second_value = 22;
+            let third_value = 333;
+
+            // Act
+            mock.accept_value(first_value);
+            mock.accept_value(second_value);
+            mock.accept_value(third_value);
+
+            // Assert
+            assert_panics(
+                || {
+                    mock.received
+                        .accept_value(first_value, Times::Once)
+                        .no_other_calls()
+                },
+                format!(
+                    "Did not expect to receive any other calls. Received 2 unexpected calls:
+1. accept_value({second_value})
+2. accept_value({third_value})"
                 ),
             );
         }
