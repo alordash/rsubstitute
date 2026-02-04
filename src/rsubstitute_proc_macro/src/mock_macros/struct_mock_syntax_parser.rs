@@ -51,7 +51,7 @@ impl IStructMockSyntaxParser for StructMockSyntaxParser {
 impl StructMockSyntaxParser {
     const STRUCT_MOCK_INVALID_IDENT_ERROR_MESSAGE: &'static str =
         "Struct mock should contain only `impl` blocks for it's own type.";
-    const NO_NEW_FN_ERROR_MESSAGE: &'static str = "In order to be mockable structure must have associative function `fn new(args) -> Self`, where `args` is arbitrary collection of user-defined arguments.";
+    const NO_NEW_FN_ERROR_MESSAGE: &'static str = "In order to be mockable structure must have function `pub fn new(args) -> Self`, where `args` is arbitrary collection of user-defined arguments.";
     const NEW_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("new"));
 
     fn try_extract_new_fn(&self, struct_ident: &Ident, item_impl: &ItemImpl) -> Option<ImplItemFn> {
@@ -76,6 +76,7 @@ impl StructMockSyntaxParser {
         impl_item_fn: &ImplItemFn,
     ) -> bool {
         if impl_item_fn.sig.ident == Self::NEW_FN_IDENT.clone()
+            && let Visibility::Public(_) = impl_item_fn.vis
             && let ReturnType::Type(_, return_type) = &impl_item_fn.sig.output
             && let Type::Path(type_path) = &**return_type
             && let Some(type_ident) = type_path.path.get_ident()

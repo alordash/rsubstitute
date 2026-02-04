@@ -2,33 +2,44 @@ trait MyTrait {
     fn work(&self, value: i32) -> String;
 }
 
-struct Struct {
-    number: i32,
-}
+mocked! {
+    struct Struct {
+        number: i32,
+    }
 
-impl MyTrait for Struct {
-    fn work(&self, value: i32) -> String {
-        return "working...".to_owned();
+    impl Struct {
+        fn first_struct_impl(&self) { println!("first_struct_impl"); }
+    }
+
+    impl MyTrait for Struct {
+        fn work(&self, value: i32) -> String {
+            return "working...".to_owned();
+        }
+    }
+
+    impl Struct {
+        pub fn new(number: i32) -> Self {
+            Self { number }
+        }
+
+        pub fn get_number(&self) -> i32 {
+            self.number
+        }
+
+        pub fn format(&self) -> String {
+            let number = self.get_number();
+            let work_result = self.work(number);
+            let result = format!("Struct, number = {number}, work_result = {work_result}");
+            return result;
+        }
+    }
+
+    impl Debug for Struct {
+        fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+            return write!(f, "Struct = {{ number = {} }}", self.number);
+        }
     }
 }
-
-impl Struct {
-    pub fn new(number: i32) -> Self {
-        Self { number }
-    }
-
-    pub fn get_number(&self) -> i32 {
-        self.number
-    }
-
-    pub fn format(&self) -> String {
-        let number = self.get_number();
-        let work_result = self.work(number);
-        let result = format!("Struct, number = {number}, work_result = {work_result}");
-        return result;
-    }
-}
-
 #[cfg(test)]
 mod tests {
     use crate::{MyTrait, StructMock};
@@ -99,6 +110,9 @@ mod tests {
 }
 
 pub use __rsubstitute_generated_Struct::*;
+use rsubstitute_proc_macro::mocked;
+use std::fmt::{Debug, Formatter};
+
 mod __rsubstitute_generated_Struct {
     #![allow(non_camel_case_types)]
     #![allow(non_snake_case)]
@@ -163,7 +177,10 @@ mod __rsubstitute_generated_Struct {
                 _phantom_lifetime: PhantomData,
                 value: value.into(),
             };
-            let fn_config = self.data.MyTrait_work_data.add_config(MyTrait_work_ArgsChecker);
+            let fn_config = self
+                .data
+                .MyTrait_work_data
+                .add_config(MyTrait_work_ArgsChecker);
             let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
         }
@@ -187,7 +204,6 @@ mod __rsubstitute_generated_Struct {
             self.data.verify_received_nothing_else()
         }
     }
-    
 
     #[derive(Clone)]
     pub struct get_number_Call<'a> {
