@@ -2,7 +2,11 @@ trait MyTrait {
     fn work(&self, value: i32) -> String;
 }
 
-mocked! {
+trait Gen<T> {
+    
+}
+
+// mocked! {
     struct Struct {
         number: i32,
     }
@@ -39,7 +43,8 @@ mocked! {
             return write!(f, "Struct = {{ number = {} }}", self.number);
         }
     }
-}
+// }
+
 #[cfg(test)]
 mod tests {
     use crate::{MyTrait, StructMock};
