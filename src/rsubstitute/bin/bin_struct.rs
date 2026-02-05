@@ -8,7 +8,7 @@ mocked! {
     }
 
     impl Struct {
-        fn first_struct_impl(&self) { println!("first_struct_impl"); }
+        fn first_struct_impl(&self) { println!("first_struct_impl, size_of::<T>() = {}", std::mem::size_of::<T>()); }
     }
 
     impl MyTrait for Struct {

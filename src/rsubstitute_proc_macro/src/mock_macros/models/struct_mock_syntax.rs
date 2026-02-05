@@ -9,7 +9,7 @@ pub(crate) struct StructMockSyntax {
     pub new_fn: ImplItemFn,
     pub trait_impls: Vec<ItemImpl>,
     // TODO - flatten into list of functions for FnDecl extractor
-    pub struct_impls: Vec<ItemImpl>,
+    pub struct_fns: Vec<ImplItemFn>
 }
 
 impl Parse for StructMockSyntax {
@@ -30,7 +30,7 @@ impl Debug for StructMockSyntax {
                 .iter()
                 .map(|x| x.to_token_stream().to_string())
                 .collect::<Vec<_>>(),
-            self.struct_impls
+            self.struct_fns
                 .iter()
                 .map(|x| x.to_token_stream().to_string())
                 .collect::<Vec<_>>(),
