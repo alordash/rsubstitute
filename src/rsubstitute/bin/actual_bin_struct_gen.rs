@@ -5,6 +5,7 @@ mod __rsubstitute_generated_Struct {
     use rsubstitute::for_generated::*;
     #[allow(non_camel_case_types)]
     #[allow(non_snake_case)]
+    // TODO - rename trait fn decls
     pub struct work_Call<'__rsubstitute_arg_field_lifetime> {
         _phantom_lifetime: PhantomData<&'__rsubstitute_arg_field_lifetime ()>,
         value: i32,
@@ -83,6 +84,7 @@ mod __rsubstitute_generated_Struct {
             return "working...".to_owned();
         }
     }
+    // TODO - add trait setup and received structs
     #[allow(non_camel_case_types)]
     #[allow(non_snake_case)]
     pub struct fmt_Call<'__rsubstitute_arg_field_lifetime> {

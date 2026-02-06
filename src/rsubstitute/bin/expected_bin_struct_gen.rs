@@ -33,18 +33,18 @@ mod __rsubstitute_generated_Struct {
         pub value: Arg<i32>,
     }
 
+    impl<'a> IArgsChecker<MyTrait_work_Call<'a>> for MyTrait_work_ArgsChecker<'a> {
+        fn check(&self, call: MyTrait_work_Call<'a>) -> Vec<ArgCheckResult> {
+            vec![self.value.check("value", call.value)]
+        }
+    }
+
     pub struct MyTraitSetup<'a> {
         data: Arc<StructMockData<'a>>,
     }
 
     pub struct MyTraitReceived<'a> {
         data: Arc<StructMockData<'a>>,
-    }
-
-    impl<'a> IArgsChecker<MyTrait_work_Call<'a>> for MyTrait_work_ArgsChecker<'a> {
-        fn check(&self, call: MyTrait_work_Call<'a>) -> Vec<ArgCheckResult> {
-            vec![self.value.check("value", call.value)]
-        }
     }
 
     impl<'a> IBaseCaller<MyTrait_work_Call<'a>, String> for StructMock<'a> {
