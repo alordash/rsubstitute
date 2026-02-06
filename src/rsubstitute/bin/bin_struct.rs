@@ -2,47 +2,47 @@ trait MyTrait {
     fn work(&self, value: i32) -> String;
 }
 
-trait Gen<T> {
-    
-}
+trait Gen<T> {}
 
 // mocked! {
-    struct Struct {
-        number: i32,
+struct Struct {
+    number: i32,
+}
+
+impl Struct {
+    fn first_struct_impl(&self) {
+        println!("first_struct_impl");
+    }
+}
+
+impl MyTrait for Struct {
+    fn work(&self, value: i32) -> String {
+        return "working...".to_owned();
+    }
+}
+
+impl Struct {
+    pub fn new(number: i32) -> Self {
+        Self { number }
     }
 
-    impl Struct {
-        fn first_struct_impl(&self) { println!("first_struct_impl, size_of::<T>() = {}", std::mem::size_of::<T>()); }
+    pub fn get_number(&self) -> i32 {
+        self.number
     }
 
-    impl MyTrait for Struct {
-        fn work(&self, value: i32) -> String {
-            return "working...".to_owned();
-        }
+    pub fn format(&self) -> String {
+        let number = self.get_number();
+        let work_result = self.work(number);
+        let result = format!("Struct, number = {number}, work_result = {work_result}");
+        return result;
     }
+}
 
-    impl Struct {
-        pub fn new(number: i32) -> Self {
-            Self { number }
-        }
-
-        pub fn get_number(&self) -> i32 {
-            self.number
-        }
-
-        pub fn format(&self) -> String {
-            let number = self.get_number();
-            let work_result = self.work(number);
-            let result = format!("Struct, number = {number}, work_result = {work_result}");
-            return result;
-        }
+impl Debug for Struct {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        return write!(f, "Struct = {{ number = {} }}", self.number);
     }
-
-    impl Debug for Struct {
-        fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-            return write!(f, "Struct = {{ number = {} }}", self.number);
-        }
-    }
+}
 // }
 
 #[cfg(test)]

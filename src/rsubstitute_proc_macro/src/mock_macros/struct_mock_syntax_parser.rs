@@ -16,7 +16,7 @@ impl IStructMockSyntaxParser for StructMockSyntaxParser {
         let r#struct = input.call(ItemStruct::parse)?;
         let mut maybe_new_fn = None;
         let mut trait_impls = Vec::new();
-        let mut struct_fns = Vec::new();
+        let mut struct_impls = Vec::new();
         while !input.is_empty() {
             let item_impl = input.call(ItemImpl::parse)?;
             let Type::Path(type_path) = item_impl.self_ty.as_ref() else {
@@ -32,10 +32,7 @@ impl IStructMockSyntaxParser for StructMockSyntaxParser {
                 if maybe_new_fn.is_none() {
                     maybe_new_fn = self.try_extract_new_fn(&r#struct.ident, &item_impl);
                 }
-                struct_fns.extend(item_impl.items.iter().filter_map(|item| match item {
-                    ImplItem::Fn(impl_item_fn) => Some(impl_item_fn.clone()),
-                    _ => None
-                }));
+                struct_impls.push(item_impl);
             }
         }
         let Some(new_fn) = maybe_new_fn else {
@@ -45,7 +42,7 @@ impl IStructMockSyntaxParser for StructMockSyntaxParser {
             r#struct,
             new_fn,
             trait_impls,
-            struct_fns,
+            struct_impls,
         };
         return Ok(struct_mock_syntax);
     }

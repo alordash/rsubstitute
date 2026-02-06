@@ -38,7 +38,7 @@ impl IStructMockHandler for StructMockHandler {
         );
         let fn_decls = self
             .fn_decl_extractor
-            .extract_struct_fns(&struct_mock_syntax.struct_fns);
+            .extract_struct_fns(&struct_mock_syntax.get_struct_fns());
         let target_ident = struct_mock_syntax.r#struct.ident.clone();
         let mock_generics = self
             .mock_generics_generator
@@ -107,16 +107,64 @@ impl IStructMockHandler for StructMockHandler {
             mock_received_impl,
         );
 
+        let source_struct_impls_syntax =
+            self.generate_source_struct_impls_syntax(&struct_mock_syntax);
+
         let GeneratedMod {
             item_mod,
             use_generated_mod,
         } = generated_mod;
         let result = quote! {
-            #item_trait
+            #source_struct_impls_syntax
 
             #use_generated_mod
             #item_mod
         };
         return result.into();
+    }
+}
+
+impl StructMockHandler {
+    fn generate_source_struct_impls_syntax(
+        &self,
+        struct_mock_syntax: &StructMockSyntax,
+    ) -> proc_macro2::TokenStream {
+        let cfg_not_test_attribute = constants::CFG_NOT_TEST_ATTRIBUTE.clone();
+        let struct_syntax_var = &struct_mock_syntax.r#struct;
+        let struct_syntax = quote! {
+            #cfg_not_test_attribute
+            #struct_syntax_var
+        };
+
+        let trait_impls_syntaxes: Vec<_> = struct_mock_syntax
+            .trait_impls
+            .iter()
+            .map(|trait_impl| {
+                quote! {
+                    #cfg_not_test_attribute
+                    #trait_impl
+                }
+            })
+            .collect();
+
+        let struct_impls_syntaxes: Vec<_> = struct_mock_syntax
+            .struct_impls
+            .iter()
+            .map(|struct_impl| {
+                quote! {
+                    #cfg_not_test_attribute
+                    #struct_impl
+                }
+            })
+            .collect();
+
+        let result = quote! {
+            #struct_syntax
+
+            #(#trait_impls_syntaxes)*
+
+            #(#struct_impls_syntaxes)*
+        };
+        return result;
     }
 }

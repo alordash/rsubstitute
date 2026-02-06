@@ -4,7 +4,7 @@ use syn::*;
 pub trait IFnDeclExtractor {
     fn extract(&self, items: &[TraitItem]) -> Vec<FnDecl>;
 
-    fn extract_struct_fns(&self, impl_item_fns: &[ImplItemFn]) -> Vec<FnDecl>;
+    fn extract_struct_fns(&self, impl_item_fns: &[&ImplItemFn]) -> Vec<FnDecl>;
 
     fn extract_fn(&self, item_fn: &ItemFn) -> FnDecl;
 }
@@ -20,7 +20,7 @@ impl IFnDeclExtractor for FnDeclExtractor {
         return fn_decls;
     }
 
-    fn extract_struct_fns(&self, impl_item_fns: &[ImplItemFn]) -> Vec<FnDecl> {
+    fn extract_struct_fns(&self, impl_item_fns: &[&ImplItemFn]) -> Vec<FnDecl> {
         let fn_decls = impl_item_fns
             .iter()
             .map(|x| self.map_impl_item_fn(x))
