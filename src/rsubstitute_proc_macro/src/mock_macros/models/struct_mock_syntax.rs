@@ -38,9 +38,16 @@ impl Debug for StructMockSyntax {
 }
 
 impl StructMockSyntax {
+    pub fn get_trait_fns(&self) -> Vec<&ImplItemFn> {
+        self.extract_fns(&self.trait_impls)
+    }
+    
     pub fn get_struct_fns(&self) -> Vec<&ImplItemFn> {
-        return self
-            .struct_impls
+        self.extract_fns(&self.struct_impls)
+    }
+    
+    fn extract_fns<'a>(&self, item_impls: &'a [ItemImpl]) -> Vec<&'a ImplItemFn> {
+        return item_impls
             .iter()
             .flat_map(|struct_impl| {
                 struct_impl.items.iter().filter_map(|item| match item {

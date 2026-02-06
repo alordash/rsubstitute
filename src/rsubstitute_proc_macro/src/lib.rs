@@ -22,9 +22,7 @@ pub fn mock(
 pub fn mocked(proc_macro_item: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let mock_macro_handler = &SERVICES.mock_macro_handler;
 
-    let result = mock_macro_handler.handle_macro(proc_macro_item);
-    dbg!(result.to_string());
-    return result;
+    return mock_macro_handler.handle_macro(proc_macro_item);
 }
 
 #[proc_macro_derive(IArgsFormatter)]

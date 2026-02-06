@@ -3,8 +3,8 @@ use rsubstitute_proc_macro::mocked;
 
 #[cfg(not(test))]
 fn main() {
-    let r#struct = Struct::new(2);
-    dbg!(r#struct);
+    // let r#struct = Struct::new(2);
+    // dbg!(r#struct);
 
     println!("done")
 }
@@ -124,7 +124,7 @@ mocked! {
 //             .no_other_calls();
 //     }
 // }
-//
+
 // pub use __rsubstitute_generated_Struct::*;
 // use rsubstitute_proc_macro::mocked;
 // use std::fmt::{Debug, Formatter};

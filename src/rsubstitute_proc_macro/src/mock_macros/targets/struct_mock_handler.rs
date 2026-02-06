@@ -35,9 +35,13 @@ impl IStructMockHandler for StructMockHandler {
             struct_mock_syntax.r#struct.ident,
             constants::MOCK_STRUCT_IDENT_PREFIX
         );
-        let fn_decls = self
+        let traits_fn_decls = self
+            .fn_decl_extractor
+            .extract_struct_fns(&struct_mock_syntax.get_trait_fns());
+        let struct_fn_decls = self
             .fn_decl_extractor
             .extract_struct_fns(&struct_mock_syntax.get_struct_fns());
+        let fn_decls: Vec<_> = traits_fn_decls.into_iter().chain(struct_fn_decls).collect();
         let target_ident = struct_mock_syntax.r#struct.ident.clone();
         let mock_generics = self
             .mock_generics_generator
@@ -116,8 +120,8 @@ impl IStructMockHandler for StructMockHandler {
         let result = quote! {
             #source_struct_impls_syntax
 
-            // #use_generated_mod
-            // #item_mod
+            #use_generated_mod
+            #item_mod
         };
         return result.into();
     }
