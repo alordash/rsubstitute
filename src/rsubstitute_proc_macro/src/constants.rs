@@ -151,12 +151,6 @@ pub const ALLOW_UNUSED_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     return result;
 });
 
-pub const ALLOW_ELIDED_NAMED_LIFETIMES_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
-    let attribute_factory = &SERVICES.attribute_factory;
-    let result = attribute_factory.create(ALLOW_IDENT.clone(), "elided_named_lifetimes");
-    return result;
-});
-
 pub const ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     let attribute_factory = &SERVICES.attribute_factory;
     let result = attribute_factory.create(ALLOW_IDENT.clone(), "mismatched_lifetime_syntaxes");

@@ -7,13 +7,12 @@ use crate::mock_macros::*;
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
 use std::sync::Arc;
-use syn::*;
 
 pub trait IStructMockHandler {
     fn handle(&self, struct_mock_syntax: StructMockSyntax) -> TokenStream;
 }
 
-struct StructMockHandler {
+pub struct StructMockHandler {
     pub fn_decl_extractor: Arc<dyn IFnDeclExtractor>,
     pub mock_generics_generator: Arc<dyn IMockGenericsGenerator>,
     pub fn_info_generator: Arc<dyn IFnInfoGenerator>,
@@ -117,8 +116,8 @@ impl IStructMockHandler for StructMockHandler {
         let result = quote! {
             #source_struct_impls_syntax
 
-            #use_generated_mod
-            #item_mod
+            // #use_generated_mod
+            // #item_mod
         };
         return result.into();
     }

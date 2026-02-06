@@ -2,7 +2,7 @@ use crate::derive_args_formatter_macro_handler::*;
 use crate::derive_mock_data_macro_handler::*;
 use crate::mock_macros::fn_info_generation::*;
 use crate::mock_macros::mock_generation::*;
-use crate::mock_macros::targets::{ItemFnHandler, ItemTraitHandler};
+use crate::mock_macros::targets::{ItemFnHandler, ItemTraitHandler, StructMockHandler};
 use crate::mock_macros::*;
 use crate::syntax::*;
 use std::cell::{LazyCell, OnceCell};
@@ -17,7 +17,6 @@ pub(crate) struct ServiceCollection {
     pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
     pub derive_args_formatter_macro_handler: Arc<dyn IDeriveArgsFormatterMacroHandler>,
     pub derive_mock_data_macro_handler: Arc<dyn IDeriveMockDataMacroHandler>,
-    pub attribute_mock_macro_handler: Arc<dyn IAttributeMockMacroHandler>,
     pub mock_macro_handler: Arc<dyn IMockMacroHandler>,
     pub struct_mock_syntax_parser: Arc<dyn IStructMockSyntaxParser>,
 }
@@ -252,13 +251,28 @@ fn create_services() -> ServiceCollection {
         fn_received_generator: fn_received_generator.clone(),
         static_fn_generator: static_fn_generator.clone(),
     });
-
-    let attribute_mock_macro_handler = Arc::new(AttributeMockMacroHandler {
-        item_trait_handler,
-        item_fn_handler,
+    
+    let struct_mock_handler = Arc::new(StructMockHandler {
+        fn_decl_extractor: fn_decl_extractor.clone(),
+        mock_generics_generator: mock_generics_generator.clone(),
+        fn_info_generator: fn_info_generator.clone(),
+        mock_data_struct_generator: mock_data_struct_generator.clone(),
+        mock_setup_struct_generator: mock_setup_struct_generator.clone(),
+        mock_received_struct_generator: mock_received_struct_generator.clone(),
+        mock_type_generator: mock_type_generator.clone(),
+        mock_struct_generator: mock_struct_generator.clone(),
+        mock_trait_impl_generator: mock_trait_impl_generator.clone(),
+        mock_impl_generator: mock_impl_generator.clone(),
+        mock_setup_impl_generator: mock_setup_impl_generator.clone(),
+        mock_received_impl_generator: mock_received_impl_generator.clone(),
+        mod_generator: mod_generator.clone(),
     });
 
-    let mock_macro_handler = Arc::new(MockMacroHandler);
+    let mock_macro_handler = Arc::new(MockMacroHandler {
+        item_trait_handler,
+        item_fn_handler,
+        struct_mock_handler
+    });
 
     let struct_mock_syntax_parser = Arc::new(StructMockSyntaxParser);
 
@@ -271,7 +285,6 @@ fn create_services() -> ServiceCollection {
         expr_method_call_factory,
         derive_args_formatter_macro_handler,
         derive_mock_data_macro_handler,
-        attribute_mock_macro_handler,
         mock_macro_handler,
         struct_mock_syntax_parser,
     };
