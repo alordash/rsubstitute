@@ -1,4 +1,5 @@
 use crate::di::SERVICES;
+use crate::mock_macros::models::*;
 use quote::ToTokens;
 use std::fmt::{Debug, Formatter};
 use syn::parse::*;
@@ -38,23 +39,43 @@ impl Debug for StructMockSyntax {
 }
 
 impl StructMockSyntax {
-    pub fn get_trait_fns(&self) -> Vec<&ImplItemFn> {
-        self.extract_fns(&self.trait_impls)
-    }
-    
-    pub fn get_struct_fns(&self) -> Vec<&ImplItemFn> {
-        self.extract_fns(&self.struct_impls)
-    }
-    
-    fn extract_fns<'a>(&self, item_impls: &'a [ItemImpl]) -> Vec<&'a ImplItemFn> {
-        return item_impls
+    pub fn get_trait_impls(&self) -> Vec<TraitImpl> {
+        let trait_impl = self
+            .trait_impls
             .iter()
-            .flat_map(|struct_impl| {
-                struct_impl.items.iter().filter_map(|item| match item {
-                    ImplItem::Fn(impl_item_fn) => Some(impl_item_fn),
-                    _ => None,
-                })
+            .map(|trait_impl| {
+                let trait_fn = TraitImpl {
+                    trait_path: trait_impl
+                        .trait_
+                        .clone()
+                        .expect("trait_impls should contain only trait implementations.")
+                        .1,
+                    fns: self.extract_fns_from_item_impl(trait_impl),
+                };
+                return trait_fn;
             })
             .collect();
+        return trait_impl;
+    }
+
+    pub fn get_struct_fns(&self) -> Vec<&ImplItemFn> {
+        let fns = self
+            .struct_impls
+            .iter()
+            .flat_map(|item_impl| self.extract_fns_from_item_impl(item_impl))
+            .collect();
+        return fns;
+    }
+
+    fn extract_fns_from_item_impl<'a>(&self, item_impl: &'a ItemImpl) -> Vec<&'a ImplItemFn> {
+        let fns = item_impl
+            .items
+            .iter()
+            .filter_map(|item| match item {
+                ImplItem::Fn(impl_item_fn) => Some(impl_item_fn),
+                _ => None,
+            })
+            .collect();
+        return fns;
     }
 }

@@ -7,6 +7,7 @@ pub(crate) struct FnDecl {
     pub arguments: Vec<FnArg>,
     pub return_value: ReturnType,
     pub maybe_base_fn_block: Option<Block>,
+    pub maybe_parent_trait_path: Option<Path>
 }
 
 impl FnDecl {

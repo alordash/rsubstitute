@@ -1,6 +1,7 @@
 use crate::mock_macros::fn_info_generation::models::*;
 use crate::mock_macros::models::FnDecl;
 use proc_macro2::Ident;
+use syn::Path;
 
 // TODO - make all models internal
 pub(crate) struct FnInfo<'a> {
@@ -11,5 +12,6 @@ pub(crate) struct FnInfo<'a> {
     pub args_checker_struct: ArgsCheckerStruct,
     pub args_checker_impl: ArgsCheckerTraitImpl,
     pub data_field_ident: Ident,
-    pub maybe_base_caller_impl: Option<BaseCallerImpl>
+    pub maybe_base_caller_impl: Option<BaseCallerImpl>,
+    pub maybe_parent_trait_path: Option<Path>
 }

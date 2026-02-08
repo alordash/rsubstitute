@@ -37,7 +37,7 @@ impl IStructMockHandler for StructMockHandler {
         );
         let traits_fn_decls = self
             .fn_decl_extractor
-            .extract_struct_fns(&struct_mock_syntax.get_trait_fns());
+            .extract_struct_trait_impls_fns(struct_mock_syntax.get_trait_impls());
         let struct_fn_decls = self
             .fn_decl_extractor
             .extract_struct_fns(&struct_mock_syntax.get_struct_fns());
