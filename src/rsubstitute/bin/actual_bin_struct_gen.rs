@@ -84,7 +84,6 @@ mod __rsubstitute_generated_Struct {
             return "working...".to_owned();
         }
     }
-    // TODO - add trait setup and received structs
     #[allow(non_camel_case_types)]
     #[allow(non_snake_case)]
     pub struct fmt_Call<'__rsubstitute_arg_field_lifetime> {
@@ -160,6 +159,7 @@ mod __rsubstitute_generated_Struct {
             return f.write_fmt(format_args!("Struct = {{ number = {0} }}", self.number));
         }
     }
+    // TODO - add trait setup and received structs
     #[allow(non_camel_case_types)]
     #[allow(non_snake_case)]
     pub struct first_struct_impl_Call<'__rsubstitute_arg_field_lifetime> {
@@ -235,6 +235,7 @@ mod __rsubstitute_generated_Struct {
             };
         }
     }
+    // TODO - `new` fn shouldn't be mocked
     #[allow(non_camel_case_types)]
     #[allow(non_snake_case)]
     pub struct new_Call<'__rsubstitute_arg_field_lifetime> {
@@ -471,6 +472,7 @@ mod __rsubstitute_generated_Struct {
             return result;
         }
     }
+    // TODO - add Trait methods data
     pub struct StructMockData<'__rsubstitute_arg_field_lifetime> {
         _phantom_lifetime: PhantomData<&'__rsubstitute_arg_field_lifetime ()>,
         work_data: FnData<
@@ -491,6 +493,7 @@ mod __rsubstitute_generated_Struct {
             first_struct_impl_ArgsChecker<'__rsubstitute_arg_field_lifetime>,
             (),
         >,
+        // TODO - `new` fn shouldn't be mocked
         new_data: FnData<
             StructMock<'__rsubstitute_arg_field_lifetime>,
             new_Call<'__rsubstitute_arg_field_lifetime>,
@@ -525,18 +528,23 @@ mod __rsubstitute_generated_Struct {
             ]));
         }
     }
+    // TODO - add traits Setup
     pub struct StructMockSetup<'__rsubstitute_arg_field_lifetime> {
         data: Arc<StructMockData<'__rsubstitute_arg_field_lifetime>>,
     }
+    // TODO - add traits Received
     pub struct StructMockReceived<'__rsubstitute_arg_field_lifetime> {
         data: Arc<StructMockData<'__rsubstitute_arg_field_lifetime>>,
     }
+    // TODO - add struct inner data, insert it into Mock
     #[allow(non_camel_case_types)]
     pub struct StructMock<'__rsubstitute_arg_field_lifetime> {
         pub setup: StructMockSetup<'__rsubstitute_arg_field_lifetime>,
         pub received: StructMockReceived<'__rsubstitute_arg_field_lifetime>,
         data: Arc<StructMockData<'__rsubstitute_arg_field_lifetime>>,
     }
+    // TODO - impl Deref for Mock with target = InnerData
+    // TODO - split fns across various Trait impls and struct impl
     impl<'__rsubstitute_arg_field_lifetime> Struct for StructMock<'__rsubstitute_arg_field_lifetime> {
         fn work<'__rsubstitute_arg_anonymous>(
             &'__rsubstitute_arg_anonymous self,
@@ -599,9 +607,10 @@ mod __rsubstitute_generated_Struct {
     impl<'__rsubstitute_arg_field_lifetime> StructMock<'__rsubstitute_arg_field_lifetime> {
         #[allow(dead_code)]
         pub fn new() -> Self {
+            // TODO - create inner data
             let data = Arc::new(StructMockData {
                 _phantom_lifetime: PhantomData,
-                work_data: FnData::new("work", &SERVICES),
+                work_data: FnData::new("work", &SERVICES),  // TODO - add trait name as prefix
                 fmt_data: FnData::new("fmt", &SERVICES),
                 first_struct_impl_data: FnData::new("first_struct_impl", &SERVICES),
                 new_data: FnData::new("new", &SERVICES),

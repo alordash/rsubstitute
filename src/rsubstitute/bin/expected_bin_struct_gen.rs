@@ -39,19 +39,19 @@ mod __rsubstitute_generated_Struct {
         }
     }
 
+    impl<'a> IBaseCaller<MyTrait_work_Call<'a>, String> for StructMock<'a> {
+        fn call_base(&self, call: MyTrait_work_Call<'a>) -> String {
+            let MyTrait_work_Call { value, .. } = call;
+            return "working...".to_owned();
+        }
+    }
+
     pub struct MyTraitSetup<'a> {
         data: Arc<StructMockData<'a>>,
     }
 
     pub struct MyTraitReceived<'a> {
         data: Arc<StructMockData<'a>>,
-    }
-
-    impl<'a> IBaseCaller<MyTrait_work_Call<'a>, String> for StructMock<'a> {
-        fn call_base(&self, call: MyTrait_work_Call<'a>) -> String {
-            let MyTrait_work_Call { value, .. } = call;
-            return "working...".to_owned();
-        }
     }
 
     impl<'a> MyTraitSetup<'a> {
