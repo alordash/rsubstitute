@@ -1,4 +1,6 @@
 mod generated_mod;
+mod inner_data_impl;
+mod inner_data_struct;
 mod mock_data_struct;
 mod mock_generics;
 mod mock_impl;
@@ -16,6 +18,8 @@ mod send_sync_impls;
 mod static_fn;
 
 pub use generated_mod::*;
+pub use inner_data_impl::*;
+pub use inner_data_struct::*;
 pub use mock_data_struct::*;
 pub use mock_generics::*;
 pub use mock_impl::*;

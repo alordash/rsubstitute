@@ -22,6 +22,8 @@ pub struct StructMockHandler {
     pub mock_data_struct_generator: Arc<dyn IMockDataStructGenerator>,
     pub mock_setup_struct_generator: Arc<dyn IMockSetupStructGenerator>,
     pub mock_received_struct_generator: Arc<dyn IMockReceivedStructGenerator>,
+    pub inner_data_struct_generator: Arc<dyn IInnerDataStructGenerator>,
+    pub inner_data_impl_generator: Arc<dyn IInnerDataImplGenerator>,
     pub mock_struct_generator: Arc<dyn IMockStructGenerator>,
     pub mock_struct_trait_generator: Arc<dyn IMockStructTraitGenerator>,
     pub mock_trait_impl_generator: Arc<dyn IMockTraitImplGenerator>,
@@ -33,6 +35,9 @@ pub struct StructMockHandler {
 
 impl IStructMockHandler for StructMockHandler {
     fn handle(&self, mut struct_mock_syntax: StructMockSyntax) -> TokenStream {
+        let source_struct_impls_syntax =
+            self.generate_source_struct_impls_syntax(&struct_mock_syntax);
+
         let mock_ident = format_ident!(
             "{}{}",
             struct_mock_syntax.r#struct.ident,
@@ -67,10 +72,8 @@ impl IStructMockHandler for StructMockHandler {
         let mock_struct_traits: Vec<_> = mock_struct_trait_infos
             .into_iter()
             .map(|mock_struct_trait_info| {
-                self.mock_struct_trait_generator.generate(
-                    &mock_data_struct,
-                    mock_struct_trait_info,
-                )
+                self.mock_struct_trait_generator
+                    .generate(&mock_data_struct, mock_struct_trait_info)
             })
             .collect();
         let mock_setup_struct = self.mock_setup_struct_generator.generate(
@@ -91,6 +94,12 @@ impl IStructMockHandler for StructMockHandler {
                 .map(|mock_struct_trait| &mock_struct_trait.received_struct)
                 .collect(),
         );
+        let inner_data_struct = self
+            .inner_data_struct_generator
+            .generate(struct_mock_syntax.r#struct);
+        let inner_data_impl = self
+            .inner_data_impl_generator
+            .generate(&inner_data_struct, struct_mock_syntax.new_fn);
         let mock_struct = self.mock_struct_generator.generate(
             &mock_type,
             &mock_setup_struct,
@@ -127,15 +136,14 @@ impl IStructMockHandler for StructMockHandler {
             mock_data_struct,
             mock_setup_struct,
             mock_received_struct,
+            inner_data_struct,
+            inner_data_impl,
             mock_struct,
             mock_trait_impl,
             mock_impl,
             mock_setup_impl,
             mock_received_impl,
         );
-
-        let source_struct_impls_syntax =
-            self.generate_source_struct_impls_syntax(&struct_mock_syntax);
 
         let GeneratedMod {
             item_mod,
