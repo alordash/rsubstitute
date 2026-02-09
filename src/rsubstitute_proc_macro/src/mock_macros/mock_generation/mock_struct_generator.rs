@@ -11,6 +11,7 @@ pub trait IMockStructGenerator {
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
         mock_data_struct: &MockDataStruct,
+        maybe_inner_data_struct: Option<&InnerDataStruct>,
     ) -> MockStruct;
 
     fn generate_for_static(
@@ -36,6 +37,7 @@ impl IMockStructGenerator for MockStructGenerator {
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
         mock_data_struct: &MockDataStruct,
+        maybe_inner_data_struct: Option<&InnerDataStruct>,
     ) -> MockStruct {
         let attrs = Vec::new();
         let data_field = self.field_factory.create(
@@ -59,6 +61,16 @@ impl IMockStructGenerator for MockStructGenerator {
                 data_field,
             ]
             .into_iter()
+            .chain(
+                maybe_inner_data_struct
+                    .map(|inner_data_struct| {
+                        self.field_factory.create_from_struct(
+                            constants::INNER_DATA_FIELD_IDENT.clone(),
+                            &inner_data_struct.item_struct,
+                        )
+                    })
+                    .into_iter(),
+            )
             .collect(),
         };
         let item_struct = self.struct_factory.create(
@@ -83,6 +95,7 @@ impl IMockStructGenerator for MockStructGenerator {
             mock_setup_struct,
             mock_received_struct,
             mock_data_struct,
+            None
         );
         mock_struct.item_struct.generics.params = mock_struct
             .item_struct

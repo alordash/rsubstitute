@@ -105,6 +105,7 @@ impl IStructMockHandler for StructMockHandler {
             &mock_setup_struct,
             &mock_received_struct,
             &mock_data_struct,
+            Some(&inner_data_struct)
         );
         let mock_trait_impl = self.mock_trait_impl_generator.generate(
             target_ident.clone(),

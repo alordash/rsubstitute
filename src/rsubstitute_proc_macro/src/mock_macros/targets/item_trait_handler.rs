@@ -66,6 +66,7 @@ impl IItemTraitHandler for ItemTraitHandler {
             &mock_setup_struct,
             &mock_received_struct,
             &mock_data_struct,
+            None
         );
         let mock_trait_impl = self.mock_trait_impl_generator.generate(
             target_ident.clone(),

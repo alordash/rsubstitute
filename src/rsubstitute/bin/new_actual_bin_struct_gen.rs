@@ -541,6 +541,7 @@ mod __rsubstitute_generated_Struct {
         pub setup: StructMockSetup<'a>,
         pub received: StructMockReceived<'a>,
         data: Arc<StructMockData<'a>>,
+        inner_data: Struct_InnerData,
     }
     impl<'a> Struct for StructMock<'a> {
         fn first_struct_impl<'__rsubstitute_arg_anonymous>(&'__rsubstitute_arg_anonymous self) {
