@@ -57,7 +57,9 @@ impl IFnDeclExtractor for FnDeclExtractor {
 impl FnDeclExtractor {
     fn try_map_trait_item_fn(&self, trait_item: &TraitItem) -> Option<FnDecl> {
         match trait_item {
-            TraitItem::Fn(trait_item_fn) => {
+            TraitItem::Fn(trait_item_fn)
+                if trait_item_fn.sig.ident != constants::NEW_IDENT.clone() =>
+            {
                 self.validate_signature(&trait_item_fn.sig);
                 Some(self.map_trait_item_fn(trait_item_fn))
             }
