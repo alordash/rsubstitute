@@ -538,6 +538,7 @@ mod __rsubstitute_generated_Struct {
     }
     // TODO - impl Deref for Mock with target = InnerData
     // TODO - split fns across various Trait impls and struct impl
+    // TODO - impl just `impl StructMock`, not `impl Struct for StructMock`
     impl<'__rsubstitute_arg_field_lifetime> Struct for StructMock<'__rsubstitute_arg_field_lifetime> {
         fn work<'__rsubstitute_arg_anonymous>(
             &'__rsubstitute_arg_anonymous self,
@@ -603,7 +604,7 @@ mod __rsubstitute_generated_Struct {
             // TODO - create inner data
             let data = Arc::new(StructMockData {
                 _phantom_lifetime: PhantomData,
-                work_data: FnData::new("work", &SERVICES),  // TODO - add trait name as prefix
+                work_data: FnData::new("work", &SERVICES),
                 fmt_data: FnData::new("fmt", &SERVICES),
                 first_struct_impl_data: FnData::new("first_struct_impl", &SERVICES),
                 new_data: FnData::new("new", &SERVICES),
