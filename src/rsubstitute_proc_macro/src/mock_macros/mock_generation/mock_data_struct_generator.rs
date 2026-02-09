@@ -7,9 +7,9 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait IMockDataStructGenerator {
-    fn generate_for_trait(&self, mock_type: &MockType, fn_infos: &[FnInfo]) -> MockDataStruct;
+    fn generate_for_trait(&self, mock_type: &MockType, all_fn_infos: &[&FnInfo]) -> MockDataStruct;
 
-    fn generate_for_static(&self, mock_type: &MockType, fn_infos: &[FnInfo]) -> MockDataStruct;
+    fn generate_for_static(&self, mock_type: &MockType, all_fn_infos: &[&FnInfo]) -> MockDataStruct;
 }
 
 // TODO - verify all impls are internal
@@ -20,7 +20,7 @@ pub(crate) struct MockDataStructGenerator {
 }
 
 impl IMockDataStructGenerator for MockDataStructGenerator {
-    fn generate_for_trait(&self, mock_type: &MockType, fn_infos: &[FnInfo]) -> MockDataStruct {
+    fn generate_for_trait(&self, mock_type: &MockType, fn_infos: &[&FnInfo]) -> MockDataStruct {
         let attrs = vec![constants::DERIVE_MOCK_DATA_ATTRIBUTE.clone()];
         let ident = format_ident!(
             "{}{}",
@@ -57,7 +57,7 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
         return mock_struct;
     }
 
-    fn generate_for_static(&self, mock_type: &MockType, fn_infos: &[FnInfo]) -> MockDataStruct {
+    fn generate_for_static(&self, mock_type: &MockType, fn_infos: &[&FnInfo]) -> MockDataStruct {
         let attrs = vec![
             constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone(),
             constants::DERIVE_MOCK_DATA_ATTRIBUTE.clone(),

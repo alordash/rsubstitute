@@ -1,5 +1,5 @@
 use crate::constants;
-use crate::mock_macros::models::StructMockSyntax;
+use crate::mock_macros::models::{StructMockSyntax, TraitImpl};
 use quote::format_ident;
 use std::cell::LazyCell;
 use syn::parse::*;
@@ -27,7 +27,8 @@ impl IStructMockSyntaxParser for StructMockSyntaxParser {
                 panic!("{}", Self::STRUCT_MOCK_INVALID_IDENT_ERROR_MESSAGE);
             }
             if item_impl.trait_.is_some() {
-                trait_impls.push(item_impl);
+                let trait_impl = TraitImpl { item_impl };
+                trait_impls.push(trait_impl);
             } else {
                 if maybe_new_fn.is_none() {
                     maybe_new_fn = self.try_extract_new_fn(&r#struct.ident, &item_impl);

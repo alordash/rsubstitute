@@ -1,20 +1,6 @@
 use std::fmt::{Debug, Formatter};
 use rsubstitute_proc_macro::mocked;
 
-#[cfg(not(test))]
-fn main() {
-    // let r#struct = Struct::new(2);
-    // dbg!(r#struct);
-
-    println!("done")
-}
-
-trait MyTrait {
-    fn work(&self, value: i32) -> String;
-}
-
-trait Gen<T> {}
-
 mocked! {
     struct Struct {
         number: i32,
@@ -55,6 +41,20 @@ mocked! {
         }
     }
 }
+
+#[cfg(not(test))]
+fn main() {
+    // let r#struct = Struct::new(2);
+    // dbg!(r#struct);
+
+    println!("done")
+}
+
+trait MyTrait {
+    fn work(&self, value: i32) -> String;
+}
+
+trait Gen<T> {}
 
 // #[cfg(test)]
 // mod tests {

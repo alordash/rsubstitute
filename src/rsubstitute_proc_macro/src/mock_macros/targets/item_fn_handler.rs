@@ -15,8 +15,8 @@ pub trait IItemFnHandler {
 pub(crate) struct ItemFnHandler {
     pub fn_decl_extractor: Arc<dyn IFnDeclExtractor>,
     pub mock_generics_generator: Arc<dyn IMockGenericsGenerator>,
-    pub fn_info_generator: Arc<dyn IFnInfoGenerator>,
     pub mock_type_generator: Arc<dyn IMockTypeGenerator>,
+    pub fn_info_generator: Arc<dyn IFnInfoGenerator>,
     pub mock_data_struct_generator: Arc<dyn IMockDataStructGenerator>,
     pub mock_setup_struct_generator: Arc<dyn IMockSetupStructGenerator>,
     pub mock_received_struct_generator: Arc<dyn IMockReceivedStructGenerator>,
@@ -44,13 +44,12 @@ impl IItemFnHandler for ItemFnHandler {
             .mock_type_generator
             .generate_for_static(mock_ident.clone(), mock_generics);
         let fn_ident = item_fn.sig.ident.clone();
-        let fn_info =
-            self.fn_info_generator
-                .generate(&fn_decl, &mock_type, Some(*item_fn.block.clone()));
+        let fn_info = self.fn_info_generator.generate(fn_decl, &mock_type);
         let fn_infos = [fn_info];
+        let all_fn_infos: Vec<_> = fn_infos.iter().collect();
         let mock_data_struct = self
             .mock_data_struct_generator
-            .generate_for_static(&mock_type, &fn_infos);
+            .generate_for_static(&mock_type, &all_fn_infos);
         let mock_setup_struct = self
             .mock_setup_struct_generator
             .generate_with_non_camel_case_allowed(&mock_ident, &mock_type, &mock_data_struct);

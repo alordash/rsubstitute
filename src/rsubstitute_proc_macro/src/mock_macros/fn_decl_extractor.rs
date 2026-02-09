@@ -1,4 +1,5 @@
 use crate::mock_macros::models::*;
+use quote::format_ident;
 use syn::*;
 
 pub trait IFnDeclExtractor {
@@ -6,7 +7,7 @@ pub trait IFnDeclExtractor {
 
     fn extract_struct_fns(&self, impl_item_fns: &[&ImplItemFn]) -> Vec<FnDecl>;
 
-    fn extract_struct_trait_impls_fns(&self, trait_impls: Vec<TraitImpl>) -> Vec<FnDecl>;
+    fn extract_struct_trait_impl_fns(&self, trait_impl: &TraitImpl) -> Vec<FnDecl>;
 
     fn extract_fn(&self, item_fn: &ItemFn) -> FnDecl;
 }
@@ -30,17 +31,17 @@ impl IFnDeclExtractor for FnDeclExtractor {
         return fn_decls;
     }
 
-    fn extract_struct_trait_impls_fns(&self, trait_impls: Vec<TraitImpl>) -> Vec<FnDecl> {
-        let fn_decls = trait_impls
-            .into_iter()
-            .flat_map(|trait_impl| {
-                trait_impl.fns.into_iter().map(move |trait_impl_fn| {
-                    self.create_fn_decl(
-                        &trait_impl_fn.sig,
-                        Some(trait_impl_fn.block.clone()),
-                        Some(trait_impl.trait_path.clone()),
-                    )
-                })
+    fn extract_struct_trait_impl_fns(&self, trait_impl: &TraitImpl) -> Vec<FnDecl> {
+        let trait_ident = trait_impl.get_trait_ident_from_path();
+        let fn_decls = trait_impl
+            .get_fns()
+            .iter()
+            .map(move |trait_impl_fn| {
+                self.create_fn_decl(
+                    &trait_impl_fn.sig,
+                    Some(trait_impl_fn.block.clone()),
+                    Some(trait_ident.clone()),
+                )
             })
             .collect();
         return fn_decls;
@@ -86,15 +87,27 @@ impl FnDeclExtractor {
         &self,
         sig: &Signature,
         maybe_base_fn_block: Option<Block>,
-        maybe_parent_trait_path: Option<Path>,
+        maybe_parent_trait_ident: Option<Ident>,
     ) -> FnDecl {
+        let ident = if let Some(parent_trait_ident) = maybe_parent_trait_ident {
+            let original_ident = &sig.ident;
+            format_ident!("{parent_trait_ident}_{original_ident}")
+        } else {
+            sig.ident.clone()
+        };
         let fn_decl = FnDecl {
-            ident: sig.ident.clone(),
+            ident,
             arguments: sig.inputs.iter().cloned().collect(),
             return_value: sig.output.clone(),
             maybe_base_fn_block,
-            maybe_parent_trait_path,
         };
         return fn_decl;
+    }
+
+    fn generate_ident_from_parent_trait_path(&self, original_ident: &Ident, path: &Path) -> Ident {
+        let parent_trait_path_idents: Vec<_> =
+            path.segments.iter().map(|x| x.ident.to_string()).collect();
+        let joined_parent_trait_path_idents = parent_trait_path_idents.join("_");
+        return format_ident!("{joined_parent_trait_path_idents}_{original_ident}");
     }
 }
