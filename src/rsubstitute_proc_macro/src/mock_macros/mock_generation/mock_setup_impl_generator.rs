@@ -14,7 +14,6 @@ use syn::*;
 pub trait IMockSetupImplGenerator {
     fn generate_for_trait(
         &self,
-        mock_struct: &MockStruct,
         mock_type: &MockType,
         mock_setup_struct: &MockSetupStruct,
         fn_infos: &[FnInfo],
@@ -22,7 +21,6 @@ pub trait IMockSetupImplGenerator {
 
     fn generate_for_static(
         &self,
-        mock_struct: &MockStruct,
         mock_type: &MockType,
         mock_setup_struct: &MockSetupStruct,
         fn_info: &FnInfo,
@@ -42,7 +40,6 @@ pub(crate) struct MockSetupImplGenerator {
 impl IMockSetupImplGenerator for MockSetupImplGenerator {
     fn generate_for_trait(
         &self,
-        mock_struct: &MockStruct,
         mock_type: &MockType,
         mock_setup_struct: &MockSetupStruct,
         fn_infos: &[FnInfo],
@@ -56,7 +53,7 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
             .map(|x| {
                 let output = self
                     .setup_output_generator
-                    .generate_for_trait(x, mock_struct);
+                    .generate_for_trait(x, mock_type);
                 return ImplItem::Fn(self.generate_fn_setup(
                     x,
                     use_fn_info_ident_as_method_ident,
@@ -75,7 +72,6 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
 
     fn generate_for_static(
         &self,
-        mock_struct: &MockStruct,
         mock_type: &MockType,
         mock_setup_struct: &MockSetupStruct,
         fn_info: &FnInfo,
@@ -86,7 +82,7 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
         let use_fn_info_ident_as_method_ident = false;
         let output = self
             .setup_output_generator
-            .generate_for_trait(fn_info, mock_struct);
+            .generate_for_trait(fn_info, mock_type);
         let fn_setup = ImplItem::Fn(self.generate_fn_setup(
             fn_info,
             use_fn_info_ident_as_method_ident,

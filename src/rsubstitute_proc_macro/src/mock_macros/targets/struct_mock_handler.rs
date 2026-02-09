@@ -2,8 +2,9 @@ use crate::constants;
 use crate::mock_macros::fn_info_generation::IFnInfoGenerator;
 use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::mock_generation::*;
-use crate::mock_macros::models::StructMockSyntax;
+use crate::mock_macros::models::*;
 use crate::mock_macros::*;
+use crate::syntax::*;
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
 use std::sync::Arc;
@@ -63,13 +64,32 @@ impl IStructMockHandler for StructMockHandler {
         let mock_data_struct = self
             .mock_data_struct_generator
             .generate_for_trait(&mock_type, &all_fn_infos);
-        let mock_setup_struct =
-            self.mock_setup_struct_generator
-                .generate(&mock_ident, &mock_type, &mock_data_struct);
+        let mock_struct_traits: Vec<_> = mock_struct_trait_infos
+            .into_iter()
+            .map(|mock_struct_trait_info| {
+                self.mock_struct_trait_generator.generate(
+                    &mock_data_struct,
+                    mock_struct_trait_info,
+                )
+            })
+            .collect();
+        let mock_setup_struct = self.mock_setup_struct_generator.generate(
+            &mock_ident,
+            &mock_type,
+            &mock_data_struct,
+            mock_struct_traits
+                .iter()
+                .map(|mock_struct_trait| &mock_struct_trait.setup_struct)
+                .collect(),
+        );
         let mock_received_struct = self.mock_received_struct_generator.generate(
             &mock_ident,
             &mock_type,
             &mock_data_struct,
+            mock_struct_traits
+                .iter()
+                .map(|mock_struct_trait| &mock_struct_trait.received_struct)
+                .collect(),
         );
         let mock_struct = self.mock_struct_generator.generate(
             &mock_type,
@@ -77,16 +97,6 @@ impl IStructMockHandler for StructMockHandler {
             &mock_received_struct,
             &mock_data_struct,
         );
-        let mock_struct_traits: Vec<_> = mock_struct_trait_infos
-            .into_iter()
-            .map(|mock_struct_trait_info| {
-                self.mock_struct_trait_generator.generate(
-                    &mock_struct,
-                    &mock_data_struct,
-                    mock_struct_trait_info,
-                )
-            })
-            .collect();
         let mock_trait_impl = self.mock_trait_impl_generator.generate(
             target_ident.clone(),
             &mock_type,
@@ -101,7 +111,6 @@ impl IStructMockHandler for StructMockHandler {
             &mock_received_struct,
         );
         let mock_setup_impl = self.mock_setup_impl_generator.generate_for_trait(
-            &mock_struct,
             &mock_type,
             &mock_setup_struct,
             &struct_fn_infos,

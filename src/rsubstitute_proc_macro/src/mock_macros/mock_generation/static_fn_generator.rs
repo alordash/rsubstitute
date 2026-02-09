@@ -62,7 +62,7 @@ impl IStaticFnGenerator for StaticFnGenerator {
         };
         let block = self
             .mock_fn_block_generator
-            .generate_for_static(fn_info, mock_struct);
+            .generate_for_static(fn_info, mock_type);
         let item_fn = ItemFn {
             attrs: Vec::new(),
             vis: Visibility::Public(Default::default()),

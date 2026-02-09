@@ -52,10 +52,10 @@ impl IItemFnHandler for ItemFnHandler {
             .generate_for_static(&mock_type, &all_fn_infos);
         let mock_setup_struct = self
             .mock_setup_struct_generator
-            .generate(&mock_ident, &mock_type, &mock_data_struct);
+            .generate(&mock_ident, &mock_type, &mock_data_struct, Vec::new());
         let mock_received_struct = self
             .mock_received_struct_generator
-            .generate(&mock_ident, &mock_type, &mock_data_struct);
+            .generate(&mock_ident, &mock_type, &mock_data_struct, Vec::new());
         let mock_struct = self.mock_struct_generator.generate_for_static(
             &mock_type,
             &mock_setup_struct,
@@ -74,7 +74,6 @@ impl IItemFnHandler for ItemFnHandler {
         );
         let [fn_info] = fn_infos;
         let mock_setup_impl = self.mock_setup_impl_generator.generate_for_static(
-            &mock_struct,
             &mock_type,
             &mock_setup_struct,
             &fn_info,
@@ -86,13 +85,11 @@ impl IItemFnHandler for ItemFnHandler {
         );
         let fn_setup = self.fn_setup_generator.generate(
             &fn_info,
-            &mock_struct,
             &mock_setup_struct,
             &mock_type,
         );
         let fn_received = self.fn_received_generator.generate(
             &fn_info,
-            &mock_struct,
             &mock_received_struct,
             &mock_type,
         );

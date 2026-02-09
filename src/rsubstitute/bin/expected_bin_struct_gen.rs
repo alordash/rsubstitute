@@ -170,13 +170,13 @@ mod __rsubstitute_generated_Struct {
     }
 
     pub struct StructMockSetup<'a> {
-        pub MyTrait: MyTraitSetup<'a>,
         data: Arc<StructMockData<'a>>,
+        pub MyTrait: MyTraitSetup<'a>,
     }
 
     pub struct StructMockReceived<'a> {
-        pub MyTrait: MyTraitReceived<'a>,
         data: Arc<StructMockData<'a>>,
+        pub MyTrait: MyTraitReceived<'a>,
     }
 
     pub struct Struct_InnerData {

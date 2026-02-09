@@ -469,7 +469,6 @@ mod __rsubstitute_generated_Struct {
             return result;
         }
     }
-    // TODO - add Trait methods data
     pub struct StructMockData<'__rsubstitute_arg_field_lifetime> {
         _phantom_lifetime: PhantomData<&'__rsubstitute_arg_field_lifetime ()>,
         work_data: FnData<
