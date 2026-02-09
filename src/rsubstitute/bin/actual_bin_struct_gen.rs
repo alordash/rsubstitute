@@ -529,7 +529,6 @@ mod __rsubstitute_generated_Struct {
     pub struct StructMockReceived<'__rsubstitute_arg_field_lifetime> {
         data: Arc<StructMockData<'__rsubstitute_arg_field_lifetime>>,
     }
-    // TODO - add struct inner data, insert it into Mock
     #[allow(non_camel_case_types)]
     pub struct StructMock<'__rsubstitute_arg_field_lifetime> {
         pub setup: StructMockSetup<'__rsubstitute_arg_field_lifetime>,

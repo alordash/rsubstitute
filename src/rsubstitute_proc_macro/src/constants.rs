@@ -475,5 +475,12 @@ pub const DEFAULT_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
 });
 
 pub const DEFAULT_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("default"));
-
 pub const INNER_DATA_FIELD_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("inner_data"));
+
+pub const DEREF_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
+    let path_factory = &SERVICES.path_factory;
+    let result = path_factory.create(format_ident!("Deref"));
+    return result;
+});
+pub const DEREF_TARGET_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Target"));
+pub const DEREF_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("deref"));

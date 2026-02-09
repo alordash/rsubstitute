@@ -235,6 +235,11 @@ fn create_services() -> ServiceCollection {
     let inner_data_impl_generator = Arc::new(InnerDataImplGenerator {
         type_factory: type_factory.clone(),
     });
+    let inner_data_deref_impl_generator = Arc::new(InnerDataDerefImplGenerator {
+        type_factory: type_factory.clone(),
+        path_factory: path_factory.clone(),
+        field_access_expr_factory: field_access_expr_factory.clone(),
+    });
 
     // TODO - fix order of fields
     let item_trait_handler = Arc::new(ItemTraitHandler {
@@ -284,6 +289,7 @@ fn create_services() -> ServiceCollection {
         inner_data_struct_generator: inner_data_struct_generator.clone(),
         inner_data_impl_generator: inner_data_impl_generator.clone(),
         mock_struct_generator: mock_struct_generator.clone(),
+        inner_data_deref_impl_generator: inner_data_deref_impl_generator.clone(),
         mock_struct_trait_generator: mock_struct_trait_generator.clone(),
         mock_trait_impl_generator: mock_trait_impl_generator.clone(),
         mock_impl_generator: mock_impl_generator.clone(),

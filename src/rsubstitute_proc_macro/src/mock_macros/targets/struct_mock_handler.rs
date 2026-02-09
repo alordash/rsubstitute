@@ -25,6 +25,7 @@ pub struct StructMockHandler {
     pub inner_data_struct_generator: Arc<dyn IInnerDataStructGenerator>,
     pub inner_data_impl_generator: Arc<dyn IInnerDataImplGenerator>,
     pub mock_struct_generator: Arc<dyn IMockStructGenerator>,
+    pub inner_data_deref_impl_generator: Arc<dyn IInnerDataDerefImplGenerator>,
     pub mock_struct_trait_generator: Arc<dyn IMockStructTraitGenerator>,
     pub mock_trait_impl_generator: Arc<dyn IMockTraitImplGenerator>,
     pub mock_impl_generator: Arc<dyn IMockImplGenerator>,
@@ -105,8 +106,11 @@ impl IStructMockHandler for StructMockHandler {
             &mock_setup_struct,
             &mock_received_struct,
             &mock_data_struct,
-            Some(&inner_data_struct)
+            Some(&inner_data_struct),
         );
+        let inner_data_deref_impl = self
+            .inner_data_deref_impl_generator
+            .generate(&mock_struct, &inner_data_struct);
         let mock_trait_impl = self.mock_trait_impl_generator.generate(
             target_ident.clone(),
             &mock_type,
@@ -140,6 +144,7 @@ impl IStructMockHandler for StructMockHandler {
             inner_data_struct,
             inner_data_impl,
             mock_struct,
+            inner_data_deref_impl,
             mock_trait_impl,
             mock_impl,
             mock_setup_impl,
