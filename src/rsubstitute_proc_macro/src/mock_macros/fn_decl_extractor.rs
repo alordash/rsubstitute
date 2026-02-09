@@ -1,3 +1,4 @@
+use crate::constants;
 use crate::mock_macros::models::*;
 use quote::format_ident;
 use syn::*;
@@ -26,6 +27,7 @@ impl IFnDeclExtractor for FnDeclExtractor {
     fn extract_struct_fns(&self, impl_item_fns: &[&ImplItemFn]) -> Vec<FnDecl> {
         let fn_decls = impl_item_fns
             .iter()
+            .filter(|impl_item_fn| impl_item_fn.sig.ident != constants::NEW_IDENT.clone())
             .map(|x| self.map_impl_item_fn(x))
             .collect();
         return fn_decls;
@@ -103,12 +105,5 @@ impl FnDeclExtractor {
             raw_fn_ident: sig.ident.clone(),
         };
         return fn_decl;
-    }
-
-    fn generate_ident_from_parent_trait_path(&self, original_ident: &Ident, path: &Path) -> Ident {
-        let parent_trait_path_idents: Vec<_> =
-            path.segments.iter().map(|x| x.ident.to_string()).collect();
-        let joined_parent_trait_path_idents = parent_trait_path_idents.join("_");
-        return format_ident!("{joined_parent_trait_path_idents}_{original_ident}");
     }
 }

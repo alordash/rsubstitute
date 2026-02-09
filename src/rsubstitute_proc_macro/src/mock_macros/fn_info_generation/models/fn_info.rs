@@ -1,7 +1,6 @@
 use crate::mock_macros::fn_info_generation::models::*;
 use crate::mock_macros::models::FnDecl;
 use proc_macro2::Ident;
-use syn::Path;
 
 // TODO - make all models internal
 pub(crate) struct FnInfo {

@@ -6,7 +6,6 @@ use crate::mock_macros::models::FnDecl;
 use proc_macro2::Ident;
 use quote::format_ident;
 use std::sync::Arc;
-use syn::*;
 
 pub trait IFnInfoGenerator {
     fn generate(&self, fn_decl: FnDecl, mock_type: &MockType) -> FnInfo;

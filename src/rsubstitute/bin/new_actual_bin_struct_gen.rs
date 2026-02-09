@@ -334,80 +334,6 @@ mod __rsubstitute_generated_Struct {
             };
         }
     }
-    pub struct new_Call<'a> {
-        _phantom_lifetime: PhantomData<&'a ()>,
-        number: i32,
-    }
-    #[automatically_derived]
-    impl<'a> ::core::clone::Clone
-        for new_Call<'a>
-    {
-        #[inline]
-        fn clone(&self) -> new_Call<'a> {
-            new_Call {
-                _phantom_lifetime: ::core::clone::Clone::clone(&self._phantom_lifetime),
-                number: ::core::clone::Clone::clone(&self.number),
-            }
-        }
-    }
-    impl<'a> IArgInfosProvider
-        for new_Call<'a>
-    {
-        fn get_arg_infos(&self) -> Vec<ArgInfo> {
-            <[_]>::into_vec(::alloc::boxed::box_new([ArgInfo::new(
-                "number",
-                self.number.clone(),
-            )]))
-        }
-    }
-    pub struct new_ArgsChecker<'a> {
-        _phantom_lifetime: PhantomData<&'a ()>,
-        number: Arg<i32>,
-    }
-    #[automatically_derived]
-    impl<'a> ::core::fmt::Debug
-        for new_ArgsChecker<'a>
-    {
-        #[inline]
-        fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
-            ::core::fmt::Formatter::debug_struct_field2_finish(
-                f,
-                "new_ArgsChecker",
-                "_phantom_lifetime",
-                &self._phantom_lifetime,
-                "number",
-                &&self.number,
-            )
-        }
-    }
-    impl<'a> IArgsFormatter
-        for new_ArgsChecker<'a>
-    {
-        fn fmt_args(&self) -> String {
-            ::alloc::__export::must_use({
-                ::alloc::fmt::format(format_args!("{0:?}", self.number))
-            })
-        }
-    }
-    impl<'a>
-        IArgsChecker<new_Call<'a>>
-        for new_ArgsChecker<'a>
-    {
-        fn check(&self, call: new_Call<'a>) -> Vec<ArgCheckResult> {
-            <[_]>::into_vec(::alloc::boxed::box_new([self
-                .number
-                .check("number", call.number)]))
-        }
-    }
-    impl<'a>
-        IBaseCaller<new_Call<'a>, Self>
-        for StructMock<'a>
-    {
-        fn call_base(&self, call: new_Call<'a>) -> Self {
-            let new_Call { number, .. } = call;
-            Self { number }
-        }
-    }
     pub struct get_number_Call<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
     }
@@ -554,12 +480,6 @@ mod __rsubstitute_generated_Struct {
             first_struct_impl_ArgsChecker<'a>,
             (),
         >,
-        new_data: FnData<
-            StructMock<'a>,
-            new_Call<'a>,
-            new_ArgsChecker<'a>,
-            Self,
-        >,
         get_number_data: FnData<
             StructMock<'a>,
             get_number_Call<'a>,
@@ -592,7 +512,6 @@ mod __rsubstitute_generated_Struct {
             return <[_]>::into_vec(::alloc::boxed::box_new([
                 self.first_struct_impl_data
                     .get_unexpected_calls_error_msgs(),
-                self.new_data.get_unexpected_calls_error_msgs(),
                 self.get_number_data.get_unexpected_calls_error_msgs(),
                 self.format_data.get_unexpected_calls_error_msgs(),
                 self.MyTrait_work_data.get_unexpected_calls_error_msgs(),
@@ -620,15 +539,6 @@ mod __rsubstitute_generated_Struct {
             };
             self.data.first_struct_impl_data.handle_base(&self, call);
         }
-        fn new<'__rsubstitute_arg_anonymous>(number: i32) -> Self {
-            let call = unsafe {
-                new_Call {
-                    _phantom_lifetime: PhantomData,
-                    number: std::mem::transmute(number),
-                }
-            };
-            return self.data.new_data.handle_base_returning(&self, call);
-        }
         fn get_number<'__rsubstitute_arg_anonymous>(&'__rsubstitute_arg_anonymous self) -> i32 {
             let call = unsafe {
                 get_number_Call {
@@ -652,7 +562,6 @@ mod __rsubstitute_generated_Struct {
             let data = Arc::new(StructMockData {
                 _phantom_lifetime: PhantomData,
                 first_struct_impl_data: FnData::new("first_struct_impl", &SERVICES),
-                new_data: FnData::new("new", &SERVICES),
                 get_number_data: FnData::new("get_number", &SERVICES),
                 format_data: FnData::new("format", &SERVICES),
                 MyTrait_work_data: FnData::new("MyTrait_work", &SERVICES),
@@ -685,27 +594,6 @@ mod __rsubstitute_generated_Struct {
                 .data
                 .first_struct_impl_data
                 .add_config(first_struct_impl_args_checker);
-            let shared_fn_config = SharedFnConfig::new(fn_config, self);
-            return shared_fn_config;
-        }
-        #[allow(dead_code)]
-        #[allow(mismatched_lifetime_syntaxes)]
-        pub fn new(
-            &'a self,
-            number: impl Into<Arg<i32>>,
-        ) -> SharedFnConfig<
-            'a,
-            StructMock<'a>,
-            new_Call<'a>,
-            new_ArgsChecker<'a>,
-            Self,
-            Self,
-        > {
-            let new_args_checker = new_ArgsChecker {
-                _phantom_lifetime: PhantomData,
-                number: number.into(),
-            };
-            let fn_config = self.data.new_data.add_config(new_args_checker);
             let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
         }
@@ -764,20 +652,6 @@ mod __rsubstitute_generated_Struct {
             self.data
                 .first_struct_impl_data
                 .verify_received(first_struct_impl_args_checker, times);
-            return self;
-        }
-        #[allow(dead_code)]
-        #[allow(mismatched_lifetime_syntaxes)]
-        pub fn new(
-            &'a self,
-            number: impl Into<Arg<i32>>,
-            times: Times,
-        ) -> &'a Self {
-            let new_args_checker = new_ArgsChecker {
-                _phantom_lifetime: PhantomData,
-                number: number.into(),
-            };
-            self.data.new_data.verify_received(new_args_checker, times);
             return self;
         }
         #[allow(dead_code)]

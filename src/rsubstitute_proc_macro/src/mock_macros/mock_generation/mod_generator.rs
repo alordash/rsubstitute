@@ -244,8 +244,8 @@ impl ModGenerator {
             attrs: vec![
                 constants::CFG_TEST_ATTRIBUTE.clone(),
                 constants::ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE.clone(),
-                constants::ALLOW_NON_SNAKE_CASE_ATTdRIBUTE.clone(),
-                constants::ALLOW_NON_CAMEL_CASE_TYPEsS_ATTRIBUTE.clone(),
+                constants::ALLOW_NON_SNAKE_CASE_ATTRIBUTE.clone(),
+                constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone(),
             ],
             vis: Visibility::Inherited,
             unsafety: None,

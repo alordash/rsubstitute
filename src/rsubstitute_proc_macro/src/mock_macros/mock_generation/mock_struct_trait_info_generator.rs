@@ -32,7 +32,6 @@ impl IMockStructTraitInfoGenerator for MockStructTraitInfoGenerator {
             .collect();
         let mock_struct_trait_info = MockStructTraitInfo {
             trait_ident_from_path,
-            trait_impl,
             mock_type,
             fn_infos,
         };

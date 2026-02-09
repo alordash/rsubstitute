@@ -5,7 +5,6 @@ mod __rsubstitute_generated_Struct {
     use rsubstitute::for_generated::*;
     #[allow(non_camel_case_types)]
     #[allow(non_snake_case)]
-    // TODO - rename trait fn decls
     pub struct work_Call<'__rsubstitute_arg_field_lifetime> {
         _phantom_lifetime: PhantomData<&'__rsubstitute_arg_field_lifetime ()>,
         value: i32,
@@ -159,7 +158,6 @@ mod __rsubstitute_generated_Struct {
             return f.write_fmt(format_args!("Struct = {{ number = {0} }}", self.number));
         }
     }
-    // TODO - add trait setup and received structs
     #[allow(non_camel_case_types)]
     #[allow(non_snake_case)]
     pub struct first_struct_impl_Call<'__rsubstitute_arg_field_lifetime> {
@@ -235,7 +233,6 @@ mod __rsubstitute_generated_Struct {
             };
         }
     }
-    // TODO - `new` fn shouldn't be mocked
     #[allow(non_camel_case_types)]
     #[allow(non_snake_case)]
     pub struct new_Call<'__rsubstitute_arg_field_lifetime> {
@@ -493,7 +490,6 @@ mod __rsubstitute_generated_Struct {
             first_struct_impl_ArgsChecker<'__rsubstitute_arg_field_lifetime>,
             (),
         >,
-        // TODO - `new` fn shouldn't be mocked
         new_data: FnData<
             StructMock<'__rsubstitute_arg_field_lifetime>,
             new_Call<'__rsubstitute_arg_field_lifetime>,
