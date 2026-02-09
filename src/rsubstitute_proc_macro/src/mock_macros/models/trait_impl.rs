@@ -5,9 +5,10 @@ pub(crate) struct TraitImpl {
     pub item_impl: ItemImpl,
 }
 
-impl TraitImpl {    
+impl TraitImpl {
     pub fn get_trait_ident_from_path(&self) -> Ident {
-        let trait_path = &self.item_impl
+        let trait_path = &self
+            .item_impl
             .trait_
             .as_ref()
             .expect("trait_impls should contain only trait implementations.")

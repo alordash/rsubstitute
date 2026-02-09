@@ -12,7 +12,7 @@ pub trait IMockSetupStructGenerator {
         mock_ident: &Ident,
         mock_type: &MockType,
         mock_data_struct: &MockDataStruct,
-        implemented_traits_setups: Vec<&MockSetupStruct>,
+        implemented_traits_configurators: Vec<ImplementedTraitConfigurator>,
     ) -> MockSetupStruct;
 }
 
@@ -28,7 +28,7 @@ impl IMockSetupStructGenerator for MockSetupStructGenerator {
         mock_ident: &Ident,
         mock_type: &MockType,
         mock_data_struct: &MockDataStruct,
-        implemented_traits_setups: Vec<&MockSetupStruct>,
+        implemented_traits_configurators: Vec<ImplementedTraitConfigurator>,
     ) -> MockSetupStruct {
         let attrs = Vec::new();
         let ident = format_ident!("{}{}", mock_ident, Self::MOCK_SETUP_STRUCT_IDENT_SUFFIX);
@@ -37,24 +37,23 @@ impl IMockSetupStructGenerator for MockSetupStructGenerator {
             .create_from_struct(&mock_data_struct.item_struct);
         let data_arc_type = self.type_factory.wrap_in_arc(data_type);
 
-        let fields = FieldsNamed {
-            brace_token: Default::default(),
-            named: [self
-                .field_factory
-                .create(constants::DATA_IDENT.clone(), data_arc_type)]
-            .into_iter()
-            .chain(
-                implemented_traits_setups
-                    .into_iter()
-                    .map(|implemented_trait_setup| {
+        let fields =
+            FieldsNamed {
+                brace_token: Default::default(),
+                named: [self
+                    .field_factory
+                    .create(constants::DATA_IDENT.clone(), data_arc_type)]
+                .into_iter()
+                .chain(implemented_traits_configurators.into_iter().map(
+                    |implemented_trait_setup| {
                         self.field_factory.create_pub_from_struct(
-                            implemented_trait_setup.item_struct.ident.clone(),
+                            implemented_trait_setup.trait_ident,
                             &implemented_trait_setup.item_struct,
                         )
-                    }),
-            )
-            .collect(),
-        };
+                    },
+                ))
+                .collect(),
+            };
         let item_struct = self.struct_factory.create(
             attrs,
             ident,

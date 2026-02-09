@@ -1,6 +1,8 @@
 mod generated_mod;
+mod implemented_trait_configurator;
 mod inner_data_deref_impl;
 mod inner_data_impl;
+mod inner_data_param;
 mod inner_data_struct;
 mod mock_data_struct;
 mod mock_generics;
@@ -19,8 +21,10 @@ mod send_sync_impls;
 mod static_fn;
 
 pub use generated_mod::*;
+pub use implemented_trait_configurator::*;
 pub use inner_data_deref_impl::*;
 pub use inner_data_impl::*;
+pub use inner_data_param::*;
 pub use inner_data_struct::*;
 pub use mock_data_struct::*;
 pub use mock_generics::*;

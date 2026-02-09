@@ -80,6 +80,8 @@ impl IItemTraitHandler for ItemTraitHandler {
             &mock_data_struct,
             &mock_setup_struct,
             &mock_received_struct,
+            Vec::new(),
+            None
         );
         let mock_setup_impl = self.mock_setup_impl_generator.generate_for_trait(
             &mock_type,

@@ -394,13 +394,13 @@ mod __rsubstitute_generated_Struct {
     }
     pub struct StructMockSetup<'a> {
         data: Arc<StructMockData<'a>>,
-        pub MyTraitSetup: MyTraitSetup<'a>,
-        pub DebugSetup: DebugSetup<'a>,
+        pub MyTrait: MyTraitSetup<'a>,
+        pub Debug: DebugSetup<'a>,
     }
     pub struct StructMockReceived<'a> {
         data: Arc<StructMockData<'a>>,
-        pub MyTraitReceived: MyTraitReceived<'a>,
-        pub DebugReceived: DebugReceived<'a>,
+        pub MyTrait: MyTraitReceived<'a>,
+        pub Debug: DebugReceived<'a>,
     }
     struct Struct_InnerData {
         number: i32,
@@ -450,7 +450,7 @@ mod __rsubstitute_generated_Struct {
     }
     impl<'a> StructMock<'a> {
         #[allow(dead_code)]
-        pub fn new() -> Self {
+        pub fn new(number: i32) -> Self {
             let data = Arc::new(StructMockData {
                 _phantom_lifetime: PhantomData,
                 first_struct_impl_data: FnData::new("first_struct_impl", &SERVICES),
@@ -459,10 +459,20 @@ mod __rsubstitute_generated_Struct {
                 MyTrait_work_data: FnData::new("MyTrait::work", &SERVICES),
                 Debug_fmt_data: FnData::new("Debug::fmt", &SERVICES),
             });
+            let inner_data = Struct_InnerData::new(number);
             return StructMock {
-                setup: StructMockSetup { data: data.clone() },
-                received: StructMockReceived { data: data.clone() },
+                setup: StructMockSetup {
+                    data: data.clone(),
+                    MyTrait: MyTraitSetup { data: data.clone() },
+                    Debug: DebugSetup { data: data.clone() },
+                },
+                received: StructMockReceived {
+                    data: data.clone(),
+                    MyTrait: MyTraitReceived { data: data.clone() },
+                    Debug: DebugReceived { data: data.clone() },
+                },
                 data,
+                inner_data,
             };
         }
     }

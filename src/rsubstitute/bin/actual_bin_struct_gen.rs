@@ -599,7 +599,6 @@ mod __rsubstitute_generated_Struct {
     impl<'__rsubstitute_arg_field_lifetime> StructMock<'__rsubstitute_arg_field_lifetime> {
         #[allow(dead_code)]
         pub fn new() -> Self {
-            // TODO - create inner data
             let data = Arc::new(StructMockData {
                 _phantom_lifetime: PhantomData,
                 work_data: FnData::new("work", &SERVICES),

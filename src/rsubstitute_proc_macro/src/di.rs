@@ -142,6 +142,7 @@ fn create_services() -> ServiceCollection {
     });
     let mock_constructor_block_generator = Arc::new(MockConstructorBlockGenerator {
         path_factory: path_factory.clone(),
+        local_factory: local_factory.clone(),
     });
     let mock_impl_generator = Arc::new(MockImplGenerator {
         type_factory: type_factory.clone(),
@@ -233,6 +234,7 @@ fn create_services() -> ServiceCollection {
     let inner_data_impl_generator = Arc::new(InnerDataImplGenerator {
         type_factory: type_factory.clone(),
     });
+    let inner_data_param_generator = Arc::new(InnerDataParamGenerator);
     let inner_data_deref_impl_generator = Arc::new(InnerDataDerefImplGenerator {
         type_factory: type_factory.clone(),
         path_factory: path_factory.clone(),
@@ -286,6 +288,7 @@ fn create_services() -> ServiceCollection {
         mock_received_struct_generator: mock_received_struct_generator.clone(),
         inner_data_struct_generator: inner_data_struct_generator.clone(),
         inner_data_impl_generator: inner_data_impl_generator.clone(),
+        inner_data_param_generator: inner_data_param_generator.clone(),
         mock_struct_generator: mock_struct_generator.clone(),
         inner_data_deref_impl_generator: inner_data_deref_impl_generator.clone(),
         mock_struct_trait_generator: mock_struct_trait_generator.clone(),

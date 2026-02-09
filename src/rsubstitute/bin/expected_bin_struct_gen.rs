@@ -252,12 +252,12 @@ mod __rsubstitute_generated_Struct {
             let inner_data = Struct_InnerData::new(number);
             return StructMock {
                 setup: StructMockSetup {
-                    MyTrait: MyTraitSetup { data: data.clone() },
                     data: data.clone(),
+                    MyTrait: MyTraitSetup { data: data.clone() },
                 },
                 received: StructMockReceived {
-                    MyTrait: MyTraitReceived { data: data.clone() },
                     data: data.clone(),
+                    MyTrait: MyTraitReceived { data: data.clone() },
                 },
                 data,
                 inner_data,

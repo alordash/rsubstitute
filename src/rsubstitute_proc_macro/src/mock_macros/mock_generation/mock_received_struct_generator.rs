@@ -12,7 +12,7 @@ pub trait IMockReceivedStructGenerator {
         mock_ident: &Ident,
         mock_type: &MockType,
         mock_data_struct: &MockDataStruct,
-        implemented_traits_receiveds: Vec<&MockReceivedStruct>,
+        implemented_traits_configurators: Vec<ImplementedTraitConfigurator>,
     ) -> MockReceivedStruct;
 }
 
@@ -28,7 +28,7 @@ impl IMockReceivedStructGenerator for MockReceivedStructGenerator {
         mock_ident: &Ident,
         mock_type: &MockType,
         mock_data_struct: &MockDataStruct,
-        implemented_traits_receiveds: Vec<&MockReceivedStruct>,
+        implemented_traits_configurators: Vec<ImplementedTraitConfigurator>,
     ) -> MockReceivedStruct {
         let attrs = Vec::new();
         let ident = format_ident!("{}{}", mock_ident, Self::MOCK_RECEIVED_STRUCT_IDENT_SUFFIX);
@@ -36,23 +36,22 @@ impl IMockReceivedStructGenerator for MockReceivedStructGenerator {
             .type_factory
             .create_from_struct(&mock_data_struct.item_struct);
         let data_arc_type = self.type_factory.wrap_in_arc(data_type);
-        let fields =
-            FieldsNamed {
-                brace_token: Default::default(),
-                named: [self
-                    .field_factory
-                    .create(constants::DATA_IDENT.clone(), data_arc_type)]
-                .into_iter()
-                .chain(implemented_traits_receiveds.into_iter().map(
-                    |implemented_traits_received| {
-                        self.field_factory.create_pub_from_struct(
-                            implemented_traits_received.item_struct.ident.clone(),
-                            &implemented_traits_received.item_struct,
-                        )
-                    },
-                ))
-                .collect(),
-            };
+        let fields = FieldsNamed {
+            brace_token: Default::default(),
+            named: [self
+                .field_factory
+                .create(constants::DATA_IDENT.clone(), data_arc_type)]
+            .into_iter()
+            .chain(implemented_traits_configurators.into_iter().map(
+                |implemented_traits_received| {
+                    self.field_factory.create_pub_from_struct(
+                        implemented_traits_received.trait_ident,
+                        &implemented_traits_received.item_struct,
+                    )
+                },
+            ))
+            .collect(),
+        };
         let item_struct = self.struct_factory.create(
             attrs,
             ident,

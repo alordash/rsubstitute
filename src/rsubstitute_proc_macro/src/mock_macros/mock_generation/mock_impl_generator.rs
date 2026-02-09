@@ -17,6 +17,8 @@ pub trait IMockImplGenerator {
         mock_data_struct: &MockDataStruct,
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
+        mock_struct_traits: Vec<&MockStructTrait>,
+        maybe_inner_data_param: Option<InnerDataParam>,
     ) -> MockImpl;
 }
 
@@ -33,13 +35,19 @@ impl IMockImplGenerator for MockImplGenerator {
         mock_data_struct: &MockDataStruct,
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
+        mock_struct_traits: Vec<&MockStructTrait>,
+        maybe_inner_data_param: Option<InnerDataParam>,
     ) -> MockImpl {
-        let self_ty = self.type_factory.create_from_struct(&mock_struct.item_struct);
+        let self_ty = self
+            .type_factory
+            .create_from_struct(&mock_struct.item_struct);
         let constructor = self.generate_constructor(
             mock_struct,
             mock_data_struct,
             mock_setup_struct,
             mock_received_struct,
+            mock_struct_traits,
+            maybe_inner_data_param,
         );
 
         let item_impl = ItemImpl {
@@ -67,12 +75,38 @@ impl MockImplGenerator {
         mock_data_struct: &MockDataStruct,
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
+        mock_struct_traits: Vec<&MockStructTrait>,
+        maybe_inner_data_param: Option<InnerDataParam>,
     ) -> ImplItem {
+        let inputs = if let Some(inner_data_param) = &maybe_inner_data_param {
+            inner_data_param
+                .constructor_arguments
+                .iter()
+                .map(|constructor_argument| {
+                    FnArg::Typed(PatType {
+                        attrs: Vec::new(),
+                        pat: Box::new(Pat::Ident(PatIdent {
+                            attrs: Vec::new(),
+                            by_ref: None,
+                            mutability: None,
+                            ident: constructor_argument.0.clone(),
+                            subpat: None,
+                        })),
+                        colon_token: Default::default(),
+                        ty: Box::new(constructor_argument.1.clone()),
+                    })
+                })
+                .collect()
+        } else {
+            Punctuated::new()
+        };
         let block = self.mock_constructor_block_generator.generate(
             mock_struct,
             mock_data_struct,
             mock_setup_struct,
             mock_received_struct,
+            mock_struct_traits,
+            maybe_inner_data_param,
         );
         let item_impl = ImplItem::Fn(ImplItemFn {
             attrs: vec![constants::ALLOW_UNUSED_ATTRIBUTE.clone()],
@@ -87,7 +121,7 @@ impl MockImplGenerator {
                 ident: Self::CONSTRUCTOR_IDENT.clone(),
                 generics: Generics::default(),
                 paren_token: Default::default(),
-                inputs: Punctuated::new(),
+                inputs,
                 variadic: None,
                 output: ReturnType::Type(
                     Default::default(),

@@ -39,6 +39,8 @@ impl IMockStructDefaultImplGenerator for MockStructDefaultImplGenerator {
             mock_data_struct,
             mock_setup_struct,
             mock_received_struct,
+            Vec::new(),
+            None,
         );
         let default_fn = ImplItemFn {
             attrs: Vec::new(),
