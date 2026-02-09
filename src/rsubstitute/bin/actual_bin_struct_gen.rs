@@ -523,11 +523,9 @@ mod __rsubstitute_generated_Struct {
             ]));
         }
     }
-    // TODO - add traits Setup
     pub struct StructMockSetup<'__rsubstitute_arg_field_lifetime> {
         data: Arc<StructMockData<'__rsubstitute_arg_field_lifetime>>,
     }
-    // TODO - add traits Received
     pub struct StructMockReceived<'__rsubstitute_arg_field_lifetime> {
         data: Arc<StructMockData<'__rsubstitute_arg_field_lifetime>>,
     }
