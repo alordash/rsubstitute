@@ -55,25 +55,25 @@ mocked! {
 // }
 // 
 // trait Gen<T> {}
-
+// 
 // #[cfg(test)]
 // mod tests {
 //     use crate::{MyTrait, StructMock};
 //     use rsubstitute_core::Times;
-//
+// 
 //     #[test]
 //     fn struct_test() {
 //         // Arrange
 //         let mock_number = 10;
 //         let mock = StructMock::new(mock_number);
-//
+// 
 //         let get_number_returned_value = 22;
 //         mock.setup
 //             .get_number()
 //             .returns(get_number_returned_value)
 //             .format()
 //             .call_base();
-//
+// 
 //         let my_trait_work_returned_value_for_format = "for format!".to_owned();
 //         let my_trait_work_accepted_value_for_call_base = 333;
 //         let my_trait_work_returned_value_for_mock = "Mocked value!".to_owned();
@@ -86,23 +86,23 @@ mocked! {
 //             .call_base()
 //             .work(my_trait_work_accepted_value_for_mock)
 //             .returns(my_trait_work_returned_value_for_mock.clone());
-//
+// 
 //         // Act
 //         let actual_get_number_returned_value = mock.get_number();
 //         let actual_format_value = mock.format();
-//
+// 
 //         let actual_my_trait_work_call_base_value =
 //             mock.work(my_trait_work_accepted_value_for_call_base);
 //         let actual_my_trait_work_returned_value_for_mock =
 //             mock.work(my_trait_work_accepted_value_for_mock);
-//
+// 
 //         // Assert
 //         assert_eq!(get_number_returned_value, actual_get_number_returned_value);
 //         let expected_format_value = format!(
 //             "Struct, number = {get_number_returned_value}, work_result = {my_trait_work_returned_value_for_format}"
 //         );
 //         assert_eq!(expected_format_value, actual_format_value);
-//
+// 
 //         let expected_my_trait_work_call_base_value = "working...".to_owned();
 //         assert_eq!(
 //             expected_my_trait_work_call_base_value,
@@ -112,7 +112,7 @@ mocked! {
 //             my_trait_work_returned_value_for_mock,
 //             actual_my_trait_work_returned_value_for_mock
 //         );
-//
+// 
 //         mock.received
 //             .get_number(Times::Exactly(2))
 //             .format(Times::Once);
@@ -124,19 +124,17 @@ mocked! {
 //             .no_other_calls();
 //     }
 // }
-
+// 
 // pub use __rsubstitute_generated_Struct::*;
-// use rsubstitute_proc_macro::mocked;
-// use std::fmt::{Debug, Formatter};
-//
+// 
 // mod __rsubstitute_generated_Struct {
 //     #![allow(non_camel_case_types)]
 //     #![allow(non_snake_case)]
-//
+// 
 //     use super::*;
 //     use rsubstitute::for_generated::*;
 //     use std::ops::Deref;
-//
+// 
 //     #[derive(Clone)]
 //     pub struct MyTrait_work_Call<'a> {
 //         _phantom_lifetime: PhantomData<&'a ()>,
@@ -147,34 +145,34 @@ mocked! {
 //             vec![ArgInfo::new("value", self.value)]
 //         }
 //     }
-//
+// 
 //     #[derive(Debug, IArgsFormatter)]
 //     pub struct MyTrait_work_ArgsChecker<'a> {
 //         _phantom_lifetime: PhantomData<&'a ()>,
 //         pub value: Arg<i32>,
 //     }
-//
+// 
 //     pub struct MyTraitSetup<'a> {
 //         data: Arc<StructMockData<'a>>,
 //     }
-//
+// 
 //     pub struct MyTraitReceived<'a> {
 //         data: Arc<StructMockData<'a>>,
 //     }
-//
+// 
 //     impl<'a> IArgsChecker<MyTrait_work_Call<'a>> for MyTrait_work_ArgsChecker<'a> {
 //         fn check(&self, call: MyTrait_work_Call<'a>) -> Vec<ArgCheckResult> {
 //             vec![self.value.check("value", call.value)]
 //         }
 //     }
-//
+// 
 //     impl<'a> IBaseCaller<MyTrait_work_Call<'a>, String> for StructMock<'a> {
 //         fn call_base(&self, call: MyTrait_work_Call<'a>) -> String {
 //             let MyTrait_work_Call { value, .. } = call;
 //             return "working...".to_owned();
 //         }
 //     }
-//
+// 
 //     impl<'a> MyTraitSetup<'a> {
 //         #[allow(dead_code)]
 //         #[allow(mismatched_lifetime_syntaxes)]
@@ -201,7 +199,7 @@ mocked! {
 //             return shared_fn_config;
 //         }
 //     }
-//
+// 
 //     impl<'a> MyTraitReceived<'a> {
 //         #[allow(dead_code)]
 //         #[allow(mismatched_lifetime_syntaxes)]
@@ -215,12 +213,12 @@ mocked! {
 //                 .verify_received(MyTrait_work_ArgsChecker, times);
 //             return self;
 //         }
-//
+// 
 //         pub fn no_other_calls(&self) {
 //             self.data.verify_received_nothing_else()
 //         }
 //     }
-//
+// 
 //     #[derive(Clone)]
 //     pub struct get_number_Call<'a> {
 //         _phantom_lifetime: PhantomData<&'a ()>,
@@ -230,25 +228,25 @@ mocked! {
 //             vec![]
 //         }
 //     }
-//
+// 
 //     #[derive(Debug, IArgsFormatter)]
 //     pub struct get_number_ArgsChecker<'a> {
 //         _phantom_lifetime: PhantomData<&'a ()>,
 //     }
-//
+// 
 //     impl<'a> IArgsChecker<get_number_Call<'a>> for get_number_ArgsChecker<'a> {
 //         fn check(&self, call: get_number_Call<'a>) -> Vec<ArgCheckResult> {
 //             vec![]
 //         }
 //     }
-//
+// 
 //     impl<'a> IBaseCaller<get_number_Call<'a>, i32> for StructMock<'a> {
 //         fn call_base(&self, call: get_number_Call<'a>) -> i32 {
 //             let get_number_Call { .. } = call;
 //             return self.number;
 //         }
 //     }
-//
+// 
 //     #[derive(Clone)]
 //     pub struct format_Call<'a> {
 //         _phantom_lifetime: PhantomData<&'a ()>,
@@ -258,18 +256,18 @@ mocked! {
 //             vec![]
 //         }
 //     }
-//
+// 
 //     #[derive(Debug, IArgsFormatter)]
 //     pub struct format_ArgsChecker<'a> {
 //         _phantom_lifetime: PhantomData<&'a ()>,
 //     }
-//
+// 
 //     impl<'a> IArgsChecker<format_Call<'a>> for format_ArgsChecker<'a> {
 //         fn check(&self, call: format_Call<'a>) -> Vec<ArgCheckResult> {
 //             vec![]
 //         }
 //     }
-//
+// 
 //     impl<'a> IBaseCaller<format_Call<'a>, String> for StructMock<'a> {
 //         fn call_base(&self, call: format_Call<'a>) -> String {
 //             let format_Call { .. } = call;
@@ -279,7 +277,7 @@ mocked! {
 //             return result;
 //         }
 //     }
-//
+// 
 //     #[derive(IMockData)]
 //     pub struct StructMockData<'a> {
 //         _phantom_lifetime: PhantomData<&'a ()>,
@@ -289,27 +287,27 @@ mocked! {
 //             FnData<StructMock<'a>, get_number_Call<'a>, get_number_ArgsChecker<'a>, i32>,
 //         format_data: FnData<StructMock<'a>, format_Call<'a>, format_ArgsChecker<'a>, String>,
 //     }
-//
+// 
 //     pub struct StructMockSetup<'a> {
 //         pub MyTrait: MyTraitSetup<'a>,
 //         data: Arc<StructMockData<'a>>,
 //     }
-//
+// 
 //     pub struct StructMockReceived<'a> {
 //         pub MyTrait: MyTraitReceived<'a>,
 //         data: Arc<StructMockData<'a>>,
 //     }
-//
+// 
 //     pub struct Struct_InnerData {
 //         number: i32,
 //     }
-//
+// 
 //     impl Struct_InnerData {
 //         fn new(number: i32) -> Self {
 //             Self { number }
 //         }
 //     }
-//
+// 
 //     #[allow(non_camel_case_types)]
 //     pub struct StructMock<'a> {
 //         pub setup: StructMockSetup<'a>,
@@ -317,15 +315,15 @@ mocked! {
 //         data: Arc<StructMockData<'a>>,
 //         inner_data: Struct_InnerData,
 //     }
-//
+// 
 //     impl<'a> Deref for StructMock<'a> {
 //         type Target = Struct_InnerData;
-//
+// 
 //         fn deref(&self) -> &Self::Target {
 //             &self.inner_data
 //         }
 //     }
-//
+// 
 //     impl<'a> MyTrait for StructMock<'a> {
 //         fn work(&self, value: i32) -> String {
 //             let call = unsafe {
@@ -340,7 +338,7 @@ mocked! {
 //                 .handle_base_returning(self, call);
 //         }
 //     }
-//
+// 
 //     impl<'a> StructMock<'a> {
 //         pub fn get_number<'__rsubstitute_arg_anonymous>(&'__rsubstitute_arg_anonymous self) -> i32 {
 //             let call = unsafe {
@@ -350,7 +348,7 @@ mocked! {
 //             };
 //             return self.data.get_number_data.handle_base_returning(self, call);
 //         }
-//
+// 
 //         pub fn format<'__rsubstitute_arg_anonymous>(&'__rsubstitute_arg_anonymous self) -> String {
 //             let call = unsafe {
 //                 format_Call {
@@ -360,7 +358,7 @@ mocked! {
 //             return self.data.format_data.handle_base_returning(self, call);
 //         }
 //     }
-//
+// 
 //     impl<'a> StructMock<'a> {
 //         #[allow(dead_code)]
 //         pub fn new(number: i32) -> Self {
@@ -385,7 +383,7 @@ mocked! {
 //             };
 //         }
 //     }
-//
+// 
 //     impl<'a> StructMockSetup<'a> {
 //         #[allow(dead_code)]
 //         #[allow(mismatched_lifetime_syntaxes)]
@@ -423,7 +421,7 @@ mocked! {
 //             return shared_fn_config;
 //         }
 //     }
-//
+// 
 //     impl<'a> StructMockReceived<'a> {
 //         #[allow(dead_code)]
 //         #[allow(mismatched_lifetime_syntaxes)]
