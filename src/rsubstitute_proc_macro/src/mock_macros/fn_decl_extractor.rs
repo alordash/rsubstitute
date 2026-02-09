@@ -100,6 +100,7 @@ impl FnDeclExtractor {
             arguments: sig.inputs.iter().cloned().collect(),
             return_value: sig.output.clone(),
             maybe_base_fn_block,
+            raw_fn_ident: sig.ident.clone(),
         };
         return fn_decl;
     }

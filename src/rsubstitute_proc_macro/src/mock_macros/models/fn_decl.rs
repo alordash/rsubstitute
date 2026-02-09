@@ -4,6 +4,7 @@ use syn::*;
 
 pub(crate) struct FnDecl {
     pub ident: Ident,
+    pub raw_fn_ident: Ident,
     pub arguments: Vec<FnArg>,
     pub return_value: ReturnType,
     pub maybe_base_fn_block: Option<Block>

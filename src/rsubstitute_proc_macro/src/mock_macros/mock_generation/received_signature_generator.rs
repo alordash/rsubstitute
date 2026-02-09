@@ -44,7 +44,7 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
         let prepend_ref_self_arg = true;
         let result = self.generate(
             fn_info,
-            fn_info.parent.ident.clone(),
+            fn_info.parent.raw_fn_ident.clone(),
             prepend_ref_self_arg,
             return_ty,
             MockGenericsUsage::JustGetPhantomTypesCount(&mock_type.generics),

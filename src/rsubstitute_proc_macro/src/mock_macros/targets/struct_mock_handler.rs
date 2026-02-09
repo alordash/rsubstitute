@@ -84,7 +84,7 @@ impl IStructMockHandler for StructMockHandler {
                     &mock_struct,
                     &mock_data_struct,
                     mock_struct_trait_info,
-                );
+                )
             })
             .collect();
         let mock_trait_impl = self.mock_trait_impl_generator.generate(
@@ -111,8 +111,9 @@ impl IStructMockHandler for StructMockHandler {
             &mock_received_struct,
             &struct_fn_infos,
         );
-        let generated_mod = self.mod_generator.generate_trait(
+        let generated_mod = self.mod_generator.generate_struct(
             target_ident,
+            mock_struct_traits,
             struct_fn_infos,
             mock_data_struct,
             mock_setup_struct,

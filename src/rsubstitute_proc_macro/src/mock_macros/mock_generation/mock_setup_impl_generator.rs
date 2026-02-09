@@ -121,7 +121,7 @@ impl MockSetupImplGenerator {
             abi: None,
             fn_token: Default::default(),
             ident: if use_fn_info_ident_as_method_ident {
-                fn_info.parent.ident.clone()
+                fn_info.parent.raw_fn_ident.clone()
             } else {
                 constants::MOCK_SETUP_FIELD_IDENT.clone()
             },
