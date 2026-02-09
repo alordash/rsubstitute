@@ -422,7 +422,38 @@ mod __rsubstitute_generated_Struct {
             &self.inner_data
         }
     }
-    impl<'a> Struct for StructMock<'a> {
+    impl<'a> MyTrait for StructMock<'a> {
+        fn work<'__rsubstitute_arg_anonymous>(
+            &'__rsubstitute_arg_anonymous self,
+            value: i32,
+        ) -> String {
+            let call = unsafe {
+                MyTrait_work_Call {
+                    _phantom_lifetime: PhantomData,
+                    value: std::mem::transmute(value),
+                }
+            };
+            return self
+                .data
+                .MyTrait_work_data
+                .handle_base_returning(&self, call);
+        }
+    }
+    impl<'a> Debug for StructMock<'a> {
+        fn fmt<'__rsubstitute_arg_anonymous>(
+            &'__rsubstitute_arg_anonymous self,
+            f: &'__rsubstitute_arg_anonymous mut Formatter<'_>,
+        ) -> std::fmt::Result {
+            let call = unsafe {
+                Debug_fmt_Call {
+                    _phantom_lifetime: PhantomData,
+                    f: std::mem::transmute(f),
+                }
+            };
+            return self.data.Debug_fmt_data.handle_base_returning(&self, call);
+        }
+    }
+    impl<'a> StructMock<'a> {
         fn first_struct_impl<'__rsubstitute_arg_anonymous>(&'__rsubstitute_arg_anonymous self) {
             let call = unsafe {
                 first_struct_impl_Call {

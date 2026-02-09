@@ -45,17 +45,20 @@ impl IStructMockHandler for StructMockHandler {
             constants::MOCK_STRUCT_IDENT_PREFIX
         );
 
+        let mock_generics = self
+            .mock_generics_generator
+            .generate(&struct_mock_syntax.r#struct.generics);
         let mock_struct_trait_infos: Vec<_> = std::mem::take(&mut struct_mock_syntax.trait_impls)
             .into_iter()
-            .map(|x| self.mock_struct_trait_info_generator.generate(x))
+            .map(|x| {
+                self.mock_struct_trait_info_generator
+                    .generate(x, &mock_generics.impl_generics)
+            })
             .collect();
         let struct_fn_decls = self
             .fn_decl_extractor
             .extract_struct_fns(&struct_mock_syntax.get_struct_fns());
         let target_ident = struct_mock_syntax.r#struct.ident.clone();
-        let mock_generics = self
-            .mock_generics_generator
-            .generate(&struct_mock_syntax.r#struct.generics);
         let mock_type = self
             .mock_type_generator
             .generate_for_trait(mock_ident.clone(), mock_generics);
@@ -117,12 +120,19 @@ impl IStructMockHandler for StructMockHandler {
         let inner_data_deref_impl = self
             .inner_data_deref_impl_generator
             .generate(&mock_struct, &inner_data_struct);
-        let mock_trait_impl = self.mock_trait_impl_generator.generate(
-            target_ident.clone(),
-            &mock_type,
-            &mock_struct,
-            &struct_fn_infos,
-        );
+        let mock_trait_impls = mock_struct_traits
+            .iter()
+            .map(|mock_struct_trait| {
+                self.mock_trait_impl_generator.generate(
+                    mock_struct_trait.info.trait_ident_from_path.clone(),
+                    &mock_type,
+                    &mock_struct_trait.info.fn_infos,
+                )
+            })
+            .collect();
+        let mock_trait_impl = self
+            .mock_trait_impl_generator
+            .generate_for_struct(&mock_type, &struct_fn_infos);
         let inner_data_param = self.inner_data_param_generator.generate(&inner_data_struct);
         let mock_impl = self.mock_impl_generator.generate(
             &mock_type,
@@ -154,6 +164,7 @@ impl IStructMockHandler for StructMockHandler {
             inner_data_impl,
             mock_struct,
             inner_data_deref_impl,
+            mock_trait_impls,
             mock_trait_impl,
             mock_impl,
             mock_setup_impl,

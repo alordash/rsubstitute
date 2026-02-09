@@ -4,7 +4,6 @@ use proc_macro2::Ident;
 
 // TODO - make all models internal
 pub(crate) struct FnInfo {
-    // TODO - remove this field or use it instead of FnDecl everywhere
     pub parent: FnDecl,
     pub call_struct: CallStruct,
     pub call_arg_infos_provider_impl: CallArgInfosProviderImpl,

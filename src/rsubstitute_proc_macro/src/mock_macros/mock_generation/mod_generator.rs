@@ -50,6 +50,7 @@ pub trait IModGenerator {
         inner_data_impl: InnerDataImpl,
         mock_struct: MockStruct,
         inner_data_deref_impl: InnerDataDerefImpl,
+        trait_mock_impls: Vec<MockTraitImpl>,
         mock_trait_impl: MockTraitImpl,
         mock_impl: MockImpl,
         mock_setup_impl: MockSetupImpl,
@@ -162,6 +163,7 @@ impl IModGenerator for ModGenerator {
         inner_data_impl: InnerDataImpl,
         mock_struct: MockStruct,
         inner_data_deref_impl: InnerDataDerefImpl,
+        mock_trait_impls: Vec<MockTraitImpl>,
         mock_trait_impl: MockTraitImpl,
         mock_impl: MockImpl,
         mock_setup_impl: MockSetupImpl,
@@ -205,6 +207,13 @@ impl IModGenerator for ModGenerator {
                 Item::Impl(inner_data_impl.item_impl),
                 Item::Struct(mock_struct.item_struct),
                 Item::Impl(inner_data_deref_impl.item_impl),
+            ])
+            .chain(
+                mock_trait_impls
+                    .into_iter()
+                    .map(|mock_trait_impl| Item::Impl(mock_trait_impl.item_impl)),
+            )
+            .chain([
                 Item::Impl(mock_trait_impl.item_impl),
                 Item::Impl(mock_impl.item_impl),
                 Item::Impl(mock_setup_impl.item_impl),

@@ -1,31 +1,48 @@
 use crate::mock_macros::fn_info_generation::*;
-use crate::mock_macros::mock_generation::models::MockStructTraitInfo;
+use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::mock_generation::*;
 use crate::mock_macros::models::*;
 use crate::mock_macros::*;
+use crate::syntax::*;
 use std::sync::Arc;
+use syn::*;
 
 pub trait IMockStructTraitInfoGenerator {
-    fn generate(&self, trait_impl: TraitImpl) -> MockStructTraitInfo;
+    fn generate(
+        &self,
+        trait_impl: TraitImpl,
+        struct_impl_generics: &Generics,
+    ) -> MockStructTraitInfo;
 }
 
 pub(crate) struct MockStructTraitInfoGenerator {
     pub fn_decl_extractor: Arc<dyn IFnDeclExtractor>,
-    pub mock_generics_generator: Arc<dyn IMockGenericsGenerator>,
+    pub generics_merger: Arc<dyn IGenericsMerger>,
     pub mock_type_generator: Arc<dyn IMockTypeGenerator>,
     pub fn_info_generator: Arc<dyn IFnInfoGenerator>,
 }
 
 impl IMockStructTraitInfoGenerator for MockStructTraitInfoGenerator {
-    fn generate(&self, trait_impl: TraitImpl) -> MockStructTraitInfo {
+    fn generate(
+        &self,
+        trait_impl: TraitImpl,
+        struct_impl_generics: &Generics,
+    ) -> MockStructTraitInfo {
         let trait_ident_from_path = trait_impl.get_trait_ident_from_path();
-        let generics = self.mock_generics_generator.generate(&trait_impl.item_impl.generics);
+        let merged_generics = self
+            .generics_merger
+            .merge(&trait_impl.item_impl.generics, &struct_impl_generics);
+        let mock_generics = MockGenerics {
+            source_generics: trait_impl.item_impl.generics.clone(),
+            impl_generics: merged_generics,
+            phantom_type_fields: Vec::new(),
+        };
         let fn_decls = self
             .fn_decl_extractor
             .extract_struct_trait_impl_fns(&trait_impl);
         let mock_type = self
             .mock_type_generator
-            .generate_for_trait(trait_ident_from_path.clone(), generics);
+            .generate_for_trait(trait_ident_from_path.clone(), mock_generics);
         let fn_infos: Vec<_> = fn_decls
             .into_iter()
             .map(|fn_decl| self.fn_info_generator.generate(fn_decl, &mock_type))
