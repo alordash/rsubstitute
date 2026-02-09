@@ -3,6 +3,12 @@ use rsubstitute::macros::mock;
 #[mock]
 trait Trait {
     fn f(&self);
+
+    // TODO - add support
+    fn mutate(&mut self);
+
+    // TODO - add support
+    fn consume(self) -> i32;
 }
 
 #[mock]
