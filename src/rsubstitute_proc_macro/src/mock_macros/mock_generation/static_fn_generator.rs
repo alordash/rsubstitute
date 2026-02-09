@@ -11,7 +11,6 @@ pub trait IStaticFnGenerator {
     fn generate(
         &self,
         fn_info: &FnInfo,
-        mock_struct: &MockStruct,
         mock_type: &MockType,
     ) -> StaticFn;
 }
@@ -25,7 +24,6 @@ impl IStaticFnGenerator for StaticFnGenerator {
     fn generate(
         &self,
         fn_info: &FnInfo,
-        mock_struct: &MockStruct,
         mock_type: &MockType,
     ) -> StaticFn {
         let mut generics = mock_type.generics.impl_generics.clone();
@@ -44,7 +42,7 @@ impl IStaticFnGenerator for StaticFnGenerator {
             unsafety: None,
             abi: None,
             fn_token: Default::default(),
-            ident: fn_info.parent.ident.clone(),
+            ident: fn_info.parent.get_full_ident(),
             generics,
             paren_token: Default::default(),
             inputs: fn_info

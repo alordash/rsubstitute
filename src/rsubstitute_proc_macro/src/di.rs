@@ -122,9 +122,7 @@ fn create_services() -> ServiceCollection {
     let std_mem_transmute_expr_factory = Arc::new(StdMemTransmuteExprFactory {
         path_factory: path_factory.clone(),
     });
-    let get_global_mock_expr_generator = Arc::new(GetGlobalMockExprGenerator {
-        type_factory: type_factory.clone(),
-    });
+    let get_global_mock_expr_generator = Arc::new(GetGlobalMockExprGenerator);
     let field_checker = Arc::new(FieldChecker);
     let local_factory = Arc::new(LocalFactory);
     let mock_fn_block_generator = Arc::new(MockFnBlockGenerator {

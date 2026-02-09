@@ -3,5 +3,5 @@ use syn::ItemStruct;
 
 pub struct MockDataStruct {
     pub item_struct: ItemStruct,
-    pub field_and_fn_idents: Vec<(Ident, Ident)>
+    pub field_and_fn_idents: Vec<(Ident, String)>
 }

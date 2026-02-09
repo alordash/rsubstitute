@@ -99,7 +99,7 @@ impl IInputArgsGenerator for InputArgsGenerator {
     fn generate_args_checker_var_ident_and_decl_stmt(&self, fn_info: &FnInfo) -> (Ident, Stmt) {
         let args_checker_var_ident = format_ident!(
             "{}_{}",
-            fn_info.parent.ident,
+            fn_info.parent.get_full_ident(),
             Self::ARGS_CHECKER_VARIABLE_SUFFIX
         );
         let field_values: Vec<_> = fn_info

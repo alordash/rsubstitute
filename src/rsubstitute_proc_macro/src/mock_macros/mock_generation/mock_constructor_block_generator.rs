@@ -52,80 +52,33 @@ impl MockConstructorBlockGenerator {
         let mut data_fields: Vec<_> = mock_data_struct
             .field_and_fn_idents
             .iter()
-            .map(|(field_ident, fn_ident)| FieldValue {
-                attrs: Vec::new(),
-                member: Member::Named(field_ident.clone()),
-                colon_token: Some(Default::default()),
-                expr: Expr::Call(ExprCall {
+            .map(|(field_ident, fn_ident)| {
+                FieldValue {
                     attrs: Vec::new(),
-                    func: Box::new(self.path_factory.create_expr_from_parts(vec![
-                        constants::FN_DATA_TYPE_IDENT.clone(),
-                        constants::NEW_IDENT.clone(),
-                    ])),
-                    paren_token: Default::default(),
-                    args: [
-                        Expr::Lit(ExprLit {
-                            attrs: Vec::new(),
-                            lit: Lit::Str(LitStr::new(&fn_ident.to_string(), Span::call_site())),
-                        }),
-                        constants::SERVICES_REF_EXPR.clone(),
-                    ]
-                    .into_iter()
-                    .collect(),
-                }),
+                    member: Member::Named(field_ident.clone()),
+                    colon_token: Some(Default::default()),
+                    expr: Expr::Call(ExprCall {
+                        attrs: Vec::new(),
+                        func: Box::new(self.path_factory.create_expr_from_parts(vec![
+                            constants::FN_DATA_TYPE_IDENT.clone(),
+                            constants::NEW_IDENT.clone(),
+                        ])),
+                        paren_token: Default::default(),
+                        args: [
+                            Expr::Lit(ExprLit {
+                                attrs: Vec::new(),
+                                lit: Lit::Str(LitStr::new(&fn_ident.to_string(), Span::call_site())),
+                            }),
+                            constants::SERVICES_REF_EXPR.clone(),
+                        ]
+                            .into_iter()
+                            .collect(),
+                    }),
+                }
             })
             .collect();
         let phantom_lifetime_field = constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE.clone();
         data_fields.insert(0, phantom_lifetime_field);
-        // TODO - remove?
-        // if let Some(base_caller_struct) = maybe_base_caller_struct {
-        //     let base_caller_struct_fields = base_caller_struct
-        //         .item_struct
-        //         .fields
-        //         .iter()
-        //         .map(|field| {
-        //             // Assume all fields are PhantomData
-        //             let field_ident = field.get_required_ident();
-        //             return self.field_value_factory.create_as_phantom_data(field_ident);
-        //         })
-        //         .collect();
-        //     let base_caller_struct_construction = Expr::Struct(ExprStruct {
-        //         attrs: Vec::new(),
-        //         qself: None,
-        //         path: self
-        //             .path_factory
-        //             .create(base_caller_struct.item_struct.ident.clone()),
-        //         brace_token: Default::default(),
-        //         fields: base_caller_struct_fields,
-        //         dot2_token: None,
-        //         rest: None,
-        //     });
-        //     let base_caller_field = FieldValue {
-        //         attrs: Vec::new(),
-        //         member: Member::Named(constants::BASE_CALLER_FIELD_IDENT.clone()),
-        //         colon_token: Some(Default::default()),
-        //         expr: Expr::Call(ExprCall {
-        //             attrs: Vec::new(),
-        //             func: Box::new(self.path_factory.create_expr_from_parts(vec![
-        //                 constants::ARC_IDENT.clone(),
-        //                 constants::NEW_IDENT.clone(),
-        //             ])),
-        //             paren_token: Default::default(),
-        //             args: [Expr::Call(ExprCall {
-        //                 attrs: Vec::new(),
-        //                 func: Box::new(self.path_factory.create_expr_from_parts(vec![
-        //                     constants::REF_CELL_IDENT.clone(),
-        //                     constants::NEW_IDENT.clone(),
-        //                 ])),
-        //                 paren_token: Default::default(),
-        //                 args: [base_caller_struct_construction].into_iter().collect(),
-        //             })]
-        //             .into_iter()
-        //             .collect(),
-        //         }),
-        //     };
-        //     data_fields.insert(1, base_caller_field);
-        // }
         let data_stmt = Stmt::Local(Local {
             attrs: Vec::new(),
             let_token: Default::default(),

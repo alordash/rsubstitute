@@ -69,7 +69,7 @@ impl MockTraitImplGenerator {
             unsafety: None,
             abi: None,
             fn_token: Default::default(),
-            ident: fn_info.parent.ident.clone(),
+            ident: fn_info.parent.get_full_ident().clone(),
             generics: Generics {
                 lt_token: Some(Default::default()),
                 params: [GenericParam::Lifetime(LifetimeParam {

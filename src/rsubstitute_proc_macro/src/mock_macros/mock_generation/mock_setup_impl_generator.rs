@@ -51,9 +51,7 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
         let fn_setups = fn_infos
             .iter()
             .map(|x| {
-                let output = self
-                    .setup_output_generator
-                    .generate_for_trait(x, mock_type);
+                let output = self.setup_output_generator.generate_for_trait(x, mock_type);
                 return ImplItem::Fn(self.generate_fn_setup(
                     x,
                     use_fn_info_ident_as_method_ident,
@@ -117,7 +115,7 @@ impl MockSetupImplGenerator {
             abi: None,
             fn_token: Default::default(),
             ident: if use_fn_info_ident_as_method_ident {
-                fn_info.parent.raw_fn_ident.clone()
+                fn_info.parent.fn_ident.clone()
             } else {
                 constants::MOCK_SETUP_FIELD_IDENT.clone()
             },

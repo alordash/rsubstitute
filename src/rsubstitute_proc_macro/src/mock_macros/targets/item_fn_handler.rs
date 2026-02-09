@@ -95,7 +95,7 @@ impl IItemFnHandler for ItemFnHandler {
         );
         let static_fn = self
             .static_fn_generator
-            .generate(&fn_info, &mock_struct, &mock_type);
+            .generate(&fn_info, &mock_type);
 
         let generated_mod = self.mod_generator.generate_fn(
             fn_ident,

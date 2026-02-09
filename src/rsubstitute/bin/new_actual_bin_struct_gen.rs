@@ -456,8 +456,8 @@ mod __rsubstitute_generated_Struct {
                 first_struct_impl_data: FnData::new("first_struct_impl", &SERVICES),
                 get_number_data: FnData::new("get_number", &SERVICES),
                 format_data: FnData::new("format", &SERVICES),
-                MyTrait_work_data: FnData::new("MyTrait_work", &SERVICES),
-                Debug_fmt_data: FnData::new("Debug_fmt", &SERVICES),
+                MyTrait_work_data: FnData::new("MyTrait::work", &SERVICES),
+                Debug_fmt_data: FnData::new("Debug::fmt", &SERVICES),
             });
             return StructMock {
                 setup: StructMockSetup { data: data.clone() },

@@ -1,6 +1,5 @@
 use crate::constants;
 use crate::mock_macros::models::*;
-use quote::format_ident;
 use syn::*;
 
 pub trait IFnDeclExtractor {
@@ -91,18 +90,12 @@ impl FnDeclExtractor {
         maybe_base_fn_block: Option<Block>,
         maybe_parent_trait_ident: Option<Ident>,
     ) -> FnDecl {
-        let ident = if let Some(parent_trait_ident) = maybe_parent_trait_ident {
-            let original_ident = &sig.ident;
-            format_ident!("{parent_trait_ident}_{original_ident}")
-        } else {
-            sig.ident.clone()
-        };
         let fn_decl = FnDecl {
-            ident,
+            maybe_parent_trait_ident,
+            fn_ident: sig.ident.clone(),
             arguments: sig.inputs.iter().cloned().collect(),
             return_value: sig.output.clone(),
             maybe_base_fn_block,
-            raw_fn_ident: sig.ident.clone(),
         };
         return fn_decl;
     }

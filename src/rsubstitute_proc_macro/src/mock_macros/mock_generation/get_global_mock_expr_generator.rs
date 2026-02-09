@@ -1,6 +1,4 @@
 use crate::constants;
-use crate::syntax::*;
-use std::sync::Arc;
 use syn::punctuated::Punctuated;
 use syn::*;
 
@@ -8,9 +6,7 @@ pub trait IGetGlobalMockExprGenerator {
     fn generate(&self, ty: Type) -> Expr;
 }
 
-pub(crate) struct GetGlobalMockExprGenerator {
-    pub type_factory: Arc<dyn ITypeFactory>,
-}
+pub(crate) struct GetGlobalMockExprGenerator;
 
 impl IGetGlobalMockExprGenerator for GetGlobalMockExprGenerator {
     fn generate(&self, ty: Type) -> Expr {

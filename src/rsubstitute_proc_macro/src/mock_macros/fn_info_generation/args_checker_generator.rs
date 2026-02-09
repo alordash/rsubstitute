@@ -21,10 +21,12 @@ pub struct ArgsCheckerGenerator {
 
 impl IArgsCheckerGenerator for ArgsCheckerGenerator {
     fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> ArgsCheckerStruct {
-        let attrs = vec![
-            constants::DERIVE_DEBUG_AND_I_ARGS_FORMATTER_ATTRIBUTE.clone(),
-        ];
-        let ident = format_ident!("{}_{}", fn_decl.ident, Self::ARGS_CHECKER_STRUCT_SUFFIX);
+        let attrs = vec![constants::DERIVE_DEBUG_AND_I_ARGS_FORMATTER_ATTRIBUTE.clone()];
+        let ident = format_ident!(
+            "{}_{}",
+            fn_decl.get_full_ident(),
+            Self::ARGS_CHECKER_STRUCT_SUFFIX
+        );
         let fn_fields: Vec<_> = fn_decl
             .arguments
             .iter()

@@ -4,10 +4,9 @@ use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::mock_generation::*;
 use crate::mock_macros::models::*;
 use crate::mock_macros::*;
-use crate::syntax::*;
 use proc_macro::TokenStream;
-use quote::{format_ident, quote};
 use std::sync::Arc;
+use quote::{format_ident, quote};
 
 pub trait IStructMockHandler {
     fn handle(&self, struct_mock_syntax: StructMockSyntax) -> TokenStream;
