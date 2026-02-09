@@ -1,5 +1,6 @@
 use crate::constants;
 use crate::mock_macros::models::{StructMockSyntax, TraitImpl};
+use quote::ToTokens;
 use syn::parse::*;
 use syn::*;
 
@@ -29,7 +30,7 @@ impl IStructMockSyntaxParser for StructMockSyntaxParser {
                 trait_impls.push(trait_impl);
             } else {
                 if maybe_new_fn.is_none() {
-                    maybe_new_fn = self.try_extract_new_fn(&r#struct.ident, &item_impl);
+                    maybe_new_fn = self.try_extract_new_fn(&item_impl);
                 }
                 struct_impls.push(item_impl);
             }
@@ -51,15 +52,16 @@ impl StructMockSyntaxParser {
     const STRUCT_MOCK_INVALID_IDENT_ERROR_MESSAGE: &'static str =
         "Struct mock should contain only `impl` blocks for it's own type.";
     const NO_NEW_FN_ERROR_MESSAGE: &'static str = "In order to be mockable structure must have function `pub fn new(args) -> Self`, where `args` is arbitrary collection of user-defined arguments.";
+    const NEW_FN_MUST_BE_PUBLIC_ERROR_MESSAGE: &'static str = "Function `new` must be public.";
+    const NEW_FN_MUST_HAVE_RETURN_TYPE_ERROR_MESSAGE_PART: &'static str =
+        "Function `new` must have return type that is equal to `Self`";
 
-    fn try_extract_new_fn(&self, struct_ident: &Ident, item_impl: &ItemImpl) -> Option<ImplItemFn> {
+    fn try_extract_new_fn(&self, item_impl: &ItemImpl) -> Option<ImplItemFn> {
         let maybe_new_fn = item_impl
             .items
             .iter()
             .filter_map(|item| match item {
-                ImplItem::Fn(impl_item_fn)
-                    if self.is_fn_impl_item_fn_is_new_fn(struct_ident, impl_item_fn) =>
-                {
+                ImplItem::Fn(impl_item_fn) if self.is_fn_impl_item_fn_is_new_fn(impl_item_fn) => {
                     Some(impl_item_fn.clone())
                 }
                 _ => None,
@@ -68,20 +70,67 @@ impl StructMockSyntaxParser {
         return maybe_new_fn;
     }
 
-    fn is_fn_impl_item_fn_is_new_fn(
-        &self,
-        struct_ident: &Ident,
-        impl_item_fn: &ImplItemFn,
-    ) -> bool {
-        if impl_item_fn.sig.ident == constants::NEW_IDENT.clone()
-            && let Visibility::Public(_) = impl_item_fn.vis
-            && let ReturnType::Type(_, return_type) = &impl_item_fn.sig.output
-            && let Type::Path(type_path) = &**return_type
-            && let Some(type_ident) = type_path.path.get_ident()
-            && (type_ident == struct_ident || type_ident == &constants::SELF_TYPE_IDENT.clone())
-        {
+    fn is_fn_impl_item_fn_is_new_fn(&self, impl_item_fn: &ImplItemFn) -> bool {
+        if impl_item_fn.sig.ident == constants::NEW_IDENT.clone() {
+            self.validate_new_fn(impl_item_fn);
             return true;
         }
         return false;
+    }
+
+    fn validate_new_fn(&self, impl_item_fn: &ImplItemFn) {
+        let mut errors = Vec::new();
+
+        match impl_item_fn.vis {
+            Visibility::Public(_) => (),
+            _ => errors.push(Self::NEW_FN_MUST_BE_PUBLIC_ERROR_MESSAGE.to_owned()),
+        };
+
+        let ReturnType::Type(_, return_type) = &impl_item_fn.sig.output else {
+            errors.push(format!(
+                "{}. Actually does not have return type.",
+                Self::NEW_FN_MUST_HAVE_RETURN_TYPE_ERROR_MESSAGE_PART
+            ));
+            self.panic_with_new_fn_errors(errors);
+        };
+
+        let Type::Path(type_path) = &**return_type else {
+            errors.push(self.format_new_fn_error_invalid_return_type(return_type));
+            self.panic_with_new_fn_errors(errors);
+        };
+
+        let Some(type_ident) = type_path.path.get_ident() else {
+            errors.push(self.format_new_fn_error_invalid_return_type(return_type));
+            self.panic_with_new_fn_errors(errors);
+        };
+
+        if type_ident != &constants::SELF_TYPE_IDENT.clone() {
+            errors.push(self.format_new_fn_error_invalid_return_type(return_type));
+        }
+    }
+
+    fn format_new_fn_error_invalid_return_type(&self, return_type: &Box<Type>) -> String {
+        format!(
+            "{}. Actual type: {}",
+            Self::NEW_FN_MUST_HAVE_RETURN_TYPE_ERROR_MESSAGE_PART.to_owned(),
+            return_type.to_token_stream().to_string()
+        )
+    }
+
+    fn panic_with_new_fn_errors(&self, errors: Vec<String>) -> ! {
+        let errors_count = errors.len();
+        let numbered_errors: Vec<_> = errors
+            .into_iter()
+            .enumerate()
+            .map(|(i, e)| {
+                let number = i + 1;
+                format!("{number}. {e}")
+            })
+            .collect();
+        let errors_lines = numbered_errors.join("\n");
+        panic!(
+            "Function `new` is invalid. List of errors ({errors_count}):
+{errors_lines}"
+        )
     }
 }
