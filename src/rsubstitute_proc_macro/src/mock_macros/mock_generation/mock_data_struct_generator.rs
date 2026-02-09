@@ -59,7 +59,6 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
 
     fn generate_for_static(&self, mock_type: &MockType, fn_infos: &[&FnInfo]) -> MockDataStruct {
         let attrs = vec![
-            constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone(),
             constants::DERIVE_MOCK_DATA_ATTRIBUTE.clone(),
         ];
         let ident = format_ident!(

@@ -90,32 +90,8 @@ impl IModGenerator for ModGenerator {
                 Item::Impl(mock_received_impl.item_impl),
             ])
             .collect();
-        let item_mod = ItemMod {
-            attrs: vec![
-                constants::CFG_TEST_ATTRIBUTE.clone(),
-                constants::ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE.clone(),
-            ],
-            vis: Visibility::Inherited,
-            unsafety: None,
-            mod_token: Default::default(),
-            ident,
-            content: Some((Default::default(), items)),
-            semi: None,
-        };
-        let use_generated_mod = ItemUse {
-            attrs: vec![constants::CFG_TEST_ATTRIBUTE.clone()],
-            vis: Visibility::Public(Default::default()),
-            use_token: Default::default(),
-            leading_colon: None,
-            tree: UseTree::Path(UsePath {
-                ident: item_mod.ident.clone(),
-                colon2_token: Default::default(),
-                tree: Box::new(UseTree::Glob(UseGlob {
-                    star_token: Default::default(),
-                })),
-            }),
-            semi_token: Default::default(),
-        };
+        let item_mod = self.create_item_mod(ident, items);
+        let use_generated_mod = self.create_use_generated_mod(item_mod.ident.clone());
         let generated_mod = GeneratedMod {
             item_mod,
             use_generated_mod,
@@ -162,30 +138,8 @@ impl IModGenerator for ModGenerator {
                 Item::Fn(static_fn.item_fn),
             ])
             .collect();
-        let item_mod = ItemMod {
-            attrs: vec![
-                constants::CFG_TEST_ATTRIBUTE.clone(),
-                constants::ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE.clone(),
-            ],
-            vis: Visibility::Inherited,
-            unsafety: None,
-            mod_token: Default::default(),
-            ident: fn_ident.clone(),
-            content: Some((Default::default(), items)),
-            semi: None,
-        };
-        let use_generated_mod = ItemUse {
-            attrs: vec![constants::CFG_TEST_ATTRIBUTE.clone()],
-            vis: Visibility::Inherited,
-            use_token: Default::default(),
-            leading_colon: None,
-            tree: UseTree::Path(UsePath {
-                ident: fn_ident.clone(),
-                colon2_token: Default::default(),
-                tree: Box::new(UseTree::Name(UseName { ident: fn_ident })),
-            }),
-            semi_token: Default::default(),
-        };
+        let item_mod = self.create_item_mod(fn_ident.clone(), items);
+        let use_generated_mod = self.create_use_generated_mod(item_mod.ident.clone());
         let generated_mod = GeneratedMod {
             item_mod,
             use_generated_mod,
@@ -248,32 +202,8 @@ impl IModGenerator for ModGenerator {
                 Item::Impl(mock_received_impl.item_impl),
             ])
             .collect();
-        let item_mod = ItemMod {
-            attrs: vec![
-                constants::CFG_TEST_ATTRIBUTE.clone(),
-                constants::ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE.clone(),
-            ],
-            vis: Visibility::Inherited,
-            unsafety: None,
-            mod_token: Default::default(),
-            ident,
-            content: Some((Default::default(), items)),
-            semi: None,
-        };
-        let use_generated_mod = ItemUse {
-            attrs: vec![constants::CFG_TEST_ATTRIBUTE.clone()],
-            vis: Visibility::Public(Default::default()),
-            use_token: Default::default(),
-            leading_colon: None,
-            tree: UseTree::Path(UsePath {
-                ident: item_mod.ident.clone(),
-                colon2_token: Default::default(),
-                tree: Box::new(UseTree::Glob(UseGlob {
-                    star_token: Default::default(),
-                })),
-            }),
-            semi_token: Default::default(),
-        };
+        let item_mod = self.create_item_mod(ident, items);
+        let use_generated_mod = self.create_use_generated_mod(item_mod.ident.clone());
         let generated_mod = GeneratedMod {
             item_mod,
             use_generated_mod,
@@ -307,5 +237,41 @@ impl ModGenerator {
             .into_iter()
             .flat_map(|x| self.convert_fn_info(x))
             .collect();
+    }
+
+    fn create_item_mod(&self, ident: Ident, items: Vec<Item>) -> ItemMod {
+        let item_mod = ItemMod {
+            attrs: vec![
+                constants::CFG_TEST_ATTRIBUTE.clone(),
+                constants::ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE.clone(),
+                constants::ALLOW_NON_SNAKE_CASE_ATTdRIBUTE.clone(),
+                constants::ALLOW_NON_CAMEL_CASE_TYPEsS_ATTRIBUTE.clone(),
+            ],
+            vis: Visibility::Inherited,
+            unsafety: None,
+            mod_token: Default::default(),
+            ident,
+            content: Some((Default::default(), items)),
+            semi: None,
+        };
+        return item_mod;
+    }
+
+    fn create_use_generated_mod(&self, mod_ident: Ident) -> ItemUse {
+        let use_generated_mod = ItemUse {
+            attrs: vec![constants::CFG_TEST_ATTRIBUTE.clone()],
+            vis: Visibility::Public(Default::default()),
+            use_token: Default::default(),
+            leading_colon: None,
+            tree: UseTree::Path(UsePath {
+                ident: mod_ident,
+                colon2_token: Default::default(),
+                tree: Box::new(UseTree::Glob(UseGlob {
+                    star_token: Default::default(),
+                })),
+            }),
+            semi_token: Default::default(),
+        };
+        return use_generated_mod;
     }
 }

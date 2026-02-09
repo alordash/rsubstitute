@@ -37,7 +37,7 @@ impl IMockStructGenerator for MockStructGenerator {
         mock_received_struct: &MockReceivedStruct,
         mock_data_struct: &MockDataStruct,
     ) -> MockStruct {
-        let attrs = vec![constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone()];
+        let attrs = Vec::new();
         let data_field = self.field_factory.create(
             constants::DATA_IDENT.clone(),
             self.type_factory.wrap_in_arc(

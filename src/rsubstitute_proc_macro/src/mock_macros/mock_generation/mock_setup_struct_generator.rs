@@ -13,13 +13,6 @@ pub trait IMockSetupStructGenerator {
         mock_type: &MockType,
         mock_data_struct: &MockDataStruct,
     ) -> MockSetupStruct;
-
-    fn generate_with_non_camel_case_allowed(
-        &self,
-        mock_ident: &Ident,
-        mock_type: &MockType,
-        mock_data_struct: &MockDataStruct,
-    ) -> MockSetupStruct;
 }
 
 pub(crate) struct MockSetupStructGenerator {
@@ -57,20 +50,6 @@ impl IMockSetupStructGenerator for MockSetupStructGenerator {
         );
         let mock_setup_struct = MockSetupStruct { item_struct };
         return mock_setup_struct;
-    }
-
-    fn generate_with_non_camel_case_allowed(
-        &self,
-        mock_ident: &Ident,
-        mock_type: &MockType,
-        mock_data_struct: &MockDataStruct,
-    ) -> MockSetupStruct {
-        let mut result = self.generate(mock_ident, mock_type, mock_data_struct);
-        result
-            .item_struct
-            .attrs
-            .push(constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone());
-        return result;
     }
 }
 

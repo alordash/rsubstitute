@@ -13,13 +13,6 @@ pub trait IMockReceivedStructGenerator {
         mock_type: &MockType,
         mock_data_struct: &MockDataStruct,
     ) -> MockReceivedStruct;
-
-    fn generate_with_non_camel_case_allowed(
-        &self,
-        mock_ident: &Ident,
-        mock_type: &MockType,
-        mock_data_struct: &MockDataStruct,
-    ) -> MockReceivedStruct;
 }
 
 pub(crate) struct MockReceivedStructGenerator {
@@ -57,20 +50,6 @@ impl IMockReceivedStructGenerator for MockReceivedStructGenerator {
         );
         let mock_received_struct = MockReceivedStruct { item_struct };
         return mock_received_struct;
-    }
-
-    fn generate_with_non_camel_case_allowed(
-        &self,
-        mock_ident: &Ident,
-        mock_type: &MockType,
-        mock_data_struct: &MockDataStruct,
-    ) -> MockReceivedStruct {
-        let mut result = self.generate(mock_ident, mock_type, mock_data_struct);
-        result
-            .item_struct
-            .attrs
-            .push(constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone());
-        return result;
     }
 }
 

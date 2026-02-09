@@ -52,10 +52,10 @@ impl IItemFnHandler for ItemFnHandler {
             .generate_for_static(&mock_type, &all_fn_infos);
         let mock_setup_struct = self
             .mock_setup_struct_generator
-            .generate_with_non_camel_case_allowed(&mock_ident, &mock_type, &mock_data_struct);
+            .generate(&mock_ident, &mock_type, &mock_data_struct);
         let mock_received_struct = self
             .mock_received_struct_generator
-            .generate_with_non_camel_case_allowed(&mock_ident, &mock_type, &mock_data_struct);
+            .generate(&mock_ident, &mock_type, &mock_data_struct);
         let mock_struct = self.mock_struct_generator.generate_for_static(
             &mock_type,
             &mock_setup_struct,

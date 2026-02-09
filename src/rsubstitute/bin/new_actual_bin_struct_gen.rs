@@ -1,16 +1,14 @@
+#[allow(mismatched_lifetime_syntaxes)]
 #[allow(non_snake_case)]
+#[allow(non_camel_case_types)]
 mod __rsubstitute_generated_Struct {
     use super::*;
     use rsubstitute::for_generated::*;
-    #[allow(non_camel_case_types)]
-    #[allow(non_snake_case)]
     pub struct MyTrait_work_Call<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
         value: i32,
     }
     #[automatically_derived]
-    #[allow(non_camel_case_types)]
-    #[allow(non_snake_case)]
     impl<'a> ::core::clone::Clone
         for MyTrait_work_Call<'a>
     {
@@ -32,15 +30,11 @@ mod __rsubstitute_generated_Struct {
             )]))
         }
     }
-    #[allow(non_camel_case_types)]
-    #[allow(non_snake_case)]
     pub struct MyTrait_work_ArgsChecker<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
         value: Arg<i32>,
     }
     #[automatically_derived]
-    #[allow(non_camel_case_types)]
-    #[allow(non_snake_case)]
     impl<'a> ::core::fmt::Debug
         for MyTrait_work_ArgsChecker<'a>
     {
@@ -138,15 +132,11 @@ mod __rsubstitute_generated_Struct {
             self.data.verify_received_nothing_else();
         }
     }
-    #[allow(non_camel_case_types)]
-    #[allow(non_snake_case)]
     pub struct Debug_fmt_Call<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
         f: &'a mut Formatter<'a>,
     }
     #[automatically_derived]
-    #[allow(non_camel_case_types)]
-    #[allow(non_snake_case)]
     impl<'a> ::core::clone::Clone
         for Debug_fmt_Call<'a>
     {
@@ -165,15 +155,11 @@ mod __rsubstitute_generated_Struct {
             <[_]>::into_vec(::alloc::boxed::box_new([ArgInfo::new("f", self.f.clone())]))
         }
     }
-    #[allow(non_camel_case_types)]
-    #[allow(non_snake_case)]
     pub struct Debug_fmt_ArgsChecker<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
         f: Arg<&'a mut Formatter<'a>>,
     }
     #[automatically_derived]
-    #[allow(non_camel_case_types)]
-    #[allow(non_snake_case)]
     impl<'a> ::core::fmt::Debug
         for Debug_fmt_ArgsChecker<'a>
     {
@@ -281,14 +267,10 @@ mod __rsubstitute_generated_Struct {
             self.data.verify_received_nothing_else();
         }
     }
-    #[allow(non_camel_case_types)]
-    #[allow(non_snake_case)]
     pub struct first_struct_impl_Call<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
     }
     #[automatically_derived]
-    #[allow(non_camel_case_types)]
-    #[allow(non_snake_case)]
     impl<'a> ::core::clone::Clone
         for first_struct_impl_Call<'a>
     {
@@ -306,14 +288,10 @@ mod __rsubstitute_generated_Struct {
             ::alloc::vec::Vec::new()
         }
     }
-    #[allow(non_camel_case_types)]
-    #[allow(non_snake_case)]
     pub struct first_struct_impl_ArgsChecker<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
     }
     #[automatically_derived]
-    #[allow(non_camel_case_types)]
-    #[allow(non_snake_case)]
     impl<'a> ::core::fmt::Debug
         for first_struct_impl_ArgsChecker<'a>
     {
@@ -356,15 +334,11 @@ mod __rsubstitute_generated_Struct {
             };
         }
     }
-    #[allow(non_camel_case_types)]
-    #[allow(non_snake_case)]
     pub struct new_Call<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
         number: i32,
     }
     #[automatically_derived]
-    #[allow(non_camel_case_types)]
-    #[allow(non_snake_case)]
     impl<'a> ::core::clone::Clone
         for new_Call<'a>
     {
@@ -386,15 +360,11 @@ mod __rsubstitute_generated_Struct {
             )]))
         }
     }
-    #[allow(non_camel_case_types)]
-    #[allow(non_snake_case)]
     pub struct new_ArgsChecker<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
         number: Arg<i32>,
     }
     #[automatically_derived]
-    #[allow(non_camel_case_types)]
-    #[allow(non_snake_case)]
     impl<'a> ::core::fmt::Debug
         for new_ArgsChecker<'a>
     {
@@ -438,14 +408,10 @@ mod __rsubstitute_generated_Struct {
             Self { number }
         }
     }
-    #[allow(non_camel_case_types)]
-    #[allow(non_snake_case)]
     pub struct get_number_Call<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
     }
     #[automatically_derived]
-    #[allow(non_camel_case_types)]
-    #[allow(non_snake_case)]
     impl<'a> ::core::clone::Clone
         for get_number_Call<'a>
     {
@@ -463,14 +429,10 @@ mod __rsubstitute_generated_Struct {
             ::alloc::vec::Vec::new()
         }
     }
-    #[allow(non_camel_case_types)]
-    #[allow(non_snake_case)]
     pub struct get_number_ArgsChecker<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
     }
     #[automatically_derived]
-    #[allow(non_camel_case_types)]
-    #[allow(non_snake_case)]
     impl<'a> ::core::fmt::Debug
         for get_number_ArgsChecker<'a>
     {
@@ -511,14 +473,10 @@ mod __rsubstitute_generated_Struct {
             self.number
         }
     }
-    #[allow(non_camel_case_types)]
-    #[allow(non_snake_case)]
     pub struct format_Call<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
     }
     #[automatically_derived]
-    #[allow(non_camel_case_types)]
-    #[allow(non_snake_case)]
     impl<'a> ::core::clone::Clone
         for format_Call<'a>
     {
@@ -536,14 +494,10 @@ mod __rsubstitute_generated_Struct {
             ::alloc::vec::Vec::new()
         }
     }
-    #[allow(non_camel_case_types)]
-    #[allow(non_snake_case)]
     pub struct format_ArgsChecker<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
     }
     #[automatically_derived]
-    #[allow(non_camel_case_types)]
-    #[allow(non_snake_case)]
     impl<'a> ::core::fmt::Debug
         for format_ArgsChecker<'a>
     {
@@ -652,7 +606,6 @@ mod __rsubstitute_generated_Struct {
     pub struct StructMockReceived<'a> {
         data: Arc<StructMockData<'a>>,
     }
-    #[allow(non_camel_case_types)]
     pub struct StructMock<'a> {
         pub setup: StructMockSetup<'a>,
         pub received: StructMockReceived<'a>,
