@@ -16,7 +16,12 @@ pub trait IMockTraitImplGenerator {
         fn_infos: &[FnInfo],
     ) -> MockTraitImpl;
 
-    fn generate_for_struct(&self, mock_type: &MockType, fn_infos: &[FnInfo]) -> MockTraitImpl;
+    fn generate_for_struct(
+        &self,
+        attrs: Vec<Attribute>,
+        mock_type: &MockType,
+        fn_infos: &[FnInfo],
+    ) -> MockTraitImpl;
 }
 
 pub(crate) struct MockTraitImplGenerator {
@@ -37,6 +42,7 @@ impl IMockTraitImplGenerator for MockTraitImplGenerator {
             .create_with_generics(trait_ident, mock_type.generics.source_generics.clone());
 
         let mock_impl = self.generate_core(
+            Vec::new(),
             mock_type.ty.clone(),
             mock_type.generics.impl_generics.clone(),
             fn_infos,
@@ -45,8 +51,14 @@ impl IMockTraitImplGenerator for MockTraitImplGenerator {
         return mock_impl;
     }
 
-    fn generate_for_struct(&self, mock_type: &MockType, fn_infos: &[FnInfo]) -> MockTraitImpl {
+    fn generate_for_struct(
+        &self,
+        attrs: Vec<Attribute>,
+        mock_type: &MockType,
+        fn_infos: &[FnInfo],
+    ) -> MockTraitImpl {
         let mock_impl = self.generate_core(
+            attrs,
             mock_type.ty.clone(),
             mock_type.generics.impl_generics.clone(),
             fn_infos,
@@ -59,6 +71,7 @@ impl IMockTraitImplGenerator for MockTraitImplGenerator {
 impl MockTraitImplGenerator {
     fn generate_core(
         &self,
+        attrs: Vec<Attribute>,
         self_ty: Type,
         generics: Generics,
         fn_infos: &[FnInfo],
@@ -72,7 +85,7 @@ impl MockTraitImplGenerator {
         let trait_ = maybe_trait_path.map(|trait_path| (None, trait_path, Default::default()));
 
         let item_impl = ItemImpl {
-            attrs: Vec::new(),
+            attrs,
             defaultness: None,
             unsafety: None,
             impl_token: Default::default(),
@@ -123,7 +136,7 @@ impl MockTraitImplGenerator {
         };
         let block = self.mock_fn_block_generator.generate_for_trait(fn_info);
         let impl_item_fn = ImplItemFn {
-            attrs: Vec::new(),
+            attrs: fn_info.parent.attrs.clone(),
             vis: fn_info.parent.visibility.clone(),
             defaultness: None,
             sig,

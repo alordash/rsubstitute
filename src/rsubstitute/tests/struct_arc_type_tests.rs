@@ -2,14 +2,18 @@ use rsubstitute::macros::*;
 use std::sync::Arc;
 
 mocked! {
-    struct Struct;
-
     #[allow(unused)]    // TODO - apply all source attributes
+    struct Struct {
+        pub number: i32
+    }
+
+    #[allow(unused)]
     impl Struct {
         pub fn new() -> Self {
-            Self
+            Self { number: 3 }
         }
 
+        #[allow(unused)]
         pub(crate) fn accept_arc(&self, r: Arc<i32>) {
             todo!()
         }

@@ -39,6 +39,7 @@ impl IFnDeclExtractor for FnDeclExtractor {
             .iter()
             .map(move |trait_impl_fn| {
                 self.create_fn_decl(
+                    trait_impl_fn.attrs.clone(),
                     &trait_impl_fn.sig,
                     trait_impl_fn.vis.clone(),
                     Some(trait_impl_fn.block.clone()),
@@ -51,6 +52,7 @@ impl IFnDeclExtractor for FnDeclExtractor {
 
     fn extract_fn(&self, item_fn: &ItemFn) -> FnDecl {
         let fn_decl = self.create_fn_decl(
+            item_fn.attrs.clone(),
             &item_fn.sig,
             item_fn.vis.clone(),
             Some(*item_fn.block.clone()),
@@ -76,6 +78,7 @@ impl FnDeclExtractor {
     fn map_trait_item_fn(&self, trait_item_fn: &TraitItemFn) -> FnDecl {
         let sig = &trait_item_fn.sig;
         let fn_decl = self.create_fn_decl(
+            trait_item_fn.attrs.clone(),
             sig,
             Visibility::Inherited,
             trait_item_fn.default.clone(),
@@ -88,6 +91,7 @@ impl FnDeclExtractor {
         let sig = &impl_item_fn.sig;
         self.validate_signature(sig);
         let fn_decl = self.create_fn_decl(
+            impl_item_fn.attrs.clone(),
             sig,
             impl_item_fn.vis.clone(),
             Some(impl_item_fn.block.clone()),
@@ -104,12 +108,14 @@ impl FnDeclExtractor {
 
     fn create_fn_decl(
         &self,
+        attrs: Vec<Attribute>,
         sig: &Signature,
         visibility: Visibility,
         maybe_base_fn_block: Option<Block>,
         maybe_parent_trait_ident: Option<Ident>,
     ) -> FnDecl {
         let fn_decl = FnDecl {
+            attrs,
             maybe_parent_trait_ident,
             fn_ident: sig.ident.clone(),
             arguments: sig.inputs.iter().cloned().collect(),

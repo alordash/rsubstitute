@@ -7,6 +7,7 @@ use syn::*;
 pub trait IMockStructGenerator {
     fn generate(
         &self,
+        attrs: Vec<Attribute>,
         mock_type: &MockType,
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
@@ -33,13 +34,13 @@ pub(crate) struct MockStructGenerator {
 impl IMockStructGenerator for MockStructGenerator {
     fn generate(
         &self,
+        attrs: Vec<Attribute>,
         mock_type: &MockType,
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
         mock_data_struct: &MockDataStruct,
         maybe_inner_data_struct: Option<&InnerDataStruct>,
     ) -> MockStruct {
-        let attrs = Vec::new();
         let data_field = self.field_factory.create(
             constants::DATA_IDENT.clone(),
             self.type_factory.wrap_in_arc(
@@ -91,6 +92,7 @@ impl IMockStructGenerator for MockStructGenerator {
         mock_data_struct: &MockDataStruct,
     ) -> MockStruct {
         let mut mock_struct = self.generate(
+            Vec::new(),
             mock_type,
             mock_setup_struct,
             mock_received_struct,

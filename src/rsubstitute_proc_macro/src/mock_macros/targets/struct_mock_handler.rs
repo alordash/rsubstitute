@@ -105,10 +105,13 @@ impl IStructMockHandler for StructMockHandler {
                 })
                 .collect(),
         );
+        let struct_attrs = struct_mock_syntax.r#struct.attrs.clone();
+        let struct_impls_attrs = struct_mock_syntax.get_struct_impls_attrs();
         let inner_data_struct = self
             .inner_data_struct_generator
             .generate(struct_mock_syntax.r#struct);
         let mock_struct = self.mock_struct_generator.generate(
+            struct_attrs,
             &mock_type,
             &mock_setup_struct,
             &mock_received_struct,
@@ -128,10 +131,14 @@ impl IStructMockHandler for StructMockHandler {
                 )
             })
             .collect();
-        let mock_trait_impl = self
-            .mock_trait_impl_generator
-            .generate_for_struct(&mock_type, &struct_fn_infos);
-        let inner_data_param = self.inner_data_param_generator.generate(&inner_data_struct, &struct_mock_syntax.new_fn);
+        let mock_trait_impl = self.mock_trait_impl_generator.generate_for_struct(
+            struct_impls_attrs,
+            &mock_type,
+            &struct_fn_infos,
+        );
+        let inner_data_param = self
+            .inner_data_param_generator
+            .generate(&inner_data_struct, &struct_mock_syntax.new_fn);
         let inner_data_impl = self
             .inner_data_impl_generator
             .generate(&inner_data_struct, struct_mock_syntax.new_fn);

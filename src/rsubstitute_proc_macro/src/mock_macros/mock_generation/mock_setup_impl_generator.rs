@@ -132,10 +132,7 @@ impl MockSetupImplGenerator {
         };
         let block = self.generate_fn_setup_block(fn_info);
         let impl_item_fn = ImplItemFn {
-            attrs: vec![
-                constants::ALLOW_UNUSED_ATTRIBUTE.clone(),
-                constants::ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE.clone(),
-            ],
+            attrs: vec![constants::ALLOW_UNUSED_ATTRIBUTE.clone()],
             vis: Visibility::Public(Default::default()),
             defaultness: None,
             sig,

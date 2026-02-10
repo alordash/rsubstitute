@@ -53,4 +53,14 @@ impl StructMockSyntax {
             .collect();
         return fns;
     }
+
+    pub fn get_struct_impls_attrs(&self) -> Vec<Attribute> {
+        let attrs = self
+            .struct_impls
+            .iter()
+            .flat_map(|item_impl| item_impl.attrs.iter())
+            .cloned()
+            .collect();
+        return attrs;
+    }
 }

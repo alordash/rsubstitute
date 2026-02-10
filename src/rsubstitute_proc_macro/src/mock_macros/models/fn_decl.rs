@@ -4,6 +4,7 @@ use quote::format_ident;
 use syn::*;
 
 pub(crate) struct FnDecl {
+    pub attrs: Vec<Attribute>,
     pub maybe_parent_trait_ident: Option<Ident>,
     pub fn_ident: Ident,
     pub arguments: Vec<FnArg>,

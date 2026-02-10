@@ -5,9 +5,11 @@ trait Trait {
     fn f(&self);
 
     // TODO - add support
+    #[allow(unused)]
     fn mutate(&mut self);
 
     // TODO - add support
+    #[allow(unused)]
     fn consume(self) -> i32;
 }
 
