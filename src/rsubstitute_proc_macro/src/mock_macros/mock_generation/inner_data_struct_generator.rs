@@ -16,6 +16,7 @@ impl IInnerDataStructGenerator for InnerDataStructGenerator {
             item_struct.ident,
             Self::INNER_DATA_STRUCT_IDENT_SUFFIX
         );
+        item_struct.vis = Visibility::Public(Default::default());
         let inner_data_struct = InnerDataStruct { item_struct };
         return inner_data_struct;
     }

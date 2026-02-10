@@ -31,6 +31,7 @@ pub struct StructMockHandler {
     pub mock_impl_generator: Arc<dyn IMockImplGenerator>,
     pub mock_setup_impl_generator: Arc<dyn IMockSetupImplGenerator>,
     pub mock_received_impl_generator: Arc<dyn IMockReceivedImplGenerator>,
+    pub ignored_impl_fixer: Arc<dyn IIgnoredImplFixer>,
     pub mod_generator: Arc<dyn IModGenerator>,
 }
 
@@ -153,6 +154,8 @@ impl IStructMockHandler for StructMockHandler {
             &mock_received_struct,
             &struct_fn_infos,
         );
+        self.ignored_impl_fixer
+            .fix(&mock_type, &mut struct_mock_syntax.ignored_impls);
         let generated_mod = self.mod_generator.generate_struct(
             target_ident,
             mock_struct_traits,
@@ -169,6 +172,7 @@ impl IStructMockHandler for StructMockHandler {
             mock_impl,
             mock_setup_impl,
             mock_received_impl,
+            struct_mock_syntax.ignored_impls,
         );
 
         let GeneratedMod {

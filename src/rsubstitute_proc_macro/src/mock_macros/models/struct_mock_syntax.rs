@@ -10,6 +10,7 @@ pub(crate) struct StructMockSyntax {
     pub new_fn: ImplItemFn,
     pub trait_impls: Vec<TraitImpl>,
     pub struct_impls: Vec<ItemImpl>,
+    pub ignored_impls: Vec<ItemImpl>,
 }
 
 impl Parse for StructMockSyntax {

@@ -16,6 +16,7 @@ impl IStructMockSyntaxParser for StructMockSyntaxParser {
         let mut maybe_new_fn = None;
         let mut trait_impls = Vec::new();
         let mut struct_impls = Vec::new();
+        let mut ignored_impls = Vec::new();
         while !input.is_empty() {
             let item_impl = input.call(ItemImpl::parse)?;
             let Type::Path(type_path) = item_impl.self_ty.as_ref() else {
@@ -25,7 +26,9 @@ impl IStructMockSyntaxParser for StructMockSyntaxParser {
             if *type_ident != r#struct.ident {
                 panic!("{}", Self::STRUCT_MOCK_INVALID_IDENT_ERROR_MESSAGE);
             }
-            if item_impl.trait_.is_some() {
+            if self.should_ignore_impl(&item_impl) {
+                ignored_impls.push(item_impl);
+            } else if item_impl.trait_.is_some() {
                 let trait_impl = TraitImpl { item_impl };
                 trait_impls.push(trait_impl);
             } else {
@@ -43,6 +46,7 @@ impl IStructMockSyntaxParser for StructMockSyntaxParser {
             new_fn,
             trait_impls,
             struct_impls,
+            ignored_impls,
         };
         return Ok(struct_mock_syntax);
     }
@@ -55,6 +59,18 @@ impl StructMockSyntaxParser {
     const NEW_FN_MUST_BE_PUBLIC_ERROR_MESSAGE: &'static str = "Function `new` must be public.";
     const NEW_FN_MUST_HAVE_RETURN_TYPE_ERROR_MESSAGE_PART: &'static str =
         "Function `new` must have return type that is equal to `Self`";
+
+    fn should_ignore_impl(&self, item_impl: &ItemImpl) -> bool {
+        return item_impl
+            .attrs
+            .iter()
+            .find(|attr| {
+                attr.path().get_ident().is_some_and(|attr_ident| {
+                    *attr_ident == constants::IGNORE_IMPL_ATTRIBUTE_IDENT.clone()
+                })
+            })
+            .is_some();
+    }
 
     fn try_extract_new_fn(&self, item_impl: &ItemImpl) -> Option<ImplItemFn> {
         let maybe_new_fn = item_impl

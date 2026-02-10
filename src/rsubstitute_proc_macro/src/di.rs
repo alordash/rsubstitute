@@ -237,6 +237,9 @@ fn create_services() -> ServiceCollection {
         path_factory: path_factory.clone(),
         field_access_expr_factory: field_access_expr_factory.clone(),
     });
+    let ignored_impl_fixer = Arc::new(IgnoredImplFixer {
+        generics_merger: generics_merger.clone(),
+    });
 
     // TODO - fix order of fields
     let item_trait_handler = Arc::new(ItemTraitHandler {
@@ -293,6 +296,7 @@ fn create_services() -> ServiceCollection {
         mock_impl_generator: mock_impl_generator.clone(),
         mock_setup_impl_generator: mock_setup_impl_generator.clone(),
         mock_received_impl_generator: mock_received_impl_generator.clone(),
+        ignored_impl_fixer: ignored_impl_fixer.clone(),
         mod_generator: mod_generator.clone(),
     });
 

@@ -484,3 +484,5 @@ pub const DEREF_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
 });
 pub const DEREF_TARGET_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Target"));
 pub const DEREF_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("deref"));
+
+pub const IGNORE_IMPL_ATTRIBUTE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("unmock"));
