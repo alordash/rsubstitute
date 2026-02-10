@@ -8,7 +8,7 @@ use std::sync::Arc;
 use syn::punctuated::Punctuated;
 use syn::*;
 
-pub trait IMockTraitImplGenerator {
+pub trait IMockPayloadImplGenerator {
     fn generate(
         &self,
         trait_ident: Ident,
@@ -24,13 +24,13 @@ pub trait IMockTraitImplGenerator {
     ) -> MockTraitImpl;
 }
 
-pub(crate) struct MockTraitImplGenerator {
+pub(crate) struct MockPayloadImplGenerator {
     pub path_factory: Arc<dyn IPathFactory>,
     pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
     pub mock_fn_block_generator: Arc<dyn IMockFnBlockGenerator>,
 }
 
-impl IMockTraitImplGenerator for MockTraitImplGenerator {
+impl IMockPayloadImplGenerator for MockPayloadImplGenerator {
     fn generate(
         &self,
         trait_ident: Ident,
@@ -68,7 +68,7 @@ impl IMockTraitImplGenerator for MockTraitImplGenerator {
     }
 }
 
-impl MockTraitImplGenerator {
+impl MockPayloadImplGenerator {
     fn generate_core(
         &self,
         attrs: Vec<Attribute>,

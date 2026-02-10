@@ -22,7 +22,14 @@ impl IStructMockSyntaxParser for StructMockSyntaxParser {
             let Type::Path(type_path) = item_impl.self_ty.as_ref() else {
                 panic!("{}", Self::STRUCT_MOCK_INVALID_IDENT_ERROR_MESSAGE);
             };
-            let type_ident = type_path.path.require_ident()?;
+            assert_eq!(
+                type_path.path.segments.len(),
+                1,
+                "{}",
+                Self::STRUCT_MOCK_INVALID_IMPL_TARGET_PATH_ERROR_MSG
+            );
+            let type_path_segment = type_path.path.segments.first().unwrap();
+            let type_ident = &type_path_segment.ident;
             if *type_ident != r#struct.ident {
                 panic!("{}", Self::STRUCT_MOCK_INVALID_IDENT_ERROR_MESSAGE);
             }
@@ -56,6 +63,8 @@ impl IStructMockSyntaxParser for StructMockSyntaxParser {
 }
 
 impl StructMockSyntaxParser {
+    const STRUCT_MOCK_INVALID_IMPL_TARGET_PATH_ERROR_MSG: &'static str =
+        "(`impl` target's path length) Struct type ident in `impl` block can not be long path, it should be just a single ident.";
     const STRUCT_MOCK_INVALID_IDENT_ERROR_MESSAGE: &'static str =
         "Struct mock should contain only `impl` blocks for it's own type.";
     const STRUCT_MOCK_INVALID_FN_SIG_ERROR_MESSAGE: &'static str = "Struct mock `impl` functions should all be associated. ℹ You can ignore `impl` block with `#[unmock]` attribute.";
@@ -146,7 +155,7 @@ impl StructMockSyntaxParser {
         if type_ident != &constants::SELF_TYPE_IDENT.clone() {
             errors.push(self.format_new_fn_error_invalid_return_type(return_type));
         }
-        
+
         if !errors.is_empty() {
             self.panic_with_new_fn_errors(errors);
         }

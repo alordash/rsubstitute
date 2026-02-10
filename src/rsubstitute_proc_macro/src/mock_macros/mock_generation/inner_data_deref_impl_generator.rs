@@ -30,8 +30,7 @@ impl IInnerDataDerefImplGenerator for InnerDataDerefImplGenerator {
         let inner_data_type = self
             .type_factory
             .create_from_struct(&inner_data_struct.item_struct);
-        let target_type_item =
-            self.generate_target_type_item(inner_data_struct, inner_data_type.clone());
+        let target_type_item = self.generate_target_type_item(inner_data_type.clone());
         let deref_fn_item = self.generate_deref_fn_item();
         let items = vec![target_type_item, deref_fn_item];
         let item_impl = ItemImpl {
@@ -55,14 +54,14 @@ impl IInnerDataDerefImplGenerator for InnerDataDerefImplGenerator {
 }
 
 impl InnerDataDerefImplGenerator {
-    fn generate_target_type_item(&self, inner_data_struct: &InnerDataStruct, ty: Type) -> ImplItem {
+    fn generate_target_type_item(&self, ty: Type) -> ImplItem {
         let target_type_item = ImplItemType {
             attrs: Vec::new(),
             vis: Visibility::Inherited,
             defaultness: None,
             type_token: Default::default(),
             ident: constants::DEREF_TARGET_TYPE_IDENT.clone(),
-            generics: inner_data_struct.item_struct.generics.clone(),
+            generics: Generics::default(),
             eq_token: Default::default(),
             ty,
             semi_token: Default::default(),

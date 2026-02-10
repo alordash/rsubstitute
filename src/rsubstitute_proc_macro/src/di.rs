@@ -42,14 +42,12 @@ fn create_services() -> ServiceCollection {
     let call_struct_generator = Arc::new(CallStructGenerator {
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
-        reference_normalizer: reference_normalizer.clone(),
     });
     let arg_type_factory = Arc::new(ArgTypeFactory);
     let args_checker_generator = Arc::new(ArgsCheckerGenerator {
         arg_type_factory: arg_type_factory.clone(),
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
-        reference_normalizer: reference_normalizer.clone(),
     });
     let generic_argument_factory = Arc::new(GenericArgumentFactory {
         path_factory: path_factory.clone(),
@@ -134,7 +132,7 @@ fn create_services() -> ServiceCollection {
         field_checker: field_checker.clone(),
         local_factory: local_factory.clone(),
     });
-    let mock_trait_impl_generator = Arc::new(MockTraitImplGenerator {
+    let mock_payload_impl_generator = Arc::new(MockPayloadImplGenerator {
         path_factory: path_factory.clone(),
         reference_normalizer: reference_normalizer.clone(),
         mock_fn_block_generator: mock_fn_block_generator.clone(),
@@ -251,7 +249,7 @@ fn create_services() -> ServiceCollection {
         mock_setup_struct_generator: mock_setup_struct_generator.clone(),
         mock_received_struct_generator: mock_received_struct_generator.clone(),
         mock_struct_generator: mock_struct_generator.clone(),
-        mock_trait_impl_generator: mock_trait_impl_generator.clone(),
+        mock_payload_impl_generator: mock_payload_impl_generator.clone(),
         mock_impl_generator: mock_impl_generator.clone(),
         mock_setup_impl_generator: mock_setup_impl_generator.clone(),
         mock_received_impl_generator: mock_received_impl_generator.clone(),
@@ -292,7 +290,7 @@ fn create_services() -> ServiceCollection {
         mock_struct_generator: mock_struct_generator.clone(),
         inner_data_deref_impl_generator: inner_data_deref_impl_generator.clone(),
         mock_struct_trait_generator: mock_struct_trait_generator.clone(),
-        mock_trait_impl_generator: mock_trait_impl_generator.clone(),
+        mock_payload_impl_generator: mock_payload_impl_generator.clone(),
         mock_impl_generator: mock_impl_generator.clone(),
         mock_setup_impl_generator: mock_setup_impl_generator.clone(),
         mock_received_impl_generator: mock_received_impl_generator.clone(),

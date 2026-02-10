@@ -21,7 +21,7 @@ pub(crate) struct ItemTraitHandler {
     pub mock_setup_struct_generator: Arc<dyn IMockSetupStructGenerator>,
     pub mock_received_struct_generator: Arc<dyn IMockReceivedStructGenerator>,
     pub mock_struct_generator: Arc<dyn IMockStructGenerator>,
-    pub mock_trait_impl_generator: Arc<dyn IMockTraitImplGenerator>,
+    pub mock_payload_impl_generator: Arc<dyn IMockPayloadImplGenerator>,
     pub mock_impl_generator: Arc<dyn IMockImplGenerator>,
     pub mock_setup_impl_generator: Arc<dyn IMockSetupImplGenerator>,
     pub mock_received_impl_generator: Arc<dyn IMockReceivedImplGenerator>,
@@ -70,7 +70,7 @@ impl IItemTraitHandler for ItemTraitHandler {
             None,
         );
         let mock_trait_impl =
-            self.mock_trait_impl_generator
+            self.mock_payload_impl_generator
                 .generate(target_ident.clone(), &mock_type, &fn_infos);
         let mock_impl = self.mock_impl_generator.generate(
             &mock_type,
