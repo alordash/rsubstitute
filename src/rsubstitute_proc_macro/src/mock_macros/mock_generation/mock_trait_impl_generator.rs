@@ -124,7 +124,7 @@ impl MockTraitImplGenerator {
         let block = self.mock_fn_block_generator.generate_for_trait(fn_info);
         let impl_item_fn = ImplItemFn {
             attrs: Vec::new(),
-            vis: Visibility::Inherited,
+            vis: fn_info.parent.visibility.clone(),
             defaultness: None,
             sig,
             block,

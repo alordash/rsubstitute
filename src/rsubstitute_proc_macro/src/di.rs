@@ -217,8 +217,6 @@ fn create_services() -> ServiceCollection {
 
     let mock_struct_trait_info_generator = Arc::new(MockStructTraitInfoGenerator {
         fn_decl_extractor: fn_decl_extractor.clone(),
-        generics_merger: generics_merger.clone(),
-        mock_type_generator: mock_type_generator.clone(),
         fn_info_generator: fn_info_generator.clone(),
     });
 

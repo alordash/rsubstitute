@@ -1,65 +1,70 @@
 use rsubstitute_proc_macro::mocked;
 use std::fmt::{Debug, Formatter};
-use std::ops::Deref;
 
+#[cfg(not(test))]
+struct Struct {
+    number: i32,
+}
+#[cfg(not(test))]
+impl MyTrait for Struct {
+    fn work(&self, value: i32) -> String {
+        return "working...".to_owned();
+    }
+}
+#[cfg(not(test))]
+impl Debug for Struct {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        return write!(f, "Struct = {{ number = {} }}", self.number);
+    }
+}
+#[cfg(not(test))]
+impl Struct {
+    fn first_struct_impl(&self) {
+        println!("first_struct_impl");
+    }
+}
+#[cfg(not(test))]
+impl Struct {
+    pub fn new(number: i32) -> Self {
+        Self { number }
+    }
+
+    pub fn get_number(&self) -> i32 {
+        self.number
+    }
+
+    pub fn format(&self) -> String {
+        let number = self.get_number();
+        let work_result = self.work(number);
+        let result = format!("Struct, number = {number}, work_result = {work_result}");
+        return result;
+    }
+}
+#[cfg(test)]
+pub use __rsubstitute_generated_Struct::*;
+#[cfg(test)]
 #[allow(mismatched_lifetime_syntaxes)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 mod __rsubstitute_generated_Struct {
     use super::*;
     use rsubstitute::for_generated::*;
+    #[derive(Clone)]
     pub struct MyTrait_work_Call<'__rsubstitute_arg_field_lifetime> {
         _phantom_lifetime: PhantomData<&'__rsubstitute_arg_field_lifetime ()>,
         value: i32,
-    }
-    #[automatically_derived]
-    impl<'__rsubstitute_arg_field_lifetime> ::core::clone::Clone
-        for MyTrait_work_Call<'__rsubstitute_arg_field_lifetime>
-    {
-        #[inline]
-        fn clone(&self) -> MyTrait_work_Call<'__rsubstitute_arg_field_lifetime> {
-            MyTrait_work_Call {
-                _phantom_lifetime: ::core::clone::Clone::clone(&self._phantom_lifetime),
-                value: ::core::clone::Clone::clone(&self.value),
-            }
-        }
     }
     impl<'__rsubstitute_arg_field_lifetime> IArgInfosProvider
         for MyTrait_work_Call<'__rsubstitute_arg_field_lifetime>
     {
         fn get_arg_infos(&self) -> Vec<ArgInfo> {
-            <[_]>::into_vec(::alloc::boxed::box_new([ArgInfo::new(
-                "value",
-                self.value.clone(),
-            )]))
+            vec![ArgInfo::new("value", self.value.clone())]
         }
     }
+    #[derive(Debug, IArgsFormatter)]
     pub struct MyTrait_work_ArgsChecker<'__rsubstitute_arg_field_lifetime> {
         _phantom_lifetime: PhantomData<&'__rsubstitute_arg_field_lifetime ()>,
         value: Arg<i32>,
-    }
-    #[automatically_derived]
-    impl<'__rsubstitute_arg_field_lifetime> ::core::fmt::Debug
-        for MyTrait_work_ArgsChecker<'__rsubstitute_arg_field_lifetime>
-    {
-        #[inline]
-        fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
-            ::core::fmt::Formatter::debug_struct_field2_finish(
-                f,
-                "MyTrait_work_ArgsChecker",
-                "_phantom_lifetime",
-                &self._phantom_lifetime,
-                "value",
-                &&self.value,
-            )
-        }
-    }
-    impl<'__rsubstitute_arg_field_lifetime> IArgsFormatter
-        for MyTrait_work_ArgsChecker<'__rsubstitute_arg_field_lifetime>
-    {
-        fn fmt_args(&self) -> String {
-            ::alloc::__export::must_use({ ::alloc::fmt::format(format_args!("{0:?}", self.value)) })
-        }
     }
     impl<'__rsubstitute_arg_field_lifetime>
         IArgsChecker<MyTrait_work_Call<'__rsubstitute_arg_field_lifetime>>
@@ -69,14 +74,12 @@ mod __rsubstitute_generated_Struct {
             &self,
             call: MyTrait_work_Call<'__rsubstitute_arg_field_lifetime>,
         ) -> Vec<ArgCheckResult> {
-            <[_]>::into_vec(::alloc::boxed::box_new([self
-                .value
-                .check("value", call.value)]))
+            vec![self.value.check("value", call.value)]
         }
     }
     impl<'__rsubstitute_arg_field_lifetime>
         IBaseCaller<MyTrait_work_Call<'__rsubstitute_arg_field_lifetime>, String>
-        for MyTrait<'__rsubstitute_arg_field_lifetime>
+        for StructMock<'__rsubstitute_arg_field_lifetime>
     {
         fn call_base(&self, call: MyTrait_work_Call<'__rsubstitute_arg_field_lifetime>) -> String {
             let MyTrait_work_Call { value, .. } = call;
@@ -97,7 +100,7 @@ mod __rsubstitute_generated_Struct {
             value: impl Into<Arg<i32>>,
         ) -> SharedFnConfig<
             '__rsubstitute_arg_field_lifetime,
-            MyTrait<'__rsubstitute_arg_field_lifetime>,
+            StructMock<'__rsubstitute_arg_field_lifetime>,
             MyTrait_work_Call<'__rsubstitute_arg_field_lifetime>,
             MyTrait_work_ArgsChecker<'__rsubstitute_arg_field_lifetime>,
             String,
@@ -136,55 +139,22 @@ mod __rsubstitute_generated_Struct {
             self.data.verify_received_nothing_else();
         }
     }
+    #[derive(Clone)]
     pub struct Debug_fmt_Call<'__rsubstitute_arg_field_lifetime> {
         _phantom_lifetime: PhantomData<&'__rsubstitute_arg_field_lifetime ()>,
         f: &'__rsubstitute_arg_field_lifetime mut Formatter<'__rsubstitute_arg_field_lifetime>,
-    }
-    #[automatically_derived]
-    impl<'__rsubstitute_arg_field_lifetime> ::core::clone::Clone
-        for Debug_fmt_Call<'__rsubstitute_arg_field_lifetime>
-    {
-        #[inline]
-        fn clone(&self) -> Debug_fmt_Call<'__rsubstitute_arg_field_lifetime> {
-            Debug_fmt_Call {
-                _phantom_lifetime: ::core::clone::Clone::clone(&self._phantom_lifetime),
-                f: ::core::clone::Clone::clone(&self.f),
-            }
-        }
     }
     impl<'__rsubstitute_arg_field_lifetime> IArgInfosProvider
         for Debug_fmt_Call<'__rsubstitute_arg_field_lifetime>
     {
         fn get_arg_infos(&self) -> Vec<ArgInfo> {
-            <[_]>::into_vec(::alloc::boxed::box_new([ArgInfo::new("f", self.f.clone())]))
+            vec![ArgInfo::new("f", self.f.clone())]
         }
     }
+    #[derive(Debug, IArgsFormatter)]
     pub struct Debug_fmt_ArgsChecker<'__rsubstitute_arg_field_lifetime> {
         _phantom_lifetime: PhantomData<&'__rsubstitute_arg_field_lifetime ()>,
         f: Arg<&'__rsubstitute_arg_field_lifetime mut Formatter<'__rsubstitute_arg_field_lifetime>>,
-    }
-    #[automatically_derived]
-    impl<'__rsubstitute_arg_field_lifetime> ::core::fmt::Debug
-        for Debug_fmt_ArgsChecker<'__rsubstitute_arg_field_lifetime>
-    {
-        #[inline]
-        fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
-            ::core::fmt::Formatter::debug_struct_field2_finish(
-                f,
-                "Debug_fmt_ArgsChecker",
-                "_phantom_lifetime",
-                &self._phantom_lifetime,
-                "f",
-                &&self.f,
-            )
-        }
-    }
-    impl<'__rsubstitute_arg_field_lifetime> IArgsFormatter
-        for Debug_fmt_ArgsChecker<'__rsubstitute_arg_field_lifetime>
-    {
-        fn fmt_args(&self) -> String {
-            ::alloc::__export::must_use({ ::alloc::fmt::format(format_args!("{0:?}", self.f)) })
-        }
     }
     impl<'__rsubstitute_arg_field_lifetime>
         IArgsChecker<Debug_fmt_Call<'__rsubstitute_arg_field_lifetime>>
@@ -194,19 +164,19 @@ mod __rsubstitute_generated_Struct {
             &self,
             call: Debug_fmt_Call<'__rsubstitute_arg_field_lifetime>,
         ) -> Vec<ArgCheckResult> {
-            <[_]>::into_vec(::alloc::boxed::box_new([self.f.check_ref("f", call.f)]))
+            vec![self.f.check_ref("f", call.f)]
         }
     }
     impl<'__rsubstitute_arg_field_lifetime>
         IBaseCaller<Debug_fmt_Call<'__rsubstitute_arg_field_lifetime>, std::fmt::Result>
-        for Debug<'__rsubstitute_arg_field_lifetime>
+        for StructMock<'__rsubstitute_arg_field_lifetime>
     {
         fn call_base(
             &self,
             call: Debug_fmt_Call<'__rsubstitute_arg_field_lifetime>,
         ) -> std::fmt::Result {
             let Debug_fmt_Call { f, .. } = call;
-            return f.write_fmt(format_args!("Struct = {{ number = {0} }}", self.number));
+            return write!(f, "Struct = {{ number = {} }}", self.number);
         }
     }
     pub struct DebugSetup<'__rsubstitute_arg_field_lifetime> {
@@ -229,7 +199,7 @@ mod __rsubstitute_generated_Struct {
             >,
         ) -> SharedFnConfig<
             '__rsubstitute_arg_field_lifetime,
-            Debug<'__rsubstitute_arg_field_lifetime>,
+            StructMock<'__rsubstitute_arg_field_lifetime>,
             Debug_fmt_Call<'__rsubstitute_arg_field_lifetime>,
             Debug_fmt_ArgsChecker<'__rsubstitute_arg_field_lifetime>,
             std::fmt::Result,
@@ -271,50 +241,20 @@ mod __rsubstitute_generated_Struct {
             self.data.verify_received_nothing_else();
         }
     }
+    #[derive(Clone)]
     pub struct first_struct_impl_Call<'__rsubstitute_arg_field_lifetime> {
         _phantom_lifetime: PhantomData<&'__rsubstitute_arg_field_lifetime ()>,
-    }
-    #[automatically_derived]
-    impl<'__rsubstitute_arg_field_lifetime> ::core::clone::Clone
-        for first_struct_impl_Call<'__rsubstitute_arg_field_lifetime>
-    {
-        #[inline]
-        fn clone(&self) -> first_struct_impl_Call<'__rsubstitute_arg_field_lifetime> {
-            first_struct_impl_Call {
-                _phantom_lifetime: ::core::clone::Clone::clone(&self._phantom_lifetime),
-            }
-        }
     }
     impl<'__rsubstitute_arg_field_lifetime> IArgInfosProvider
         for first_struct_impl_Call<'__rsubstitute_arg_field_lifetime>
     {
         fn get_arg_infos(&self) -> Vec<ArgInfo> {
-            ::alloc::vec::Vec::new()
+            vec![]
         }
     }
+    #[derive(Debug, IArgsFormatter)]
     pub struct first_struct_impl_ArgsChecker<'__rsubstitute_arg_field_lifetime> {
         _phantom_lifetime: PhantomData<&'__rsubstitute_arg_field_lifetime ()>,
-    }
-    #[automatically_derived]
-    impl<'__rsubstitute_arg_field_lifetime> ::core::fmt::Debug
-        for first_struct_impl_ArgsChecker<'__rsubstitute_arg_field_lifetime>
-    {
-        #[inline]
-        fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
-            ::core::fmt::Formatter::debug_struct_field1_finish(
-                f,
-                "first_struct_impl_ArgsChecker",
-                "_phantom_lifetime",
-                &&self._phantom_lifetime,
-            )
-        }
-    }
-    impl<'__rsubstitute_arg_field_lifetime> IArgsFormatter
-        for first_struct_impl_ArgsChecker<'__rsubstitute_arg_field_lifetime>
-    {
-        fn fmt_args(&self) -> String {
-            ::alloc::__export::must_use({ ::alloc::fmt::format(format_args!("")) })
-        }
     }
     impl<'__rsubstitute_arg_field_lifetime>
         IArgsChecker<first_struct_impl_Call<'__rsubstitute_arg_field_lifetime>>
@@ -324,7 +264,7 @@ mod __rsubstitute_generated_Struct {
             &self,
             call: first_struct_impl_Call<'__rsubstitute_arg_field_lifetime>,
         ) -> Vec<ArgCheckResult> {
-            ::alloc::vec::Vec::new()
+            vec![]
         }
     }
     impl<'__rsubstitute_arg_field_lifetime>
@@ -333,55 +273,23 @@ mod __rsubstitute_generated_Struct {
     {
         fn call_base(&self, call: first_struct_impl_Call<'__rsubstitute_arg_field_lifetime>) {
             let first_struct_impl_Call { .. } = call;
-            {
-                ::std::io::_print(format_args!("first_struct_impl\n"));
-            };
+            println!("first_struct_impl");
         }
     }
+    #[derive(Clone)]
     pub struct get_number_Call<'__rsubstitute_arg_field_lifetime> {
         _phantom_lifetime: PhantomData<&'__rsubstitute_arg_field_lifetime ()>,
-    }
-    #[automatically_derived]
-    impl<'__rsubstitute_arg_field_lifetime> ::core::clone::Clone
-        for get_number_Call<'__rsubstitute_arg_field_lifetime>
-    {
-        #[inline]
-        fn clone(&self) -> get_number_Call<'__rsubstitute_arg_field_lifetime> {
-            get_number_Call {
-                _phantom_lifetime: ::core::clone::Clone::clone(&self._phantom_lifetime),
-            }
-        }
     }
     impl<'__rsubstitute_arg_field_lifetime> IArgInfosProvider
         for get_number_Call<'__rsubstitute_arg_field_lifetime>
     {
         fn get_arg_infos(&self) -> Vec<ArgInfo> {
-            ::alloc::vec::Vec::new()
+            vec![]
         }
     }
+    #[derive(Debug, IArgsFormatter)]
     pub struct get_number_ArgsChecker<'__rsubstitute_arg_field_lifetime> {
         _phantom_lifetime: PhantomData<&'__rsubstitute_arg_field_lifetime ()>,
-    }
-    #[automatically_derived]
-    impl<'__rsubstitute_arg_field_lifetime> ::core::fmt::Debug
-        for get_number_ArgsChecker<'__rsubstitute_arg_field_lifetime>
-    {
-        #[inline]
-        fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
-            ::core::fmt::Formatter::debug_struct_field1_finish(
-                f,
-                "get_number_ArgsChecker",
-                "_phantom_lifetime",
-                &&self._phantom_lifetime,
-            )
-        }
-    }
-    impl<'__rsubstitute_arg_field_lifetime> IArgsFormatter
-        for get_number_ArgsChecker<'__rsubstitute_arg_field_lifetime>
-    {
-        fn fmt_args(&self) -> String {
-            ::alloc::__export::must_use({ ::alloc::fmt::format(format_args!("")) })
-        }
     }
     impl<'__rsubstitute_arg_field_lifetime>
         IArgsChecker<get_number_Call<'__rsubstitute_arg_field_lifetime>>
@@ -391,7 +299,7 @@ mod __rsubstitute_generated_Struct {
             &self,
             call: get_number_Call<'__rsubstitute_arg_field_lifetime>,
         ) -> Vec<ArgCheckResult> {
-            ::alloc::vec::Vec::new()
+            vec![]
         }
     }
     impl<'__rsubstitute_arg_field_lifetime>
@@ -403,50 +311,20 @@ mod __rsubstitute_generated_Struct {
             self.number
         }
     }
+    #[derive(Clone)]
     pub struct format_Call<'__rsubstitute_arg_field_lifetime> {
         _phantom_lifetime: PhantomData<&'__rsubstitute_arg_field_lifetime ()>,
-    }
-    #[automatically_derived]
-    impl<'__rsubstitute_arg_field_lifetime> ::core::clone::Clone
-        for format_Call<'__rsubstitute_arg_field_lifetime>
-    {
-        #[inline]
-        fn clone(&self) -> format_Call<'__rsubstitute_arg_field_lifetime> {
-            format_Call {
-                _phantom_lifetime: ::core::clone::Clone::clone(&self._phantom_lifetime),
-            }
-        }
     }
     impl<'__rsubstitute_arg_field_lifetime> IArgInfosProvider
         for format_Call<'__rsubstitute_arg_field_lifetime>
     {
         fn get_arg_infos(&self) -> Vec<ArgInfo> {
-            ::alloc::vec::Vec::new()
+            vec![]
         }
     }
+    #[derive(Debug, IArgsFormatter)]
     pub struct format_ArgsChecker<'__rsubstitute_arg_field_lifetime> {
         _phantom_lifetime: PhantomData<&'__rsubstitute_arg_field_lifetime ()>,
-    }
-    #[automatically_derived]
-    impl<'__rsubstitute_arg_field_lifetime> ::core::fmt::Debug
-        for format_ArgsChecker<'__rsubstitute_arg_field_lifetime>
-    {
-        #[inline]
-        fn fmt(&self, f: &mut ::core::fmt::Formatter) -> ::core::fmt::Result {
-            ::core::fmt::Formatter::debug_struct_field1_finish(
-                f,
-                "format_ArgsChecker",
-                "_phantom_lifetime",
-                &&self._phantom_lifetime,
-            )
-        }
-    }
-    impl<'__rsubstitute_arg_field_lifetime> IArgsFormatter
-        for format_ArgsChecker<'__rsubstitute_arg_field_lifetime>
-    {
-        fn fmt_args(&self) -> String {
-            ::alloc::__export::must_use({ ::alloc::fmt::format(format_args!("")) })
-        }
     }
     impl<'__rsubstitute_arg_field_lifetime>
         IArgsChecker<format_Call<'__rsubstitute_arg_field_lifetime>>
@@ -456,7 +334,7 @@ mod __rsubstitute_generated_Struct {
             &self,
             call: format_Call<'__rsubstitute_arg_field_lifetime>,
         ) -> Vec<ArgCheckResult> {
-            ::alloc::vec::Vec::new()
+            vec![]
         }
     }
     impl<'__rsubstitute_arg_field_lifetime>
@@ -467,15 +345,11 @@ mod __rsubstitute_generated_Struct {
             let format_Call { .. } = call;
             let number = self.get_number();
             let work_result = self.work(number);
-            let result = ::alloc::__export::must_use({
-                ::alloc::fmt::format(format_args!(
-                    "Struct, number = {0}, work_result = {1}",
-                    number, work_result,
-                ))
-            });
+            let result = format!("Struct, number = {number}, work_result = {work_result}");
             return result;
         }
     }
+    #[derive(IMockData)]
     pub struct StructMockData<'__rsubstitute_arg_field_lifetime> {
         _phantom_lifetime: PhantomData<&'__rsubstitute_arg_field_lifetime ()>,
         first_struct_impl_data: FnData<
@@ -509,20 +383,6 @@ mod __rsubstitute_generated_Struct {
             std::fmt::Result,
         >,
     }
-    impl<'__rsubstitute_arg_field_lifetime> IMockData
-        for StructMockData<'__rsubstitute_arg_field_lifetime>
-    {
-        fn get_received_nothing_else_error_msgs(&self) -> Vec<Vec<String>> {
-            return <[_]>::into_vec(::alloc::boxed::box_new([
-                self.first_struct_impl_data
-                    .get_unexpected_calls_error_msgs(),
-                self.get_number_data.get_unexpected_calls_error_msgs(),
-                self.format_data.get_unexpected_calls_error_msgs(),
-                self.MyTrait_work_data.get_unexpected_calls_error_msgs(),
-                self.Debug_fmt_data.get_unexpected_calls_error_msgs(),
-            ]));
-        }
-    }
     pub struct StructMockSetup<'__rsubstitute_arg_field_lifetime> {
         data: Arc<StructMockData<'__rsubstitute_arg_field_lifetime>>,
         pub MyTrait: MyTraitSetup<'__rsubstitute_arg_field_lifetime>,
@@ -536,11 +396,13 @@ mod __rsubstitute_generated_Struct {
     struct Struct_InnerData {
         number: i32,
     }
+
     impl Struct_InnerData {
         pub fn new(number: i32) -> Self {
             Self { number }
         }
     }
+
     pub struct StructMock<'__rsubstitute_arg_field_lifetime> {
         pub setup: StructMockSetup<'__rsubstitute_arg_field_lifetime>,
         pub received: StructMockReceived<'__rsubstitute_arg_field_lifetime>,
@@ -593,7 +455,7 @@ mod __rsubstitute_generated_Struct {
             };
             self.data.first_struct_impl_data.handle_base(&self, call);
         }
-        fn get_number<'__rsubstitute_arg_anonymous>(&'__rsubstitute_arg_anonymous self) -> i32 {
+        pub fn get_number<'__rsubstitute_arg_anonymous>(&'__rsubstitute_arg_anonymous self) -> i32 {
             let call = unsafe {
                 get_number_Call {
                     _phantom_lifetime: PhantomData,
@@ -601,7 +463,8 @@ mod __rsubstitute_generated_Struct {
             };
             return self.data.get_number_data.handle_base_returning(&self, call);
         }
-        fn format<'__rsubstitute_arg_anonymous>(&'__rsubstitute_arg_anonymous self) -> String {
+
+        pub fn format<'__rsubstitute_arg_anonymous>(&'__rsubstitute_arg_anonymous self) -> String {
             let call = unsafe {
                 format_Call {
                     _phantom_lifetime: PhantomData,

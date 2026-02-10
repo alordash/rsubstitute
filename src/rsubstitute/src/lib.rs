@@ -18,4 +18,5 @@ pub mod for_generated {
     pub use std::marker::PhantomData;
     pub use std::sync::Arc;
     pub use std::sync::LazyLock;
+    pub use std::ops::Deref;
 }

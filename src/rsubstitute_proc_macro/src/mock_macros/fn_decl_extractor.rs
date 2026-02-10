@@ -40,6 +40,7 @@ impl IFnDeclExtractor for FnDeclExtractor {
             .map(move |trait_impl_fn| {
                 self.create_fn_decl(
                     &trait_impl_fn.sig,
+                    trait_impl_fn.vis.clone(),
                     Some(trait_impl_fn.block.clone()),
                     Some(trait_ident.clone()),
                 )
@@ -49,7 +50,12 @@ impl IFnDeclExtractor for FnDeclExtractor {
     }
 
     fn extract_fn(&self, item_fn: &ItemFn) -> FnDecl {
-        let fn_decl = self.create_fn_decl(&item_fn.sig, Some(*item_fn.block.clone()), None);
+        let fn_decl = self.create_fn_decl(
+            &item_fn.sig,
+            item_fn.vis.clone(),
+            Some(*item_fn.block.clone()),
+            None,
+        );
         return fn_decl;
     }
 }
@@ -69,14 +75,24 @@ impl FnDeclExtractor {
 
     fn map_trait_item_fn(&self, trait_item_fn: &TraitItemFn) -> FnDecl {
         let sig = &trait_item_fn.sig;
-        let fn_decl = self.create_fn_decl(sig, trait_item_fn.default.clone(), None);
+        let fn_decl = self.create_fn_decl(
+            sig,
+            Visibility::Inherited,
+            trait_item_fn.default.clone(),
+            None,
+        );
         return fn_decl;
     }
 
     fn map_impl_item_fn(&self, impl_item_fn: &ImplItemFn) -> FnDecl {
         let sig = &impl_item_fn.sig;
         self.validate_signature(sig);
-        let fn_decl = self.create_fn_decl(sig, Some(impl_item_fn.block.clone()), None);
+        let fn_decl = self.create_fn_decl(
+            sig,
+            impl_item_fn.vis.clone(),
+            Some(impl_item_fn.block.clone()),
+            None,
+        );
         return fn_decl;
     }
 
@@ -89,6 +105,7 @@ impl FnDeclExtractor {
     fn create_fn_decl(
         &self,
         sig: &Signature,
+        visibility: Visibility,
         maybe_base_fn_block: Option<Block>,
         maybe_parent_trait_ident: Option<Ident>,
     ) -> FnDecl {
@@ -97,6 +114,7 @@ impl FnDeclExtractor {
             fn_ident: sig.ident.clone(),
             arguments: sig.inputs.iter().cloned().collect(),
             return_value: sig.output.clone(),
+            visibility,
             maybe_base_fn_block,
         };
         return fn_decl;

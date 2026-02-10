@@ -8,6 +8,7 @@ pub(crate) struct FnDecl {
     pub fn_ident: Ident,
     pub arguments: Vec<FnArg>,
     pub return_value: ReturnType,
+    pub visibility: Visibility,
     pub maybe_base_fn_block: Option<Block>,
 }
 

@@ -48,20 +48,20 @@ impl IStructMockHandler for StructMockHandler {
         let mock_generics = self
             .mock_generics_generator
             .generate(&struct_mock_syntax.r#struct.generics);
+        let mock_type = self
+            .mock_type_generator
+            .generate_for_trait(mock_ident.clone(), mock_generics);
         let mock_struct_trait_infos: Vec<_> = std::mem::take(&mut struct_mock_syntax.trait_impls)
             .into_iter()
             .map(|x| {
                 self.mock_struct_trait_info_generator
-                    .generate(x, &mock_generics.impl_generics)
+                    .generate(&mock_type, x)
             })
             .collect();
         let struct_fn_decls = self
             .fn_decl_extractor
             .extract_struct_fns(&struct_mock_syntax.get_struct_fns());
         let target_ident = struct_mock_syntax.r#struct.ident.clone();
-        let mock_type = self
-            .mock_type_generator
-            .generate_for_trait(mock_ident.clone(), mock_generics);
         let struct_fn_infos: Vec<_> = struct_fn_decls
             .into_iter()
             .map(|x| self.fn_info_generator.generate(x, &mock_type))
