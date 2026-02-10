@@ -108,9 +108,6 @@ impl IStructMockHandler for StructMockHandler {
         let inner_data_struct = self
             .inner_data_struct_generator
             .generate(struct_mock_syntax.r#struct);
-        let inner_data_impl = self
-            .inner_data_impl_generator
-            .generate(&inner_data_struct, struct_mock_syntax.new_fn);
         let mock_struct = self.mock_struct_generator.generate(
             &mock_type,
             &mock_setup_struct,
@@ -134,7 +131,10 @@ impl IStructMockHandler for StructMockHandler {
         let mock_trait_impl = self
             .mock_trait_impl_generator
             .generate_for_struct(&mock_type, &struct_fn_infos);
-        let inner_data_param = self.inner_data_param_generator.generate(&inner_data_struct);
+        let inner_data_param = self.inner_data_param_generator.generate(&inner_data_struct, &struct_mock_syntax.new_fn);
+        let inner_data_impl = self
+            .inner_data_impl_generator
+            .generate(&inner_data_struct, struct_mock_syntax.new_fn);
         let mock_impl = self.mock_impl_generator.generate(
             &mock_type,
             &mock_struct,

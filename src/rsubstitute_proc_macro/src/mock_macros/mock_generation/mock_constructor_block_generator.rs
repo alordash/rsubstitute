@@ -2,7 +2,7 @@ use crate::constants;
 use crate::mock_macros::mock_generation::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
-use quote::format_ident;
+use quote::{ToTokens, format_ident};
 use std::cell::LazyCell;
 use std::sync::Arc;
 use syn::*;
@@ -179,7 +179,7 @@ impl IMockConstructorBlockGenerator for MockConstructorBlockGenerator {
             Some(Default::default()),
         );
         let stmts = if let Some(inner_data_param) = maybe_inner_data_param {
-            let inner_data_stmt = self.generate_inner_data_stmt(&inner_data_param);
+            let inner_data_stmt = self.generate_inner_data_stmt(inner_data_param);
             vec![data_stmt, inner_data_stmt, return_stmt]
         } else {
             vec![data_stmt, return_stmt]
@@ -219,7 +219,7 @@ impl MockConstructorBlockGenerator {
         return field_value;
     }
 
-    fn generate_inner_data_stmt(&self, inner_data_param: &InnerDataParam) -> Stmt {
+    fn generate_inner_data_stmt(&self, inner_data_param: InnerDataParam) -> Stmt {
         let local_init = LocalInit {
             eq_token: Default::default(),
             expr: Box::new(Expr::Call(ExprCall {
