@@ -28,10 +28,13 @@ impl IStructMockSyntaxParser for StructMockSyntaxParser {
             }
             if self.should_ignore_impl(&item_impl) {
                 ignored_impls.push(item_impl);
-            } else if item_impl.trait_.is_some() {
+                continue;
+            }
+            if item_impl.trait_.is_some() {
                 let trait_impl = TraitImpl { item_impl };
                 trait_impls.push(trait_impl);
             } else {
+                self.validate_item_impl(&item_impl);
                 if maybe_new_fn.is_none() {
                     maybe_new_fn = self.try_extract_new_fn(&item_impl);
                 }
@@ -55,6 +58,7 @@ impl IStructMockSyntaxParser for StructMockSyntaxParser {
 impl StructMockSyntaxParser {
     const STRUCT_MOCK_INVALID_IDENT_ERROR_MESSAGE: &'static str =
         "Struct mock should contain only `impl` blocks for it's own type.";
+    const STRUCT_MOCK_INVALID_FN_SIG_ERROR_MESSAGE: &'static str = "Struct mock `impl` functions should all be associated. ℹ You can ignore `impl` block with `#[unmock]` attribute.";
     const NO_NEW_FN_ERROR_MESSAGE: &'static str = "In order to be mockable structure must have function `pub fn new(args) -> Self`, where `args` is arbitrary collection of user-defined arguments.";
     const NEW_FN_MUST_BE_PUBLIC_ERROR_MESSAGE: &'static str = "Function `new` must be public.";
     const NEW_FN_MUST_HAVE_RETURN_TYPE_ERROR_MESSAGE_PART: &'static str =
@@ -70,6 +74,26 @@ impl StructMockSyntaxParser {
                 })
             })
             .is_some();
+    }
+
+    fn validate_item_impl(&self, item_impl: &ItemImpl) {
+        let impl_item_fns = item_impl.items.iter().filter_map(|x| match x {
+            ImplItem::Fn(impl_item_fn) => Some(impl_item_fn),
+            _ => None,
+        });
+
+        for impl_item_fn in impl_item_fns {
+            if self.is_fn_impl_item_fn_is_new_fn(impl_item_fn) {
+                self.validate_new_fn(impl_item_fn);
+                continue;
+            }
+            if let Some(first_arg) = impl_item_fn.sig.inputs.first()
+                && let FnArg::Receiver(_) = first_arg
+            {
+                continue;
+            }
+            panic!("{}", Self::STRUCT_MOCK_INVALID_FN_SIG_ERROR_MESSAGE);
+        }
     }
 
     fn try_extract_new_fn(&self, item_impl: &ItemImpl) -> Option<ImplItemFn> {
@@ -88,7 +112,6 @@ impl StructMockSyntaxParser {
 
     fn is_fn_impl_item_fn_is_new_fn(&self, impl_item_fn: &ImplItemFn) -> bool {
         if impl_item_fn.sig.ident == constants::NEW_IDENT.clone() {
-            self.validate_new_fn(impl_item_fn);
             return true;
         }
         return false;
@@ -122,6 +145,10 @@ impl StructMockSyntaxParser {
 
         if type_ident != &constants::SELF_TYPE_IDENT.clone() {
             errors.push(self.format_new_fn_error_invalid_return_type(return_type));
+        }
+        
+        if !errors.is_empty() {
+            self.panic_with_new_fn_errors(errors);
         }
     }
 

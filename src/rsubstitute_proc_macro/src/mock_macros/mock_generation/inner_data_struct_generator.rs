@@ -1,3 +1,4 @@
+use crate::constants;
 use crate::mock_macros::mock_generation::models::*;
 use quote::format_ident;
 use syn::*;
@@ -11,6 +12,9 @@ pub(crate) struct InnerDataStructGenerator;
 impl IInnerDataStructGenerator for InnerDataStructGenerator {
     fn generate(&self, source_struct: ItemStruct) -> InnerDataStruct {
         let mut item_struct = source_struct.clone();
+        item_struct
+            .attrs
+            .push(constants::DOC_HIDDEN_ATTRIBUTE.clone());
         item_struct.ident = format_ident!(
             "{}_{}",
             item_struct.ident,

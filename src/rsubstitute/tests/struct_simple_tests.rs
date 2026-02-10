@@ -1,30 +1,42 @@
-use rsubstitute::macros::mocked;
-
-struct Foo {
-    pub number: i32,
-    pub string: String,
-}
+use rsubstitute::macros::*;
 
 mocked! {
-    struct Structd {
+    struct Struct {
         pub value: i32
     }
 
-    impl Structd {
-        pub fn new(Foo {number, ..}: Foo) -> Self {
-            Self { value: number }
+    impl Struct {
+        pub fn new(value: i32) -> Self {
+            Self { value }
         }
+
+        pub fn f(&self) {}
     }
-}
-fn ad() {
-    let s = StructdMock::new(Foo {
-        number: 32,
-        string: "asd".to_owned(),
-    });
+
+    #[unmock]
+    impl Struct {
+        pub fn non_associative() {}
+    }
 }
 
 #[cfg(test)]
 mod tests {
+    #![allow(non_snake_case)]
+
+    use super::*;
+    use not_enough_asserts::panics::*;
+    use rsubstitute::*;
+    use std::cell::RefCell;
+    use std::sync::Arc;
+
     #[test]
-    fn compile() {}
+    fn f_Ok() {
+        // Arrange
+        let value = 22;
+        let mock = StructMock::new(value);
+        
+        // Act
+        StructMock::non_associative();
+        
+    }
 }

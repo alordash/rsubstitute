@@ -14,6 +14,8 @@ trait Trait {
     fn accept_two_rcs_return_rc(&self, r1: Rc<i32>, r2: Rc<f32>) -> Rc<String>;
 }
 
+// TODO - mark all `mod tests` with `#[cfg(test)]`
+#[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
     use super::*;
