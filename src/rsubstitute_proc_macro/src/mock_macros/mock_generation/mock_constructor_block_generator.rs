@@ -2,7 +2,7 @@ use crate::constants;
 use crate::mock_macros::mock_generation::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
-use quote::{ToTokens, format_ident};
+use quote::format_ident;
 use std::cell::LazyCell;
 use std::sync::Arc;
 use syn::*;

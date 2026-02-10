@@ -1,5 +1,5 @@
-use rsubstitute_proc_macro::{mocked, unmock};
-use std::fmt::{Debug, Formatter};
+use rsubstitute_proc_macro::*;
+use std::fmt::*;
 
 mocked! {
     struct Struct {
