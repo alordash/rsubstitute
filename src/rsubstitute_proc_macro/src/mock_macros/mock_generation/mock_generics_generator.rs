@@ -1,7 +1,7 @@
 use crate::constants;
 use crate::mock_macros::mock_generation::models::*;
 use crate::syntax::*;
-use quote::{ToTokens, format_ident};
+use quote::format_ident;
 use std::sync::Arc;
 use syn::*;
 

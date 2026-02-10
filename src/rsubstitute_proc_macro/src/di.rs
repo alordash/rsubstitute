@@ -42,12 +42,14 @@ fn create_services() -> ServiceCollection {
     let call_struct_generator = Arc::new(CallStructGenerator {
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
+        reference_normalizer: reference_normalizer.clone(),
     });
     let arg_type_factory = Arc::new(ArgTypeFactory);
     let args_checker_generator = Arc::new(ArgsCheckerGenerator {
         arg_type_factory: arg_type_factory.clone(),
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
+        reference_normalizer: reference_normalizer.clone(),
     });
     let generic_argument_factory = Arc::new(GenericArgumentFactory {
         path_factory: path_factory.clone(),

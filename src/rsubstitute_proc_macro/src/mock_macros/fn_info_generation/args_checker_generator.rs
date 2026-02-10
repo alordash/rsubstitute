@@ -12,10 +12,11 @@ pub trait IArgsCheckerGenerator {
     fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> ArgsCheckerStruct;
 }
 
-pub struct ArgsCheckerGenerator {
-    pub(crate) arg_type_factory: Arc<dyn IArgTypeFactory>,
-    pub(crate) field_factory: Arc<dyn IFieldFactory>,
-    pub(crate) struct_factory: Arc<dyn IStructFactory>,
+pub(crate) struct ArgsCheckerGenerator {
+    pub arg_type_factory: Arc<dyn IArgTypeFactory>,
+    pub field_factory: Arc<dyn IFieldFactory>,
+    pub struct_factory: Arc<dyn IStructFactory>,
+    pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
 }
 
 impl IArgsCheckerGenerator for ArgsCheckerGenerator {
@@ -40,12 +41,14 @@ impl IArgsCheckerGenerator for ArgsCheckerGenerator {
             named: struct_fields,
         };
 
-        let item_struct = self.struct_factory.create(
+        let mut item_struct = self.struct_factory.create(
             attrs,
             ident,
             mock_generics.impl_generics.clone(),
             fields_named,
         );
+        self.reference_normalizer
+            .normalize_anonymous_lifetimes_in_struct(&mut item_struct);
         let args_checker_struct = ArgsCheckerStruct { item_struct };
 
         return args_checker_struct;
