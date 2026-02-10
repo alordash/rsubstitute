@@ -11,6 +11,7 @@ trait Trait<T1, T2> {
     fn get_return_different(&self, value: T1) -> T2;
 }
 
+#[cfg(test)]
 mod trait_generic_tests {
     #![allow(non_snake_case)]
     use super::*;

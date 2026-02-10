@@ -13,6 +13,7 @@ trait Trait {
     fn accept_two_refs_return_ref(&self, r1: &i32, r2: &f32) -> &'static str;
 }
 
+#[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
     use super::*;

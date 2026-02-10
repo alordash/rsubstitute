@@ -17,6 +17,7 @@ trait Trait {
 #[allow(unused)]
 trait AnotherTestTrait {}
 
+#[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
 

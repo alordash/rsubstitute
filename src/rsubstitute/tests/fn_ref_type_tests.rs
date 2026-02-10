@@ -25,6 +25,7 @@ fn accept_two_refs_return_ref(r1: &i32, r2: &f32) -> &'static str {
     ACCEPT_TWO_REFS_RETURN_REF
 }
 
+#[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
     use super::*;
