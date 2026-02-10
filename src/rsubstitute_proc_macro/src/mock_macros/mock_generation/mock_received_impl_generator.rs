@@ -16,6 +16,13 @@ pub trait IMockReceivedImplGenerator {
         fn_infos: &[FnInfo],
     ) -> MockReceivedImpl;
 
+    fn generate_for_struct_trait(
+        &self,
+        mock_type: &MockType,
+        mock_received_struct: &MockReceivedStruct,
+        fn_infos: &[FnInfo],
+    ) -> MockReceivedImpl;
+
     fn generate_for_static(
         &self,
         mock_type: &MockType,
@@ -46,6 +53,27 @@ impl IMockReceivedImplGenerator for MockReceivedImplGenerator {
             .iter()
             .map(|x| ImplItem::Fn(self.generate_fn_received(x, mock_type)))
             .chain(std::iter::once(self.generate_only_fn()))
+            .collect();
+
+        let item_impl = self
+            .impl_factory
+            .create_with_default_lifetime(mock_type, self_ty, fns);
+        let mock_received_impl = MockReceivedImpl { item_impl };
+        return mock_received_impl;
+    }
+
+    fn generate_for_struct_trait(
+        &self,
+        mock_type: &MockType,
+        mock_received_struct: &MockReceivedStruct,
+        fn_infos: &[FnInfo],
+    ) -> MockReceivedImpl {
+        let self_ty = self
+            .type_factory
+            .create_from_struct(&mock_received_struct.item_struct);
+        let fns = fn_infos
+            .iter()
+            .map(|x| ImplItem::Fn(self.generate_fn_received(x, mock_type)))
             .collect();
 
         let item_impl = self

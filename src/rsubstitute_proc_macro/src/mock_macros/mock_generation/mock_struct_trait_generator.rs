@@ -40,7 +40,7 @@ impl IMockStructTraitGenerator for MockStructTraitGenerator {
             &setup_struct,
             &mock_struct_trait_info.fn_infos,
         );
-        let received_impl = self.mock_received_impl_generator.generate_for_trait(
+        let received_impl = self.mock_received_impl_generator.generate_for_struct_trait(
             &mock_struct_trait_info.mock_type,
             &received_struct,
             &mock_struct_trait_info.fn_infos,
