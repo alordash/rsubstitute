@@ -45,7 +45,9 @@ impl IReferenceNormalizer for ReferenceNormalizer {
             })
             .collect();
         for optional_lifetime in optional_lifetime_refs {
-            *optional_lifetime = Some(self.get_normalized_lifetime());
+            if optional_lifetime.is_none() {
+                *optional_lifetime = Some(self.get_normalized_lifetime());
+            }
         }
     }
 
