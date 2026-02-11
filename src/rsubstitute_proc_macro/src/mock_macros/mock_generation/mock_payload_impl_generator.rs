@@ -24,6 +24,7 @@ pub trait IMockPayloadImplGenerator {
 
 pub(crate) struct MockPayloadImplGenerator {
     pub path_factory: Arc<dyn IPathFactory>,
+    pub mock_fn_inputs_generator: Arc<dyn IMockFnInputsGenerator>,
     pub mock_fn_block_generator: Arc<dyn IMockFnBlockGenerator>,
 }
 
@@ -106,7 +107,9 @@ impl MockPayloadImplGenerator {
             ident: fn_info.parent.fn_ident.clone(),
             generics: Generics::default(),
             paren_token: Default::default(),
-            inputs: fn_info.parent.arguments.iter().cloned().collect(),
+            inputs: self
+                .mock_fn_inputs_generator
+                .generate(&fn_info.parent.arguments),
             variadic: None,
             output: fn_info.parent.return_value.clone(),
         };

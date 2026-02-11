@@ -1,3 +1,4 @@
+mod arg_ident_extractor;
 mod arg_type_factory;
 mod attribute_factory;
 mod expr_method_call_factory;
@@ -17,6 +18,7 @@ mod std_mem_transmute_expr_factory;
 mod struct_factory;
 mod type_factory;
 
+pub use arg_ident_extractor::*;
 pub use arg_type_factory::*;
 pub use attribute_factory::*;
 pub use expr_method_call_factory::*;

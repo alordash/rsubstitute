@@ -11,6 +11,7 @@ pub trait IStaticFnGenerator {
 }
 
 pub(crate) struct StaticFnGenerator {
+    pub mock_fn_inputs_generator: Arc<dyn IMockFnInputsGenerator>,
     pub mock_fn_block_generator: Arc<dyn IMockFnBlockGenerator>,
 }
 
@@ -35,7 +36,9 @@ impl IStaticFnGenerator for StaticFnGenerator {
             ident: fn_info.parent.get_full_ident(),
             generics,
             paren_token: Default::default(),
-            inputs: fn_info.parent.arguments.iter().cloned().collect(),
+            inputs: self
+                .mock_fn_inputs_generator
+                .generate(&fn_info.parent.arguments),
             variadic: None,
             output: fn_info.parent.return_value.clone(),
         };

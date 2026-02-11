@@ -9,7 +9,7 @@ struct Foo {
 trait Trait<'a, 'b> {
     fn accept_ref(&self, r: &'a &'b &'a &i32) -> &'b &'a &'b &'a i32;
 
-    fn fooo(&self, Foo { number }: Foo) {
+    fn fooo(&mut self, Foo { mut number }: Foo) {
         println!("number: {number:?}")
     }
 }

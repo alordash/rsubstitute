@@ -3,8 +3,7 @@ use crate::mock_macros::fn_info_generation::models::*;
 use crate::mock_macros::mock_generation::models::MockGenerics;
 use crate::mock_macros::models::*;
 use crate::syntax::*;
-use proc_macro2::Ident;
-use quote::{ToTokens, format_ident};
+use quote::format_ident;
 use std::sync::Arc;
 use syn::*;
 
@@ -16,6 +15,7 @@ pub(crate) struct CallStructGenerator {
     pub field_factory: Arc<dyn IFieldFactory>,
     pub struct_factory: Arc<dyn IStructFactory>,
     pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
+    pub arg_ident_extractor: Arc<dyn IArgIdentExtractor>,
 }
 
 impl ICallStructGenerator for CallStructGenerator {
@@ -70,17 +70,9 @@ impl CallStructGenerator {
             }),
             rest => rest.clone(),
         };
-        let ident = self.generate_field_ident(arg_number, pat_type);
+        let ident = self.arg_ident_extractor.extract(arg_number, pat_type);
 
         let result = self.field_factory.create(ident, ty);
         return Some(result);
-    }
-
-    fn generate_field_ident(&self, arg_number: usize, pat_type: &PatType) -> Ident {
-        let result = match &*pat_type.pat {
-            Pat::Ident(pat_ident) => pat_ident.ident.clone(),
-            _ => format_ident!("arg_{arg_number}"),
-        };
-        return result;
     }
 }
