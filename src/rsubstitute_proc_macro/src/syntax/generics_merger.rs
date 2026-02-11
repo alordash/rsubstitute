@@ -11,6 +11,8 @@ impl IGenericsMerger for GenericsMerger {
     fn merge(&self, base: &mut Generics, merged: &Generics) {
         let where_clause =
             self.merge_where_clause(base.where_clause.clone(), merged.where_clause.clone());
+        base.params
+        
         let params = base
             .params
             .clone()

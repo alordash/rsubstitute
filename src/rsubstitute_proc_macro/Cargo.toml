@@ -9,6 +9,7 @@ proc-macro = true
 
 [dependencies]
 rsubstitute_core = { workspace = true }
+itertools = { workspace = true }
 
 proc-macro2 = { workspace = true }
 quote = { workspace = true }

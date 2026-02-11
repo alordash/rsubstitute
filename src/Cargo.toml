@@ -9,3 +9,4 @@ rsubstitute_proc_macro = { path = "rsubstitute_proc_macro" }
 proc-macro2 = "1.0.95"
 quote = "1.0.40"
 syn = { version = "2.0.104", features = ["full"] }
+itertools = "0.14.0"
