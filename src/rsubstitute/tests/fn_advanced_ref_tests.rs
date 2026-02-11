@@ -1,13 +1,24 @@
 #![allow(unused)]
 use rsubstitute::macros::mock;
 
-#[mock]
-fn accept_ref<'a>(r: &'a i32) -> &'a i32 {
-    todo!()
-}
+// #[mock]
+// fn accept_ref<'a>(r: &'a i32) -> &'a i32 {
+//     todo!()
+// }
 
 // #[mock]
-// fn accept_mut_ref<'a>() -> &'a mut i32 {
+// fn return_mut_ref<'a>() -> &'a mut i32 {
+//     todo!()
+// }
+
+// TODO - support it
+// #[mock]
+// fn accept_mut_ref<'a>(mut r: i32) {
+//     todo!()
+// }
+
+// #[mock]
+// fn accept_mut_ref<'a, 'b>(r: &'a &'b &'a &i32) -> &'a &'b &'a &'b i32 {
 //     todo!()
 // }
 

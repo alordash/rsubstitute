@@ -1,11 +1,9 @@
-use crate::constants;
 use crate::mock_macros::fn_info_generation::models::*;
 use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::mock_generation::*;
 use crate::syntax::*;
 use proc_macro2::Ident;
 use std::sync::Arc;
-use syn::punctuated::Punctuated;
 use syn::*;
 
 pub trait IMockPayloadImplGenerator {
@@ -26,7 +24,6 @@ pub trait IMockPayloadImplGenerator {
 
 pub(crate) struct MockPayloadImplGenerator {
     pub path_factory: Arc<dyn IPathFactory>,
-    pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
     pub mock_fn_block_generator: Arc<dyn IMockFnBlockGenerator>,
 }
 
@@ -107,30 +104,9 @@ impl MockPayloadImplGenerator {
             abi: None,
             fn_token: Default::default(),
             ident: fn_info.parent.fn_ident.clone(),
-            generics: Generics {
-                lt_token: Some(Default::default()),
-                params: [GenericParam::Lifetime(LifetimeParam {
-                    attrs: Vec::new(),
-                    lifetime: constants::ANONYMOUS_LIFETIME.clone(),
-                    colon_token: None,
-                    bounds: Punctuated::new(),
-                })]
-                .into_iter()
-                .collect(),
-                gt_token: Some(Default::default()),
-                where_clause: None,
-            },
+            generics: Generics::default(),
             paren_token: Default::default(),
-            inputs: fn_info
-                .parent
-                .arguments
-                .clone()
-                .into_iter()
-                .map(|mut fn_arg| {
-                    self.reference_normalizer.anonymize_fn_arg(&mut fn_arg);
-                    return fn_arg;
-                })
-                .collect(),
+            inputs: fn_info.parent.arguments.iter().cloned().collect(),
             variadic: None,
             output: fn_info.parent.return_value.clone(),
         };

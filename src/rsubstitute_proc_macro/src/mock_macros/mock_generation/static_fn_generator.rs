@@ -2,30 +2,20 @@ use crate::constants;
 use crate::mock_macros::fn_info_generation::models::*;
 use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::mock_generation::*;
-use crate::syntax::*;
 use std::sync::Arc;
 use syn::punctuated::Punctuated;
 use syn::*;
 
 pub trait IStaticFnGenerator {
-    fn generate(
-        &self,
-        fn_info: &FnInfo,
-        mock_type: &MockType,
-    ) -> StaticFn;
+    fn generate(&self, fn_info: &FnInfo, mock_type: &MockType) -> StaticFn;
 }
 
 pub(crate) struct StaticFnGenerator {
     pub mock_fn_block_generator: Arc<dyn IMockFnBlockGenerator>,
-    pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
 }
 
 impl IStaticFnGenerator for StaticFnGenerator {
-    fn generate(
-        &self,
-        fn_info: &FnInfo,
-        mock_type: &MockType,
-    ) -> StaticFn {
+    fn generate(&self, fn_info: &FnInfo, mock_type: &MockType) -> StaticFn {
         let mut generics = mock_type.generics.impl_generics.clone();
         generics.params.insert(
             0,
@@ -45,16 +35,7 @@ impl IStaticFnGenerator for StaticFnGenerator {
             ident: fn_info.parent.get_full_ident(),
             generics,
             paren_token: Default::default(),
-            inputs: fn_info
-                .parent
-                .arguments
-                .clone()
-                .into_iter()
-                .map(|mut fn_arg| {
-                    self.reference_normalizer.anonymize_fn_arg(&mut fn_arg);
-                    return fn_arg;
-                })
-                .collect(),
+            inputs: fn_info.parent.arguments.iter().cloned().collect(),
             variadic: None,
             output: fn_info.parent.return_value.clone(),
         };

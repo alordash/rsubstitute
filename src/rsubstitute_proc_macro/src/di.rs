@@ -136,7 +136,6 @@ fn create_services() -> ServiceCollection {
     });
     let mock_payload_impl_generator = Arc::new(MockPayloadImplGenerator {
         path_factory: path_factory.clone(),
-        reference_normalizer: reference_normalizer.clone(),
         mock_fn_block_generator: mock_fn_block_generator.clone(),
     });
     let mock_constructor_block_generator = Arc::new(MockConstructorBlockGenerator {
@@ -212,7 +211,6 @@ fn create_services() -> ServiceCollection {
     });
     let static_fn_generator = Arc::new(StaticFnGenerator {
         mock_fn_block_generator: mock_fn_block_generator.clone(),
-        reference_normalizer: reference_normalizer.clone(),
     });
 
     let mock_struct_trait_info_generator = Arc::new(MockStructTraitInfoGenerator {
