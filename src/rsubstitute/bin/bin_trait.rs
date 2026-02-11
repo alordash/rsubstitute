@@ -67,7 +67,7 @@ mod generated {
 
     impl<'a> IArgInfosProvider for work_Call<'a> {
         fn get_arg_infos(&self) -> Vec<ArgInfo> {
-            return vec![ArgInfo::new("value", self.value.clone())];
+            return vec![ArgInfo::new("value", &self.value)];
         }
     }
 
@@ -79,8 +79,8 @@ mod generated {
     }
 
     impl<'a> IArgsChecker<work_Call<'a>> for work_ArgsChecker<'a> {
-        fn check(&'_ self, call: work_Call) -> Vec<ArgCheckResult> {
-            vec![self.value.check("value", call.value)]
+        fn check(&'_ self, call: &work_Call) -> Vec<ArgCheckResult> {
+            vec![self.value.check("value", &call.value)]
         }
     }
 
@@ -97,10 +97,10 @@ mod generated {
     impl<'a> IArgInfosProvider for another_work_Call<'a> {
         fn get_arg_infos(&self) -> Vec<ArgInfo> {
             return vec![
-                ArgInfo::new("string", self.string.clone()),
-                ArgInfo::new("something", self.something.clone()),
-                ArgInfo::new("dyn_obj", self.dyn_obj.clone()),
-                ArgInfo::new("arc", self.arc.clone()),
+                ArgInfo::new("string", &self.string),
+                ArgInfo::new("something", &self.something),
+                ArgInfo::new("dyn_obj", &self.dyn_obj),
+                ArgInfo::new("arc", &self.arc),
             ];
         }
     }
@@ -116,12 +116,12 @@ mod generated {
     }
 
     impl<'a> IArgsChecker<another_work_Call<'a>> for another_work_ArgsChecker<'a> {
-        fn check(&self, call: another_work_Call<'a>) -> Vec<ArgCheckResult> {
+        fn check(&self, call: &another_work_Call<'a>) -> Vec<ArgCheckResult> {
             vec![
-                self.string.check("string", call.string),
-                self.something.check_ref("something", call.something),
-                self.dyn_obj.check_ref("dyn_obj", call.dyn_obj),
-                self.arc.check_arc("arc", call.arc),
+                self.string.check("string", &call.string),
+                self.something.check_ref("something", &call.something),
+                self.dyn_obj.check_ref("dyn_obj", &call.dyn_obj),
+                self.arc.check_arc("arc", &call.arc),
             ]
         }
     }
@@ -145,7 +145,7 @@ mod generated {
     }
 
     impl<'a> IArgsChecker<get_Call<'a>> for get_ArgsChecker<'a> {
-        fn check(&'_ self, _call: get_Call) -> Vec<ArgCheckResult> {
+        fn check(&'_ self, _call: &get_Call) -> Vec<ArgCheckResult> {
             Vec::new()
         }
     }
@@ -413,7 +413,7 @@ fn main() {
     let arc_foo2: Arc<dyn IFoo> = Arc::new(Foo(144));
     my_trait_mock
         .setup
-        .work(Arg::Is(|value| value == 32))
+        .work(Arg::Is(|value| *value == 32))
         .does(|| println!("work mock called"))
         .another_work(
             Arg::Eq(string as &str),
@@ -426,7 +426,7 @@ fn main() {
             Arg::Any,
             Arg::Any,
             Arg::Any,
-            Arg::Is(|foo: Arc<dyn IFoo>| foo.get_value() == 144),
+            Arg::Is(|foo: &Arc<dyn IFoo>| foo.get_value() == 144),
         )
         .returns(vec![7, 70, 77])
         .get()

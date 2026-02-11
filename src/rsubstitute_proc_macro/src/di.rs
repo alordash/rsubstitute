@@ -66,7 +66,7 @@ fn create_services() -> ServiceCollection {
     let call_arg_infos_provider_impl_generator = Arc::new(CallArgInfosProviderImplGenerator {
         path_factory: path_factory.clone(),
         type_factory: type_factory.clone(),
-        expr_method_call_factory: expr_method_call_factory.clone(),
+        field_access_expr_factory: field_access_expr_factory.clone(),
     });
     let args_checker_impl_generator = Arc::new(ArgsCheckerTraitImplGenerator {
         type_factory: type_factory.clone(),

@@ -1,13 +1,14 @@
 pub(crate) struct CallInfo<TCall> {
     verified: bool,
-    call: TCall,
+    call_ptr: *const TCall,
 }
 
 impl<TCall> CallInfo<TCall> {
-    pub fn new(call: TCall) -> Self {
+    pub fn new(call: &TCall) -> Self {
+        let call_ptr = std::ptr::from_ref(call);
         Self {
             verified: false,
-            call,
+            call_ptr,
         }
     }
 
@@ -20,6 +21,10 @@ impl<TCall> CallInfo<TCall> {
     }
 
     pub fn get_call(&self) -> &TCall {
-        &self.call
+        unsafe {
+            self.call_ptr
+                .as_ref()
+                .expect("Call ptr should not be null, calls basically should have static lifetime.")
+        }
     }
 }

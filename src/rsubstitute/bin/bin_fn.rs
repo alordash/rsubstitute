@@ -28,15 +28,20 @@ mod global {
     }
 
     #[allow(non_camel_case_types)]
-    #[derive(Clone)]
     pub struct global_Call<'a> {
         phantom_lifetime: PhantomData<&'a ()>,
         pub number: i32,
     }
+    
+    impl<'a> Drop for global_Call<'a> {
+        fn drop(&mut self) {
+            println!("Dropping global call");
+        }
+    }
 
     impl<'a> IArgInfosProvider for global_Call<'a> {
         fn get_arg_infos(&self) -> Vec<ArgInfo> {
-            return vec![ArgInfo::new("number", self.number.clone())];
+            return vec![ArgInfo::new("number", &self.number)];
         }
     }
 
@@ -48,8 +53,8 @@ mod global {
     }
 
     impl<'a> IArgsChecker<global_Call<'a>> for global_ArgsChecker<'a> {
-        fn check(&self, call: global_Call<'a>) -> Vec<ArgCheckResult> {
-            vec![self.number.check("number", call.number)]
+        fn check(&self, call: &global_Call<'a>) -> Vec<ArgCheckResult> {
+            vec![self.number.check("number", &call.number)]
         }
     }
 
@@ -79,6 +84,7 @@ mod global {
     impl<'a> IBaseCaller<global_Call<'a>, String> for globalMock {
         fn call_base(&self, call: global_Call) -> String {
             let global_Call { number, .. } = call;
+            std::mem::forget(call); // TODO - add to all IBaseCaller impls
             return format!("actual number: {number}");
         }
     }
@@ -178,7 +184,7 @@ mod tests {
 
         // Assert
         let expected_v = 2;
-        global::received(Arg::Is(|v| v == expected_v), Times::Once);
+        global::received(Arg::Is(|v| *v == expected_v), Times::Once);
         global::received(Arg::Eq(2), Times::Once).received(Arg::Eq(143), Times::Exactly(1));
         // assert_eq!("MOCK: 2", result1);
         assert_eq!("actual number: 2", result1);

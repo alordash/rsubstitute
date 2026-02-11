@@ -208,12 +208,6 @@ pub const CLONE_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
     return result;
 });
 
-pub const DERIVE_CLONE_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
-    let attribute_factory = &SERVICES.attribute_factory;
-    let result = attribute_factory.create(format_ident!("derive"), &CLONE_TRAIT_IDENT.to_string());
-    return result;
-});
-
 pub const DERIVE_MOCK_DATA_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     let attribute_factory = &SERVICES.attribute_factory;
     let result = attribute_factory.create(
@@ -464,8 +458,6 @@ pub const DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE: LazyCell<FieldValue> = LazyCel
 
 pub const SEND_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Send"));
 pub const SYNC_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Sync"));
-
-pub const CLONE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("clone"));
 
 pub const RESET_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("reset"));
 

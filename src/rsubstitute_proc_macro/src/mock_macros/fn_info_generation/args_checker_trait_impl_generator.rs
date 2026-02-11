@@ -121,7 +121,13 @@ impl ArgsCheckerTraitImplGenerator {
                             subpat: None,
                         })),
                         colon_token: Default::default(),
-                        ty: call_type.clone(),
+                        // TODO - add to type_factory
+                        ty: Box::new(Type::Reference(TypeReference {
+                            and_token: Default::default(),
+                            lifetime: None,
+                            mutability: None,
+                            elem: call_type.clone(),
+                        })),
                     }),
                 ]
                 .into_iter()
@@ -170,9 +176,16 @@ impl ArgsCheckerTraitImplGenerator {
             attrs: Vec::new(),
             lit: Lit::Str(LitStr::new(&field_ident.to_string(), Span::call_site())),
         });
-        let field_access_arg = self
-            .field_access_expr_factory
-            .create(vec![Self::CALL_ARG_IDENT.clone(), field_ident]);
+        // TODO - add factory for ExprReference
+        let field_access_arg = Expr::Reference(ExprReference {
+            attrs: Vec::new(),
+            and_token: Default::default(),
+            mutability: None,
+            expr: Box::new(
+                self.field_access_expr_factory
+                    .create(vec![Self::CALL_ARG_IDENT.clone(), field_ident]),
+            ),
+        });
         let method = self.get_check_fn_ident(&field.ty);
         let expr = Expr::MethodCall(ExprMethodCall {
             attrs: Vec::new(),

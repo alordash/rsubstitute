@@ -64,12 +64,12 @@ mod tests {
             accept_value::received(Arg::Any, Times::Exactly(3))
                 .received(first_value, Times::Once)
                 .received(
-                    Arg::Is(move |actual_value| actual_value == first_value),
+                    Arg::Is(move |actual_value| *actual_value == first_value),
                     Times::Once,
                 )
                 .received(Arg::Eq(second_value), Times::Exactly(2))
                 .received(
-                    Arg::Is(move |actual_value| actual_value == second_value),
+                    Arg::Is(move |actual_value| *actual_value == second_value),
                     Times::Exactly(2),
                 )
                 .no_other_calls();
@@ -233,7 +233,7 @@ accept_value(*{first_value}*)
             assert_panics(
                 || {
                     accept_value::received(
-                        Arg::Is(move |actual_value| actual_value == first_value),
+                        Arg::Is(move |actual_value| *actual_value == first_value),
                         Times::Never,
                     )
                 },
@@ -251,7 +251,7 @@ accept_value(*{second_value}*)
             assert_panics(
                 || {
                     accept_value::received(
-                        Arg::Is(move |actual_value| actual_value == first_value),
+                        Arg::Is(move |actual_value| *actual_value == first_value),
                         Times::Exactly(3),
                     )
                 },
@@ -269,7 +269,7 @@ accept_value(*{second_value}*)
             assert_panics(
                 || {
                     accept_value::received(
-                        Arg::Is(move |actual_value| actual_value == second_value),
+                        Arg::Is(move |actual_value| *actual_value == second_value),
                         Times::Never,
                     )
                 },
@@ -287,7 +287,7 @@ accept_value(*{first_value}*)
             assert_panics(
                 || {
                     accept_value::received(
-                        Arg::Is(move |actual_value| actual_value == second_value),
+                        Arg::Is(move |actual_value| *actual_value == second_value),
                         Times::Exactly(3),
                     )
                 },
@@ -532,7 +532,7 @@ accept_value(*{first_value}*)
                 .returns(first_returned_value)
                 .setup(Arg::Eq(second_accepted_value))
                 .returns(second_returned_value)
-                .setup(Arg::Is(move |x| x == third_accepted_value))
+                .setup(Arg::Is(move |x| *x == third_accepted_value))
                 .returns(third_returned_value);
 
             // Act

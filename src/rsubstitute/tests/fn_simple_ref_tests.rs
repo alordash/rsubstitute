@@ -25,6 +25,9 @@ fn accept_two_refs_return_ref(r1: &i32, r2: &f32) -> &'static str {
     ACCEPT_TWO_REFS_RETURN_REF
 }
 
+#[mock]
+fn accept_mut_ref(r: &mut i32) {}
+
 #[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]

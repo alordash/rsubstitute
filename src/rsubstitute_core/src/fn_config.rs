@@ -10,7 +10,7 @@ pub struct FnConfig<TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValu
     args_checker: TArgsChecker,
     current_return_value_index: usize,
     return_values: VecDeque<TReturnValue>,
-    calls: Vec<TCall>,
+    calls: Vec<*const TCall>,
     callback: Option<Arc<RefCell<dyn FnMut()>>>,
     call_base: bool,
 }
@@ -44,11 +44,11 @@ impl<TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
         self.callback = Some(Arc::new(RefCell::new(callback)));
     }
 
-    pub fn register_call(&mut self, call: TCall) {
+    pub fn register_call(&mut self, call: &TCall) {
         self.calls.push(call);
     }
 
-    pub fn check(&'_ self, call: TCall) -> Vec<ArgCheckResult> {
+    pub fn check(&'_ self, call: &TCall) -> Vec<ArgCheckResult> {
         self.args_checker.check(call)
     }
 

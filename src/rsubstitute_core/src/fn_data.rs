@@ -7,6 +7,7 @@ use crate::*;
 use std::cell::RefCell;
 use std::sync::Arc;
 
+// TODO - impl manual drop that clears calls
 pub struct FnData<TMock, TCall: IArgInfosProvider, TArgsChecker: IArgsChecker<TCall>, TReturnValue>
 {
     fn_name: &'static str,
@@ -34,16 +35,15 @@ impl<TMock, TCall: IArgInfosProvider, TArgsChecker: IArgsChecker<TCall>, TReturn
     }
 }
 
-impl<
-    TMock,
-    TCall: IArgInfosProvider + Clone,
-    TArgsChecker: IArgsChecker<TCall>,
-    TReturnValue: Clone,
-> FnData<TMock, TCall, TArgsChecker, TReturnValue>
+impl<TMock, TCall: IArgInfosProvider, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
+    FnData<TMock, TCall, TArgsChecker, TReturnValue>
 {
-    pub fn register_call(&self, call: TCall) -> &Self {
-        self.call_infos.borrow_mut().push(CallInfo::new(call));
-        self
+    pub fn retain_call(&self, call: TCall) -> TCall {
+        let boxed_call = Box::new(call);
+        let call_ref = Box::leak(boxed_call);
+        let call_copy: TCall = unsafe { std::mem::transmute_copy(call_ref) };
+        self.call_infos.borrow_mut().push(CallInfo::new(call_ref));
+        return call_copy;
     }
 
     pub fn add_config(
@@ -59,27 +59,29 @@ impl<
     }
 
     pub fn handle(&self, call: TCall) {
-        let maybe_fn_config = self.try_get_matching_config(call.clone());
-        self.register_call(call.clone());
+        let retained_call = self.retain_call(call);
+        let maybe_fn_config = self.try_get_matching_config(&retained_call);
         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
-            fn_config.borrow_mut().register_call(call);
+            fn_config.borrow_mut().register_call(&retained_call);
             if let Some(callback) = fn_config.borrow_mut().get_callback() {
                 callback.borrow_mut()();
             }
         }
+        std::mem::forget(retained_call);
     }
 
     pub fn handle_returning(&self, call: TCall) -> TReturnValue {
-        let fn_config = self.get_required_matching_config(call.clone());
-        self.register_call(call.clone());
-        fn_config.borrow_mut().register_call(call.clone());
+        let retained_call = self.retain_call(call);
+        let fn_config = self.get_required_matching_config(&retained_call);
+        fn_config.borrow_mut().register_call(&retained_call);
         if let Some(callback) = fn_config.borrow_mut().get_callback() {
             callback.borrow_mut()();
         }
         let Some(return_value) = fn_config.borrow_mut().get_return_value() else {
             self.error_printer
-                .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
+                .panic_no_return_value_was_configured(self.fn_name, retained_call.get_arg_infos());
         };
+        std::mem::forget(retained_call);
         return return_value;
     }
 
@@ -126,7 +128,7 @@ impl<
         let mut non_matching_calls = Vec::new();
         let mut call_infos = self.call_infos.borrow_mut();
         for call_info in call_infos.iter_mut() {
-            let call_matching_result = args_checker.check(call_info.get_call().clone());
+            let call_matching_result = args_checker.check(call_info.get_call());
             let is_matching = call_matching_result.iter().all(ArgCheckResult::is_ok);
             if is_matching {
                 call_info.verify();
@@ -140,12 +142,12 @@ impl<
 
     fn try_get_matching_config(
         &self,
-        call: TCall,
+        call: &TCall,
     ) -> MatchingConfigSearchResult<TMock, TCall, TArgsChecker, TReturnValue> {
         let configs = unsafe { &*self.configs };
         let mut args_check_results = Vec::with_capacity(configs.len());
         for config in configs.iter().rev() {
-            let args_check_result = config.borrow().check(call.clone());
+            let args_check_result = config.borrow().check(call);
             if args_check_result.iter().all(|x| x.is_ok()) {
                 return MatchingConfigSearchResult::Ok(config.clone());
             }
@@ -164,9 +166,9 @@ impl<
 
     fn get_required_matching_config(
         &self,
-        call: TCall,
+        call: &TCall,
     ) -> Arc<RefCell<FnConfig<TMock, TCall, TArgsChecker, TReturnValue>>> {
-        let fn_config = match self.try_get_matching_config(call.clone()) {
+        let fn_config = match self.try_get_matching_config(call) {
             MatchingConfigSearchResult::Ok(matching_config) => matching_config,
             MatchingConfigSearchResult::Err(matching_config_search_err) => {
                 self.error_printer.panic_no_suitable_fn_configuration_found(
@@ -182,40 +184,44 @@ impl<
 
 impl<
     TMock: IBaseCaller<TCall, TReturnValue>,
-    TCall: IArgInfosProvider + Clone,
+    TCall: IArgInfosProvider,
     TArgsChecker: IArgsChecker<TCall>,
     TReturnValue: Clone,
 > FnData<TMock, TCall, TArgsChecker, TReturnValue>
 {
     pub fn handle_base(&self, mock: &TMock, call: TCall) {
-        let maybe_fn_config = self.try_get_matching_config(call.clone());
-        self.register_call(call.clone());
+        let retained_call = self.retain_call(call);
+        let maybe_fn_config = self.try_get_matching_config(&retained_call);
         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
-            fn_config.borrow_mut().register_call(call.clone());
+            fn_config.borrow_mut().register_call(&retained_call);
             if fn_config.borrow().should_call_base() {
-                mock.call_base(call);
+                mock.call_base(retained_call);
+                return;
             }
             if let Some(callback) = fn_config.borrow().get_callback() {
                 callback.borrow_mut()();
             }
         }
+        std::mem::forget(retained_call);
     }
 
     pub fn handle_base_returning(&self, mock: &TMock, call: TCall) -> TReturnValue {
-        let fn_config = self.get_required_matching_config(call.clone());
-        self.register_call(call.clone());
+        let retained_call = self.retain_call(call);
+        let fn_config = self.get_required_matching_config(&retained_call);
         // TODO - ain't too many fn_config.borrows? Maybe borrow once and reuse borrow?
-        fn_config.borrow_mut().register_call(call.clone());
+        fn_config.borrow_mut().register_call(&retained_call);
         if fn_config.borrow().should_call_base() {
-            return mock.call_base(call);
+            return mock.call_base(retained_call);
         }
         if let Some(callback) = fn_config.borrow().get_callback() {
             callback.borrow_mut()();
         }
         let Some(return_value) = fn_config.borrow_mut().get_return_value() else {
             self.error_printer
-                .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
+                .panic_no_return_value_was_configured(self.fn_name, retained_call.get_arg_infos());
         };
+        std::mem::forget(retained_call);
+
         return return_value;
     }
 }

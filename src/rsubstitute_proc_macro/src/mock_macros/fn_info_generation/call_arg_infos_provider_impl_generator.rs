@@ -17,10 +17,10 @@ pub trait ICallArgInfosProviderImplGenerator {
     ) -> CallArgInfosProviderImpl;
 }
 
-pub struct CallArgInfosProviderImplGenerator {
-    pub(crate) path_factory: Arc<dyn IPathFactory>,
-    pub(crate) type_factory: Arc<dyn ITypeFactory>,
-    pub(crate) expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
+pub(crate) struct CallArgInfosProviderImplGenerator {
+    pub path_factory: Arc<dyn IPathFactory>,
+    pub type_factory: Arc<dyn ITypeFactory>,
+    pub field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
 }
 
 impl ICallArgInfosProviderImplGenerator for CallArgInfosProviderImplGenerator {
@@ -118,19 +118,20 @@ impl CallArgInfosProviderImplGenerator {
     }
 
     fn generate_arg_info_new_expr(&self, field: &Field) -> Expr {
-        let field_ident = field
-            .ident
-            .clone()
-            .expect("Call struct fields should have ident.");
+        let field_ident = field.get_required_ident();
         let field_name_arg = Expr::Lit(ExprLit {
             attrs: Vec::new(),
             lit: Lit::Str(LitStr::new(&field_ident.to_string(), Span::call_site())),
         });
-        let field_access_arg = Expr::MethodCall(self.expr_method_call_factory.create(
-            vec![constants::SELF_IDENT.clone(), field_ident],
-            constants::CLONE_IDENT.clone(),
-            Vec::new(),
-        ));
+        let field_access_arg = Expr::Reference(ExprReference {
+            attrs: Vec::new(),
+            and_token: Default::default(),
+            mutability: None,
+            expr: Box::new(
+                self.field_access_expr_factory
+                    .create(vec![constants::SELF_IDENT.clone(), field_ident]),
+            ),
+        });
 
         let expr = Expr::Call(ExprCall {
             attrs: Vec::new(),

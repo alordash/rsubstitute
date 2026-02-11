@@ -22,7 +22,6 @@ impl ICallStructGenerator for CallStructGenerator {
     fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> CallStruct {
         let attrs = vec![
             constants::DOC_HIDDEN_ATTRIBUTE.clone(),
-            constants::DERIVE_CLONE_ATTRIBUTE.clone(),
         ];
         let ident = format_ident!("{}_{}", fn_decl.get_full_ident(), Self::CALL_STRUCT_SUFFIX);
         let fn_fields = fn_decl
