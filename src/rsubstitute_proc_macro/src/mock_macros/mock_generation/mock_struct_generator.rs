@@ -99,6 +99,7 @@ impl IMockStructGenerator for MockStructGenerator {
             mock_data_struct,
             None
         );
+        mock_struct.item_struct.attrs.insert(0, constants::DOC_HIDDEN_ATTRIBUTE.clone());
         mock_struct.item_struct.generics.params = mock_struct
             .item_struct
             .generics

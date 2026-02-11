@@ -22,7 +22,10 @@ pub(crate) struct MockDataStructGenerator {
 
 impl IMockDataStructGenerator for MockDataStructGenerator {
     fn generate_for_trait(&self, mock_type: &MockType, fn_infos: &[&FnInfo]) -> MockDataStruct {
-        let attrs = vec![constants::DERIVE_MOCK_DATA_ATTRIBUTE.clone()];
+        let attrs = vec![
+            constants::DOC_HIDDEN_ATTRIBUTE.clone(),
+            constants::DERIVE_MOCK_DATA_ATTRIBUTE.clone(),
+        ];
         let ident = format_ident!(
             "{}{}",
             mock_type.ident.clone(),
@@ -35,7 +38,12 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
         let field_and_fn_idents = fn_fields
             .iter()
             .zip(fn_infos)
-            .map(|(x, y)| (x.get_required_ident(), y.parent.get_str_literal_full_ident().clone()))
+            .map(|(x, y)| {
+                (
+                    x.get_required_ident(),
+                    y.parent.get_str_literal_full_ident().clone(),
+                )
+            })
             .collect();
         let fields = std::iter::once(constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD.clone())
             .chain(fn_fields)
@@ -59,7 +67,10 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
     }
 
     fn generate_for_static(&self, mock_type: &MockType, fn_infos: &[&FnInfo]) -> MockDataStruct {
-        let attrs = vec![constants::DERIVE_MOCK_DATA_ATTRIBUTE.clone()];
+        let attrs = vec![
+            constants::DOC_HIDDEN_ATTRIBUTE.clone(),
+            constants::DERIVE_MOCK_DATA_ATTRIBUTE.clone(),
+        ];
         let ident = format_ident!(
             "{}{}",
             mock_type.ident.clone(),
@@ -72,7 +83,12 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
         let field_and_fn_idents = fn_fields
             .iter()
             .zip(fn_infos)
-            .map(|(x, y)| (x.get_required_ident(), y.parent.get_str_literal_full_ident()))
+            .map(|(x, y)| {
+                (
+                    x.get_required_ident(),
+                    y.parent.get_str_literal_full_ident(),
+                )
+            })
             .collect();
         let fields = [constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD.clone()]
             .into_iter()

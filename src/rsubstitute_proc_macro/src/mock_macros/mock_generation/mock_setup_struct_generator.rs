@@ -30,7 +30,7 @@ impl IMockSetupStructGenerator for MockSetupStructGenerator {
         mock_data_struct: &MockDataStruct,
         implemented_traits_configurators: Vec<ImplementedTraitConfigurator>,
     ) -> MockSetupStruct {
-        let attrs = Vec::new();
+        let attrs = vec![constants::DOC_HIDDEN_ATTRIBUTE.clone()];
         let ident = format_ident!("{}{}", mock_ident, Self::MOCK_SETUP_STRUCT_IDENT_SUFFIX);
         let data_type = self
             .type_factory

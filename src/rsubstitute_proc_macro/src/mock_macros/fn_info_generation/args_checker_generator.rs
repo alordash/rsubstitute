@@ -21,7 +21,10 @@ pub(crate) struct ArgsCheckerGenerator {
 
 impl IArgsCheckerGenerator for ArgsCheckerGenerator {
     fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> ArgsCheckerStruct {
-        let attrs = vec![constants::DERIVE_DEBUG_AND_I_ARGS_FORMATTER_ATTRIBUTE.clone()];
+        let attrs = vec![
+            constants::DOC_HIDDEN_ATTRIBUTE.clone(),
+            constants::DERIVE_DEBUG_AND_I_ARGS_FORMATTER_ATTRIBUTE.clone(),
+        ];
         let ident = format_ident!(
             "{}_{}",
             fn_decl.get_full_ident(),
