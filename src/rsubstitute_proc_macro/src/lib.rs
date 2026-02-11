@@ -4,7 +4,6 @@ mod constants;
 mod derive_args_formatter_macro_handler;
 mod derive_mock_data_macro_handler;
 mod di;
-mod lifetime_ref;
 mod mock_macros;
 mod syntax;
 
