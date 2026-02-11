@@ -9,6 +9,12 @@ struct Foo {
 trait Trait<'a, 'b> {
     fn accept_ref(&self, r: &'a &'b &'a &i32) -> &'b &'a &'b &'a i32;
 
+    fn return_mut_ref(&self) -> &'a mut i32;
+
+    fn return_mut_ref_with_base(&self) -> &'a mut i32 {
+        todo!()
+    }
+
     fn fooo(&mut self, Foo { mut number }: Foo) {
         println!("number: {number:?}")
     }

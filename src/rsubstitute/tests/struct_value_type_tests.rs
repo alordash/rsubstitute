@@ -2,18 +2,18 @@ use rsubstitute::macros::*;
 
 mocked! {
     struct Struct;
-    
+
     impl Struct {
         pub fn new() -> Self { Self }
-        
+
         pub fn accept_value(&self, v: i32) { todo!() }
-    
+
         pub fn return_value(&self) -> i32 { todo!() }
-    
+
         pub fn accept_value_return_value(&self, v: i32) -> f32 { todo!() }
-    
+
         pub fn accept_two_values(&self, v1: i32, v2: f32) { todo!() }
-    
+
         pub fn accept_two_values_return_value(&self, v1: i32, v2: f32) -> String { todo!() }
     }
 }
@@ -426,7 +426,7 @@ accept_value(*{first_value}*)
             let third_value = 333;
             mock.setup
                 .return_value()
-                .returns_many(&[first_value, second_value, third_value]);
+                .returns_many([first_value, second_value, third_value]);
 
             // Act
             let actual_first_value = mock.return_value();
@@ -448,7 +448,7 @@ accept_value(*{first_value}*)
             let second_value = 22;
             mock.setup
                 .return_value()
-                .returns_many(&[1, 2, 3])
+                .returns_many([1, 2, 3])
                 .return_value()
                 .returns(second_value);
 
@@ -471,7 +471,7 @@ accept_value(*{first_value}*)
             let second_value = 22;
             mock.setup
                 .return_value()
-                .returns_many_and_does(&[first_value, second_value], move || {
+                .returns_many_and_does([first_value, second_value], move || {
                     *callback_counter_clone.borrow_mut() += 1
                 });
 
@@ -554,7 +554,7 @@ accept_value(*{first_value}*)
 
             mock.setup
                 .accept_value_return_value(Arg::Any)
-                .returns_many(&[
+                .returns_many([
                     first_returned_value,
                     second_returned_value,
                     third_returned_value,
@@ -592,9 +592,9 @@ accept_value(*{first_value}*)
 
             mock.setup
                 .accept_value_return_value(Arg::Eq(first_accepted_value))
-                .returns_many(&[first_first_returned_value, first_second_returned_value])
+                .returns_many([first_first_returned_value, first_second_returned_value])
                 .accept_value_return_value(Arg::Eq(second_accepted_value))
-                .returns_many(&[
+                .returns_many([
                     second_first_returned_value,
                     second_second_returned_value,
                     second_third_returned_value,

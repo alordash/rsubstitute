@@ -9,7 +9,7 @@ pub struct SharedFnConfig<'a, TMock, TCall, TArgsChecker: IArgsChecker<TCall>, T
     owner: &'a TOwner,
 }
 
-impl<'a, TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, TOwner>
+impl<'a, TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TOwner>
     SharedFnConfig<'a, TMock, TCall, TArgsChecker, TReturnValue, TOwner>
 {
     pub fn new(
@@ -27,7 +27,7 @@ impl<'a, TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, T
         return self.owner;
     }
 
-    pub fn returns_many(&self, return_values: &[TReturnValue]) -> &'a TOwner {
+    pub fn returns_many<const N: usize>(&self, return_values: [TReturnValue; N]) -> &'a TOwner {
         self.fn_config.borrow_mut().add_return_values(return_values);
         return self.owner;
     }
@@ -42,9 +42,9 @@ impl<'a, TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone, T
         return self.owner;
     }
 
-    pub fn returns_many_and_does(
+    pub fn returns_many_and_does<const N: usize>(
         &self,
-        return_values: &[TReturnValue],
+        return_values: [TReturnValue; N],
         callback: impl FnMut() + 'static,
     ) -> &'a TOwner {
         self.returns_many(return_values);

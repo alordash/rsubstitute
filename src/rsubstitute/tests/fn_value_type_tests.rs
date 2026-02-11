@@ -355,8 +355,10 @@ accept_value(*{first_value}*)
             // Assert
             assert_panics(
                 || accept_value::received(first_value, Times::Once).no_other_calls(),
-                format!("Did not expect to receive any other calls. Received 1 unexpected call:
-1. accept_value({second_value})"),
+                format!(
+                    "Did not expect to receive any other calls. Received 1 unexpected call:
+1. accept_value({second_value})"
+                ),
             );
         }
 
@@ -375,9 +377,11 @@ accept_value(*{first_value}*)
             // Assert
             assert_panics(
                 || accept_value::received(first_value, Times::Once).no_other_calls(),
-                format!("Did not expect to receive any other calls. Received 2 unexpected calls:
+                format!(
+                    "Did not expect to receive any other calls. Received 2 unexpected calls:
 1. accept_value({second_value})
-2. accept_value({third_value})"),
+2. accept_value({third_value})"
+                ),
             );
         }
     }
@@ -458,7 +462,7 @@ accept_value(*{first_value}*)
             let first_value = 10;
             let second_value = 22;
             let third_value = 333;
-            return_value::setup().returns_many(&[first_value, second_value, third_value]);
+            return_value::setup().returns_many([first_value, second_value, third_value]);
 
             // Act
             let actual_first_value = return_value();
@@ -478,7 +482,7 @@ accept_value(*{first_value}*)
             // Arrange
             let second_value = 22;
             return_value::setup()
-                .returns_many(&[1, 2, 3])
+                .returns_many([1, 2, 3])
                 .setup()
                 .returns(second_value);
 
@@ -498,7 +502,7 @@ accept_value(*{first_value}*)
             let callback_counter_clone = callback_counter.clone();
             let first_value = 10;
             let second_value = 22;
-            return_value::setup().returns_many_and_does(&[first_value, second_value], move || {
+            return_value::setup().returns_many_and_does([first_value, second_value], move || {
                 *callback_counter_clone.borrow_mut() += 1
             });
 
@@ -577,7 +581,7 @@ accept_value(*{first_value}*)
             let second_returned_value = 22.2;
             let third_returned_value = 33.3;
 
-            accept_value_return_value::setup(Arg::Any).returns_many(&[
+            accept_value_return_value::setup(Arg::Any).returns_many([
                 first_returned_value,
                 second_returned_value,
                 third_returned_value,
@@ -611,9 +615,9 @@ accept_value(*{first_value}*)
             let second_third_returned_value = 203.3;
 
             accept_value_return_value::setup(Arg::Eq(first_accepted_value))
-                .returns_many(&[first_first_returned_value, first_second_returned_value])
+                .returns_many([first_first_returned_value, first_second_returned_value])
                 .setup(Arg::Eq(second_accepted_value))
-                .returns_many(&[
+                .returns_many([
                     second_first_returned_value,
                     second_second_returned_value,
                     second_third_returned_value,

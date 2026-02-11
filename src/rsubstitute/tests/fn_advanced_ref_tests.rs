@@ -6,28 +6,28 @@ use rsubstitute::macros::mock;
 //     todo!()
 // }
 
-// #[mock]
-// fn return_mut_ref<'a>() -> &'a mut i32 {
-//     todo!()
-// }
-
-// TODO - support it
-// #[mock]
-// fn accept_mut_ref<'a>(mut r: i32) {
-//     todo!()
-// }
-
-#[derive(Clone, Debug, PartialOrd, PartialEq)]
-struct Foo {
-    pub number: Vec<i32>,
-}
-
 #[mock]
-fn accept_foo(Foo { mut number }: Foo) {
-    let q = Foo { number };
-
-    println!("number: ???");
+fn return_mut_ref<'a>() -> &'a mut i32 {
+    todo!()
 }
+
+// #[mock]
+// fn accept_mut_ref<'a>(mut r: i32) -> i32 {
+//     r += 1;
+//     return r;
+// }
+// 
+// #[derive(Clone, Debug, PartialOrd, PartialEq)]
+// struct Foo {
+//     pub number: Vec<i32>,
+// }
+// 
+// #[mock]
+// fn accept_foo(Foo { mut number }: Foo) {
+//     let q = Foo { number };
+// 
+//     println!("number: ???");
+// }
 
 #[mock]
 fn accept_many_ref<'a, 'b>(mut r: &'a &'b &'a &i32, _em: &()) -> &'a &'b &'a &'b i32 {

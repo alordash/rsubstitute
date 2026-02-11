@@ -1,5 +1,6 @@
 use crate::IBaseCaller;
 use crate::args_matching::{ArgCheckResult, IArgsChecker};
+use crate::mut_ref_clone::IMutRefClone;
 use std::cell::RefCell;
 use std::collections::VecDeque;
 use std::marker::PhantomData;
@@ -15,7 +16,7 @@ pub struct FnConfig<TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValu
     call_base: bool,
 }
 
-impl<TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
+impl<TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue>
     FnConfig<TMock, TCall, TArgsChecker, TReturnValue>
 {
     pub fn new(args_checker: TArgsChecker) -> Self {
@@ -34,10 +35,8 @@ impl<TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
         self.return_values.push_back(return_value);
     }
 
-    pub fn add_return_values(&mut self, return_values: &[TReturnValue]) {
-        for return_value in return_values.iter().cloned() {
-            self.add_return_value(return_value);
-        }
+    pub fn add_return_values<const N: usize>(&mut self, return_values: [TReturnValue; N]) {
+        self.return_values.extend(return_values.into_iter());
     }
 
     pub fn set_callback(&mut self, callback: impl FnMut() + 'static) {
@@ -52,11 +51,29 @@ impl<TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
         self.args_checker.check(call)
     }
 
-    pub fn get_return_value(&mut self) -> Option<TReturnValue> {
+    pub fn get_return_value(&mut self) -> Option<TReturnValue>
+    where
+        TReturnValue: Clone,
+    {
         let return_value = self
             .return_values
             .get(self.current_return_value_index)
             .cloned();
+        if return_value.is_some() {
+            self.current_return_value_index =
+                (self.current_return_value_index + 1).min(self.return_values.len() - 1);
+        }
+        return return_value;
+    }
+
+    pub fn get_return_value_mut_ref(&mut self) -> Option<TReturnValue>
+    where
+        TReturnValue: IMutRefClone,
+    {
+        let return_value = self
+            .return_values
+            .get(self.current_return_value_index)
+            .map(|x| x.mut_ref_clone());
         if return_value.is_some() {
             self.current_return_value_index =
                 (self.current_return_value_index + 1).min(self.return_values.len() - 1);

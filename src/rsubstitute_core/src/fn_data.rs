@@ -3,6 +3,7 @@ use crate::call_info::CallInfo;
 use crate::di::ServiceCollection;
 use crate::error_printer::IErrorPrinter;
 use crate::matching_config_search_result::*;
+use crate::mut_ref_clone::IMutRefClone;
 use crate::*;
 use std::cell::RefCell;
 use std::sync::Arc;
@@ -34,12 +35,8 @@ impl<TMock, TCall: IArgInfosProvider, TArgsChecker: IArgsChecker<TCall>, TReturn
     }
 }
 
-impl<
-    TMock,
-    TCall: IArgInfosProvider + Clone,
-    TArgsChecker: IArgsChecker<TCall>,
-    TReturnValue: Clone,
-> FnData<TMock, TCall, TArgsChecker, TReturnValue>
+impl<TMock, TCall: IArgInfosProvider + Clone, TArgsChecker: IArgsChecker<TCall>, TReturnValue>
+    FnData<TMock, TCall, TArgsChecker, TReturnValue>
 {
     pub fn register_call(&self, call: TCall) -> &Self {
         self.call_infos.borrow_mut().push(CallInfo::new(call));
@@ -69,7 +66,10 @@ impl<
         }
     }
 
-    pub fn handle_returning(&self, call: TCall) -> TReturnValue {
+    pub fn handle_returning(&self, call: TCall) -> TReturnValue
+    where
+        TReturnValue: Clone,
+    {
         let fn_config = self.get_required_matching_config(call.clone());
         self.register_call(call.clone());
         fn_config.borrow_mut().register_call(call.clone());
@@ -77,6 +77,23 @@ impl<
             callback.borrow_mut()();
         }
         let Some(return_value) = fn_config.borrow_mut().get_return_value() else {
+            self.error_printer
+                .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
+        };
+        return return_value;
+    }
+
+    pub fn handle_returning_mut_ref(&self, call: TCall) -> TReturnValue
+    where
+        TReturnValue: IMutRefClone,
+    {
+        let fn_config = self.get_required_matching_config(call.clone());
+        self.register_call(call.clone());
+        fn_config.borrow_mut().register_call(call.clone());
+        if let Some(callback) = fn_config.borrow_mut().get_callback() {
+            callback.borrow_mut()();
+        }
+        let Some(return_value) = fn_config.borrow_mut().get_return_value_mut_ref() else {
             self.error_printer
                 .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
         };
@@ -184,7 +201,7 @@ impl<
     TMock: IBaseCaller<TCall, TReturnValue>,
     TCall: IArgInfosProvider + Clone,
     TArgsChecker: IArgsChecker<TCall>,
-    TReturnValue: Clone,
+    TReturnValue,
 > FnData<TMock, TCall, TArgsChecker, TReturnValue>
 {
     pub fn handle_base(&self, mock: &TMock, call: TCall) {
@@ -201,7 +218,10 @@ impl<
         }
     }
 
-    pub fn handle_base_returning(&self, mock: &TMock, call: TCall) -> TReturnValue {
+    pub fn handle_base_returning(&self, mock: &TMock, call: TCall) -> TReturnValue
+    where
+        TReturnValue: Clone,
+    {
         let fn_config = self.get_required_matching_config(call.clone());
         self.register_call(call.clone());
         // TODO - ain't too many fn_config.borrows? Maybe borrow once and reuse borrow?
@@ -213,6 +233,27 @@ impl<
             callback.borrow_mut()();
         }
         let Some(return_value) = fn_config.borrow_mut().get_return_value() else {
+            self.error_printer
+                .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
+        };
+        return return_value;
+    }
+
+    pub fn handle_base_returning_mut_ref(&self, mock: &TMock, call: TCall) -> TReturnValue
+    where
+        TReturnValue: IMutRefClone,
+    {
+        let fn_config = self.get_required_matching_config(call.clone());
+        self.register_call(call.clone());
+        // TODO - ain't too many fn_config.borrows? Maybe borrow once and reuse borrow?
+        fn_config.borrow_mut().register_call(call.clone());
+        if fn_config.borrow().should_call_base() {
+            return mock.call_base(call);
+        }
+        if let Some(callback) = fn_config.borrow().get_callback() {
+            callback.borrow_mut()();
+        }
+        let Some(return_value) = fn_config.borrow_mut().get_return_value_mut_ref() else {
             self.error_printer
                 .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
         };
