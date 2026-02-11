@@ -102,7 +102,7 @@ impl FnDeclExtractor {
 
     fn validate_signature(&self, sig: &Signature) {
         if !sig.generics.params.is_empty() {
-            panic!("Generic type parameters for trait functions are not supported.");
+            panic!("Generic type parameters for associated functions are not supported.");
         }
     }
 
