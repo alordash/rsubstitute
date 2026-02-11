@@ -1,6 +1,7 @@
 use rsubstitute::macros::mock;
 use std::fmt::{Debug, Display};
 
+// TODO - test with overlapping generics
 #[mock]
 fn get_return<T>(value: T) -> T {
     return value;

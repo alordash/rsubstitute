@@ -437,20 +437,6 @@ pub const STATIC_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
     ident: format_ident!("static"),
 });
 
-pub const DEFAULT_ARG_FIELD_LIFETIME_GENERIC: LazyCell<Generics> = LazyCell::new(|| Generics {
-    lt_token: Some(Default::default()),
-    params: [GenericParam::Lifetime(LifetimeParam {
-        attrs: Vec::new(),
-        lifetime: DEFAULT_ARG_FIELD_LIFETIME.clone(),
-        colon_token: None,
-        bounds: Punctuated::new(),
-    })]
-    .into_iter()
-    .collect(),
-    gt_token: Some(Default::default()),
-    where_clause: None,
-});
-
 pub const DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE: LazyCell<FieldValue> = LazyCell::new(|| {
     let path_factory = &SERVICES.path_factory;
     let field_value = FieldValue {

@@ -20,10 +20,11 @@ impl IMockGenericsGenerator for MockGenericsGenerator {
         let mut modified_source_generics = source_generics.clone();
         self.add_required_for_lib_type_trait_constraints(&mut modified_source_generics);
 
-        let result_generics = self.generics_merger.merge(
-            &constants::DEFAULT_ARG_FIELD_LIFETIME_GENERIC,
-            &modified_source_generics,
-        );
+        let default_field_lifetime_generic =
+            self.generate_default_field_lifetime_generic(source_generics);
+        let result_generics = self
+            .generics_merger
+            .merge(&default_field_lifetime_generic, &modified_source_generics);
         let phantom_type_fields = self.get_all_phantom_fields_from_generics(source_generics);
         let mock_generics = MockGenerics {
             source_generics: source_generics.clone(),
@@ -113,6 +114,26 @@ impl MockGenericsGenerator {
             }
             _ => false,
         }
+    }
+
+    fn generate_default_field_lifetime_generic(&self, source_generics: &Generics) -> Generics {
+        let generics = Generics {
+            lt_token: Some(Default::default()),
+            params: [GenericParam::Lifetime(LifetimeParam {
+                attrs: Vec::new(),
+                lifetime: constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
+                colon_token: Some(Default::default()),
+                bounds: source_generics
+                    .lifetimes()
+                    .map(|lifetime_param| lifetime_param.lifetime.clone())
+                    .collect(),
+            })]
+            .into_iter()
+            .collect(),
+            gt_token: Some(Default::default()),
+            where_clause: None,
+        };
+        return generics;
     }
 
     fn get_all_phantom_fields_from_generics(&self, generics: &Generics) -> Vec<Field> {
