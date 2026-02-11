@@ -190,6 +190,7 @@ fn create_services() -> ServiceCollection {
         path_factory: path_factory.clone(),
         type_factory: type_factory.clone(),
         field_access_expr_factory: field_access_expr_factory.clone(),
+        field_checker: field_checker.clone(),
     });
     let derive_mock_data_macro_handler = Arc::new(DeriveMockDataMacroHandler {
         path_factory: path_factory.clone(),

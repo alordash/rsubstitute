@@ -1,7 +1,5 @@
 use crate::constants;
-use crate::syntax::{
-    IFieldAccessExprFactory, IFieldRequiredIdentGetter, IPathFactory, ITypeFactory,
-};
+use crate::syntax::*;
 use proc_macro::TokenStream;
 use proc_macro2::Literal;
 use quote::{ToTokens, quote};
@@ -17,6 +15,7 @@ pub(crate) struct DeriveArgsFormatterMacroHandler {
     pub path_factory: Arc<dyn IPathFactory>,
     pub type_factory: Arc<dyn ITypeFactory>,
     pub field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
+    pub field_checker: Arc<dyn IFieldChecker>,
 }
 
 impl IDeriveArgsFormatterMacroHandler for DeriveArgsFormatterMacroHandler {
@@ -75,7 +74,7 @@ impl DeriveArgsFormatterMacroHandler {
         let literal_str = item_struct
             .fields
             .iter()
-            .skip(1)
+            .skip_while(|field| self.field_checker.is_phantom_data(field))
             .map(|_| "{:?}")
             .collect::<Vec<_>>()
             .join(", ");
@@ -83,7 +82,7 @@ impl DeriveArgsFormatterMacroHandler {
         let args: Vec<_> = item_struct
             .fields
             .iter()
-            .skip(1)
+            .skip_while(|field| self.field_checker.is_phantom_data(field))
             .map(|field| {
                 self.field_access_expr_factory.create(vec![
                     constants::SELF_IDENT.clone(),
