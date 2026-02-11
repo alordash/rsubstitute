@@ -3,6 +3,11 @@ use syn::*;
 
 pub trait IReferenceTypeCrawler {
     fn get_all_type_references<'a>(&self, ty: &'a mut Type) -> Vec<LifetimeRef<'a>>;
+
+    fn get_all_optional_type_references<'a>(
+        &self,
+        ty: &'a mut Type,
+    ) -> Vec<&'a mut Option<Lifetime>>;
 }
 
 pub struct ReferenceTypeCrawler;
@@ -11,6 +16,21 @@ impl IReferenceTypeCrawler for ReferenceTypeCrawler {
     fn get_all_type_references<'a>(&self, ty: &'a mut Type) -> Vec<LifetimeRef<'a>> {
         let mut result = Vec::new();
         self.recursive_get_all_type_references(&mut result, ty);
+        return result;
+    }
+
+    fn get_all_optional_type_references<'a>(
+        &self,
+        ty: &'a mut Type,
+    ) -> Vec<&'a mut Option<Lifetime>> {
+        let result = self
+            .get_all_type_references(ty)
+            .into_iter()
+            .filter_map(|lifetime_ref| match lifetime_ref {
+                LifetimeRef::Optional(optional_lifetime) => Some(optional_lifetime),
+                _ => None,
+            })
+            .collect();
         return result;
     }
 }

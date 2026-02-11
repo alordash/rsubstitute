@@ -42,7 +42,7 @@ impl IItemFnHandler for ItemFnHandler {
         let mock_generics = self.mock_generics_generator.generate(&item_fn.sig.generics);
         let mock_type = self
             .mock_type_generator
-            .generate_for_static(mock_ident.clone(), mock_generics);
+            .generate(mock_ident.clone(), mock_generics);
         let fn_ident = item_fn.sig.ident.clone();
         let fn_info = self.fn_info_generator.generate(fn_decl, &mock_type);
         let fn_infos = [fn_info];

@@ -61,7 +61,7 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
         let mut return_ty = self
             .type_factory
             .create_from_struct(&mock_received_struct.item_struct);
-        self.reference_normalizer.staticify(&mut return_ty);
+        self.reference_normalizer.staticify_anonymous_lifetimes(&mut return_ty);
         let return_ty_reference = Type::Reference(TypeReference {
             and_token: Default::default(),
             lifetime: Some(constants::STATIC_LIFETIME.clone()),
@@ -78,7 +78,7 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
         );
         for input in result.inputs.iter_mut() {
             if let FnArg::Typed(pat_type) = input {
-                self.reference_normalizer.staticify(pat_type.ty.as_mut());
+                self.reference_normalizer.staticify_anonymous_lifetimes(pat_type.ty.as_mut());
             }
         }
         return result;

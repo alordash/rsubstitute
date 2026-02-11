@@ -48,7 +48,7 @@ impl ISetupOutputGenerator for SetupOutputGenerator {
             constants::STATIC_LIFETIME.clone(),
             owner_type,
         );
-        self.reference_normalizer.staticify(&mut ty);
+        self.reference_normalizer.staticify_anonymous_lifetimes(&mut ty);
         let result = ReturnType::Type(Default::default(), Box::new(ty));
         return result;
     }

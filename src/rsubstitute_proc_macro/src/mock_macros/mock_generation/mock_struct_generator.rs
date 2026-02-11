@@ -100,15 +100,8 @@ impl IMockStructGenerator for MockStructGenerator {
             None
         );
         mock_struct.item_struct.attrs.insert(0, constants::DOC_HIDDEN_ATTRIBUTE.clone());
-        mock_struct.item_struct.generics.params = mock_struct
-            .item_struct
-            .generics
-            .params
-            .into_iter()
-            .skip(1)
-            .collect();
         for field in mock_struct.item_struct.fields.iter_mut() {
-            self.reference_normalizer.staticify(&mut field.ty);
+            self.reference_normalizer.staticify_anonymous_lifetimes(&mut field.ty);
         }
 
         return mock_struct;

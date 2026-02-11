@@ -90,7 +90,7 @@ impl IInputArgsGenerator for InputArgsGenerator {
         let mut fn_args = self.generate_input_args(fn_info, phantom_types_count);
         for fn_arg in fn_args.iter_mut() {
             if let FnArg::Typed(pat_type) = fn_arg {
-                self.reference_normalizer.staticify(&mut pat_type.ty);
+                self.reference_normalizer.staticify_anonymous_lifetimes(&mut pat_type.ty);
             }
         }
         return fn_args;
