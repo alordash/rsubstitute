@@ -46,9 +46,12 @@ impl IStructMockHandler for StructMockHandler {
             constants::MOCK_STRUCT_IDENT_PREFIX
         );
 
+        let struct_fn_decls = self
+            .fn_decl_extractor
+            .extract_struct_fns(&struct_mock_syntax.get_struct_fns());
         let mock_generics = self
             .mock_generics_generator
-            .generate(&struct_mock_syntax.r#struct.generics);
+            .generate(&struct_mock_syntax.r#struct.generics, &struct_fn_decls);
         let mock_type = self
             .mock_type_generator
             .generate(mock_ident.clone(), mock_generics);
@@ -59,9 +62,6 @@ impl IStructMockHandler for StructMockHandler {
                     .generate(&mock_type, x)
             })
             .collect();
-        let struct_fn_decls = self
-            .fn_decl_extractor
-            .extract_struct_fns(&struct_mock_syntax.get_struct_fns());
         let target_ident = struct_mock_syntax.r#struct.ident.clone();
         let struct_fn_infos: Vec<_> = struct_fn_decls
             .into_iter()

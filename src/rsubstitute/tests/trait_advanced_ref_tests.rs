@@ -7,9 +7,13 @@ struct Foo {
 
 #[mock]
 trait Trait<'a, 'b> {
-    fn accept_ref(&self, r: &'a &'b &'a &i32) -> &'b &'a &'b &'a i32;
+    // fn accept_ref(&self, r: &'a &'b &'a &i32) -> &'b &'a &'b &'a i32;
 
-    fn fooo(&mut self, Foo { mut number }: Foo) {
+    fn fooo<'c: 'a, 'd: 'b + 'a>(
+        &mut self,
+        Foo { mut number }: Foo,
+        mut qq: &'d mut &'b mut &'a &'a &'c &'d mut i32,
+    ) {
         println!("number: {number:?}")
     }
 }

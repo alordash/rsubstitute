@@ -42,6 +42,7 @@ impl IFnDeclExtractor for FnDeclExtractor {
                     trait_impl_fn.attrs.clone(),
                     &trait_impl_fn.sig,
                     trait_impl_fn.vis.clone(),
+                    trait_impl_fn.sig.generics.clone(),
                     Some(trait_impl_fn.block.clone()),
                     Some(trait_ident.clone()),
                 )
@@ -55,6 +56,7 @@ impl IFnDeclExtractor for FnDeclExtractor {
             item_fn.attrs.clone(),
             &item_fn.sig,
             item_fn.vis.clone(),
+            item_fn.sig.generics.clone(),
             Some(*item_fn.block.clone()),
             None,
         );
@@ -81,6 +83,7 @@ impl FnDeclExtractor {
             trait_item_fn.attrs.clone(),
             sig,
             Visibility::Inherited,
+            trait_item_fn.sig.generics.clone(),
             trait_item_fn.default.clone(),
             None,
         );
@@ -89,11 +92,11 @@ impl FnDeclExtractor {
 
     fn map_impl_item_fn(&self, impl_item_fn: &ImplItemFn) -> FnDecl {
         let sig = &impl_item_fn.sig;
-        self.validate_signature(sig);
         let fn_decl = self.create_fn_decl(
             impl_item_fn.attrs.clone(),
             sig,
             impl_item_fn.vis.clone(),
+            impl_item_fn.sig.generics.clone(),
             Some(impl_item_fn.block.clone()),
             None,
         );
@@ -101,7 +104,7 @@ impl FnDeclExtractor {
     }
 
     fn validate_signature(&self, sig: &Signature) {
-        if !sig.generics.params.is_empty() {
+        if sig.generics.type_params().peekable().peek().is_some() {
             panic!("Generic type parameters for trait functions are not supported.");
         }
     }
@@ -111,6 +114,7 @@ impl FnDeclExtractor {
         attrs: Vec<Attribute>,
         sig: &Signature,
         visibility: Visibility,
+        generics: Generics,
         maybe_base_fn_block: Option<Block>,
         maybe_parent_trait_ident: Option<Ident>,
     ) -> FnDecl {
@@ -121,6 +125,7 @@ impl FnDeclExtractor {
             arguments: sig.inputs.iter().cloned().collect(),
             return_value: sig.output.clone(),
             visibility,
+            generics,
             maybe_base_fn_block,
         };
         return fn_decl;

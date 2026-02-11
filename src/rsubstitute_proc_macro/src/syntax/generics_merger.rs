@@ -1,29 +1,24 @@
 use syn::{Generics, WhereClause};
 
 pub trait IGenericsMerger {
-    fn merge(&self, first: &Generics, second: &Generics) -> Generics;
+    fn merge(&self, base: &mut Generics, merged: &Generics);
 }
 
 pub(crate) struct GenericsMerger;
 
 impl IGenericsMerger for GenericsMerger {
     // TODO - properly merge same type params and where clauses
-    fn merge(&self, first: &Generics, second: &Generics) -> Generics {
+    fn merge(&self, base: &mut Generics, merged: &Generics) {
         let where_clause =
-            self.merge_where_clause(first.where_clause.clone(), second.where_clause.clone());
-        let params = first
+            self.merge_where_clause(base.where_clause.clone(), merged.where_clause.clone());
+        let params = base
             .params
             .clone()
             .into_iter()
-            .chain(second.params.clone().into_iter())
+            .chain(merged.params.clone().into_iter())
             .collect();
-        let result = Generics {
-            lt_token: Some(Default::default()),
-            params,
-            gt_token: Some(Default::default()),
-            where_clause,
-        };
-        return result;
+        base.params = params;
+        base.where_clause = where_clause;
     }
 }
 

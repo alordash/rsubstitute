@@ -21,9 +21,9 @@ impl IIgnoredImplFixer for IgnoredImplFixer {
 
 impl IgnoredImplFixer {
     fn fix_single(&self, mock_type: &MockType, ignored_impl: &mut ItemImpl) {
-        let merged_generics = self
-            .generics_merger
-            .merge(&mock_type.generics.impl_generics, &ignored_impl.generics);
+        let mut merged_generics = mock_type.generics.impl_generics.clone();
+        self.generics_merger
+            .merge(&mut merged_generics, &ignored_impl.generics);
         ignored_impl.generics = merged_generics;
         *ignored_impl.self_ty = mock_type.ty.clone();
     }

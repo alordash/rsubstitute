@@ -37,7 +37,9 @@ impl IItemTraitHandler for ItemTraitHandler {
         );
         let fn_decls = self.fn_decl_extractor.extract(&item_trait.items);
         let target_ident = item_trait.ident.clone();
-        let mock_generics = self.mock_generics_generator.generate(&item_trait.generics);
+        let mock_generics = self
+            .mock_generics_generator
+            .generate(&item_trait.generics, &fn_decls);
         let mock_type = self
             .mock_type_generator
             .generate(mock_ident.clone(), mock_generics);

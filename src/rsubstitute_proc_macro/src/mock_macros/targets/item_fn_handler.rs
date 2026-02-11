@@ -39,7 +39,11 @@ impl IItemFnHandler for ItemFnHandler {
             constants::MOCK_STRUCT_IDENT_PREFIX
         );
         let fn_decl = self.fn_decl_extractor.extract_fn(&item_fn);
-        let mock_generics = self.mock_generics_generator.generate(&item_fn.sig.generics);
+        let fn_decls = [fn_decl];
+        let mock_generics = self
+            .mock_generics_generator
+            .generate(&item_fn.sig.generics, &fn_decls);
+        let [fn_decl] = fn_decls;
         let mock_type = self
             .mock_type_generator
             .generate(mock_ident.clone(), mock_generics);

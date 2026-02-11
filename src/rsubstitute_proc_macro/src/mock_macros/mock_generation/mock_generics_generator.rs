@@ -1,12 +1,13 @@
 use crate::constants;
 use crate::mock_macros::mock_generation::models::*;
+use crate::mock_macros::models::*;
 use crate::syntax::*;
 use quote::format_ident;
 use std::sync::Arc;
 use syn::*;
 
 pub trait IMockGenericsGenerator {
-    fn generate(&self, source_generics: &Generics) -> MockGenerics;
+    fn generate(&self, source_generics: &Generics, fn_decls: &[FnDecl]) -> MockGenerics;
 }
 
 pub(crate) struct MockGenericsGenerator {
@@ -16,15 +17,19 @@ pub(crate) struct MockGenericsGenerator {
 }
 
 impl IMockGenericsGenerator for MockGenericsGenerator {
-    fn generate(&self, source_generics: &Generics) -> MockGenerics {
+    fn generate(&self, source_generics: &Generics, fn_decls: &[FnDecl]) -> MockGenerics {
         let mut modified_source_generics = source_generics.clone();
         self.add_required_for_lib_type_trait_constraints(&mut modified_source_generics);
 
         let default_field_lifetime_generic =
             self.generate_default_field_lifetime_generic(source_generics);
-        let result_generics = self
-            .generics_merger
-            .merge(&default_field_lifetime_generic, &modified_source_generics);
+        let mut result_generics = default_field_lifetime_generic;
+        self.generics_merger
+            .merge(&mut result_generics, &modified_source_generics);
+        for fn_decl in fn_decls {
+            self.generics_merger
+                .merge(&mut result_generics, &fn_decl.generics);
+        }
         let phantom_type_fields = self.get_all_phantom_fields_from_generics(source_generics);
         let mock_generics = MockGenerics {
             source_generics: source_generics.clone(),
