@@ -3,12 +3,21 @@ use rsubstitute::macros::mock;
 #[mock]
 trait Trait {
     fn f(&self);
+
+    // TODO - add support
+    #[allow(unused)]
+    fn mutate(&mut self);
+
+    // TODO - add support
+    #[allow(unused)]
+    fn consume(self) -> i32;
 }
 
 #[mock]
 #[allow(unused)]
 trait AnotherTestTrait {}
 
+#[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
 

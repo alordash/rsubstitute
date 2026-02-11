@@ -1,19 +1,15 @@
 use crate::constants;
-use crate::syntax::*;
-use std::sync::Arc;
 use syn::punctuated::Punctuated;
 use syn::*;
 
 pub trait IGetGlobalMockExprGenerator {
-    fn generate(&self, item_struct: &ItemStruct) -> Expr;
+    fn generate(&self, ty: Type) -> Expr;
 }
 
-pub(crate) struct GetGlobalMockExprGenerator {
-    pub type_factory: Arc<dyn ITypeFactory>,
-}
+pub(crate) struct GetGlobalMockExprGenerator;
 
 impl IGetGlobalMockExprGenerator for GetGlobalMockExprGenerator {
-    fn generate(&self, item_struct: &ItemStruct) -> Expr {
+    fn generate(&self, ty: Type) -> Expr {
         let global_mock_expr = Expr::Call(ExprCall {
             attrs: Vec::new(),
             func: Box::new(Expr::Path(ExprPath {
@@ -26,11 +22,7 @@ impl IGetGlobalMockExprGenerator for GetGlobalMockExprGenerator {
                         arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
                             colon2_token: Some(Default::default()),
                             lt_token: Default::default(),
-                            args: [GenericArgument::Type(
-                                self.type_factory.create_from_struct(item_struct),
-                            )]
-                            .into_iter()
-                            .collect(),
+                            args: [GenericArgument::Type(ty)].into_iter().collect(),
                             gt_token: Default::default(),
                         }),
                     }]

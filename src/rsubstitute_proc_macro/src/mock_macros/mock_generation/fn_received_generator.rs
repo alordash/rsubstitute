@@ -10,7 +10,6 @@ pub trait IFnReceivedGenerator {
     fn generate(
         &self,
         fn_info: &FnInfo,
-        mock_struct: &MockStruct,
         mock_received_struct: &MockReceivedStruct,
         mock_type: &MockType,
     ) -> ItemFn;
@@ -26,7 +25,6 @@ impl IFnReceivedGenerator for FnReceivedGenerator {
     fn generate(
         &self,
         fn_info: &FnInfo,
-        mock_struct: &MockStruct,
         mock_received_struct: &MockReceivedStruct,
         mock_type: &MockType,
     ) -> ItemFn {
@@ -37,7 +35,7 @@ impl IFnReceivedGenerator for FnReceivedGenerator {
         );
         let block = self.generate_fn_received_block(
             fn_info,
-            mock_struct,
+            mock_type,
             mock_type.generics.get_phantom_types_count(),
         );
         let item_fn = ItemFn {
@@ -54,12 +52,12 @@ impl FnReceivedGenerator {
     fn generate_fn_received_block(
         &self,
         fn_info: &FnInfo,
-        mock_struct: &MockStruct,
+        mock_type: &MockType,
         phantom_types_count: usize,
     ) -> Block {
         let static_mock_expr = self
             .get_global_mock_expr_generator
-            .generate(&mock_struct.item_struct);
+            .generate(mock_type.ty.clone());
         let return_stmt = Stmt::Expr(
             Expr::Return(ExprReturn {
                 attrs: Vec::new(),

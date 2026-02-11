@@ -12,7 +12,6 @@ pub trait IFnSetupGenerator {
     fn generate(
         &self,
         fn_info: &FnInfo,
-        mock_struct: &MockStruct,
         mock_setup_struct: &MockSetupStruct,
         mock_type: &MockType,
     ) -> ItemFn;
@@ -31,15 +30,12 @@ impl IFnSetupGenerator for FnSetupGenerator {
     fn generate(
         &self,
         fn_info: &FnInfo,
-        mock_struct: &MockStruct,
         mock_setup_struct: &MockSetupStruct,
         mock_type: &MockType,
     ) -> ItemFn {
-        let output = self.setup_output_generator.generate_for_static(
-            fn_info,
-            mock_struct,
-            mock_setup_struct,
-        );
+        let output =
+            self.setup_output_generator
+                .generate_for_static(fn_info, mock_type, mock_setup_struct);
         let phantom_types_count = mock_type.generics.get_phantom_types_count();
         let sig = Signature {
             constness: None,
@@ -58,7 +54,7 @@ impl IFnSetupGenerator for FnSetupGenerator {
             variadic: None,
             output,
         };
-        let block = self.generate_fn_setup_block(fn_info, mock_struct, phantom_types_count);
+        let block = self.generate_fn_setup_block(fn_info, mock_type, phantom_types_count);
         let item_fn = ItemFn {
             attrs: Vec::new(),
             vis: Visibility::Public(Default::default()),
@@ -75,7 +71,7 @@ impl FnSetupGenerator {
     fn generate_fn_setup_block(
         &self,
         fn_info: &FnInfo,
-        mock_struct: &MockStruct,
+        mock_type: &MockType,
         phantom_types_count: usize,
     ) -> Block {
         let mock_var_stmt = Stmt::Local(
@@ -85,7 +81,7 @@ impl FnSetupGenerator {
                     eq_token: Default::default(),
                     expr: Box::new(
                         self.get_global_mock_expr_generator
-                            .generate(&mock_struct.item_struct),
+                            .generate(mock_type.ty.clone()),
                     ),
                     diverge: None,
                 },

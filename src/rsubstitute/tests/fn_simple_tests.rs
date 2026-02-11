@@ -5,6 +5,7 @@ use std::sync::Arc;
 #[mock]
 fn f() {}
 
+#[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
     use super::*;

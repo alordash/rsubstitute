@@ -7,6 +7,7 @@ pub trait IGenericsMerger {
 pub(crate) struct GenericsMerger;
 
 impl IGenericsMerger for GenericsMerger {
+    // TODO - properly merge same type params and where clauses
     fn merge(&self, first: &Generics, second: &Generics) -> Generics {
         let where_clause =
             self.merge_where_clause(first.where_clause.clone(), second.where_clause.clone());

@@ -7,10 +7,12 @@ use syn::*;
 pub trait IMockStructGenerator {
     fn generate(
         &self,
+        attrs: Vec<Attribute>,
         mock_type: &MockType,
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
         mock_data_struct: &MockDataStruct,
+        maybe_inner_data_struct: Option<&InnerDataStruct>,
     ) -> MockStruct;
 
     fn generate_for_static(
@@ -32,12 +34,13 @@ pub(crate) struct MockStructGenerator {
 impl IMockStructGenerator for MockStructGenerator {
     fn generate(
         &self,
+        attrs: Vec<Attribute>,
         mock_type: &MockType,
         mock_setup_struct: &MockSetupStruct,
         mock_received_struct: &MockReceivedStruct,
         mock_data_struct: &MockDataStruct,
+        maybe_inner_data_struct: Option<&InnerDataStruct>,
     ) -> MockStruct {
-        let attrs = vec![constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone()];
         let data_field = self.field_factory.create(
             constants::DATA_IDENT.clone(),
             self.type_factory.wrap_in_arc(
@@ -59,6 +62,16 @@ impl IMockStructGenerator for MockStructGenerator {
                 data_field,
             ]
             .into_iter()
+            .chain(
+                maybe_inner_data_struct
+                    .map(|inner_data_struct| {
+                        self.field_factory.create_from_struct(
+                            constants::INNER_DATA_FIELD_IDENT.clone(),
+                            &inner_data_struct.item_struct,
+                        )
+                    })
+                    .into_iter(),
+            )
             .collect(),
         };
         let item_struct = self.struct_factory.create(
@@ -79,10 +92,12 @@ impl IMockStructGenerator for MockStructGenerator {
         mock_data_struct: &MockDataStruct,
     ) -> MockStruct {
         let mut mock_struct = self.generate(
+            Vec::new(),
             mock_type,
             mock_setup_struct,
             mock_received_struct,
             mock_data_struct,
+            None
         );
         mock_struct.item_struct.generics.params = mock_struct
             .item_struct

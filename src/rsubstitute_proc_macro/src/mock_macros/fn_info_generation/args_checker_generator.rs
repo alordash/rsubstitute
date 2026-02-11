@@ -12,21 +12,21 @@ pub trait IArgsCheckerGenerator {
     fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> ArgsCheckerStruct;
 }
 
-pub struct ArgsCheckerGenerator {
-    pub(crate) arg_type_factory: Arc<dyn IArgTypeFactory>,
-    pub(crate) field_factory: Arc<dyn IFieldFactory>,
-    pub(crate) struct_factory: Arc<dyn IStructFactory>,
-    pub(crate) reference_normalizer: Arc<dyn IReferenceNormalizer>,
+pub(crate) struct ArgsCheckerGenerator {
+    pub arg_type_factory: Arc<dyn IArgTypeFactory>,
+    pub field_factory: Arc<dyn IFieldFactory>,
+    pub struct_factory: Arc<dyn IStructFactory>,
+    pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
 }
 
 impl IArgsCheckerGenerator for ArgsCheckerGenerator {
     fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> ArgsCheckerStruct {
-        let attrs = vec![
-            constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone(),
-            constants::ALLOW_NON_SNAKE_CASE_ATTRIBUTE.clone(),
-            constants::DERIVE_DEBUG_AND_I_ARGS_FORMATTER_ATTRIBUTE.clone(),
-        ];
-        let ident = format_ident!("{}_{}", fn_decl.ident, Self::ARGS_CHECKER_STRUCT_SUFFIX);
+        let attrs = vec![constants::DERIVE_DEBUG_AND_I_ARGS_FORMATTER_ATTRIBUTE.clone()];
+        let ident = format_ident!(
+            "{}_{}",
+            fn_decl.get_full_ident(),
+            Self::ARGS_CHECKER_STRUCT_SUFFIX
+        );
         let fn_fields: Vec<_> = fn_decl
             .arguments
             .iter()
@@ -48,7 +48,7 @@ impl IArgsCheckerGenerator for ArgsCheckerGenerator {
             fields_named,
         );
         self.reference_normalizer
-            .normalize_in_struct(&mut item_struct);
+            .normalize_anonymous_lifetimes_in_struct(&mut item_struct);
         let args_checker_struct = ArgsCheckerStruct { item_struct };
 
         return args_checker_struct;

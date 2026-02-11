@@ -10,6 +10,7 @@ fn work(_v1: i32, _v2: i32, _v3: i32, _v4: i32) -> i32 {
     1
 }
 
+#[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
 

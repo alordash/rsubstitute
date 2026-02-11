@@ -6,15 +6,9 @@ use crate::mock_macros::models::FnDecl;
 use proc_macro2::Ident;
 use quote::format_ident;
 use std::sync::Arc;
-use syn::*;
 
 pub trait IFnInfoGenerator {
-    fn generate<'a>(
-        &self,
-        fn_decl: &'a FnDecl,
-        mock_type: &MockType,
-        maybe_base_impl_fn_block: Option<Block>,
-    ) -> FnInfo<'a>;
+    fn generate(&self, fn_decl: FnDecl, mock_type: &MockType) -> FnInfo;
 }
 
 pub(crate) struct FnInfoGenerator {
@@ -26,31 +20,26 @@ pub(crate) struct FnInfoGenerator {
 }
 
 impl IFnInfoGenerator for FnInfoGenerator {
-    fn generate<'a>(
-        &self,
-        fn_decl: &'a FnDecl,
-        mock_type: &MockType,
-        maybe_base_impl_fn_block: Option<Block>,
-    ) -> FnInfo<'a> {
+    fn generate(&self, fn_decl: FnDecl, mock_type: &MockType) -> FnInfo {
         let call_struct = self
             .call_struct_generator
-            .generate(fn_decl, &mock_type.generics);
+            .generate(&fn_decl, &mock_type.generics);
         let phantom_types_count = mock_type.generics.get_phantom_types_count();
         let call_arg_infos_provider_impl = self
             .call_arg_infos_provider_impl_generator
             .generate(&call_struct, phantom_types_count);
         let args_checker_struct = self
             .args_checker_generator
-            .generate(fn_decl, &mock_type.generics);
+            .generate(&fn_decl, &mock_type.generics);
         let args_checker_impl = self.args_checker_impl_generator.generate(
             &call_struct,
             &args_checker_struct,
             phantom_types_count,
         );
-        let data_field_ident = self.generate_data_field_ident(fn_decl);
-        let maybe_base_caller_impl = maybe_base_impl_fn_block.map(|x| {
+        let data_field_ident = self.generate_data_field_ident(&fn_decl);
+        let maybe_base_caller_impl = fn_decl.maybe_base_fn_block.clone().map(|x| {
             self.base_caller_impl_generator
-                .generate(mock_type, fn_decl, &call_struct, x)
+                .generate(mock_type, &fn_decl, &call_struct, x)
         });
         let fn_info = FnInfo {
             parent: fn_decl,
@@ -69,7 +58,7 @@ impl FnInfoGenerator {
     const DATA_FIELD_IDENT_SUFFIX: &'static str = "data";
 
     fn generate_data_field_ident(&self, fn_decl: &FnDecl) -> Ident {
-        let data_field_ident = format_ident!("{}_{}", fn_decl.ident, Self::DATA_FIELD_IDENT_SUFFIX);
+        let data_field_ident = format_ident!("{}_{}", fn_decl.get_full_ident(), Self::DATA_FIELD_IDENT_SUFFIX);
         return data_field_ident;
     }
 }

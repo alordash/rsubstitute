@@ -12,13 +12,7 @@ pub trait IMockReceivedStructGenerator {
         mock_ident: &Ident,
         mock_type: &MockType,
         mock_data_struct: &MockDataStruct,
-    ) -> MockReceivedStruct;
-
-    fn generate_with_non_camel_case_allowed(
-        &self,
-        mock_ident: &Ident,
-        mock_type: &MockType,
-        mock_data_struct: &MockDataStruct,
+        implemented_traits_configurators: Vec<ImplementedTraitConfigurator>,
     ) -> MockReceivedStruct;
 }
 
@@ -34,6 +28,7 @@ impl IMockReceivedStructGenerator for MockReceivedStructGenerator {
         mock_ident: &Ident,
         mock_type: &MockType,
         mock_data_struct: &MockDataStruct,
+        implemented_traits_configurators: Vec<ImplementedTraitConfigurator>,
     ) -> MockReceivedStruct {
         let attrs = Vec::new();
         let ident = format_ident!("{}{}", mock_ident, Self::MOCK_RECEIVED_STRUCT_IDENT_SUFFIX);
@@ -47,6 +42,14 @@ impl IMockReceivedStructGenerator for MockReceivedStructGenerator {
                 .field_factory
                 .create(constants::DATA_IDENT.clone(), data_arc_type)]
             .into_iter()
+            .chain(implemented_traits_configurators.into_iter().map(
+                |implemented_traits_received| {
+                    self.field_factory.create_pub_from_struct(
+                        implemented_traits_received.trait_ident,
+                        &implemented_traits_received.item_struct,
+                    )
+                },
+            ))
             .collect(),
         };
         let item_struct = self.struct_factory.create(
@@ -57,20 +60,6 @@ impl IMockReceivedStructGenerator for MockReceivedStructGenerator {
         );
         let mock_received_struct = MockReceivedStruct { item_struct };
         return mock_received_struct;
-    }
-
-    fn generate_with_non_camel_case_allowed(
-        &self,
-        mock_ident: &Ident,
-        mock_type: &MockType,
-        mock_data_struct: &MockDataStruct,
-    ) -> MockReceivedStruct {
-        let mut result = self.generate(mock_ident, mock_type, mock_data_struct);
-        result
-            .item_struct
-            .attrs
-            .push(constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone());
-        return result;
     }
 }
 

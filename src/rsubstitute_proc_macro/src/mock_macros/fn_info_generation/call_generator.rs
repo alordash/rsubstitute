@@ -12,20 +12,16 @@ pub trait ICallStructGenerator {
     fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> CallStruct;
 }
 
-pub struct CallStructGenerator {
-    pub(crate) field_factory: Arc<dyn IFieldFactory>,
-    pub(crate) struct_factory: Arc<dyn IStructFactory>,
-    pub(crate) reference_normalizer: Arc<dyn IReferenceNormalizer>,
+pub(crate) struct CallStructGenerator {
+    pub field_factory: Arc<dyn IFieldFactory>,
+    pub struct_factory: Arc<dyn IStructFactory>,
+    pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
 }
 
 impl ICallStructGenerator for CallStructGenerator {
     fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> CallStruct {
-        let attrs = vec![
-            constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone(),
-            constants::ALLOW_NON_SNAKE_CASE_ATTRIBUTE.clone(),
-            constants::DERIVE_CLONE_ATTRIBUTE.clone(),
-        ];
-        let ident = format_ident!("{}_{}", fn_decl.ident, Self::CALL_STRUCT_SUFFIX);
+        let attrs = vec![constants::DERIVE_CLONE_ATTRIBUTE.clone()];
+        let ident = format_ident!("{}_{}", fn_decl.get_full_ident(), Self::CALL_STRUCT_SUFFIX);
         let fn_fields = fn_decl
             .arguments
             .iter()
@@ -45,8 +41,7 @@ impl ICallStructGenerator for CallStructGenerator {
             mock_generics.impl_generics.clone(),
             fields_named,
         );
-        self.reference_normalizer
-            .normalize_in_struct(&mut item_struct);
+        self.reference_normalizer.normalize_anonymous_lifetimes_in_struct(&mut item_struct);
         let call_struct = CallStruct { item_struct };
 
         return call_struct;

@@ -8,50 +8,89 @@ use std::sync::Arc;
 use syn::punctuated::Punctuated;
 use syn::*;
 
-pub trait IMockTraitImplGenerator {
+pub trait IMockPayloadImplGenerator {
     fn generate(
         &self,
-        target_ident: Ident,
+        trait_ident: Ident,
         mock_type: &MockType,
-        mock_struct: &MockStruct,
+        fn_infos: &[FnInfo],
+    ) -> MockTraitImpl;
+
+    fn generate_for_struct(
+        &self,
+        attrs: Vec<Attribute>,
+        mock_type: &MockType,
         fn_infos: &[FnInfo],
     ) -> MockTraitImpl;
 }
 
-pub(crate) struct MockTraitImplGenerator {
+pub(crate) struct MockPayloadImplGenerator {
     pub path_factory: Arc<dyn IPathFactory>,
-    pub type_factory: Arc<dyn ITypeFactory>,
     pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
     pub mock_fn_block_generator: Arc<dyn IMockFnBlockGenerator>,
 }
 
-impl IMockTraitImplGenerator for MockTraitImplGenerator {
+impl IMockPayloadImplGenerator for MockPayloadImplGenerator {
     fn generate(
         &self,
-        target_ident: Ident,
+        trait_ident: Ident,
         mock_type: &MockType,
-        mock_struct: &MockStruct,
         fn_infos: &[FnInfo],
     ) -> MockTraitImpl {
-        let trait_ = self
+        let trait_path = self
             .path_factory
-            .create_with_generics(target_ident, mock_type.generics.source_generics.clone());
-        let self_ty = self
-            .type_factory
-            .create_from_struct(&mock_struct.item_struct);
+            .create_with_generics(trait_ident, mock_type.generics.source_generics.clone());
+
+        let mock_impl = self.generate_core(
+            Vec::new(),
+            mock_type.ty.clone(),
+            mock_type.generics.impl_generics.clone(),
+            fn_infos,
+            Some(trait_path),
+        );
+        return mock_impl;
+    }
+
+    fn generate_for_struct(
+        &self,
+        attrs: Vec<Attribute>,
+        mock_type: &MockType,
+        fn_infos: &[FnInfo],
+    ) -> MockTraitImpl {
+        let mock_impl = self.generate_core(
+            attrs,
+            mock_type.ty.clone(),
+            mock_type.generics.impl_generics.clone(),
+            fn_infos,
+            None,
+        );
+        return mock_impl;
+    }
+}
+
+impl MockPayloadImplGenerator {
+    fn generate_core(
+        &self,
+        attrs: Vec<Attribute>,
+        self_ty: Type,
+        generics: Generics,
+        fn_infos: &[FnInfo],
+        maybe_trait_path: Option<Path>,
+    ) -> MockTraitImpl {
         let items = fn_infos
             .iter()
             .map(|x| self.generate_impl_item_fn(x))
             .map(ImplItem::Fn)
             .collect();
+        let trait_ = maybe_trait_path.map(|trait_path| (None, trait_path, Default::default()));
 
         let item_impl = ItemImpl {
-            attrs: Vec::new(),
+            attrs,
             defaultness: None,
             unsafety: None,
             impl_token: Default::default(),
-            generics: mock_type.generics.impl_generics.clone(),
-            trait_: Some((None, trait_, Default::default())),
+            generics,
+            trait_,
             self_ty: Box::new(self_ty),
             brace_token: Default::default(),
             items,
@@ -59,9 +98,7 @@ impl IMockTraitImplGenerator for MockTraitImplGenerator {
         let mock_impl = MockTraitImpl { item_impl };
         return mock_impl;
     }
-}
 
-impl MockTraitImplGenerator {
     fn generate_impl_item_fn(&self, fn_info: &FnInfo) -> ImplItemFn {
         let sig = Signature {
             constness: None,
@@ -69,7 +106,7 @@ impl MockTraitImplGenerator {
             unsafety: None,
             abi: None,
             fn_token: Default::default(),
-            ident: fn_info.parent.ident.clone(),
+            ident: fn_info.parent.fn_ident.clone(),
             generics: Generics {
                 lt_token: Some(Default::default()),
                 params: [GenericParam::Lifetime(LifetimeParam {
@@ -99,8 +136,8 @@ impl MockTraitImplGenerator {
         };
         let block = self.mock_fn_block_generator.generate_for_trait(fn_info);
         let impl_item_fn = ImplItemFn {
-            attrs: Vec::new(),
-            vis: Visibility::Inherited,
+            attrs: fn_info.parent.attrs.clone(),
+            vis: fn_info.parent.visibility.clone(),
             defaultness: None,
             sig,
             block,

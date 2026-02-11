@@ -12,13 +12,7 @@ pub trait IMockSetupStructGenerator {
         mock_ident: &Ident,
         mock_type: &MockType,
         mock_data_struct: &MockDataStruct,
-    ) -> MockSetupStruct;
-
-    fn generate_with_non_camel_case_allowed(
-        &self,
-        mock_ident: &Ident,
-        mock_type: &MockType,
-        mock_data_struct: &MockDataStruct,
+        implemented_traits_configurators: Vec<ImplementedTraitConfigurator>,
     ) -> MockSetupStruct;
 }
 
@@ -34,6 +28,7 @@ impl IMockSetupStructGenerator for MockSetupStructGenerator {
         mock_ident: &Ident,
         mock_type: &MockType,
         mock_data_struct: &MockDataStruct,
+        implemented_traits_configurators: Vec<ImplementedTraitConfigurator>,
     ) -> MockSetupStruct {
         let attrs = Vec::new();
         let ident = format_ident!("{}{}", mock_ident, Self::MOCK_SETUP_STRUCT_IDENT_SUFFIX);
@@ -41,14 +36,24 @@ impl IMockSetupStructGenerator for MockSetupStructGenerator {
             .type_factory
             .create_from_struct(&mock_data_struct.item_struct);
         let data_arc_type = self.type_factory.wrap_in_arc(data_type);
-        let fields = FieldsNamed {
-            brace_token: Default::default(),
-            named: [self
-                .field_factory
-                .create(constants::DATA_IDENT.clone(), data_arc_type)]
-            .into_iter()
-            .collect(),
-        };
+
+        let fields =
+            FieldsNamed {
+                brace_token: Default::default(),
+                named: [self
+                    .field_factory
+                    .create(constants::DATA_IDENT.clone(), data_arc_type)]
+                .into_iter()
+                .chain(implemented_traits_configurators.into_iter().map(
+                    |implemented_trait_setup| {
+                        self.field_factory.create_pub_from_struct(
+                            implemented_trait_setup.trait_ident,
+                            &implemented_trait_setup.item_struct,
+                        )
+                    },
+                ))
+                .collect(),
+            };
         let item_struct = self.struct_factory.create(
             attrs,
             ident,
@@ -57,20 +62,6 @@ impl IMockSetupStructGenerator for MockSetupStructGenerator {
         );
         let mock_setup_struct = MockSetupStruct { item_struct };
         return mock_setup_struct;
-    }
-
-    fn generate_with_non_camel_case_allowed(
-        &self,
-        mock_ident: &Ident,
-        mock_type: &MockType,
-        mock_data_struct: &MockDataStruct,
-    ) -> MockSetupStruct {
-        let mut result = self.generate(mock_ident, mock_type, mock_data_struct);
-        result
-            .item_struct
-            .attrs
-            .push(constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone());
-        return result;
     }
 }
 

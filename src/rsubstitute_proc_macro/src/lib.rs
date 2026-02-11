@@ -15,7 +15,22 @@ pub fn mock(
 ) -> proc_macro::TokenStream {
     let mock_macro_handler = &SERVICES.mock_macro_handler;
 
-    return mock_macro_handler.handle(proc_macro_attribute, proc_macro_item);
+    return mock_macro_handler.handle_attribute_macro(proc_macro_attribute, proc_macro_item);
+}
+
+#[proc_macro_attribute]
+pub fn unmock(
+    _proc_macro_attribute: proc_macro::TokenStream,
+    proc_macro_item: proc_macro::TokenStream,
+) -> proc_macro::TokenStream {
+    return proc_macro_item;
+}
+
+#[proc_macro]
+pub fn mocked(proc_macro_item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let mock_macro_handler = &SERVICES.mock_macro_handler;
+
+    return mock_macro_handler.handle_macro(proc_macro_item);
 }
 
 #[proc_macro_derive(IArgsFormatter)]

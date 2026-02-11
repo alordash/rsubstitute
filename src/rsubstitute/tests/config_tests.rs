@@ -5,6 +5,7 @@ trait Trait {
     fn work(&self, v: i32);
 }
 
+#[cfg(test)]
 mod max_invalid_calls_listed_count_tests {
     #![allow(non_snake_case)]
     use super::*;

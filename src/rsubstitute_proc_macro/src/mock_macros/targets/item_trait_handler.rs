@@ -15,13 +15,13 @@ pub trait IItemTraitHandler {
 pub(crate) struct ItemTraitHandler {
     pub fn_decl_extractor: Arc<dyn IFnDeclExtractor>,
     pub mock_generics_generator: Arc<dyn IMockGenericsGenerator>,
-    pub fn_info_generator: Arc<dyn IFnInfoGenerator>,
     pub mock_type_generator: Arc<dyn IMockTypeGenerator>,
+    pub fn_info_generator: Arc<dyn IFnInfoGenerator>,
     pub mock_data_struct_generator: Arc<dyn IMockDataStructGenerator>,
     pub mock_setup_struct_generator: Arc<dyn IMockSetupStructGenerator>,
     pub mock_received_struct_generator: Arc<dyn IMockReceivedStructGenerator>,
     pub mock_struct_generator: Arc<dyn IMockStructGenerator>,
-    pub mock_trait_impl_generator: Arc<dyn IMockTraitImplGenerator>,
+    pub mock_payload_impl_generator: Arc<dyn IMockPayloadImplGenerator>,
     pub mock_impl_generator: Arc<dyn IMockImplGenerator>,
     pub mock_setup_impl_generator: Arc<dyn IMockSetupImplGenerator>,
     pub mock_received_impl_generator: Arc<dyn IMockReceivedImplGenerator>,
@@ -42,44 +42,46 @@ impl IItemTraitHandler for ItemTraitHandler {
             .mock_type_generator
             .generate_for_trait(mock_ident.clone(), mock_generics);
         let fn_infos: Vec<_> = fn_decls
-            .iter()
-            .map(|x| {
-                self.fn_info_generator
-                    .generate(x, &mock_type, x.maybe_base_fn_block.clone())
-            })
+            .into_iter()
+            .map(|x| self.fn_info_generator.generate(x, &mock_type))
             .collect();
+        let all_fn_infos: Vec<_> = fn_infos.iter().collect();
         let mock_data_struct = self
             .mock_data_struct_generator
-            .generate_for_trait(&mock_type, &fn_infos);
-        let mock_setup_struct =
-            self.mock_setup_struct_generator
-                .generate(&mock_ident, &mock_type, &mock_data_struct);
+            .generate_for_trait(&mock_type, &all_fn_infos);
+        let mock_setup_struct = self.mock_setup_struct_generator.generate(
+            &mock_ident,
+            &mock_type,
+            &mock_data_struct,
+            Vec::new(),
+        );
         let mock_received_struct = self.mock_received_struct_generator.generate(
             &mock_ident,
             &mock_type,
             &mock_data_struct,
+            Vec::new(),
         );
         let mock_struct = self.mock_struct_generator.generate(
+            Vec::new(),
             &mock_type,
             &mock_setup_struct,
             &mock_received_struct,
             &mock_data_struct,
+            None,
         );
-        let mock_trait_impl = self.mock_trait_impl_generator.generate(
-            target_ident.clone(),
-            &mock_type,
-            &mock_struct,
-            &fn_infos,
-        );
+        let mock_trait_impl =
+            self.mock_payload_impl_generator
+                .generate(target_ident.clone(), &mock_type, &fn_infos);
         let mock_impl = self.mock_impl_generator.generate(
             &mock_type,
             &mock_struct,
             &mock_data_struct,
             &mock_setup_struct,
             &mock_received_struct,
+            Vec::new(),
+            None,
         );
         let mock_setup_impl = self.mock_setup_impl_generator.generate_for_trait(
-            &mock_struct,
             &mock_type,
             &mock_setup_struct,
             &fn_infos,

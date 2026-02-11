@@ -145,21 +145,15 @@ pub const SHARED_FN_CONFIG_NEW_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| form
 
 pub const ALLOW_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("allow"));
 
-pub const ALLOW_UNUSED_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+pub const ALLOW_DEAD_CODE_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     let attribute_factory = &SERVICES.attribute_factory;
     let result = attribute_factory.create(ALLOW_IDENT.clone(), "dead_code");
     return result;
 });
 
-pub const ALLOW_ELIDED_NAMED_LIFETIMES_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+pub const ALLOW_UNUSED_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     let attribute_factory = &SERVICES.attribute_factory;
-    let result = attribute_factory.create(ALLOW_IDENT.clone(), "elided_named_lifetimes");
-    return result;
-});
-
-pub const ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
-    let attribute_factory = &SERVICES.attribute_factory;
-    let result = attribute_factory.create(ALLOW_IDENT.clone(), "mismatched_lifetime_syntaxes");
+    let result = attribute_factory.create(ALLOW_IDENT.clone(), "unused");
     return result;
 });
 
@@ -226,6 +220,13 @@ pub const DERIVE_MOCK_DATA_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
         format_ident!("derive"),
         &I_MOCK_DATA_TRAIT_IDENT.to_string(),
     );
+    return result;
+});
+
+pub const DOC_HIDDEN_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+    let attribute_factory = &SERVICES.attribute_factory;
+    let ident = format_ident!("doc");
+    let result = attribute_factory.create(ident, "hidden");
     return result;
 });
 
@@ -481,3 +482,14 @@ pub const DEFAULT_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
 });
 
 pub const DEFAULT_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("default"));
+pub const INNER_DATA_FIELD_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("inner_data"));
+
+pub const DEREF_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
+    let path_factory = &SERVICES.path_factory;
+    let result = path_factory.create(format_ident!("Deref"));
+    return result;
+});
+pub const DEREF_TARGET_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Target"));
+pub const DEREF_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("deref"));
+
+pub const IGNORE_IMPL_ATTRIBUTE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("unmock"));

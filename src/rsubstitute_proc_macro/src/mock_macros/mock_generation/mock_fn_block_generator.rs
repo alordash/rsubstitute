@@ -11,7 +11,7 @@ use syn::*;
 pub trait IMockFnBlockGenerator {
     fn generate_for_trait(&self, fn_info: &FnInfo) -> Block;
 
-    fn generate_for_static(&self, fn_info: &FnInfo, mock_struct: &MockStruct) -> Block;
+    fn generate_for_static(&self, fn_info: &FnInfo, mock_type: &MockType) -> Block;
 }
 
 pub(crate) struct MockFnBlockGenerator {
@@ -36,9 +36,9 @@ impl IMockFnBlockGenerator for MockFnBlockGenerator {
         return block;
     }
 
-    fn generate_for_static(&self, fn_info: &FnInfo, mock_struct: &MockStruct) -> Block {
+    fn generate_for_static(&self, fn_info: &FnInfo, mock_type: &MockType) -> Block {
         let call_stmt = self.generate_call_stmt(fn_info);
-        let last_stmts = self.generate_last_stmts(fn_info, ReturnAccessor::Static(mock_struct));
+        let last_stmts = self.generate_last_stmts(fn_info, ReturnAccessor::Static(mock_type));
         let stmts = [call_stmt].into_iter().chain(last_stmts).collect();
         let block = Block {
             brace_token: Default::default(),
@@ -133,7 +133,7 @@ impl MockFnBlockGenerator {
         let handle_stmt = Stmt::Expr(handle_expr, Some(Default::default()));
         let last_stmts = match return_accessor {
             ReturnAccessor::SelfRef => vec![handle_stmt],
-            ReturnAccessor::Static(mock_struct) => {
+            ReturnAccessor::Static(mock_type) => {
                 let mock_var_stmt = Stmt::Local(
                     self.local_factory.create(
                         Self::MOCK_VARIABLE_IDENT.clone(),
@@ -141,7 +141,7 @@ impl MockFnBlockGenerator {
                             eq_token: Default::default(),
                             expr: Box::new(
                                 self.get_global_mock_expr_generator
-                                    .generate(&mock_struct.item_struct),
+                                    .generate(mock_type.ty.clone()),
                             ),
                             diverge: None,
                         },
@@ -195,5 +195,5 @@ impl MockFnBlockGenerator {
 #[derive(Clone, Copy)]
 enum ReturnAccessor<'a> {
     SelfRef,
-    Static(&'a MockStruct),
+    Static(&'a MockType),
 }

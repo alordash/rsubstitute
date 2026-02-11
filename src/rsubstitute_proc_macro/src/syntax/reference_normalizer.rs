@@ -7,9 +7,9 @@ use syn::*;
 pub trait IReferenceNormalizer {
     fn get_normalized_lifetime(&self) -> Lifetime;
 
-    fn normalize_in_struct(&self, item_struct: &mut ItemStruct);
-
     fn staticify(&self, ty: &mut Type);
+
+    fn normalize_anonymous_lifetimes_in_struct(&self, item_struct: &mut ItemStruct);
 
     fn anonymize_fn_arg(&self, fn_arg: &mut FnArg);
 }
@@ -23,25 +23,31 @@ impl IReferenceNormalizer for ReferenceNormalizer {
         constants::DEFAULT_ARG_FIELD_LIFETIME.clone()
     }
 
-    fn normalize_in_struct(&self, item_struct: &mut ItemStruct) {
-        let lifetime_refs: Vec<_> = item_struct
+    fn staticify(&self, ty: &mut Type) {
+        let lifetime_refs: Vec<_> = self.reference_type_crawler.get_all_type_references(ty);
+
+        for lifetime_ref in lifetime_refs {
+            lifetime_ref.set_lifetime(constants::STATIC_LIFETIME.clone());
+        }
+    }
+
+    fn normalize_anonymous_lifetimes_in_struct(&self, item_struct: &mut ItemStruct) {
+        let optional_lifetime_refs: Vec<_> = item_struct
             .fields
             .iter_mut()
             .flat_map(|field| {
                 self.reference_type_crawler
                     .get_all_type_references(&mut field.ty)
             })
+            .filter_map(|lifetime_ref| match lifetime_ref {
+                LifetimeRef::Optional(optional_lifetime) => Some(optional_lifetime),
+                _ => None,
+            })
             .collect();
-        for lifetime_ref in lifetime_refs {
-            lifetime_ref.set_lifetime(self.get_normalized_lifetime());
-        }
-    }
-
-    fn staticify(&self, ty: &mut Type) {
-        let lifetime_refs: Vec<_> = self.reference_type_crawler.get_all_type_references(ty);
-
-        for lifetime_ref in lifetime_refs {
-            lifetime_ref.set_lifetime(constants::STATIC_LIFETIME.clone());
+        for optional_lifetime in optional_lifetime_refs {
+            if optional_lifetime.is_none() {
+                *optional_lifetime = Some(self.get_normalized_lifetime());
+            }
         }
     }
 

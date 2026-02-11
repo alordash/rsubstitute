@@ -24,10 +24,7 @@ impl IMockGenericsGenerator for MockGenericsGenerator {
             &constants::DEFAULT_ARG_FIELD_LIFETIME_GENERIC,
             &modified_source_generics,
         );
-        let phantom_type_fields = source_generics
-            .type_params()
-            .map(|x| self.convert_type_param_to_phantom_field(&x))
-            .collect();
+        let phantom_type_fields = self.get_all_phantom_fields_from_generics(source_generics);
         let mock_generics = MockGenerics {
             source_generics: source_generics.clone(),
             impl_generics: result_generics,
@@ -118,14 +115,49 @@ impl MockGenericsGenerator {
         }
     }
 
+    fn get_all_phantom_fields_from_generics(&self, generics: &Generics) -> Vec<Field> {
+        let fields = generics
+            .params
+            .iter()
+            .filter_map(|generic_param| match generic_param {
+                GenericParam::Lifetime(lifetime_param) => {
+                    Some(self.convert_lifetime_param_to_phantom_field(lifetime_param))
+                }
+                GenericParam::Type(type_param) => {
+                    Some(self.convert_type_param_to_phantom_field(type_param))
+                }
+                _ => None,
+            })
+            .collect();
+        return fields;
+    }
+
+    fn convert_lifetime_param_to_phantom_field(&self, lifetime_param: &LifetimeParam) -> Field {
+        let ref_ty = Type::Reference(TypeReference {
+            and_token: Default::default(),
+            lifetime: Some(lifetime_param.lifetime.clone()),
+            mutability: None,
+            elem: Box::new(constants::VOID_TYPE.clone()),
+        });
+        let ty = self
+            .type_factory
+            .wrap_in(ref_ty, constants::PHANTOM_DATA_IDENT.clone());
+        let ident = self.format_phantom_field_ident(&lifetime_param.lifetime.ident);
+        let field = self.field_factory.create(ident, ty);
+        return field;
+    }
+
     fn convert_type_param_to_phantom_field(&self, type_param: &TypeParam) -> Field {
         let ty = self.type_factory.wrap_in(
             self.type_factory.create(type_param.ident.clone()),
             constants::PHANTOM_DATA_IDENT.clone(),
         );
-        let field = self
-            .field_factory
-            .create(format_ident!("_phantom_{}", type_param.ident), ty);
+        let ident = self.format_phantom_field_ident(&type_param.ident);
+        let field = self.field_factory.create(ident, ty);
         return field;
+    }
+
+    fn format_phantom_field_ident(&self, own_ident: &Ident) -> Ident {
+        format_ident!("_phantom_{}", own_ident)
     }
 }

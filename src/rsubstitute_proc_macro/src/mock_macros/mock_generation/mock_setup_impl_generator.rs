@@ -14,7 +14,6 @@ use syn::*;
 pub trait IMockSetupImplGenerator {
     fn generate_for_trait(
         &self,
-        mock_struct: &MockStruct,
         mock_type: &MockType,
         mock_setup_struct: &MockSetupStruct,
         fn_infos: &[FnInfo],
@@ -22,7 +21,6 @@ pub trait IMockSetupImplGenerator {
 
     fn generate_for_static(
         &self,
-        mock_struct: &MockStruct,
         mock_type: &MockType,
         mock_setup_struct: &MockSetupStruct,
         fn_info: &FnInfo,
@@ -42,7 +40,6 @@ pub(crate) struct MockSetupImplGenerator {
 impl IMockSetupImplGenerator for MockSetupImplGenerator {
     fn generate_for_trait(
         &self,
-        mock_struct: &MockStruct,
         mock_type: &MockType,
         mock_setup_struct: &MockSetupStruct,
         fn_infos: &[FnInfo],
@@ -54,9 +51,7 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
         let fn_setups = fn_infos
             .iter()
             .map(|x| {
-                let output = self
-                    .setup_output_generator
-                    .generate_for_trait(x, mock_struct);
+                let output = self.setup_output_generator.generate_for_trait(x, mock_type);
                 return ImplItem::Fn(self.generate_fn_setup(
                     x,
                     use_fn_info_ident_as_method_ident,
@@ -75,7 +70,6 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
 
     fn generate_for_static(
         &self,
-        mock_struct: &MockStruct,
         mock_type: &MockType,
         mock_setup_struct: &MockSetupStruct,
         fn_info: &FnInfo,
@@ -86,7 +80,7 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
         let use_fn_info_ident_as_method_ident = false;
         let output = self
             .setup_output_generator
-            .generate_for_trait(fn_info, mock_struct);
+            .generate_for_trait(fn_info, mock_type);
         let fn_setup = ImplItem::Fn(self.generate_fn_setup(
             fn_info,
             use_fn_info_ident_as_method_ident,
@@ -121,7 +115,7 @@ impl MockSetupImplGenerator {
             abi: None,
             fn_token: Default::default(),
             ident: if use_fn_info_ident_as_method_ident {
-                fn_info.parent.ident.clone()
+                fn_info.parent.fn_ident.clone()
             } else {
                 constants::MOCK_SETUP_FIELD_IDENT.clone()
             },
@@ -138,10 +132,7 @@ impl MockSetupImplGenerator {
         };
         let block = self.generate_fn_setup_block(fn_info);
         let impl_item_fn = ImplItemFn {
-            attrs: vec![
-                constants::ALLOW_UNUSED_ATTRIBUTE.clone(),
-                constants::ALLOW_ELIDED_NAMED_LIFETIMES_ATTRIBUTE.clone(),
-            ],
+            attrs: vec![constants::ALLOW_UNUSED_ATTRIBUTE.clone()],
             vis: Visibility::Public(Default::default()),
             defaultness: None,
             sig,
