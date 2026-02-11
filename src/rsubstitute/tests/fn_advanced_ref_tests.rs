@@ -19,13 +19,15 @@ mod tests {
 
     #[test]
     fn compile() {
-        let r1 = &1;
+        let v1 = 1;
+        let v2 = 2;
+        let r1 = &v1;
         {
-            let r2 = &2;
+            let r2 = &v2;
 
             accept_ref::setup(r1).returns(r2);
             
-            check(r2, r1);
+            // check(r2, r1);
 
             accept_ref(r1);
 

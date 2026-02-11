@@ -161,7 +161,6 @@ fn create_services() -> ServiceCollection {
     let impl_factory = Arc::new(ImplFactory);
     let setup_output_generator = Arc::new(SetupOutputGenerator {
         type_factory: type_factory.clone(),
-        reference_normalizer: reference_normalizer.clone(),
     });
     let mock_setup_impl_generator = Arc::new(MockSetupImplGenerator {
         path_factory: path_factory.clone(),

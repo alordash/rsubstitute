@@ -18,7 +18,6 @@ pub trait ISetupOutputGenerator {
 
 pub(crate) struct SetupOutputGenerator {
     pub type_factory: Arc<dyn ITypeFactory>,
-    pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
 }
 
 impl ISetupOutputGenerator for SetupOutputGenerator {
@@ -42,13 +41,12 @@ impl ISetupOutputGenerator for SetupOutputGenerator {
         let owner_type = self
             .type_factory
             .create_from_struct(&mock_setup_struct.item_struct);
-        let mut ty = self.generate(
+        let ty = self.generate(
             fn_info,
             mock_type,
-            constants::STATIC_LIFETIME.clone(),
+            constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
             owner_type,
         );
-        self.reference_normalizer.staticify_anonymous_lifetimes(&mut ty);
         let result = ReturnType::Type(Default::default(), Box::new(ty));
         return result;
     }

@@ -64,23 +64,18 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
         self.reference_normalizer.staticify_anonymous_lifetimes(&mut return_ty);
         let return_ty_reference = Type::Reference(TypeReference {
             and_token: Default::default(),
-            lifetime: Some(constants::STATIC_LIFETIME.clone()),
+            lifetime: Some(constants::DEFAULT_ARG_FIELD_LIFETIME.clone()),
             mutability: None,
             elem: Box::new(return_ty),
         });
         let prepend_ref_self_arg = false;
-        let mut result = self.generate(
+        let result = self.generate(
             fn_info,
             constants::MOCK_RECEIVED_FIELD_IDENT.clone(),
             prepend_ref_self_arg,
             return_ty_reference,
             MockGenericsUsage::UseAsGenerics(&mock_type.generics),
         );
-        for input in result.inputs.iter_mut() {
-            if let FnArg::Typed(pat_type) = input {
-                self.reference_normalizer.staticify_anonymous_lifetimes(pat_type.ty.as_mut());
-            }
-        }
         return result;
     }
 }
