@@ -1,8 +1,17 @@
 use rsubstitute::macros::mock;
 
+#[derive(Clone, Debug, PartialOrd, PartialEq)]
+struct Foo {
+    pub number: Vec<i32>,
+}
+
 #[mock]
 trait Trait<'a, 'b> {
     fn accept_ref(&self, r: &'a &'b &'a &i32) -> &'b &'a &'b &'a i32;
+
+    fn fooo(&self, Foo { number }: Foo) {
+        println!("number: {number:?}")
+    }
 }
 
 #[cfg(test)]

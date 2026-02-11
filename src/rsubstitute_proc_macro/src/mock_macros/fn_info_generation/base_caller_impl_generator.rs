@@ -114,7 +114,8 @@ impl BaseCallerImplGenerator {
             variadic: None,
             output: fn_decl.return_value.clone(),
         };
-        let block = self.generate_call_base_fn_block(mock_type, call_struct, base_impl_fn_block);
+        let block =
+            self.generate_call_base_fn_block(mock_type, fn_decl, call_struct, base_impl_fn_block);
         let impl_item_fn = ImplItemFn {
             attrs: Vec::new(),
             vis: Visibility::Inherited,
@@ -129,27 +130,28 @@ impl BaseCallerImplGenerator {
     fn generate_call_base_fn_block(
         &self,
         mock_type: &MockType,
+        fn_decl: &FnDecl,
         call_struct: &CallStruct,
         base_impl_fn_block: Block,
     ) -> Block {
-        let fields = call_struct
+        let call_struct_fields = call_struct
             .item_struct
             .fields
             .iter()
-            // TODO - replace it with just get_phantom_types_count? I think I know that there's always one extra phantom for lifetime and can add it in get_phantom_types_count()?
-            .skip(1 + mock_type.generics.get_phantom_types_count())
-            .map(|field| {
-                let field_ident = field.get_required_ident();
-                FieldPat {
-                    attrs: Vec::new(),
-                    member: Member::Named(field_ident.clone()),
-                    colon_token: None,
-                    pat: Box::new(Pat::Path(PatPath {
-                        attrs: Vec::new(),
-                        qself: None,
-                        path: self.path_factory.create(field_ident),
-                    })),
-                }
+            .skip(1 + mock_type.generics.get_phantom_types_count());
+        let fields = fn_decl
+            .arguments
+            .iter()
+            .filter_map(|fn_arg| match fn_arg {
+                FnArg::Receiver(_) => None,
+                FnArg::Typed(typed) => Some(typed),
+            })
+            .zip(call_struct_fields)
+            .map(|(typed_fn_arg, call_struct_field)| FieldPat {
+                attrs: Vec::new(),
+                member: Member::Named(call_struct_field.get_required_ident()),
+                colon_token: Some(Default::default()),
+                pat: typed_fn_arg.pat.clone(),
             })
             .collect();
         let deconstruct_call_stmt = Stmt::Local(Local {

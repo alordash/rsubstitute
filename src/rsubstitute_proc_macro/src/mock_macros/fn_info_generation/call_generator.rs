@@ -28,7 +28,8 @@ impl ICallStructGenerator for CallStructGenerator {
         let fn_fields = fn_decl
             .arguments
             .iter()
-            .flat_map(|x| self.try_convert_fn_arg_to_field(x));
+            .enumerate()
+            .flat_map(|(i, x)| self.try_convert_fn_arg_to_field(i, x));
         let struct_fields = std::iter::once(constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD.clone())
             .chain(mock_generics.phantom_type_fields.clone())
             .chain(fn_fields)
@@ -55,7 +56,7 @@ impl ICallStructGenerator for CallStructGenerator {
 impl CallStructGenerator {
     pub const CALL_STRUCT_SUFFIX: &'static str = "Call";
 
-    fn try_convert_fn_arg_to_field(&self, fn_arg: &FnArg) -> Option<Field> {
+    fn try_convert_fn_arg_to_field(&self, arg_number: usize, fn_arg: &FnArg) -> Option<Field> {
         let pat_type = match fn_arg {
             FnArg::Receiver(_) => return None,
             FnArg::Typed(pat_type) => pat_type,
@@ -69,15 +70,17 @@ impl CallStructGenerator {
             }),
             rest => rest.clone(),
         };
-        let ident = self.generate_field_ident(pat_type);
+        let ident = self.generate_field_ident(arg_number, pat_type);
 
         let result = self.field_factory.create(ident, ty);
         return Some(result);
     }
 
-    fn generate_field_ident(&self, pat_type: &PatType) -> Ident {
-        let result =
-            syn::parse2(pat_type.pat.to_token_stream()).expect("Should be valid field identifier");
+    fn generate_field_ident(&self, arg_number: usize, pat_type: &PatType) -> Ident {
+        let result = match &*pat_type.pat {
+            Pat::Ident(pat_ident) => pat_ident.ident.clone(),
+            _ => format_ident!("arg_{arg_number}"),
+        };
         return result;
     }
 }
