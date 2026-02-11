@@ -60,7 +60,15 @@ impl CallStructGenerator {
             FnArg::Receiver(_) => return None,
             FnArg::Typed(pat_type) => pat_type,
         };
-        let ty = *pat_type.ty.clone();
+        let ty = match &*pat_type.ty {
+            Type::Reference(reference) if reference.mutability.is_some() => Type::Ptr(TypePtr {
+                star_token: Default::default(),
+                const_token: None,
+                mutability: Some(Default::default()),
+                elem: reference.elem.clone(),
+            }),
+            rest => rest.clone(),
+        };
         let ident = self.generate_field_ident(pat_type);
 
         let result = self.field_factory.create(ident, ty);

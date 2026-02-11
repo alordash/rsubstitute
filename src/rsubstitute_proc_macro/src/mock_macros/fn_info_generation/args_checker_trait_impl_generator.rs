@@ -1,6 +1,6 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::*;
-use crate::syntax::{IFieldAccessExprFactory, ITypeFactory};
+use crate::syntax::*;
 use proc_macro2::{Ident, Span};
 use quote::{ToTokens, format_ident};
 use std::cell::LazyCell;
@@ -18,9 +18,9 @@ pub trait IArgsCheckerTraitImplGenerator {
     ) -> ArgsCheckerTraitImpl;
 }
 
-pub struct ArgsCheckerTraitImplGenerator {
-    pub(crate) type_factory: Arc<dyn ITypeFactory>,
-    pub(crate) field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
+pub(crate) struct ArgsCheckerTraitImplGenerator {
+    pub type_factory: Arc<dyn ITypeFactory>,
+    pub field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
 }
 
 impl IArgsCheckerTraitImplGenerator for ArgsCheckerTraitImplGenerator {
@@ -80,6 +80,8 @@ impl ArgsCheckerTraitImplGenerator {
 
     const ARG_CHECK_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("check"));
     const ARG_CHECK_REF_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("check_ref"));
+    const ARG_CHECK_MUT_REF_FN_IDENT: LazyCell<Ident> =
+        LazyCell::new(|| format_ident!("check_mut"));
     const ARG_CHECK_RC_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("check_rc"));
     const ARG_CHECK_ARC_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("check_arc"));
 
@@ -159,10 +161,7 @@ impl ArgsCheckerTraitImplGenerator {
     }
 
     fn generate_check_exprs(&self, field: &Field) -> Expr {
-        let field_ident = field
-            .ident
-            .clone()
-            .expect("Call struct fields should have ident.");
+        let field_ident = field.get_required_ident();
         let receiver = self
             .field_access_expr_factory
             .create(vec![constants::SELF_IDENT.clone(), field_ident.clone()]);
@@ -189,6 +188,11 @@ impl ArgsCheckerTraitImplGenerator {
     fn get_check_fn_ident(&self, ty: &Type) -> Ident {
         if let Type::Reference(_) = ty {
             return Self::ARG_CHECK_REF_FN_IDENT.clone();
+        }
+        if let Type::Ptr(ptr) = ty
+            && ptr.mutability.is_some()
+        {
+            return Self::ARG_CHECK_MUT_REF_FN_IDENT.clone();
         }
         if let Type::Path(type_path) = ty {
             if let Some(ident) = type_path.path.segments.last().map(|x| &x.ident) {

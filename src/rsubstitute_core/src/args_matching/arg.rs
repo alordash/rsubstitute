@@ -132,6 +132,69 @@ impl<'a, T: Debug + ?Sized> Arg<&'a T> {
     }
 }
 
+impl<T: Debug + ?Sized> Arg<*mut T> {
+    pub fn check_mut(&self, arg_name: &'static str, actual_value: *mut T) -> ArgCheckResult {
+        self.check(arg_name, actual_value)
+    }
+}
+
+impl<'a, T: Debug + ?Sized> Arg<&'a mut T> {
+    pub fn check_mut(
+        &self,
+        arg_name: &'static str,
+        actual_value_ptr: *mut T,
+    ) -> ArgCheckResult {
+        let actual_value = unsafe {
+            actual_value_ptr
+                .as_ref()
+                .expect("Mutable reference to call argument should not be null.")
+        };
+        let mut_actual_value = unsafe {
+            actual_value_ptr
+                .as_mut()
+                .expect("Mutable reference to call argument should not be null.")
+        };
+        let arg_info = ArgInfo::new(arg_name, actual_value);
+        let actual_ptr = std::ptr::from_ref(actual_value);
+        match self {
+            Arg::Eq(expected_value) => {
+                let expected_ptr = std::ptr::from_ref(*expected_value);
+                if !std::ptr::eq(actual_ptr, expected_ptr) {
+                    return ArgCheckResult::Err(ArgCheckResultErr {
+                        arg_info,
+                        error_msg: format!(
+                            "\t\tExpected reference (ptr: {expected_ptr:?}): {expected_value:?}\n\t\tActual reference   (ptr: {actual_ptr:?}): {actual_value:?}"
+                        ),
+                    });
+                }
+            }
+            Arg::NotEq(not_expected_value) => {
+                let not_expected_ptr = std::ptr::from_ref(*not_expected_value);
+                if std::ptr::eq(actual_ptr, not_expected_ptr) {
+                    return ArgCheckResult::Err(ArgCheckResultErr {
+                        arg_info,
+                        error_msg: format!(
+                            "\t\tDid not expect reference (ptr: {not_expected_ptr:?}): {not_expected_value:?}"
+                        ),
+                    });
+                }
+            }
+            Arg::PrivateIs(predicate, _) => {
+                if !predicate(mut_actual_value) {
+                    return ArgCheckResult::Err(ArgCheckResultErr {
+                        arg_info,
+                        error_msg: format!(
+                            "\t\tCustom predicate didn't match passed reference value. Received value (ptr: {actual_ptr:?}): {actual_value:?}"
+                        ),
+                    });
+                }
+            }
+            Arg::Any => {}
+        };
+        return ArgCheckResult::Ok(ArgCheckResultOk { arg_info });
+    }
+}
+
 impl<T: Debug + ?Sized> Arg<Rc<T>> {
     pub fn check_rc<'a>(&self, arg_name: &'static str, actual_value: Rc<T>) -> ArgCheckResult
     where

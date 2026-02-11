@@ -83,6 +83,7 @@ impl InnerDataDerefImplGenerator {
             variadic: None,
             output: ReturnType::Type(
                 Default::default(),
+                // TODO - make factory for referencing types
                 Box::new(Type::Reference(TypeReference {
                     and_token: Default::default(),
                     lifetime: None,
