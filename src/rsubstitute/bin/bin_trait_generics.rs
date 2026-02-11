@@ -56,8 +56,8 @@ mod generated {
     }
 
     impl<'a, T: Debug + PartialOrd + Clone> IArgsChecker<work_Call<'a, T>> for work_ArgsChecker<'a, T> {
-        fn check(&'_ self, call: work_Call<'a, T>) -> Vec<ArgCheckResult> {
-            vec![self.value.check("value", call.value)]
+        fn check(&'_ self, call: &work_Call<'a, T>) -> Vec<ArgCheckResult> {
+            vec![self.value.check("value", &call.value)]
         }
     }
 
@@ -86,8 +86,8 @@ mod generated {
     impl<'a, T: Debug + PartialOrd + Clone> IArgsChecker<another_work_Call<'a, T>>
         for another_work_ArgsChecker<'a, T>
     {
-        fn check(&self, call: another_work_Call<'a, T>) -> Vec<ArgCheckResult> {
-            vec![self.string.check("string", call.string)]
+        fn check(&self, call: &another_work_Call<'a, T>) -> Vec<ArgCheckResult> {
+            vec![self.string.check("string", &call.string)]
         }
     }
 
@@ -112,7 +112,7 @@ mod generated {
     }
 
     impl<'a, T: Debug + PartialOrd + Clone> IArgsChecker<get_Call<'a, T>> for get_ArgsChecker<'a, T> {
-        fn check(&'_ self, _call: get_Call<'a, T>) -> Vec<ArgCheckResult> {
+        fn check(&'_ self, _call: &get_Call<'a, T>) -> Vec<ArgCheckResult> {
             Vec::new()
         }
     }

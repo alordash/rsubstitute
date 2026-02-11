@@ -59,7 +59,7 @@ impl<
     }
 
     pub fn handle(&self, call: TCall) {
-        let maybe_fn_config = self.try_get_matching_config(call.clone());
+        let maybe_fn_config = self.try_get_matching_config(&call);
         self.register_call(call.clone());
         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
             fn_config.borrow_mut().register_call(call);
@@ -126,7 +126,7 @@ impl<
         let mut non_matching_calls = Vec::new();
         let mut call_infos = self.call_infos.borrow_mut();
         for call_info in call_infos.iter_mut() {
-            let call_matching_result = args_checker.check(call_info.get_call().clone());
+            let call_matching_result = args_checker.check(call_info.get_call());
             let is_matching = call_matching_result.iter().all(ArgCheckResult::is_ok);
             if is_matching {
                 call_info.verify();
@@ -140,12 +140,12 @@ impl<
 
     fn try_get_matching_config(
         &self,
-        call: TCall,
+        call: &TCall,
     ) -> MatchingConfigSearchResult<TMock, TCall, TArgsChecker, TReturnValue> {
         let configs = unsafe { &*self.configs };
         let mut args_check_results = Vec::with_capacity(configs.len());
         for config in configs.iter().rev() {
-            let args_check_result = config.borrow().check(call.clone());
+            let args_check_result = config.borrow().check(call);
             if args_check_result.iter().all(|x| x.is_ok()) {
                 return MatchingConfigSearchResult::Ok(config.clone());
             }
@@ -166,7 +166,7 @@ impl<
         &self,
         call: TCall,
     ) -> Arc<RefCell<FnConfig<TMock, TCall, TArgsChecker, TReturnValue>>> {
-        let fn_config = match self.try_get_matching_config(call.clone()) {
+        let fn_config = match self.try_get_matching_config(&call) {
             MatchingConfigSearchResult::Ok(matching_config) => matching_config,
             MatchingConfigSearchResult::Err(matching_config_search_err) => {
                 self.error_printer.panic_no_suitable_fn_configuration_found(
@@ -188,7 +188,7 @@ impl<
 > FnData<TMock, TCall, TArgsChecker, TReturnValue>
 {
     pub fn handle_base(&self, mock: &TMock, call: TCall) {
-        let maybe_fn_config = self.try_get_matching_config(call.clone());
+        let maybe_fn_config = self.try_get_matching_config(&call);
         self.register_call(call.clone());
         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
             fn_config.borrow_mut().register_call(call.clone());

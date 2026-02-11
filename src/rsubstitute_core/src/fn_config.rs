@@ -48,7 +48,7 @@ impl<TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue: Clone>
         self.calls.push(call);
     }
 
-    pub fn check(&'_ self, call: TCall) -> Vec<ArgCheckResult> {
+    pub fn check(&'_ self, call: &TCall) -> Vec<ArgCheckResult> {
         self.args_checker.check(call)
     }
 

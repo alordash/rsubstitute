@@ -47,12 +47,12 @@ mod tests {
                 .accept_value(Arg::Any, Times::Exactly(3))
                 .accept_value(first_value, Times::Once)
                 .accept_value(
-                    Arg::Is(|actual_value| actual_value == first_value),
+                    Arg::Is(|actual_value| *actual_value == first_value),
                     Times::Once,
                 )
                 .accept_value(Arg::Eq(second_value), Times::Exactly(2))
                 .accept_value(
-                    Arg::Is(|actual_value| actual_value == second_value),
+                    Arg::Is(|actual_value| *actual_value == second_value),
                     Times::Exactly(2),
                 )
                 .no_other_calls();
@@ -219,7 +219,7 @@ accept_value(*{first_value}*)
             assert_panics(
                 || {
                     mock.received.accept_value(
-                        Arg::Is(|actual_value| actual_value == first_value),
+                        Arg::Is(|actual_value| *actual_value == first_value),
                         Times::Never,
                     )
                 },
@@ -237,7 +237,7 @@ accept_value(*{second_value}*)
             assert_panics(
                 || {
                     mock.received.accept_value(
-                        Arg::Is(|actual_value| actual_value == first_value),
+                        Arg::Is(|actual_value| *actual_value == first_value),
                         Times::Exactly(3),
                     )
                 },
@@ -255,7 +255,7 @@ accept_value(*{second_value}*)
             assert_panics(
                 || {
                     mock.received.accept_value(
-                        Arg::Is(|actual_value| actual_value == second_value),
+                        Arg::Is(|actual_value| *actual_value == second_value),
                         Times::Never,
                     )
                 },
@@ -273,7 +273,7 @@ accept_value(*{first_value}*)
             assert_panics(
                 || {
                     mock.received.accept_value(
-                        Arg::Is(|actual_value| actual_value == second_value),
+                        Arg::Is(|actual_value| *actual_value == second_value),
                         Times::Exactly(3),
                     )
                 },
@@ -521,7 +521,7 @@ accept_value(*{first_value}*)
                 .returns(first_returned_value)
                 .accept_value_return_value(Arg::Eq(second_accepted_value))
                 .returns(second_returned_value)
-                .accept_value_return_value(Arg::Is(|x| x == third_accepted_value))
+                .accept_value_return_value(Arg::Is(|x| *x == third_accepted_value))
                 .returns(third_returned_value);
 
             // Act

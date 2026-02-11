@@ -200,7 +200,7 @@ mod tests {
             // Arrange
             let first_accepted_number = 10;
             let returned_string = String::from("quo vadis");
-            get_return_different::setup::<i32, _>(Arg::Is(|x| x == first_accepted_number))
+            get_return_different::setup::<i32, _>(Arg::Is(|x| *x == first_accepted_number))
                 .returns(returned_string.clone());
 
             let second_accepted_number = 20;
@@ -224,7 +224,7 @@ mod tests {
         fn get_return_different_CallBase_Ok() {
             // Arrange
             let first_accepted_number = 10;
-            get_return_different::setup::<i32, String>(Arg::Is(|x| x == first_accepted_number))
+            get_return_different::setup::<i32, String>(Arg::Is(|x| *x == first_accepted_number))
                 .call_base();
 
             let second_accepted_number = 20;

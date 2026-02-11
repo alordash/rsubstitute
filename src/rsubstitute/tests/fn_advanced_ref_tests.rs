@@ -1,13 +1,15 @@
 #![allow(unused)]
 use rsubstitute::macros::mock;
 
+#[mock]
+fn accept_ref<'a>(r: &'a i32) -> &'a i32 {
+    todo!()
+}
+
 // #[mock]
-// fn accept_ref<'a>(r: &'a i32) -> &'a i32 {
+// fn accept_mut_ref<'a>() -> &'a mut i32 {
 //     todo!()
 // }
-
-#[mock]
-fn accept_mut_ref(r: &mut i32, cp: *const i32, mp: *mut i32) {}
 
 #[cfg(test)]
 mod tests {

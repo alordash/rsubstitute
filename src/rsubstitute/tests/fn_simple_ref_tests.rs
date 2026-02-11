@@ -25,6 +25,27 @@ fn accept_two_refs_return_ref(r1: &i32, r2: &f32) -> &'static str {
     ACCEPT_TWO_REFS_RETURN_REF
 }
 
+// #[mock]
+// fn accept_mut_ref(r: &mut i32) {}
+// 
+// #[mock]
+// fn return_mut_ref() -> &'static mut i32 {
+//     BASE_RETURN_REF
+// }
+// 
+// #[mock]
+// fn accept_mut_ref_return_mut_ref(r: &mut i32) -> &'static i32 {
+//     BASE_ACCEPT_REF_RETURN_REF
+// }
+// 
+// #[mock]
+// fn accept_two_mut_refs(r1: &mut i32, r2: &mut f32) {}
+// 
+// #[mock]
+// fn accept_two_mut_refs_return_mut_ref(r1: &mut i32, r2: &mut f32) -> &'static mut str {
+//     ACCEPT_TWO_REFS_RETURN_REF
+// }
+
 #[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]

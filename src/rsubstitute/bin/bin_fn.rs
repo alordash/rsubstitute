@@ -48,8 +48,8 @@ mod global {
     }
 
     impl<'a> IArgsChecker<global_Call<'a>> for global_ArgsChecker<'a> {
-        fn check(&self, call: global_Call<'a>) -> Vec<ArgCheckResult> {
-            vec![self.number.check("number", call.number)]
+        fn check(&self, call: &global_Call<'a>) -> Vec<ArgCheckResult> {
+            vec![self.number.check("number", &call.number)]
         }
     }
 
@@ -178,7 +178,7 @@ mod tests {
 
         // Assert
         let expected_v = 2;
-        global::received(Arg::Is(|v| v == expected_v), Times::Once);
+        global::received(Arg::Is(|v| *v == expected_v), Times::Once);
         global::received(Arg::Eq(2), Times::Once).received(Arg::Eq(143), Times::Exactly(1));
         // assert_eq!("MOCK: 2", result1);
         assert_eq!("actual number: 2", result1);
