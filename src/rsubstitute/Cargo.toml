@@ -23,6 +23,10 @@ edition = "2024"
 name = "dyn_data"
 path = "bin/bin_dyn_data.rs"
 
+[[bin]]
+name = "dyn_data_ref"
+path = "bin/bin_dyn_data_ref.rs"
+
 [dependencies]
 rsubstitute_core = { workspace = true }
 rsubstitute_proc_macro = { workspace = true }
