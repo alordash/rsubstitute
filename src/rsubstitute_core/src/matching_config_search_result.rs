@@ -3,8 +3,8 @@ use crate::args_matching::ArgCheckResult;
 use std::cell::RefCell;
 use std::sync::Arc;
 
-pub(crate) enum MatchingConfigSearchResult<TMock, TArgsChecker> {
-    Ok(Arc<RefCell<FnConfig<TMock, TArgsChecker>>>),
+pub(crate) enum MatchingConfigSearchResult<'a, TMock> {
+    Ok(Arc<RefCell<FnConfig<'a, TMock>>>),
     Err(MatchingConfigSearchErr),
 }
 

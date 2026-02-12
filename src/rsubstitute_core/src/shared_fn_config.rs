@@ -3,19 +3,16 @@ use std::cell::RefCell;
 use std::marker::PhantomData;
 use std::sync::Arc;
 
-pub struct SharedFnConfig<'a, TMock, TArgsChecker, TReturnValue: IRawReturnValue, TOwner> {
+pub struct SharedFnConfig<'a, TMock, TReturnValue: IRawReturnValue, TOwner> {
     _phantom_return_value: PhantomData<TReturnValue>,
-    fn_config: Arc<RefCell<FnConfig<TMock, TArgsChecker>>>,
+    fn_config: Arc<RefCell<FnConfig<'a, TMock>>>,
     owner: &'a TOwner,
 }
 
-impl<'a, TMock, TArgsChecker, TReturnValue: IRawReturnValue, TOwner>
-    SharedFnConfig<'a, TMock, TArgsChecker, TReturnValue, TOwner>
+impl<'a, TMock, TReturnValue: IRawReturnValue, TOwner>
+    SharedFnConfig<'a, TMock, TReturnValue, TOwner>
 {
-    pub fn new(
-        shared_fn_config: Arc<RefCell<FnConfig<TMock, TArgsChecker>>>,
-        owner: &'a TOwner,
-    ) -> Self {
+    pub fn new(shared_fn_config: Arc<RefCell<FnConfig<'a, TMock>>>, owner: &'a TOwner) -> Self {
         Self {
             _phantom_return_value: PhantomData,
             fn_config: shared_fn_config,
@@ -58,15 +55,15 @@ impl<'a, TMock, TArgsChecker, TReturnValue: IRawReturnValue, TOwner>
     }
 }
 
-impl<'a, TMock, TArgsChecker, TOwner> SharedFnConfig<'a, TMock, TArgsChecker, (), TOwner> {
+impl<'a, TMock, TOwner> SharedFnConfig<'a, TMock, (), TOwner> {
     pub fn does(&self, callback: impl FnMut() + 'static) -> &'a TOwner {
         self.fn_config.borrow_mut().set_callback(callback);
         return self.owner;
     }
 }
 
-impl<'a, TMock: IBaseCaller, TArgsChecker, TReturnValue: IRawReturnValue, TOwner>
-    SharedFnConfig<'a, TMock, TArgsChecker, TReturnValue, TOwner>
+impl<'a, TMock: IBaseCaller, TReturnValue: IRawReturnValue, TOwner>
+    SharedFnConfig<'a, TMock, TReturnValue, TOwner>
 {
     pub fn call_base(&self) -> &'a TOwner {
         self.fn_config.borrow_mut().set_call_base();

@@ -36,7 +36,7 @@ mod __rsubstitute_generated_Trait {
         _phantom_lifetime: PhantomData<&'a ()>,
         v: Arg<i32>,
     }
-    impl<'a> IDynArgsChecker for work_ArgsChecker<'a> {
+    impl<'a> IArgsChecker<'a> for work_ArgsChecker<'a> {
         fn check(&self, dyn_call: &dyn IRawCall) -> Vec<ArgCheckResult> {
             let call: &work_Call<'a> = (dyn_call as &dyn Any)
                 .downcast_ref()
@@ -48,7 +48,7 @@ mod __rsubstitute_generated_Trait {
     #[derive(IMockData)]
     pub struct TraitMockData<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
-        work_data: FnData<TraitMock<'a>, work_ArgsChecker<'a>>,
+        work_data: FnData<'static, TraitMock<'a>>,
     }
 
     #[derive(Clone)]
@@ -100,12 +100,13 @@ mod __rsubstitute_generated_Trait {
         pub fn work(
             &'a self,
             v: impl Into<Arg<i32>>,
-        ) -> SharedFnConfig<'a, TraitMock<'a>, work_ArgsChecker<'a>, i32, Self> {
+        ) -> SharedFnConfig<'a, TraitMock<'a>, i32, Self> {
             let work_args_checker = work_ArgsChecker {
                 _phantom_lifetime: PhantomData,
                 v: v.into(),
             };
-            let fn_config = self.data.work_data.add_config(work_args_checker);
+            let fn_config: Arc<RefCell<FnConfig<'a, TraitMock<'a>>>> =
+                unsafe { std::mem::transmute(self.data.work_data.add_config(work_args_checker)) };
             let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
         }
