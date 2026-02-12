@@ -129,12 +129,8 @@ pub const FN_DATA_VERIFY_RECEIVED_FN_IDENT: LazyCell<Ident> =
 
 pub const SERVICES_REF_EXPR: LazyCell<Expr> = LazyCell::new(|| {
     let path_factory = &SERVICES.path_factory;
-    let result = Expr::Reference(ExprReference {
-        attrs: Vec::new(),
-        and_token: Default::default(),
-        mutability: None,
-        expr: Box::new(path_factory.create_expr(format_ident!("SERVICES"))),
-    });
+    let expr_reference_factory = &SERVICES.expr_reference_factory;
+    let result = expr_reference_factory.create(path_factory.create_expr(format_ident!("SERVICES")));
     return result;
 });
 

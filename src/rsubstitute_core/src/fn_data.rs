@@ -83,6 +83,7 @@ impl<TMock, TCall: IArgInfosProvider + Clone, TArgsChecker: IArgsChecker<TCall>,
         return return_value;
     }
 
+    #[allow(private_bounds)]
     pub fn handle_returning_mut_ref(&self, call: TCall) -> TReturnValue
     where
         TReturnValue: IMutRefClone,
@@ -239,6 +240,7 @@ impl<
         return return_value;
     }
 
+    #[allow(private_bounds)]
     pub fn handle_base_returning_mut_ref(&self, mock: &TMock, call: TCall) -> TReturnValue
     where
         TReturnValue: IMutRefClone,

@@ -21,6 +21,7 @@ pub trait IArgsCheckerTraitImplGenerator {
 pub(crate) struct ArgsCheckerTraitImplGenerator {
     pub type_factory: Arc<dyn ITypeFactory>,
     pub field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
+    pub expr_reference_factory: Arc<dyn IExprReferenceFactory>,
 }
 
 impl IArgsCheckerTraitImplGenerator for ArgsCheckerTraitImplGenerator {
@@ -169,16 +170,10 @@ impl ArgsCheckerTraitImplGenerator {
             attrs: Vec::new(),
             lit: Lit::Str(LitStr::new(&field_ident.to_string(), Span::call_site())),
         });
-        // TODO - add factory for ExprReference
-        let field_access_arg = Expr::Reference(ExprReference {
-            attrs: Vec::new(),
-            and_token: Default::default(),
-            mutability: None,
-            expr: Box::new(
-                self.field_access_expr_factory
-                    .create(vec![Self::CALL_ARG_IDENT.clone(), field_ident]),
-            ),
-        });
+        let field_access_arg = self.expr_reference_factory.create(
+            self.field_access_expr_factory
+                .create(vec![Self::CALL_ARG_IDENT.clone(), field_ident]),
+        );
         let method = self.get_check_fn_ident(&field.ty);
         let expr = Expr::MethodCall(ExprMethodCall {
             attrs: Vec::new(),

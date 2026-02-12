@@ -15,6 +15,7 @@ pub(crate) struct ServiceCollection {
     pub path_factory: Arc<dyn IPathFactory>,
     pub type_factory: Arc<dyn ITypeFactory>,
     pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
+    pub expr_reference_factory: Arc<dyn IExprReferenceFactory>,
     pub derive_args_formatter_macro_handler: Arc<dyn IDeriveArgsFormatterMacroHandler>,
     pub derive_mock_data_macro_handler: Arc<dyn IDeriveMockDataMacroHandler>,
     pub mock_macro_handler: Arc<dyn IMockMacroHandler>,
@@ -62,6 +63,7 @@ fn create_services() -> ServiceCollection {
     let field_access_expr_factory = Arc::new(FieldAccessExprFactory {
         path_factory: path_factory.clone(),
     });
+    let expr_reference_factory = Arc::new(ExprReferenceFactory);
     let expr_method_call_factory = Arc::new(ExprMethodCallFactory {
         path_factory: path_factory.clone(),
         field_access_expr_factory: field_access_expr_factory.clone(),
@@ -74,6 +76,7 @@ fn create_services() -> ServiceCollection {
     let args_checker_impl_generator = Arc::new(ArgsCheckerTraitImplGenerator {
         type_factory: type_factory.clone(),
         field_access_expr_factory: field_access_expr_factory.clone(),
+        expr_reference_factory: expr_reference_factory.clone(),
     });
     let mock_generics_generator = Arc::new(MockGenericsGenerator {
         type_factory: type_factory.clone(),
@@ -139,6 +142,7 @@ fn create_services() -> ServiceCollection {
         get_global_mock_expr_generator: get_global_mock_expr_generator.clone(),
         field_checker: field_checker.clone(),
         local_factory: local_factory.clone(),
+        expr_reference_factory: expr_reference_factory.clone(),
     });
     let mock_payload_impl_generator = Arc::new(MockPayloadImplGenerator {
         path_factory: path_factory.clone(),
@@ -242,6 +246,7 @@ fn create_services() -> ServiceCollection {
         type_factory: type_factory.clone(),
         path_factory: path_factory.clone(),
         field_access_expr_factory: field_access_expr_factory.clone(),
+        expr_reference_factory: expr_reference_factory.clone(),
     });
     let ignored_impl_fixer = Arc::new(IgnoredImplFixer {
         generics_merger: generics_merger.clone(),
@@ -321,6 +326,7 @@ fn create_services() -> ServiceCollection {
         path_factory,
         type_factory,
         expr_method_call_factory,
+        expr_reference_factory,
         derive_args_formatter_macro_handler,
         derive_mock_data_macro_handler,
         mock_macro_handler,

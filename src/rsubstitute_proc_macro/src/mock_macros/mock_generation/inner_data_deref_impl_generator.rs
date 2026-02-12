@@ -16,6 +16,7 @@ pub(crate) struct InnerDataDerefImplGenerator {
     pub type_factory: Arc<dyn ITypeFactory>,
     pub path_factory: Arc<dyn IPathFactory>,
     pub field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
+    pub expr_reference_factory: Arc<dyn IExprReferenceFactory>,
 }
 
 impl IInnerDataDerefImplGenerator for InnerDataDerefImplGenerator {
@@ -99,15 +100,11 @@ impl InnerDataDerefImplGenerator {
         let block = Block {
             brace_token: Default::default(),
             stmts: vec![Stmt::Expr(
-                Expr::Reference(ExprReference {
-                    attrs: Vec::new(),
-                    and_token: Default::default(),
-                    mutability: None,
-                    expr: Box::new(self.field_access_expr_factory.create(vec![
+                self.expr_reference_factory
+                    .create(self.field_access_expr_factory.create(vec![
                         constants::SELF_IDENT.clone(),
                         constants::INNER_DATA_FIELD_IDENT.clone(),
                     ])),
-                }),
                 None,
             )],
         };

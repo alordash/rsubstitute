@@ -16,6 +16,7 @@ pub trait IMockFnBlockGenerator {
 
 pub(crate) struct MockFnBlockGenerator {
     pub path_factory: Arc<dyn IPathFactory>,
+    pub expr_reference_factory: Arc<dyn IExprReferenceFactory>,
     pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
     pub std_mem_transmute_expr_factory: Arc<dyn IStdMemTransmuteExprFactory>,
     pub field_value_factory: Arc<dyn IFieldValueFactory>,
@@ -180,12 +181,7 @@ impl MockFnBlockGenerator {
         };
         let args = if fn_info.maybe_base_caller_impl.is_some() {
             vec![
-                Expr::Reference(ExprReference {
-                    attrs: Vec::new(),
-                    and_token: Default::default(),
-                    mutability: None,
-                    expr: Box::new(base_receiver.clone()),
-                }),
+                self.expr_reference_factory.create(base_receiver.clone()),
                 self.path_factory
                     .create_expr(Self::CALL_VARIABLE_IDENT.clone()),
             ]

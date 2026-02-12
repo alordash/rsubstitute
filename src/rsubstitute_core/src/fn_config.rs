@@ -66,6 +66,7 @@ impl<TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue>
         return return_value;
     }
 
+    #[allow(private_bounds)]
     pub fn get_return_value_mut_ref(&mut self) -> Option<TReturnValue>
     where
         TReturnValue: IMutRefClone,
