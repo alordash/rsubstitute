@@ -1,7 +1,7 @@
 use crate::IBaseCaller;
 use crate::args_matching::{ArgCheckResult, IArgsChecker};
 use crate::i_mut_ref_clone::IMutRefClone;
-use std::cell::RefCell;
+use std::cell::{Cell, RefCell};
 use std::collections::VecDeque;
 use std::marker::PhantomData;
 use std::sync::Arc;
@@ -9,7 +9,7 @@ use std::sync::Arc;
 pub struct FnConfig<TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue> {
     _phantom_mock: PhantomData<TMock>,
     args_checker: TArgsChecker,
-    current_return_value_index: usize,
+    current_return_value_index: Cell<usize>,
     return_values: VecDeque<TReturnValue>,
     calls: Vec<TCall>,
     callback: Option<Arc<RefCell<dyn FnMut()>>>,
@@ -23,7 +23,7 @@ impl<TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue>
         FnConfig {
             _phantom_mock: PhantomData,
             args_checker,
-            current_return_value_index: 0,
+            current_return_value_index: Cell::new(0),
             return_values: VecDeque::new(),
             calls: Vec::new(),
             callback: None,
@@ -51,33 +51,36 @@ impl<TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue>
         self.args_checker.check(call)
     }
 
-    pub fn get_return_value(&mut self) -> Option<TReturnValue>
+    pub fn get_return_value(&self) -> Option<TReturnValue>
     where
         TReturnValue: Clone,
     {
-        let return_value = self
-            .return_values
-            .get(self.current_return_value_index)
-            .cloned();
+        let current_return_value_index = self.current_return_value_index.get();
+        let return_value = self.return_values.get(current_return_value_index).cloned();
         if return_value.is_some() {
-            self.current_return_value_index =
-                (self.current_return_value_index + 1).min(self.return_values.len() - 1);
+            let new_current_return_value_index =
+                (current_return_value_index + 1).min(self.return_values.len() - 1);
+            self.current_return_value_index
+                .set(new_current_return_value_index);
         }
         return return_value;
     }
 
     #[allow(private_bounds)]
-    pub fn get_return_value_mut_ref(&mut self) -> Option<TReturnValue>
+    pub fn get_return_value_mut_ref(&self) -> Option<TReturnValue>
     where
         TReturnValue: IMutRefClone,
     {
+        let current_return_value_index = self.current_return_value_index.get();
         let return_value = self
             .return_values
-            .get(self.current_return_value_index)
-            .map(|x| x.mut_ref_clone());
+            .get(current_return_value_index)
+            .map(IMutRefClone::mut_ref_clone);
         if return_value.is_some() {
-            self.current_return_value_index =
-                (self.current_return_value_index + 1).min(self.return_values.len() - 1);
+            let new_current_return_value_index =
+                (current_return_value_index + 1).min(self.return_values.len() - 1);
+            self.current_return_value_index
+                .set(new_current_return_value_index);
         }
         return return_value;
     }

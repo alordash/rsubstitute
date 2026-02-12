@@ -2,8 +2,8 @@ use crate::args_matching::*;
 use crate::call_info::CallInfo;
 use crate::di::ServiceCollection;
 use crate::error_printer::IErrorPrinter;
-use crate::matching_config_search_result::*;
 use crate::i_mut_ref_clone::IMutRefClone;
+use crate::matching_config_search_result::*;
 use crate::*;
 use std::cell::RefCell;
 use std::sync::Arc;
@@ -60,7 +60,7 @@ impl<TMock, TCall: IArgInfosProvider + Clone, TArgsChecker: IArgsChecker<TCall>,
         self.register_call(call.clone());
         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
             fn_config.borrow_mut().register_call(call);
-            if let Some(callback) = fn_config.borrow_mut().get_callback() {
+            if let Some(callback) = fn_config.borrow().get_callback() {
                 callback.borrow_mut()();
             }
         }
@@ -73,10 +73,11 @@ impl<TMock, TCall: IArgInfosProvider + Clone, TArgsChecker: IArgsChecker<TCall>,
         let fn_config = self.get_required_matching_config(call.clone());
         self.register_call(call.clone());
         fn_config.borrow_mut().register_call(call.clone());
-        if let Some(callback) = fn_config.borrow_mut().get_callback() {
+        let fn_config_ref = fn_config.borrow();
+        if let Some(callback) = fn_config_ref.get_callback() {
             callback.borrow_mut()();
         }
-        let Some(return_value) = fn_config.borrow_mut().get_return_value() else {
+        let Some(return_value) = fn_config_ref.get_return_value() else {
             self.error_printer
                 .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
         };
@@ -91,10 +92,11 @@ impl<TMock, TCall: IArgInfosProvider + Clone, TArgsChecker: IArgsChecker<TCall>,
         let fn_config = self.get_required_matching_config(call.clone());
         self.register_call(call.clone());
         fn_config.borrow_mut().register_call(call.clone());
-        if let Some(callback) = fn_config.borrow_mut().get_callback() {
+        let fn_config_ref = fn_config.borrow();
+        if let Some(callback) = fn_config_ref.get_callback() {
             callback.borrow_mut()();
         }
-        let Some(return_value) = fn_config.borrow_mut().get_return_value_mut_ref() else {
+        let Some(return_value) = fn_config_ref.get_return_value_mut_ref() else {
             self.error_printer
                 .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
         };
@@ -210,10 +212,11 @@ impl<
         self.register_call(call.clone());
         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
             fn_config.borrow_mut().register_call(call.clone());
-            if fn_config.borrow().should_call_base() {
+            let fn_config_ref = fn_config.borrow();
+            if fn_config_ref.should_call_base() {
                 mock.call_base(call);
             }
-            if let Some(callback) = fn_config.borrow().get_callback() {
+            if let Some(callback) = fn_config_ref.get_callback() {
                 callback.borrow_mut()();
             }
         }
@@ -225,15 +228,15 @@ impl<
     {
         let fn_config = self.get_required_matching_config(call.clone());
         self.register_call(call.clone());
-        // TODO - ain't too many fn_config.borrows? Maybe borrow once and reuse borrow?
         fn_config.borrow_mut().register_call(call.clone());
-        if fn_config.borrow().should_call_base() {
+        let fn_config_ref = fn_config.borrow();
+        if fn_config_ref.should_call_base() {
             return mock.call_base(call);
         }
-        if let Some(callback) = fn_config.borrow().get_callback() {
+        if let Some(callback) = fn_config_ref.get_callback() {
             callback.borrow_mut()();
         }
-        let Some(return_value) = fn_config.borrow_mut().get_return_value() else {
+        let Some(return_value) = fn_config_ref.get_return_value() else {
             self.error_printer
                 .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
         };
@@ -247,15 +250,15 @@ impl<
     {
         let fn_config = self.get_required_matching_config(call.clone());
         self.register_call(call.clone());
-        // TODO - ain't too many fn_config.borrows? Maybe borrow once and reuse borrow?
         fn_config.borrow_mut().register_call(call.clone());
-        if fn_config.borrow().should_call_base() {
+        let fn_config_ref = fn_config.borrow();
+        if fn_config_ref.should_call_base() {
             return mock.call_base(call);
         }
-        if let Some(callback) = fn_config.borrow().get_callback() {
+        if let Some(callback) = fn_config_ref.get_callback() {
             callback.borrow_mut()();
         }
-        let Some(return_value) = fn_config.borrow_mut().get_return_value_mut_ref() else {
+        let Some(return_value) = fn_config_ref.get_return_value_mut_ref() else {
             self.error_printer
                 .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
         };
