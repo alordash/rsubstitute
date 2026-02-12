@@ -62,7 +62,7 @@ impl IItemTraitHandler for ItemTraitHandler {
             Vec::new(),
         );
         let mock_struct = self.mock_struct_generator.generate(
-            Vec::new(),
+            vec![constants::DERIVE_CLONE_ATTRIBUTE.clone()],
             &mock_type,
             &mock_setup_struct,
             &mock_received_struct,

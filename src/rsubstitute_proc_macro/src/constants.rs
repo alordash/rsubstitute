@@ -167,7 +167,7 @@ pub const ALLOW_NON_SNAKE_CASE_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(||
 
 pub const DERIVE_DEBUG_AND_I_ARGS_FORMATTER_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     let attribute_factory = &SERVICES.attribute_factory;
-    let ident = format_ident!("derive");
+    let ident = DERIVE_IDENT.clone();
     let result = attribute_factory.create(ident, "Debug, IArgsFormatter");
     return result;
 });
@@ -193,7 +193,8 @@ pub const PARTIAL_ORD_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
     return result;
 });
 
-pub const CLONE_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Clone"));
+pub const CLONE_TRAIT_STR: &'static str = "Clone";
+pub const CLONE_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("{CLONE_TRAIT_STR}"));
 pub const CLONE_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
     let path_factory = &SERVICES.path_factory;
     let result = path_factory.create_from_parts(vec![
@@ -204,18 +205,17 @@ pub const CLONE_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
     return result;
 });
 
+pub const DERIVE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("derive"));
 pub const DERIVE_CLONE_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     let attribute_factory = &SERVICES.attribute_factory;
-    let result = attribute_factory.create(format_ident!("derive"), &CLONE_TRAIT_IDENT.to_string());
+    let result = attribute_factory.create(DERIVE_IDENT.clone(), &CLONE_TRAIT_IDENT.to_string());
     return result;
 });
 
 pub const DERIVE_MOCK_DATA_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     let attribute_factory = &SERVICES.attribute_factory;
-    let result = attribute_factory.create(
-        format_ident!("derive"),
-        &I_MOCK_DATA_TRAIT_IDENT.to_string(),
-    );
+    let result =
+        attribute_factory.create(DERIVE_IDENT.clone(), &I_MOCK_DATA_TRAIT_IDENT.to_string());
     return result;
 });
 
