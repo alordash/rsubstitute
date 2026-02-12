@@ -15,6 +15,8 @@ pub trait ITypeFactory {
     fn wrap_in(&self, ty: Type, wrapper: Ident) -> Type;
 
     fn wrap_in_arc(&self, ty: Type) -> Type;
+
+    fn reference(&self, ty: Type, lifetime: Option<Lifetime>) -> Type;
 }
 
 pub struct TypeFactory {
@@ -63,6 +65,16 @@ impl ITypeFactory for TypeFactory {
 
     fn wrap_in_arc(&self, ty: Type) -> Type {
         let result = self.wrap_in(ty, constants::ARC_IDENT.clone());
+        return result;
+    }
+
+    fn reference(&self, ty: Type, lifetime: Option<Lifetime>) -> Type {
+        let result = Type::Reference(TypeReference {
+            and_token: Default::default(),
+            lifetime,
+            mutability: None,
+            elem: Box::new(ty.clone()),
+        });
         return result;
     }
 }

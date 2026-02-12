@@ -123,13 +123,7 @@ impl ArgsCheckerTraitImplGenerator {
                             subpat: None,
                         })),
                         colon_token: Default::default(),
-                        // TODO - add to type_factory
-                        ty: Box::new(Type::Reference(TypeReference {
-                            and_token: Default::default(),
-                            lifetime: None,
-                            mutability: None,
-                            elem: call_type.clone(),
-                        })),
+                        ty: Box::new(self.type_factory.reference(*call_type.clone(), None)),
                     }),
                 ]
                 .into_iter()

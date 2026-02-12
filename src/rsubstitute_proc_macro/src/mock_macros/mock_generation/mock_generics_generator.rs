@@ -154,12 +154,10 @@ impl MockGenericsGenerator {
     }
 
     fn convert_lifetime_param_to_phantom_field(&self, lifetime_param: &LifetimeParam) -> Field {
-        let ref_ty = Type::Reference(TypeReference {
-            and_token: Default::default(),
-            lifetime: Some(lifetime_param.lifetime.clone()),
-            mutability: None,
-            elem: Box::new(constants::VOID_TYPE.clone()),
-        });
+        let ref_ty = self.type_factory.reference(
+            constants::VOID_TYPE.clone(),
+            Some(lifetime_param.lifetime.clone()),
+        );
         let ty = self
             .type_factory
             .wrap_in(ref_ty, constants::PHANTOM_DATA_IDENT.clone());

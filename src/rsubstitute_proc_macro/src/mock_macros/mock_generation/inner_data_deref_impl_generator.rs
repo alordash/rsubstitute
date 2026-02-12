@@ -84,18 +84,16 @@ impl InnerDataDerefImplGenerator {
             output: ReturnType::Type(
                 Default::default(),
                 // TODO - make factory for referencing types
-                Box::new(Type::Reference(TypeReference {
-                    and_token: Default::default(),
-                    lifetime: None,
-                    mutability: None,
-                    elem: Box::new(Type::Path(TypePath {
+                Box::new(self.type_factory.reference(
+                    Type::Path(TypePath {
                         qself: None,
                         path: self.path_factory.create_from_parts(vec![
                             constants::SELF_TYPE_IDENT.clone(),
                             constants::DEREF_TARGET_TYPE_IDENT.clone(),
                         ]),
-                    })),
-                })),
+                    }),
+                    None,
+                )),
             ),
         };
         let block = Block {

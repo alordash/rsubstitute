@@ -273,15 +273,14 @@ pub const SELF_TYPE: LazyCell<Type> = LazyCell::new(|| {
 });
 
 pub const REF_SELF_TYPE: LazyCell<Type> = LazyCell::new(|| {
-    let result = Type::Reference(TypeReference {
-        and_token: Default::default(),
-        lifetime: Some(DEFAULT_ARG_FIELD_LIFETIME.clone()),
-        mutability: None,
-        elem: Box::new(Type::Path(TypePath {
+    let type_factory = &SERVICES.type_factory;
+    let result = type_factory.reference(
+        Type::Path(TypePath {
             qself: None,
             path: SELF_TYPE_PATH.clone(),
-        })),
-    });
+        }),
+        Some(DEFAULT_ARG_FIELD_LIFETIME.clone()),
+    );
     return result;
 });
 
@@ -390,36 +389,38 @@ pub const PHANTOM_DATA_EXPR_PATH: LazyCell<Expr> = LazyCell::new(|| {
 pub const DEFAULT_ARG_FIELD_LIFETIME_FIELD_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("_phantom_lifetime"));
 
-pub const DEFAULT_ARG_FIELD_LIFETIME_FIELD: LazyCell<Field> = LazyCell::new(|| Field {
-    attrs: Vec::new(),
-    vis: Visibility::Inherited,
-    mutability: FieldMutability::None,
-    ident: Some(DEFAULT_ARG_FIELD_LIFETIME_FIELD_IDENT.clone()),
-    colon_token: Some(Default::default()),
-    ty: Type::Path(TypePath {
-        qself: None,
-        path: Path {
-            leading_colon: None,
-            segments: [PathSegment {
-                ident: PHANTOM_DATA_IDENT.clone(),
-                arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
-                    colon2_token: None,
-                    lt_token: Default::default(),
-                    args: [GenericArgument::Type(Type::Reference(TypeReference {
-                        and_token: Default::default(),
-                        lifetime: Some(DEFAULT_ARG_FIELD_LIFETIME.clone()),
-                        mutability: None,
-                        elem: Box::new(VOID_TYPE.clone()),
-                    }))]
-                    .into_iter()
-                    .collect(),
-                    gt_token: Default::default(),
-                }),
-            }]
-            .into_iter()
-            .collect(),
-        },
-    }),
+pub const DEFAULT_ARG_FIELD_LIFETIME_FIELD: LazyCell<Field> = LazyCell::new(|| {
+    let type_factory = &SERVICES.type_factory;
+    let result = Field {
+        attrs: Vec::new(),
+        vis: Visibility::Inherited,
+        mutability: FieldMutability::None,
+        ident: Some(DEFAULT_ARG_FIELD_LIFETIME_FIELD_IDENT.clone()),
+        colon_token: Some(Default::default()),
+        ty: Type::Path(TypePath {
+            qself: None,
+            path: Path {
+                leading_colon: None,
+                segments: [PathSegment {
+                    ident: PHANTOM_DATA_IDENT.clone(),
+                    arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
+                        colon2_token: None,
+                        lt_token: Default::default(),
+                        args: [GenericArgument::Type(type_factory.reference(
+                            VOID_TYPE.clone(),
+                            Some(DEFAULT_ARG_FIELD_LIFETIME.clone()),
+                        ))]
+                        .into_iter()
+                        .collect(),
+                        gt_token: Default::default(),
+                    }),
+                }]
+                .into_iter()
+                .collect(),
+            },
+        }),
+    };
+    return result;
 });
 
 pub const ANONYMOUS_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {

@@ -35,12 +35,10 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
     }
 
     fn generate_for_trait(&self, fn_info: &FnInfo, mock_type: &MockType) -> Signature {
-        let return_ty = Type::Reference(TypeReference {
-            and_token: Default::default(),
-            lifetime: Some(constants::DEFAULT_ARG_FIELD_LIFETIME.clone()),
-            mutability: None,
-            elem: Box::new(constants::SELF_TYPE.clone()),
-        });
+        let return_ty = self.type_factory.reference(
+            constants::SELF_TYPE.clone(),
+            Some(constants::DEFAULT_ARG_FIELD_LIFETIME.clone()),
+        );
         let prepend_ref_self_arg = true;
         let result = self.generate(
             fn_info,
@@ -61,13 +59,12 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
         let mut return_ty = self
             .type_factory
             .create_from_struct(&mock_received_struct.item_struct);
-        self.reference_normalizer.staticify_anonymous_lifetimes(&mut return_ty);
-        let return_ty_reference = Type::Reference(TypeReference {
-            and_token: Default::default(),
-            lifetime: Some(constants::DEFAULT_ARG_FIELD_LIFETIME.clone()),
-            mutability: None,
-            elem: Box::new(return_ty),
-        });
+        self.reference_normalizer
+            .staticify_anonymous_lifetimes(&mut return_ty);
+        let return_ty_reference = self.type_factory.reference(
+            return_ty,
+            Some(constants::DEFAULT_ARG_FIELD_LIFETIME.clone()),
+        );
         let prepend_ref_self_arg = false;
         let result = self.generate(
             fn_info,
