@@ -24,8 +24,26 @@ mod tests {
     use super::*;
     use not_enough_asserts::panics::*;
     use rsubstitute::*;
-    use std::cell::RefCell;
+    use std::cell::{Cell, RefCell};
     use std::sync::Arc;
+
+    #[test]
+    fn no_support() {
+        // Arrange
+        let flag = Arc::new(Cell::new(false));
+        let flag_copy = flag.clone();
+        let mut mock = TraitMock::new();
+        {
+            mock.setup.mutate().does(move || flag_copy.set(true));
+            mock.setup.consume().returns(33);
+        }
+
+        // mock.mutate();
+        assert!(!flag.get());
+        
+        // let v = mock.consume();
+        // assert_eq!(33, v);
+    }
 
     #[test]
     fn f_Ok() {

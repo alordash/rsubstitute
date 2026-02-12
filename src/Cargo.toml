@@ -6,6 +6,8 @@ members = ["rsubstitute", "rsubstitute_core", "rsubstitute_proc_macro"]
 rsubstitute_core = { path = "rsubstitute_core" }
 rsubstitute_proc_macro = { path = "rsubstitute_proc_macro" }
 
+typeid = "1.0.3"
 proc-macro2 = "1.0.95"
 quote = "1.0.40"
 syn = { version = "2.0.104", features = ["full"] }
+not_enough_asserts = "0.1.1"

@@ -2,7 +2,7 @@ use rsubstitute::macros::*;
 use std::sync::Arc;
 
 mocked! {
-    #[allow(unused)]    // TODO - apply all source attributes
+    #[allow(unused)]
     struct Struct {
         pub number: i32
     }

@@ -84,7 +84,6 @@ impl InnerDataDerefImplGenerator {
             variadic: None,
             output: ReturnType::Type(
                 Default::default(),
-                // TODO - make factory for referencing types
                 Box::new(self.type_factory.reference(
                     Type::Path(TypePath {
                         qself: None,

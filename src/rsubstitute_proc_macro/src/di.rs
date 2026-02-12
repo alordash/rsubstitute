@@ -252,7 +252,6 @@ fn create_services() -> ServiceCollection {
         generics_merger: generics_merger.clone(),
     });
 
-    // TODO - fix order of fields
     let item_trait_handler = Arc::new(ItemTraitHandler {
         fn_decl_extractor: fn_decl_extractor.clone(),
         mock_generics_generator: mock_generics_generator.clone(),

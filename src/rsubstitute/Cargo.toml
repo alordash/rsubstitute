@@ -22,5 +22,5 @@ path = "bin/bin_struct.rs"
 [dependencies]
 rsubstitute_core = { workspace = true }
 rsubstitute_proc_macro = { workspace = true }
-not_enough_asserts = "0.1.1"
-typeid = "1.0.3"    # TODO - remove, it's for bin testing only
+typeid = { workspace = true }
+not_enough_asserts = { workspace = true }
