@@ -1,10 +1,12 @@
-pub(crate) struct CallInfo<TCall> {
+use crate::fn_parameters::Call;
+
+pub(crate) struct CallInfo {
     verified: bool,
-    call: TCall,
+    call: Call,
 }
 
-impl<TCall> CallInfo<TCall> {
-    pub fn new(call: TCall) -> Self {
+impl CallInfo {
+    pub fn new(call: Call) -> Self {
         Self {
             verified: false,
             call,
@@ -19,7 +21,7 @@ impl<TCall> CallInfo<TCall> {
         !self.verified
     }
 
-    pub fn get_call(&self) -> &TCall {
+    pub fn get_call(&self) -> &Call {
         &self.call
     }
 }

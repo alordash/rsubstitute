@@ -1,24 +1,24 @@
 use crate::IBaseCaller;
-use crate::args_matching::{ArgCheckResult, IArgsChecker};
+use crate::args_matching::{ArgCheckResult, IDynArgsChecker};
+use crate::fn_parameters::Call;
 use crate::i_mut_ref_clone::IMutRefClone;
 use std::cell::{Cell, RefCell};
 use std::collections::VecDeque;
 use std::marker::PhantomData;
+use std::ops::Deref;
 use std::sync::Arc;
 
-pub struct FnConfig<TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue> {
+pub struct FnConfig<TMock, TArgsChecker, TReturnValue> {
     _phantom_mock: PhantomData<TMock>,
     args_checker: TArgsChecker,
     current_return_value_index: Cell<usize>,
     return_values: VecDeque<TReturnValue>,
-    calls: Vec<TCall>,
+    calls: Vec<Call>,
     callback: Option<Arc<RefCell<dyn FnMut()>>>,
     call_base: bool,
 }
 
-impl<TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue>
-    FnConfig<TMock, TCall, TArgsChecker, TReturnValue>
-{
+impl<TMock, TArgsChecker, TReturnValue> FnConfig<TMock, TArgsChecker, TReturnValue> {
     pub fn new(args_checker: TArgsChecker) -> Self {
         FnConfig {
             _phantom_mock: PhantomData,
@@ -43,12 +43,15 @@ impl<TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue>
         self.callback = Some(Arc::new(RefCell::new(callback)));
     }
 
-    pub fn register_call(&mut self, call: TCall) {
+    pub fn register_call(&mut self, call: Call) {
         self.calls.push(call);
     }
 
-    pub fn check(&'_ self, call: &TCall) -> Vec<ArgCheckResult> {
-        self.args_checker.check(call)
+    pub fn check(&self, call: &Call) -> Vec<ArgCheckResult>
+    where
+        TArgsChecker: IDynArgsChecker,
+    {
+        self.args_checker.check(call.deref())
     }
 
     pub fn get_return_value(&self) -> Option<TReturnValue>
@@ -90,12 +93,8 @@ impl<TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue>
     }
 }
 
-impl<
-    TMock: IBaseCaller<TCall, TReturnValue>,
-    TCall,
-    TArgsChecker: IArgsChecker<TCall>,
-    TReturnValue,
-> FnConfig<TMock, TCall, TArgsChecker, TReturnValue>
+impl<TMock: IBaseCaller<TReturnValue>, TArgsChecker, TReturnValue>
+    FnConfig<TMock, TArgsChecker, TReturnValue>
 {
     pub fn set_call_base(&mut self) {
         self.call_base = true;

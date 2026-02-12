@@ -1,19 +1,17 @@
-use crate::args_matching::IArgsChecker;
 use crate::{FnConfig, IBaseCaller};
 use std::cell::RefCell;
 use std::sync::Arc;
 
-pub struct SharedFnConfig<'a, TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TOwner>
-{
-    fn_config: Arc<RefCell<FnConfig<TMock, TCall, TArgsChecker, TReturnValue>>>,
+pub struct SharedFnConfig<'a, TMock, TArgsChecker, TReturnValue, TOwner> {
+    fn_config: Arc<RefCell<FnConfig<TMock, TArgsChecker, TReturnValue>>>,
     owner: &'a TOwner,
 }
 
-impl<'a, TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TOwner>
-    SharedFnConfig<'a, TMock, TCall, TArgsChecker, TReturnValue, TOwner>
+impl<'a, TMock, TArgsChecker, TReturnValue, TOwner>
+    SharedFnConfig<'a, TMock, TArgsChecker, TReturnValue, TOwner>
 {
     pub fn new(
-        shared_fn_config: Arc<RefCell<FnConfig<TMock, TCall, TArgsChecker, TReturnValue>>>,
+        shared_fn_config: Arc<RefCell<FnConfig<TMock, TArgsChecker, TReturnValue>>>,
         owner: &'a TOwner,
     ) -> Self {
         Self {
@@ -53,23 +51,15 @@ impl<'a, TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TReturnValue, TOwner>
     }
 }
 
-impl<'a, TMock, TCall, TArgsChecker: IArgsChecker<TCall>, TOwner>
-    SharedFnConfig<'a, TMock, TCall, TArgsChecker, (), TOwner>
-{
+impl<'a, TMock, TArgsChecker, TOwner> SharedFnConfig<'a, TMock, TArgsChecker, (), TOwner> {
     pub fn does(&self, callback: impl FnMut() + 'static) -> &'a TOwner {
         self.fn_config.borrow_mut().set_callback(callback);
         return self.owner;
     }
 }
 
-impl<
-    'a,
-    TMock: IBaseCaller<TCall, TReturnValue>,
-    TCall,
-    TArgsChecker: IArgsChecker<TCall>,
-    TReturnValue,
-    TOwner,
-> SharedFnConfig<'a, TMock, TCall, TArgsChecker, TReturnValue, TOwner>
+impl<'a, TMock: IBaseCaller<TReturnValue>, TArgsChecker, TReturnValue, TOwner>
+    SharedFnConfig<'a, TMock, TArgsChecker, TReturnValue, TOwner>
 {
     pub fn call_base(&self) -> &'a TOwner {
         self.fn_config.borrow_mut().set_call_base();

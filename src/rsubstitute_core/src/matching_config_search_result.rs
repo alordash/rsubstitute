@@ -1,15 +1,10 @@
 use crate::FnConfig;
-use crate::args_matching::{ArgCheckResult, IArgsChecker};
+use crate::args_matching::ArgCheckResult;
 use std::cell::RefCell;
 use std::sync::Arc;
 
-pub(crate) enum MatchingConfigSearchResult<
-    TMock,
-    TCall,
-    TArgsChecker: IArgsChecker<TCall>,
-    TReturnValue,
-> {
-    Ok(Arc<RefCell<FnConfig<TMock, TCall, TArgsChecker, TReturnValue>>>),
+pub(crate) enum MatchingConfigSearchResult<TMock, TArgsChecker, TReturnValue> {
+    Ok(Arc<RefCell<FnConfig<TMock, TArgsChecker, TReturnValue>>>),
     Err(MatchingConfigSearchErr),
 }
 

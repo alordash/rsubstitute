@@ -1,3 +1,5 @@
-pub trait IBaseCaller<TCall, TReturnValue> {
-    fn call_base(&self, call: TCall) -> TReturnValue;
+use crate::fn_parameters::IRawCall;
+
+pub trait IBaseCaller<TReturnValue> {
+    fn call_base(&self, call: Box<dyn IRawCall>) -> TReturnValue;
 }

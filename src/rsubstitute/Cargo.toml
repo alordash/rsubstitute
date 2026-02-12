@@ -3,21 +3,25 @@ name = "rsubstitute"
 version = "0.1.0"
 edition = "2024"
 
-[[bin]]
-name = "trait"
-path = "bin/bin_trait.rs"
+#[[bin]]
+#name = "trait"
+#path = "bin/bin_trait.rs"
+#
+#[[bin]]
+#name = "trait_generics"
+#path = "bin/bin_trait_generics.rs"
+#
+#[[bin]]
+#name = "fn"
+#path = "bin/bin_fn.rs"
+#
+#[[bin]]
+#name = "struct"
+#path = "bin/bin_struct.rs"
 
 [[bin]]
-name = "trait_generics"
-path = "bin/bin_trait_generics.rs"
-
-[[bin]]
-name = "fn"
-path = "bin/bin_fn.rs"
-
-[[bin]]
-name = "struct"
-path = "bin/bin_struct.rs"
+name = "dyn_data"
+path = "bin/bin_dyn_data.rs"
 
 [dependencies]
 rsubstitute_core = { workspace = true }
