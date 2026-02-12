@@ -2,11 +2,11 @@ use crate::IRawReturnValue;
 use std::any::Any;
 use std::ops::Deref;
 
-pub struct ReturnValue {
-    inner: Box<dyn IRawReturnValue>,
+pub struct ReturnValue<'a> {
+    inner: Box<dyn IRawReturnValue<'a> + 'a>,
 }
 
-impl Clone for ReturnValue {
+impl<'a> Clone for ReturnValue<'a> {
     fn clone(&self) -> Self {
         Self {
             inner: self.inner.clone_box(),
@@ -14,24 +14,26 @@ impl Clone for ReturnValue {
     }
 }
 
-impl Deref for ReturnValue {
-    type Target = dyn IRawReturnValue;
+impl<'a> Deref for ReturnValue<'a> {
+    type Target = dyn IRawReturnValue<'a> + 'a;
 
     fn deref(&self) -> &Self::Target {
         self.inner.as_ref()
     }
 }
 
-impl ReturnValue {
-    pub fn new<T: IRawReturnValue>(raw_return_value: T) -> Self {
+impl<'a> ReturnValue<'a> {
+    pub fn new<T: IRawReturnValue<'a> + 'a>(raw_return_value: T) -> Self {
         Self {
             inner: Box::new(raw_return_value),
         }
     }
 
-    pub fn downcast_into<T: 'static>(self) -> T {
-        *((self.inner as Box<dyn Any>)
-            .downcast()
-            .expect("Return type must be TODO"))
+    pub fn downcast_into<T: 'a>(self) -> T {
+        let raw_ptr = Box::into_raw(self.inner);
+        let t_ptr = raw_ptr as *mut T;
+        let t_box = unsafe { Box::from_raw(t_ptr) };
+        let t = *t_box;
+        return t;
     }
 }

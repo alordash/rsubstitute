@@ -3,13 +3,13 @@ use std::cell::RefCell;
 use std::marker::PhantomData;
 use std::sync::Arc;
 
-pub struct SharedFnConfig<'a, TMock, TReturnValue: IRawReturnValue, TOwner> {
+pub struct SharedFnConfig<'a, TMock, TReturnValue: IRawReturnValue<'a>, TOwner> {
     _phantom_return_value: PhantomData<TReturnValue>,
     fn_config: Arc<RefCell<FnConfig<'a, TMock>>>,
     owner: &'a TOwner,
 }
 
-impl<'a, TMock, TReturnValue: IRawReturnValue, TOwner>
+impl<'a, TMock, TReturnValue: IRawReturnValue<'a> + 'a, TOwner>
     SharedFnConfig<'a, TMock, TReturnValue, TOwner>
 {
     pub fn new(shared_fn_config: Arc<RefCell<FnConfig<'a, TMock>>>, owner: &'a TOwner) -> Self {
@@ -62,7 +62,7 @@ impl<'a, TMock, TOwner> SharedFnConfig<'a, TMock, (), TOwner> {
     }
 }
 
-impl<'a, TMock: IBaseCaller, TReturnValue: IRawReturnValue, TOwner>
+impl<'a, TMock: IBaseCaller, TReturnValue: IRawReturnValue<'a>, TOwner>
     SharedFnConfig<'a, TMock, TReturnValue, TOwner>
 {
     pub fn call_base(&self) -> &'a TOwner {

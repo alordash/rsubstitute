@@ -1,11 +1,9 @@
-use std::any::Any;
-
-pub trait IRawReturnValue: Any {
-    fn clone_box(&self) -> Box<dyn IRawReturnValue>;
+pub trait IRawReturnValue<'a> {
+    fn clone_box(&self) -> Box<dyn IRawReturnValue<'a> + 'a>;
 }
 
-impl<T: Any + Clone> IRawReturnValue for T {
-    fn clone_box(&self) -> Box<dyn IRawReturnValue> {
+impl<'a, T: Clone + 'a> IRawReturnValue<'a> for T {
+    fn clone_box(&self) -> Box<dyn IRawReturnValue<'a> + 'a> {
         Box::new(self.clone())
     }
 }

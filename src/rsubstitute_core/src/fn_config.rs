@@ -10,7 +10,7 @@ pub struct FnConfig<'a, TMock> {
     _phantom_mock: PhantomData<TMock>,
     args_checker: ArgsChecker<'a>,
     current_return_value_index: Cell<usize>,
-    return_values: VecDeque<ReturnValue>,
+    return_values: VecDeque<ReturnValue<'a>>,
     calls: Vec<Call<'a>>,
     callback: Option<Arc<RefCell<dyn FnMut()>>>,
     call_base: bool,
@@ -29,11 +29,14 @@ impl<'a, TMock> FnConfig<'a, TMock> {
         }
     }
 
-    pub(crate) fn add_return_value(&mut self, return_value: ReturnValue) {
+    pub(crate) fn add_return_value(&mut self, return_value: ReturnValue<'a>) {
         self.return_values.push_back(return_value);
     }
 
-    pub(crate) fn add_return_values<const N: usize>(&mut self, return_values: [ReturnValue; N]) {
+    pub(crate) fn add_return_values<const N: usize>(
+        &mut self,
+        return_values: [ReturnValue<'a>; N],
+    ) {
         self.return_values.extend(return_values.into_iter());
     }
 
@@ -49,7 +52,7 @@ impl<'a, TMock> FnConfig<'a, TMock> {
         self.args_checker.check(&call)
     }
 
-    pub(crate) fn get_return_value(&self) -> Option<ReturnValue> {
+    pub(crate) fn get_return_value(&self) -> Option<ReturnValue<'a>> {
         let current_return_value_index = self.current_return_value_index.get();
         let return_value = self.return_values.get(current_return_value_index).cloned();
         if return_value.is_some() {
