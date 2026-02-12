@@ -38,8 +38,9 @@ mod __rsubstitute_generated_Trait {
     }
     impl<'a> IDynArgsChecker for work_ArgsChecker<'a> {
         fn check(&self, dyn_call: &dyn IRawCall) -> Vec<ArgCheckResult> {
-            let call: &work_Call<'a> = (dyn_call as &dyn Any).downcast_ref().unwrap();
-            // let call: work_Call<'a> = *dyn_call.downcast().expect("dyn_call should be work_Call");
+            let call: &work_Call<'a> = (dyn_call as &dyn Any)
+                .downcast_ref()
+                .expect("dyn_call should be work_Call");
             vec![self.v.check("v", &call.v)]
         }
     }
@@ -47,7 +48,7 @@ mod __rsubstitute_generated_Trait {
     #[derive(IMockData)]
     pub struct TraitMockData<'a> {
         _phantom_lifetime: PhantomData<&'a ()>,
-        work_data: FnData<TraitMock<'a>, work_ArgsChecker<'a>, i32>,
+        work_data: FnData<TraitMock<'a>, work_ArgsChecker<'a>>,
     }
 
     #[derive(Clone)]

@@ -1,23 +1,22 @@
 use crate::args_matching::*;
-use crate::fn_parameters::{Call, CallInfo};
 use crate::di::ServiceCollection;
 use crate::error_printer::IErrorPrinter;
-use crate::i_mut_ref_clone::IMutRefClone;
+use crate::fn_parameters::{Call, CallInfo};
 use crate::matching_config_search_result::*;
 use crate::*;
 use std::cell::RefCell;
 use std::ops::Deref;
 use std::sync::Arc;
 
-pub struct FnData<TMock, TArgsChecker: IDynArgsChecker, TReturnValue> {
+pub struct FnData<TMock, TArgsChecker: IDynArgsChecker> {
     fn_name: &'static str,
     call_infos: RefCell<Vec<CallInfo>>,
     // Behind a raw reference to lift 'static requirement from TCall, TArgsChecker, etc.
-    configs: *mut Vec<Arc<RefCell<FnConfig<TMock, TArgsChecker, TReturnValue>>>>,
+    configs: *mut Vec<Arc<RefCell<FnConfig<TMock, TArgsChecker>>>>,
     error_printer: Arc<dyn IErrorPrinter>,
 }
 
-impl<TMock, TArgsChecker: IDynArgsChecker, TReturnValue> FnData<TMock, TArgsChecker, TReturnValue> {
+impl<TMock, TArgsChecker: IDynArgsChecker> FnData<TMock, TArgsChecker> {
     pub fn new(fn_name: &'static str, services: &ServiceCollection) -> Self {
         Self {
             fn_name,
@@ -33,7 +32,7 @@ impl<TMock, TArgsChecker: IDynArgsChecker, TReturnValue> FnData<TMock, TArgsChec
     }
 }
 
-impl<TMock, TArgsChecker: IDynArgsChecker, TReturnValue> FnData<TMock, TArgsChecker, TReturnValue> {
+impl<TMock, TArgsChecker: IDynArgsChecker> FnData<TMock, TArgsChecker> {
     pub fn register_call(&self, call: Call) -> &Self {
         self.call_infos.borrow_mut().push(CallInfo::new(call));
         self
@@ -42,7 +41,7 @@ impl<TMock, TArgsChecker: IDynArgsChecker, TReturnValue> FnData<TMock, TArgsChec
     pub fn add_config(
         &self,
         args_checker: TArgsChecker,
-    ) -> Arc<RefCell<FnConfig<TMock, TArgsChecker, TReturnValue>>> {
+    ) -> Arc<RefCell<FnConfig<TMock, TArgsChecker>>> {
         let config = FnConfig::new(args_checker);
         let shared_config = Arc::new(RefCell::new(config));
         unsafe {
@@ -62,10 +61,7 @@ impl<TMock, TArgsChecker: IDynArgsChecker, TReturnValue> FnData<TMock, TArgsChec
         }
     }
 
-    pub fn handle_returning(&self, call: Call) -> TReturnValue
-    where
-        TReturnValue: Clone,
-    {
+    pub fn handle_returning<TReturnValue: 'static>(&self, call: Call) -> TReturnValue {
         let fn_config = self.get_required_matching_config(call.clone());
         self.register_call(call.clone());
         fn_config.borrow_mut().register_call(call.clone());
@@ -77,27 +73,27 @@ impl<TMock, TArgsChecker: IDynArgsChecker, TReturnValue> FnData<TMock, TArgsChec
             self.error_printer
                 .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
         };
-        return return_value;
+        return return_value.downcast_into();
     }
 
-    #[allow(private_bounds)]
-    pub fn handle_returning_mut_ref(&self, call: Call) -> TReturnValue
-    where
-        TReturnValue: IMutRefClone,
-    {
-        let fn_config = self.get_required_matching_config(call.clone());
-        self.register_call(call.clone());
-        fn_config.borrow_mut().register_call(call.clone());
-        let fn_config_ref = fn_config.borrow();
-        if let Some(callback) = fn_config_ref.get_callback() {
-            callback.borrow_mut()();
-        }
-        let Some(return_value) = fn_config_ref.get_return_value_mut_ref() else {
-            self.error_printer
-                .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
-        };
-        return return_value;
-    }
+    // #[allow(private_bounds)]
+    // pub fn handle_returning_mut_ref(&self, call: Call) -> TReturnValue
+    // where
+    //     TReturnValue: IMutRefClone,
+    // {
+    //     let fn_config = self.get_required_matching_config(call.clone());
+    //     self.register_call(call.clone());
+    //     fn_config.borrow_mut().register_call(call.clone());
+    //     let fn_config_ref = fn_config.borrow();
+    //     if let Some(callback) = fn_config_ref.get_callback() {
+    //         callback.borrow_mut()();
+    //     }
+    //     let Some(return_value) = fn_config_ref.get_return_value_mut_ref() else {
+    //         self.error_printer
+    //             .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
+    //     };
+    //     return return_value;
+    // }
 
     pub fn verify_received(&self, args_checker: TArgsChecker, times: Times)
     where
@@ -160,7 +156,7 @@ impl<TMock, TArgsChecker: IDynArgsChecker, TReturnValue> FnData<TMock, TArgsChec
     fn try_get_matching_config(
         &self,
         call: &Call,
-    ) -> MatchingConfigSearchResult<TMock, TArgsChecker, TReturnValue> {
+    ) -> MatchingConfigSearchResult<TMock, TArgsChecker> {
         let configs = unsafe { &*self.configs };
         let mut args_check_results = Vec::with_capacity(configs.len());
         for config in configs.iter().rev() {
@@ -184,7 +180,7 @@ impl<TMock, TArgsChecker: IDynArgsChecker, TReturnValue> FnData<TMock, TArgsChec
     fn get_required_matching_config(
         &self,
         call: Call,
-    ) -> Arc<RefCell<FnConfig<TMock, TArgsChecker, TReturnValue>>> {
+    ) -> Arc<RefCell<FnConfig<TMock, TArgsChecker>>> {
         let fn_config = match self.try_get_matching_config(&call) {
             MatchingConfigSearchResult::Ok(matching_config) => matching_config,
             MatchingConfigSearchResult::Err(matching_config_search_err) => {
@@ -199,9 +195,7 @@ impl<TMock, TArgsChecker: IDynArgsChecker, TReturnValue> FnData<TMock, TArgsChec
     }
 }
 
-impl<TMock: IBaseCaller<TReturnValue>, TArgsChecker: IDynArgsChecker, TReturnValue>
-    FnData<TMock, TArgsChecker, TReturnValue>
-{
+impl<TMock: IBaseCaller, TArgsChecker: IDynArgsChecker> FnData<TMock, TArgsChecker> {
     pub fn handle_base(&self, mock: &TMock, call: Call) {
         let maybe_fn_config = self.try_get_matching_config(&call);
         self.register_call(call.clone());
@@ -209,7 +203,7 @@ impl<TMock: IBaseCaller<TReturnValue>, TArgsChecker: IDynArgsChecker, TReturnVal
             fn_config.borrow_mut().register_call(call.clone());
             let fn_config_ref = fn_config.borrow();
             if fn_config_ref.should_call_base() {
-                mock.call_base(call.into_raw_call());
+                mock.call_base(call);
             }
             if let Some(callback) = fn_config_ref.get_callback() {
                 callback.borrow_mut()();
@@ -217,16 +211,18 @@ impl<TMock: IBaseCaller<TReturnValue>, TArgsChecker: IDynArgsChecker, TReturnVal
         }
     }
 
-    pub fn handle_base_returning(&self, mock: &TMock, call: Call) -> TReturnValue
-    where
-        TReturnValue: Clone,
-    {
+    pub fn handle_base_returning<TReturnValue: 'static>(
+        &self,
+        mock: &TMock,
+        call: Call,
+    ) -> TReturnValue {
         let fn_config = self.get_required_matching_config(call.clone());
         self.register_call(call.clone());
         fn_config.borrow_mut().register_call(call.clone());
         let fn_config_ref = fn_config.borrow();
         if fn_config_ref.should_call_base() {
-            return mock.call_base(call.into_raw_call());
+            let base_return_value = mock.call_base(call);
+            return base_return_value.downcast_into();
         }
         if let Some(callback) = fn_config_ref.get_callback() {
             callback.borrow_mut()();
@@ -235,28 +231,28 @@ impl<TMock: IBaseCaller<TReturnValue>, TArgsChecker: IDynArgsChecker, TReturnVal
             self.error_printer
                 .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
         };
-        return return_value;
+        return return_value.downcast_into();
     }
 
-    #[allow(private_bounds)]
-    pub fn handle_base_returning_mut_ref(&self, mock: &TMock, call: Call) -> TReturnValue
-    where
-        TReturnValue: IMutRefClone,
-    {
-        let fn_config = self.get_required_matching_config(call.clone());
-        self.register_call(call.clone());
-        fn_config.borrow_mut().register_call(call.clone());
-        let fn_config_ref = fn_config.borrow();
-        if fn_config_ref.should_call_base() {
-            return mock.call_base(call.into_raw_call());
-        }
-        if let Some(callback) = fn_config_ref.get_callback() {
-            callback.borrow_mut()();
-        }
-        let Some(return_value) = fn_config_ref.get_return_value_mut_ref() else {
-            self.error_printer
-                .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
-        };
-        return return_value;
-    }
+    // #[allow(private_bounds)]
+    // pub fn handle_base_returning_mut_ref(&self, mock: &TMock, call: Call) -> TReturnValue
+    // where
+    //     TReturnValue: IMutRefClone,
+    // {
+    //     let fn_config = self.get_required_matching_config(call.clone());
+    //     self.register_call(call.clone());
+    //     fn_config.borrow_mut().register_call(call.clone());
+    //     let fn_config_ref = fn_config.borrow();
+    //     if fn_config_ref.should_call_base() {
+    //         return mock.call_base(call.into_raw_call());
+    //     }
+    //     if let Some(callback) = fn_config_ref.get_callback() {
+    //         callback.borrow_mut()();
+    //     }
+    //     let Some(return_value) = fn_config_ref.get_return_value_mut_ref() else {
+    //         self.error_printer
+    //             .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
+    //     };
+    //     return return_value;
+    // }
 }

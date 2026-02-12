@@ -1,12 +1,12 @@
-use crate::fn_parameters::IRawCall;
+use crate::IRawReturnValue;
 use std::any::Any;
 use std::ops::Deref;
 
-pub struct Call {
-    inner: Box<dyn IRawCall>,
+pub struct ReturnValue {
+    inner: Box<dyn IRawReturnValue>,
 }
 
-impl Clone for Call {
+impl Clone for ReturnValue {
     fn clone(&self) -> Self {
         Self {
             inner: self.inner.clone_box(),
@@ -14,24 +14,24 @@ impl Clone for Call {
     }
 }
 
-impl Deref for Call {
-    type Target = dyn IRawCall;
+impl Deref for ReturnValue {
+    type Target = dyn IRawReturnValue;
 
     fn deref(&self) -> &Self::Target {
         self.inner.as_ref()
     }
 }
 
-impl Call {
-    pub fn new<T: IRawCall>(raw_call: T) -> Self {
+impl ReturnValue {
+    pub fn new<T: IRawReturnValue>(raw_return_value: T) -> Self {
         Self {
-            inner: Box::new(raw_call),
+            inner: Box::new(raw_return_value),
         }
     }
 
     pub fn downcast_into<T: 'static>(self) -> T {
         *((self.inner as Box<dyn Any>)
             .downcast()
-            .expect("Call type must be TODO"))
+            .expect("Return type must be TODO"))
     }
 }
