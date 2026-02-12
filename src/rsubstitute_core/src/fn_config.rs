@@ -4,7 +4,6 @@ use crate::{IBaseCaller, ReturnValue};
 use std::cell::{Cell, RefCell};
 use std::collections::VecDeque;
 use std::marker::PhantomData;
-use std::ops::Deref;
 use std::sync::Arc;
 
 pub struct FnConfig<'a, TMock> {
@@ -12,7 +11,7 @@ pub struct FnConfig<'a, TMock> {
     args_checker: ArgsChecker<'a>,
     current_return_value_index: Cell<usize>,
     return_values: VecDeque<ReturnValue>,
-    calls: Vec<Call>,
+    calls: Vec<Call<'a>>,
     callback: Option<Arc<RefCell<dyn FnMut()>>>,
     call_base: bool,
 }
@@ -42,12 +41,12 @@ impl<'a, TMock> FnConfig<'a, TMock> {
         self.callback = Some(Arc::new(RefCell::new(callback)));
     }
 
-    pub(crate) fn register_call(&mut self, call: Call) {
+    pub(crate) fn register_call(&mut self, call: Call<'a>) {
         self.calls.push(call);
     }
 
     pub(crate) fn check(&self, call: &Call) -> Vec<ArgCheckResult> {
-        self.args_checker.check(call.deref())
+        self.args_checker.check(&call)
     }
 
     pub(crate) fn get_return_value(&self) -> Option<ReturnValue> {

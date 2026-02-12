@@ -1,12 +1,12 @@
 use crate::fn_parameters::Call;
 
-pub(crate) struct CallInfo {
+pub(crate) struct CallInfo<'a> {
     verified: bool,
-    call: Call,
+    call: Call<'a>,
 }
 
-impl CallInfo {
-    pub fn new(call: Call) -> Self {
+impl<'a> CallInfo<'a> {
+    pub fn new(call: Call<'a>) -> Self {
         Self {
             verified: false,
             call,
@@ -21,7 +21,7 @@ impl CallInfo {
         !self.verified
     }
 
-    pub fn get_call(&self) -> &Call {
+    pub fn get_call(&self) -> &Call<'a> {
         &self.call
     }
 }

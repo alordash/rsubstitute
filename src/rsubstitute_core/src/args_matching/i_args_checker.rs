@@ -1,8 +1,8 @@
+use crate::Call;
 use crate::args_matching::{ArgCheckResult, IArgsFormatter};
-use crate::fn_parameters::IRawCall;
 
 pub trait IArgsChecker<'a>: 'a + IArgsFormatter {
-    fn check(&self, raw_call: &dyn IRawCall) -> Vec<ArgCheckResult>;
+    fn check(&self, raw_call: &Call) -> Vec<ArgCheckResult>;
 }
 
 pub struct ArgsChecker<'a> {
@@ -16,7 +16,7 @@ impl<'a> IArgsFormatter for ArgsChecker<'a> {
 }
 
 impl<'a> IArgsChecker<'a> for ArgsChecker<'a> {
-    fn check(&self, raw_call: &dyn IRawCall) -> Vec<ArgCheckResult> {
+    fn check(&self, raw_call: &Call) -> Vec<ArgCheckResult> {
         self.inner.check(raw_call)
     }
 }

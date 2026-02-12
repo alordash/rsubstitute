@@ -37,10 +37,8 @@ mod __rsubstitute_generated_Trait {
         v: Arg<i32>,
     }
     impl<'a> IArgsChecker<'a> for work_ArgsChecker<'a> {
-        fn check(&self, dyn_call: &dyn IRawCall) -> Vec<ArgCheckResult> {
-            let call: &work_Call<'a> = (dyn_call as &dyn Any)
-                .downcast_ref()
-                .expect("dyn_call should be work_Call");
+        fn check(&self, dyn_call: &Call) -> Vec<ArgCheckResult> {
+            let call: &work_Call<'a> = dyn_call.downcast_ref();
             vec![self.v.check("v", &call.v)]
         }
     }

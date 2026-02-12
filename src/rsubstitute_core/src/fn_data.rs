@@ -5,12 +5,11 @@ use crate::fn_parameters::{Call, CallInfo};
 use crate::matching_config_search_result::*;
 use crate::*;
 use std::cell::RefCell;
-use std::ops::Deref;
 use std::sync::Arc;
 
 pub struct FnData<'a, TMock> {
     fn_name: &'static str,
-    call_infos: RefCell<Vec<CallInfo>>,
+    call_infos: RefCell<Vec<CallInfo<'a>>>,
     configs: RefCell<Vec<Arc<RefCell<FnConfig<'a, TMock>>>>>,
     error_printer: Arc<dyn IErrorPrinter>,
 }
@@ -32,7 +31,7 @@ impl<'a, TMock> FnData<'a, TMock> {
 }
 
 impl<'a, TMock> FnData<'a, TMock> {
-    pub fn register_call(&self, call: Call) -> &Self {
+    pub fn register_call(&self, call: Call<'a>) -> &Self {
         self.call_infos.borrow_mut().push(CallInfo::new(call));
         self
     }
@@ -48,7 +47,7 @@ impl<'a, TMock> FnData<'a, TMock> {
         return shared_config;
     }
 
-    pub fn handle(&self, call: Call) {
+    pub fn handle(&self, call: Call<'a>) {
         let maybe_fn_config = self.try_get_matching_config(&call);
         self.register_call(call.clone());
         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
@@ -59,7 +58,7 @@ impl<'a, TMock> FnData<'a, TMock> {
         }
     }
 
-    pub fn handle_returning<TReturnValue: 'static>(&self, call: Call) -> TReturnValue {
+    pub fn handle_returning<TReturnValue: 'static>(&self, call: Call<'a>) -> TReturnValue {
         let fn_config = self.get_required_matching_config(call.clone());
         self.register_call(call.clone());
         fn_config.borrow_mut().register_call(call.clone());
@@ -122,7 +121,7 @@ impl<'a, TMock> FnData<'a, TMock> {
         let mut non_matching_calls = Vec::new();
         let mut call_infos = self.call_infos.borrow_mut();
         for call_info in call_infos.iter_mut() {
-            let call_matching_result = args_checker.check(call_info.get_call().deref());
+            let call_matching_result = args_checker.check(call_info.get_call());
             let is_matching = call_matching_result.iter().all(ArgCheckResult::is_ok);
             if is_matching {
                 call_info.verify();
@@ -171,7 +170,7 @@ impl<'a, TMock> FnData<'a, TMock> {
 }
 
 impl<'a, TMock: IBaseCaller> FnData<'a, TMock> {
-    pub fn handle_base(&self, mock: &TMock, call: Call) {
+    pub fn handle_base(&self, mock: &TMock, call: Call<'a>) {
         let maybe_fn_config = self.try_get_matching_config(&call);
         self.register_call(call.clone());
         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
@@ -189,7 +188,7 @@ impl<'a, TMock: IBaseCaller> FnData<'a, TMock> {
     pub fn handle_base_returning<TReturnValue: 'static>(
         &self,
         mock: &TMock,
-        call: Call,
+        call: Call<'a>,
     ) -> TReturnValue {
         let fn_config = self.get_required_matching_config(call.clone());
         self.register_call(call.clone());

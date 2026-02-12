@@ -1,12 +1,11 @@
 use crate::args_matching::IArgInfosProvider;
-use std::any::Any;
 
-pub trait IRawCall: Any + IArgInfosProvider {
-    fn clone_box(&self) -> Box<dyn IRawCall>;
+pub trait IRawCall<'a>: IArgInfosProvider {
+    fn clone_box(&self) -> Box<dyn IRawCall<'a> + 'a>;
 }
 
-impl<T: Any + IArgInfosProvider + Clone> IRawCall for T {
-    fn clone_box(&self) -> Box<dyn IRawCall> {
+impl<'a, T: IArgInfosProvider + Clone + 'a> IRawCall<'a> for T {
+    fn clone_box(&self) -> Box<dyn IRawCall<'a> + 'a> {
         Box::new(self.clone())
     }
 }
