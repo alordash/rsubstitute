@@ -23,7 +23,7 @@ mod tests {
         // Arrange
         let mock = TraitMock::new();
         let (v1, v2, v3, v4) = (10, 20, 30, 40);
-        mock.setup
+        mock.setup()
             .work(Arg::Any, Arg::Any, Arg::Any, Arg::Is(|_| false))
             .returns(1)
             .work(Arg::Any, Arg::Any, Arg::Is(|_| false), Arg::Is(|_| false))

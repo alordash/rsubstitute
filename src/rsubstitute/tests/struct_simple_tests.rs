@@ -48,7 +48,7 @@ mod tests {
             let callback_flag = Arc::new(RefCell::new(false));
             let callback_flag_clone = callback_flag.clone();
             let return_value = ();
-            mock.setup.f().returns_and_does(return_value, move || {
+            mock.setup().f().returns_and_does(return_value, move || {
                 *callback_flag_clone.borrow_mut() = true
             });
 
@@ -60,7 +60,7 @@ mod tests {
             assert_eq!(value, mock.value);
             assert_eq!((), result);
             assert!(*callback_flag.borrow());
-            mock.received.f(Times::Once).no_other_calls();
+            mock.received().f(Times::Once).no_other_calls();
         }
 
         #[test]
@@ -73,7 +73,7 @@ mod tests {
 
             // Assert
             assert_eq!((), result);
-            mock.received.f(Times::Once).no_other_calls();
+            mock.received().f(Times::Once).no_other_calls();
         }
 
         #[test]
@@ -91,7 +91,7 @@ mod tests {
             assert_eq!((), result2);
             assert_eq!((), result3);
 
-            mock.received.f(Times::Exactly(3)).no_other_calls();
+            mock.received().f(Times::Exactly(3)).no_other_calls();
         }
 
         #[test]
@@ -106,7 +106,7 @@ mod tests {
 
             // Assert
             assert_panics(
-                || mock.received.f(Times::Once),
+                || mock.received().f(Times::Once),
                 r#"Expected to receive a call exactly once matching:
 	f()
 Actually received 3 matching calls:
@@ -117,7 +117,7 @@ Received no non-matching calls"#,
             );
 
             assert_panics(
-                || mock.received.f(Times::Exactly(1)),
+                || mock.received().f(Times::Exactly(1)),
                 r#"Expected to receive a call exactly once matching:
 	f()
 Actually received 3 matching calls:
@@ -128,7 +128,7 @@ Received no non-matching calls"#,
             );
 
             assert_panics(
-                || mock.received.f(Times::Exactly(2)),
+                || mock.received().f(Times::Exactly(2)),
                 r#"Expected to receive a call 2 times matching:
 	f()
 Actually received 3 matching calls:
@@ -139,7 +139,7 @@ Received no non-matching calls"#,
             );
 
             assert_panics(
-                || mock.received.f(Times::Exactly(4)),
+                || mock.received().f(Times::Exactly(4)),
                 r#"Expected to receive a call 4 times matching:
 	f()
 Actually received 3 matching calls:
@@ -162,7 +162,7 @@ Received no non-matching calls"#,
             let callback_flag = Arc::new(RefCell::new(false));
             let callback_flag_clone = callback_flag.clone();
             let return_value = ();
-            mock.setup
+            mock.setup()
                 .Trait
                 .f()
                 .returns_and_does(return_value, move || {
@@ -177,8 +177,8 @@ Received no non-matching calls"#,
             assert_eq!(value, mock.value);
             assert_eq!((), result);
             assert!(*callback_flag.borrow());
-            mock.received.Trait.f(Times::Once);
-            mock.received.no_other_calls()
+            mock.received().Trait.f(Times::Once);
+            mock.received().no_other_calls()
         }
 
         #[test]
@@ -191,8 +191,8 @@ Received no non-matching calls"#,
 
             // Assert
             assert_eq!((), result);
-            mock.received.Trait.f(Times::Once);
-            mock.received.no_other_calls();
+            mock.received().Trait.f(Times::Once);
+            mock.received().no_other_calls();
         }
 
         #[test]
@@ -210,8 +210,8 @@ Received no non-matching calls"#,
             assert_eq!((), result2);
             assert_eq!((), result3);
 
-            mock.received.Trait.f(Times::Exactly(3));
-            mock.received.no_other_calls();
+            mock.received().Trait.f(Times::Exactly(3));
+            mock.received().no_other_calls();
         }
 
         #[test]
@@ -226,7 +226,7 @@ Received no non-matching calls"#,
 
             // Assert
             assert_panics(
-                || mock.received.Trait.f(Times::Once),
+                || mock.received().Trait.f(Times::Once),
                 r#"Expected to receive a call exactly once matching:
 	Trait::f()
 Actually received 3 matching calls:
@@ -237,7 +237,7 @@ Received no non-matching calls"#,
             );
 
             assert_panics(
-                || mock.received.Trait.f(Times::Exactly(1)),
+                || mock.received().Trait.f(Times::Exactly(1)),
                 r#"Expected to receive a call exactly once matching:
 	Trait::f()
 Actually received 3 matching calls:
@@ -248,7 +248,7 @@ Received no non-matching calls"#,
             );
 
             assert_panics(
-                || mock.received.Trait.f(Times::Exactly(2)),
+                || mock.received().Trait.f(Times::Exactly(2)),
                 r#"Expected to receive a call 2 times matching:
 	Trait::f()
 Actually received 3 matching calls:
@@ -259,7 +259,7 @@ Received no non-matching calls"#,
             );
 
             assert_panics(
-                || mock.received.Trait.f(Times::Exactly(4)),
+                || mock.received().Trait.f(Times::Exactly(4)),
                 r#"Expected to receive a call 4 times matching:
 	Trait::f()
 Actually received 3 matching calls:

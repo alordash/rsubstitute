@@ -311,6 +311,18 @@ pub const VEC_OF_VEC_OF_STRINGS_TYPE: LazyCell<Type> = LazyCell::new(|| {
 
 pub const ARC_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Arc"));
 
+pub const SELF_ARG: LazyCell<FnArg> = LazyCell::new(|| {
+    let result = FnArg::Receiver(Receiver {
+        attrs: Vec::new(),
+        reference: None,
+        mutability: None,
+        self_token: Default::default(),
+        colon_token: None,
+        ty: Box::new(SELF_TYPE.clone()),
+    });
+    return result;
+});
+
 pub const REF_SELF_ARG: LazyCell<FnArg> = LazyCell::new(|| {
     let result = FnArg::Receiver(Receiver {
         attrs: Vec::new(),
@@ -448,7 +460,7 @@ pub const DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE: LazyCell<FieldValue> = LazyCel
 pub const SEND_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Send"));
 pub const SYNC_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Sync"));
 
-pub const CLONE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("clone"));
+pub const CLONE_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("clone"));
 
 pub const RESET_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("reset"));
 
@@ -476,3 +488,24 @@ pub const DEREF_TARGET_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ide
 pub const DEREF_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("deref"));
 
 pub const IGNORE_IMPL_ATTRIBUTE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("unmock"));
+
+pub const CONFIG_LIFETIME_IDENT: LazyCell<Ident> =
+    LazyCell::new(|| format_ident!("__rsubstitute_config"));
+pub const CONFIG_LIFETIME_GENERICS: LazyCell<Generics> = LazyCell::new(|| {
+    let lifetime_param = GenericParam::Lifetime(LifetimeParam {
+        attrs: Vec::new(),
+        lifetime: Lifetime {
+            apostrophe: Span::call_site(),
+            ident: CONFIG_LIFETIME_IDENT.clone(),
+        },
+        colon_token: None,
+        bounds: Punctuated::new(),
+    });
+    let generics = Generics {
+        lt_token: Some(Default::default()),
+        params: [lifetime_param].into_iter().collect(),
+        gt_token: Some(Default::default()),
+        where_clause: None,
+    };
+    return generics;
+});

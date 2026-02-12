@@ -51,11 +51,11 @@ impl IMockStructGenerator for MockStructGenerator {
         let fields = FieldsNamed {
             brace_token: Default::default(),
             named: [
-                self.field_factory.create_pub_from_struct(
+                self.field_factory.create_from_struct(
                     constants::MOCK_SETUP_FIELD_IDENT.clone(),
                     &mock_setup_struct.item_struct,
                 ),
-                self.field_factory.create_pub_from_struct(
+                self.field_factory.create_from_struct(
                     constants::MOCK_RECEIVED_FIELD_IDENT.clone(),
                     &mock_received_struct.item_struct,
                 ),
@@ -97,11 +97,15 @@ impl IMockStructGenerator for MockStructGenerator {
             mock_setup_struct,
             mock_received_struct,
             mock_data_struct,
-            None
+            None,
         );
-        mock_struct.item_struct.attrs.insert(0, constants::DOC_HIDDEN_ATTRIBUTE.clone());
+        mock_struct
+            .item_struct
+            .attrs
+            .insert(0, constants::DOC_HIDDEN_ATTRIBUTE.clone());
         for field in mock_struct.item_struct.fields.iter_mut() {
-            self.reference_normalizer.staticify_anonymous_lifetimes(&mut field.ty);
+            self.reference_normalizer
+                .staticify_anonymous_lifetimes(&mut field.ty);
         }
 
         return mock_struct;

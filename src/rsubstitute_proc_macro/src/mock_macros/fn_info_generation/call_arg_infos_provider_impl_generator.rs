@@ -128,7 +128,7 @@ impl CallArgInfosProviderImplGenerator {
         });
         let field_access_arg = Expr::MethodCall(self.expr_method_call_factory.create(
             vec![constants::SELF_IDENT.clone(), field_ident],
-            constants::CLONE_IDENT.clone(),
+            constants::CLONE_FN_IDENT.clone(),
             Vec::new(),
         ));
 

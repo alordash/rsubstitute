@@ -33,7 +33,7 @@ mod tests {
             mock.accept_ref(r);
 
             // Assert
-            mock.received.accept_ref(r, Times::Once).no_other_calls();
+            mock.received().accept_ref(r, Times::Once).no_other_calls();
         }
 
         #[test]
@@ -48,7 +48,7 @@ mod tests {
 
             // Assert
             assert_panics(
-                || mock.received.accept_ref(Arg::Any, Times::Never),
+                || mock.received().accept_ref(Arg::Any, Times::Never),
                 format!(
                     "Expected to never receive a call matching:
 	accept_ref((&i32): any)
@@ -59,7 +59,7 @@ Received no non-matching calls"
             );
 
             assert_panics(
-                || mock.received.accept_ref(Arg::Any, Times::Exactly(3)),
+                || mock.received().accept_ref(Arg::Any, Times::Exactly(3)),
                 format!(
                     "Expected to receive a call 3 times matching:
 	accept_ref((&i32): any)
@@ -72,7 +72,7 @@ Received no non-matching calls"
             let invalid_r = &22;
             let invalid_r_ptr = std::ptr::from_ref(invalid_r);
             assert_panics(
-                || mock.received.accept_ref(invalid_r, Times::Once),
+                || mock.received().accept_ref(invalid_r, Times::Once),
                 format!(
                     "Expected to receive a call exactly once matching:
 	accept_ref((&i32): equal to {invalid_r})
@@ -95,7 +95,7 @@ accept_ref(*{r}*)
             // Arrange
             let mock = TraitMock::new();
             let r = Box::leak(Box::new(11));
-            mock.setup.return_ref().returns(r);
+            mock.setup().return_ref().returns(r);
 
             // Act
             let actual_r = mock.return_ref();
@@ -114,7 +114,7 @@ accept_ref(*{r}*)
             let mock = TraitMock::new();
             let accepted_r = &10;
             let returned_r = &20;
-            mock.setup
+            mock.setup()
                 .accept_ref_return_ref(accepted_r)
                 .returns(returned_r);
 
@@ -124,7 +124,7 @@ accept_ref(*{r}*)
             // Assert
             assert_eq!(returned_r, actual_returned_r);
 
-            mock.received
+            mock.received()
                 .accept_ref_return_ref(accepted_r, Times::Once)
                 .accept_ref_return_ref(Arg::NotEq(accepted_r), Times::Never)
                 .no_other_calls();
@@ -145,7 +145,7 @@ accept_ref(*{r}*)
             mock.accept_two_refs(r1, r2);
 
             // Assert
-            mock.received
+            mock.received()
                 .accept_two_refs(r1, r2, Times::Once)
                 .accept_two_refs(Arg::NotEq(r1), Arg::NotEq(r2), Times::Never)
                 .no_other_calls();
@@ -162,7 +162,7 @@ accept_ref(*{r}*)
             let r1 = &10;
             let r2 = &20.2;
             let returned_r = "veridis quo";
-            mock.setup
+            mock.setup()
                 .accept_two_refs_return_ref(r1, r2)
                 .returns(returned_r);
 
@@ -172,7 +172,7 @@ accept_ref(*{r}*)
             // Assert
             assert_eq!(returned_r, actual_returned_r);
 
-            mock.received
+            mock.received()
                 .accept_two_refs_return_ref(r1, r2, Times::Once)
                 .no_other_calls();
         }

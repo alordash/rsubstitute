@@ -26,7 +26,7 @@ mod trait_generic_tests {
             let mock = TraitMock::<_, String>::new();
             let accepted_value = 10;
             let returned_value = 200;
-            mock.setup
+            mock.setup()
                 .get_return(accepted_value)
                 .returns(returned_value);
 
@@ -36,7 +36,7 @@ mod trait_generic_tests {
             // Assert
             assert_eq!(returned_value, actual_returned_value);
 
-            mock.received
+            mock.received()
                 .get_return(accepted_value, Times::Once)
                 .no_other_calls();
         }
@@ -47,7 +47,7 @@ mod trait_generic_tests {
             let mock = TraitMock::<_, ()>::new();
             let accepted_value = "quo vadis";
             let returned_value = "veridis quo";
-            mock.setup
+            mock.setup()
                 .get_return(accepted_value)
                 .returns(returned_value);
 
@@ -57,7 +57,7 @@ mod trait_generic_tests {
             // Assert
             assert_eq!(returned_value, actual_returned_value);
 
-            mock.received
+            mock.received()
                 .get_return(accepted_value, Times::Once)
                 .no_other_calls();
         }
@@ -68,7 +68,7 @@ mod trait_generic_tests {
             let mock = TraitMock::<u8, Box<Vec<String>>>::new();
             let accepted_value = 10u8;
             let returned_value = 20u8;
-            mock.setup
+            mock.setup()
                 .get_return(accepted_value)
                 .returns(returned_value);
 
@@ -78,7 +78,7 @@ mod trait_generic_tests {
             // Assert
             assert_eq!(returned_value, actual_returned_value);
 
-            mock.received
+            mock.received()
                 .get_return(accepted_value, Times::Once)
                 .no_other_calls();
         }
@@ -98,7 +98,7 @@ mod trait_generic_tests {
             }
 
             let returned_value = Foo { number: 100 };
-            mock.setup
+            mock.setup()
                 .return_where_constraint()
                 .returns(returned_value.clone());
 
@@ -107,7 +107,7 @@ mod trait_generic_tests {
 
             // Assert
             assert_eq!(returned_value, actual_returned_value);
-            mock.received
+            mock.received()
                 .return_where_constraint(Times::Once)
                 .no_other_calls();
         }
@@ -121,7 +121,7 @@ mod trait_generic_tests {
         let returned_get_return_value = 20;
         let accepted_get_return_different_value = 15;
         let returned_get_return_different_value = "quo vadis";
-        mock.setup
+        mock.setup()
             .get_return(accepted_get_return_value)
             .returns(returned_get_return_value)
             .get_return_different(accepted_get_return_different_value)
@@ -139,7 +139,7 @@ mod trait_generic_tests {
             actual_returned_get_return_different_value
         );
 
-        mock.received
+        mock.received()
             .get_return(accepted_get_return_value, Times::Once)
             .get_return_different(accepted_get_return_different_value, Times::Once)
             .no_other_calls();

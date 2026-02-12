@@ -156,6 +156,8 @@ fn create_services() -> ServiceCollection {
     let mock_impl_generator = Arc::new(MockImplGenerator {
         type_factory: type_factory.clone(),
         mock_constructor_block_generator: mock_constructor_block_generator.clone(),
+        expr_method_call_factory: expr_method_call_factory.clone(),
+        std_mem_transmute_expr_factory: std_mem_transmute_expr_factory.clone(),
     });
     let mock_struct_default_impl_generator = Arc::new(MockStructDefaultImplGenerator {
         type_factory: type_factory.clone(),

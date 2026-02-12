@@ -113,9 +113,7 @@ impl MockReceivedImplGenerator {
             .generate_for_trait(fn_info, mock_type);
         let block = self.generate_fn_received_block(fn_info);
         let impl_item_fn = ImplItemFn {
-            attrs: vec![
-                constants::ALLOW_UNUSED_ATTRIBUTE.clone(),
-            ],
+            attrs: Vec::new(),
             vis: Visibility::Public(Default::default()),
             defaultness: None,
             sig,

@@ -26,7 +26,7 @@ mod max_invalid_calls_listed_count_tests {
             for _ in 0..calls_count {
                 mock.work(unexpected_v);
             }
-            let actual_error_msg = record_panic(|| mock.received.work(expected_v, Times::Once));
+            let actual_error_msg = record_panic(|| mock.received().work(expected_v, Times::Once));
 
             // Assert
             let expected_error_msg = format!(
@@ -87,7 +87,7 @@ work(*{unexpected_v}*)
             for _ in 0..calls_count {
                 mock.work(unexpected_v);
             }
-            let actual_error_msg = record_panic(|| mock.received.work(expected_v, Times::Once));
+            let actual_error_msg = record_panic(|| mock.received().work(expected_v, Times::Once));
 
             // Assert
             let expected_error_msg = format!(
@@ -154,7 +154,7 @@ work(*{unexpected_v}*)
         for _ in 0..calls_count {
             mock.work(unexpected_v);
         }
-        let actual_error_msg = record_panic(|| mock.received.work(expected_v, Times::Once));
+        let actual_error_msg = record_panic(|| mock.received().work(expected_v, Times::Once));
 
         // Assert
         let expected_error_msg = format!(
@@ -198,7 +198,7 @@ work(*{unexpected_v}*)
             for _ in 0..calls_count {
                 mock.work(unexpected_v);
             }
-            let actual_error_msg = record_panic(|| mock.received.work(expected_v, Times::Once));
+            let actual_error_msg = record_panic(|| mock.received().work(expected_v, Times::Once));
 
             // Assert
             let expected_error_msg = format!(

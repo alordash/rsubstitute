@@ -8,6 +8,8 @@ use syn::*;
 
 pub trait IStdMemTransmuteExprFactory {
     fn create(&self, ident: Ident) -> Expr;
+
+    fn create_for_expr(&self, expr: Expr) -> Expr;
 }
 
 pub(crate) struct StdMemTransmuteExprFactory {
@@ -16,11 +18,16 @@ pub(crate) struct StdMemTransmuteExprFactory {
 
 impl IStdMemTransmuteExprFactory for StdMemTransmuteExprFactory {
     fn create(&self, ident: Ident) -> Expr {
+        let expr = self.create_for_expr(self.path_factory.create_expr(ident));
+        return expr;
+    }
+
+    fn create_for_expr(&self, expr: Expr) -> Expr {
         let expr = Expr::Call(ExprCall {
             attrs: Vec::new(),
             func: Box::new(Self::STD_MEM_TRANSMUTE_FUNC_PATH_EXPR.clone()),
             paren_token: Default::default(),
-            args: [self.path_factory.create_expr(ident)].into_iter().collect(),
+            args: [expr].into_iter().collect(),
         });
         return expr;
     }

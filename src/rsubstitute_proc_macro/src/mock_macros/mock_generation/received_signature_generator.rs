@@ -35,16 +35,12 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
     }
 
     fn generate_for_trait(&self, fn_info: &FnInfo, mock_type: &MockType) -> Signature {
-        let return_ty = self.type_factory.reference(
-            constants::SELF_TYPE.clone(),
-            Some(constants::DEFAULT_ARG_FIELD_LIFETIME.clone()),
-        );
         let prepend_ref_self_arg = true;
         let result = self.generate(
             fn_info,
             fn_info.parent.fn_ident.clone(),
             prepend_ref_self_arg,
-            return_ty,
+            constants::SELF_TYPE.clone(),
             MockGenericsUsage::JustGetPhantomTypesCount(&mock_type.generics),
         );
         return result;
@@ -61,16 +57,12 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
             .create_from_struct(&mock_received_struct.item_struct);
         self.reference_normalizer
             .staticify_anonymous_lifetimes(&mut return_ty);
-        let return_ty_reference = self.type_factory.reference(
-            return_ty,
-            Some(constants::DEFAULT_ARG_FIELD_LIFETIME.clone()),
-        );
         let prepend_ref_self_arg = false;
         let result = self.generate(
             fn_info,
             constants::MOCK_RECEIVED_FIELD_IDENT.clone(),
             prepend_ref_self_arg,
-            return_ty_reference,
+            return_ty,
             MockGenericsUsage::UseAsGenerics(&mock_type.generics),
         );
         return result;
@@ -107,7 +99,7 @@ impl ReceivedSignatureGenerator {
             .chain(iter::once(times_arg))
             .collect();
         if prepend_ref_self_arg {
-            inputs.insert(0, constants::REF_SELF_ARG_WITH_LIFETIME.clone());
+            inputs.insert(0, constants::SELF_ARG.clone());
         }
         let generics = match mock_generics_usage {
             MockGenericsUsage::JustGetPhantomTypesCount(_) => Generics::default(),

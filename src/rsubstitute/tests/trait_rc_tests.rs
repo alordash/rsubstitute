@@ -34,7 +34,7 @@ mod tests {
             mock.accept_rc(r.clone());
 
             // Assert
-            mock.received.accept_rc(r, Times::Once).no_other_calls();
+            mock.received().accept_rc(r, Times::Once).no_other_calls();
         }
 
         #[test]
@@ -49,7 +49,7 @@ mod tests {
 
             // Assert
             assert_panics(
-                || mock.received.accept_rc(Arg::Any, Times::Never),
+                || mock.received().accept_rc(Arg::Any, Times::Never),
                 format!(
                     "Expected to never receive a call matching:
 	accept_rc((alloc::rc::Rc<i32>): any)
@@ -60,7 +60,7 @@ Received no non-matching calls"
             );
 
             assert_panics(
-                || mock.received.accept_rc(Arg::Any, Times::Exactly(3)),
+                || mock.received().accept_rc(Arg::Any, Times::Exactly(3)),
                 format!(
                     "Expected to receive a call 3 times matching:
 	accept_rc((alloc::rc::Rc<i32>): any)
@@ -73,7 +73,7 @@ Received no non-matching calls"
             let invalid_r = Rc::new(22);
             let invalid_r_ptr = Rc::as_ptr(&invalid_r);
             assert_panics(
-                || mock.received.accept_rc(invalid_r.clone(), Times::Once),
+                || mock.received().accept_rc(invalid_r.clone(), Times::Once),
                 format!(
                     "Expected to receive a call exactly once matching:
 	accept_rc((alloc::rc::Rc<i32>): equal to {invalid_r})
@@ -96,7 +96,7 @@ accept_rc(*{r}*)
             // Arrange
             let mock = TraitMock::new();
             let r = Rc::new(10);
-            mock.setup.return_rc().returns(r.clone());
+            mock.setup().return_rc().returns(r.clone());
 
             // Act
             let actual_r = mock.return_rc();
@@ -115,7 +115,7 @@ accept_rc(*{r}*)
             let mock = TraitMock::new();
             let accepted_r = Rc::new(10);
             let returned_r = Rc::new(20);
-            mock.setup
+            mock.setup()
                 .accept_rc_return_rc(accepted_r.clone())
                 .returns(returned_r.clone());
 
@@ -125,7 +125,7 @@ accept_rc(*{r}*)
             // Assert
             assert_eq!(returned_r, actual_returned_r);
 
-            mock.received
+            mock.received()
                 .accept_rc_return_rc(accepted_r.clone(), Times::Once)
                 .accept_rc_return_rc(Arg::NotEq(accepted_r), Times::Never)
                 .no_other_calls();
@@ -146,7 +146,7 @@ accept_rc(*{r}*)
             mock.accept_two_rcs(r1.clone(), r2.clone());
 
             // Assert
-            mock.received
+            mock.received()
                 .accept_two_rcs(r1.clone(), r2.clone(), Times::Once)
                 .accept_two_rcs(Arg::NotEq(r1), Arg::NotEq(r2), Times::Never)
                 .no_other_calls();
@@ -163,7 +163,7 @@ accept_rc(*{r}*)
             let r1 = Rc::new(10);
             let r2 = Rc::new(20.2);
             let returned_r = Rc::new(String::from("veridis quo"));
-            mock.setup
+            mock.setup()
                 .accept_two_rcs_return_rc(r1.clone(), r2.clone())
                 .returns(returned_r.clone());
 
@@ -173,7 +173,7 @@ accept_rc(*{r}*)
             // Assert
             assert_eq!(returned_r, actual_returned_r);
 
-            mock.received
+            mock.received()
                 .accept_two_rcs_return_rc(r1, r2, Times::Once)
                 .no_other_calls();
         }

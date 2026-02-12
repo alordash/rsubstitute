@@ -42,7 +42,7 @@ mod tests {
         let mock = StructMock::new();
 
         let value = 302;
-        mock.setup.get_plus_one().returns(value);
+        mock.setup().get_plus_one().returns(value);
 
         // Act
         let actual_value = mock.get_plus_one();
@@ -50,7 +50,7 @@ mod tests {
         // Assert
         assert_eq!(value, actual_value);
 
-        mock.received.get_plus_one(Times::Once).no_other_calls();
+        mock.received().get_plus_one(Times::Once).no_other_calls();
     }
 
     #[test]
@@ -60,7 +60,7 @@ mod tests {
 
         let struct_value = 302;
         let trait_value = 33;
-        mock.setup
+        mock.setup()
             .get()
             .returns(struct_value)
             .get_plus_one()
@@ -76,12 +76,12 @@ mod tests {
         let expected_value = struct_value + trait_value;
         assert_eq!(expected_value, actual_value);
 
-        mock.received
+        mock.received()
             .get(Times::Once)
             .get_plus_one(Times::Once)
             .Trait
             .get(Times::Once);
-        mock.received.no_other_calls();
+        mock.received().no_other_calls();
     }
 
     #[test]
@@ -90,7 +90,7 @@ mod tests {
         let mock = StructMock::new();
 
         let trait_value = 33;
-        mock.setup
+        mock.setup()
             .get()
             .call_base()
             .get_plus_one()
@@ -106,12 +106,12 @@ mod tests {
         let expected_value = DEFAULT_STRUCT_GET_VALUE + trait_value;
         assert_eq!(expected_value, actual_value);
 
-        mock.received
+        mock.received()
             .get(Times::Once)
             .get_plus_one(Times::Once)
             .Trait
             .get(Times::Once);
-        mock.received.no_other_calls();
+        mock.received().no_other_calls();
     }
 
     #[test]
@@ -119,7 +119,7 @@ mod tests {
         // Arrange
         let mock = StructMock::new();
 
-        mock.setup
+        mock.setup()
             .get()
             .call_base()
             .get_plus_one()
@@ -135,11 +135,11 @@ mod tests {
         let expected_value = DEFAULT_STRUCT_GET_VALUE + DEFAULT_TRAIT_GET_VALUE;
         assert_eq!(expected_value, actual_value);
 
-        mock.received
+        mock.received()
             .get(Times::Once)
             .get_plus_one(Times::Once)
             .Trait
             .get(Times::Once);
-        mock.received.no_other_calls();
+        mock.received().no_other_calls();
     }
 }

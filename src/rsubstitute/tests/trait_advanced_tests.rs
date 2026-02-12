@@ -40,13 +40,13 @@ mod tests {
             let v2 = 23;
             let r2 = &&&&v2;
 
-            trait_mock.setup.accept_ref(r2).returns(r1);
+            trait_mock.setup().accept_ref(r2).returns(r1);
 
             let r = trait_mock.accept_ref(r2);
             assert_eq!(r1, r);
 
             trait_mock
-                .received
+                .received()
                 .accept_ref(r2, Times::Once)
                 .no_other_calls();
         }

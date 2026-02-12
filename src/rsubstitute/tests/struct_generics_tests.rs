@@ -39,7 +39,7 @@ mod tests {
         let mock = StructMock::new(t1, &t2, number);
 
         let another_t2 = vec![11, 2];
-        mock.setup.get_t2().returns(&another_t2);
+        mock.setup().get_t2().returns(&another_t2);
 
         let actual_t2 = mock.get_t2();
 

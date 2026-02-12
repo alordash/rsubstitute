@@ -70,7 +70,7 @@ mod tests {
         let mock = StructMock::new(mock_number);
 
         let get_number_returned_value = 22;
-        mock.setup
+        mock.setup()
             .get_number()
             .returns(get_number_returned_value)
             .format()
@@ -80,7 +80,7 @@ mod tests {
         let my_trait_work_accepted_value_for_call_base = 333;
         let my_trait_work_returned_value_for_mock = "Mocked value!".to_owned();
         let my_trait_work_accepted_value_for_mock = 4;
-        mock.setup
+        mock.setup()
             .MyTrait
             .work(get_number_returned_value)
             .returns(my_trait_work_returned_value_for_format.clone())
@@ -115,15 +115,15 @@ mod tests {
             actual_my_trait_work_returned_value_for_mock
         );
 
-        mock.received
+        mock.received()
             .get_number(Times::Exactly(2))
             .format(Times::Once);
-        mock.received
+        mock.received()
             .MyTrait
             .work(my_trait_work_accepted_value_for_call_base, Times::Once)
             .work(my_trait_work_accepted_value_for_mock, Times::Once)
             .work(get_number_returned_value, Times::Once);
-        mock.received.no_other_calls();
+        mock.received().no_other_calls();
     }
 }
 
