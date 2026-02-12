@@ -27,20 +27,20 @@ fn accept_two_refs_return_ref(r1: &i32, r2: &f32) -> &'static str {
 
 // #[mock]
 // fn accept_mut_ref(r: &mut i32) {}
-// 
+//
 // #[mock]
 // fn return_mut_ref() -> &'static mut i32 {
 //     BASE_RETURN_REF
 // }
-// 
+//
 // #[mock]
 // fn accept_mut_ref_return_mut_ref(r: &mut i32) -> &'static i32 {
 //     BASE_ACCEPT_REF_RETURN_REF
 // }
-// 
+//
 // #[mock]
 // fn accept_two_mut_refs(r1: &mut i32, r2: &mut f32) {}
-// 
+//
 // #[mock]
 // fn accept_two_mut_refs_return_mut_ref(r1: &mut i32, r2: &mut f32) -> &'static mut str {
 //     ACCEPT_TWO_REFS_RETURN_REF
@@ -60,6 +60,13 @@ mod tests {
         fn accept_ref_Ok() {
             // Arrange
             let r = &1;
+
+            // TODO - what will happen?
+            {
+                let v2 = 24;
+                let r2 = &v2;
+                accept_ref::setup(r2).does(|| {});
+            }
 
             // Act
             accept_ref(r);
