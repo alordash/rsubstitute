@@ -3,6 +3,7 @@ use std::cell::RefCell;
 use std::marker::PhantomData;
 use std::sync::Arc;
 
+// TODO - rename to something like ReturnConfig to better reflect intended usage
 pub struct SharedFnConfig<'a, TMock, TReturnValue: IRawReturnValue<'a>, TOwner> {
     _phantom_return_value: PhantomData<TReturnValue>,
     fn_config: Arc<RefCell<FnConfig<'a, TMock>>>,
@@ -58,6 +59,10 @@ impl<'a, TMock, TReturnValue: IRawReturnValue<'a> + 'a, TOwner>
 impl<'a, TMock, TOwner> SharedFnConfig<'a, TMock, (), TOwner> {
     pub fn does(&self, callback: impl FnMut() + 'static) -> &'a TOwner {
         self.fn_config.borrow_mut().set_callback(callback);
+        return self.owner;
+    }
+
+    pub fn does_nothing(&self) -> &'a TOwner {
         return self.owner;
     }
 }

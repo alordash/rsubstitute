@@ -13,7 +13,6 @@ pub trait IFnInfoGenerator {
 
 pub(crate) struct FnInfoGenerator {
     pub call_struct_generator: Arc<dyn ICallStructGenerator>,
-    pub call_arg_infos_provider_impl_generator: Arc<dyn ICallArgInfosProviderImplGenerator>,
     pub args_checker_generator: Arc<dyn IArgsCheckerGenerator>,
     pub args_checker_impl_generator: Arc<dyn IArgsCheckerTraitImplGenerator>,
     pub base_caller_impl_generator: Arc<dyn IBaseCallerImplGenerator>,
@@ -25,9 +24,6 @@ impl IFnInfoGenerator for FnInfoGenerator {
             .call_struct_generator
             .generate(&fn_decl, &mock_type.generics);
         let phantom_types_count = mock_type.generics.get_phantom_types_count();
-        let call_arg_infos_provider_impl = self
-            .call_arg_infos_provider_impl_generator
-            .generate(&call_struct, phantom_types_count);
         let args_checker_struct = self
             .args_checker_generator
             .generate(&fn_decl, &mock_type.generics);
@@ -44,7 +40,6 @@ impl IFnInfoGenerator for FnInfoGenerator {
         let fn_info = FnInfo {
             parent: fn_decl,
             call_struct,
-            call_arg_infos_provider_impl,
             args_checker_struct,
             args_checker_impl,
             data_field_ident,

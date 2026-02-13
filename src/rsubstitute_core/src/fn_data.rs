@@ -6,11 +6,12 @@ use crate::matching_config_search_result::*;
 use crate::*;
 use std::cell::RefCell;
 use std::collections::HashMap;
+use std::ops::Deref;
 use std::sync::Arc;
 
 pub struct FnData<'a, TMock> {
     fn_name: &'static str,
-    call_infos: RefCell<Vec<CallInfo<'a>>>,
+    call_infos: RefCell<HashMap<GenericsHashKey, Vec<CallInfo<'a>>>>,
     configs: RefCell<HashMap<GenericsHashKey, Vec<Arc<RefCell<FnConfig<'a, TMock>>>>>>,
     error_printer: Arc<dyn IErrorPrinter>,
 }
@@ -19,7 +20,7 @@ impl<'a, TMock> FnData<'a, TMock> {
     pub fn new(fn_name: &'static str, services: &ServiceCollection) -> Self {
         Self {
             fn_name,
-            call_infos: RefCell::new(Vec::new()),
+            call_infos: RefCell::new(HashMap::new()),
             configs: RefCell::new(HashMap::new()),
             error_printer: services.error_printer.clone(),
         }
@@ -40,7 +41,12 @@ impl<'a, TMock> FnData<'a, TMock> {
 
 impl<'a, TMock> FnData<'a, TMock> {
     pub fn register_call(&self, call: Call<'a>) -> &Self {
-        self.call_infos.borrow_mut().push(CallInfo::new(call));
+        let generics_hash_key = call.get_generics_hash_key();
+        self.call_infos
+            .borrow_mut()
+            .entry(generics_hash_key)
+            .or_default()
+            .push(CallInfo::new(call));
         self
     }
 
@@ -55,14 +61,15 @@ impl<'a, TMock> FnData<'a, TMock> {
         self.configs
             .borrow_mut()
             .entry(generics_hash_key)
-            .or_insert(Vec::new())
+            .or_default()
             .push(shared_config.clone());
         return shared_config;
     }
 
     pub fn handle(&self, call: Call<'a>) {
-        let maybe_fn_config = self.try_get_matching_config(&call);
-        self.register_call(call.clone());
+        let call_ref: &'a Call<'a> = unsafe { std::mem::transmute(&call) };
+        let maybe_fn_config = self.try_get_matching_config(call_ref);
+        self.register_call(call_ref.clone());
         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
             fn_config.borrow_mut().register_call(call);
             if let Some(callback) = fn_config.borrow().get_callback() {
@@ -108,9 +115,15 @@ impl<'a, TMock> FnData<'a, TMock> {
     }
 
     pub fn get_unexpected_calls_error_msgs(&self) -> Vec<String> {
-        let call_infos = self.call_infos.borrow();
-        let unexpected_call_infos: Vec<_> =
-            call_infos.iter().filter(|x| x.is_not_verified()).collect();
+        // TODO - turn next two lines into method?
+        let call_infos_borrow = self.call_infos.borrow();
+        let all_call_infos: &'a HashMap<GenericsHashKey, Vec<CallInfo<'a>>> =
+            unsafe { std::mem::transmute(call_infos_borrow.deref()) };
+        let unexpected_call_infos: Vec<_> = all_call_infos
+            .values()
+            .flatten()
+            .filter(|x| x.is_not_verified())
+            .collect();
         if unexpected_call_infos.is_empty() {
             return Vec::new();
         }
@@ -132,7 +145,10 @@ impl<'a, TMock> FnData<'a, TMock> {
     ) -> (Vec<Vec<ArgCheckResult>>, Vec<Vec<ArgCheckResult>>) {
         let mut matching_calls = Vec::new();
         let mut non_matching_calls = Vec::new();
-        let mut call_infos = self.call_infos.borrow_mut();
+        let generics_hash_key = args_checker.get_generics_hash_key();
+        let mut call_infos_borrow = self.call_infos.borrow_mut();
+        let call_infos: &'a mut Vec<CallInfo<'a>> =
+            unsafe { std::mem::transmute(call_infos_borrow.entry(generics_hash_key).or_default()) };
         for call_info in call_infos.iter_mut() {
             let call_matching_result = args_checker.check(call_info.get_call());
             let is_matching = call_matching_result.iter().all(ArgCheckResult::is_ok);
@@ -146,7 +162,7 @@ impl<'a, TMock> FnData<'a, TMock> {
         return (matching_calls, non_matching_calls);
     }
 
-    fn try_get_matching_config(&self, call: &Call) -> MatchingConfigSearchResult<'a, TMock> {
+    fn try_get_matching_config(&self, call: &'a Call<'a>) -> MatchingConfigSearchResult<'a, TMock> {
         let generics_hash_key = call.get_generics_hash_key();
         let all_configs = self.configs.borrow();
         let Some(matching_configs) = all_configs.get(&generics_hash_key) else {
@@ -171,8 +187,9 @@ impl<'a, TMock> FnData<'a, TMock> {
         });
     }
 
-    fn get_required_matching_config(&self, call: Call) -> Arc<RefCell<FnConfig<'a, TMock>>> {
-        let fn_config = match self.try_get_matching_config(&call) {
+    fn get_required_matching_config(&self, call: Call<'a>) -> Arc<RefCell<FnConfig<'a, TMock>>> {
+        let call_ref: &'a Call<'a> = unsafe { std::mem::transmute(&call) };
+        let fn_config = match self.try_get_matching_config(call_ref) {
             MatchingConfigSearchResult::Ok(matching_config) => matching_config,
             MatchingConfigSearchResult::Err(matching_config_search_err) => {
                 self.error_printer.panic_no_suitable_fn_configuration_found(
@@ -188,7 +205,9 @@ impl<'a, TMock> FnData<'a, TMock> {
 
 impl<'a, TMock: IBaseCaller> FnData<'a, TMock> {
     pub fn handle_base(&self, mock: &TMock, call: Call<'a>) {
-        let maybe_fn_config = self.try_get_matching_config(&call);
+        // TODO - turn into method?
+        let call_ref: &'a Call<'a> = unsafe { std::mem::transmute(&call) };
+        let maybe_fn_config = self.try_get_matching_config(call_ref);
         self.register_call(call.clone());
         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
             fn_config.borrow_mut().register_call(call.clone());

@@ -1,9 +1,8 @@
 use crate::args_matching::{ArgCheckResult, IArgsFormatter};
-use crate::{Call, IGenericsHashKeyProvider};
-use std::any::TypeId;
+use crate::{Call, GenericsHasher, IGenericsHashKeyProvider};
 
 pub trait IArgsChecker<'a>: 'a + IArgsFormatter + IGenericsHashKeyProvider {
-    fn check(&self, raw_call: &Call) -> Vec<ArgCheckResult>;
+    fn check(&self, raw_call: &'a Call<'a>) -> Vec<ArgCheckResult>;
 }
 
 pub struct ArgsChecker<'a> {
@@ -17,13 +16,17 @@ impl<'a> IArgsFormatter for ArgsChecker<'a> {
 }
 
 impl<'a> IGenericsHashKeyProvider for ArgsChecker<'a> {
-    fn get_generics_type_ids(&self) -> Vec<TypeId> {
-        self.inner.get_generics_type_ids()
+    fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {
+        self.inner.hash_generics_type_ids(hasher)
+    }
+
+    fn hash_const_values(&self, hasher: &mut GenericsHasher) {
+        self.inner.hash_const_values(hasher)
     }
 }
 
 impl<'a> IArgsChecker<'a> for ArgsChecker<'a> {
-    fn check(&self, raw_call: &Call) -> Vec<ArgCheckResult> {
+    fn check(&self, raw_call: &'a Call<'a>) -> Vec<ArgCheckResult> {
         self.inner.check(raw_call)
     }
 }

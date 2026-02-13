@@ -27,6 +27,10 @@ path = "bin/bin_dyn_data.rs"
 name = "dyn_data_ref"
 path = "bin/bin_dyn_data_ref.rs"
 
+[[bin]]
+name = "dyn_data_generics"
+path = "bin/bin_dyn_data_generics.rs"
+
 [dependencies]
 rsubstitute_core = { workspace = true }
 rsubstitute_proc_macro = { workspace = true }

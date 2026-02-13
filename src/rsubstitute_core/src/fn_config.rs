@@ -48,7 +48,7 @@ impl<'a, TMock> FnConfig<'a, TMock> {
         self.calls.push(call);
     }
 
-    pub(crate) fn check(&self, call: &Call) -> Vec<ArgCheckResult> {
+    pub(crate) fn check(&self, call: &'a Call<'a>) -> Vec<ArgCheckResult> {
         self.args_checker.check(&call)
     }
 

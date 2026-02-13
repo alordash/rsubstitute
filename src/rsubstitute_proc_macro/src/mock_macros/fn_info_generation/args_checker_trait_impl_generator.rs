@@ -9,6 +9,7 @@ use syn::punctuated::Punctuated;
 use syn::token::Bracket;
 use syn::*;
 
+// TODO - turn into #[derive()] macro?
 pub trait IArgsCheckerTraitImplGenerator {
     fn generate(
         &self,

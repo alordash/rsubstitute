@@ -17,6 +17,8 @@ pub trait ITypeFactory {
     fn wrap_in_arc(&self, ty: Type) -> Type;
 
     fn reference(&self, ty: Type, lifetime: Option<Lifetime>) -> Type;
+
+    fn mut_reference(&self, ty: Type, lifetime: Option<Lifetime>) -> Type;
 }
 
 pub struct TypeFactory {
@@ -73,6 +75,16 @@ impl ITypeFactory for TypeFactory {
             and_token: Default::default(),
             lifetime,
             mutability: None,
+            elem: Box::new(ty.clone()),
+        });
+        return result;
+    }
+
+    fn mut_reference(&self, ty: Type, lifetime: Option<Lifetime>) -> Type {
+        let result = Type::Reference(TypeReference {
+            and_token: Default::default(),
+            lifetime,
+            mutability: Some(Default::default()),
             elem: Box::new(ty.clone()),
         });
         return result;

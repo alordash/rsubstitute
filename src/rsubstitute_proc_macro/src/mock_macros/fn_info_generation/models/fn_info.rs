@@ -6,7 +6,6 @@ use proc_macro2::Ident;
 pub(crate) struct FnInfo {
     pub parent: FnDecl,
     pub call_struct: CallStruct,
-    pub call_arg_infos_provider_impl: CallArgInfosProviderImpl,
     pub args_checker_struct: ArgsCheckerStruct,
     pub args_checker_impl: ArgsCheckerTraitImpl,
     pub data_field_ident: Ident,

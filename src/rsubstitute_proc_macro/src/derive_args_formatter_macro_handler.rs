@@ -12,7 +12,6 @@ pub trait IDeriveArgsFormatterMacroHandler {
 }
 
 pub(crate) struct DeriveArgsFormatterMacroHandler {
-    pub path_factory: Arc<dyn IPathFactory>,
     pub type_factory: Arc<dyn ITypeFactory>,
     pub field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
     pub field_checker: Arc<dyn IFieldChecker>,
@@ -31,8 +30,7 @@ impl IDeriveArgsFormatterMacroHandler for DeriveArgsFormatterMacroHandler {
             generics: item_struct.generics.clone(),
             trait_: Some((
                 None,
-                self.path_factory
-                    .create(constants::I_ARGS_FORMATTER_TRAIT_IDENT.clone()),
+                constants::I_ARGS_FORMATTER_TRAIT_PATH.clone(),
                 Default::default(),
             )),
             self_ty: Box::new(self.type_factory.create_from_struct(&item_struct)),

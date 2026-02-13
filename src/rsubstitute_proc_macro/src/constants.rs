@@ -1,3 +1,4 @@
+// TODO - write macros for ident definition, replace all LazyCell<Ident>
 use crate::di::SERVICES;
 use proc_macro2::{Ident, Span};
 use quote::format_ident;
@@ -41,8 +42,17 @@ pub const CRATE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("rsubsti
 
 pub const ARG_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Arg"));
 
-pub const I_ARGS_FORMATTER_TRAIT_IDENT: LazyCell<Ident> =
-    LazyCell::new(|| format_ident!("IArgsFormatter"));
+pub const I_ARGS_FORMATTER_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
+    let path_factory = &SERVICES.path_factory;
+    let result = path_factory.create(format_ident!("IArgsFormatter"));
+    return result;
+});
+
+pub const I_GENERICS_HASH_KEY_PROVIDER_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
+    let path_factory = &SERVICES.path_factory;
+    let result = path_factory.create(format_ident!("IGenericsHashKeyProvider"));
+    return result;
+});
 
 pub const I_ARGS_FORMATTER_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("fmt_args"));
 
@@ -509,3 +519,5 @@ pub const CONFIG_LIFETIME_GENERICS: LazyCell<Generics> = LazyCell::new(|| {
     };
     return generics;
 });
+
+pub const HASH_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("hash"));

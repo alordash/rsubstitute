@@ -190,7 +190,6 @@ impl IModGenerator for ModGenerator {
             .chain(struct_fn_infos.into_iter().flat_map(|x| {
                 [
                     Item::Struct(x.call_struct.item_struct),
-                    Item::Impl(x.call_arg_infos_provider_impl.item_impl),
                     Item::Struct(x.args_checker_struct.item_struct),
                     Item::Impl(x.args_checker_impl.item_impl),
                 ]
@@ -239,7 +238,6 @@ impl ModGenerator {
     fn convert_fn_info(&self, fn_info: FnInfo) -> Vec<Item> {
         [
             Item::Struct(fn_info.call_struct.item_struct),
-            Item::Impl(fn_info.call_arg_infos_provider_impl.item_impl),
             Item::Struct(fn_info.args_checker_struct.item_struct),
             Item::Impl(fn_info.args_checker_impl.item_impl),
         ]

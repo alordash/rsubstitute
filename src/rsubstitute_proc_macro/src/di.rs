@@ -1,8 +1,10 @@
 use crate::derive_args_formatter_macro_handler::*;
+use crate::derive_args_infos_provider_macro_handler::*;
+use crate::derive_generics_hash_key_provider_macro_handler::*;
 use crate::derive_mock_data_macro_handler::*;
 use crate::mock_macros::fn_info_generation::*;
 use crate::mock_macros::mock_generation::*;
-use crate::mock_macros::targets::{ItemFnHandler, ItemTraitHandler, StructMockHandler};
+use crate::mock_macros::targets::*;
 use crate::mock_macros::*;
 use crate::syntax::*;
 use std::cell::{LazyCell, OnceCell};
@@ -17,7 +19,10 @@ pub(crate) struct ServiceCollection {
     pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
     pub expr_reference_factory: Arc<dyn IExprReferenceFactory>,
     pub derive_args_formatter_macro_handler: Arc<dyn IDeriveArgsFormatterMacroHandler>,
+    pub derive_args_infos_provider_macro_handler: Arc<dyn IDeriveArgsInfosProviderMacroHandler>,
     pub derive_mock_data_macro_handler: Arc<dyn IDeriveMockDataMacroHandler>,
+    pub derive_generics_hash_key_provider_macro_handler:
+        Arc<dyn IDeriveGenericsHashKeyProviderMacroHandler>,
     pub mock_macro_handler: Arc<dyn IMockMacroHandler>,
     pub struct_mock_syntax_parser: Arc<dyn IStructMockSyntaxParser>,
 }
@@ -68,11 +73,6 @@ fn create_services() -> ServiceCollection {
         path_factory: path_factory.clone(),
         field_access_expr_factory: field_access_expr_factory.clone(),
     });
-    let call_arg_infos_provider_impl_generator = Arc::new(CallArgInfosProviderImplGenerator {
-        path_factory: path_factory.clone(),
-        type_factory: type_factory.clone(),
-        expr_method_call_factory: expr_method_call_factory.clone(),
-    });
     let args_checker_impl_generator = Arc::new(ArgsCheckerTraitImplGenerator {
         type_factory: type_factory.clone(),
         field_access_expr_factory: field_access_expr_factory.clone(),
@@ -89,7 +89,6 @@ fn create_services() -> ServiceCollection {
     });
     let fn_info_generator = Arc::new(FnInfoGenerator {
         call_struct_generator: call_struct_generator.clone(),
-        call_arg_infos_provider_impl_generator: call_arg_infos_provider_impl_generator.clone(),
         args_checker_generator: args_checker_generator.clone(),
         args_checker_impl_generator: args_checker_impl_generator.clone(),
         base_caller_impl_generator: base_caller_impl_generator.clone(),
@@ -198,16 +197,26 @@ fn create_services() -> ServiceCollection {
     let mod_generator = Arc::new(ModGenerator);
 
     let derive_args_formatter_macro_handler = Arc::new(DeriveArgsFormatterMacroHandler {
-        path_factory: path_factory.clone(),
         type_factory: type_factory.clone(),
         field_access_expr_factory: field_access_expr_factory.clone(),
         field_checker: field_checker.clone(),
+    });
+    let derive_args_infos_provider_macro_handler = Arc::new(DeriveArgsInfosProviderMacroHandler {
+        path_factory: path_factory.clone(),
+        type_factory: type_factory.clone(),
+        expr_method_call_factory: expr_method_call_factory.clone(),
     });
     let derive_mock_data_macro_handler = Arc::new(DeriveMockDataMacroHandler {
         path_factory: path_factory.clone(),
         type_factory: type_factory.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
     });
+    let derive_generics_hash_key_provider_macro_handler =
+        Arc::new(DeriveGenericsHashKeyProviderMacroHandler {
+            type_factory: type_factory.clone(),
+            path_factory: path_factory.clone(),
+            expr_method_call_factory: expr_method_call_factory.clone(),
+        });
 
     let fn_setup_generator = Arc::new(FnSetupGenerator {
         input_args_generator: input_args_generator.clone(),
@@ -329,7 +338,9 @@ fn create_services() -> ServiceCollection {
         expr_method_call_factory,
         expr_reference_factory,
         derive_args_formatter_macro_handler,
+        derive_args_infos_provider_macro_handler,
         derive_mock_data_macro_handler,
+        derive_generics_hash_key_provider_macro_handler,
         mock_macro_handler,
         struct_mock_syntax_parser,
     };

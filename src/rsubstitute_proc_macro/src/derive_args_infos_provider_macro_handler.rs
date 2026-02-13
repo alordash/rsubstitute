@@ -1,59 +1,49 @@
 use crate::constants;
-use crate::mock_macros::fn_info_generation::models::*;
 use crate::syntax::*;
+use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
-use quote::{ToTokens, format_ident};
+use quote::{format_ident, ToTokens};
 use std::cell::LazyCell;
 use std::sync::Arc;
 use syn::punctuated::Punctuated;
 use syn::token::Bracket;
 use syn::*;
 
-pub trait ICallArgInfosProviderImplGenerator {
-    fn generate(
-        &self,
-        call_struct: &CallStruct,
-        phantom_types_count: usize,
-    ) -> CallArgInfosProviderImpl;
+pub trait IDeriveArgsInfosProviderMacroHandler {
+    fn handle(&self, item: proc_macro::TokenStream) -> proc_macro::TokenStream;
 }
 
-pub struct CallArgInfosProviderImplGenerator {
+pub struct DeriveArgsInfosProviderMacroHandler {
     pub(crate) path_factory: Arc<dyn IPathFactory>,
     pub(crate) type_factory: Arc<dyn ITypeFactory>,
     pub(crate) expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
 }
 
-impl ICallArgInfosProviderImplGenerator for CallArgInfosProviderImplGenerator {
-    fn generate(
-        &self,
-        call_struct: &CallStruct,
-        phantom_types_count: usize,
-    ) -> CallArgInfosProviderImpl {
+impl IDeriveArgsInfosProviderMacroHandler for DeriveArgsInfosProviderMacroHandler {
+    fn handle(&self, item: TokenStream) -> TokenStream {
+        let item_struct = parse_macro_input!(item as ItemStruct);
+
         let trait_path = self
             .path_factory
             .create(constants::I_ARG_INFOS_PROVIDER_TRAIT_IDENT.clone());
-        let self_ty = Box::new(
-            self.type_factory
-                .create_from_struct(&call_struct.item_struct),
-        );
-        let get_arg_infos_fn = self.generate_get_arg_infos_fn(call_struct, phantom_types_count);
+        let self_ty = Box::new(self.type_factory.create_from_struct(&item_struct));
+        let get_arg_infos_fn = self.generate_get_arg_infos_fn(&item_struct);
         let item_impl = ItemImpl {
             attrs: Vec::new(),
             defaultness: None,
             unsafety: None,
             impl_token: Default::default(),
-            generics: call_struct.item_struct.generics.clone(),
+            generics: item_struct.generics.clone(),
             trait_: Some((None, trait_path, Default::default())),
             self_ty,
             brace_token: Default::default(),
             items: vec![get_arg_infos_fn],
         };
-        let call_arg_infos_provider_impl = CallArgInfosProviderImpl { item_impl };
-        return call_arg_infos_provider_impl;
+        return item_impl.into_token_stream().into();
     }
 }
 
-impl CallArgInfosProviderImplGenerator {
+impl DeriveArgsInfosProviderMacroHandler {
     const GET_ARG_INFOS_FN_SIGNATURE: LazyCell<Signature> = LazyCell::new(|| {
         let signature = Signature {
             constness: None,
@@ -76,12 +66,8 @@ impl CallArgInfosProviderImplGenerator {
 
     const ARG_INFO_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("ArgInfo"));
 
-    fn generate_get_arg_infos_fn(
-        &self,
-        call_struct: &CallStruct,
-        phantom_types_count: usize,
-    ) -> ImplItem {
-        let return_stmt = self.generate_return_stmt(call_struct, phantom_types_count);
+    fn generate_get_arg_infos_fn(&self, item_struct: &ItemStruct) -> ImplItem {
+        let return_stmt = self.generate_return_stmt(item_struct);
         let block = Block {
             brace_token: Default::default(),
             stmts: vec![return_stmt],
@@ -96,12 +82,10 @@ impl CallArgInfosProviderImplGenerator {
         return impl_item;
     }
 
-    fn generate_return_stmt(&self, call_struct: &CallStruct, phantom_types_count: usize) -> Stmt {
-        let check_exprs: Punctuated<_, Token![,]> = call_struct
-            .item_struct
+    fn generate_return_stmt(&self, item_struct: &ItemStruct) -> Stmt {
+        let check_exprs: Punctuated<_, Token![,]> = item_struct
             .fields
             .iter()
-            .skip(1 + phantom_types_count)
             .map(|field| self.generate_arg_info_new_expr(field))
             .collect();
         let vec_expr = Expr::Macro(ExprMacro {

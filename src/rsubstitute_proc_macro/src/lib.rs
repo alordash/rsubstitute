@@ -2,6 +2,8 @@ use crate::di::SERVICES;
 
 mod constants;
 mod derive_args_formatter_macro_handler;
+mod derive_args_infos_provider_macro_handler;
+mod derive_generics_hash_key_provider_macro_handler;
 mod derive_mock_data_macro_handler;
 mod di;
 mod mock_macros;
@@ -39,9 +41,24 @@ pub fn derive_args_formatter(item: proc_macro::TokenStream) -> proc_macro::Token
     return derive_args_formatter_macro_handler.handle(item);
 }
 
+#[proc_macro_derive(IArgInfosProvider)]
+pub fn derive_args_infos_provider(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let derive_args_infos_provider_macro_handler = &SERVICES.derive_args_infos_provider_macro_handler;
+
+    return derive_args_infos_provider_macro_handler.handle(item);
+}
+
 #[proc_macro_derive(IMockData)]
 pub fn derive_mock_data(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let derive_mock_data_macro_handler = &SERVICES.derive_mock_data_macro_handler;
 
     return derive_mock_data_macro_handler.handle(item);
+}
+
+#[proc_macro_derive(IGenericsHashKeyProvider)]
+pub fn derive_generics_hash_key_provider(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let derive_generics_hash_key_provider_macro_handler =
+        &SERVICES.derive_generics_hash_key_provider_macro_handler;
+
+    return derive_generics_hash_key_provider_macro_handler.handle(item);
 }

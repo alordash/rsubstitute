@@ -39,6 +39,9 @@ dependencies = [
 [[package]]
 name = "rsubstitute_core"
 version = "0.1.0"
+dependencies = [
+ "typeid",
+]
 
 [[package]]
 name = "rsubstitute_proc_macro"
