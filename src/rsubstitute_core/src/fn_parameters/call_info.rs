@@ -13,7 +13,7 @@ impl<'a> CallInfo<'a> {
         }
     }
 
-    pub fn verify(&mut self) {
+    pub fn mark_as_verified(&mut self) {
         self.verified = true;
     }
 

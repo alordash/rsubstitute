@@ -131,7 +131,7 @@ impl<'a, TMock> FnData<'a, TMock> {
             let call_matching_result = args_checker.check(call_info.get_call());
             let is_matching = call_matching_result.iter().all(ArgCheckResult::is_ok);
             if is_matching {
-                call_info.verify();
+                call_info.mark_as_verified();
                 matching_calls.push(call_matching_result);
             } else {
                 non_matching_calls.push(call_matching_result);
