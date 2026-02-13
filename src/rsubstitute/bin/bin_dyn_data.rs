@@ -57,8 +57,8 @@ mod __rsubstitute_generated_Trait {
     }
     #[derive(Clone)]
     pub struct TraitMock {
-        setup: TraitMockSetup,
-        received: TraitMockReceived,
+        pub setup: TraitMockSetup,
+        pub received: TraitMockReceived,
         data: Arc<TraitMockData>,
     }
     impl Trait for TraitMock {
@@ -82,12 +82,6 @@ mod __rsubstitute_generated_Trait {
                 data,
             };
         }
-        pub fn setup(&self) -> TraitMockSetup {
-            unsafe { std::mem::transmute(self.setup.clone()) }
-        }
-        pub fn received(&self) -> TraitMockReceived {
-            unsafe { std::mem::transmute(self.received.clone()) }
-        }
     }
     impl TraitMockSetup {
         pub fn work<'rs>(
@@ -95,8 +89,7 @@ mod __rsubstitute_generated_Trait {
             v: impl Into<Arg<i32>>,
         ) -> SharedFnConfig<'rs, TraitMock, i32, Self> {
             let work_args_checker = work_ArgsChecker { v: v.into() };
-            let fn_config: Arc<RefCell<FnConfig<'rs, TraitMock>>> =
-                unsafe { std::mem::transmute(self.data.work_data.add_config(work_args_checker)) };
+            let fn_config = self.data.work_data.as_local().add_config(work_args_checker);
             let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
         }
@@ -106,6 +99,7 @@ mod __rsubstitute_generated_Trait {
             let work_args_checker = work_ArgsChecker { v: v.into() };
             self.data
                 .work_data
+                .as_local()
                 .verify_received(work_args_checker, times);
             return self;
         }
@@ -133,7 +127,7 @@ mod tests {
         let r2 = 222;
         let r3 = 333;
 
-        mock.setup()
+        mock.setup
             .work(v1)
             .returns(r1)
             .work(v2)
@@ -151,7 +145,7 @@ mod tests {
         assert_eq!(r2, actual_r2);
         assert_eq!(r3, actual_r3);
 
-        mock.received()
+        mock.received
             .work(v1, Times::Once)
             .work(v2, Times::Once)
             .work(v3, Times::Once)

@@ -1,5 +1,4 @@
 use crate::IRawReturnValue;
-use std::any::Any;
 use std::ops::Deref;
 
 pub struct ReturnValue<'a> {

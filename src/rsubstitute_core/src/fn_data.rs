@@ -28,6 +28,13 @@ impl<'a, TMock> FnData<'a, TMock> {
         self.call_infos.borrow_mut().clear();
         self.configs.borrow_mut().clear();
     }
+
+    pub fn as_local<'b>(&self) -> &FnData<'b, TMock> {
+        // To allow storing lifetimes to local references.
+        // TODO - write somewhere in README that it's ok because all local references in test method are 'static
+        // because they live only during unit test method
+        unsafe { std::mem::transmute(self) }
+    }
 }
 
 impl<'a, TMock> FnData<'a, TMock> {
@@ -36,7 +43,7 @@ impl<'a, TMock> FnData<'a, TMock> {
         self
     }
 
-    pub fn add_config<TRawArgsChecker: IArgsChecker<'a>>(
+    pub fn add_config<TRawArgsChecker: IArgsChecker<'a> + 'a>(
         &self,
         raw_args_checker: TRawArgsChecker,
     ) -> Arc<RefCell<FnConfig<'a, TMock>>> {
@@ -73,7 +80,7 @@ impl<'a, TMock> FnData<'a, TMock> {
         return return_value.downcast_into();
     }
 
-    pub fn verify_received<TRawArgsChecker: IArgsChecker<'a>>(
+    pub fn verify_received<TRawArgsChecker: IArgsChecker<'a> + 'a>(
         &self,
         raw_args_checker: TRawArgsChecker,
         times: Times,
