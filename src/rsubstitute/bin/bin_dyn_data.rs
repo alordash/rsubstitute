@@ -18,11 +18,18 @@ pub use __rsubstitute_generated_Trait::*;
 mod __rsubstitute_generated_Trait {
     use super::*;
     use rsubstitute::for_generated::*;
-    use std::any::Any;
+    use std::any::{Any, TypeId};
+    use std::hash::{DefaultHasher, Hash, Hasher};
+    use std::ptr::hash;
 
     #[derive(Clone)]
     pub struct work_Call {
         v: i32,
+    }
+    impl IGenericsHashKeyProvider for work_Call {
+        fn get_generics_type_ids(&self) -> Vec<TypeId> {
+            vec![]
+        }
     }
     impl IArgInfosProvider for work_Call {
         fn get_arg_infos(&self) -> Vec<ArgInfo> {
@@ -34,7 +41,12 @@ mod __rsubstitute_generated_Trait {
     pub struct work_ArgsChecker {
         v: Arg<i32>,
     }
-    impl<'rs>  IArgsChecker<'rs> for work_ArgsChecker {
+    impl IGenericsHashKeyProvider for work_ArgsChecker {
+        fn get_generics_type_ids(&self) -> Vec<TypeId> {
+            vec![]
+        }
+    }
+    impl<'rs> IArgsChecker<'rs> for work_ArgsChecker {
         fn check(&self, dyn_call: &Call) -> Vec<ArgCheckResult> {
             let call: &work_Call = dyn_call.downcast_ref();
             vec![self.v.check("v", &call.v)]
