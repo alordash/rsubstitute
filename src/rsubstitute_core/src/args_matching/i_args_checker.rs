@@ -1,7 +1,7 @@
-use crate::Call;
 use crate::args_matching::{ArgCheckResult, IArgsFormatter};
+use crate::{Call, GenericsHashKey, IGenericsHashKeyProvider};
 
-pub trait IArgsChecker<'a>: 'a + IArgsFormatter {
+pub trait IArgsChecker<'a>: 'a + IArgsFormatter + IGenericsHashKeyProvider {
     fn check(&self, raw_call: &Call) -> Vec<ArgCheckResult>;
 }
 
@@ -12,6 +12,12 @@ pub struct ArgsChecker<'a> {
 impl<'a> IArgsFormatter for ArgsChecker<'a> {
     fn fmt_args(&self) -> String {
         self.inner.fmt_args()
+    }
+}
+
+impl<'a> IGenericsHashKeyProvider for ArgsChecker<'a> {
+    fn get_generics_hash_key(&self) -> GenericsHashKey {
+        self.inner.get_generics_hash_key()
     }
 }
 

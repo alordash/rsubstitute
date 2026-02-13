@@ -5,12 +5,13 @@ use crate::fn_parameters::{Call, CallInfo};
 use crate::matching_config_search_result::*;
 use crate::*;
 use std::cell::RefCell;
+use std::collections::HashMap;
 use std::sync::Arc;
 
 pub struct FnData<'a, TMock> {
     fn_name: &'static str,
     call_infos: RefCell<Vec<CallInfo<'a>>>,
-    configs: RefCell<Vec<Arc<RefCell<FnConfig<'a, TMock>>>>>,
+    configs: RefCell<HashMap<GenericsHashKey, Vec<Arc<RefCell<FnConfig<'a, TMock>>>>>>,
     error_printer: Arc<dyn IErrorPrinter>,
 }
 
@@ -19,7 +20,7 @@ impl<'a, TMock> FnData<'a, TMock> {
         Self {
             fn_name,
             call_infos: RefCell::new(Vec::new()),
-            configs: RefCell::new(Vec::new()),
+            configs: RefCell::new(HashMap::new()),
             error_printer: services.error_printer.clone(),
         }
     }
@@ -47,10 +48,15 @@ impl<'a, TMock> FnData<'a, TMock> {
         &self,
         raw_args_checker: TRawArgsChecker,
     ) -> Arc<RefCell<FnConfig<'a, TMock>>> {
+        let generics_hash_key = raw_args_checker.get_generics_hash_key();
         let args_checker = ArgsChecker::new(raw_args_checker);
         let config = FnConfig::new(args_checker);
         let shared_config = Arc::new(RefCell::new(config));
-        self.configs.borrow_mut().push(shared_config.clone());
+        self.configs
+            .borrow_mut()
+            .entry(generics_hash_key)
+            .or_insert(Vec::new())
+            .push(shared_config.clone());
         return shared_config;
     }
 
@@ -141,9 +147,13 @@ impl<'a, TMock> FnData<'a, TMock> {
     }
 
     fn try_get_matching_config(&self, call: &Call) -> MatchingConfigSearchResult<'a, TMock> {
-        let configs = self.configs.borrow();
-        let mut args_check_results = Vec::with_capacity(configs.len());
-        for config in configs.iter().rev() {
+        let generics_hash_key = call.get_generics_hash_key();
+        let all_configs = self.configs.borrow();
+        let Some(matching_configs) = all_configs.get(&generics_hash_key) else {
+            return MatchingConfigSearchResult::Err(MatchingConfigSearchErr::empty());
+        };
+        let mut args_check_results = Vec::with_capacity(matching_configs.len());
+        for config in matching_configs.iter().rev() {
             let args_check_result = config.borrow().check(call);
             if args_check_result.iter().all(|x| x.is_ok()) {
                 return MatchingConfigSearchResult::Ok(config.clone());

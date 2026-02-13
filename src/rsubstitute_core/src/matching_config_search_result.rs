@@ -12,3 +12,11 @@ pub(crate) struct MatchingConfigSearchErr {
     pub args_check_results_sorted_by_number_of_correctly_matched_args_descending:
         Vec<Vec<ArgCheckResult>>,
 }
+
+impl MatchingConfigSearchErr {
+    pub fn empty() -> Self {
+        Self {
+            args_check_results_sorted_by_number_of_correctly_matched_args_descending: Vec::new(),
+        }
+    }
+}

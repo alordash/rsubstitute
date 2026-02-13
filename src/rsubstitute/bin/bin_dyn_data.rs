@@ -34,7 +34,7 @@ mod __rsubstitute_generated_Trait {
     pub struct work_ArgsChecker {
         v: Arg<i32>,
     }
-    impl<'rs> IArgsChecker<'rs> for work_ArgsChecker {
+    impl<'rs>  IArgsChecker<'rs> for work_ArgsChecker {
         fn check(&self, dyn_call: &Call) -> Vec<ArgCheckResult> {
             let call: &work_Call = dyn_call.downcast_ref();
             vec![self.v.check("v", &call.v)]
