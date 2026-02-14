@@ -9,14 +9,14 @@ use std::collections::HashMap;
 use std::ops::Deref;
 use std::sync::Arc;
 
-pub struct FnData<'a, TMock> {
+pub struct FnData<'a, TMock: 'a> {
     fn_name: &'static str,
     call_infos: RefCell<HashMap<GenericsHashKey, Vec<CallInfo<'a>>>>,
     configs: RefCell<HashMap<GenericsHashKey, Vec<Arc<RefCell<FnConfig<'a, TMock>>>>>>,
     error_printer: Arc<dyn IErrorPrinter>,
 }
 
-impl<'a, TMock> FnData<'a, TMock> {
+impl<'a, TMock: 'a> FnData<'a, TMock> {
     pub fn new(fn_name: &'static str, services: &ServiceCollection) -> Self {
         Self {
             fn_name,
@@ -39,7 +39,7 @@ impl<'a, TMock> FnData<'a, TMock> {
     }
 }
 
-impl<'a, TMock> FnData<'a, TMock> {
+impl<'a, TMock: 'a> FnData<'a, TMock> {
     pub fn register_call(&self, call: Call<'a>) -> &Self {
         let generics_hash_key = call.get_generics_hash_key();
         self.call_infos
@@ -203,7 +203,7 @@ impl<'a, TMock> FnData<'a, TMock> {
     }
 }
 
-impl<'a, TMock: IBaseCaller> FnData<'a, TMock> {
+impl<'a, TMock: IBaseCaller + 'a> FnData<'a, TMock> {
     pub fn handle_base(&self, mock: &TMock, call: Call<'a>) {
         // TODO - turn into method?
         let call_ref: &'a Call<'a> = unsafe { std::mem::transmute(&call) };

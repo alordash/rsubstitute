@@ -126,11 +126,11 @@ mod __rsubstitute_generated_Trait {
     }
     impl<T1: Clone + Debug + PartialOrd> TraitMockReceived<T1> {
         pub fn work<T2: Clone + Debug + PartialOrd, const B: bool, const N: usize>(
-            self,
+            &self,
             t1: impl Into<Arg<T1>>,
             t2: impl Into<Arg<T2>>,
             times: Times,
-        ) -> Self {
+        ) -> &Self {
             let work_args_checker: work_ArgsChecker<T1, T2, B, N> = work_ArgsChecker {
                 t1: t1.into(),
                 t2: t2.into(),
@@ -180,8 +180,9 @@ mod tests {
         mock.received
             .work::<_, true, 2>(10, "amogus", Times::Once)
             .work::<_, true, 4>(10, "amogus", Times::Once)
-            .work::<_, false, 2>(10, "amogus", Times::Once)
+            .work::<_, false, 2>(10, "amogus", Times::Once);
             // TODO - mock.received - value used after move
+        mock.received
             .work::<_, true, 2>(10, "quo vadis", Times::Never)
             .work::<_, true, 4>(11, "amogus", Times::Never)
             .work::<_, false, 2>(10, "quo vadis", Times::Never)

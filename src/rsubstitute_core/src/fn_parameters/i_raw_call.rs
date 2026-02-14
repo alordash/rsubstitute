@@ -1,12 +1,15 @@
-use crate::args_matching::IArgInfosProvider;
 use crate::IGenericsHashKeyProvider;
+use crate::args_matching::IArgInfosProvider;
+use std::ptr::NonNull;
 
-pub trait IRawCall<'a>: IArgInfosProvider + IGenericsHashKeyProvider {
-    fn clone_box(&self) -> Box<dyn IRawCall<'a> + 'a>;
+pub trait IRawCall: IArgInfosProvider + IGenericsHashKeyProvider {
+    fn clone_box_ptr(&self) -> *const dyn IRawCall;
 }
 
-impl<'a, T: IArgInfosProvider + IGenericsHashKeyProvider + Clone + 'a> IRawCall<'a> for T {
-    fn clone_box(&self) -> Box<dyn IRawCall<'a> + 'a> {
-        Box::new(self.clone())
+impl<T: IArgInfosProvider + IGenericsHashKeyProvider + Clone> IRawCall for T {
+    fn clone_box_ptr(&self) -> *const dyn IRawCall {
+        let boxed: Box<T> = Box::new(self.clone());
+        let boxed_ptr = Box::into_raw(boxed) as *const _ as *const dyn IRawCall;
+        return boxed_ptr;
     }
 }

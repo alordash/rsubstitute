@@ -4,13 +4,13 @@ use std::marker::PhantomData;
 use std::sync::Arc;
 
 // TODO - rename to something like ReturnConfig to better reflect intended usage
-pub struct SharedFnConfig<'a, TMock, TReturnValue: IRawReturnValue<'a>, TOwner> {
+pub struct SharedFnConfig<'a, TMock: 'a, TReturnValue: IRawReturnValue<'a>, TOwner> {
     _phantom_return_value: PhantomData<TReturnValue>,
     fn_config: Arc<RefCell<FnConfig<'a, TMock>>>,
     owner: &'a TOwner,
 }
 
-impl<'a, TMock, TReturnValue: IRawReturnValue<'a> + 'a, TOwner>
+impl<'a, TMock: 'a, TReturnValue: IRawReturnValue<'a> + 'a, TOwner>
     SharedFnConfig<'a, TMock, TReturnValue, TOwner>
 {
     pub fn new(shared_fn_config: Arc<RefCell<FnConfig<'a, TMock>>>, owner: &'a TOwner) -> Self {
@@ -56,7 +56,7 @@ impl<'a, TMock, TReturnValue: IRawReturnValue<'a> + 'a, TOwner>
     }
 }
 
-impl<'a, TMock, TOwner> SharedFnConfig<'a, TMock, (), TOwner> {
+impl<'a, TMock: 'a, TOwner> SharedFnConfig<'a, TMock, (), TOwner> {
     pub fn does(&self, callback: impl FnMut() + 'static) -> &'a TOwner {
         self.fn_config.borrow_mut().set_callback(callback);
         return self.owner;
@@ -67,7 +67,7 @@ impl<'a, TMock, TOwner> SharedFnConfig<'a, TMock, (), TOwner> {
     }
 }
 
-impl<'a, TMock: IBaseCaller, TReturnValue: IRawReturnValue<'a>, TOwner>
+impl<'a, TMock: IBaseCaller + 'a, TReturnValue: IRawReturnValue<'a>, TOwner>
     SharedFnConfig<'a, TMock, TReturnValue, TOwner>
 {
     pub fn call_base(&self) -> &'a TOwner {

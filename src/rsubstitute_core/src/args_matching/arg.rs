@@ -12,6 +12,8 @@ pub enum Arg<T> {
     // Private for cleaner API: just pass closure without having to box or reference it.
     #[allow(private_interfaces)]
     #[doc(hidden)]
+    // TODO - add ability to pass closure straight-away like in `mockiato`:
+    // |arg| arg.partial_eq("Paul"), |arg| arg.any()
     PrivateIs(Box<dyn Fn(&T) -> bool>, Private),
 }
 
@@ -139,11 +141,7 @@ impl<T: Debug + ?Sized> Arg<*mut T> {
 }
 
 impl<'a, T: Debug + ?Sized> Arg<&'a mut T> {
-    pub fn check_mut(
-        &self,
-        arg_name: &'static str,
-        actual_value_ptr: &*mut T,
-    ) -> ArgCheckResult {
+    pub fn check_mut(&self, arg_name: &'static str, actual_value_ptr: &*mut T) -> ArgCheckResult {
         let actual_value = unsafe {
             &(*actual_value_ptr)
                 .as_ref()

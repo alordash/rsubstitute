@@ -6,21 +6,21 @@ use std::collections::VecDeque;
 use std::marker::PhantomData;
 use std::sync::Arc;
 
-pub struct FnConfig<'a, TMock> {
+pub struct FnConfig<TMock> {
     _phantom_mock: PhantomData<TMock>,
-    args_checker: ArgsChecker<'a>,
+    args_checker: ArgsChecker<'static>,
     current_return_value_index: Cell<usize>,
-    return_values: VecDeque<ReturnValue<'a>>,
-    calls: Vec<Call<'a>>,
+    return_values: VecDeque<ReturnValue<'static>>,
+    calls: Vec<Call<'static>>,
     callback: Option<Arc<RefCell<dyn FnMut()>>>,
     call_base: bool,
 }
 
-impl<'a, TMock> FnConfig<'a, TMock> {
-    pub(crate) fn new(args_checker: ArgsChecker<'a>) -> Self {
+impl<TMock> FnConfig<TMock> {
+    pub(crate) fn new(args_checker: ArgsChecker) -> Self {
         FnConfig {
             _phantom_mock: PhantomData,
-            args_checker,
+            args_checker: unsafe { std::mem::transmute(args_checker) },
             current_return_value_index: Cell::new(0),
             return_values: VecDeque::new(),
             calls: Vec::new(),
@@ -29,8 +29,8 @@ impl<'a, TMock> FnConfig<'a, TMock> {
         }
     }
 
-    pub(crate) fn add_return_value(&mut self, return_value: ReturnValue<'a>) {
-        self.return_values.push_back(return_value);
+    pub(crate) fn add_return_value<'a>(&mut self, return_value: ReturnValue<'a>) {
+        self.return_values.push_back(unsafe {std::mem::transmute(return_value)});
     }
 
     pub(crate) fn add_return_values<const N: usize>(

@@ -8,7 +8,7 @@ pub struct Call<'a> {
 impl<'a> Clone for Call<'a> {
     fn clone(&self) -> Self {
         Self {
-            inner: self.inner.clone_box(),
+            inner: self.inner.clone_box_ptr(),
         }
     }
 }

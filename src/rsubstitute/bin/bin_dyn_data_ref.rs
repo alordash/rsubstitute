@@ -5,8 +5,8 @@ use rsubstitute::macros::*;
 //     fn work<'a>(&self, v: &'a i32) -> &'a i32;
 // }
 
-trait Trait {
-    fn work<'a>(&self, v: &'a i32) -> &'a i32;
+trait Trait<'rs> {
+    fn work<'a: 'rs>(&'rs self, v: &'a i32) -> &'a i32;
 }
 #[cfg(test)]
 pub use __rsubstitute_generated_Trait::*;
@@ -37,27 +37,27 @@ mod __rsubstitute_generated_Trait {
     }
 
     #[derive(IMockData)]
-    pub struct TraitMockData {
-        work_data: FnData<'static, TraitMock>,
+    pub struct TraitMockData<'rs> {
+        work_data: FnData<'rs, TraitMock<'static>>,
     }
 
     #[derive(Clone)]
-    pub struct TraitMockSetup {
-        data: Arc<TraitMockData>,
+    pub struct TraitMockSetup<'rs> {
+        data: Arc<TraitMockData<'rs>>,
     }
 
     #[derive(Clone)]
-    pub struct TraitMockReceived {
-        data: Arc<TraitMockData>,
+    pub struct TraitMockReceived<'rs> {
+        data: Arc<TraitMockData<'rs>>,
     }
     #[derive(Clone)]
-    pub struct TraitMock {
-        pub setup: TraitMockSetup,
-        pub received: TraitMockReceived,
-        data: Arc<TraitMockData>,
+    pub struct TraitMock<'rs> {
+        pub setup: TraitMockSetup<'rs>,
+        pub received: TraitMockReceived<'rs>,
+        data: Arc<TraitMockData<'rs>>,
     }
-    impl Trait for TraitMock {
-        fn work<'a>(&self, v: &'a i32) -> &'a i32 {
+    impl<'rs> Trait<'rs> for TraitMock<'rs> {
+        fn work<'a: 'rs>(&'rs self, v: &'a i32) -> &'a i32 {
             let call = unsafe {
                 work_Call {
                     v: std::mem::transmute(v),
@@ -66,8 +66,16 @@ mod __rsubstitute_generated_Trait {
             return self.data.work_data.handle_returning(Call::new(call));
         }
     }
-    impl TraitMock {
-        pub fn new() -> Self {
+    impl<'rs> TraitMock<'rs> {
+        pub fn setup(&self) -> &'static TraitMockSetup<'rs> {
+            unsafe { std::mem::transmute(&self.setup) }
+        }
+
+        pub fn received(&self) -> &'static TraitMockReceived<'rs> {
+            unsafe { std::mem::transmute(&self.received) }
+        }
+
+        pub fn new() -> TraitMock<'rs> {
             let data = Arc::new(TraitMockData {
                 work_data: FnData::new("work", &SERVICES),
             });
@@ -78,19 +86,19 @@ mod __rsubstitute_generated_Trait {
             };
         }
     }
-    impl TraitMockSetup {
-        pub fn work<'rs, 'a: 'rs>(
+    impl<'rs> TraitMockSetup<'rs> {
+        pub fn work<'a: 'rs>(
             &'rs self,
             v: impl Into<Arg<&'a i32>>,
-        ) -> SharedFnConfig<'rs, TraitMock, &'a i32, Self> {
+        ) -> SharedFnConfig<'rs, TraitMock<'static>, &'a i32, Self> {
             let work_args_checker = work_ArgsChecker { v: v.into() };
             let fn_config = self.data.work_data.as_local().add_config(work_args_checker);
             let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
         }
     }
-    impl TraitMockReceived {
-        pub fn work<'a>(self, v: impl Into<Arg<&'a i32>>, times: Times) -> Self {
+    impl<'rs> TraitMockReceived<'rs> {
+        pub fn work<'a>(&self, v: impl Into<Arg<&'a i32>>, times: Times) -> &Self {
             let work_args_checker: work_ArgsChecker<'a> = work_ArgsChecker { v: v.into() };
             self.data
                 .work_data
@@ -122,13 +130,21 @@ mod tests {
         let r2 = &222;
         let r3 = &333;
 
-        mock.setup
-            .work(v1)
-            .returns(r1)
-            .work(v2)
-            .returns(r2)
-            .work(Arg::Is(|x: &&i32| **x < 0))
-            .returns(r3);
+        // let h = &mock.setup;
+        // mock
+        //     .setup
+        //     .work(v1)
+        //     .returns(r1)
+        //     .work(v2)
+        //     .returns(r2)
+        //     .work(Arg::Is(|x: &&i32| **x < 0))
+        //     .returns(r3);
+
+        {
+            // let q = 32;
+            // let rq = &q;
+            // mock.work(rq);
+        }
 
         // Act
         let actual_r1 = mock.work(v1);
