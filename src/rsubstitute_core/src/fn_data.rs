@@ -78,7 +78,7 @@ impl<'a, TMock> FnData<'a, TMock> {
         }
     }
 
-    pub fn handle_returning<TReturnValue: 'static>(&self, call: Call<'a>) -> TReturnValue {
+    pub fn handle_returning<'b, TReturnValue: 'b>(&self, call: Call<'a>) -> TReturnValue {
         let fn_config = self.get_required_matching_config(call.clone());
         self.register_call(call.clone());
         fn_config.borrow_mut().register_call(call.clone());
@@ -90,7 +90,8 @@ impl<'a, TMock> FnData<'a, TMock> {
             self.error_printer
                 .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
         };
-        return return_value.downcast_into();
+        let local_return_value: ReturnValue<'b> = unsafe { std::mem::transmute(return_value) };
+        return local_return_value.downcast_into();
     }
 
     pub fn verify_received<TRawArgsChecker: IArgsChecker<'a> + 'a>(

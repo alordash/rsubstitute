@@ -12,6 +12,8 @@ pub enum Arg<T> {
     // Private for cleaner API: just pass closure without having to box or reference it.
     #[allow(private_interfaces)]
     #[doc(hidden)]
+    // TODO - add ability to pass closure straight-away like in `mockiato`:
+    // |arg| arg.partial_eq("Paul"), |arg| arg.any()
     PrivateIs(Box<dyn Fn(&T) -> bool>, Private),
 }
 
