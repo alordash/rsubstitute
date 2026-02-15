@@ -73,6 +73,11 @@ fn create_services() -> ServiceCollection {
         path_factory: path_factory.clone(),
         field_access_expr_factory: field_access_expr_factory.clone(),
     });
+    let debug_string_expr_generator = Arc::new(DebugStringExprGenerator {
+        path_factory: path_factory.clone(),
+        expr_method_call_factory: expr_method_call_factory.clone(),
+        expr_reference_factory: expr_reference_factory.clone(),
+    });
     let args_checker_impl_generator = Arc::new(ArgsCheckerTraitImplGenerator {
         type_factory: type_factory.clone(),
         field_access_expr_factory: field_access_expr_factory.clone(),
@@ -200,11 +205,14 @@ fn create_services() -> ServiceCollection {
         type_factory: type_factory.clone(),
         field_access_expr_factory: field_access_expr_factory.clone(),
         field_checker: field_checker.clone(),
+        debug_string_expr_generator: debug_string_expr_generator.clone(),
     });
     let derive_args_infos_provider_macro_handler = Arc::new(DeriveArgsInfosProviderMacroHandler {
         path_factory: path_factory.clone(),
         type_factory: type_factory.clone(),
-        expr_method_call_factory: expr_method_call_factory.clone(),
+        field_access_expr_factory: field_access_expr_factory.clone(),
+        expr_reference_factory: expr_reference_factory.clone(),
+        debug_string_expr_generator: debug_string_expr_generator.clone(),
     });
     let derive_mock_data_macro_handler = Arc::new(DeriveMockDataMacroHandler {
         path_factory: path_factory.clone(),

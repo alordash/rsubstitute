@@ -1,8 +1,9 @@
 use crate::constants;
+use crate::mock_macros::mock_generation::IDebugStringExprGenerator;
 use crate::syntax::*;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
-use quote::{format_ident, ToTokens};
+use quote::{ToTokens, format_ident};
 use std::cell::LazyCell;
 use std::sync::Arc;
 use syn::punctuated::Punctuated;
@@ -13,10 +14,12 @@ pub trait IDeriveArgsInfosProviderMacroHandler {
     fn handle(&self, item: proc_macro::TokenStream) -> proc_macro::TokenStream;
 }
 
-pub struct DeriveArgsInfosProviderMacroHandler {
-    pub(crate) path_factory: Arc<dyn IPathFactory>,
-    pub(crate) type_factory: Arc<dyn ITypeFactory>,
-    pub(crate) expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
+pub(crate) struct DeriveArgsInfosProviderMacroHandler {
+    pub path_factory: Arc<dyn IPathFactory>,
+    pub type_factory: Arc<dyn ITypeFactory>,
+    pub field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
+    pub expr_reference_factory: Arc<dyn IExprReferenceFactory>,
+    pub debug_string_expr_generator: Arc<dyn IDebugStringExprGenerator>,
 }
 
 impl IDeriveArgsInfosProviderMacroHandler for DeriveArgsInfosProviderMacroHandler {
@@ -110,11 +113,14 @@ impl DeriveArgsInfosProviderMacroHandler {
             attrs: Vec::new(),
             lit: Lit::Str(LitStr::new(&field_ident.to_string(), Span::call_site())),
         });
-        let field_access_arg = Expr::MethodCall(self.expr_method_call_factory.create(
-            vec![constants::SELF_IDENT.clone(), field_ident],
-            constants::CLONE_FN_IDENT.clone(),
-            Vec::new(),
-        ));
+        let field_value_arg = self.expr_reference_factory.create(
+            self.field_access_expr_factory
+                .create(vec![constants::SELF_IDENT.clone(), field_ident.clone()]),
+        );
+        let field_debug_string_arg = self.debug_string_expr_generator.generate(
+            self.field_access_expr_factory
+                .create(vec![constants::SELF_IDENT.clone(), field_ident]),
+        );
 
         let expr = Expr::Call(ExprCall {
             attrs: Vec::new(),
@@ -123,7 +129,9 @@ impl DeriveArgsInfosProviderMacroHandler {
                 constants::NEW_IDENT.clone(),
             ])),
             paren_token: Default::default(),
-            args: [field_name_arg, field_access_arg].into_iter().collect(),
+            args: [field_name_arg, field_value_arg, field_debug_string_arg]
+                .into_iter()
+                .collect(),
         });
         return expr;
     }

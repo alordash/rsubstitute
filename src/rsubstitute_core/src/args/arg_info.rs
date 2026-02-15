@@ -1,20 +1,16 @@
-use std::fmt::Debug;
-
 pub struct ArgInfo {
     arg_name: &'static str,
     arg_type_name: &'static str,
-    arg_value: Box<dyn Debug>,
+    arg_debug_string: String,
 }
 
 impl ArgInfo {
-    pub fn new<T: Debug>(arg_name: &'static str, arg_value: T) -> Self {
+    pub fn new<T>(arg_name: &'static str, _arg_value: &T, arg_debug_string: String) -> Self {
         let arg_type_name = std::any::type_name::<T>();
-        let arg_value: Box<dyn Debug + 'static> =
-            unsafe { std::mem::transmute(Box::new(arg_value) as Box<dyn Debug>) };
         return Self {
             arg_name,
             arg_type_name,
-            arg_value,
+            arg_debug_string,
         };
     }
 
@@ -26,7 +22,7 @@ impl ArgInfo {
         self.arg_type_name
     }
 
-    pub fn arg_value(&self) -> &Box<dyn Debug> {
-        &self.arg_value
+    pub fn arg_debug_string(&self) -> &str {
+        &self.arg_debug_string
     }
 }

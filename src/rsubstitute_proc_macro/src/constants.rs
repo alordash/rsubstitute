@@ -521,3 +521,6 @@ pub const CONFIG_LIFETIME_GENERICS: LazyCell<Generics> = LazyCell::new(|| {
 });
 
 pub const HASH_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("hash"));
+
+pub const ARG_PRINTER_STRUCT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("ArgPrinter"));
+pub const DEBUG_STRING_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("debug_string"));

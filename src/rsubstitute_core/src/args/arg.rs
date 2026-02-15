@@ -1,4 +1,6 @@
-use crate::args_matching::{ArgCheckResult, ArgCheckResultErr, ArgCheckResultOk, ArgInfo};
+use crate::args::{
+    ArgCheckResult, ArgCheckResultErr, ArgCheckResultOk, ArgInfo, ArgPrinter, IUnknownArgPrinter,
+};
 use std::fmt::{Debug, Formatter};
 use std::rc::Rc;
 use std::sync::Arc;
@@ -49,20 +51,25 @@ impl<T> Arg<T> {
     }
 }
 
-impl<T: Debug + PartialOrd + Clone> Arg<T> {
+impl<T: PartialOrd> Arg<T> {
     pub fn check<'a>(&self, arg_name: &'static str, actual_value: &T) -> ArgCheckResult
     where
         T: 'a,
     {
-        let arg_info = ArgInfo::new(arg_name, (*actual_value).clone());
+        let arg_info = ArgInfo::new(
+            arg_name,
+            actual_value,
+            (&ArgPrinter(actual_value)).debug_string(),
+        );
         match self {
             Arg::Eq(expected_value) => {
                 if !actual_value.eq(expected_value) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
-                        error_msg: format!(
-                            "\t\tExpected: {expected_value:?}\n\t\tActual:   {actual_value:?}"
-                        ),
+                        // error_msg: format!(
+                        //     "\t\tExpected: {expected_value:?}\n\t\tActual:   {actual_value:?}"
+                        // ),
+                        error_msg: format!("TODO - debug string"),
                     });
                 }
             }
@@ -70,12 +77,14 @@ impl<T: Debug + PartialOrd + Clone> Arg<T> {
                 if actual_value.eq(not_expected_value) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
-                        error_msg: format!("\t\tDid not expect to be {not_expected_value:?}"),
+                        // error_msg: format!("\t\tDid not expect to be {not_expected_value:?}"),
+                        error_msg: format!("TODO - debug string"),
                     });
                 }
             }
             Arg::PrivateIs(predicate, _) => {
-                let actual_value_str = format!("{:?}", actual_value);
+                // let actual_value_str = format!("{:?}", actual_value);
+                let actual_value_str = format!("TODO - debug string");
                 if !predicate(actual_value) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
@@ -91,9 +100,13 @@ impl<T: Debug + PartialOrd + Clone> Arg<T> {
     }
 }
 
-impl<'a, T: Debug + ?Sized> Arg<&'a T> {
+impl<'a, T: ?Sized> Arg<&'a T> {
     pub fn check_ref(&self, arg_name: &'static str, actual_value: &&'a T) -> ArgCheckResult {
-        let arg_info = ArgInfo::new(arg_name, *actual_value);
+        let arg_info = ArgInfo::new(
+            arg_name,
+            actual_value,
+            (&ArgPrinter(*actual_value)).debug_string(),
+        );
         let actual_ptr = std::ptr::from_ref(*actual_value);
         match self {
             Arg::Eq(expected_value) => {
@@ -102,7 +115,8 @@ impl<'a, T: Debug + ?Sized> Arg<&'a T> {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
-                            "\t\tExpected reference (ptr: {expected_ptr:?}): {expected_value:?}\n\t\tActual reference   (ptr: {actual_ptr:?}): {actual_value:?}"
+                            // "\t\tExpected reference (ptr: {expected_ptr:?}): {expected_value:?}\n\t\tActual reference   (ptr: {actual_ptr:?}): {actual_value:?}"
+                            "TODO - debug string"
                         ),
                     });
                 }
@@ -113,7 +127,8 @@ impl<'a, T: Debug + ?Sized> Arg<&'a T> {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
-                            "\t\tDid not expect reference (ptr: {not_expected_ptr:?}): {not_expected_value:?}"
+                            // "\t\tDid not expect reference (ptr: {not_expected_ptr:?}): {not_expected_value:?}"
+                            "TODO - debug string"
                         ),
                     });
                 }
@@ -123,7 +138,8 @@ impl<'a, T: Debug + ?Sized> Arg<&'a T> {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
-                            "\t\tCustom predicate didn't match passed reference value. Received value (ptr: {actual_ptr:?}): {actual_value:?}"
+                            // "\t\tCustom predicate didn't match passed reference value. Received value (ptr: {actual_ptr:?}): {actual_value:?}"
+                            "TODO - debug string"
                         ),
                     });
                 }
@@ -134,18 +150,14 @@ impl<'a, T: Debug + ?Sized> Arg<&'a T> {
     }
 }
 
-impl<T: Debug + ?Sized> Arg<*mut T> {
+impl<T: ?Sized> Arg<*mut T> {
     pub fn check_mut(&self, arg_name: &'static str, actual_value: &*mut T) -> ArgCheckResult {
         self.check(arg_name, actual_value)
     }
 }
 
-impl<'a, T: Debug + ?Sized> Arg<&'a mut T> {
-    pub fn check_mut(
-        &self,
-        arg_name: &'static str,
-        actual_value_ptr: &*mut T,
-    ) -> ArgCheckResult {
+impl<'a, T: ?Sized> Arg<&'a mut T> {
+    pub fn check_mut(&self, arg_name: &'static str, actual_value_ptr: &*mut T) -> ArgCheckResult {
         let actual_value = unsafe {
             &(*actual_value_ptr)
                 .as_ref()
@@ -156,7 +168,11 @@ impl<'a, T: Debug + ?Sized> Arg<&'a mut T> {
                 .as_mut()
                 .expect("Mutable reference to call argument should not be null.")
         };
-        let arg_info = ArgInfo::new(arg_name, *actual_value);
+        let arg_info = ArgInfo::new(
+            arg_name,
+            actual_value,
+            (&ArgPrinter(*actual_value)).debug_string(),
+        );
         let actual_ptr = std::ptr::from_ref(*actual_value);
         match self {
             Arg::Eq(expected_value) => {
@@ -165,7 +181,8 @@ impl<'a, T: Debug + ?Sized> Arg<&'a mut T> {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
-                            "\t\tExpected reference (ptr: {expected_ptr:?}): {expected_value:?}\n\t\tActual reference   (ptr: {actual_ptr:?}): {actual_value:?}"
+                            // "\t\tExpected reference (ptr: {expected_ptr:?}): {expected_value:?}\n\t\tActual reference   (ptr: {actual_ptr:?}): {actual_value:?}"
+                            "TODO - debug string"
                         ),
                     });
                 }
@@ -176,7 +193,8 @@ impl<'a, T: Debug + ?Sized> Arg<&'a mut T> {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
-                            "\t\tDid not expect reference (ptr: {not_expected_ptr:?}): {not_expected_value:?}"
+                            // "\t\tDid not expect reference (ptr: {not_expected_ptr:?}): {not_expected_value:?}"
+                            "TODO - debug string"
                         ),
                     });
                 }
@@ -186,7 +204,8 @@ impl<'a, T: Debug + ?Sized> Arg<&'a mut T> {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
-                            "\t\tCustom predicate didn't match passed reference value. Received value (ptr: {actual_ptr:?}): {actual_value:?}"
+                            // "\t\tCustom predicate didn't match passed reference value. Received value (ptr: {actual_ptr:?}): {actual_value:?}"
+                            "TODO - debug string"
                         ),
                     });
                 }
@@ -197,12 +216,16 @@ impl<'a, T: Debug + ?Sized> Arg<&'a mut T> {
     }
 }
 
-impl<T: Debug + ?Sized> Arg<Rc<T>> {
+impl<T: ?Sized> Arg<Rc<T>> {
     pub fn check_rc<'a>(&self, arg_name: &'static str, actual_value: &Rc<T>) -> ArgCheckResult
     where
         T: 'a,
     {
-        let arg_info = ArgInfo::new(arg_name, actual_value.clone());
+        let arg_info = ArgInfo::new(
+            arg_name,
+            actual_value,
+            (&ArgPrinter(actual_value)).debug_string(),
+        );
         let actual_ptr = Rc::as_ptr(&actual_value);
         match self {
             Arg::Eq(expected_value) => {
@@ -211,7 +234,8 @@ impl<T: Debug + ?Sized> Arg<Rc<T>> {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
-                            "\t\tExpected Rc (ptr: {expected_ptr:?}): {expected_value:?}\n\t\tActual Rc   (ptr: {actual_ptr:?}): {actual_value:?}"
+                            // "\t\tExpected Rc (ptr: {expected_ptr:?}): {expected_value:?}\n\t\tActual Rc   (ptr: {actual_ptr:?}): {actual_value:?}"
+                            "TODO - debug string"
                         ),
                     });
                 }
@@ -222,13 +246,15 @@ impl<T: Debug + ?Sized> Arg<Rc<T>> {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
-                            "\t\tDid not expect Rc (ptr: {not_expected_ptr:?}): {not_expected_value:?}"
+                            // "\t\tDid not expect Rc (ptr: {not_expected_ptr:?}): {not_expected_value:?}"
+                            "TODO - debug string"
                         ),
                     });
                 }
             }
             Arg::PrivateIs(predicate, _) => {
-                let actual_value_str = format!("{:?}", actual_value);
+                // let actual_value_str = format!("{:?}", actual_value);
+                let actual_value_str = format!("TODO - debug string");
                 if !predicate(actual_value) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
@@ -244,12 +270,16 @@ impl<T: Debug + ?Sized> Arg<Rc<T>> {
     }
 }
 
-impl<T: Debug + ?Sized> Arg<Arc<T>> {
+impl<T: ?Sized> Arg<Arc<T>> {
     pub fn check_arc<'a>(&self, arg_name: &'static str, actual_value: &Arc<T>) -> ArgCheckResult
     where
         T: 'a,
     {
-        let arg_info = ArgInfo::new(arg_name, actual_value.clone());
+        let arg_info = ArgInfo::new(
+            arg_name,
+            actual_value,
+            (&ArgPrinter(actual_value)).debug_string(),
+        );
         let actual_ptr = Arc::as_ptr(&actual_value);
         match self {
             Arg::Eq(expected_value) => {
@@ -258,7 +288,8 @@ impl<T: Debug + ?Sized> Arg<Arc<T>> {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
-                            "\t\tExpected Arc (ptr: {expected_ptr:?}): {expected_value:?}\n\t\tActual Arc   (ptr: {actual_ptr:?}): {actual_value:?}"
+                            // "\t\tExpected Arc (ptr: {expected_ptr:?}): {expected_value:?}\n\t\tActual Arc   (ptr: {actual_ptr:?}): {actual_value:?}"
+                            "TODO - debug string"
                         ),
                     });
                 }
@@ -269,13 +300,15 @@ impl<T: Debug + ?Sized> Arg<Arc<T>> {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
-                            "\t\tDid not expect Arc (ptr: {not_expected_ptr:?}): {not_expected_value:?}"
+                            // "\t\tDid not expect Arc (ptr: {not_expected_ptr:?}): {not_expected_value:?}"
+                            "TODO - debug string"
                         ),
                     });
                 }
             }
             Arg::PrivateIs(predicate, _) => {
-                let actual_value_str = format!("{:?}", actual_value);
+                // let actual_value_str = format!("{:?}", actual_value);
+                let actual_value_str = format!("TODO - debug string");
                 if !predicate(actual_value) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,

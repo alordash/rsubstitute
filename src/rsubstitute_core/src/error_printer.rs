@@ -1,5 +1,5 @@
 use crate::Times;
-use crate::args_matching::{ArgCheckResult, ArgInfo, IArgsFormatter};
+use crate::args::{ArgCheckResult, ArgInfo, IArgsFormatter};
 use crate::config::get_max_invalid_calls_listed_count;
 use crate::matching_config_search_result::MatchingConfigSearchErr;
 
@@ -142,7 +142,7 @@ List of existing configuration ordered by number of correctly matched arguments 
     ) -> String {
         let call_args_msgs: Vec<_> = call_args
             .into_iter()
-            .map(|call_arg| format!("{:?}", call_arg.arg_value()))
+            .map(|call_arg| format!("{:?}", call_arg.arg_debug_string()))
             .collect();
         let call_args_msg = call_args_msgs.join(", ");
         let error_msg = format!("{fn_name}({call_args_msg})");
@@ -216,10 +216,10 @@ impl ErrorPrinter {
             .into_iter()
             .map(|x| match x {
                 ArgCheckResult::Ok(x) => {
-                    format!("{:?}", x.arg_info.arg_value())
+                    format!("{:?}", x.arg_info.arg_debug_string())
                 }
                 ArgCheckResult::Err(x) => {
-                    format!("*{:?}*", x.arg_info.arg_value())
+                    format!("*{:?}*", x.arg_info.arg_debug_string())
                 }
             })
             .collect();

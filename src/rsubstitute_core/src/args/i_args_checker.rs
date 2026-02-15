@@ -1,4 +1,4 @@
-use crate::args_matching::{ArgCheckResult, IArgsFormatter};
+use crate::args::{ArgCheckResult, IArgsFormatter};
 use crate::{Call, GenericsHasher, IGenericsHashKeyProvider};
 
 pub trait IArgsChecker<'a>: 'a + IArgsFormatter + IGenericsHashKeyProvider {

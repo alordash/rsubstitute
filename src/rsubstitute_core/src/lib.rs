@@ -1,4 +1,6 @@
-pub mod args_matching;
+#![cfg_attr(feature = "debug_naming", feature(specialization))]
+
+pub mod args;
 
 mod config;
 mod di;

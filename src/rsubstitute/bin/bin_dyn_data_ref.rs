@@ -108,7 +108,7 @@ mod __rsubstitute_generated_Trait {
 mod tests {
     use super::*;
     use rsubstitute_core::Times;
-    use rsubstitute_core::args_matching::Arg;
+    use rsubstitute_core::args::Arg;
 
     #[test]
     fn my_test() {

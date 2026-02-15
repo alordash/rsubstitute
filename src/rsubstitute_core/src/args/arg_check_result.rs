@@ -1,4 +1,4 @@
-use crate::args_matching::arg_info::ArgInfo;
+use crate::args::arg_info::ArgInfo;
 
 pub enum ArgCheckResult {
     Ok(ArgCheckResultOk),

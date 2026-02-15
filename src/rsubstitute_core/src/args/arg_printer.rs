@@ -1,0 +1,63 @@
+use std::fmt::{Debug, Formatter};
+
+const UNKNOWN_ARG_STRING: &'static str = "?";
+
+// Credits to mockall's way of printing arguments values.
+// https://github.com/asomers/mockall/blob/4401e5ac4aa7b05227c157f569d1147d732944b0/mockall/src/lib.rs#L1496
+pub struct ArgPrinter<'a, T: ?Sized>(pub &'a T);
+
+impl<'a, T: Debug> Debug for ArgPrinter<'a, T> {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        self.0.fmt(f)
+    }
+}
+
+#[cfg(not(feature = "debug_naming"))]
+pub use default_printing::*;
+#[cfg(not(feature = "debug_naming"))]
+mod default_printing {
+    use super::*;
+
+    pub trait IDebugArgPrinter {
+        fn debug_string(&self) -> String;
+    }
+
+    pub trait IUnknownArgPrinter {
+        fn debug_string(&self) -> String;
+    }
+
+    impl<'a, T: Debug + ?Sized> IDebugArgPrinter for ArgPrinter<'a, T> {
+        fn debug_string(&self) -> String {
+            return format!("{:?}", self.0);
+        }
+    }
+
+    impl<'a, T: ?Sized> IUnknownArgPrinter for &ArgPrinter<'a, T> {
+        fn debug_string(&self) -> String {
+            UNKNOWN_ARG_STRING.to_owned()
+        }
+    }
+}
+
+#[cfg(feature = "debug_naming")]
+pub use specialization_printing::*;
+#[cfg(feature = "debug_naming")]
+mod specialization_printing {
+    use super::*;
+
+    pub trait IDebugPrinter {
+        fn debug_string(&self) -> String;
+    }
+
+    impl<'a, T: ?Sized> IDebugPrinter for ArgPrinter<'a, T> {
+        default fn debug_string(&self) -> String {
+            UNKNOWN_ARG_STRING.to_owned()
+        }
+    }
+
+    impl<'a, T: Debug + ?Sized> IDebugPrinter for ArgPrinter<'a, T> {
+        fn debug_string(&self) -> String {
+            return format!("{:?}", self.0);
+        }
+    }
+}

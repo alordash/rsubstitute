@@ -1,13 +1,14 @@
 use crate::fn_parameters::Call;
 use std::cell::Cell;
+use std::sync::Arc;
 
 pub(crate) struct CallInfo<'a> {
     verified: Cell<bool>,
-    call: Call<'a>,
+    call: Arc<Call<'a>>,
 }
 
 impl<'a> CallInfo<'a> {
-    pub fn new(call: Call<'a>) -> Self {
+    pub fn new(call: Arc<Call<'a>>) -> Self {
         Self {
             verified: Cell::new(false),
             call,

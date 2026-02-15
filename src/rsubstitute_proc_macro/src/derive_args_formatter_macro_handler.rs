@@ -1,4 +1,5 @@
 use crate::constants;
+use crate::mock_macros::mock_generation::IDebugStringExprGenerator;
 use crate::syntax::*;
 use proc_macro::TokenStream;
 use proc_macro2::Literal;
@@ -15,6 +16,7 @@ pub(crate) struct DeriveArgsFormatterMacroHandler {
     pub type_factory: Arc<dyn ITypeFactory>,
     pub field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
     pub field_checker: Arc<dyn IFieldChecker>,
+    pub debug_string_expr_generator: Arc<dyn IDebugStringExprGenerator>,
 }
 
 impl IDeriveArgsFormatterMacroHandler for DeriveArgsFormatterMacroHandler {
@@ -73,7 +75,7 @@ impl DeriveArgsFormatterMacroHandler {
             .fields
             .iter()
             .skip_while(|field| self.field_checker.is_phantom_data(field))
-            .map(|_| "{:?}")
+            .map(|_| "{}")
             .collect::<Vec<_>>()
             .join(", ");
         let literal = Literal::string(&literal_str);
@@ -82,10 +84,11 @@ impl DeriveArgsFormatterMacroHandler {
             .iter()
             .skip_while(|field| self.field_checker.is_phantom_data(field))
             .map(|field| {
-                self.field_access_expr_factory.create(vec![
-                    constants::SELF_IDENT.clone(),
-                    field.get_required_ident(),
-                ])
+                self.debug_string_expr_generator
+                    .generate(self.field_access_expr_factory.create(vec![
+                        constants::SELF_IDENT.clone(),
+                        field.get_required_ident(),
+                    ]))
             })
             .collect();
         let tokens = quote! { #literal, #(#args),* };

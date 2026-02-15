@@ -1,4 +1,4 @@
-pub use rsubstitute_core::args_matching::*;
+pub use rsubstitute_core::args::*;
 pub use rsubstitute_core::*;
 
 mod global_mocks_map;
