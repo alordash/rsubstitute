@@ -3,11 +3,11 @@ use std::fmt::Debug;
 
 // #[mock]
 // trait Trait {
-//     fn work<T1: PartialOrd, T2: PartialOrd,, T3: PartialOrd, const B: bool, const N: usize>(&self, v: T1) -> T3;
+//     fn work<T1, T2, T3, const B: bool, const N: usize>(&self, v: T1) -> T3;
 // }
 
 trait Trait<T1> {
-    fn work<T2: PartialOrd + Clone, T3: PartialOrd + Clone, const B: bool, const N: usize>(
+    fn work<T2: Clone, T3: Clone, const B: bool, const N: usize>(
         &self,
         t1: T1,
         t2: T2,
@@ -29,9 +29,9 @@ mod __rsubstitute_generated_Trait {
 
     #[derive(Clone, IGenericsHashKeyProvider, IArgInfosProvider)]
     pub struct work_Call<
-        T1: PartialOrd + Clone,
-        T2: PartialOrd + Clone,
-        T3: PartialOrd + Clone,
+        T1: Clone,
+        T2: Clone,
+        T3: Clone,
         const B: bool,
         const N: usize,
     > {
@@ -42,9 +42,9 @@ mod __rsubstitute_generated_Trait {
 
     #[derive(Debug, IGenericsHashKeyProvider, IArgsFormatter)]
     pub struct work_ArgsChecker<
-        T1: PartialOrd + Clone,
-        T2: PartialOrd + Clone,
-        T3: PartialOrd + Clone,
+        T1: Clone,
+        T2: Clone,
+        T3: Clone,
         const B: bool,
         const N: usize,
     > {
@@ -54,9 +54,9 @@ mod __rsubstitute_generated_Trait {
     }
     impl<
         'rs,
-        T1: PartialOrd + Clone + 'rs,
-        T2: PartialOrd + Clone + 'rs,
-        T3: PartialOrd + Clone + 'rs,
+        T1: Clone + 'rs,
+        T2: Clone + 'rs,
+        T3: Clone + 'rs,
         const B: bool,
         const N: usize,
     > IArgsChecker<'rs> for work_ArgsChecker<T1, T2, T3, B, N>
@@ -87,8 +87,8 @@ mod __rsubstitute_generated_Trait {
         pub received: TraitMockReceived<T1>,
         data: Arc<TraitMockData<T1>>,
     }
-    impl<T1: PartialOrd + Clone> Trait<T1> for TraitMock<T1> {
-        fn work<T2: PartialOrd + Clone, T3: PartialOrd + Clone, const B: bool, const N: usize>(
+    impl<T1: Clone> Trait<T1> for TraitMock<T1> {
+        fn work<T2: Clone, T3: Clone, const B: bool, const N: usize>(
             &self,
             t1: T1,
             t2: T2,
@@ -103,7 +103,7 @@ mod __rsubstitute_generated_Trait {
             return self.data.work_data.handle_returning(Call::new(call));
         }
     }
-    impl<T1: PartialOrd + Clone> TraitMock<T1> {
+    impl<T1: Clone> TraitMock<T1> {
         pub fn new() -> Self {
             let data = Arc::new(TraitMockData {
                 work_data: FnData::new("work", &SERVICES),
@@ -115,11 +115,11 @@ mod __rsubstitute_generated_Trait {
             };
         }
     }
-    impl<T1: PartialOrd + Clone> TraitMockSetup<T1> {
+    impl<T1: Clone> TraitMockSetup<T1> {
         pub fn work<
             'rs,
-            T2: PartialOrd + Clone + 'rs,
-            T3: PartialOrd + Clone + Clone + 'rs,
+            T2: Clone + 'rs,
+            T3: Clone + Clone + 'rs,
             const B: bool,
             const N: usize,
         >(
@@ -137,8 +137,8 @@ mod __rsubstitute_generated_Trait {
             return shared_fn_config;
         }
     }
-    impl<T1: PartialOrd + Clone> TraitMockReceived<T1> {
-        pub fn work<T2: PartialOrd + Clone, T3: PartialOrd + Clone, const B: bool, const N: usize>(
+    impl<T1: Clone> TraitMockReceived<T1> {
+        pub fn work<T2: Clone, T3: Clone, const B: bool, const N: usize>(
             self,
             t1: impl Into<Arg<T1>>,
             t2: impl Into<Arg<T2>>,

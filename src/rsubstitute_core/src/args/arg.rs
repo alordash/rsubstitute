@@ -51,7 +51,7 @@ impl<T> Arg<T> {
     }
 }
 
-impl<T: PartialOrd> Arg<T> {
+impl<T> Arg<T> {
     pub fn check<'a>(&self, arg_name: &'static str, actual_value: &T) -> ArgCheckResult
     where
         T: 'a,
