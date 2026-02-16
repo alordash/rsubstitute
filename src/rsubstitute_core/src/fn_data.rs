@@ -40,7 +40,7 @@ impl<'a, TMock> FnData<'a, TMock> {
 }
 
 impl<'a, TMock> FnData<'a, TMock> {
-    pub fn register_call(&self, call: Arc<Call<'a>>) -> &Self {
+    pub fn register_call(&self, call: Call<'a>) -> &Self {
         let generics_hash_key = call.get_generics_hash_key();
         self.call_infos
             .borrow_mut()
@@ -66,12 +66,12 @@ impl<'a, TMock> FnData<'a, TMock> {
         return shared_config;
     }
 
-    pub fn handle(&self, unique_call: Call<'a>) {
-        let call = Arc::new(unique_call);
-        let maybe_fn_config = self.try_get_matching_config(&call);
-        self.register_call(call.clone());
+    pub fn handle(&self, call: Call<'a>) {
+        let call_ref: &'a Call<'a> = unsafe { std::mem::transmute(&call) };
+        let maybe_fn_config = self.try_get_matching_config(call_ref);
+        self.register_call(call_ref.clone());
         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
-            fn_config.borrow_mut().register_call(call.clone());
+            fn_config.borrow_mut().register_call(call);
             if let Some(callback) = fn_config.borrow().get_callback() {
                 callback.borrow_mut()();
             }
@@ -188,8 +188,9 @@ impl<'a, TMock> FnData<'a, TMock> {
         });
     }
 
-    fn get_required_matching_config(&self, call: &'a Call<'a>) -> Arc<RefCell<FnConfig<'a, TMock>>> {
-        let fn_config = match self.try_get_matching_config(call) {
+    fn get_required_matching_config(&self, call: Call<'a>) -> Arc<RefCell<FnConfig<'a, TMock>>> {
+        let call_ref: &'a Call<'a> = unsafe { std::mem::transmute(&call) };
+        let fn_config = match self.try_get_matching_config(call_ref) {
             MatchingConfigSearchResult::Ok(matching_config) => matching_config,
             MatchingConfigSearchResult::Err(matching_config_search_err) => {
                 self.error_printer.panic_no_suitable_fn_configuration_found(
@@ -204,9 +205,10 @@ impl<'a, TMock> FnData<'a, TMock> {
 }
 
 impl<'a, TMock: IBaseCaller> FnData<'a, TMock> {
-    pub fn handle_base(&self, mock: &TMock, unique_call: Call<'a>) {
-        let call = Arc::new(unique_call);
-        let maybe_fn_config = self.try_get_matching_config(&call);
+    pub fn handle_base(&self, mock: &TMock, call: Call<'a>) {
+        // TODO - turn into method?
+        let call_ref: &'a Call<'a> = unsafe { std::mem::transmute(&call) };
+        let maybe_fn_config = self.try_get_matching_config(call_ref);
         self.register_call(call.clone());
         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
             fn_config.borrow_mut().register_call(call.clone());

@@ -5,13 +5,13 @@ pub struct Call<'a> {
     inner: Box<dyn IRawCall<'a> + 'a>,
 }
 
-// impl<'a> Clone for Call<'a> {
-//     fn clone(&self) -> Self {
-//         Self {
-//             inner: self.inner.clone_box(),
-//         }
-//     }
-// }
+impl<'a> Clone for Call<'a> {
+    fn clone(&self) -> Self {
+        Self {
+            inner: self.inner.clone_box(),
+        }
+    }
+}
 
 impl<'a> Deref for Call<'a> {
     type Target = dyn IRawCall<'a> + 'a;

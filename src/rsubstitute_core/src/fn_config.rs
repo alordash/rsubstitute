@@ -11,7 +11,7 @@ pub struct FnConfig<'a, TMock> {
     args_checker: ArgsChecker<'a>,
     current_return_value_index: Cell<usize>,
     return_values: VecDeque<ReturnValue<'a>>,
-    calls: Vec<Arc<Call<'a>>>,
+    calls: Vec<Call<'a>>,
     callback: Option<Arc<RefCell<dyn FnMut()>>>,
     call_base: bool,
 }
@@ -44,7 +44,7 @@ impl<'a, TMock> FnConfig<'a, TMock> {
         self.callback = Some(Arc::new(RefCell::new(callback)));
     }
 
-    pub(crate) fn register_call(&mut self, call: Arc<Call<'a>>) {
+    pub(crate) fn register_call(&mut self, call: Call<'a>) {
         self.calls.push(call);
     }
 
