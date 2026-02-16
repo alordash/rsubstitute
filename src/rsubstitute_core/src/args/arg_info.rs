@@ -1,3 +1,4 @@
+#[derive(Debug)]    // TODO - remove
 pub struct ArgInfo {
     arg_name: &'static str,
     arg_type_name: &'static str,

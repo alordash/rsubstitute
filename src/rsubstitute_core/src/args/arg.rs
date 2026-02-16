@@ -1,6 +1,4 @@
-use crate::args::{
-    ArgCheckResult, ArgCheckResultErr, ArgCheckResultOk, ArgInfo, ArgPrinter, IUnknownArgPrinter,
-};
+use crate::args::*;
 use std::fmt::{Debug, Formatter};
 use std::rc::Rc;
 use std::sync::Arc;
@@ -62,26 +60,26 @@ impl<T> Arg<T> {
             (&ArgPrinter(actual_value)).debug_string(),
         );
         match self {
-            Arg::Eq(expected_value) => {
-                if !actual_value.eq(expected_value) {
-                    return ArgCheckResult::Err(ArgCheckResultErr {
-                        arg_info,
-                        // error_msg: format!(
-                        //     "\t\tExpected: {expected_value:?}\n\t\tActual:   {actual_value:?}"
-                        // ),
-                        error_msg: format!("TODO - debug string"),
-                    });
-                }
-            }
-            Arg::NotEq(not_expected_value) => {
-                if actual_value.eq(not_expected_value) {
-                    return ArgCheckResult::Err(ArgCheckResultErr {
-                        arg_info,
-                        // error_msg: format!("\t\tDid not expect to be {not_expected_value:?}"),
-                        error_msg: format!("TODO - debug string"),
-                    });
-                }
-            }
+            // Arg::Eq(expected_value) => {
+            //     if !actual_value.eq(expected_value) {
+            //         return ArgCheckResult::Err(ArgCheckResultErr {
+            //             arg_info,
+            //             // error_msg: format!(
+            //             //     "\t\tExpected: {expected_value:?}\n\t\tActual:   {actual_value:?}"
+            //             // ),
+            //             error_msg: format!("TODO - debug string"),
+            //         });
+            //     }
+            // }
+            // Arg::NotEq(not_expected_value) => {
+            //     if actual_value.eq(not_expected_value) {
+            //         return ArgCheckResult::Err(ArgCheckResultErr {
+            //             arg_info,
+            //             // error_msg: format!("\t\tDid not expect to be {not_expected_value:?}"),
+            //             error_msg: format!("TODO - debug string"),
+            //         });
+            //     }
+            // }
             Arg::PrivateIs(predicate, _) => {
                 // let actual_value_str = format!("{:?}", actual_value);
                 let actual_value_str = format!("TODO - debug string");
@@ -95,6 +93,7 @@ impl<T> Arg<T> {
                 }
             }
             Arg::Any => (),
+            _ => panic!("TODO uncomment above"),
         };
         return ArgCheckResult::Ok(ArgCheckResultOk { arg_info });
     }

@@ -32,7 +32,7 @@ name = "dyn_data_generics"
 path = "bin/bin_dyn_data_generics.rs"
 
 [dependencies]
-rsubstitute_core = { workspace = true }
+rsubstitute_core = { workspace = true, features = ["debug_naming"] }
 rsubstitute_proc_macro = { workspace = true }
 typeid = { workspace = true }
 not_enough_asserts = { workspace = true }

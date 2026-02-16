@@ -7,11 +7,7 @@ use std::fmt::Debug;
 // }
 
 trait Trait<T1> {
-    fn work<T2: Clone, T3: Clone, const B: bool, const N: usize>(
-        &self,
-        t1: T1,
-        t2: T2,
-    ) -> T3;
+    fn work<T2: Clone, T3: Clone, const B: bool, const N: usize>(&self, t1: T1, t2: T2) -> T3;
 }
 #[cfg(test)]
 pub use __rsubstitute_generated_Trait::*;
@@ -27,39 +23,37 @@ mod __rsubstitute_generated_Trait {
     use std::hash::Hash;
     use std::marker::PhantomData;
 
-    #[derive(Clone, IGenericsHashKeyProvider, IArgInfosProvider)]
-    pub struct work_Call<
-        T1: Clone,
-        T2: Clone,
-        T3: Clone,
-        const B: bool,
-        const N: usize,
-    > {
+    #[derive(Clone, IGenericsHashKeyProvider)]
+    // #[derive(IArgInfosProvider)]
+    pub struct work_Call<T1: Clone, T2: Clone, T3: Clone, const B: bool, const N: usize> {
         t1: T1,
         t2: T2,
         _return_type: PhantomData<T3>,
     }
+    impl<T1: Clone, T2: Clone, T3: Clone, const B: bool, const N: usize> IArgInfosProvider
+        for work_Call<T1, T2, T3, B, N>
+    {
+        fn get_arg_infos(&self) -> Vec<ArgInfo> {
+            vec![
+                ArgInfo::new("t1", &self.t1, (&ArgPrinter(&self.t1)).debug_string()),
+                ArgInfo::new("t2", &self.t2, (&ArgPrinter(&self.t2)).debug_string()),
+                ArgInfo::new(
+                    "_return_type",
+                    &self._return_type,
+                    (&ArgPrinter(&self._return_type)).debug_string(),
+                ),
+            ]
+        }
+    }
 
     #[derive(Debug, IGenericsHashKeyProvider, IArgsFormatter)]
-    pub struct work_ArgsChecker<
-        T1: Clone,
-        T2: Clone,
-        T3: Clone,
-        const B: bool,
-        const N: usize,
-    > {
+    pub struct work_ArgsChecker<T1: Clone, T2: Clone, T3: Clone, const B: bool, const N: usize> {
         t1: Arg<T1>,
         t2: Arg<T2>,
         _return_type: PhantomData<T3>,
     }
-    impl<
-        'rs,
-        T1: Clone + 'rs,
-        T2: Clone + 'rs,
-        T3: Clone + 'rs,
-        const B: bool,
-        const N: usize,
-    > IArgsChecker<'rs> for work_ArgsChecker<T1, T2, T3, B, N>
+    impl<'rs, T1: Clone + 'rs, T2: Clone + 'rs, T3: Clone + 'rs, const B: bool, const N: usize>
+        IArgsChecker<'rs> for work_ArgsChecker<T1, T2, T3, B, N>
     {
         fn check(&self, dyn_call: &'rs Call<'rs>) -> Vec<ArgCheckResult> {
             let call: &work_Call<T1, T2, T3, B, N> = dyn_call.downcast_ref();
@@ -88,11 +82,7 @@ mod __rsubstitute_generated_Trait {
         data: Arc<TraitMockData<T1>>,
     }
     impl<T1: Clone> Trait<T1> for TraitMock<T1> {
-        fn work<T2: Clone, T3: Clone, const B: bool, const N: usize>(
-            &self,
-            t1: T1,
-            t2: T2,
-        ) -> T3 {
+        fn work<T2: Clone, T3: Clone, const B: bool, const N: usize>(&self, t1: T1, t2: T2) -> T3 {
             let call: work_Call<T1, T2, T3, B, N> = unsafe {
                 work_Call {
                     t1: std::mem::transmute(t1),
@@ -100,6 +90,7 @@ mod __rsubstitute_generated_Trait {
                     _return_type: PhantomData,
                 }
             };
+            dbg!(call.get_arg_infos());
             return self.data.work_data.handle_returning(Call::new(call));
         }
     }
