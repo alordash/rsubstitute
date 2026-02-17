@@ -5,21 +5,37 @@ use std::sync::Arc;
 
 struct Private;
 
+#[allow(private_interfaces)]
 pub enum Arg<T> {
     Any,
-    Eq(T),
-    NotEq(T),
-    // Private for cleaner API: just pass closure without having to box or reference it.
-    #[allow(private_interfaces)]
+    #[doc(hidden)]
+    PrivateEq(ArgCmp<T>, Private),
+    #[doc(hidden)]
+    PrivateNotEq(ArgCmp<T>, Private),
     #[doc(hidden)]
     // TODO - add ability to pass closure straight-away like in `mockiato`:
     // |arg| arg.partial_eq("Paul"), |arg| arg.any()
     PrivateIs(Box<dyn Fn(&T) -> bool>, Private),
 }
 
-impl<T> From<T> for Arg<T> {
+struct ArgCmp<T> {
+    value: T,
+    comparator: fn(&T, &T) -> bool,
+}
+
+impl<T> ArgCmp<T> {
+    pub fn is_arg_equal_to(&self, other: &T) -> bool {
+        (self.comparator)(&self.value, other)
+    }
+}
+
+impl<T: PartialEq> From<T> for Arg<T> {
     fn from(value: T) -> Self {
-        Self::Eq(value)
+        let arg_cmp = ArgCmp {
+            value,
+            comparator: PartialEq::eq,
+        };
+        return Self::PrivateEq(arg_cmp, Private);
     }
 }
 
@@ -30,22 +46,41 @@ impl<T: Debug> Debug for Arg<T> {
         let arg_type_name = std::any::type_name::<T>();
         match self {
             Arg::Any => write!(f, "({arg_type_name}): any"),
-            Arg::Eq(expected_value) => write!(f, "({arg_type_name}): equal to {expected_value:?}"),
-            Arg::NotEq(not_expected_value) => {
-                write!(f, "({arg_type_name}): NOT equal to {not_expected_value:?}")
+            Arg::PrivateEq(ArgCmp { value, .. }, _) => {
+                write!(f, "({arg_type_name}): equal to {value:?}")
+            }
+            Arg::PrivateNotEq(ArgCmp { value, .. }, _) => {
+                write!(f, "({arg_type_name}): NOT equal to {value:?}")
             }
             Arg::PrivateIs(_, _) => write!(f, "({arg_type_name}): custom predicate"),
         }
     }
 }
 
+// Beautify API ✨
 impl<T> Arg<T> {
-    #[allow(non_snake_case)] // beautify API ✨
+    #[allow(non_snake_case)]
     pub fn Is<'a, TFn: Fn(&T) -> bool + 'a>(predicate: TFn) -> Self {
         let reference = Box::new(predicate) as Box<dyn Fn(&T) -> bool + 'a>;
         let static_reference: Box<dyn Fn(&T) -> bool + 'static> =
             unsafe { std::mem::transmute(reference) };
         return Self::PrivateIs(static_reference, Private);
+    }
+
+    #[allow(non_snake_case)]
+    pub fn Eq(value: T) -> Self
+    where
+        T: PartialEq,
+    {
+        value.into()
+    }
+
+    #[allow(non_snake_case)]
+    pub fn NotEq(value: T) -> Self
+    where
+        T: PartialEq,
+    {
+        value.into()
     }
 }
 
@@ -60,29 +95,28 @@ impl<T> Arg<T> {
             (&ArgPrinter(actual_value)).debug_string(),
         );
         match self {
-            // Arg::Eq(expected_value) => {
-            //     if !actual_value.eq(expected_value) {
-            //         return ArgCheckResult::Err(ArgCheckResultErr {
-            //             arg_info,
-            //             // error_msg: format!(
-            //             //     "\t\tExpected: {expected_value:?}\n\t\tActual:   {actual_value:?}"
-            //             // ),
-            //             error_msg: format!("TODO - debug string"),
-            //         });
-            //     }
-            // }
-            // Arg::NotEq(not_expected_value) => {
-            //     if actual_value.eq(not_expected_value) {
-            //         return ArgCheckResult::Err(ArgCheckResultErr {
-            //             arg_info,
-            //             // error_msg: format!("\t\tDid not expect to be {not_expected_value:?}"),
-            //             error_msg: format!("TODO - debug string"),
-            //         });
-            //     }
-            // }
+            Arg::PrivateEq(arg_cmp, _) => {
+                if !arg_cmp.is_arg_equal_to(actual_value) {
+                    return ArgCheckResult::Err(ArgCheckResultErr {
+                        arg_info,
+                        // error_msg: format!(
+                        //     "\t\tExpected: {expected_value:?}\n\t\tActual:   {actual_value:?}"
+                        // ),
+                        error_msg: format!("TODO - debug string"),
+                    });
+                }
+            }
+            Arg::PrivateNotEq(arg_cmp, _) => {
+                if arg_cmp.is_arg_equal_to(actual_value) {
+                    return ArgCheckResult::Err(ArgCheckResultErr {
+                        arg_info,
+                        // error_msg: format!("\t\tDid not expect to be {not_expected_value:?}"),
+                        error_msg: format!("TODO - debug string"),
+                    });
+                }
+            }
             Arg::PrivateIs(predicate, _) => {
-                // let actual_value_str = format!("{:?}", actual_value);
-                let actual_value_str = format!("TODO - debug string");
+                let actual_value_str = (&ArgPrinter(&actual_value)).debug_string();
                 if !predicate(actual_value) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
@@ -93,7 +127,6 @@ impl<T> Arg<T> {
                 }
             }
             Arg::Any => (),
-            _ => panic!("TODO uncomment above"),
         };
         return ArgCheckResult::Ok(ArgCheckResultOk { arg_info });
     }
@@ -108,8 +141,8 @@ impl<'a, T: ?Sized> Arg<&'a T> {
         );
         let actual_ptr = std::ptr::from_ref(*actual_value);
         match self {
-            Arg::Eq(expected_value) => {
-                let expected_ptr = std::ptr::from_ref(*expected_value);
+            Arg::PrivateEq(arg_cmp, _) => {
+                let expected_ptr = std::ptr::from_ref(arg_cmp.value);
                 if !std::ptr::eq(actual_ptr, expected_ptr) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
@@ -120,8 +153,8 @@ impl<'a, T: ?Sized> Arg<&'a T> {
                     });
                 }
             }
-            Arg::NotEq(not_expected_value) => {
-                let not_expected_ptr = std::ptr::from_ref(*not_expected_value);
+            Arg::PrivateNotEq(arg_cmp, _) => {
+                let not_expected_ptr = std::ptr::from_ref(arg_cmp.value);
                 if std::ptr::eq(actual_ptr, not_expected_ptr) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
@@ -174,8 +207,8 @@ impl<'a, T: ?Sized> Arg<&'a mut T> {
         );
         let actual_ptr = std::ptr::from_ref(*actual_value);
         match self {
-            Arg::Eq(expected_value) => {
-                let expected_ptr = std::ptr::from_ref(*expected_value);
+            Arg::PrivateEq(arg_cmp, _) => {
+                let expected_ptr = std::ptr::from_ref(arg_cmp.value);
                 if !std::ptr::eq(actual_ptr, expected_ptr) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
@@ -186,8 +219,8 @@ impl<'a, T: ?Sized> Arg<&'a mut T> {
                     });
                 }
             }
-            Arg::NotEq(not_expected_value) => {
-                let not_expected_ptr = std::ptr::from_ref(*not_expected_value);
+            Arg::PrivateNotEq(arg_cmp, _) => {
+                let not_expected_ptr = std::ptr::from_ref(arg_cmp.value);
                 if std::ptr::eq(actual_ptr, not_expected_ptr) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
@@ -227,8 +260,8 @@ impl<T: ?Sized> Arg<Rc<T>> {
         );
         let actual_ptr = Rc::as_ptr(&actual_value);
         match self {
-            Arg::Eq(expected_value) => {
-                let expected_ptr = Rc::as_ptr(expected_value);
+            Arg::PrivateEq(arg_cmp, _) => {
+                let expected_ptr = Rc::as_ptr(&arg_cmp.value);
                 if !std::ptr::eq(actual_ptr, expected_ptr) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
@@ -239,8 +272,8 @@ impl<T: ?Sized> Arg<Rc<T>> {
                     });
                 }
             }
-            Arg::NotEq(not_expected_value) => {
-                let not_expected_ptr = Rc::as_ptr(not_expected_value);
+            Arg::PrivateNotEq(arg_cmp, _) => {
+                let not_expected_ptr = Rc::as_ptr(&arg_cmp.value);
                 if std::ptr::eq(actual_ptr, not_expected_ptr) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
@@ -281,8 +314,8 @@ impl<T: ?Sized> Arg<Arc<T>> {
         );
         let actual_ptr = Arc::as_ptr(&actual_value);
         match self {
-            Arg::Eq(expected_value) => {
-                let expected_ptr = Arc::as_ptr(expected_value);
+            Arg::PrivateEq(arg_cmp, _) => {
+                let expected_ptr = Arc::as_ptr(&arg_cmp.value);
                 if !std::ptr::eq(actual_ptr, expected_ptr) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
@@ -293,8 +326,8 @@ impl<T: ?Sized> Arg<Arc<T>> {
                     });
                 }
             }
-            Arg::NotEq(not_expected_value) => {
-                let not_expected_ptr = Arc::as_ptr(not_expected_value);
+            Arg::PrivateNotEq(arg_cmp, _) => {
+                let not_expected_ptr = Arc::as_ptr(&arg_cmp.value);
                 if std::ptr::eq(actual_ptr, not_expected_ptr) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,

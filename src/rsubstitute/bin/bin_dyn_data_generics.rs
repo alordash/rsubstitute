@@ -90,7 +90,7 @@ mod __rsubstitute_generated_Trait {
                     _return_type: PhantomData,
                 }
             };
-            dbg!(call.get_arg_infos());
+            // dbg!(call.get_arg_infos()); // TODO remove
             return self.data.work_data.handle_returning(Call::new(call));
         }
     }
@@ -152,6 +152,11 @@ mod __rsubstitute_generated_Trait {
     }
 }
 
+#[derive(Clone, Debug)]
+struct Foo {
+    amogus: f32,
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;
@@ -175,12 +180,15 @@ mod tests {
             .work::<_, _, false, 2>(10, "amogus")
             .returns(v3)
             .work::<_, _, false, 2>(10, "amogus")
-            .returns(v4);
+            .returns(v4)
+            .work::<Foo, _, false, 2>(23, Arg::Any)
+            .returns(22);
 
         let av3 = mock.work::<_, i32, false, 2>(10, "amogus");
         let av2 = mock.work::<_, i32, true, 4>(10, "amogus");
         let av1 = mock.work::<_, i32, true, 2>(10, "amogus");
         let av4 = mock.work::<_, [i32; 5], false, 2>(10, "amogus");
+        let av5 = mock.work::<_, i32, false, 2>(23, Foo { amogus: 53.2f32 });
 
         assert_eq!(v1, av1);
         assert_eq!(v2, av2);
@@ -197,6 +205,7 @@ mod tests {
             .work::<_, i32, true, 4>(11, "amogus", Times::Never)
             .work::<_, i32, false, 2>(10, "quo vadis", Times::Never)
             .work::<_, i32, true, 2>(10, true, Times::Never)
+            .work::<Foo, i32, false, 2>(23, Arg::Is(|_| false), Times::Once)
             .no_other_calls();
         // TODO - write const generic parameters in error logs
     }
