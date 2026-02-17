@@ -4,17 +4,19 @@ use std::marker::PhantomData;
 use std::sync::Arc;
 
 // TODO - rename to something like ReturnConfig to better reflect intended usage
-pub struct SharedFnConfig<'a, TMock, TReturnValue: IRawReturnValue<'a>, TOwner> {
+pub struct SharedFnConfig<'a, TCall, TMock, TReturnValue: IRawReturnValue<'a>, TOwner> {
+    _phantom_call: PhantomData<TCall>,
     _phantom_return_value: PhantomData<TReturnValue>,
-    fn_config: Arc<RefCell<FnConfig<'a, TMock>>>,
+    fn_config: Arc<RefCell<FnConfig<'a, TCall, TMock>>>,
     owner: &'a TOwner,
 }
 
-impl<'a, TMock, TReturnValue: IRawReturnValue<'a> + 'a, TOwner>
-    SharedFnConfig<'a, TMock, TReturnValue, TOwner>
+impl<'a, TCall, TMock, TReturnValue: IRawReturnValue<'a> + 'a, TOwner>
+    SharedFnConfig<'a, TCall, TMock, TReturnValue, TOwner>
 {
-    pub fn new(shared_fn_config: Arc<RefCell<FnConfig<'a, TMock>>>, owner: &'a TOwner) -> Self {
+    pub fn new(shared_fn_config: Arc<RefCell<FnConfig<'a, TCall, TMock>>>, owner: &'a TOwner) -> Self {
         Self {
+            _phantom_call: PhantomData,
             _phantom_return_value: PhantomData,
             fn_config: shared_fn_config,
             owner,
@@ -56,7 +58,7 @@ impl<'a, TMock, TReturnValue: IRawReturnValue<'a> + 'a, TOwner>
     }
 }
 
-impl<'a, TMock, TOwner> SharedFnConfig<'a, TMock, (), TOwner> {
+impl<'a, TCall, TMock, TOwner> SharedFnConfig<'a, TCall, TMock, (), TOwner> {
     pub fn does(&self, callback: impl FnMut() + 'static) -> &'a TOwner {
         self.fn_config.borrow_mut().set_callback(callback);
         return self.owner;
@@ -67,8 +69,8 @@ impl<'a, TMock, TOwner> SharedFnConfig<'a, TMock, (), TOwner> {
     }
 }
 
-impl<'a, TMock: IBaseCaller, TReturnValue: IRawReturnValue<'a>, TOwner>
-    SharedFnConfig<'a, TMock, TReturnValue, TOwner>
+impl<'a, TCall: 'a, TMock: IBaseCaller<'a, TCall>, TReturnValue: IRawReturnValue<'a>, TOwner>
+    SharedFnConfig<'a, TCall, TMock, TReturnValue, TOwner>
 {
     pub fn call_base(&self) -> &'a TOwner {
         self.fn_config.borrow_mut().set_call_base();

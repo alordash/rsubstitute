@@ -6,19 +6,22 @@ use crate::matching_config_search_result::*;
 use crate::*;
 use std::cell::RefCell;
 use std::collections::HashMap;
+use std::marker::PhantomData;
 use std::ops::Deref;
 use std::sync::Arc;
 
-pub struct FnData<'a, TMock> {
+pub struct FnData<'a, TCall, TMock> {
+    _phantom_call: PhantomData<TCall>,
     fn_name: &'static str,
     call_infos: RefCell<HashMap<GenericsHashKey, Vec<CallInfo<'a>>>>,
-    configs: RefCell<HashMap<GenericsHashKey, Vec<Arc<RefCell<FnConfig<'a, TMock>>>>>>,
+    configs: RefCell<HashMap<GenericsHashKey, Vec<Arc<RefCell<FnConfig<'a, TCall, TMock>>>>>>,
     error_printer: Arc<dyn IErrorPrinter>,
 }
 
-impl<'a, TMock> FnData<'a, TMock> {
+impl<'a, TCall, TMock> FnData<'a, TCall, TMock> {
     pub fn new(fn_name: &'static str, services: &ServiceCollection) -> Self {
         Self {
+            _phantom_call: PhantomData,
             fn_name,
             call_infos: RefCell::new(HashMap::new()),
             configs: RefCell::new(HashMap::new()),
@@ -31,7 +34,7 @@ impl<'a, TMock> FnData<'a, TMock> {
         self.configs.borrow_mut().clear();
     }
 
-    pub fn as_local<'b>(&self) -> &FnData<'b, TMock> {
+    pub fn as_local<'b>(&self) -> &FnData<'b, TCall, TMock> {
         // To allow storing lifetimes to local references.
         // TODO - write somewhere in README that it's ok because all local references in test method are 'static
         // because they live only during unit test method
@@ -39,7 +42,7 @@ impl<'a, TMock> FnData<'a, TMock> {
     }
 }
 
-impl<'a, TMock> FnData<'a, TMock> {
+impl<'a, TCall, TMock> FnData<'a, TCall, TMock> {
     pub fn register_call(&self, call: Call<'a>) -> &Self {
         let generics_hash_key = call.get_generics_hash_key();
         self.call_infos
@@ -53,7 +56,7 @@ impl<'a, TMock> FnData<'a, TMock> {
     pub fn add_config<TRawArgsChecker: IArgsChecker<'a> + 'a>(
         &self,
         raw_args_checker: TRawArgsChecker,
-    ) -> Arc<RefCell<FnConfig<'a, TMock>>> {
+    ) -> Arc<RefCell<FnConfig<'a, TCall, TMock>>> {
         let generics_hash_key = raw_args_checker.get_generics_hash_key();
         let args_checker = ArgsChecker::new(raw_args_checker);
         let config = FnConfig::new(args_checker);
@@ -188,7 +191,7 @@ impl<'a, TMock> FnData<'a, TMock> {
         });
     }
 
-    fn get_required_matching_config(&self, call: Call<'a>) -> Arc<RefCell<FnConfig<'a, TMock>>> {
+    fn get_required_matching_config(&self, call: Call<'a>) -> Arc<RefCell<FnConfig<'a, TCall, TMock>>> {
         let call_ref: &'a Call<'a> = unsafe { std::mem::transmute(&call) };
         let fn_config = match self.try_get_matching_config(call_ref) {
             MatchingConfigSearchResult::Ok(matching_config) => matching_config,
@@ -204,10 +207,9 @@ impl<'a, TMock> FnData<'a, TMock> {
     }
 }
 
-impl<'a, TMock: IBaseCaller> FnData<'a, TMock> {
-    pub fn handle_base(&self, mock: &TMock, call: Call<'a>) {
+impl<'a, TCall: 'a, TMock: IBaseCaller<'a, TCall>> FnData<'a, TCall, TMock> {
+    pub fn handle_base(&self, mock: &TMock, call: TCall) {
         // TODO - turn into method?
-        let call_ref: &'a Call<'a> = unsafe { std::mem::transmute(&call) };
         let maybe_fn_config = self.try_get_matching_config(call_ref);
         self.register_call(call.clone());
         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {

@@ -6,7 +6,8 @@ use std::collections::VecDeque;
 use std::marker::PhantomData;
 use std::sync::Arc;
 
-pub struct FnConfig<'a, TMock> {
+pub struct FnConfig<'a, TCall, TMock> {
+    _phantom_call: PhantomData<TCall>,
     _phantom_mock: PhantomData<TMock>,
     args_checker: ArgsChecker<'a>,
     current_return_value_index: Cell<usize>,
@@ -16,9 +17,10 @@ pub struct FnConfig<'a, TMock> {
     call_base: bool,
 }
 
-impl<'a, TMock> FnConfig<'a, TMock> {
+impl<'a, TCall, TMock> FnConfig<'a, TCall, TMock> {
     pub(crate) fn new(args_checker: ArgsChecker<'a>) -> Self {
         FnConfig {
+            _phantom_call: PhantomData,
             _phantom_mock: PhantomData,
             args_checker,
             current_return_value_index: Cell::new(0),
@@ -69,7 +71,7 @@ impl<'a, TMock> FnConfig<'a, TMock> {
     }
 }
 
-impl<'a, TMock: IBaseCaller> FnConfig<'a, TMock> {
+impl<'a, TCall: 'a, TMock: IBaseCaller<'a,  TCall>> FnConfig<'a, TCall, TMock> {
     pub(crate) fn set_call_base(&mut self) {
         self.call_base = true;
     }
