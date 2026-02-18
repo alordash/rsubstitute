@@ -7,7 +7,7 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::sync::Arc;
 
-pub struct FnData<TMock, TCall, TReturnType, TArgsChecker> {
+pub(crate) struct FnData<TMock, TCall, TReturnType, TArgsChecker> {
     fn_name: &'static str,
     call_infos: RefCell<HashMap<GenericsHashKey, Vec<CallCheck<TCall>>>>,
     configs: RefCell<
