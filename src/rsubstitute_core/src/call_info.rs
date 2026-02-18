@@ -1,20 +1,20 @@
-use crate::fn_parameters::Call;
 use std::cell::Cell;
+use std::sync::Arc;
 
-pub(crate) struct CallInfo<'a> {
+pub(crate) struct CallCheck<TCall> {
     verified: Cell<bool>,
-    call: Call<'a>,
+    call: Arc<TCall>,
 }
 
-impl<'a> CallInfo<'a> {
-    pub fn new(call: Call<'a>) -> Self {
+impl<TCall> CallCheck<TCall> {
+    pub fn new(call: Arc<TCall>) -> Self {
         Self {
             verified: Cell::new(false),
             call,
         }
     }
 
-    pub fn mark_as_verified(&'a self) {
+    pub fn mark_as_verified(&self) {
         self.verified.set(true);
     }
 
@@ -22,7 +22,7 @@ impl<'a> CallInfo<'a> {
         !self.verified.get()
     }
 
-    pub fn get_call(&'_ self) -> &Call<'a> {
+    pub fn get_call(&self) -> &TCall {
         &self.call
     }
 }

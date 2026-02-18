@@ -7,7 +7,7 @@ use std::fmt::Debug;
 // }
 
 trait Trait<T1> {
-    fn work<T2: Clone, T3: Clone, const B: bool, const N: usize>(&self, t1: T1, t2: T2) -> T3;
+    fn work<T2, T3: Clone, const B: bool, const N: usize>(&self, t1: T1, t2: T2) -> T3;
 }
 #[cfg(test)]
 pub use __rsubstitute_generated_Trait::*;
@@ -23,14 +23,14 @@ mod __rsubstitute_generated_Trait {
     use std::hash::Hash;
     use std::marker::PhantomData;
 
-    #[derive(Clone, IGenericsHashKeyProvider)]
+    #[derive(IGenericsHashKeyProvider)]
     // #[derive(IArgInfosProvider)]
-    pub struct work_Call<T1: Clone, T2: Clone, T3: Clone, const B: bool, const N: usize> {
+    pub struct work_Call<T1, T2, T3: Clone, const B: bool, const N: usize> {
         t1: T1,
         t2: T2,
         _return_type: PhantomData<T3>,
     }
-    impl<T1: Clone, T2: Clone, T3: Clone, const B: bool, const N: usize> IArgInfosProvider
+    impl<T1, T2, T3: Clone, const B: bool, const N: usize> IArgInfosProvider
         for work_Call<T1, T2, T3, B, N>
     {
         fn get_arg_infos(&self) -> Vec<ArgInfo> {
@@ -47,23 +47,23 @@ mod __rsubstitute_generated_Trait {
     }
 
     #[derive(Debug, IGenericsHashKeyProvider, IArgsFormatter)]
-    pub struct work_ArgsChecker<T1: Clone, T2: Clone, T3: Clone, const B: bool, const N: usize> {
+    pub struct work_ArgsChecker<T1, T2, T3: Clone, const B: bool, const N: usize> {
         t1: Arg<T1>,
         t2: Arg<T2>,
         _return_type: PhantomData<T3>,
     }
-    impl<'rs, T1: Clone + 'rs, T2: Clone + 'rs, T3: Clone + 'rs, const B: bool, const N: usize>
-        IArgsChecker<'rs> for work_ArgsChecker<T1, T2, T3, B, N>
+    impl<T1, T2, T3: Clone, const B: bool, const N: usize> IArgsChecker<work_Call<T1, T2, T3, B, N>>
+        for work_ArgsChecker<T1, T2, T3, B, N>
     {
-        fn check(&self, dyn_call: &'rs Call<'rs>) -> Vec<ArgCheckResult> {
-            let call: &work_Call<T1, T2, T3, B, N> = dyn_call.downcast_ref();
+        fn check(&self, call: &work_Call<T1, T2, T3, B, N>) -> Vec<ArgCheckResult> {
             vec![self.t1.check("t1", &call.t1), self.t2.check("t2", &call.t2)]
         }
     }
 
     #[derive(IMockData)]
     pub struct TraitMockData<T1> {
-        work_data: FnData<'static, TraitMock<T1>>,
+        _phantom_T1: PhantomData<T1>,
+        work_data: (), //FnData<'static, TraitMock<T1>>,
     }
 
     #[derive(Clone)]
@@ -81,8 +81,8 @@ mod __rsubstitute_generated_Trait {
         pub received: TraitMockReceived<T1>,
         data: Arc<TraitMockData<T1>>,
     }
-    impl<T1: Clone> Trait<T1> for TraitMock<T1> {
-        fn work<T2: Clone, T3: Clone, const B: bool, const N: usize>(&self, t1: T1, t2: T2) -> T3 {
+    impl<T1> Trait<T1> for TraitMock<T1> {
+        fn work<T2, T3: Clone, const B: bool, const N: usize>(&self, t1: T1, t2: T2) -> T3 {
             let call: work_Call<T1, T2, T3, B, N> = unsafe {
                 work_Call {
                     t1: std::mem::transmute(t1),
@@ -91,10 +91,10 @@ mod __rsubstitute_generated_Trait {
                 }
             };
             // dbg!(call.get_arg_infos()); // TODO remove
-            return self.data.work_data.handle_returning(Call::new(call));
+            return self.data.work_data.handle_returning(call);
         }
     }
-    impl<T1: Clone> TraitMock<T1> {
+    impl<T1> TraitMock<T1> {
         pub fn new() -> Self {
             let data = Arc::new(TraitMockData {
                 work_data: FnData::new("work", &SERVICES),
@@ -106,30 +106,30 @@ mod __rsubstitute_generated_Trait {
             };
         }
     }
-    impl<T1: Clone> TraitMockSetup<T1> {
-        pub fn work<
-            'rs,
-            T2: Clone + 'rs,
-            T3: Clone + Clone + 'rs,
-            const B: bool,
-            const N: usize,
-        >(
-            &'rs self,
+    impl<T1> TraitMockSetup<T1> {
+        pub fn work<T2, T3: Clone, const B: bool, const N: usize>(
+            &self,
             t1: impl Into<Arg<T1>>,
             t2: impl Into<Arg<T2>>,
-        ) -> SharedFnConfig<'rs, TraitMock<T1>, T3, Self> {
+        ) -> SharedFnConfig<
+            Self,
+            TraitMock<T1>,
+            work_Call<T1, T2, T3, B, N>,
+            T3,
+            work_ArgsChecker<T1, T2, T3, B, N>,
+        > {
             let work_args_checker: work_ArgsChecker<T1, T2, T3, B, N> = work_ArgsChecker {
                 t1: t1.into(),
                 t2: t2.into(),
                 _return_type: PhantomData,
             };
-            let fn_config = self.data.work_data.as_local().add_config(work_args_checker);
+            let fn_config = self.data.work_data.add_config(work_args_checker);
             let shared_fn_config = SharedFnConfig::new(fn_config, self);
             return shared_fn_config;
         }
     }
-    impl<T1: Clone> TraitMockReceived<T1> {
-        pub fn work<T2: Clone, T3: Clone, const B: bool, const N: usize>(
+    impl<T1> TraitMockReceived<T1> {
+        pub fn work<T2, T3: Clone, const B: bool, const N: usize>(
             self,
             t1: impl Into<Arg<T1>>,
             t2: impl Into<Arg<T2>>,
@@ -142,7 +142,6 @@ mod __rsubstitute_generated_Trait {
             };
             self.data
                 .work_data
-                .as_local()
                 .verify_received(work_args_checker, times);
             return self;
         }
