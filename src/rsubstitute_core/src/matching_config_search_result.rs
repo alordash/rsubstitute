@@ -1,5 +1,5 @@
-use crate::FnConfig;
 use crate::args::ArgCheckResult;
+use crate::mock_data::FnConfig;
 use std::cell::RefCell;
 use std::sync::Arc;
 

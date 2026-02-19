@@ -1,4 +1,5 @@
-use crate::{FnConfig, IBaseCaller};
+use crate::IBaseCaller;
+use crate::mock_data::FnConfig;
 use std::cell::RefCell;
 use std::sync::Arc;
 

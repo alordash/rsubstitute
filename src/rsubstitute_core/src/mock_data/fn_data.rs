@@ -150,6 +150,8 @@ where
 }
 
 pub(crate) use internal_api::*;
+use crate::mock_data::FnConfig;
+
 mod internal_api {
     use super::*;
 
