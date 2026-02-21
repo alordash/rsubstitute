@@ -22,6 +22,7 @@ mod __rsubstitute_generated_Trait {
     use std::fmt::Debug;
     use std::hash::Hash;
     use std::marker::PhantomData;
+    use rsubstitute_core::mock_data::{DynFnDataHolder, IIntoDynFnDataParam, SharedFnConfig};
 
     #[derive(IGenericsHashKeyProvider)]
     // #[derive(IArgInfosProvider)]
@@ -63,7 +64,7 @@ mod __rsubstitute_generated_Trait {
     #[derive(IMockData)]
     pub struct TraitMockData<T1> {
         _phantom_T1: PhantomData<T1>,
-        work_data: (), //FnData<'static, TraitMock<T1>>,
+        work_data: DynFnDataHolder,
     }
 
     #[derive(Clone)]
@@ -91,13 +92,14 @@ mod __rsubstitute_generated_Trait {
                 }
             };
             // dbg!(call.get_arg_infos()); // TODO remove
-            return self.data.work_data.handle_returning(call);
+            return self.data.work_data.handle_returning(call.upcast_into()).downcast_into();
         }
     }
     impl<T1> TraitMock<T1> {
         pub fn new() -> Self {
             let data = Arc::new(TraitMockData {
-                work_data: FnData::new("work", &SERVICES),
+                _phantom_T1: PhantomData,
+                work_data: DynFnDataHolder::new("work"),
             });
             return TraitMock {
                 setup: TraitMockSetup { data: data.clone() },
@@ -123,8 +125,8 @@ mod __rsubstitute_generated_Trait {
                 t2: t2.into(),
                 _return_type: PhantomData,
             };
-            let fn_config = self.data.work_data.add_config(work_args_checker);
-            let shared_fn_config = SharedFnConfig::new(fn_config, self);
+            let fn_config = self.data.work_data.add_config(work_args_checker.upcast_into());
+            let shared_fn_config = SharedFnConfig::new(fn_config.downcast_into(), self);
             return shared_fn_config;
         }
     }

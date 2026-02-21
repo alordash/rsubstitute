@@ -7,7 +7,7 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::sync::Arc;
 
-pub(crate) struct FnData<TMock, TCall, TReturnType, TArgsChecker> {
+pub struct FnData<TMock, TCall, TReturnType, TArgsChecker> {
     fn_name: &'static str,
     call_infos: RefCell<HashMap<GenericsHashKey, Vec<CallCheck<TCall>>>>,
     configs: RefCell<
@@ -23,6 +23,7 @@ impl<TMock, TCall, TReturnType, TArgsChecker> FnData<TMock, TCall, TReturnType, 
 where
     TCall: IGenericsHashKeyProvider + IArgInfosProvider,
     TArgsChecker: IArgsChecker<TCall>,
+    TReturnType: Clone,
 {
     pub fn new(fn_name: &'static str, services: &ServiceCollection) -> Self {
         Self {
@@ -64,6 +65,29 @@ where
         }
     }
 
+    pub fn get_unexpected_calls_error_msgs(&self) -> Vec<String> {
+        // TODO - turn next two lines into method?
+        let all_call_infos = self.call_infos.borrow();
+        let unexpected_call_infos: Vec<_> = all_call_infos
+            .values()
+            .flatten()
+            .filter(|x| x.is_not_verified())
+            .collect();
+        if unexpected_call_infos.is_empty() {
+            return Vec::new();
+        }
+        let unexpected_call_arg_infos = unexpected_call_infos
+            .into_iter()
+            .map(|x| {
+                self.error_printer.format_received_unexpected_call_error(
+                    self.fn_name,
+                    x.get_call().get_arg_infos(),
+                )
+            })
+            .collect();
+        return unexpected_call_arg_infos;
+    }
+
     pub fn handle(&self, the_call: TCall) {
         let call = Arc::new(the_call);
         let maybe_fn_config = self.try_get_matching_config(&call);
@@ -76,10 +100,7 @@ where
         }
     }
 
-    pub fn handle_returning(&self, the_call: TCall) -> TReturnType
-    where
-        TReturnType: Clone,
-    {
+    pub fn handle_returning(&self, the_call: TCall) -> TReturnType {
         let call = Arc::new(the_call);
         let fn_config = self.get_required_matching_config(&call);
         self.register_call(call.clone());
@@ -102,11 +123,9 @@ where
     TMock: IBaseCaller<TCall, TReturnType>,
     TCall: IGenericsHashKeyProvider + IArgInfosProvider + Clone,
     TArgsChecker: IArgsChecker<TCall>,
+    TReturnType: Clone,
 {
-    pub fn handle_base(&self, mock: &TMock, the_call: TCall)
-    where
-        TReturnType: Clone,
-    {
+    pub fn handle_base(&self, mock: &TMock, the_call: TCall) {
         let call_for_base_call = the_call.clone();
         let call = Arc::new(the_call);
         let maybe_fn_config = self.try_get_matching_config(&call);
@@ -123,10 +142,7 @@ where
         }
     }
 
-    pub fn handle_base_returning(&self, mock: &TMock, the_call: TCall) -> TReturnType
-    where
-        TReturnType: Clone,
-    {
+    pub fn handle_base_returning(&self, mock: &TMock, the_call: TCall) -> TReturnType {
         let call_for_base_call = the_call.clone();
         let call = Arc::new(the_call);
         let fn_config = self.get_required_matching_config(&call);
@@ -149,8 +165,8 @@ where
     }
 }
 
-pub(crate) use internal_api::*;
 use crate::mock_data::FnConfig;
+pub(crate) use internal_api::*;
 
 mod internal_api {
     use super::*;
@@ -173,29 +189,6 @@ mod internal_api {
                 .or_default()
                 .push(CallCheck::new(call));
             self
-        }
-
-        pub fn get_unexpected_calls_error_msgs(&self) -> Vec<String> {
-            // TODO - turn next two lines into method?
-            let all_call_infos = self.call_infos.borrow();
-            let unexpected_call_infos: Vec<_> = all_call_infos
-                .values()
-                .flatten()
-                .filter(|x| x.is_not_verified())
-                .collect();
-            if unexpected_call_infos.is_empty() {
-                return Vec::new();
-            }
-            let unexpected_call_arg_infos = unexpected_call_infos
-                .into_iter()
-                .map(|x| {
-                    self.error_printer.format_received_unexpected_call_error(
-                        self.fn_name,
-                        x.get_call().get_arg_infos(),
-                    )
-                })
-                .collect();
-            return unexpected_call_arg_infos;
         }
 
         pub fn get_matching_and_non_matching_calls(
