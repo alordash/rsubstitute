@@ -12,6 +12,7 @@ pub mod for_generated {
     pub use crate::*;
     pub use global_mocks_map::*;
     pub use macros::*;
+    pub use rsubstitute_core::mock_data::*;
     pub use rsubstitute_core::*;
     pub use std::cell::LazyCell;
     pub use std::cell::RefCell;
@@ -20,4 +21,5 @@ pub mod for_generated {
     pub use std::ops::Deref;
     pub use std::sync::Arc;
     pub use std::sync::LazyLock;
+    pub use std::fmt::Debug;
 }

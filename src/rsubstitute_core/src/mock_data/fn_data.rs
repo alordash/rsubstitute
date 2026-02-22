@@ -25,12 +25,12 @@ where
     TArgsChecker: IArgsChecker<TCall>,
     TReturnType: Clone,
 {
-    pub fn new(fn_name: &'static str, services: &ServiceCollection) -> Self {
+    pub fn new(fn_name: &'static str) -> Self {
         Self {
             fn_name,
             call_infos: RefCell::new(HashMap::new()),
             configs: RefCell::new(HashMap::new()),
-            error_printer: services.error_printer.clone(),
+            error_printer: SERVICES.error_printer.clone(),
         }
     }
 
