@@ -2,8 +2,8 @@
 
 pub mod args;
 pub mod mock_data;
+pub mod fn_parameters;
 
-mod call_info;
 mod config;
 mod di;
 mod error_printer;
@@ -14,7 +14,6 @@ mod matching_config_search_result;
 mod static_local_key;
 mod times;
 
-pub(crate) use call_info::*;
 pub use config::*;
 pub use generics_hash_key::*;
 pub use i_base_caller::*;

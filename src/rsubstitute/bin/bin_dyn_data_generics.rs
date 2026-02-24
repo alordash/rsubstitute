@@ -19,6 +19,7 @@ pub use __rsubstitute_generated_Trait::*;
 mod __rsubstitute_generated_Trait {
     use super::*;
     use rsubstitute::for_generated::*;
+    use rsubstitute_core::fn_parameters::DynCall;
     use std::fmt::Debug;
     use std::hash::Hash;
     use std::marker::PhantomData;
@@ -52,28 +53,24 @@ mod __rsubstitute_generated_Trait {
         t2: Arg<T2>,
         _return_type: PhantomData<T3>,
     }
-    impl<T1, T2, T3: Clone, const B: bool, const N: usize> IArgsChecker<work_Call<T1, T2, T3, B, N>>
+    impl<T1, T2, T3: Clone, const B: bool, const N: usize> IArgsChecker
         for work_ArgsChecker<T1, T2, T3, B, N>
     {
-        fn check(&self, call: &work_Call<T1, T2, T3, B, N>) -> Vec<ArgCheckResult> {
+        fn check(&self, dyn_call: &DynCall) -> Vec<ArgCheckResult> {
+            let call = dyn_call.downcast_ref();
             vec![self.t1.check("t1", &call.t1), self.t2.check("t2", &call.t2)]
         }
     }
 
     #[derive(IMockData)]
-    pub struct TraitMockData<T1, work_T2, work_T3: Clone, const work_B: bool, const work_N: usize> {
+    pub struct TraitMockData<'rs, T1> {
         _phantom_T1: PhantomData<T1>,
-        work_data: FnData<
-            TraitMock<T1, work_T2, work_T3, work_B, work_N>,
-            work_Call<T1, work_T2, work_T3, work_B, work_N>,
-            work_T3,
-            work_ArgsChecker<T1, work_T2, work_T3, work_B, work_N>,
-        >,
+        work_data: FnData<'rs, TraitMock<T1>>,
     }
 
     #[derive(Clone)]
-    pub struct TraitMockSetup<T1, work_T2, work_T3: Clone, const work_B: bool, const work_N: usize> {
-        data: Arc<TraitMockData<T1, work_T2, work_T3, work_B, work_N>>,
+    pub struct TraitMockSetup<'rs, T1> {
+        data: Arc<TraitMockData<'rs, T1>>,
     }
 
     #[derive(Clone)]
@@ -87,10 +84,10 @@ mod __rsubstitute_generated_Trait {
         data: Arc<TraitMockData<T1, work_T2, work_T3, work_B, work_N>>,
     }
     #[derive(Clone)]
-    pub struct TraitMock<T1, work_T2, work_T3: Clone, const work_B: bool, const work_N: usize> {
-        pub setup: TraitMockSetup<T1, work_T2, work_T3, work_B, work_N>,
-        pub received: TraitMockReceived<T1, work_T2, work_T3, work_B, work_N>,
-        data: Arc<TraitMockData<T1, work_T2, work_T3, work_B, work_N>>,
+    pub struct TraitMock<T1> {
+        pub setup: TraitMockSetup<T1>,
+        pub received: TraitMockReceived<T1>,
+        data: Arc<TraitMockData<T1>>,
     }
     impl<T1, work_T2, work_T3: Clone, const work_B: bool, const work_N: usize> Trait<T1>
         for TraitMock<T1, work_T2, work_T3, work_B, work_N>

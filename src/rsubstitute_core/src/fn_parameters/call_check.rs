@@ -1,13 +1,14 @@
 use std::cell::Cell;
 use std::sync::Arc;
+use crate::fn_parameters::DynCall;
 
-pub(crate) struct CallCheck<TCall> {
+pub(crate) struct CallCheck<'rs> {
     verified: Cell<bool>,
-    call: Arc<TCall>,
+    call: Arc<DynCall<'rs>>,
 }
 
-impl<TCall> CallCheck<TCall> {
-    pub fn new(call: Arc<TCall>) -> Self {
+impl<'rs> CallCheck<'rs> {
+    pub fn new(call: Arc<DynCall<'rs>>) -> Self {
         Self {
             verified: Cell::new(false),
             call,
@@ -22,7 +23,7 @@ impl<TCall> CallCheck<TCall> {
         !self.verified.get()
     }
 
-    pub fn get_call(&self) -> &TCall {
+    pub fn get_call(&self) -> &DynCall<'rs> {
         &self.call
     }
 }
