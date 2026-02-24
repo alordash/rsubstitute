@@ -23,8 +23,6 @@ impl<'rs> IGenericsHashKeyProvider for DynCall<'rs> {
     }
 }
 
-impl<'rs> ICall for DynCall<'rs> {}
-
 impl<'rs> DynCall<'rs> {
     pub fn new<T: ICall + 'rs>(value: T) -> Self {
         Self {

@@ -25,11 +25,12 @@ impl<'rs, TMock> FnData<'rs, TMock> {
         }
     }
 
-    pub fn add_config<TArgsChecker: IArgsChecker + 'rs>(
+    pub fn add_config<'a, TArgsChecker: IArgsChecker + 'a>(
         &self,
         args_checker: TArgsChecker,
-    ) -> Arc<RefCell<FnConfig<'rs, TMock>>> {
-        let dyn_args_checker = DynArgsChecker::new(args_checker);
+    ) -> Arc<RefCell<FnConfig<'a, TMock>>> {
+        let dyn_args_checker: DynArgsChecker<'rs> =
+            unsafe { std::mem::transmute(DynArgsChecker::new(args_checker)) };
         let generics_hash_key = dyn_args_checker.get_generics_hash_key();
         let config = FnConfig::new(dyn_args_checker);
         let shared_config = Arc::new(RefCell::new(config));
@@ -38,10 +39,10 @@ impl<'rs, TMock> FnData<'rs, TMock> {
             .entry(generics_hash_key)
             .or_default()
             .push(shared_config.clone());
-        return shared_config;
+        return unsafe { std::mem::transmute(shared_config) };
     }
 
-    pub fn verify_received<TArgsChecker: IArgsChecker + 'rs>(
+    pub fn verify_received<'a, TArgsChecker: IArgsChecker + 'a>(
         &self,
         args_checker: TArgsChecker,
         times: Times,
@@ -97,11 +98,8 @@ impl<'rs, TMock> FnData<'rs, TMock> {
         }
     }
 
-    pub fn handle_returning<TCall: ICall + 'rs, TReturnValue: IReturnValue<'rs> + 'rs>(
-        &self,
-        the_call: TCall,
-    ) -> TReturnValue {
-        let dyn_call = DynCall::new(the_call);
+    pub fn handle_returning<'a, TCall: ICall + 'a>(&self, the_call: TCall) -> DynReturnValue<'rs> {
+        let dyn_call: DynCall<'rs> = unsafe { std::mem::transmute(DynCall::new(the_call)) };
         let call = Arc::new(dyn_call);
         let fn_config = self.get_required_matching_config(&call);
         self.register_call(call.clone());
@@ -115,7 +113,7 @@ impl<'rs, TMock> FnData<'rs, TMock> {
             self.error_printer
                 .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
         };
-        return return_value.downcast_into();
+        return return_value;
     }
 }
 
