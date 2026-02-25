@@ -25,28 +25,28 @@ mod __rsubstitute_generated_Trait {
     use std::marker::PhantomData;
 
     #[derive(IGenericsHashKeyProvider)]
-    // #[derive(IArgInfosProvider)]
+    #[derive(IArgInfosProvider)]
     pub struct work_Call<'rs, T1, T2, T3: Clone, const B: bool, const N: usize> {
         _phantom_lifetime: PhantomData<&'rs ()>,
         _return_type: PhantomData<T3>,
         t1: T1,
         t2: &'rs T2,
     }
-    impl<'rs, T1, T2, T3: Clone, const B: bool, const N: usize> IArgInfosProvider
-        for work_Call<'rs, T1, T2, T3, B, N>
-    {
-        fn get_arg_infos(&self) -> Vec<ArgInfo> {
-            vec![
-                ArgInfo::new("t1", &self.t1, (&ArgPrinter(&self.t1)).debug_string()),
-                ArgInfo::new("t2", &self.t2, (&ArgPrinter(&self.t2)).debug_string()),
-                ArgInfo::new(
-                    "_return_type",
-                    &self._return_type,
-                    (&ArgPrinter(&self._return_type)).debug_string(),
-                ),
-            ]
-        }
-    }
+    // impl<'rs, T1, T2, T3: Clone, const B: bool, const N: usize> IArgInfosProvider
+    //     for work_Call<'rs, T1, T2, T3, B, N>
+    // {
+    //     fn get_arg_infos(&self) -> Vec<ArgInfo> {
+    //         vec![
+    //             ArgInfo::new("t1", &self.t1, (&ArgPrinter(&self.t1)).debug_string()),
+    //             ArgInfo::new("t2", &self.t2, (&ArgPrinter(&self.t2)).debug_string()),
+    //             ArgInfo::new(
+    //                 "_return_type",
+    //                 &self._return_type,
+    //                 (&ArgPrinter(&self._return_type)).debug_string(),
+    //             ),
+    //         ]
+    //     }
+    // }
 
     #[derive(Debug, IGenericsHashKeyProvider, IArgsFormatter)]
     pub struct work_ArgsChecker<'rs, T1, T2, T3: Clone, const B: bool, const N: usize> {
@@ -96,8 +96,7 @@ mod __rsubstitute_generated_Trait {
                 }
             };
             // dbg!(call.get_arg_infos()); // TODO remove
-            let return_value = self.data.work_data.handle_returning(call);
-            return return_value.downcast_into();
+            return  self.data.work_data.handle_returning(call).downcast_into();
         }
     }
     impl<'rs, T1> TraitMock<'rs, T1> {
@@ -191,6 +190,13 @@ mod tests {
         let av1 = mock.work::<_, i32, true, 2>(10, &"amogus");
         let av4 = mock.work::<_, [i32; 5], false, 2>(10, &"amogus");
         let av5 = mock.work::<_, i32, false, 2>(23, &Foo { amogus: 53.2f32 });
+
+        {
+            let q = 12;
+            let r = &q;
+            // TODO - forbid in via documentation!
+            mock.work::<_, i32, true, 2>(10, r);
+        }
 
         assert_eq!(v1, av1);
         assert_eq!(v2, av2);
