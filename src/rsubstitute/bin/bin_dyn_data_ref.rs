@@ -18,8 +18,6 @@ pub use __rsubstitute_generated_Trait::*;
 mod __rsubstitute_generated_Trait {
     use super::*;
     use rsubstitute::for_generated::*;
-    use rsubstitute_core::fn_parameters::DynCall;
-    use std::hash::Hash;
 
     #[derive(Clone, IGenericsHashKeyProvider, IArgInfosProvider)]
     pub struct work_Call<'rs, 'a> {

@@ -19,10 +19,6 @@ pub use __rsubstitute_generated_Trait::*;
 mod __rsubstitute_generated_Trait {
     use super::*;
     use rsubstitute::for_generated::*;
-    use rsubstitute_core::fn_parameters::DynCall;
-    use std::fmt::Debug;
-    use std::hash::Hash;
-    use std::marker::PhantomData;
 
     #[derive(IGenericsHashKeyProvider)]
     #[derive(IArgInfosProvider)]
@@ -32,21 +28,6 @@ mod __rsubstitute_generated_Trait {
         t1: T1,
         t2: &'rs T2,
     }
-    // impl<'rs, T1, T2, T3: Clone, const B: bool, const N: usize> IArgInfosProvider
-    //     for work_Call<'rs, T1, T2, T3, B, N>
-    // {
-    //     fn get_arg_infos(&self) -> Vec<ArgInfo> {
-    //         vec![
-    //             ArgInfo::new("t1", &self.t1, (&ArgPrinter(&self.t1)).debug_string()),
-    //             ArgInfo::new("t2", &self.t2, (&ArgPrinter(&self.t2)).debug_string()),
-    //             ArgInfo::new(
-    //                 "_return_type",
-    //                 &self._return_type,
-    //                 (&ArgPrinter(&self._return_type)).debug_string(),
-    //             ),
-    //         ]
-    //     }
-    // }
 
     #[derive(Debug, IGenericsHashKeyProvider, IArgsFormatter)]
     pub struct work_ArgsChecker<'rs, T1, T2, T3: Clone, const B: bool, const N: usize> {

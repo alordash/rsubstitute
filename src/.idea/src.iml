@@ -5,7 +5,7 @@
       <sourceFolder url="file://$MODULE_DIR$/rsubstitute_proc_macro/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/rsubstitute_core/src" isTestSource="false" />
       <sourceFolder url="file://$MODULE_DIR$/rsubstitute/src" isTestSource="false" />
-      <sourceFolder url="file://$MODULE_DIR$/rsubstitute/tests" isTestSource="true" />
+      <sourceFolder url="file://$MODULE_DIR$/rsubstitute/not_t1ests" isTestSource="true" />
       <excludeFolder url="file://$MODULE_DIR$/target" />
     </content>
     <orderEntry type="inheritedJdk" />
