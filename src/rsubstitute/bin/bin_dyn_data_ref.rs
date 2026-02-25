@@ -11,10 +11,9 @@ trait Trait {
 #[cfg(test)]
 pub use __rsubstitute_generated_Trait::*;
 #[cfg(test)]
-#[allow(dead_code)]
-#[allow(unused)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
+#[allow(mismatched_lifetime_syntaxes)]
 mod __rsubstitute_generated_Trait {
     use super::*;
     use rsubstitute::for_generated::*;
@@ -65,7 +64,7 @@ mod __rsubstitute_generated_Trait {
                     v: std::mem::transmute(v),
                 }
             };
-            return self.data.work_data.handle_returning(call).downcast_into();
+            return self.data.work_data.handle_returning(call);
         }
     }
     impl<'rs> TraitMock<'rs> {

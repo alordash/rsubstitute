@@ -11,10 +11,9 @@ trait Trait {
 #[cfg(test)]
 pub use __rsubstitute_generated_Trait::*;
 #[cfg(test)]
-#[allow(dead_code)]
-#[allow(unused)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
+#[allow(mismatched_lifetime_syntaxes)]
 mod __rsubstitute_generated_Trait {
     use super::*;
     use rsubstitute::for_generated::*;
@@ -61,16 +60,17 @@ mod __rsubstitute_generated_Trait {
         fn work(&self, v: i32) -> i32 {
             let call = unsafe {
                 work_Call {
+                    _phantom_lifetime: PhantomData,
                     v: std::mem::transmute(v),
                 }
             };
-            return self.data.work_data.handle_returning(Call::new(call));
+            return self.data.work_data.handle_returning(call);
         }
     }
-    impl TraitMock {
+    impl<'rs> TraitMock<'rs> {
         pub fn new() -> Self {
             let data = Arc::new(TraitMockData {
-                work_data: FnData::new("work", &SERVICES),
+                work_data: FnData::new("work"),
             });
             return TraitMock {
                 setup: TraitMockSetup { data: data.clone() },
@@ -79,23 +79,25 @@ mod __rsubstitute_generated_Trait {
             };
         }
     }
-    impl TraitMockSetup {
-        pub fn work<'rs>(
-            &'rs self,
-            v: impl Into<Arg<i32>>,
-        ) -> SharedFnConfig<'rs, TraitMock, i32, Self> {
-            let work_args_checker = work_ArgsChecker { v: v.into() };
-            let fn_config = self.data.work_data.as_local().add_config(work_args_checker);
-            let shared_fn_config = SharedFnConfig::new(fn_config, self);
-            return shared_fn_config;
+    impl<'rs> TraitMockSetup<'rs> {
+        pub fn work(&self, v: impl Into<Arg<i32>>) -> SharedFnConfig<'rs, Self, TraitMock, i32> {
+            let work_args_checker = work_ArgsChecker {
+                _phantom_lifetime: PhantomData,
+                v: v.into(),
+            };
+            let shared_fn_config: SharedFnConfig<'_, _, _, i32> =
+                self.data.work_data.add_config(work_args_checker, self);
+            return unsafe { std::mem::transmute(shared_fn_config) };
         }
     }
-    impl TraitMockReceived {
+    impl<'rs> TraitMockReceived<'rs> {
         pub fn work(self, v: impl Into<Arg<i32>>, times: Times) -> Self {
-            let work_args_checker = work_ArgsChecker { v: v.into() };
+            let work_args_checker = work_ArgsChecker {
+                _phantom_lifetime: PhantomData,
+                v: v.into(),
+            };
             self.data
                 .work_data
-                .as_local()
                 .verify_received(work_args_checker, times);
             return self;
         }

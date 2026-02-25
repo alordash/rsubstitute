@@ -12,16 +12,14 @@ trait Trait<T1> {
 #[cfg(test)]
 pub use __rsubstitute_generated_Trait::*;
 #[cfg(test)]
-#[allow(dead_code)]
-#[allow(unused)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
+#[allow(mismatched_lifetime_syntaxes)]
 mod __rsubstitute_generated_Trait {
     use super::*;
     use rsubstitute::for_generated::*;
 
-    #[derive(IGenericsHashKeyProvider)]
-    #[derive(IArgInfosProvider)]
+    #[derive(IGenericsHashKeyProvider, IArgInfosProvider)]
     pub struct work_Call<'rs, T1, T2, T3: Clone, const B: bool, const N: usize> {
         _phantom_lifetime: PhantomData<&'rs ()>,
         _return_type: PhantomData<T3>,
@@ -77,7 +75,7 @@ mod __rsubstitute_generated_Trait {
                 }
             };
             // dbg!(call.get_arg_infos()); // TODO remove
-            return  self.data.work_data.handle_returning(call).downcast_into();
+            return self.data.work_data.handle_returning(call);
         }
     }
     impl<'rs, T1> TraitMock<'rs, T1> {
@@ -172,12 +170,12 @@ mod tests {
         let av4 = mock.work::<_, [i32; 5], false, 2>(10, &"amogus");
         let av5 = mock.work::<_, i32, false, 2>(23, &Foo { amogus: 53.2f32 });
 
-        {
-            let q = 12;
-            let r = &q;
-            // TODO - forbid in via documentation!
-            mock.work::<_, i32, true, 2>(10, r);
-        }
+        // {
+        //     let q = 12;
+        //     let r = &q;
+        //     // TODO - forbid in via documentation!
+        //     mock.work::<_, i32, true, 2>(10, r);
+        // }
 
         assert_eq!(v1, av1);
         assert_eq!(v2, av2);

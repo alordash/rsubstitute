@@ -100,7 +100,10 @@ impl<'rs, TMock> FnData<'rs, TMock> {
         }
     }
 
-    pub fn handle_returning<'a, TCall: ICall + 'a>(&self, the_call: TCall) -> DynReturnValue<'rs> {
+    pub fn handle_returning<'a, 'b, TCall: ICall + 'a, TReturnValue: IReturnValue<'b>>(
+        &self,
+        the_call: TCall,
+    ) -> TReturnValue {
         let dyn_call: DynCall<'rs> = unsafe { std::mem::transmute(DynCall::new(the_call)) };
         let call = Arc::new(dyn_call);
         let fn_config = self.get_required_matching_config(&call);
@@ -115,7 +118,7 @@ impl<'rs, TMock> FnData<'rs, TMock> {
             self.error_printer
                 .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
         };
-        return return_value;
+        return return_value.downcast_into();
     }
 }
 
