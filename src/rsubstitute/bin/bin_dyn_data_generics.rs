@@ -7,7 +7,7 @@ use std::fmt::Debug;
 // }
 
 trait Trait<T1> {
-    fn work<T2, T3: Clone, const B: bool, const N: usize>(&self, t1: T1, t2: T2) -> T3;
+    fn work<T2, T3: Clone, const B: bool, const N: usize>(&self, t1: T1, t2: &T2) -> T3;
 }
 #[cfg(test)]
 pub use __rsubstitute_generated_Trait::*;
@@ -26,13 +26,14 @@ mod __rsubstitute_generated_Trait {
 
     #[derive(IGenericsHashKeyProvider)]
     // #[derive(IArgInfosProvider)]
-    pub struct work_Call<T1, T2, T3: Clone, const B: bool, const N: usize> {
-        t1: T1,
-        t2: T2,
+    pub struct work_Call<'rs, T1, T2, T3: Clone, const B: bool, const N: usize> {
+        _phantom_lifetime: PhantomData<&'rs ()>,
         _return_type: PhantomData<T3>,
+        t1: T1,
+        t2: &'rs T2,
     }
-    impl<T1, T2, T3: Clone, const B: bool, const N: usize> IArgInfosProvider
-        for work_Call<T1, T2, T3, B, N>
+    impl<'rs, T1, T2, T3: Clone, const B: bool, const N: usize> IArgInfosProvider
+        for work_Call<'rs, T1, T2, T3, B, N>
     {
         fn get_arg_infos(&self) -> Vec<ArgInfo> {
             vec![
@@ -48,13 +49,14 @@ mod __rsubstitute_generated_Trait {
     }
 
     #[derive(Debug, IGenericsHashKeyProvider, IArgsFormatter)]
-    pub struct work_ArgsChecker<T1, T2, T3: Clone, const B: bool, const N: usize> {
-        t1: Arg<T1>,
-        t2: Arg<T2>,
+    pub struct work_ArgsChecker<'rs, T1, T2, T3: Clone, const B: bool, const N: usize> {
+        _phantom_lifetime: PhantomData<&'rs ()>,
         _return_type: PhantomData<T3>,
+        t1: Arg<T1>,
+        t2: Arg<&'rs T2>,
     }
-    impl<T1, T2, T3: Clone, const B: bool, const N: usize> IArgsChecker
-        for work_ArgsChecker<T1, T2, T3, B, N>
+    impl<'rs, T1, T2, T3: Clone, const B: bool, const N: usize> IArgsChecker
+        for work_ArgsChecker<'rs, T1, T2, T3, B, N>
     {
         fn check(&self, dyn_call: &DynCall) -> Vec<ArgCheckResult> {
             let call: &work_Call<T1, T2, T3, B, N> = dyn_call.downcast_ref();
@@ -84,12 +86,13 @@ mod __rsubstitute_generated_Trait {
         data: Arc<TraitMockData<'rs, T1>>,
     }
     impl<'rs, T1> Trait<T1> for TraitMock<'rs, T1> {
-        fn work<T2, T3: Clone, const B: bool, const N: usize>(&self, t1: T1, t2: T2) -> T3 {
+        fn work<T2, T3: Clone, const B: bool, const N: usize>(&self, t1: T1, t2: &T2) -> T3 {
             let call: work_Call<T1, T2, T3, B, N> = unsafe {
                 work_Call {
+                    _phantom_lifetime: PhantomData,
+                    _return_type: PhantomData,
                     t1: std::mem::transmute(t1),
                     t2: std::mem::transmute(t2),
-                    _return_type: PhantomData,
                 }
             };
             // dbg!(call.get_arg_infos()); // TODO remove
@@ -111,15 +114,16 @@ mod __rsubstitute_generated_Trait {
         }
     }
     impl<'rs, T1> TraitMockSetup<'rs, T1> {
-        pub fn work<T2, T3: Clone, const B: bool, const N: usize>(
+        pub fn work<T2: 'rs, T3: Clone, const B: bool, const N: usize>(
             &self,
             t1: impl Into<Arg<T1>>,
-            t2: impl Into<Arg<T2>>,
+            t2: impl Into<Arg<&'rs T2>>,
         ) -> SharedFnConfig<'rs, Self, TraitMock<'rs, T1>, T3> {
             let work_args_checker: work_ArgsChecker<T1, T2, T3, B, N> = work_ArgsChecker {
+                _phantom_lifetime: PhantomData,
+                _return_type: PhantomData,
                 t1: t1.into(),
                 t2: t2.into(),
-                _return_type: PhantomData,
             };
             let shared_fn_config: SharedFnConfig<'_, _, _, T3> =
                 self.data.work_data.add_config(work_args_checker, self);
@@ -127,16 +131,17 @@ mod __rsubstitute_generated_Trait {
         }
     }
     impl<'rs, T1> TraitMockReceived<'rs, T1> {
-        pub fn work<T2, T3: Clone, const B: bool, const N: usize>(
+        pub fn work<T2: 'rs, T3: Clone, const B: bool, const N: usize>(
             self,
             t1: impl Into<Arg<T1>>,
-            t2: impl Into<Arg<T2>>,
+            t2: impl Into<Arg<&'rs T2>>,
             times: Times,
         ) -> Self {
             let work_args_checker: work_ArgsChecker<T1, T2, T3, B, N> = work_ArgsChecker {
+                _phantom_lifetime: PhantomData,
+                _return_type: PhantomData,
                 t1: t1.into(),
                 t2: t2.into(),
-                _return_type: PhantomData,
             };
             self.data
                 .work_data
@@ -170,22 +175,22 @@ mod tests {
         let v4 = [10; 5];
 
         mock.setup
-            .work::<_, _, true, 2>(10, "amogus")
+            .work::<_, _, true, 2>(10, &"amogus")
             .returns(v1)
-            .work::<_, _, true, 4>(10, "amogus")
+            .work::<_, _, true, 4>(10, &"amogus")
             .returns(v2)
-            .work::<_, _, false, 2>(10, "amogus")
+            .work::<_, _, false, 2>(10, &"amogus")
             .returns(v3)
-            .work::<_, _, false, 2>(10, "amogus")
+            .work::<_, _, false, 2>(10, &"amogus")
             .returns(v4)
             .work::<Foo, _, false, 2>(23, Arg::Any)
             .returns(22);
 
-        let av3 = mock.work::<_, i32, false, 2>(10, "amogus");
-        let av2 = mock.work::<_, i32, true, 4>(10, "amogus");
-        let av1 = mock.work::<_, i32, true, 2>(10, "amogus");
-        let av4 = mock.work::<_, [i32; 5], false, 2>(10, "amogus");
-        let av5 = mock.work::<_, i32, false, 2>(23, Foo { amogus: 53.2f32 });
+        let av3 = mock.work::<_, i32, false, 2>(10, &"amogus");
+        let av2 = mock.work::<_, i32, true, 4>(10, &"amogus");
+        let av1 = mock.work::<_, i32, true, 2>(10, &"amogus");
+        let av4 = mock.work::<_, [i32; 5], false, 2>(10, &"amogus");
+        let av5 = mock.work::<_, i32, false, 2>(23, &Foo { amogus: 53.2f32 });
 
         assert_eq!(v1, av1);
         assert_eq!(v2, av2);
@@ -193,16 +198,20 @@ mod tests {
         assert_eq!(v4, av4);
 
         mock.received
-            .work::<_, i32, true, 2>(10, "amogus", Times::Once)
-            .work::<_, i32, true, 4>(10, "amogus", Times::Once)
-            .work::<_, i32, false, 2>(10, "amogus", Times::Once)
-            .work::<_, [i32; 5], false, 2>(10, "amogus", Times::Once)
+            .work::<_, i32, true, 2>(10, &"amogus", Times::Once)
+            .work::<_, i32, true, 4>(10, &"amogus", Times::Once)
+            .work::<_, i32, false, 2>(10, &"amogus", Times::Once)
+            .work::<_, [i32; 5], false, 2>(10, &"amogus", Times::Once)
             // TODO - mock.received - value used after move
-            .work::<_, i32, true, 2>(10, "quo vadis", Times::Never)
-            .work::<_, i32, true, 4>(11, "amogus", Times::Never)
-            .work::<_, i32, false, 2>(10, "quo vadis", Times::Never)
-            .work::<_, i32, true, 2>(10, true, Times::Never)
-            .work::<Foo, i32, false, 2>(23, Arg::Is(|foo: &Foo| foo.amogus == 53.2f32), Times::Once)
+            .work::<_, i32, true, 2>(10, &"quo vadis", Times::Never)
+            .work::<_, i32, true, 4>(11, &"amogus", Times::Never)
+            .work::<_, i32, false, 2>(10, &"quo vadis", Times::Never)
+            .work::<_, i32, true, 2>(10, &true, Times::Never)
+            .work::<Foo, i32, false, 2>(
+                23,
+                Arg::Is(|foo: &&Foo| foo.amogus == 53.2f32),
+                Times::Once,
+            )
             .no_other_calls();
         // TODO - write const generic parameters in error logs
     }
