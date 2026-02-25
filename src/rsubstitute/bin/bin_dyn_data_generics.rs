@@ -115,14 +115,14 @@ mod __rsubstitute_generated_Trait {
             &self,
             t1: impl Into<Arg<T1>>,
             t2: impl Into<Arg<T2>>,
-        ) -> SharedFnConfig<'rs, Self, TraitMock<'rs, T1>> {
+        ) -> SharedFnConfig<'rs, Self, TraitMock<'rs, T1>, T3> {
             let work_args_checker: work_ArgsChecker<T1, T2, T3, B, N> = work_ArgsChecker {
                 t1: t1.into(),
                 t2: t2.into(),
                 _return_type: PhantomData,
             };
-            let fn_config = self.data.work_data.add_config(work_args_checker);
-            let shared_fn_config = SharedFnConfig::new(fn_config, self);
+            let shared_fn_config: SharedFnConfig<'_, _, _, T3> =
+                self.data.work_data.add_config(work_args_checker, self);
             return unsafe { std::mem::transmute(shared_fn_config) };
         }
     }
@@ -202,7 +202,7 @@ mod tests {
             .work::<_, i32, true, 4>(11, "amogus", Times::Never)
             .work::<_, i32, false, 2>(10, "quo vadis", Times::Never)
             .work::<_, i32, true, 2>(10, true, Times::Never)
-            .work::<Foo, i32, false, 2>(23, Arg::Is(|_| false), Times::Once)
+            .work::<Foo, i32, false, 2>(23, Arg::Is(|foo: &Foo| foo.amogus == 53.2f32), Times::Once)
             .no_other_calls();
         // TODO - write const generic parameters in error logs
     }
