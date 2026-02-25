@@ -19,10 +19,10 @@ impl<'rs> DynReturnValue<'rs> {
     }
 }
 
-impl<'rs> Clone for DynReturnValue<'rs> {
-    fn clone(&self) -> Self {
-        Self {
-            inner: self.inner.clone_box(),
-        }
-    }
-}
+// impl<'rs> Clone for DynReturnValue<'rs> {
+//     fn clone(&self) -> Self {
+//         Self {
+//             inner: self.inner.clone_box(),
+//         }
+//     }
+// }

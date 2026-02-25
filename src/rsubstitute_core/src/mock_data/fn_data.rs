@@ -218,7 +218,7 @@ mod internal_api {
                 return MatchingConfigSearchResult::Err(MatchingConfigSearchErr::empty());
             };
             let mut args_check_results = Vec::with_capacity(matching_configs.len());
-            for config in matching_configs.iter().rev() {
+            for config in matching_configs.iter() {
                 let args_check_result = config.borrow().check_call(dyn_call);
                 if args_check_result.iter().all(|x| x.is_ok()) {
                     return MatchingConfigSearchResult::Ok(config.clone());

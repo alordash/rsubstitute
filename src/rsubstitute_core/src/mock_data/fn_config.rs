@@ -11,8 +11,7 @@ use std::sync::Arc;
 pub struct FnConfig<'rs, TMock> {
     _phantom_mock: PhantomData<TMock>,
     args_checker: DynArgsChecker<'rs>,
-    current_return_value_index: usize,
-    return_values: VecDeque<DynReturnValue<'rs>>,
+    return_value_sources: VecDeque<ReturnValueSource<'rs>>,
     calls: Vec<Arc<DynCall<'rs>>>,
     callback: Option<Arc<RefCell<dyn FnMut()>>>,
     call_base: bool,
@@ -23,23 +22,22 @@ impl<'rs, TMock> FnConfig<'rs, TMock> {
         FnConfig {
             _phantom_mock: PhantomData,
             args_checker,
-            current_return_value_index: 0,
-            return_values: VecDeque::new(),
+            return_value_sources: VecDeque::new(),
             calls: Vec::new(),
             callback: None,
             call_base: false,
         }
     }
 
-    pub(crate) fn add_return_value(&mut self, return_value: DynReturnValue<'rs>) {
-        self.return_values.push_back(return_value);
+    pub(crate) fn add_return_value_source(&mut self, return_value: ReturnValueSource<'rs>) {
+        self.return_value_sources.push_back(return_value);
     }
 
-    pub(crate) fn add_return_values<const N: usize>(
+    pub(crate) fn add_return_value_sources(
         &mut self,
-        return_values: [DynReturnValue<'rs>; N],
+        return_values: impl IntoIterator<Item = ReturnValueSource<'rs>>,
     ) {
-        self.return_values.extend(return_values.into_iter());
+        self.return_value_sources.extend(return_values.into_iter());
     }
 
     pub(crate) fn set_callback(&mut self, callback: impl FnMut() + 'static) {
@@ -55,16 +53,23 @@ impl<'rs, TMock> FnConfig<'rs, TMock> {
     }
 
     pub(crate) fn select_next_return_value(&mut self) -> Option<DynReturnValue<'rs>> {
-        let return_value = self
-            .return_values
-            .get(self.current_return_value_index)
-            .map(|dyn_return_value| dyn_return_value.clone());
-        if return_value.is_some() {
-            let new_current_return_value_index =
-                (self.current_return_value_index + 1).min(self.return_values.len() - 1);
-            self.current_return_value_index = new_current_return_value_index;
-        }
-        return return_value;
+        let Some(return_value_source) = self.return_value_sources.front() else {return None;};
+        return match return_value_source {
+            ReturnValueSource::SingleTime(_) => {
+                let Some(ReturnValueSource::SingleTime(return_value)) =
+                    self.return_value_sources.pop_front()
+                else {
+                    panic!(
+                        "Front return value source must be single time because it was just checked."
+                    )
+                };
+                Some(return_value)
+            },
+            ReturnValueSource::Perpetual(return_value_factory) => {
+                let return_value = return_value_factory();
+                Some(return_value)
+            }
+        };
     }
 
     pub(crate) fn get_callback(&self) -> Option<Arc<RefCell<dyn FnMut()>>> {
@@ -88,7 +93,7 @@ impl<'rs, TMock> FnConfig<'rs, TMock> {
 //     pub(crate) fn set_call_base(&mut self) {
 //         self.call_base = true;
 //     }
-// 
+//
 //     pub(crate) fn should_call_base(&self) -> bool {
 //         self.call_base
 //     }

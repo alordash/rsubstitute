@@ -26,21 +26,40 @@ impl<'rs, TOwner, TMock, TReturnValue> SharedFnConfig<'rs, TOwner, TMock, TRetur
         TReturnValue: IReturnValue<'a> + 'a,
     {
         let dyn_return_value = unsafe { std::mem::transmute(DynReturnValue::new(return_value)) };
+        let return_value_source = ReturnValueSource::SingleTime(dyn_return_value);
         self.fn_config
             .borrow_mut()
-            .add_return_value(dyn_return_value);
+            .add_return_value_source(return_value_source);
         return self.owner;
     }
 
-    pub fn returns_many<'a, const N: usize>(&self, return_values: [TReturnValue; N]) -> &'rs TOwner
+    pub fn returns_many<'a>(
+        &self,
+        return_values: impl IntoIterator<Item = TReturnValue>,
+    ) -> &'rs TOwner
     where
         TReturnValue: IReturnValue<'a> + 'a,
     {
-        let dyn_return_values =
-            return_values.map(|x| unsafe { std::mem::transmute(DynReturnValue::new(x)) });
+        let return_value_sources = return_values
+            .into_iter()
+            .map(|x| unsafe { std::mem::transmute(DynReturnValue::new(x)) })
+            .map(ReturnValueSource::SingleTime);
         self.fn_config
             .borrow_mut()
-            .add_return_values(dyn_return_values);
+            .add_return_value_sources(return_value_sources);
+        return self.owner;
+    }
+
+    pub fn returns_always<'a>(&self, return_value: TReturnValue) -> &'rs TOwner
+    where
+        TReturnValue: 'rs + 'a + IReturnValue<'a> + Clone,
+    {
+        let return_value_source = ReturnValueSource::Perpetual(Box::new(move || unsafe {
+            std::mem::transmute(DynReturnValue::new(return_value.clone()))
+        }));
+        self.fn_config
+            .borrow_mut()
+            .add_return_value_source(return_value_source);
         return self.owner;
     }
 
@@ -57,15 +76,28 @@ impl<'rs, TOwner, TMock, TReturnValue> SharedFnConfig<'rs, TOwner, TMock, TRetur
         return self.owner;
     }
 
-    pub fn returns_many_and_does<'a, const N: usize>(
+    pub fn returns_many_and_does<'a>(
         &self,
-        return_values: [TReturnValue; N],
+        return_values: impl IntoIterator<Item = TReturnValue>,
         callback: impl FnMut() + 'static,
     ) -> &'rs TOwner
     where
         TReturnValue: IReturnValue<'a> + 'a,
     {
         self.returns_many(return_values);
+        self.fn_config.borrow_mut().set_callback(callback);
+        return self.owner;
+    }
+
+    pub fn returns_always_and_does<'a>(
+        &self,
+        return_value: TReturnValue,
+        callback: impl FnMut() + 'static,
+    ) -> &'rs TOwner
+    where
+        TReturnValue: 'rs + 'a + IReturnValue<'a> + Clone,
+    {
+        self.returns_always(return_value);
         self.fn_config.borrow_mut().set_callback(callback);
         return self.owner;
     }
