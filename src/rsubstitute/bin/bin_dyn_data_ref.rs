@@ -1,13 +1,10 @@
 use rsubstitute::macros::*;
 
 // #[mock]
-// trait Trait {
-//     fn work<'a>(&self, v: &'a i32) -> &'a i32;
-// }
-
 trait Trait {
     fn work<'a>(&self, v: &'a i32) -> &'a i32;
 }
+
 #[cfg(test)]
 pub use __rsubstitute_generated_Trait::*;
 #[cfg(test)]
@@ -26,7 +23,7 @@ mod __rsubstitute_generated_Trait {
     }
     impl<'rs, 'a> IArgsTupleProvider for work_Call<'rs, 'a> {
         fn provide_ptr_to_tuple_of_refs(&self) -> *const () {
-            std::ptr::from_ref(&(&self.v)) as *const ()
+            core::ptr::from_ref(&(&self.v)) as *const ()
         }
     }
 
@@ -90,12 +87,12 @@ mod __rsubstitute_generated_Trait {
             // Notice: 'a: 'rs only in setup, not needed in received
             &self,
             v: impl Into<Arg<&'a i32>>,
-        ) -> FnTuner<'rs, Self, &(&'a i32), &'a i32> {
+        ) -> FnTuner<'rs, Self, &(&'a i32), &'a i32, false> {
             let work_args_checker = work_ArgsChecker {
                 _phantom_lifetime: PhantomData,
                 v: v.into(),
             };
-            let fn_tuner: FnTuner<'_, _, &(&'a i32), &'a i32> =
+            let fn_tuner: FnTuner<'_, _, &(&'a i32), &'a i32, _> =
                 self.data.work_data.add_config(work_args_checker, self);
             return unsafe { std::mem::transmute(fn_tuner) };
         }

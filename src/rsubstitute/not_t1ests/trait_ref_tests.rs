@@ -41,7 +41,7 @@ mod tests {
             // Arrange
             let mock = TraitMock::new();
             let r = &11;
-            let r_ptr = std::ptr::from_ref(r);
+            let r_ptr = core::ptr::from_ref(r);
 
             // Act
             mock.accept_ref(r);
@@ -70,7 +70,7 @@ Received no non-matching calls"
             );
 
             let invalid_r = &22;
-            let invalid_r_ptr = std::ptr::from_ref(invalid_r);
+            let invalid_r_ptr = core::ptr::from_ref(invalid_r);
             assert_panics(
                 || mock.received().accept_ref(invalid_r, Times::Once),
                 format!(

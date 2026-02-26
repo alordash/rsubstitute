@@ -3,15 +3,21 @@ use crate::mock_data::{FnConfig, FnReturnCallbackTuner, FnReturnTuner};
 use std::cell::RefCell;
 use std::sync::Arc;
 
-pub struct FnTuner<'rs, TOwner, TArgRefsTuple: Copy, TReturnValue> {
+pub struct FnTuner<
+    'rs,
+    TOwner,
+    TArgRefsTuple: Copy,
+    TReturnValue,
+    const SUPPORTS_BASE_CALLING: bool,
+> {
     fn_config: Arc<RefCell<FnConfig<'rs>>>,
     owner: &'rs TOwner,
     fn_return_callback_tuner: FnReturnCallbackTuner<'rs, TOwner, TArgRefsTuple>,
     pub returns: FnReturnTuner<'rs, TOwner, TArgRefsTuple, TReturnValue>,
 }
 
-impl<'rs, TOwner, TArgRefsTuple: Copy, TReturnValue>
-    FnTuner<'rs, TOwner, TArgRefsTuple, TReturnValue>
+impl<'rs, TOwner, TArgRefsTuple: Copy, TReturnValue, const SUPPORTS_BASE_CALLING: bool>
+    FnTuner<'rs, TOwner, TArgRefsTuple, TReturnValue, SUPPORTS_BASE_CALLING>
 {
     pub fn new(fn_config: Arc<RefCell<FnConfig<'rs>>>, owner: &'rs TOwner) -> Self {
         Self {
@@ -38,21 +44,20 @@ impl<'rs, TOwner, TArgRefsTuple: Copy, TReturnValue>
     }
 }
 
-impl<'rs, TOwner, TArgRefsTuple: Copy> FnTuner<'rs, TOwner, TArgRefsTuple, ()> {
+impl<'rs, TOwner, TArgRefsTuple: Copy, const SUPPORTS_BASE_CALLING: bool>
+    FnTuner<'rs, TOwner, TArgRefsTuple, (), SUPPORTS_BASE_CALLING>
+{
     pub fn does(&self, callback: impl FnMut(&TArgRefsTuple) + 'static) -> &'rs TOwner {
         self.fn_config.borrow_mut().set_callback(callback);
         return self.owner;
     }
 }
 
-// TODO - support
-// impl<'a, TOwner, TMock, TCall, TReturnType, TArgsChecker>
-//     FnTuner<'a, TOwner, TMock, TCall, TReturnType, TArgsChecker>
-// where
-//     TMock: IBaseCaller<TCall, TReturnType>,
-// {
-//     pub fn call_base(&self) -> &'a TOwner {
-//         self.fn_config.borrow_mut().set_call_base();
-//         return self.owner;
-//     }
-// }
+impl<'rs, TOwner, TArgRefsTuple: Copy, TReturnValue>
+    FnTuner<'rs, TOwner, TArgRefsTuple, TReturnValue, true>
+{
+    pub fn call_base(&self) -> &'rs TOwner {
+        self.fn_config.borrow_mut().set_call_base();
+        return self.owner;
+    }
+}

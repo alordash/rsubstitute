@@ -2,8 +2,20 @@ use rsubstitute::macros::*;
 use std::fmt::Debug;
 
 // #[mock]
+#[allow(unused)]
 trait Trait<T1> {
-    fn work<T2, T3, const B: bool, const N: usize>(&self, t1: T1, t2: &T2) -> T3;
+    fn work<T2: Clone, T3: Default, const B: bool, const N: usize>(&self, t1: T1, t2: &T2) -> T3
+    where
+        T1: Clone,
+    {
+        println!(
+            "calling base ftw. SizeOf(T1) = {}, SizeOf(T2) = {}",
+            size_of::<T1>(),
+            size_of::<T2>()
+        );
+        dbg!(core::ptr::from_ref(t2));
+        return T3::default();
+    }
 }
 
 #[cfg(test)]
@@ -17,14 +29,33 @@ mod __rsubstitute_generated_Trait {
     use rsubstitute::for_generated::*;
 
     #[derive(IGenericsHashKeyProvider, IArgInfosProvider)]
-    pub struct work_Call<'rs, T1, T2, T3, const B: bool, const N: usize> {
+    pub struct work_Call<'rs, T1, T2: Clone, T3: Default, const B: bool, const N: usize>
+    where
+        T1: Clone,
+    {
         _phantom_lifetime: PhantomData<&'rs ()>,
         _return_type: PhantomData<T3>,
         t1: T1,
         t2: &'rs T2,
     }
-    impl<'rs, T1, T2, T3, const B: bool, const N: usize> IArgsTupleProvider
+    impl<'rs, T1, T2: Clone, T3: Default, const B: bool, const N: usize> Clone
         for work_Call<'rs, T1, T2, T3, B, N>
+    where
+        T1: Clone,
+    {
+        fn clone(&self) -> Self {
+            Self {
+                _phantom_lifetime: PhantomData,
+                _return_type: PhantomData,
+                t1: (&self.t1).clone(),
+                t2: (&self.t2).clone(),
+            }
+        }
+    }
+    impl<'rs, T1, T2: Clone, T3: Default, const B: bool, const N: usize> IArgsTupleProvider
+        for work_Call<'rs, T1, T2, T3, B, N>
+    where
+        T1: Clone,
     {
         fn provide_ptr_to_tuple_of_refs(&self) -> *const () {
             core::ptr::from_ref(&(&self.t1, &self.t2)) as *const ()
@@ -32,14 +63,19 @@ mod __rsubstitute_generated_Trait {
     }
 
     #[derive(Debug, IGenericsHashKeyProvider, IArgsFormatter)]
-    pub struct work_ArgsChecker<'rs, T1, T2, T3, const B: bool, const N: usize> {
+    pub struct work_ArgsChecker<'rs, T1, T2: Clone, T3: Default, const B: bool, const N: usize>
+    where
+        T1: Clone,
+    {
         _phantom_lifetime: PhantomData<&'rs ()>,
         _return_type: PhantomData<T3>,
         t1: Arg<T1>,
         t2: Arg<&'rs T2>,
     }
-    impl<'rs, T1, T2, T3, const B: bool, const N: usize> IArgsChecker
+    impl<'rs, T1, T2: Clone, T3: Default, const B: bool, const N: usize> IArgsChecker
         for work_ArgsChecker<'rs, T1, T2, T3, B, N>
+    where
+        T1: Clone,
     {
         fn check(&self, dyn_call: &DynCall) -> Vec<ArgCheckResult> {
             let call: &work_Call<T1, T2, T3, B, N> = dyn_call.downcast_ref();
@@ -50,7 +86,7 @@ mod __rsubstitute_generated_Trait {
     #[derive(IMockData)]
     pub struct TraitMockData<'rs, T1> {
         _phantom_T1: PhantomData<T1>,
-        work_data: FnData<'rs, TraitMock<'rs, T1>>,
+        work_data: FnData<'rs, TraitMock<'rs, T1>, true>,
     }
 
     #[derive(Clone)]
@@ -69,7 +105,10 @@ mod __rsubstitute_generated_Trait {
         data: Arc<TraitMockData<'rs, T1>>,
     }
     impl<'rs, T1> Trait<T1> for TraitMock<'rs, T1> {
-        fn work<T2, T3, const B: bool, const N: usize>(&self, t1: T1, t2: &T2) -> T3 {
+        fn work<T2: Clone, T3: Default, const B: bool, const N: usize>(&self, t1: T1, t2: &T2) -> T3
+        where
+            T1: Clone,
+        {
             let call: work_Call<T1, T2, T3, B, N> = unsafe {
                 work_Call {
                     _phantom_lifetime: PhantomData,
@@ -79,7 +118,11 @@ mod __rsubstitute_generated_Trait {
                 }
             };
             // dbg!(call.get_arg_infos()); // TODO remove
-            return self.data.work_data.handle_returning(call);
+            // let call: work_Call<T1, T2, T3, B, N> = todo!();
+            return self
+                .data
+                .work_data
+                .handle_base_returning(self, call, Self::base_work);
         }
     }
     impl<'rs, T1> TraitMock<'rs, T1> {
@@ -94,13 +137,32 @@ mod __rsubstitute_generated_Trait {
                 data,
             };
         }
+        fn base_work<T2: Clone, T3: Default, const B: bool, const N: usize>(
+            &self,
+            call: work_Call<T1, T2, T3, B, N>,
+        ) -> T3
+        where
+            T1: Clone,
+        {
+            let work_Call { t1, t2, .. } = call;
+            println!(
+                "calling base ftw. SizeOf(T1) = {}, SizeOf(T2) = {}",
+                size_of::<T1>(),
+                size_of::<T2>()
+            );
+            dbg!(core::ptr::from_ref(t2));
+            return T3::default();
+        }
     }
-    impl<'rs, T1: 'rs> TraitMockSetup<'rs, T1> {
-        pub fn work<T2: 'rs, T3: 'rs, const B: bool, const N: usize>(
+    impl<'rs, T1> TraitMockSetup<'rs, T1> {
+        pub fn work<T2: Clone + 'rs, T3: Default + 'rs, const B: bool, const N: usize>(
             &self,
             t1: impl Into<Arg<T1>>,
             t2: impl Into<Arg<&'rs T2>>,
-        ) -> FnTuner<'rs, Self, (&T1, &&T2), T3, false> {
+        ) -> FnTuner<'rs, Self, (&T1, &&T2), T3, true>
+        where
+            T1: Clone,
+        {
             let work_args_checker: work_ArgsChecker<T1, T2, T3, B, N> = work_ArgsChecker {
                 _phantom_lifetime: PhantomData,
                 _return_type: PhantomData,
@@ -113,12 +175,15 @@ mod __rsubstitute_generated_Trait {
         }
     }
     impl<'rs, T1> TraitMockReceived<'rs, T1> {
-        pub fn work<T2: 'rs, T3: Clone, const B: bool, const N: usize>(
+        pub fn work<T2: Clone + 'rs, T3: Default, const B: bool, const N: usize>(
             self,
             t1: impl Into<Arg<T1>>,
             t2: impl Into<Arg<&'rs T2>>,
             times: Times,
-        ) -> Self {
+        ) -> Self
+        where
+            T1: Clone,
+        {
             let work_args_checker: work_ArgsChecker<T1, T2, T3, B, N> = work_ArgsChecker {
                 _phantom_lifetime: PhantomData,
                 _return_type: PhantomData,
@@ -151,15 +216,13 @@ mod tests {
     fn my_test() {
         let mock = TraitMock::new();
 
-        let v1 = 11;
         let v2 = 22;
         let v3 = 33;
         let v4 = [10; 5];
 
         mock.setup
-            .work::<_, _, true, 2>(10, &"amogus")
-            .returns(v1)
-            .and_does(|(number, string)| println!("Received number = {number}, string = {string}"))
+            .work::<_, i32, true, 2>(10, &"amogus")
+            .call_base()
             .work::<_, _, true, 4>(10, &"amogus")
             .returns(v2)
             .and_does(|_| println!("I don't care what was received"))
@@ -183,7 +246,7 @@ mod tests {
         //     mock.work::<_, i32, true, 2>(10, r);
         // }
 
-        assert_eq!(v1, av1);
+        assert_eq!(i32::default(), av1);
         assert_eq!(v2, av2);
         assert_eq!(v3, av3);
         assert_eq!(v4, av4);

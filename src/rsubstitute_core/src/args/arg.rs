@@ -139,11 +139,11 @@ impl<'a, T: ?Sized> Arg<&'a T> {
             actual_value,
             (&ArgPrinter(*actual_value)).debug_string(),
         );
-        let actual_ptr = std::ptr::from_ref(*actual_value);
+        let actual_ptr = core::ptr::from_ref(*actual_value);
         match self {
             Arg::PrivateEq(arg_cmp, _) => {
-                let expected_ptr = std::ptr::from_ref(arg_cmp.value);
-                if !std::ptr::eq(actual_ptr, expected_ptr) {
+                let expected_ptr = core::ptr::from_ref(arg_cmp.value);
+                if !core::ptr::eq(actual_ptr, expected_ptr) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
@@ -154,8 +154,8 @@ impl<'a, T: ?Sized> Arg<&'a T> {
                 }
             }
             Arg::PrivateNotEq(arg_cmp, _) => {
-                let not_expected_ptr = std::ptr::from_ref(arg_cmp.value);
-                if std::ptr::eq(actual_ptr, not_expected_ptr) {
+                let not_expected_ptr = core::ptr::from_ref(arg_cmp.value);
+                if core::ptr::eq(actual_ptr, not_expected_ptr) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
@@ -205,11 +205,11 @@ impl<'a, T: ?Sized> Arg<&'a mut T> {
             actual_value,
             (&ArgPrinter(*actual_value)).debug_string(),
         );
-        let actual_ptr = std::ptr::from_ref(*actual_value);
+        let actual_ptr = core::ptr::from_ref(*actual_value);
         match self {
             Arg::PrivateEq(arg_cmp, _) => {
-                let expected_ptr = std::ptr::from_ref(arg_cmp.value);
-                if !std::ptr::eq(actual_ptr, expected_ptr) {
+                let expected_ptr = core::ptr::from_ref(arg_cmp.value);
+                if !core::ptr::eq(actual_ptr, expected_ptr) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
@@ -220,8 +220,8 @@ impl<'a, T: ?Sized> Arg<&'a mut T> {
                 }
             }
             Arg::PrivateNotEq(arg_cmp, _) => {
-                let not_expected_ptr = std::ptr::from_ref(arg_cmp.value);
-                if std::ptr::eq(actual_ptr, not_expected_ptr) {
+                let not_expected_ptr = core::ptr::from_ref(arg_cmp.value);
+                if core::ptr::eq(actual_ptr, not_expected_ptr) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
@@ -262,7 +262,7 @@ impl<T: ?Sized> Arg<Rc<T>> {
         match self {
             Arg::PrivateEq(arg_cmp, _) => {
                 let expected_ptr = Rc::as_ptr(&arg_cmp.value);
-                if !std::ptr::eq(actual_ptr, expected_ptr) {
+                if !core::ptr::eq(actual_ptr, expected_ptr) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
@@ -274,7 +274,7 @@ impl<T: ?Sized> Arg<Rc<T>> {
             }
             Arg::PrivateNotEq(arg_cmp, _) => {
                 let not_expected_ptr = Rc::as_ptr(&arg_cmp.value);
-                if std::ptr::eq(actual_ptr, not_expected_ptr) {
+                if core::ptr::eq(actual_ptr, not_expected_ptr) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
@@ -316,7 +316,7 @@ impl<T: ?Sized> Arg<Arc<T>> {
         match self {
             Arg::PrivateEq(arg_cmp, _) => {
                 let expected_ptr = Arc::as_ptr(&arg_cmp.value);
-                if !std::ptr::eq(actual_ptr, expected_ptr) {
+                if !core::ptr::eq(actual_ptr, expected_ptr) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
@@ -328,7 +328,7 @@ impl<T: ?Sized> Arg<Arc<T>> {
             }
             Arg::PrivateNotEq(arg_cmp, _) => {
                 let not_expected_ptr = Arc::as_ptr(&arg_cmp.value);
-                if std::ptr::eq(actual_ptr, not_expected_ptr) {
+                if core::ptr::eq(actual_ptr, not_expected_ptr) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(

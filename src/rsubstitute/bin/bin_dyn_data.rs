@@ -1,13 +1,10 @@
 use rsubstitute::macros::*;
 
 // #[mock]
-// trait Trait {
-//     fn work(&self, v: i32) -> i32;
-// }
-
 trait Trait {
     fn work(&self, v: i32) -> i32;
 }
+
 #[cfg(test)]
 pub use __rsubstitute_generated_Trait::*;
 #[cfg(test)]
@@ -26,7 +23,7 @@ mod __rsubstitute_generated_Trait {
     }
     impl<'rs> IArgsTupleProvider for work_Call<'rs> {
         fn provide_ptr_to_tuple_of_refs(&self) -> *const () {
-            std::ptr::from_ref(&(&self.v)) as *const ()
+            core::ptr::from_ref(&(&self.v)) as *const ()
         }
     }
 
@@ -86,12 +83,12 @@ mod __rsubstitute_generated_Trait {
         }
     }
     impl<'rs> TraitMockSetup<'rs> {
-        pub fn work(&self, v: impl Into<Arg<i32>>) -> FnTuner<'rs, Self, (&i32), i32> {
+        pub fn work(&self, v: impl Into<Arg<i32>>) -> FnTuner<'rs, Self, (&i32), i32, false> {
             let work_args_checker = work_ArgsChecker {
                 _phantom_lifetime: PhantomData,
                 v: v.into(),
             };
-            let fn_tuner: FnTuner<'_, _, (&i32), i32> =
+            let fn_tuner: FnTuner<'_, _, (&i32), i32, _> =
                 self.data.work_data.add_config(work_args_checker, self);
             return unsafe { std::mem::transmute(fn_tuner) };
         }

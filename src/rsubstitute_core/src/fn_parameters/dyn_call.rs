@@ -30,9 +30,14 @@ impl<'rs> IArgsTupleProvider for DynCall<'rs> {
 }
 
 impl<'rs> DynCall<'rs> {
-    pub fn new<T: ICall + 'rs>(value: T) -> Self {
-        Self {
-            inner: Box::new(value),
+    pub fn new<'a, T: ICall + 'rs>(value: T) -> DynCall<'a> {
+        unsafe {
+            // TODO - add special function for transmuting between different lifetimes
+            // and use only it in such cases. Also add comments why it exists
+            // (primarily because references need to live across Arrange-Act-Assert bound)
+            std::mem::transmute(Self {
+                inner: Box::new(value),
+            })
         }
     }
 

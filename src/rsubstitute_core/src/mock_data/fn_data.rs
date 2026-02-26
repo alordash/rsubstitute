@@ -9,7 +9,7 @@ use std::collections::HashMap;
 use std::marker::PhantomData;
 use std::sync::Arc;
 
-pub struct FnData<'rs, TMock> {
+pub struct FnData<'rs, TMock, const SUPPORTS_BASE_CALLING: bool = false> {
     _phantom_mock: PhantomData<TMock>,
     fn_name: &'static str,
     call_infos: RefCell<HashMap<GenericsHashKey, Vec<CallCheck<'rs>>>>,
@@ -17,7 +17,7 @@ pub struct FnData<'rs, TMock> {
     error_printer: Arc<dyn IErrorPrinter>,
 }
 
-impl<'rs, TMock> FnData<'rs, TMock> {
+impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool> FnData<'rs, TMock, SUPPORTS_BASE_CALLING> {
     pub fn new(fn_name: &'static str) -> Self {
         Self {
             _phantom_mock: PhantomData,
@@ -38,7 +38,7 @@ impl<'rs, TMock> FnData<'rs, TMock> {
         &self,
         args_checker: TArgsChecker,
         fn_tuner_owner: &'a TOwner,
-    ) -> FnTuner<'a, TOwner, TArgRefsTuple, TReturnValue> {
+    ) -> FnTuner<'a, TOwner, TArgRefsTuple, TReturnValue, SUPPORTS_BASE_CALLING> {
         let dyn_args_checker: DynArgsChecker<'a> = DynArgsChecker::new(args_checker);
         let generics_hash_key = dyn_args_checker.get_generics_hash_key();
         let config = FnConfig::<'a>::new(dyn_args_checker);
@@ -48,8 +48,7 @@ impl<'rs, TMock> FnData<'rs, TMock> {
             .entry(generics_hash_key)
             .or_default()
             .push(unsafe { std::mem::transmute(arc_config.clone()) });
-        let fn_tuner: FnTuner<'_, TOwner, TArgRefsTuple, TReturnValue> =
-            FnTuner::new(arc_config, fn_tuner_owner);
+        let fn_tuner = FnTuner::new(arc_config, fn_tuner_owner);
         return fn_tuner;
     }
 
@@ -96,16 +95,18 @@ impl<'rs, TMock> FnData<'rs, TMock> {
             .collect();
         return unexpected_call_arg_infos;
     }
+}
 
+impl<'rs, TMock> FnData<'rs, TMock, false> {
     pub fn handle<TArgRefsTuple, TCall: ICall + 'rs>(&self, the_call: TCall) {
         let call = Arc::new(DynCall::new(the_call));
         let maybe_fn_config = self.try_get_matching_config(&call);
         self.register_call(call.clone());
         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
+            fn_config.borrow_mut().register_call(call.clone());
             if let Some(callback) = fn_config.borrow().get_callback() {
                 callback.borrow_mut()(call.as_ref());
             }
-            fn_config.borrow_mut().register_call(call);
         }
     }
 
@@ -113,7 +114,7 @@ impl<'rs, TMock> FnData<'rs, TMock> {
         &self,
         the_call: TCall,
     ) -> TReturnValue {
-        let dyn_call: DynCall<'rs> = unsafe { std::mem::transmute(DynCall::new(the_call)) };
+        let dyn_call = DynCall::new(the_call);
         let call = Arc::new(dyn_call);
         let fn_config = self.get_required_matching_config(&call);
         self.register_call(call.clone());
@@ -131,55 +132,69 @@ impl<'rs, TMock> FnData<'rs, TMock> {
     }
 }
 
-// TODO - support
-// impl<'rs, TMock> FnData<'rs, TMock>
-// where
-//     TMock: IBaseCaller<TCall, TReturnType>
-// {
-//     pub fn handle_base(&self, mock: &TMock, the_call: TCall) {
-//         let call_for_base_call = the_call.clone();
-//         let call = Arc::new(the_call);
-//         let maybe_fn_config = self.try_get_matching_config(&call);
-//         self.register_call(call.clone());
-//         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
-//             fn_config.borrow_mut().register_call(call.clone());
-//             let fn_config_ref = fn_config.borrow();
-//             if fn_config_ref.should_call_base() {
-//                 mock.call_base(call_for_base_call);
-//             }
-//             if let Some(callback) = fn_config_ref.get_callback() {
-//                 callback.borrow_mut()();
-//             }
-//         }
-//     }
-//
-//     pub fn handle_base_returning(&self, mock: &TMock, the_call: TCall) -> TReturnType {
-//         let call_for_base_call = the_call.clone();
-//         let call = Arc::new(the_call);
-//         let fn_config = self.get_required_matching_config(&call);
-//         self.register_call(call.clone());
-//         fn_config.borrow_mut().register_call(call.clone());
-//         let fn_config_ref = fn_config.borrow();
-//         if fn_config_ref.should_call_base() {
-//             let base_return_value = mock.call_base(call_for_base_call);
-//             return base_return_value;
-//         }
-//         if let Some(callback) = fn_config_ref.get_callback() {
-//             callback.borrow_mut()();
-//         }
-//         drop(fn_config_ref);
-//         let Some(return_value) = fn_config.borrow_mut().select_next_return_value() else {
-//             self.error_printer
-//                 .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
-//         };
-//         return return_value;
-//     }
-// }
+impl<'rs, TMock> FnData<'rs, TMock, true> {
+    pub fn handle_base<TArgRefsTuple, TCall: ICall + Clone + 'rs>(
+        &self,
+        mock: &TMock,
+        the_call: TCall,
+        mut base_call: impl FnMut(&TMock, TCall),
+    ) {
+        let call_for_base_call = the_call.clone();
+        let dyn_call = DynCall::new(the_call);
+        let call = Arc::new(dyn_call);
+        let maybe_fn_config = self.try_get_matching_config(&call);
+        self.register_call(call.clone());
+        if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
+            fn_config.borrow_mut().register_call(call.clone());
+            let fn_config_ref = fn_config.borrow();
+            if fn_config_ref.should_call_base() {
+                base_call(mock, call_for_base_call);
+            }
+            if let Some(callback) = fn_config_ref.get_callback() {
+                callback.borrow_mut()(call.as_ref());
+            }
+        }
+    }
+
+    pub fn handle_base_returning<
+        'a,
+        'b,
+        TCall: ICall + Clone + 'a,
+        TReturnValue: IReturnValue<'b>,
+        TBaseCall: FnMut(&TMock, TCall) -> TReturnValue,
+    >(
+        &self,
+        mock: &TMock,
+        the_call: TCall,
+        mut base_call: TBaseCall,
+    ) -> TReturnValue {
+        let call_for_base_call = the_call.clone();
+        let dyn_call = DynCall::new(the_call);
+        let call = Arc::new(dyn_call);
+        let fn_config = self.get_required_matching_config(&call);
+        self.register_call(call.clone());
+        fn_config.borrow_mut().register_call(call.clone());
+        let fn_config_ref = fn_config.borrow();
+        if fn_config_ref.should_call_base() {
+            let base_return_value = base_call(mock, call_for_base_call);
+            return base_return_value;
+        }
+        if let Some(callback) = fn_config_ref.get_callback() {
+            callback.borrow_mut()(call.as_ref());
+        }
+        drop(fn_config_ref);
+        let Some(return_value) = fn_config.borrow_mut().select_next_return_value() else {
+            self.error_printer
+                .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
+        };
+        return return_value.downcast_into();
+    }
+}
 
 mod internal {
     use super::*;
 
-    impl<'rs, TMock> FnData<'rs, TMock> {
+    impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool> FnData<'rs, TMock, SUPPORTS_BASE_CALLING> {
         pub fn reset(&self) {
             self.call_infos.borrow_mut().clear();
             self.configs.borrow_mut().clear();
