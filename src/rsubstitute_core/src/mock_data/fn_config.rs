@@ -2,14 +2,12 @@ use crate::args::*;
 use crate::fn_parameters::*;
 use std::cell::RefCell;
 use std::collections::VecDeque;
-use std::marker::PhantomData;
 use std::sync::Arc;
 
 // TODO - maybe remove `TMock`? What is it's purpose now that we have dyn fn parameters?
 // All information needed to handle certain function is stored in it's `FnConfig`.
 // Previously `TMock` was needed only to handle IBaseCaller.
-pub struct FnConfig<'rs, TMock> {
-    _phantom_mock: PhantomData<TMock>,
+pub struct FnConfig<'rs> {
     args_checker: DynArgsChecker<'rs>,
     return_value_sources: VecDeque<ReturnValueSource<'rs>>,
     calls: Vec<Arc<DynCall<'rs>>>,
@@ -17,10 +15,9 @@ pub struct FnConfig<'rs, TMock> {
     call_base: bool,
 }
 
-impl<'rs, TMock> FnConfig<'rs, TMock> {
+impl<'rs> FnConfig<'rs> {
     pub(crate) fn new(args_checker: DynArgsChecker<'rs>) -> Self {
         FnConfig {
-            _phantom_mock: PhantomData,
             args_checker,
             return_value_sources: VecDeque::new(),
             calls: Vec::new(),

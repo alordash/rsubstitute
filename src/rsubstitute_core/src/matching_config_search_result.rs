@@ -3,8 +3,8 @@ use crate::mock_data::FnConfig;
 use std::cell::RefCell;
 use std::sync::Arc;
 
-pub(crate) enum MatchingConfigSearchResult<'rs, TMock> {
-    Ok(Arc<RefCell<FnConfig<'rs, TMock>>>),
+pub(crate) enum MatchingConfigSearchResult<'rs> {
+    Ok(Arc<RefCell<FnConfig<'rs>>>),
     Err(MatchingConfigSearchErr),
 }
 

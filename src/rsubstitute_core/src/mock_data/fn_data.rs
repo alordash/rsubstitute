@@ -8,14 +8,14 @@ use std::cell::RefCell;
 use std::collections::HashMap;
 use std::sync::Arc;
 
-pub struct FnData<'rs, TMock> {
+pub struct FnData<'rs> {
     fn_name: &'static str,
     call_infos: RefCell<HashMap<GenericsHashKey, Vec<CallCheck<'rs>>>>,
-    configs: RefCell<HashMap<GenericsHashKey, Vec<Arc<RefCell<FnConfig<'rs, TMock>>>>>>,
+    configs: RefCell<HashMap<GenericsHashKey, Vec<Arc<RefCell<FnConfig<'rs>>>>>>,
     error_printer: Arc<dyn IErrorPrinter>,
 }
 
-impl<'rs, TMock> FnData<'rs, TMock> {
+impl<'rs> FnData<'rs> {
     pub fn new(fn_name: &'static str) -> Self {
         Self {
             fn_name,
@@ -29,18 +29,17 @@ impl<'rs, TMock> FnData<'rs, TMock> {
         &self,
         args_checker: TArgsChecker,
         fn_tuner_owner: &'a TOwner,
-    ) -> FnTuner<'a, TOwner, TMock, TReturnValue> {
+    ) -> FnTuner<'a, TOwner, TReturnValue> {
         let dyn_args_checker: DynArgsChecker<'a> = DynArgsChecker::new(args_checker);
         let generics_hash_key = dyn_args_checker.get_generics_hash_key();
-        let config = FnConfig::<'a, TMock>::new(dyn_args_checker);
+        let config = FnConfig::<'a>::new(dyn_args_checker);
         let arc_config = Arc::new(RefCell::new(config));
         self.configs
             .borrow_mut()
             .entry(generics_hash_key)
             .or_default()
             .push(unsafe { std::mem::transmute(arc_config.clone()) });
-        let fn_tuner: FnTuner<'_, TOwner, TMock, TReturnValue> =
-            FnTuner::new(arc_config, fn_tuner_owner);
+        let fn_tuner: FnTuner<'_, TOwner, TReturnValue> = FnTuner::new(arc_config, fn_tuner_owner);
         return fn_tuner;
     }
 
@@ -170,7 +169,7 @@ impl<'rs, TMock> FnData<'rs, TMock> {
 mod internal {
     use super::*;
 
-    impl<'rs, TMock> FnData<'rs, TMock> {
+    impl<'rs> FnData<'rs> {
         pub fn reset(&self) {
             self.call_infos.borrow_mut().clear();
             self.configs.borrow_mut().clear();
@@ -211,7 +210,7 @@ mod internal {
         pub fn try_get_matching_config(
             &self,
             dyn_call: &DynCall<'rs>,
-        ) -> MatchingConfigSearchResult<'rs, TMock> {
+        ) -> MatchingConfigSearchResult<'rs> {
             let generics_hash_key = dyn_call.get_generics_hash_key();
             let all_configs = self.configs.borrow();
             let Some(matching_configs) = all_configs.get(&generics_hash_key) else {
@@ -239,7 +238,7 @@ mod internal {
         pub fn get_required_matching_config(
             &self,
             call: &DynCall<'rs>,
-        ) -> Arc<RefCell<FnConfig<'rs, TMock>>> {
+        ) -> Arc<RefCell<FnConfig<'rs>>> {
             let fn_config = match self.try_get_matching_config(&call) {
                 MatchingConfigSearchResult::Ok(matching_config) => matching_config,
                 MatchingConfigSearchResult::Err(matching_config_search_err) => {

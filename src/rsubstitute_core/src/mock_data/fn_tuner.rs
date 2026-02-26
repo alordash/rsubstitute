@@ -4,14 +4,14 @@ use std::cell::RefCell;
 use std::marker::PhantomData;
 use std::sync::Arc;
 
-pub struct FnTuner<'rs, TOwner, TMock, TReturnValue> {
+pub struct FnTuner<'rs, TOwner, TReturnValue> {
     _phantom_return_value: PhantomData<TReturnValue>,
-    fn_config: Arc<RefCell<FnConfig<'rs, TMock>>>,
+    fn_config: Arc<RefCell<FnConfig<'rs>>>,
     owner: &'rs TOwner,
 }
 
-impl<'rs, TOwner, TMock, TReturnValue> FnTuner<'rs, TOwner, TMock, TReturnValue> {
-    pub fn new(fn_tuner: Arc<RefCell<FnConfig<'rs, TMock>>>, owner: &'rs TOwner) -> Self {
+impl<'rs, TOwner, TReturnValue> FnTuner<'rs, TOwner, TReturnValue> {
+    pub fn new(fn_tuner: Arc<RefCell<FnConfig<'rs>>>, owner: &'rs TOwner) -> Self {
         Self {
             _phantom_return_value: PhantomData,
             fn_config: fn_tuner,
@@ -101,9 +101,7 @@ impl<'rs, TOwner, TMock, TReturnValue> FnTuner<'rs, TOwner, TMock, TReturnValue>
     }
 }
 
-impl<'rs, TOwner, TMock>
-    FnTuner<'rs, TOwner, TMock, ()>
-{
+impl<'rs, TOwner> FnTuner<'rs, TOwner, ()> {
     pub fn does(&self, callback: impl FnMut() + 'static) -> &'rs TOwner {
         self.fn_config.borrow_mut().set_callback(callback);
         return self.owner;
