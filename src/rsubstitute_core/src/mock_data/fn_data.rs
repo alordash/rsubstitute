@@ -167,7 +167,7 @@ impl<'rs, TMock> FnData<'rs, TMock> {
 //     }
 // }
 
-mod internal_api {
+mod internal {
     use super::*;
 
     impl<'rs, TMock> FnData<'rs, TMock> {
