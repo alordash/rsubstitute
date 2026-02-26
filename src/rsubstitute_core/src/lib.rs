@@ -1,3 +1,4 @@
+#![cfg_attr(feature = "debug_naming", allow(incomplete_features))]
 #![cfg_attr(feature = "debug_naming", feature(specialization))]
 
 pub mod args;

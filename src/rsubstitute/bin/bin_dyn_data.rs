@@ -135,9 +135,10 @@ mod tests {
             .returns(r2)
             .work(Arg::Is(|x| *x < 0))
             .returns(r3)
+            .and_does(|| println!("amogus"))
             .work(Arg::Any)
-            .returns_always(r45)
-        ;
+            .returns
+            .always(r45);
 
         // Act
         let actual_r1 = mock.work(v1);

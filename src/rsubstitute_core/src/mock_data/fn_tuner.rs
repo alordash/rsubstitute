@@ -1,5 +1,5 @@
 use crate::fn_parameters::*;
-use crate::mock_data::FnConfig;
+use crate::mock_data::{FnConfig, FnReturnCallbackTuner, FnReturnTuner};
 use std::cell::RefCell;
 use std::marker::PhantomData;
 use std::sync::Arc;
@@ -8,18 +8,22 @@ pub struct FnTuner<'rs, TOwner, TReturnValue> {
     _phantom_return_value: PhantomData<TReturnValue>,
     fn_config: Arc<RefCell<FnConfig<'rs>>>,
     owner: &'rs TOwner,
+    fn_return_callback_tuner: FnReturnCallbackTuner<'rs, TOwner>,
+    pub returns: FnReturnTuner<'rs, TOwner, TReturnValue>,
 }
 
 impl<'rs, TOwner, TReturnValue> FnTuner<'rs, TOwner, TReturnValue> {
-    pub fn new(fn_tuner: Arc<RefCell<FnConfig<'rs>>>, owner: &'rs TOwner) -> Self {
+    pub fn new(fn_config: Arc<RefCell<FnConfig<'rs>>>, owner: &'rs TOwner) -> Self {
         Self {
             _phantom_return_value: PhantomData,
-            fn_config: fn_tuner,
+            fn_config: fn_config.clone(),
             owner,
+            fn_return_callback_tuner: FnReturnCallbackTuner::new(fn_config.clone(), owner),
+            returns: FnReturnTuner::new(fn_config, owner),
         }
     }
 
-    pub fn returns<'a>(&self, return_value: TReturnValue) -> &'rs TOwner
+    pub fn returns<'a>(&self, return_value: TReturnValue) -> &FnReturnCallbackTuner<'rs, TOwner>
     where
         TReturnValue: IReturnValue<'a> + 'a,
     {
@@ -28,76 +32,7 @@ impl<'rs, TOwner, TReturnValue> FnTuner<'rs, TOwner, TReturnValue> {
         self.fn_config
             .borrow_mut()
             .add_return_value_source(return_value_source);
-        return self.owner;
-    }
-
-    pub fn returns_many<'a>(
-        &self,
-        return_values: impl IntoIterator<Item = TReturnValue>,
-    ) -> &'rs TOwner
-    where
-        TReturnValue: IReturnValue<'a> + 'a,
-    {
-        let return_value_sources = return_values
-            .into_iter()
-            .map(|x| unsafe { std::mem::transmute(DynReturnValue::new(x)) })
-            .map(ReturnValueSource::SingleTime);
-        self.fn_config
-            .borrow_mut()
-            .add_return_value_sources(return_value_sources);
-        return self.owner;
-    }
-
-    pub fn returns_always<'a>(&self, return_value: TReturnValue) -> &'rs TOwner
-    where
-        TReturnValue: 'rs + 'a + IReturnValue<'a> + Clone,
-    {
-        let return_value_source = ReturnValueSource::Perpetual(Box::new(move || unsafe {
-            std::mem::transmute(DynReturnValue::new(return_value.clone()))
-        }));
-        self.fn_config
-            .borrow_mut()
-            .add_return_value_source(return_value_source);
-        return self.owner;
-    }
-
-    pub fn returns_and_does<'a>(
-        &self,
-        return_value: TReturnValue,
-        callback: impl FnMut() + 'static,
-    ) -> &'rs TOwner
-    where
-        TReturnValue: IReturnValue<'a> + 'a,
-    {
-        self.returns(return_value);
-        self.fn_config.borrow_mut().set_callback(callback);
-        return self.owner;
-    }
-
-    pub fn returns_many_and_does<'a>(
-        &self,
-        return_values: impl IntoIterator<Item = TReturnValue>,
-        callback: impl FnMut() + 'static,
-    ) -> &'rs TOwner
-    where
-        TReturnValue: IReturnValue<'a> + 'a,
-    {
-        self.returns_many(return_values);
-        self.fn_config.borrow_mut().set_callback(callback);
-        return self.owner;
-    }
-
-    pub fn returns_always_and_does<'a>(
-        &self,
-        return_value: TReturnValue,
-        callback: impl FnMut() + 'static,
-    ) -> &'rs TOwner
-    where
-        TReturnValue: 'rs + 'a + IReturnValue<'a> + Clone,
-    {
-        self.returns_always(return_value);
-        self.fn_config.borrow_mut().set_callback(callback);
-        return self.owner;
+        return &self.fn_return_callback_tuner;
     }
 }
 

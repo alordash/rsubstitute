@@ -207,7 +207,7 @@ mod internal {
             return (matching_calls, non_matching_calls);
         }
 
-        pub fn try_get_matching_config(
+        pub(crate) fn try_get_matching_config(
             &self,
             dyn_call: &DynCall<'rs>,
         ) -> MatchingConfigSearchResult<'rs> {
