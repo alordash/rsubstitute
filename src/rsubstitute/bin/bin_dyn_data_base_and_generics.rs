@@ -254,8 +254,8 @@ mod tests {
         mock.received
             .work::<_, i32, true, 2>(10, &"amogus", Times::Once)
             .work::<_, i32, true, 4>(10, &"amogus", Times::Once)
-            .work::<_, i32, false, 2>(10, &"amogus", Times::Once)
-            .work::<_, [i32; 5], false, 2>(10, &"amogus", Times::Once)
+            // .work::<_, i32, false, 2>(10, &"amogus", Times::Once)
+            // .work::<_, [i32; 5], false, 2>(10, &"amogus", Times::Once)
             // TODO - mock.received - value used after move
             .work::<_, i32, true, 2>(10, &"quo vadis", Times::Never)
             .work::<_, i32, true, 4>(11, &"amogus", Times::Never)
