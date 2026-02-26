@@ -103,19 +103,18 @@ impl<'rs, TOwner, TMock, TReturnValue> SharedFnConfig<'rs, TOwner, TMock, TRetur
     }
 }
 
-// TODO - support
-// impl<'rs, TOwner, TMock>
-//     SharedFnConfig<'rs, TOwner, TMock>
-// {
-//     pub fn does(&self, callback: impl FnMut() + 'static) -> &'rs TOwner {
-//         self.fn_config.borrow_mut().set_callback(callback);
-//         return self.owner;
-//     }
-//
-//     pub fn does_nothing(&self) -> &'rs TOwner {
-//         return self.owner;
-//     }
-// }
+impl<'rs, TOwner, TMock>
+    SharedFnConfig<'rs, TOwner, TMock, ()>
+{
+    pub fn does(&self, callback: impl FnMut() + 'static) -> &'rs TOwner {
+        self.fn_config.borrow_mut().set_callback(callback);
+        return self.owner;
+    }
+
+    pub fn does_nothing(&self) -> &'rs TOwner {
+        return self.owner;
+    }
+}
 
 // TODO - support
 // impl<'a, TOwner, TMock, TCall, TReturnType, TArgsChecker>
