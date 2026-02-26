@@ -11,6 +11,7 @@ trait Trait {
 #[cfg(test)]
 pub use __rsubstitute_generated_Trait::*;
 #[cfg(test)]
+#[allow(unused_parens)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 #[allow(mismatched_lifetime_syntaxes)]
@@ -22,6 +23,11 @@ mod __rsubstitute_generated_Trait {
     pub struct work_Call<'rs> {
         _phantom_lifetime: PhantomData<&'rs ()>,
         v: i32,
+    }
+    impl<'rs> IArgsTupleProvider for work_Call<'rs> {
+        fn provide_ptr_to_tuple_of_refs(&self) -> *const () {
+            std::ptr::from_ref(&(&self.v)) as *const ()
+        }
     }
 
     #[derive(Debug, IArgsFormatter, IGenericsHashKeyProvider)]
@@ -80,12 +86,12 @@ mod __rsubstitute_generated_Trait {
         }
     }
     impl<'rs> TraitMockSetup<'rs> {
-        pub fn work(&self, v: impl Into<Arg<i32>>) -> FnTuner<'rs, Self, i32> {
+        pub fn work(&self, v: impl Into<Arg<i32>>) -> FnTuner<'rs, Self, (&i32), i32> {
             let work_args_checker = work_ArgsChecker {
                 _phantom_lifetime: PhantomData,
                 v: v.into(),
             };
-            let fn_tuner: FnTuner<'_, _, i32> =
+            let fn_tuner: FnTuner<'_, _, (&i32), i32> =
                 self.data.work_data.add_config(work_args_checker, self);
             return unsafe { std::mem::transmute(fn_tuner) };
         }
@@ -135,7 +141,7 @@ mod tests {
             .returns(r2)
             .work(Arg::Is(|x| *x < 0))
             .returns(r3)
-            .and_does(|| println!("amogus"))
+            .and_does(|args| println!("amogus received number: {}", args))
             .work(Arg::Any)
             .returns
             .always(r45);

@@ -11,6 +11,7 @@ trait Trait {
 #[cfg(test)]
 pub use __rsubstitute_generated_Trait::*;
 #[cfg(test)]
+#[allow(unused_parens)]
 #[allow(non_snake_case)]
 #[allow(non_camel_case_types)]
 #[allow(mismatched_lifetime_syntaxes)]
@@ -22,6 +23,11 @@ mod __rsubstitute_generated_Trait {
     pub struct work_Call<'rs, 'a> {
         _phantom_lifetime: PhantomData<&'rs ()>,
         v: &'a i32,
+    }
+    impl<'rs, 'a> IArgsTupleProvider for work_Call<'rs, 'a> {
+        fn provide_ptr_to_tuple_of_refs(&self) -> *const () {
+            std::ptr::from_ref(&(&self.v)) as *const ()
+        }
     }
 
     #[derive(Debug, IArgsFormatter, IGenericsHashKeyProvider)]
@@ -84,12 +90,12 @@ mod __rsubstitute_generated_Trait {
             // Notice: 'a: 'rs only in setup, not needed in received
             &self,
             v: impl Into<Arg<&'a i32>>,
-        ) -> FnTuner<'rs, Self, &'a i32> {
+        ) -> FnTuner<'rs, Self, &(&'a i32), &'a i32> {
             let work_args_checker = work_ArgsChecker {
                 _phantom_lifetime: PhantomData,
                 v: v.into(),
             };
-            let fn_tuner: FnTuner<'_, _, &'a i32> =
+            let fn_tuner: FnTuner<'_, _, &(&'a i32), &'a i32> =
                 self.data.work_data.add_config(work_args_checker, self);
             return unsafe { std::mem::transmute(fn_tuner) };
         }
@@ -134,6 +140,7 @@ mod tests {
             .returns(r1)
             .work(v2)
             .returns(r2)
+            .and_does(|args| println!("accepted v2, v2 arg = {}", args))
             .work(Arg::Is(|x: &&i32| **x < 0))
             .returns(r3);
 

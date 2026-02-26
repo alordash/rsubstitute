@@ -7,7 +7,7 @@ use std::fmt::Debug;
 // }
 
 trait Trait<T1> {
-    fn work<T2, T3: Clone, const B: bool, const N: usize>(&self, t1: T1, t2: &T2) -> T3;
+    fn work<T2, T3, const B: bool, const N: usize>(&self, t1: T1, t2: &T2) -> T3;
 }
 #[cfg(test)]
 pub use __rsubstitute_generated_Trait::*;
@@ -20,21 +20,28 @@ mod __rsubstitute_generated_Trait {
     use rsubstitute::for_generated::*;
 
     #[derive(IGenericsHashKeyProvider, IArgInfosProvider)]
-    pub struct work_Call<'rs, T1, T2, T3: Clone, const B: bool, const N: usize> {
+    pub struct work_Call<'rs, T1, T2, T3, const B: bool, const N: usize> {
         _phantom_lifetime: PhantomData<&'rs ()>,
         _return_type: PhantomData<T3>,
         t1: T1,
         t2: &'rs T2,
     }
+    impl<'rs, T1, T2, T3, const B: bool, const N: usize> IArgsTupleProvider
+        for work_Call<'rs, T1, T2, T3, B, N>
+    {
+        fn provide_ptr_to_tuple_of_refs(&self) -> *const () {
+            std::ptr::from_ref(&(&self.t1, &self.t2)) as *const ()
+        }
+    }
 
     #[derive(Debug, IGenericsHashKeyProvider, IArgsFormatter)]
-    pub struct work_ArgsChecker<'rs, T1, T2, T3: Clone, const B: bool, const N: usize> {
+    pub struct work_ArgsChecker<'rs, T1, T2, T3, const B: bool, const N: usize> {
         _phantom_lifetime: PhantomData<&'rs ()>,
         _return_type: PhantomData<T3>,
         t1: Arg<T1>,
         t2: Arg<&'rs T2>,
     }
-    impl<'rs, T1, T2, T3: Clone, const B: bool, const N: usize> IArgsChecker
+    impl<'rs, T1, T2, T3, const B: bool, const N: usize> IArgsChecker
         for work_ArgsChecker<'rs, T1, T2, T3, B, N>
     {
         fn check(&self, dyn_call: &DynCall) -> Vec<ArgCheckResult> {
@@ -65,7 +72,7 @@ mod __rsubstitute_generated_Trait {
         data: Arc<TraitMockData<'rs, T1>>,
     }
     impl<'rs, T1> Trait<T1> for TraitMock<'rs, T1> {
-        fn work<T2, T3: Clone, const B: bool, const N: usize>(&self, t1: T1, t2: &T2) -> T3 {
+        fn work<T2, T3, const B: bool, const N: usize>(&self, t1: T1, t2: &T2) -> T3 {
             let call: work_Call<T1, T2, T3, B, N> = unsafe {
                 work_Call {
                     _phantom_lifetime: PhantomData,
@@ -92,18 +99,18 @@ mod __rsubstitute_generated_Trait {
         }
     }
     impl<'rs, T1> TraitMockSetup<'rs, T1> {
-        pub fn work<T2: 'rs, T3: Clone, const B: bool, const N: usize>(
+        pub fn work<T2: 'rs, T3, const B: bool, const N: usize>(
             &self,
             t1: impl Into<Arg<T1>>,
             t2: impl Into<Arg<&'rs T2>>,
-        ) -> FnTuner<'rs, Self, T3> {
+        ) -> FnTuner<'rs, Self, (&T1, &&T2), T3> {
             let work_args_checker: work_ArgsChecker<T1, T2, T3, B, N> = work_ArgsChecker {
                 _phantom_lifetime: PhantomData,
                 _return_type: PhantomData,
                 t1: t1.into(),
                 t2: t2.into(),
             };
-            let fn_tuner: FnTuner<'_, _, T3> =
+            let fn_tuner: FnTuner<'_, _, (&T1, &&T2), T3> =
                 self.data.work_data.add_config(work_args_checker, self);
             return unsafe { std::mem::transmute(fn_tuner) };
         }
@@ -155,8 +162,10 @@ mod tests {
         mock.setup
             .work::<_, _, true, 2>(10, &"amogus")
             .returns(v1)
+            .and_does(|(number, string)| println!("Received number = {number}, string = {string}"))
             .work::<_, _, true, 4>(10, &"amogus")
             .returns(v2)
+            .and_does(|_| println!("I don't care what was received"))
             .work::<_, _, false, 2>(10, &"amogus")
             .returns(v3)
             .work::<_, _, false, 2>(10, &"amogus")

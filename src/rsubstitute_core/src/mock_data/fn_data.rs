@@ -2,7 +2,7 @@ use crate::args::*;
 use crate::error_printer::IErrorPrinter;
 use crate::fn_parameters::*;
 use crate::matching_config_search_result::*;
-use crate::mock_data::{FnConfig, FnTuner};
+use crate::mock_data::*;
 use crate::*;
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -25,11 +25,17 @@ impl<'rs> FnData<'rs> {
         }
     }
 
-    pub fn add_config<'a, TArgsChecker: IArgsChecker + 'a, TOwner, TReturnValue>(
+    pub fn add_config<
+        'a,
+        TArgsChecker: IArgsChecker + 'a,
+        TOwner,
+        TArgRefsTuple: Copy,
+        TReturnValue,
+    >(
         &self,
         args_checker: TArgsChecker,
         fn_tuner_owner: &'a TOwner,
-    ) -> FnTuner<'a, TOwner, TReturnValue> {
+    ) -> FnTuner<'a, TOwner, TArgRefsTuple, TReturnValue> {
         let dyn_args_checker: DynArgsChecker<'a> = DynArgsChecker::new(args_checker);
         let generics_hash_key = dyn_args_checker.get_generics_hash_key();
         let config = FnConfig::<'a>::new(dyn_args_checker);
@@ -39,7 +45,8 @@ impl<'rs> FnData<'rs> {
             .entry(generics_hash_key)
             .or_default()
             .push(unsafe { std::mem::transmute(arc_config.clone()) });
-        let fn_tuner: FnTuner<'_, TOwner, TReturnValue> = FnTuner::new(arc_config, fn_tuner_owner);
+        let fn_tuner: FnTuner<'_, TOwner, TArgRefsTuple, TReturnValue> =
+            FnTuner::new(arc_config, fn_tuner_owner);
         return fn_tuner;
     }
 
@@ -87,15 +94,15 @@ impl<'rs> FnData<'rs> {
         return unexpected_call_arg_infos;
     }
 
-    pub fn handle<TCall: ICall + 'rs>(&self, the_call: TCall) {
+    pub fn handle<TArgRefsTuple, TCall: ICall + 'rs>(&self, the_call: TCall) {
         let call = Arc::new(DynCall::new(the_call));
         let maybe_fn_config = self.try_get_matching_config(&call);
         self.register_call(call.clone());
         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
-            fn_config.borrow_mut().register_call(call);
             if let Some(callback) = fn_config.borrow().get_callback() {
-                callback.borrow_mut()();
+                callback.borrow_mut()(call.as_ref());
             }
+            fn_config.borrow_mut().register_call(call);
         }
     }
 
@@ -110,7 +117,7 @@ impl<'rs> FnData<'rs> {
         fn_config.borrow_mut().register_call(call.clone());
         let fn_config_ref = fn_config.borrow();
         if let Some(callback) = fn_config_ref.get_callback() {
-            callback.borrow_mut()();
+            callback.borrow_mut()(call.as_ref());
         }
         drop(fn_config_ref);
         let Some(return_value) = fn_config.borrow_mut().select_next_return_value() else {

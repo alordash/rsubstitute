@@ -1,5 +1,5 @@
 use crate::args::*;
-use crate::fn_parameters::ICall;
+use crate::fn_parameters::{IArgsTupleProvider, ICall};
 use crate::{GenericsHasher, IGenericsHashKeyProvider};
 use std::ops::Deref;
 
@@ -20,6 +20,12 @@ impl<'rs> IGenericsHashKeyProvider for DynCall<'rs> {
 
     fn hash_const_values(&self, hasher: &mut GenericsHasher) {
         self.inner.hash_const_values(hasher)
+    }
+}
+
+impl<'rs> IArgsTupleProvider for DynCall<'rs> {
+    fn provide_ptr_to_tuple_of_refs(&self) -> *const () {
+        self.inner.provide_ptr_to_tuple_of_refs()
     }
 }
 

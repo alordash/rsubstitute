@@ -4,13 +4,15 @@ use std::cell::RefCell;
 use std::marker::PhantomData;
 use std::sync::Arc;
 
-pub struct FnReturnTuner<'rs, TOwner, TReturnValue> {
+pub struct FnReturnTuner<'rs, TOwner, TArgRefsTuple: Copy, TReturnValue> {
     _phantom_return_value: PhantomData<TReturnValue>,
     fn_config: Arc<RefCell<FnConfig<'rs>>>,
-    fn_return_callback_tuner: FnReturnCallbackTuner<'rs, TOwner>,
+    fn_return_callback_tuner: FnReturnCallbackTuner<'rs, TOwner, TArgRefsTuple>,
 }
 
-impl<'rs, TOwner, TReturnValue> FnReturnTuner<'rs, TOwner, TReturnValue> {
+impl<'rs, TOwner, TArgRefsTuple: Copy, TReturnValue>
+    FnReturnTuner<'rs, TOwner, TArgRefsTuple, TReturnValue>
+{
     pub(crate) fn new(fn_config: Arc<RefCell<FnConfig<'rs>>>, owner: &'rs TOwner) -> Self {
         Self {
             _phantom_return_value: PhantomData,
@@ -22,7 +24,7 @@ impl<'rs, TOwner, TReturnValue> FnReturnTuner<'rs, TOwner, TReturnValue> {
     pub fn many<'a>(
         &self,
         return_values: impl IntoIterator<Item = TReturnValue>,
-    ) -> &FnReturnCallbackTuner<'rs, TOwner>
+    ) -> &FnReturnCallbackTuner<'rs, TOwner, TArgRefsTuple>
     where
         TReturnValue: IReturnValue<'a> + 'a,
     {
@@ -36,7 +38,10 @@ impl<'rs, TOwner, TReturnValue> FnReturnTuner<'rs, TOwner, TReturnValue> {
         return &self.fn_return_callback_tuner;
     }
 
-    pub fn always<'a>(&self, return_value: TReturnValue) -> &FnReturnCallbackTuner<'rs, TOwner>
+    pub fn always<'a>(
+        &self,
+        return_value: TReturnValue,
+    ) -> &FnReturnCallbackTuner<'rs, TOwner, TArgRefsTuple>
     where
         TReturnValue: 'rs + 'a + IReturnValue<'a> + Clone,
     {

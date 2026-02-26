@@ -11,7 +11,7 @@ pub struct FnConfig<'rs> {
     args_checker: DynArgsChecker<'rs>,
     return_value_sources: VecDeque<ReturnValueSource<'rs>>,
     calls: Vec<Arc<DynCall<'rs>>>,
-    callback: Option<Arc<RefCell<dyn FnMut()>>>,
+    callback: Option<Arc<RefCell<dyn FnMut(&DynCall<'rs>)>>>,
     call_base: bool,
 }
 
@@ -37,8 +37,17 @@ impl<'rs> FnConfig<'rs> {
         self.return_value_sources.extend(return_values.into_iter());
     }
 
-    pub(crate) fn set_callback(&mut self, callback: impl FnMut() + 'static) {
-        self.callback = Some(Arc::new(RefCell::new(callback)));
+    pub(crate) fn set_callback<TArgRefsTuple: Copy>(
+        &mut self,
+        mut callback: impl FnMut(TArgRefsTuple) + 'static,
+    ) {
+        let dyn_callback = move |dyn_call: &DynCall<'rs>| {
+            let arg_refs_tuple_ptr =
+                dyn_call.provide_ptr_to_tuple_of_refs() as *const _ as *const TArgRefsTuple;
+            let arg_refs_tuple = unsafe { *arg_refs_tuple_ptr };
+            callback(arg_refs_tuple)
+        };
+        self.callback = Some(Arc::new(RefCell::new(dyn_callback)));
     }
 
     pub(crate) fn register_call(&mut self, call: Arc<DynCall<'rs>>) {
@@ -50,7 +59,9 @@ impl<'rs> FnConfig<'rs> {
     }
 
     pub(crate) fn select_next_return_value(&mut self) -> Option<DynReturnValue<'rs>> {
-        let Some(return_value_source) = self.return_value_sources.front() else {return None;};
+        let Some(return_value_source) = self.return_value_sources.front() else {
+            return None;
+        };
         return match return_value_source {
             ReturnValueSource::SingleTime(_) => {
                 let Some(ReturnValueSource::SingleTime(return_value)) =
@@ -61,7 +72,7 @@ impl<'rs> FnConfig<'rs> {
                     )
                 };
                 Some(return_value)
-            },
+            }
             ReturnValueSource::Perpetual(return_value_factory) => {
                 let return_value = return_value_factory();
                 Some(return_value)
@@ -69,7 +80,7 @@ impl<'rs> FnConfig<'rs> {
         };
     }
 
-    pub(crate) fn get_callback(&self) -> Option<Arc<RefCell<dyn FnMut()>>> {
+    pub(crate) fn get_callback(&self) -> Option<Arc<RefCell<dyn FnMut(&DynCall<'rs>)>>> {
         self.callback.clone()
     }
 
