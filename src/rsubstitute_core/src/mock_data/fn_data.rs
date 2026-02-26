@@ -6,18 +6,21 @@ use crate::mock_data::*;
 use crate::*;
 use std::cell::RefCell;
 use std::collections::HashMap;
+use std::marker::PhantomData;
 use std::sync::Arc;
 
-pub struct FnData<'rs> {
+pub struct FnData<'rs, TMock> {
+    _phantom_mock: PhantomData<TMock>,
     fn_name: &'static str,
     call_infos: RefCell<HashMap<GenericsHashKey, Vec<CallCheck<'rs>>>>,
     configs: RefCell<HashMap<GenericsHashKey, Vec<Arc<RefCell<FnConfig<'rs>>>>>>,
     error_printer: Arc<dyn IErrorPrinter>,
 }
 
-impl<'rs> FnData<'rs> {
+impl<'rs, TMock> FnData<'rs, TMock> {
     pub fn new(fn_name: &'static str) -> Self {
         Self {
+            _phantom_mock: PhantomData,
             fn_name,
             call_infos: RefCell::new(HashMap::new()),
             configs: RefCell::new(HashMap::new()),
@@ -176,7 +179,7 @@ impl<'rs> FnData<'rs> {
 mod internal {
     use super::*;
 
-    impl<'rs> FnData<'rs> {
+    impl<'rs, TMock> FnData<'rs, TMock> {
         pub fn reset(&self) {
             self.call_infos.borrow_mut().clear();
             self.configs.borrow_mut().clear();

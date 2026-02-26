@@ -44,7 +44,7 @@ mod __rsubstitute_generated_Trait {
 
     #[derive(IMockData)]
     pub struct TraitMockData<'rs> {
-        work_data: FnData<'rs>,
+        work_data: FnData<'rs, TraitMock<'rs>>,
     }
 
     #[derive(Clone)]
