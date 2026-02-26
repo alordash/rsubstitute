@@ -98,8 +98,8 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
 
 impl MockSetupImplGenerator {
     const FN_CONFIG_VAR_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("fn_config"));
-    const SHARED_FN_CONFIG_VAR_IDENT: LazyCell<Ident> =
-        LazyCell::new(|| format_ident!("shared_fn_config"));
+    const FN_TUNER_VAR_IDENT: LazyCell<Ident> =
+        LazyCell::new(|| format_ident!("fn_tuner"));
 
     fn generate_fn_setup(
         &self,
@@ -161,16 +161,16 @@ impl MockSetupImplGenerator {
                 diverge: None,
             },
         ));
-        let shared_fn_config_decl_stmt = Stmt::Local(
+        let fn_tuner_decl_stmt = Stmt::Local(
             self.local_factory.create(
-                Self::SHARED_FN_CONFIG_VAR_IDENT.clone(),
+                Self::FN_TUNER_VAR_IDENT.clone(),
                 LocalInit {
                     eq_token: Default::default(),
                     expr: Box::new(Expr::Call(ExprCall {
                         attrs: Vec::new(),
                         func: Box::new(self.path_factory.create_expr_from_parts(vec![
-                            constants::SHARED_FN_CONFIG_TYPE_IDENT.clone(),
-                            constants::SHARED_FN_CONFIG_NEW_FN_IDENT.clone(),
+                            constants::FN_TUNER_TYPE_IDENT.clone(),
+                            constants::FN_TUNER_NEW_FN_IDENT.clone(),
                         ])),
                         paren_token: Default::default(),
                         args: [
@@ -191,7 +191,7 @@ impl MockSetupImplGenerator {
                 return_token: Default::default(),
                 expr: Some(Box::new(
                     self.path_factory
-                        .create_expr(Self::SHARED_FN_CONFIG_VAR_IDENT.clone()),
+                        .create_expr(Self::FN_TUNER_VAR_IDENT.clone()),
                 )),
             }),
             Some(Default::default()),
@@ -199,7 +199,7 @@ impl MockSetupImplGenerator {
         let stmts = vec![
             args_checker_decl_stmt,
             fn_config_decl_stmt,
-            shared_fn_config_decl_stmt,
+            fn_tuner_decl_stmt,
             return_stmt,
         ];
         let block = Block {

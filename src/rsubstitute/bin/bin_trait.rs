@@ -240,15 +240,15 @@ mod generated {
         pub fn work(
             &'a self,
             value: impl Into<Arg<i32>>,
-        ) -> SharedFnConfig<'a, MyTraitMock<'a>, work_Call<'a>, work_ArgsChecker<'a>, (), Self>
+        ) -> FnTuner<'a, MyTraitMock<'a>, work_Call<'a>, work_ArgsChecker<'a>, (), Self>
         {
             let work_args_checker = work_ArgsChecker {
                 phantom_lifetime: PhantomData,
                 value: value.into(),
             };
             let fn_config = self.data.work_data.add_config(work_args_checker);
-            let shared_fn_config = SharedFnConfig::new(fn_config, self);
-            return shared_fn_config;
+            let fn_tuner = FnTuner::new(fn_config, self);
+            return fn_tuner;
         }
 
         pub fn another_work(
@@ -257,7 +257,7 @@ mod generated {
             something: impl Into<Arg<&'a &'a [u8]>>,
             dyn_obj: impl Into<Arg<&'a dyn IFoo>>,
             arc: impl Into<Arg<Arc<dyn IFoo>>>,
-        ) -> SharedFnConfig<
+        ) -> FnTuner<
             'a,
             MyTraitMock<'a>,
             another_work_Call<'a>,
@@ -276,20 +276,20 @@ mod generated {
                 .data
                 .another_work_data
                 .add_config(another_work_args_checker);
-            let shared_fn_config = SharedFnConfig::new(fn_config, self);
-            return shared_fn_config;
+            let fn_tuner = FnTuner::new(fn_config, self);
+            return fn_tuner;
         }
 
         pub fn get(
             &'a self,
-        ) -> SharedFnConfig<'a, MyTraitMock<'a>, get_Call<'a>, get_ArgsChecker<'a>, i32, Self>
+        ) -> FnTuner<'a, MyTraitMock<'a>, get_Call<'a>, get_ArgsChecker<'a>, i32, Self>
         {
             let get_args_checker = get_ArgsChecker {
                 phantom_lifetime: PhantomData,
             };
             let fn_config = self.data.get_data.add_config(get_args_checker);
-            let shared_fn_config = SharedFnConfig::new(fn_config, self);
-            return shared_fn_config;
+            let fn_tuner = FnTuner::new(fn_config, self);
+            return fn_tuner;
         }
     }
 

@@ -80,14 +80,14 @@ mod __rsubstitute_generated_Trait {
         }
     }
     impl<'rs> TraitMockSetup<'rs> {
-        pub fn work(&self, v: impl Into<Arg<i32>>) -> SharedFnConfig<'rs, Self, TraitMock, i32> {
+        pub fn work(&self, v: impl Into<Arg<i32>>) -> FnTuner<'rs, Self, TraitMock, i32> {
             let work_args_checker = work_ArgsChecker {
                 _phantom_lifetime: PhantomData,
                 v: v.into(),
             };
-            let shared_fn_config: SharedFnConfig<'_, _, _, i32> =
+            let fn_tuner: FnTuner<'_, _, _, i32> =
                 self.data.work_data.add_config(work_args_checker, self);
-            return unsafe { std::mem::transmute(shared_fn_config) };
+            return unsafe { std::mem::transmute(fn_tuner) };
         }
     }
     impl<'rs> TraitMockReceived<'rs> {

@@ -2,7 +2,7 @@ use crate::args::*;
 use crate::error_printer::IErrorPrinter;
 use crate::fn_parameters::*;
 use crate::matching_config_search_result::*;
-use crate::mock_data::{FnConfig, SharedFnConfig};
+use crate::mock_data::{FnConfig, FnTuner};
 use crate::*;
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -28,8 +28,8 @@ impl<'rs, TMock> FnData<'rs, TMock> {
     pub fn add_config<'a, TArgsChecker: IArgsChecker + 'a, TOwner, TReturnValue>(
         &self,
         args_checker: TArgsChecker,
-        shared_fn_config_owner: &'a TOwner,
-    ) -> SharedFnConfig<'a, TOwner, TMock, TReturnValue> {
+        fn_tuner_owner: &'a TOwner,
+    ) -> FnTuner<'a, TOwner, TMock, TReturnValue> {
         let dyn_args_checker: DynArgsChecker<'a> = DynArgsChecker::new(args_checker);
         let generics_hash_key = dyn_args_checker.get_generics_hash_key();
         let config = FnConfig::<'a, TMock>::new(dyn_args_checker);
@@ -39,9 +39,9 @@ impl<'rs, TMock> FnData<'rs, TMock> {
             .entry(generics_hash_key)
             .or_default()
             .push(unsafe { std::mem::transmute(arc_config.clone()) });
-        let shared_fn_config: SharedFnConfig<'_, TOwner, TMock, TReturnValue> =
-            SharedFnConfig::new(arc_config, shared_fn_config_owner);
-        return shared_fn_config;
+        let fn_tuner: FnTuner<'_, TOwner, TMock, TReturnValue> =
+            FnTuner::new(arc_config, fn_tuner_owner);
+        return fn_tuner;
     }
 
     pub fn verify_received<'a, TArgsChecker: IArgsChecker + 'a>(

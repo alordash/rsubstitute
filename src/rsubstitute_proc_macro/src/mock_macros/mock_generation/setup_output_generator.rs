@@ -65,7 +65,7 @@ impl SetupOutputGenerator {
             path: Path {
                 leading_colon: None,
                 segments: [PathSegment {
-                    ident: constants::SHARED_FN_CONFIG_TYPE_IDENT.clone(),
+                    ident: constants::FN_TUNER_TYPE_IDENT.clone(),
                     arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
                         colon2_token: None,
                         lt_token: Default::default(),

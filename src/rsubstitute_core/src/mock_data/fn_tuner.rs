@@ -1,22 +1,20 @@
-use crate::IBaseCaller;
 use crate::fn_parameters::*;
 use crate::mock_data::FnConfig;
 use std::cell::RefCell;
 use std::marker::PhantomData;
 use std::sync::Arc;
 
-// TODO - rename to something like ReturnConfig to better reflect intended usage
-pub struct SharedFnConfig<'rs, TOwner, TMock, TReturnValue> {
+pub struct FnTuner<'rs, TOwner, TMock, TReturnValue> {
     _phantom_return_value: PhantomData<TReturnValue>,
     fn_config: Arc<RefCell<FnConfig<'rs, TMock>>>,
     owner: &'rs TOwner,
 }
 
-impl<'rs, TOwner, TMock, TReturnValue> SharedFnConfig<'rs, TOwner, TMock, TReturnValue> {
-    pub fn new(shared_fn_config: Arc<RefCell<FnConfig<'rs, TMock>>>, owner: &'rs TOwner) -> Self {
+impl<'rs, TOwner, TMock, TReturnValue> FnTuner<'rs, TOwner, TMock, TReturnValue> {
+    pub fn new(fn_tuner: Arc<RefCell<FnConfig<'rs, TMock>>>, owner: &'rs TOwner) -> Self {
         Self {
             _phantom_return_value: PhantomData,
-            fn_config: shared_fn_config,
+            fn_config: fn_tuner,
             owner,
         }
     }
@@ -104,7 +102,7 @@ impl<'rs, TOwner, TMock, TReturnValue> SharedFnConfig<'rs, TOwner, TMock, TRetur
 }
 
 impl<'rs, TOwner, TMock>
-    SharedFnConfig<'rs, TOwner, TMock, ()>
+    FnTuner<'rs, TOwner, TMock, ()>
 {
     pub fn does(&self, callback: impl FnMut() + 'static) -> &'rs TOwner {
         self.fn_config.borrow_mut().set_callback(callback);
@@ -118,7 +116,7 @@ impl<'rs, TOwner, TMock>
 
 // TODO - support
 // impl<'a, TOwner, TMock, TCall, TReturnType, TArgsChecker>
-//     SharedFnConfig<'a, TOwner, TMock, TCall, TReturnType, TArgsChecker>
+//     FnTuner<'a, TOwner, TMock, TCall, TReturnType, TArgsChecker>
 // where
 //     TMock: IBaseCaller<TCall, TReturnType>,
 // {

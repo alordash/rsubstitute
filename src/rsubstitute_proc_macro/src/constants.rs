@@ -144,10 +144,10 @@ pub const SERVICES_REF_EXPR: LazyCell<Expr> = LazyCell::new(|| {
     return result;
 });
 
-pub const SHARED_FN_CONFIG_TYPE_IDENT: LazyCell<Ident> =
-    LazyCell::new(|| format_ident!("SharedFnConfig"));
+pub const FN_TUNER_TYPE_IDENT: LazyCell<Ident> =
+    LazyCell::new(|| format_ident!("FnTuner"));
 
-pub const SHARED_FN_CONFIG_NEW_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("new"));
+pub const FN_TUNER_NEW_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("new"));
 
 pub const ALLOW_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("allow"));
 

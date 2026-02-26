@@ -96,16 +96,16 @@ mod __rsubstitute_generated_Trait {
             &self,
             t1: impl Into<Arg<T1>>,
             t2: impl Into<Arg<&'rs T2>>,
-        ) -> SharedFnConfig<'rs, Self, TraitMock<'rs, T1>, T3> {
+        ) -> FnTuner<'rs, Self, TraitMock<'rs, T1>, T3> {
             let work_args_checker: work_ArgsChecker<T1, T2, T3, B, N> = work_ArgsChecker {
                 _phantom_lifetime: PhantomData,
                 _return_type: PhantomData,
                 t1: t1.into(),
                 t2: t2.into(),
             };
-            let shared_fn_config: SharedFnConfig<'_, _, _, T3> =
+            let fn_tuner: FnTuner<'_, _, _, T3> =
                 self.data.work_data.add_config(work_args_checker, self);
-            return unsafe { std::mem::transmute(shared_fn_config) };
+            return unsafe { std::mem::transmute(fn_tuner) };
         }
     }
     impl<'rs, T1> TraitMockReceived<'rs, T1> {
