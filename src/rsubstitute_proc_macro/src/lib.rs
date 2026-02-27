@@ -4,6 +4,7 @@ mod constants;
 mod derive_args_formatter_macro_handler;
 mod derive_args_infos_provider_macro_handler;
 mod derive_args_tuple_provider_macro_handler;
+mod derive_clone_for_r_substitute_macro_handler;
 mod derive_generics_hash_key_provider_macro_handler;
 mod derive_mock_data_macro_handler;
 mod di;
@@ -71,4 +72,12 @@ pub fn derive_generics_hash_key_provider(item: proc_macro::TokenStream) -> proc_
         &SERVICES.derive_generics_hash_key_provider_macro_handler;
 
     return derive_generics_hash_key_provider_macro_handler.handle(item);
+}
+
+#[proc_macro_derive(CloneForRSubstitute)]
+pub fn derive_clone_for_r_substitute(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let derive_clone_for_rsubstitute_macro_handler =
+        &SERVICES.derive_clone_for_rsubstitute_macro_handler;
+
+    return derive_clone_for_rsubstitute_macro_handler.handle(item);
 }

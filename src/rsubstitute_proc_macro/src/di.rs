@@ -1,6 +1,7 @@
 use crate::derive_args_formatter_macro_handler::*;
 use crate::derive_args_infos_provider_macro_handler::*;
 use crate::derive_args_tuple_provider_macro_handler::*;
+use crate::derive_clone_for_r_substitute_macro_handler::*;
 use crate::derive_generics_hash_key_provider_macro_handler::*;
 use crate::derive_mock_data_macro_handler::*;
 use crate::mock_macros::fn_info_generation::*;
@@ -25,6 +26,7 @@ pub(crate) struct ServiceCollection {
     pub derive_mock_data_macro_handler: Arc<dyn IDeriveMockDataMacroHandler>,
     pub derive_generics_hash_key_provider_macro_handler:
         Arc<dyn IDeriveGenericsHashKeyProviderMacroHandler>,
+    pub derive_clone_for_rsubstitute_macro_handler: Arc<dyn IDeriveCloneForRSubstituteMacroHandler>,
     pub mock_macro_handler: Arc<dyn IMockMacroHandler>,
     pub struct_mock_syntax_parser: Arc<dyn IStructMockSyntaxParser>,
 }
@@ -235,6 +237,14 @@ fn create_services() -> ServiceCollection {
             path_factory: path_factory.clone(),
             expr_method_call_factory: expr_method_call_factory.clone(),
         });
+    let derive_clone_for_rsubstitute_macro_handler =
+        Arc::new(DeriveCloneForRSubstituteMacroHandler {
+            path_factory: path_factory.clone(),
+            type_factory: type_factory.clone(),
+            field_access_expr_factory: field_access_expr_factory.clone(),
+            expr_reference_factory: expr_reference_factory.clone(),
+            expr_method_call_factory: expr_method_call_factory.clone(),
+        });
 
     let fn_setup_generator = Arc::new(FnSetupGenerator {
         input_args_generator: input_args_generator.clone(),
@@ -360,6 +370,7 @@ fn create_services() -> ServiceCollection {
         derive_args_tuple_provider_macro_handler,
         derive_mock_data_macro_handler,
         derive_generics_hash_key_provider_macro_handler,
+        derive_clone_for_rsubstitute_macro_handler,
         mock_macro_handler,
         struct_mock_syntax_parser,
     };

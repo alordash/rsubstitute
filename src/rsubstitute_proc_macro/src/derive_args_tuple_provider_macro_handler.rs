@@ -121,10 +121,9 @@ impl DeriveArgsTupleProviderMacroHandler {
             .ident
             .clone()
             .expect("Call struct fields should have ident.");
-        let field_access = self.expr_reference_factory.create(
-            self.field_access_expr_factory
-                .create(vec![constants::SELF_IDENT.clone(), field_ident.clone()]),
-        );
+        let field_access = self
+            .field_access_expr_factory
+            .create(vec![constants::SELF_IDENT.clone(), field_ident.clone()]);
         let field_reference = self.expr_reference_factory.create(field_access);
         return field_reference;
     }

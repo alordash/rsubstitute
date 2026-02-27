@@ -28,7 +28,9 @@ mod __rsubstitute_generated_Trait {
     use super::*;
     use rsubstitute::for_generated::*;
 
-    #[derive(IGenericsHashKeyProvider, IArgsInfosProvider, IArgsTupleProvider)]
+    #[derive(
+        IGenericsHashKeyProvider, IArgsInfosProvider, IArgsTupleProvider, CloneForRSubstitute,
+    )]
     pub struct work_Call<'rs, T1, T2: Clone, T3: Default, const B: bool, const N: usize>
     where
         T1: Clone,
@@ -37,20 +39,6 @@ mod __rsubstitute_generated_Trait {
         _return_type: PhantomData<T3>,
         t1: T1,
         t2: &'rs T2,
-    }
-    impl<'rs, T1, T2: Clone, T3: Default, const B: bool, const N: usize> Clone
-        for work_Call<'rs, T1, T2, T3, B, N>
-    where
-        T1: Clone,
-    {
-        fn clone(&self) -> Self {
-            Self {
-                _phantom_lifetime: PhantomData,
-                _return_type: PhantomData,
-                t1: (&self.t1).clone(),
-                t2: (&self.t2).clone(),
-            }
-        }
     }
 
     #[derive(Debug, IGenericsHashKeyProvider, IArgsFormatter)]
@@ -96,7 +84,11 @@ mod __rsubstitute_generated_Trait {
         data: Arc<TraitMockData<'rs, T1>>,
     }
     impl<'rs, T1> Trait<'rs, T1> for TraitMock<'rs, T1> {
-        fn work<T2: Clone, T3: Default, const B: bool, const N: usize>(&self, t1: T1, t2: &'rs T2) -> T3
+        fn work<T2: Clone, T3: Default, const B: bool, const N: usize>(
+            &self,
+            t1: T1,
+            t2: &'rs T2,
+        ) -> T3
         where
             T1: Clone,
         {
@@ -238,8 +230,8 @@ mod tests {
         mock.received
             .work::<_, i32, true, 2>(10, &"amogus", Times::Once)
             .work::<_, i32, true, 4>(10, &"amogus", Times::Once)
-            // .work::<_, i32, false, 2>(10, &"amogus", Times::Once)
-            // .work::<_, [i32; 5], false, 2>(10, &"amogus", Times::Once)
+            .work::<_, i32, false, 2>(10, &"amogus", Times::Once)
+            .work::<_, [i32; 5], false, 2>(10, &"amogus", Times::Once)
             // TODO - mock.received - value used after move
             .work::<_, i32, true, 2>(10, &"quo vadis", Times::Never)
             .work::<_, i32, true, 4>(11, &"amogus", Times::Never)

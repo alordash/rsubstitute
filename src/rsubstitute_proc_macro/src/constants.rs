@@ -1,4 +1,5 @@
 // TODO - write macros for ident definition, replace all LazyCell<Ident>
+use crate::constants;
 use crate::di::SERVICES;
 use proc_macro2::{Ident, Span};
 use quote::format_ident;
@@ -215,6 +216,22 @@ pub const CLONE_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
         CLONE_TRAIT_IDENT.clone(),
     ]);
     return result;
+});
+pub const CLONE_FN_SIGNATURE: LazyCell<Signature> = LazyCell::new(|| {
+    let signature = Signature {
+        constness: None,
+        asyncness: None,
+        unsafety: None,
+        abi: None,
+        fn_token: Default::default(),
+        ident: format_ident!("clone"),
+        generics: Generics::default(),
+        paren_token: Default::default(),
+        inputs: [REF_SELF_ARG.clone()].into_iter().collect(),
+        variadic: None,
+        output: ReturnType::Type(Default::default(), Box::new(SELF_TYPE.clone())),
+    };
+    return signature;
 });
 
 pub const DERIVE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("derive"));
