@@ -1,7 +1,7 @@
 use rsubstitute::macros::*;
 
 // #[mock]
-trait Trait {
+trait Trait<'rs> {
     fn work(&self, v: i32) -> i32;
 }
 
@@ -59,7 +59,7 @@ mod __rsubstitute_generated_Trait {
         pub received: TraitMockReceived<'rs>,
         data: Arc<TraitMockData<'rs>>,
     }
-    impl<'rs> Trait for TraitMock<'rs> {
+    impl<'rs> Trait<'rs> for TraitMock<'rs> {
         fn work(&self, v: i32) -> i32 {
             let call = unsafe {
                 work_Call {

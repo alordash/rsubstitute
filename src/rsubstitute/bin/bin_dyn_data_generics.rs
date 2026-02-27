@@ -2,8 +2,8 @@ use rsubstitute::macros::*;
 use std::fmt::Debug;
 
 // #[mock]
-trait Trait<T1> {
-    fn work<T2, T3, const B: bool, const N: usize>(&self, t1: T1, t2: &T2) -> T3;
+trait Trait<'rs, T1> {
+    fn work<T2, T3, const B: bool, const N: usize>(&self, t1: T1, t2: &'rs T2) -> T3;
 }
 
 #[cfg(test)]
@@ -68,8 +68,8 @@ mod __rsubstitute_generated_Trait {
         pub received: TraitMockReceived<'rs, T1>,
         data: Arc<TraitMockData<'rs, T1>>,
     }
-    impl<'rs, T1> Trait<T1> for TraitMock<'rs, T1> {
-        fn work<T2, T3, const B: bool, const N: usize>(&self, t1: T1, t2: &T2) -> T3 {
+    impl<'rs, T1> Trait<'rs, T1> for TraitMock<'rs, T1> {
+        fn work<T2, T3, const B: bool, const N: usize>(&self, t1: T1, t2: &'rs T2) -> T3 {
             let call: work_Call<T1, T2, T3, B, N> = unsafe {
                 work_Call {
                     _phantom_lifetime: PhantomData,
@@ -179,7 +179,6 @@ mod tests {
         // {
         //     let q = 12;
         //     let r = &q;
-        //     // TODO - forbid in via documentation!
         //     mock.work::<_, i32, true, 2>(10, r);
         // }
 

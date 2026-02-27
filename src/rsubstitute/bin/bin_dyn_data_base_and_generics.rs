@@ -3,8 +3,8 @@ use std::fmt::Debug;
 
 // #[mock]
 #[allow(unused)]
-trait Trait<T1> {
-    fn work<T2: Clone, T3: Default, const B: bool, const N: usize>(&self, t1: T1, t2: &T2) -> T3
+trait Trait<'rs, T1> {
+    fn work<T2: Clone, T3: Default, const B: bool, const N: usize>(&self, t1: T1, t2: &'rs T2) -> T3
     where
         T1: Clone,
     {
@@ -104,8 +104,8 @@ mod __rsubstitute_generated_Trait {
         pub received: TraitMockReceived<'rs, T1>,
         data: Arc<TraitMockData<'rs, T1>>,
     }
-    impl<'rs, T1> Trait<T1> for TraitMock<'rs, T1> {
-        fn work<T2: Clone, T3: Default, const B: bool, const N: usize>(&self, t1: T1, t2: &T2) -> T3
+    impl<'rs, T1> Trait<'rs, T1> for TraitMock<'rs, T1> {
+        fn work<T2: Clone, T3: Default, const B: bool, const N: usize>(&self, t1: T1, t2: &'rs T2) -> T3
         where
             T1: Clone,
         {
@@ -238,13 +238,6 @@ mod tests {
         let av1 = mock.work::<_, i32, true, 2>(10, &"amogus");
         let av4 = mock.work::<_, [i32; 5], false, 2>(10, &"amogus");
         let av5 = mock.work::<_, i32, false, 2>(23, &Foo { amogus: 53.2f32 });
-
-        // {
-        //     let q = 12;
-        //     let r = &q;
-        //     // TODO - forbid in via documentation!
-        //     mock.work::<_, i32, true, 2>(10, r);
-        // }
 
         assert_eq!(i32::default(), av1);
         assert_eq!(v2, av2);

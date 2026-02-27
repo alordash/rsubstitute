@@ -1,8 +1,8 @@
 use rsubstitute::macros::*;
 
 // #[mock]
-trait Trait {
-    fn work<'a>(&self, v: &'a i32) -> &'a i32;
+trait Trait<'rs> {
+    fn work<'a: 'rs>(&self, v: &'a i32) -> &'a i32;
 }
 
 #[cfg(test)]
@@ -59,8 +59,8 @@ mod __rsubstitute_generated_Trait {
         pub received: TraitMockReceived<'rs>,
         data: Arc<TraitMockData<'rs>>,
     }
-    impl<'rs> Trait for TraitMock<'rs> {
-        fn work<'a>(&self, v: &'a i32) -> &'a i32 {
+    impl<'rs> Trait<'rs> for TraitMock<'rs> {
+        fn work<'a: 'rs>(&self, v: &'a i32) -> &'a i32 {
             let call = unsafe {
                 work_Call {
                     _phantom_lifetime: PhantomData,
@@ -140,6 +140,12 @@ mod tests {
             .and_does(|args| println!("accepted v2, v2 arg = {}", args))
             .work(Arg::Is(|x: &&i32| **x < 0))
             .returns(r3);
+
+        // {
+        //     let q = 12;
+        //     let r = &q;
+        //     mock.work(r);
+        // }
 
         // Act
         let actual_r1 = mock.work(v1);
