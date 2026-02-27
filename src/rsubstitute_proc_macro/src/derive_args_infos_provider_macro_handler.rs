@@ -20,6 +20,7 @@ pub(crate) struct DeriveArgsInfosProviderMacroHandler {
     pub field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
     pub expr_reference_factory: Arc<dyn IExprReferenceFactory>,
     pub debug_string_expr_generator: Arc<dyn IDebugStringExprGenerator>,
+    pub field_checker: Arc<dyn IFieldChecker>
 }
 
 impl IDeriveArgsInfosProviderMacroHandler for DeriveArgsInfosProviderMacroHandler {
@@ -89,6 +90,7 @@ impl DeriveArgsInfosProviderMacroHandler {
         let check_exprs: Punctuated<_, Token![,]> = item_struct
             .fields
             .iter()
+            .filter(|field| !self.field_checker.is_phantom_data(field))
             .map(|field| self.generate_arg_info_new_expr(field))
             .collect();
         let vec_expr = Expr::Macro(ExprMacro {
