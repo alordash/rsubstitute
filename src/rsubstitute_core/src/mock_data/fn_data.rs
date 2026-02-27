@@ -47,7 +47,7 @@ impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool> FnData<'rs, TMock, SUPPORTS_
             .borrow_mut()
             .entry(generics_hash_key)
             .or_default()
-            .push(unsafe { std::mem::transmute(arc_config.clone()) });
+            .push(unsafe { core::mem::transmute(arc_config.clone()) });
         let fn_tuner = FnTuner::new(arc_config, fn_tuner_owner);
         return fn_tuner;
     }

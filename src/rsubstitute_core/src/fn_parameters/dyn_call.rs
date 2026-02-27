@@ -1,13 +1,13 @@
 use crate::args::*;
-use crate::fn_parameters::{IArgsTupleProvider, ICall};
-use crate::{GenericsHasher, IGenericsHashKeyProvider};
+use crate::fn_parameters::*;
+use crate::*;
 use std::ops::Deref;
 
 pub struct DynCall<'rs> {
     inner: Box<dyn ICall + 'rs>,
 }
 
-impl<'rs> IArgInfosProvider for DynCall<'rs> {
+impl<'rs> IArgsInfosProvider for DynCall<'rs> {
     fn get_arg_infos(&self) -> Vec<ArgInfo> {
         self.inner.get_arg_infos()
     }
@@ -35,7 +35,7 @@ impl<'rs> DynCall<'rs> {
             // TODO - add special function for transmuting between different lifetimes
             // and use only it in such cases. Also add comments why it exists
             // (primarily because references need to live across Arrange-Act-Assert bound)
-            std::mem::transmute(Self {
+            core::mem::transmute(Self {
                 inner: Box::new(value),
             })
         }

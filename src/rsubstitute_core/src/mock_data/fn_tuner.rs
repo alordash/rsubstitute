@@ -35,7 +35,7 @@ impl<'rs, TOwner, TArgRefsTuple: Copy, TReturnValue, const SUPPORTS_BASE_CALLING
     where
         TReturnValue: IReturnValue<'a> + 'a,
     {
-        let dyn_return_value = unsafe { std::mem::transmute(DynReturnValue::new(return_value)) };
+        let dyn_return_value = unsafe { core::mem::transmute(DynReturnValue::new(return_value)) };
         let return_value_source = ReturnValueSource::SingleTime(dyn_return_value);
         self.fn_config
             .borrow_mut()

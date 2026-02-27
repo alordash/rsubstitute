@@ -30,7 +30,7 @@ impl<'rs, TOwner, TArgRefsTuple: Copy, TReturnValue>
     {
         let return_value_sources = return_values
             .into_iter()
-            .map(|x| unsafe { std::mem::transmute(DynReturnValue::new(x)) })
+            .map(|x| unsafe { core::mem::transmute(DynReturnValue::new(x)) })
             .map(ReturnValueSource::SingleTime);
         self.fn_config
             .borrow_mut()
@@ -46,7 +46,7 @@ impl<'rs, TOwner, TArgRefsTuple: Copy, TReturnValue>
         TReturnValue: 'rs + 'a + IReturnValue<'a> + Clone,
     {
         let return_value_source = ReturnValueSource::Perpetual(Box::new(move || unsafe {
-            std::mem::transmute(DynReturnValue::new(return_value.clone()))
+            core::mem::transmute(DynReturnValue::new(return_value.clone()))
         }));
         self.fn_config
             .borrow_mut()

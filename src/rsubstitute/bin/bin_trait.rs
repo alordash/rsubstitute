@@ -202,9 +202,9 @@ mod generated {
             let call = unsafe {
                 another_work_Call {
                     phantom_lifetime: PhantomData,
-                    string: std::mem::transmute(string),
-                    something: std::mem::transmute(something),
-                    dyn_obj: std::mem::transmute(dyn_obj),
+                    string: core::mem::transmute(string),
+                    something: core::mem::transmute(something),
+                    dyn_obj: core::mem::transmute(dyn_obj),
                     arc,
                 }
             };

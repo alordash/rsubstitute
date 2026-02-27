@@ -159,7 +159,7 @@ mod generated {
                 another_work_Call {
                     phantom_lifetime: PhantomData,
                     phantom_T: PhantomData,
-                    string: std::mem::transmute(string),
+                    string: core::mem::transmute(string),
                 }
             };
             return self.data.another_work_data.handle_returning(call);

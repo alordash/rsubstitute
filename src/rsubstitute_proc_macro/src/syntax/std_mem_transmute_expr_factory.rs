@@ -37,7 +37,7 @@ impl StdMemTransmuteExprFactory {
     const STD_MEM_TRANSMUTE_FUNC_PATH_EXPR: LazyCell<Expr> = LazyCell::new(|| {
         let path_factory = &SERVICES.path_factory;
         let expr = path_factory.create_expr_from_parts(vec![
-            format_ident!("std"),
+            format_ident!("core"),
             format_ident!("mem"),
             format_ident!("transmute"),
         ]);

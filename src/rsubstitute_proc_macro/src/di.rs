@@ -1,5 +1,6 @@
 use crate::derive_args_formatter_macro_handler::*;
 use crate::derive_args_infos_provider_macro_handler::*;
+use crate::derive_args_tuple_provider_macro_handler::*;
 use crate::derive_generics_hash_key_provider_macro_handler::*;
 use crate::derive_mock_data_macro_handler::*;
 use crate::mock_macros::fn_info_generation::*;
@@ -20,6 +21,7 @@ pub(crate) struct ServiceCollection {
     pub expr_reference_factory: Arc<dyn IExprReferenceFactory>,
     pub derive_args_formatter_macro_handler: Arc<dyn IDeriveArgsFormatterMacroHandler>,
     pub derive_args_infos_provider_macro_handler: Arc<dyn IDeriveArgsInfosProviderMacroHandler>,
+    pub derive_args_tuple_provider_macro_handler: Arc<dyn IDeriveArgsTupleProviderMacroHandler>,
     pub derive_mock_data_macro_handler: Arc<dyn IDeriveMockDataMacroHandler>,
     pub derive_generics_hash_key_provider_macro_handler:
         Arc<dyn IDeriveGenericsHashKeyProviderMacroHandler>,
@@ -213,7 +215,14 @@ fn create_services() -> ServiceCollection {
         field_access_expr_factory: field_access_expr_factory.clone(),
         expr_reference_factory: expr_reference_factory.clone(),
         debug_string_expr_generator: debug_string_expr_generator.clone(),
-        field_checker: field_checker.clone()
+        field_checker: field_checker.clone(),
+    });
+    let derive_args_tuple_provider_macro_handler = Arc::new(DeriveArgsTupleProviderMacroHandler {
+        path_factory: path_factory.clone(),
+        type_factory: type_factory.clone(),
+        field_access_expr_factory: field_access_expr_factory.clone(),
+        expr_reference_factory: expr_reference_factory.clone(),
+        field_checker: field_checker.clone(),
     });
     let derive_mock_data_macro_handler = Arc::new(DeriveMockDataMacroHandler {
         path_factory: path_factory.clone(),
@@ -348,6 +357,7 @@ fn create_services() -> ServiceCollection {
         expr_reference_factory,
         derive_args_formatter_macro_handler,
         derive_args_infos_provider_macro_handler,
+        derive_args_tuple_provider_macro_handler,
         derive_mock_data_macro_handler,
         derive_generics_hash_key_provider_macro_handler,
         mock_macro_handler,

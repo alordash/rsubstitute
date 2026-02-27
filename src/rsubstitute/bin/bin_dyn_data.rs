@@ -16,15 +16,10 @@ mod __rsubstitute_generated_Trait {
     use super::*;
     use rsubstitute::for_generated::*;
 
-    #[derive(Clone, IGenericsHashKeyProvider, IArgInfosProvider)]
+    #[derive(Clone, IGenericsHashKeyProvider, IArgsInfosProvider, IArgsTupleProvider)]
     pub struct work_Call<'rs> {
         _phantom_lifetime: PhantomData<&'rs ()>,
         v: i32,
-    }
-    impl<'rs> IArgsTupleProvider for work_Call<'rs> {
-        fn provide_ptr_to_tuple_of_refs(&self) -> *const () {
-            core::ptr::from_ref(&(&self.v)) as *const ()
-        }
     }
 
     #[derive(Debug, IArgsFormatter, IGenericsHashKeyProvider)]
@@ -64,7 +59,7 @@ mod __rsubstitute_generated_Trait {
             let call = unsafe {
                 work_Call {
                     _phantom_lifetime: PhantomData,
-                    v: std::mem::transmute(v),
+                    v: core::mem::transmute(v),
                 }
             };
             return self.data.work_data.handle_returning(call);
@@ -90,7 +85,7 @@ mod __rsubstitute_generated_Trait {
             };
             let fn_tuner: FnTuner<'_, _, (&i32), i32, _> =
                 self.data.work_data.add_config(work_args_checker, self);
-            return unsafe { std::mem::transmute(fn_tuner) };
+            return unsafe { core::mem::transmute(fn_tuner) };
         }
     }
     impl<'rs> TraitMockReceived<'rs> {

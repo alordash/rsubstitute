@@ -59,8 +59,11 @@ pub const I_ARGS_FORMATTER_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_i
 pub const I_ARGS_CHECKER_TRAIT_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("IArgsChecker"));
 
-pub const I_ARG_INFOS_PROVIDER_TRAIT_IDENT: LazyCell<Ident> =
-    LazyCell::new(|| format_ident!("IArgInfosProvider"));
+pub const I_ARGS_INFOS_PROVIDER_TRAIT_IDENT: LazyCell<Ident> =
+    LazyCell::new(|| format_ident!("IArgsInfosProvider"));
+
+pub const I_ARGS_TUPLE_PROVIDER_TRAIT_IDENT: LazyCell<Ident> =
+    LazyCell::new(|| format_ident!("IArgsTupleProvider"));
 
 pub const I_BASE_CALLER_TRAIT_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("IBaseCaller"));
@@ -144,8 +147,7 @@ pub const SERVICES_REF_EXPR: LazyCell<Expr> = LazyCell::new(|| {
     return result;
 });
 
-pub const FN_TUNER_TYPE_IDENT: LazyCell<Ident> =
-    LazyCell::new(|| format_ident!("FnTuner"));
+pub const FN_TUNER_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("FnTuner"));
 
 pub const FN_TUNER_NEW_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("new"));
 
@@ -524,3 +526,12 @@ pub const HASH_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("hash"
 
 pub const ARG_PRINTER_STRUCT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("ArgPrinter"));
 pub const DEBUG_STRING_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("debug_string"));
+
+pub const VOID_PTR_TYPE: LazyCell<Type> = LazyCell::new(|| {
+    Type::Ptr(TypePtr {
+        star_token: Default::default(),
+        const_token: Some(Default::default()),
+        mutability: None,
+        elem: Box::new(VOID_TYPE.clone()),
+    })
+});

@@ -63,7 +63,7 @@ impl<T> Arg<T> {
     pub fn Is<'a, TFn: Fn(&T) -> bool + 'a>(predicate: TFn) -> Self {
         let reference = Box::new(predicate) as Box<dyn Fn(&T) -> bool + 'a>;
         let static_reference: Box<dyn Fn(&T) -> bool + 'static> =
-            unsafe { std::mem::transmute(reference) };
+            unsafe { core::mem::transmute(reference) };
         return Self::PrivateIs(static_reference, Private);
     }
 
