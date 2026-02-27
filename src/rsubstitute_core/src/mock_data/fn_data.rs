@@ -9,7 +9,7 @@ use std::collections::HashMap;
 use std::marker::PhantomData;
 use std::sync::Arc;
 
-pub struct FnData<'rs, TMock, const SUPPORTS_BASE_CALLING: bool = false> {
+pub struct FnData<'rs, TMock, const SUPPORTS_BASE_CALLING: bool> {
     _phantom_mock: PhantomData<TMock>,
     fn_name: &'static str,
     call_infos: RefCell<HashMap<GenericsHashKey, Vec<CallCheck<'rs>>>>,

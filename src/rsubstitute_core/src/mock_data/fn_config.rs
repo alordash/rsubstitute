@@ -92,17 +92,3 @@ impl<'rs> FnConfig<'rs> {
         self.call_base
     }
 }
-
-// TODO - support
-// impl<'rs, TMock, TCall, TReturnType> FnConfig<'rs, TMock>
-// where
-//     TMock: IBaseCaller<TCall, TReturnType>,
-// {
-//     pub(crate) fn set_call_base(&mut self) {
-//         self.call_base = true;
-//     }
-//
-//     pub(crate) fn should_call_base(&self) -> bool {
-//         self.call_base
-//     }
-// }
