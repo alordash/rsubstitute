@@ -51,8 +51,6 @@ impl IMockImplGenerator for MockImplGenerator {
             mock_struct_traits,
             maybe_inner_data_param,
         );
-        let setup_fn = self.generate_setup_fn(&mock_setup_struct);
-        let received_fn = self.generate_received_fn(&mock_received_struct);
 
         let item_impl = ItemImpl {
             attrs: Vec::new(),
@@ -63,7 +61,7 @@ impl IMockImplGenerator for MockImplGenerator {
             trait_: None,
             self_ty: Box::new(self_ty),
             brace_token: Default::default(),
-            items: [constructor, setup_fn, received_fn].into_iter().collect(),
+            items: [constructor].into_iter().collect(),
         };
         let mock_impl = MockImpl { item_impl };
         return mock_impl;
@@ -136,93 +134,4 @@ impl MockImplGenerator {
         };
         return ImplItem::Fn(item_impl_fn);
     }
-
-    fn generate_setup_fn(&self, mock_setup_struct: &MockSetupStruct) -> ImplItem {
-        let impl_item = self.generate_config_fn(
-            mock_setup_struct.item_struct.ident.clone(),
-            mock_setup_struct.item_struct.generics.clone(),
-            ConfigMember::Setup,
-        );
-        return impl_item;
-    }
-
-    fn generate_received_fn(&self, mock_received_struct: &MockReceivedStruct) -> ImplItem {
-        let impl_item = self.generate_config_fn(
-            mock_received_struct.item_struct.ident.clone(),
-            mock_received_struct.item_struct.generics.clone(),
-            ConfigMember::Received,
-        );
-        return impl_item;
-    }
-
-    fn generate_config_fn(
-        &self,
-        config_ident: Ident,
-        mut config_generics: Generics,
-        config_member: ConfigMember,
-    ) -> ImplItem {
-        for lifetime_param in config_generics.lifetimes_mut() {
-            lifetime_param.lifetime.ident = constants::CONFIG_LIFETIME_IDENT.clone();
-        }
-        let config_type = self
-            .type_factory
-            .create_with_generics(config_ident, config_generics);
-        let ident = match config_member {
-            ConfigMember::Setup => constants::MOCK_SETUP_FIELD_IDENT.clone(),
-            ConfigMember::Received => constants::MOCK_RECEIVED_FIELD_IDENT.clone(),
-        };
-        let block = self.generate_config_block(ident.clone());
-        let item_impl_fn = ImplItemFn {
-            attrs: Vec::new(),
-            vis: Visibility::Public(Default::default()),
-            defaultness: None,
-            sig: Signature {
-                constness: None,
-                asyncness: None,
-                unsafety: None,
-                abi: None,
-                fn_token: Default::default(),
-                ident,
-                generics: constants::CONFIG_LIFETIME_GENERICS.clone(),
-                paren_token: Default::default(),
-                inputs: [constants::REF_SELF_ARG.clone()].into_iter().collect(),
-                variadic: None,
-                output: ReturnType::Type(Default::default(), Box::new(config_type)),
-            },
-            block,
-        };
-        return ImplItem::Fn(item_impl_fn);
-    }
-
-    fn generate_config_block(&self, config_ident: Ident) -> Block {
-        let config_clone_expr = Expr::MethodCall(self.expr_method_call_factory.create(
-            vec![constants::SELF_IDENT.clone(), config_ident],
-            constants::CLONE_FN_IDENT.clone(),
-            Vec::new(),
-        ));
-        let block = Block {
-            brace_token: Default::default(),
-            stmts: vec![Stmt::Expr(
-                Expr::Unsafe(ExprUnsafe {
-                    attrs: Vec::new(),
-                    unsafe_token: Default::default(),
-                    block: Block {
-                        brace_token: Default::default(),
-                        stmts: vec![Stmt::Expr(
-                            self.std_mem_transmute_expr_factory
-                                .create_for_expr(config_clone_expr),
-                            None,
-                        )],
-                    },
-                }),
-                None,
-            )],
-        };
-        return block;
-    }
-}
-
-enum ConfigMember {
-    Setup,
-    Received,
 }

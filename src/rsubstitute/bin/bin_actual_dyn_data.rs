@@ -145,12 +145,6 @@ mod __rsubstitute_generated_Trait {
                 data,
             };
         }
-        pub fn setup<'__rsubstitute_config>(&self) -> TraitMockSetup<'__rsubstitute_config> {
-            unsafe { core::mem::transmute(self.setup.clone()) }
-        }
-        pub fn received<'__rsubstitute_config>(&self) -> TraitMockReceived<'__rsubstitute_config> {
-            unsafe { core::mem::transmute(self.received.clone()) }
-        }
     }
     impl<'rs> TraitMockSetup<'rs> {
         pub fn work(
