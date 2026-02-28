@@ -101,9 +101,9 @@ impl FnDeclExtractor {
     }
 
     fn validate_signature(&self, sig: &Signature) {
-        if !sig.generics.params.is_empty() {
-            panic!("Generic type parameters for associated functions are not supported.");
-        }
+        // if !sig.generics.params.is_empty() {
+        //     panic!("Generic type parameters for associated functions are not supported.");
+        // }
     }
 
     fn create_fn_decl(

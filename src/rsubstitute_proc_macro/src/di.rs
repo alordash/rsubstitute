@@ -292,6 +292,9 @@ fn create_services() -> ServiceCollection {
     let ignored_impl_fixer = Arc::new(IgnoredImplFixer {
         generics_merger: generics_merger.clone(),
     });
+    let lifetimes_specifier = Arc::new(LifetimesSpecifier {
+        reference_type_crawler: reference_type_crawler.clone(),
+    });
 
     let item_trait_handler = Arc::new(ItemTraitHandler {
         fn_decl_extractor: fn_decl_extractor.clone(),
@@ -307,6 +310,7 @@ fn create_services() -> ServiceCollection {
         mock_setup_impl_generator: mock_setup_impl_generator.clone(),
         mock_received_impl_generator: mock_received_impl_generator.clone(),
         mod_generator: mod_generator.clone(),
+        lifetimes_specifier: lifetimes_specifier.clone(),
     });
 
     let item_fn_handler = Arc::new(ItemFnHandler {

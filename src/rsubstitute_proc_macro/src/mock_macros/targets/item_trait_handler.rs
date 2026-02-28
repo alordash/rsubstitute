@@ -26,6 +26,7 @@ pub(crate) struct ItemTraitHandler {
     pub mock_setup_impl_generator: Arc<dyn IMockSetupImplGenerator>,
     pub mock_received_impl_generator: Arc<dyn IMockReceivedImplGenerator>,
     pub mod_generator: Arc<dyn IModGenerator>,
+    pub lifetimes_specifier: Arc<dyn ILifetimesSpecifier>,
 }
 
 impl IItemTraitHandler for ItemTraitHandler {
@@ -104,12 +105,22 @@ impl IItemTraitHandler for ItemTraitHandler {
             mock_received_impl,
         );
 
+        let mock_item_trait = self
+            .lifetimes_specifier
+            .add_default_arg_lifetime(item_trait.clone());
+        let cfg_test_attribute = constants::CFG_TEST_ATTRIBUTE.clone();
+        let cfg_not_test_attribute = constants::CFG_NOT_TEST_ATTRIBUTE.clone();
+
         let GeneratedMod {
             item_mod,
             use_generated_mod,
         } = generated_mod;
         let result = quote! {
+            #cfg_not_test_attribute
             #item_trait
+
+            #cfg_test_attribute
+            #mock_item_trait
 
             #use_generated_mod
             #item_mod

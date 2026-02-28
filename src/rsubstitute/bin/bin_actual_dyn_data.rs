@@ -5,7 +5,12 @@ use rsubstitute::macros::*;
 //     fn work(&self, v: i32) -> i32;
 // }
 
+#[cfg(not(test))]
 trait Trait {
+    fn work(&self, v: i32) -> i32;
+}
+#[cfg(test)]
+trait Trait<'rs> {
     fn work(&self, v: i32) -> i32;
 }
 #[cfg(test)]
