@@ -38,7 +38,6 @@ impl IArgsCheckerGenerator for ArgsCheckerGenerator {
             .flat_map(|(i, x)| self.try_convert_fn_arg_to_field(i, x))
             .collect();
         let struct_fields = std::iter::once(constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD.clone())
-            .chain(mock_generics.phantom_type_fields.clone())
             .chain(fn_fields)
             .collect();
         let fields_named = FieldsNamed {

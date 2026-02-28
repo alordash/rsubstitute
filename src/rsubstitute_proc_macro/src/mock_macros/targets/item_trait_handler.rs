@@ -13,6 +13,7 @@ pub trait IItemTraitHandler {
 }
 
 pub(crate) struct ItemTraitHandler {
+    pub lifetimes_specifier: Arc<dyn ILifetimesSpecifier>,
     pub fn_decl_extractor: Arc<dyn IFnDeclExtractor>,
     pub mock_generics_generator: Arc<dyn IMockGenericsGenerator>,
     pub mock_type_generator: Arc<dyn IMockTypeGenerator>,
@@ -26,19 +27,22 @@ pub(crate) struct ItemTraitHandler {
     pub mock_setup_impl_generator: Arc<dyn IMockSetupImplGenerator>,
     pub mock_received_impl_generator: Arc<dyn IMockReceivedImplGenerator>,
     pub mod_generator: Arc<dyn IModGenerator>,
-    pub lifetimes_specifier: Arc<dyn ILifetimesSpecifier>,
 }
 
 impl IItemTraitHandler for ItemTraitHandler {
     fn handle(&self, item_trait: ItemTrait) -> TokenStream {
+        let mock_item_trait = self
+            .lifetimes_specifier
+            .add_default_arg_lifetime(item_trait.clone());
+        
         let mock_ident = format_ident!(
             "{}{}",
-            item_trait.ident,
+            mock_item_trait.ident,
             constants::MOCK_STRUCT_IDENT_PREFIX
         );
-        let fn_decls = self.fn_decl_extractor.extract(&item_trait.items);
-        let target_ident = item_trait.ident.clone();
-        let mock_generics = self.mock_generics_generator.generate(&item_trait.generics);
+        let fn_decls = self.fn_decl_extractor.extract(&mock_item_trait.items);
+        let target_ident = mock_item_trait.ident.clone();
+        let mock_generics = self.mock_generics_generator.generate(&mock_item_trait.generics);
         let mock_type = self
             .mock_type_generator
             .generate(mock_ident.clone(), mock_generics);
@@ -104,10 +108,6 @@ impl IItemTraitHandler for ItemTraitHandler {
             mock_setup_impl,
             mock_received_impl,
         );
-
-        let mock_item_trait = self
-            .lifetimes_specifier
-            .add_default_arg_lifetime(item_trait.clone());
         let cfg_test_attribute = constants::CFG_TEST_ATTRIBUTE.clone();
         let cfg_not_test_attribute = constants::CFG_NOT_TEST_ATTRIBUTE.clone();
 

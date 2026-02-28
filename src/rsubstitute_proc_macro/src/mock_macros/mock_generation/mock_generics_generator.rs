@@ -12,23 +12,16 @@ pub trait IMockGenericsGenerator {
 pub(crate) struct MockGenericsGenerator {
     pub type_factory: Arc<dyn ITypeFactory>,
     pub field_factory: Arc<dyn IFieldFactory>,
-    pub generics_merger: Arc<dyn IGenericsMerger>,
 }
 
 impl IMockGenericsGenerator for MockGenericsGenerator {
     fn generate(&self, source_generics: &Generics) -> MockGenerics {
         let mut modified_source_generics = source_generics.clone();
         self.add_required_for_lib_type_trait_constraints(&mut modified_source_generics);
-
-        let default_field_lifetime_generic =
-            self.generate_default_field_lifetime_generic(source_generics);
-        let result_generics = self
-            .generics_merger
-            .merge(&default_field_lifetime_generic, &modified_source_generics);
         let phantom_type_fields = self.get_all_phantom_fields_from_generics(source_generics);
         let mock_generics = MockGenerics {
             source_generics: source_generics.clone(),
-            impl_generics: result_generics,
+            impl_generics: modified_source_generics,
             phantom_type_fields,
         };
         return mock_generics;

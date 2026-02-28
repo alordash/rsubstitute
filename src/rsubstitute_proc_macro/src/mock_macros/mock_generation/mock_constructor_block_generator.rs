@@ -34,7 +34,7 @@ impl IMockConstructorBlockGenerator for MockConstructorBlockGenerator {
         mock_struct_traits: Vec<&MockStructTrait>,
         maybe_inner_data_param: Option<InnerDataParam>,
     ) -> Block {
-        let mut data_fields: Vec<_> = mock_data_struct
+        let data_fields: Vec<_> = mock_data_struct
             .field_and_fn_idents
             .iter()
             .map(|(field_ident, fn_ident)| FieldValue {
@@ -48,20 +48,15 @@ impl IMockConstructorBlockGenerator for MockConstructorBlockGenerator {
                         constants::NEW_IDENT.clone(),
                     ])),
                     paren_token: Default::default(),
-                    args: [
-                        Expr::Lit(ExprLit {
-                            attrs: Vec::new(),
-                            lit: Lit::Str(LitStr::new(&fn_ident.to_string(), Span::call_site())),
-                        }),
-                        constants::SERVICES_REF_EXPR.clone(),
-                    ]
+                    args: [Expr::Lit(ExprLit {
+                        attrs: Vec::new(),
+                        lit: Lit::Str(LitStr::new(&fn_ident.to_string(), Span::call_site())),
+                    })]
                     .into_iter()
                     .collect(),
                 }),
             })
             .collect();
-        let phantom_lifetime_field = constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE.clone();
-        data_fields.insert(0, phantom_lifetime_field);
         let data_stmt = Stmt::Local(Local {
             attrs: Vec::new(),
             let_token: Default::default(),

@@ -1,4 +1,4 @@
-use crate::mock_macros::fn_info_generation::call_generator::*;
+use crate::mock_macros::fn_info_generation::call_struct_generator::*;
 use crate::mock_macros::fn_info_generation::models::*;
 use crate::mock_macros::fn_info_generation::*;
 use crate::mock_macros::mock_generation::models::*;

@@ -96,7 +96,6 @@ fn create_services() -> ServiceCollection {
     let mock_generics_generator = Arc::new(MockGenericsGenerator {
         type_factory: type_factory.clone(),
         field_factory: field_factory.clone(),
-        generics_merger: generics_merger.clone(),
     });
     let base_caller_impl_generator = Arc::new(BaseCallerImplGenerator {
         type_factory: type_factory.clone(),
@@ -300,6 +299,7 @@ fn create_services() -> ServiceCollection {
     });
 
     let item_trait_handler = Arc::new(ItemTraitHandler {
+        lifetimes_specifier: lifetimes_specifier.clone(),
         fn_decl_extractor: fn_decl_extractor.clone(),
         mock_generics_generator: mock_generics_generator.clone(),
         mock_type_generator: mock_type_generator.clone(),
@@ -313,7 +313,6 @@ fn create_services() -> ServiceCollection {
         mock_setup_impl_generator: mock_setup_impl_generator.clone(),
         mock_received_impl_generator: mock_received_impl_generator.clone(),
         mod_generator: mod_generator.clone(),
-        lifetimes_specifier: lifetimes_specifier.clone(),
     });
 
     let item_fn_handler = Arc::new(ItemFnHandler {

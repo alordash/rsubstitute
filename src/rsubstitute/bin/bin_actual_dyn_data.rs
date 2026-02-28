@@ -99,7 +99,7 @@ mod __rsubstitute_generated_Trait {
     impl<'rs> IArgsChecker for work_ArgsChecker<'rs> {
         fn check(&self, dyn_call: &DynCall) -> Vec<ArgCheckResult> {
             let call: &work_Call<'rs> = dyn_call.downcast_ref();
-            vec![self.v.check("v", &call.v)]
+            vec![]
         }
     }
     #[doc(hidden)]
@@ -119,11 +119,11 @@ mod __rsubstitute_generated_Trait {
     }
     #[derive(Clone)]
     pub struct TraitMock<'rs> {
-        setup: TraitMockSetup<'rs>,
-        received: TraitMockReceived<'rs>,
+        pub setup: TraitMockSetup<'rs>,
+        pub received: TraitMockReceived<'rs>,
         data: Arc<TraitMockData<'rs>>,
     }
-    impl<'rs> Trait for TraitMock<'rs> {
+    impl<'rs> Trait<'rs> for TraitMock<'rs> {
         fn work(&self, v: i32) -> i32 {
             let call = unsafe {
                 work_Call {
@@ -137,8 +137,7 @@ mod __rsubstitute_generated_Trait {
     impl<'rs> TraitMock<'rs> {
         pub fn new() -> Self {
             let data = Arc::new(TraitMockData {
-                _phantom_lifetime: PhantomData,
-                work_data: FnData::new("work", &SERVICES),
+                work_data: FnData::new("work"),
             });
             return TraitMock {
                 setup: TraitMockSetup { data: data.clone() },
@@ -156,7 +155,6 @@ mod __rsubstitute_generated_Trait {
     impl<'rs> TraitMockSetup<'rs> {
         pub fn work(
             &'rs self,
-            v: impl Into<Arg<'rs, i32>>,
         ) -> FnTuner<'rs, TraitMock<'rs>, work_Call<'rs>, work_ArgsChecker<'rs>, i32, Self>
         {
             let work_args_checker = work_ArgsChecker {
@@ -169,7 +167,7 @@ mod __rsubstitute_generated_Trait {
         }
     }
     impl<'rs> TraitMockReceived<'rs> {
-        pub fn work(self, v: impl Into<Arg<'rs, i32>>, times: Times) -> Self {
+        pub fn work(self, times: Times) -> Self {
             let work_args_checker = work_ArgsChecker {
                 _phantom_lifetime: PhantomData,
                 v: v.into(),
