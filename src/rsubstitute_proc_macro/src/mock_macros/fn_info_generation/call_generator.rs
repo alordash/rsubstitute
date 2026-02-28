@@ -12,6 +12,7 @@ pub trait ICallStructGenerator {
 }
 
 pub(crate) struct CallStructGenerator {
+    pub attribute_factory: Arc<dyn IAttributeFactory>,
     pub field_factory: Arc<dyn IFieldFactory>,
     pub struct_factory: Arc<dyn IStructFactory>,
     pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
@@ -22,7 +23,7 @@ impl ICallStructGenerator for CallStructGenerator {
     fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> CallStruct {
         let attrs = vec![
             constants::DOC_HIDDEN_ATTRIBUTE.clone(),
-            constants::DERIVE_CLONE_ATTRIBUTE.clone(),
+            self.generate_call_derive_traits_attribute(),
         ];
         let ident = format_ident!("{}_{}", fn_decl.get_full_ident(), Self::CALL_STRUCT_SUFFIX);
         let fn_fields = fn_decl
@@ -55,6 +56,19 @@ impl ICallStructGenerator for CallStructGenerator {
 
 impl CallStructGenerator {
     pub const CALL_STRUCT_SUFFIX: &'static str = "Call";
+
+    fn generate_call_derive_traits_attribute(&self) -> Attribute {
+        let derive_attribute = self.attribute_factory.create(
+            constants::DERIVE_IDENT.clone(),
+            &format!(
+                "{}, {}, {}",
+                constants::I_GENERICS_HASH_KEY_PROVIDER_TRAIT_NAME,
+                constants::I_ARGS_INFOS_PROVIDER_TRAIT_NAME,
+                constants::I_ARGS_TUPLE_PROVIDER_TRAIT_NAME
+            ),
+        );
+        return derive_attribute;
+    }
 
     fn try_convert_fn_arg_to_field(&self, arg_number: usize, fn_arg: &FnArg) -> Option<Field> {
         let pat_type = match fn_arg {

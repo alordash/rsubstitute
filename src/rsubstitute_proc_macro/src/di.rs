@@ -34,6 +34,7 @@ pub(crate) struct ServiceCollection {
 fn create_services() -> ServiceCollection {
     let fn_decl_extractor = Arc::new(FnDeclExtractor);
     let generic_argument_factory_cell = Arc::new(OnceCell::new());
+    let attribute_factory = Arc::new(AttributeFactory);
     let path_factory = Arc::new(PathFactory {
         generic_argument_factory: generic_argument_factory_cell.clone(),
     });
@@ -51,6 +52,7 @@ fn create_services() -> ServiceCollection {
     });
     let arg_ident_extractor = Arc::new(ArgIdentExtractor);
     let call_struct_generator = Arc::new(CallStructGenerator {
+        attribute_factory: attribute_factory.clone(),
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
         reference_normalizer: reference_normalizer.clone(),
@@ -356,8 +358,6 @@ fn create_services() -> ServiceCollection {
     });
 
     let struct_mock_syntax_parser = Arc::new(StructMockSyntaxParser);
-
-    let attribute_factory = Arc::new(AttributeFactory);
 
     let services = ServiceCollection {
         attribute_factory,

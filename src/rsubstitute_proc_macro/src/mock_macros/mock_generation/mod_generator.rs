@@ -262,10 +262,10 @@ impl ModGenerator {
         let item_mod = ItemMod {
             attrs: vec![
                 constants::CFG_TEST_ATTRIBUTE.clone(),
-                constants::ALLOW_DEAD_CODE_ATTRIBUTE.clone(),
-                constants::ALLOW_UNUSED_ATTRIBUTE.clone(),
+                constants::ALLOW_UNUSED_PARENS_ATTRIBUTE.clone(),
                 constants::ALLOW_NON_SNAKE_CASE_ATTRIBUTE.clone(),
                 constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone(),
+                constants::ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE.clone(),
             ],
             vis: Visibility::Inherited,
             unsafety: None,

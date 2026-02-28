@@ -24,6 +24,10 @@ name = "dyn_data"
 path = "bin/bin_dyn_data.rs"
 
 [[bin]]
+name = "actual_dyn_data"
+path = "bin/bin_actual_dyn_data.rs"
+
+[[bin]]
 name = "dyn_data_ref"
 path = "bin/bin_dyn_data_ref.rs"
 

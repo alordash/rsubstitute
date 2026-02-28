@@ -1,5 +1,4 @@
 // TODO - write macros for ident definition, replace all LazyCell<Ident>
-use crate::constants;
 use crate::di::SERVICES;
 use proc_macro2::{Ident, Span};
 use quote::format_ident;
@@ -49,9 +48,10 @@ pub const I_ARGS_FORMATTER_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
     return result;
 });
 
+pub const I_GENERICS_HASH_KEY_PROVIDER_TRAIT_NAME: &'static str = "IGenericsHashKeyProvider";
 pub const I_GENERICS_HASH_KEY_PROVIDER_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
     let path_factory = &SERVICES.path_factory;
-    let result = path_factory.create(format_ident!("IGenericsHashKeyProvider"));
+    let result = path_factory.create(format_ident!("{I_GENERICS_HASH_KEY_PROVIDER_TRAIT_NAME}"));
     return result;
 });
 
@@ -60,11 +60,13 @@ pub const I_ARGS_FORMATTER_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_i
 pub const I_ARGS_CHECKER_TRAIT_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("IArgsChecker"));
 
+pub const I_ARGS_INFOS_PROVIDER_TRAIT_NAME: &'static str = "IArgsInfosProvider";
 pub const I_ARGS_INFOS_PROVIDER_TRAIT_IDENT: LazyCell<Ident> =
-    LazyCell::new(|| format_ident!("IArgsInfosProvider"));
+    LazyCell::new(|| format_ident!("{I_ARGS_INFOS_PROVIDER_TRAIT_NAME}"));
 
+pub const I_ARGS_TUPLE_PROVIDER_TRAIT_NAME: &'static str = "IArgsTupleProvider";
 pub const I_ARGS_TUPLE_PROVIDER_TRAIT_IDENT: LazyCell<Ident> =
-    LazyCell::new(|| format_ident!("IArgsTupleProvider"));
+    LazyCell::new(|| format_ident!("{I_ARGS_TUPLE_PROVIDER_TRAIT_NAME}"));
 
 pub const I_BASE_CALLER_TRAIT_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("IBaseCaller"));
@@ -160,9 +162,15 @@ pub const ALLOW_DEAD_CODE_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     return result;
 });
 
-pub const ALLOW_UNUSED_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+pub const ALLOW_UNUSED_PARENS_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     let attribute_factory = &SERVICES.attribute_factory;
-    let result = attribute_factory.create(ALLOW_IDENT.clone(), "unused");
+    let result = attribute_factory.create(ALLOW_IDENT.clone(), "unused_parens");
+    return result;
+});
+
+pub const ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+    let attribute_factory = &SERVICES.attribute_factory;
+    let result = attribute_factory.create(ALLOW_IDENT.clone(), "mismatched_lifetime_syntaxes");
     return result;
 });
 
@@ -467,7 +475,7 @@ pub const ANONYMOUS_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
 
 pub const DEFAULT_ARG_FIELD_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
     apostrophe: Span::call_site(),
-    ident: format_ident!("__rsubstitute_arg_field_lifetime"),
+    ident: format_ident!("rs"), // TODO - return to __rsubstitute_arg_field_lifetime
 });
 
 pub const STATIC_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
