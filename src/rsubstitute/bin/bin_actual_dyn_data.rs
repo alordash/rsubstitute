@@ -105,8 +105,7 @@ mod __rsubstitute_generated_Trait {
     #[doc(hidden)]
     #[derive(IMockData)]
     pub struct TraitMockData<'rs> {
-        _phantom_lifetime: PhantomData<&'rs ()>,
-        work_data: FnData<TraitMock<'rs>, work_Call<'rs>, work_ArgsChecker<'rs>, i32>,
+        work_data: FnData<'rs, TraitMock<'rs>, false>,
     }
     #[doc(hidden)]
     #[derive(Clone)]
