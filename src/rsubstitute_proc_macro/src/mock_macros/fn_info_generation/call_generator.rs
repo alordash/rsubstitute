@@ -62,9 +62,9 @@ impl CallStructGenerator {
             constants::DERIVE_IDENT.clone(),
             &format!(
                 "{}, {}, {}",
-                constants::I_GENERICS_HASH_KEY_PROVIDER_TRAIT_NAME,
                 constants::I_ARGS_INFOS_PROVIDER_TRAIT_NAME,
-                constants::I_ARGS_TUPLE_PROVIDER_TRAIT_NAME
+                constants::I_ARGS_TUPLE_PROVIDER_TRAIT_NAME,
+                constants::I_GENERICS_HASH_KEY_PROVIDER_TRAIT_NAME,
             ),
         );
         return derive_attribute;

@@ -60,6 +60,7 @@ fn create_services() -> ServiceCollection {
     });
     let arg_type_factory = Arc::new(ArgTypeFactory);
     let args_checker_generator = Arc::new(ArgsCheckerGenerator {
+        attribute_factory: attribute_factory.clone(),
         arg_type_factory: arg_type_factory.clone(),
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
@@ -84,9 +85,12 @@ fn create_services() -> ServiceCollection {
         expr_method_call_factory: expr_method_call_factory.clone(),
         expr_reference_factory: expr_reference_factory.clone(),
     });
+    let local_factory = Arc::new(LocalFactory);
     let args_checker_impl_generator = Arc::new(ArgsCheckerTraitImplGenerator {
         type_factory: type_factory.clone(),
+        local_factory: local_factory.clone(),
         field_access_expr_factory: field_access_expr_factory.clone(),
+        expr_method_call_factory: expr_method_call_factory.clone(),
         expr_reference_factory: expr_reference_factory.clone(),
     });
     let mock_generics_generator = Arc::new(MockGenericsGenerator {
@@ -140,7 +144,6 @@ fn create_services() -> ServiceCollection {
     });
     let get_global_mock_expr_generator = Arc::new(GetGlobalMockExprGenerator);
     let field_checker = Arc::new(FieldChecker);
-    let local_factory = Arc::new(LocalFactory);
     let mock_fn_inputs_generator = Arc::new(MockFnInputsGenerator {
         arg_ident_extractor: arg_ident_extractor.clone(),
     });

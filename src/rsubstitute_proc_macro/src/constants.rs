@@ -42,9 +42,10 @@ pub const CRATE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("rsubsti
 
 pub const ARG_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Arg"));
 
+pub const I_ARGS_FORMATTER_TRAIT_NAME: &'static str = "IArgsFormatter";
 pub const I_ARGS_FORMATTER_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
     let path_factory = &SERVICES.path_factory;
-    let result = path_factory.create(format_ident!("IArgsFormatter"));
+    let result = path_factory.create(format_ident!("{I_ARGS_FORMATTER_TRAIT_NAME}"));
     return result;
 });
 
@@ -192,7 +193,9 @@ pub const DERIVE_DEBUG_AND_I_ARGS_FORMATTER_ATTRIBUTE: LazyCell<Attribute> = Laz
     let result = attribute_factory.create(ident, "Debug, IArgsFormatter");
     return result;
 });
-pub const DEBUG_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Debug"));
+pub const DEBUG_TRAIT_NAME: &'static str = "Debug";
+pub const DEBUG_TRAIT_IDENT: LazyCell<Ident> =
+    LazyCell::new(|| format_ident!("{DEBUG_TRAIT_NAME}"));
 pub const DEBUG_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
     let path_factory = &SERVICES.path_factory;
     let result = path_factory.create_from_parts(vec![
@@ -560,3 +563,11 @@ pub const VOID_PTR_TYPE: LazyCell<Type> = LazyCell::new(|| {
         elem: Box::new(VOID_TYPE.clone()),
     })
 });
+
+pub const DYN_CALL_REF_TYPE: LazyCell<Type> = LazyCell::new(|| {
+    let type_factory = &SERVICES.type_factory;
+    let result = type_factory.reference(type_factory.create(format_ident!("DynCall")), None);
+    return result;
+});
+pub const DYN_CALL_DOWNCAST_REF_FN_IDENT: LazyCell<Ident> =
+    LazyCell::new(|| format_ident!("downcast_ref"));

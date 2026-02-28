@@ -16,7 +16,7 @@ mod __rsubstitute_generated_Trait {
     use super::*;
     use rsubstitute::for_generated::*;
 
-    #[derive(IGenericsHashKeyProvider, IArgsInfosProvider, IArgsTupleProvider)]
+    #[derive(IArgsInfosProvider, IArgsTupleProvider, IGenericsHashKeyProvider)]
     pub struct work_Call<'rs> {
         _phantom_lifetime: PhantomData<&'rs ()>,
         v: i32,
@@ -29,7 +29,7 @@ mod __rsubstitute_generated_Trait {
     }
     impl<'rs> IArgsChecker for work_ArgsChecker<'rs> {
         fn check(&self, dyn_call: &DynCall) -> Vec<ArgCheckResult> {
-            let call: &work_Call = dyn_call.downcast_ref();
+            let call: &work_Call<'rs> = dyn_call.downcast_ref();
             vec![self.v.check("v", &call.v)]
         }
     }

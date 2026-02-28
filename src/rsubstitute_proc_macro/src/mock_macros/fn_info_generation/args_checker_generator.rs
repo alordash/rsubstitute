@@ -12,6 +12,7 @@ pub trait IArgsCheckerGenerator {
 }
 
 pub(crate) struct ArgsCheckerGenerator {
+    pub attribute_factory: Arc<dyn IAttributeFactory>,
     pub arg_type_factory: Arc<dyn IArgTypeFactory>,
     pub field_factory: Arc<dyn IFieldFactory>,
     pub struct_factory: Arc<dyn IStructFactory>,
@@ -23,7 +24,7 @@ impl IArgsCheckerGenerator for ArgsCheckerGenerator {
     fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> ArgsCheckerStruct {
         let attrs = vec![
             constants::DOC_HIDDEN_ATTRIBUTE.clone(),
-            constants::DERIVE_DEBUG_AND_I_ARGS_FORMATTER_ATTRIBUTE.clone(),
+            self.generate_arg_checker_derive_traits_attribute(),
         ];
         let ident = format_ident!(
             "{}_{}",
@@ -61,6 +62,19 @@ impl IArgsCheckerGenerator for ArgsCheckerGenerator {
 
 impl ArgsCheckerGenerator {
     const ARGS_CHECKER_STRUCT_SUFFIX: &'static str = "ArgsChecker";
+
+    fn generate_arg_checker_derive_traits_attribute(&self) -> Attribute {
+        let derive_attribute = self.attribute_factory.create(
+            constants::DERIVE_IDENT.clone(),
+            &format!(
+                "{}, {}, {}",
+                constants::DEBUG_TRAIT_NAME,
+                constants::I_ARGS_FORMATTER_TRAIT_NAME,
+                constants::I_GENERICS_HASH_KEY_PROVIDER_TRAIT_NAME,
+            ),
+        );
+        return derive_attribute;
+    }
 
     fn try_convert_fn_arg_to_field(&self, arg_number: usize, fn_arg: &FnArg) -> Option<Field> {
         let pat_type = match fn_arg {
