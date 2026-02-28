@@ -25,7 +25,7 @@ mod __rsubstitute_generated_Trait {
     #[derive(Debug, IArgsFormatter, IGenericsHashKeyProvider)]
     pub struct work_ArgsChecker<'rs, 'a> {
         _phantom_lifetime: PhantomData<&'rs ()>,
-        v: Arg<&'a i32>,
+        v: Arg<'rs, &'a i32>,
     }
     impl<'rs, 'a> IArgsChecker for work_ArgsChecker<'rs, 'a> {
         fn check(&self, dyn_call: &DynCall) -> Vec<ArgCheckResult> {
@@ -81,7 +81,7 @@ mod __rsubstitute_generated_Trait {
         pub fn work<'a: 'rs>(
             // Notice: 'a: 'rs only in setup, not needed in received
             &self,
-            v: impl Into<Arg<&'a i32>>,
+            v: impl Into<Arg<'rs, &'a i32>>,
         ) -> FnTuner<'rs, Self, &(&'a i32), &'a i32, false> {
             let work_args_checker = work_ArgsChecker {
                 _phantom_lifetime: PhantomData,
@@ -93,7 +93,7 @@ mod __rsubstitute_generated_Trait {
         }
     }
     impl<'rs> TraitMockReceived<'rs> {
-        pub fn work<'a>(self, v: impl Into<Arg<&'a i32>>, times: Times) -> Self {
+        pub fn work<'a>(self, v: impl Into<Arg<'rs, &'a i32>>, times: Times) -> Self {
             let work_args_checker: work_ArgsChecker<'rs, 'a> = work_ArgsChecker {
                 _phantom_lifetime: PhantomData,
                 v: v.into(),

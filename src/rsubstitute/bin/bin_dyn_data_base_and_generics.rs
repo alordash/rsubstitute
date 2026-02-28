@@ -48,8 +48,8 @@ mod __rsubstitute_generated_Trait {
     {
         _phantom_lifetime: PhantomData<&'rs ()>,
         _return_type: PhantomData<T3>,
-        t1: Arg<T1>,
-        t2: Arg<&'rs T2>,
+        t1: Arg<'rs, T1>,
+        t2: Arg<'rs, &'rs T2>,
     }
     impl<'rs, T1, T2: Clone, T3: Default, const B: bool, const N: usize> IArgsChecker
         for work_ArgsChecker<'rs, T1, T2, T3, B, N>
@@ -140,8 +140,8 @@ mod __rsubstitute_generated_Trait {
     impl<'rs, T1> TraitMockSetup<'rs, T1> {
         pub fn work<T2: Clone + 'rs, T3: Default + 'rs, const B: bool, const N: usize>(
             &self,
-            t1: impl Into<Arg<T1>>,
-            t2: impl Into<Arg<&'rs T2>>,
+            t1: impl Into<Arg<'rs, T1>>,
+            t2: impl Into<Arg<'rs, &'rs T2>>,
         ) -> FnTuner<'rs, Self, (&T1, &&T2), T3, true>
         where
             T1: Clone,
@@ -160,8 +160,8 @@ mod __rsubstitute_generated_Trait {
     impl<'rs, T1> TraitMockReceived<'rs, T1> {
         pub fn work<T2: Clone + 'rs, T3: Default, const B: bool, const N: usize>(
             self,
-            t1: impl Into<Arg<T1>>,
-            t2: impl Into<Arg<&'rs T2>>,
+            t1: impl Into<Arg<'rs, T1>>,
+            t2: impl Into<Arg<'rs, &'rs T2>>,
             times: Times,
         ) -> Self
         where

@@ -6,7 +6,7 @@ use std::sync::Arc;
 struct Private;
 
 #[allow(private_interfaces)]
-pub enum Arg<T> {
+pub enum Arg<'rs, T> {
     Any,
     #[doc(hidden)]
     PrivateEq(ArgCmp<T>, Private),
@@ -15,7 +15,7 @@ pub enum Arg<T> {
     #[doc(hidden)]
     // TODO - add ability to pass closure straight-away like in `mockiato`:
     // |arg| arg.partial_eq("Paul"), |arg| arg.any()
-    PrivateIs(Box<dyn Fn(&T) -> bool>, Private),
+    PrivateIs(Box<dyn Fn(&T) -> bool + 'rs>, Private),
 }
 
 struct ArgCmp<T> {
@@ -29,7 +29,7 @@ impl<T> ArgCmp<T> {
     }
 }
 
-impl<T: PartialEq> From<T> for Arg<T> {
+impl<'rs, T: PartialEq> From<T> for Arg<'rs, T> {
     fn from(value: T) -> Self {
         let arg_cmp = ArgCmp {
             value,
@@ -39,7 +39,7 @@ impl<T: PartialEq> From<T> for Arg<T> {
     }
 }
 
-impl<T: Debug> Debug for Arg<T> {
+impl<'rs, T: Debug> Debug for Arg<'rs, T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         // TODO - extract to const field when std::any::type_name becomes stabilized as const fn
         // https://github.com/rust-lang/rust/issues/63084
@@ -58,13 +58,11 @@ impl<T: Debug> Debug for Arg<T> {
 }
 
 // Beautify API ✨
-impl<T> Arg<T> {
+impl<'rs, T> Arg<'rs, T> {
     #[allow(non_snake_case)]
-    pub fn Is<'a, TFn: Fn(&T) -> bool + 'a>(predicate: TFn) -> Self {
-        let reference = Box::new(predicate) as Box<dyn Fn(&T) -> bool + 'a>;
-        let static_reference: Box<dyn Fn(&T) -> bool + 'static> =
-            unsafe { core::mem::transmute(reference) };
-        return Self::PrivateIs(static_reference, Private);
+    pub fn Is<TFn: Fn(&T) -> bool + 'rs>(predicate: TFn) -> Self {
+        let reference = Box::new(predicate) as Box<dyn Fn(&T) -> bool + 'rs>;
+        return Self::PrivateIs(reference, Private);
     }
 
     #[allow(non_snake_case)]
@@ -84,7 +82,7 @@ impl<T> Arg<T> {
     }
 }
 
-impl<T> Arg<T> {
+impl<'rs, T> Arg<'rs, T> {
     pub fn check<'a>(&self, arg_name: &'static str, actual_value: &T) -> ArgCheckResult
     where
         T: 'a,
@@ -132,8 +130,8 @@ impl<T> Arg<T> {
     }
 }
 
-impl<'a, T: ?Sized> Arg<&'a T> {
-    pub fn check_ref(&self, arg_name: &'static str, actual_value: &&'a T) -> ArgCheckResult {
+impl<'rs, T: ?Sized> Arg<'rs, &'rs T> {
+    pub fn check_ref(&self, arg_name: &'static str, actual_value: &&'rs T) -> ArgCheckResult {
         let arg_info = ArgInfo::new(
             arg_name,
             actual_value,
@@ -182,13 +180,13 @@ impl<'a, T: ?Sized> Arg<&'a T> {
     }
 }
 
-impl<T: ?Sized> Arg<*mut T> {
+impl<'rs, T: ?Sized> Arg<'rs, *mut T> {
     pub fn check_mut(&self, arg_name: &'static str, actual_value: &*mut T) -> ArgCheckResult {
         self.check(arg_name, actual_value)
     }
 }
 
-impl<'a, T: ?Sized> Arg<&'a mut T> {
+impl<'rs, T: ?Sized> Arg<'rs, &'rs mut T> {
     pub fn check_mut(&self, arg_name: &'static str, actual_value_ptr: &*mut T) -> ArgCheckResult {
         let actual_value = unsafe {
             &(*actual_value_ptr)
@@ -248,7 +246,7 @@ impl<'a, T: ?Sized> Arg<&'a mut T> {
     }
 }
 
-impl<T: ?Sized> Arg<Rc<T>> {
+impl<'rs, T: ?Sized> Arg<'rs, Rc<T>> {
     pub fn check_rc<'a>(&self, arg_name: &'static str, actual_value: &Rc<T>) -> ArgCheckResult
     where
         T: 'a,
@@ -302,7 +300,7 @@ impl<T: ?Sized> Arg<Rc<T>> {
     }
 }
 
-impl<T: ?Sized> Arg<Arc<T>> {
+impl<'rs, T: ?Sized> Arg<'rs, Arc<T>> {
     pub fn check_arc<'a>(&self, arg_name: &'static str, actual_value: &Arc<T>) -> ArgCheckResult
     where
         T: 'a,
