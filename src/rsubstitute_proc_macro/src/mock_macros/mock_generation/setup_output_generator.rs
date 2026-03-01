@@ -2,6 +2,7 @@ use crate::constants;
 use crate::mock_macros::fn_info_generation::models::*;
 use crate::mock_macros::mock_generation::models::*;
 use crate::syntax::*;
+use proc_macro2::Span;
 use std::sync::Arc;
 use syn::*;
 
@@ -60,6 +61,7 @@ impl SetupOutputGenerator {
         lifetime: Lifetime,
         owner_type: Type,
     ) -> Type {
+        let arg_refs_tuple = self.generate_arg_refs_tuple(&fn_info.parent.arguments);
         let result = Type::Path(TypePath {
             qself: None,
             path: Path {
@@ -71,17 +73,16 @@ impl SetupOutputGenerator {
                         lt_token: Default::default(),
                         args: [
                             GenericArgument::Lifetime(lifetime),
-                            GenericArgument::Type(mock_type.ty.clone()),
-                            GenericArgument::Type(
-                                self.type_factory
-                                    .create_from_struct(&fn_info.call_struct.item_struct),
-                            ),
-                            GenericArgument::Type(
-                                self.type_factory
-                                    .create_from_struct(&fn_info.args_checker_struct.item_struct),
-                            ),
-                            GenericArgument::Type(fn_info.parent.get_return_value_type()),
                             GenericArgument::Type(owner_type),
+                            GenericArgument::Type(arg_refs_tuple),
+                            GenericArgument::Type(fn_info.parent.get_return_value_type()),
+                            GenericArgument::Const(Expr::Lit(ExprLit {
+                                attrs: Vec::new(),
+                                lit: Lit::Bool(LitBool::new(
+                                    fn_info.parent.base_callable,
+                                    Span::call_site(),
+                                )),
+                            })),
                         ]
                         .into_iter()
                         .collect(),
@@ -91,6 +92,21 @@ impl SetupOutputGenerator {
                 .into_iter()
                 .collect(),
             },
+        });
+        return result;
+    }
+
+    fn generate_arg_refs_tuple(&self, fn_args: &[FnArg]) -> Type {
+        let result = Type::Tuple(TypeTuple {
+            paren_token: Default::default(),
+            elems: fn_args
+                .iter()
+                .filter_map(|fn_arg| match fn_arg {
+                    FnArg::Receiver(_) => None,
+                    FnArg::Typed(pat_type) => Some(*pat_type.ty.clone()),
+                })
+                .map(|ty| self.type_factory.reference(ty, None))
+                .collect(),
         });
         return result;
     }

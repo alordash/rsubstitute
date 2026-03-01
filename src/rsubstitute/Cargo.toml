@@ -22,22 +22,37 @@ edition = "2024"
 [[bin]]
 name = "dyn_data"
 path = "bin/bin_dyn_data.rs"
+test = false
+doctest = false
+bench = false
 
 [[bin]]
 name = "actual_dyn_data"
 path = "bin/bin_actual_dyn_data.rs"
+test = false
+doctest = false
+bench = false
 
 [[bin]]
 name = "dyn_data_ref"
 path = "bin/bin_dyn_data_ref.rs"
+test = false
+doctest = false
+bench = false
 
 [[bin]]
 name = "dyn_data_generics"
 path = "bin/bin_dyn_data_generics.rs"
+test = false
+doctest = false
+bench = false
 
 [[bin]]
 name = "dyn_data_base_and_generics"
 path = "bin/bin_dyn_data_base_and_generics.rs"
+test = false
+doctest = false
+bench = false
 
 [dependencies]
 rsubstitute_core = { workspace = true, features = ["debug_naming"] }

@@ -123,6 +123,7 @@ impl FnDeclExtractor {
             return_value: sig.output.clone(),
             visibility,
             maybe_base_fn_block,
+            base_callable: false    // TODO - set base callable properly (depending on argument in macro and if fn has base)
         };
         return fn_decl;
     }

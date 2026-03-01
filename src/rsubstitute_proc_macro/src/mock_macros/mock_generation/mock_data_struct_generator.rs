@@ -115,7 +115,6 @@ impl MockDataStructGenerator {
     const MOCK_DATA_STRUCT_IDENT_SUFFIX: &'static str = "Data";
 
     fn generate_field(&self, fn_info: &FnInfo, mock_type: &MockType) -> Field {
-        let supports_base_calling = false; // TODO - set correctly
         let ty = Type::Path(TypePath {
             qself: None,
             path: Path {
@@ -134,7 +133,7 @@ impl MockDataStructGenerator {
                             GenericArgument::Const(Expr::Lit(ExprLit {
                                 attrs: Vec::new(),
                                 lit: Lit::Bool(LitBool::new(
-                                    supports_base_calling,
+                                    fn_info.parent.base_callable,
                                     Span::call_site(),
                                 )),
                             })),

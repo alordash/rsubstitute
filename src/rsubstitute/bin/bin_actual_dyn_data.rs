@@ -147,10 +147,7 @@ mod __rsubstitute_generated_Trait {
         }
     }
     impl<'rs> TraitMockSetup<'rs> {
-        pub fn work(
-            &'rs self,
-        ) -> FnTuner<'rs, TraitMock<'rs>, work_Call<'rs>, work_ArgsChecker<'rs>, i32, Self>
-        {
+        pub fn work(&'rs self) -> FnTuner<'rs, Self, (&i32,), i32, false> {
             let work_args_checker = work_ArgsChecker {
                 _phantom_lifetime: PhantomData,
                 v: v.into(),

@@ -11,6 +11,7 @@ pub(crate) struct FnDecl {
     pub return_value: ReturnType,
     pub visibility: Visibility,
     pub maybe_base_fn_block: Option<Block>,
+    pub base_callable: bool, // TODO - set actual value
 }
 
 impl FnDecl {
