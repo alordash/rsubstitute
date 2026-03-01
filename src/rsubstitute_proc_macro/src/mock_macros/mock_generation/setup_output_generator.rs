@@ -7,12 +7,11 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait ISetupOutputGenerator {
-    fn generate_for_trait(&self, fn_info: &FnInfo, mock_type: &MockType) -> ReturnType;
+    fn generate_for_trait(&self, fn_info: &FnInfo) -> ReturnType;
 
     fn generate_for_static(
         &self,
         fn_info: &FnInfo,
-        mock_type: &MockType,
         mock_setup_struct: &MockSetupStruct,
     ) -> ReturnType;
 }
@@ -22,10 +21,9 @@ pub(crate) struct SetupOutputGenerator {
 }
 
 impl ISetupOutputGenerator for SetupOutputGenerator {
-    fn generate_for_trait(&self, fn_info: &FnInfo, mock_type: &MockType) -> ReturnType {
+    fn generate_for_trait(&self, fn_info: &FnInfo) -> ReturnType {
         let ty = self.generate(
             fn_info,
-            mock_type,
             constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
             constants::SELF_TYPE.clone(),
         );
@@ -36,7 +34,6 @@ impl ISetupOutputGenerator for SetupOutputGenerator {
     fn generate_for_static(
         &self,
         fn_info: &FnInfo,
-        mock_type: &MockType,
         mock_setup_struct: &MockSetupStruct,
     ) -> ReturnType {
         let owner_type = self
@@ -44,7 +41,6 @@ impl ISetupOutputGenerator for SetupOutputGenerator {
             .create_from_struct(&mock_setup_struct.item_struct);
         let ty = self.generate(
             fn_info,
-            mock_type,
             constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
             owner_type,
         );
@@ -54,13 +50,7 @@ impl ISetupOutputGenerator for SetupOutputGenerator {
 }
 
 impl SetupOutputGenerator {
-    fn generate(
-        &self,
-        fn_info: &FnInfo,
-        mock_type: &MockType,
-        lifetime: Lifetime,
-        owner_type: Type,
-    ) -> Type {
+    fn generate(&self, fn_info: &FnInfo, lifetime: Lifetime, owner_type: Type) -> Type {
         let arg_refs_tuple = self.generate_arg_refs_tuple(&fn_info.parent.arguments);
         let result = Type::Path(TypePath {
             qself: None,
