@@ -294,9 +294,7 @@ fn create_services() -> ServiceCollection {
     let ignored_impl_fixer = Arc::new(IgnoredImplFixer {
         generics_merger: generics_merger.clone(),
     });
-    let lifetimes_specifier = Arc::new(LifetimesSpecifier {
-        reference_type_crawler: reference_type_crawler.clone(),
-    });
+    let lifetimes_specifier = Arc::new(LifetimesSpecifier::new(reference_type_crawler.clone()));
 
     let item_trait_handler = Arc::new(ItemTraitHandler {
         lifetimes_specifier: lifetimes_specifier.clone(),
