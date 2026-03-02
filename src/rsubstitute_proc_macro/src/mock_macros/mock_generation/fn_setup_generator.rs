@@ -36,7 +36,6 @@ impl IFnSetupGenerator for FnSetupGenerator {
         let output = self
             .setup_output_generator
             .generate_for_static(fn_info, mock_setup_struct);
-        let phantom_types_count = mock_type.generics.get_phantom_types_count();
         let sig = Signature {
             constness: None,
             asyncness: None,
@@ -48,13 +47,13 @@ impl IFnSetupGenerator for FnSetupGenerator {
             paren_token: Default::default(),
             inputs: self
                 .input_args_generator
-                .generate_input_args_with_static_lifetimes(fn_info, phantom_types_count)
+                .generate_input_args_with_static_lifetimes(fn_info)
                 .into_iter()
                 .collect(),
             variadic: None,
             output,
         };
-        let block = self.generate_fn_setup_block(fn_info, mock_type, phantom_types_count);
+        let block = self.generate_fn_setup_block(fn_info, mock_type);
         let item_fn = ItemFn {
             attrs: Vec::new(),
             vis: Visibility::Public(Default::default()),
@@ -68,12 +67,7 @@ impl IFnSetupGenerator for FnSetupGenerator {
 impl FnSetupGenerator {
     const MOCK_VAR_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("mock"));
 
-    fn generate_fn_setup_block(
-        &self,
-        fn_info: &FnInfo,
-        mock_type: &MockType,
-        phantom_types_count: usize,
-    ) -> Block {
+    fn generate_fn_setup_block(&self, fn_info: &FnInfo, mock_type: &MockType) -> Block {
         let mock_var_stmt = Stmt::Local(
             self.local_factory.create(
                 Self::MOCK_VAR_IDENT.clone(),
@@ -114,7 +108,7 @@ impl FnSetupGenerator {
                             .item_struct
                             .fields
                             .iter()
-                            .skip(1 + phantom_types_count)
+                            .skip(fn_info.parent.get_internal_phantom_types_count())
                             .map(IFieldRequiredIdentGetter::get_required_ident)
                             .collect(),
                     ),

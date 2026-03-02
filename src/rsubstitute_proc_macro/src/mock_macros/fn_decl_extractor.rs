@@ -1,5 +1,7 @@
 use crate::constants;
 use crate::mock_macros::models::*;
+use crate::syntax::*;
+use std::sync::Arc;
 use syn::*;
 
 pub trait IFnDeclExtractor {
@@ -12,7 +14,9 @@ pub trait IFnDeclExtractor {
     fn extract_fn(&self, item_fn: &ItemFn) -> FnDecl;
 }
 
-pub struct FnDeclExtractor;
+pub(crate) struct FnDeclExtractor {
+    pub arg_ident_extractor: Arc<dyn IArgIdentExtractor>,
+}
 
 impl IFnDeclExtractor for FnDeclExtractor {
     fn extract(&self, trait_items: &[TraitItem]) -> Vec<FnDecl> {
@@ -115,16 +119,77 @@ impl FnDeclExtractor {
         maybe_base_fn_block: Option<Block>,
         maybe_parent_trait_ident: Option<Ident>,
     ) -> FnDecl {
+        let has_phantom_return_type = self.is_return_type_generic(&sig.output, &sig.generics);
         let fn_decl = FnDecl {
             attrs,
             maybe_parent_trait_ident,
             fn_ident: sig.ident.clone(),
-            arguments: sig.inputs.iter().cloned().collect(),
+            arguments: sig
+                .inputs
+                .iter()
+                .enumerate()
+                .map(|(arg_number, fn_arg)| self.generate_fn_arg_info(arg_number, fn_arg))
+                .collect(),
             return_value: sig.output.clone(),
             visibility,
             maybe_base_fn_block,
-            base_callable: false    // TODO - set base callable properly (depending on argument in macro and if fn has base)
+            base_callable: false, // TODO - set base callable properly (depending on argument in macro and if fn has base)
+            has_phantom_return_type,
         };
         return fn_decl;
     }
+
+    fn is_return_type_generic(&self, return_type: &ReturnType, generics: &Generics) -> bool {
+        let ReturnType::Type(_, ty) = return_type else {
+            return false;
+        };
+        let Type::Path(TypePath { path, .. }) = &**ty else {
+            return false;
+        };
+
+        let type_params: Vec<_> = generics.type_params().collect();
+        for segment in path.segments.iter() {
+            if type_params
+                .iter()
+                .any(|type_param| segment.ident == type_param.ident)
+            {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    fn generate_fn_arg_info(&self, arg_number: usize, fn_arg: &FnArg) -> FnArg {
+        match fn_arg {
+            FnArg::Receiver(receiver) => FnArg::Receiver(receiver.clone()),
+            FnArg::Typed(typed) => self.generate_typed_fn_arg(arg_number, typed),
+        }
+    }
+
+    fn generate_typed_fn_arg(&self, arg_number: usize, typed: &PatType) -> FnArg {
+        let arg_ident = self.arg_ident_extractor.extract(arg_number, typed);
+        let fn_arg = FnArg::Typed(PatType {
+            attrs: Vec::new(),
+            pat: Box::new(Pat::Ident(PatIdent {
+                attrs: Vec::new(),
+                by_ref: None,
+                mutability: None,
+                ident: arg_ident,
+                subpat: None,
+            })),
+            colon_token: Default::default(),
+            ty: typed.ty.clone(),
+        });
+        return fn_arg;
+    }
+
+    // fn generate_fn_arg_info(&self, arg_number: usize, fn_arg: &FnArg) -> FnArgInfo {
+    //     match fn_arg {
+    //         FnArg::Receiver(receiver) => FnArgInfo::Receiver(receiver.clone()),
+    //         FnArg::Typed(typed) => FnArgInfo::Typed(TypedFnArgInfo {
+    //             ident: self.arg_ident_extractor.extract(arg_number, typed),
+    //             ty: *typed.ty.clone(),
+    //         }),
+    //     }
+    // }
 }

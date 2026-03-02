@@ -23,14 +23,13 @@ impl IFnInfoGenerator for FnInfoGenerator {
         let call_struct = self
             .call_struct_generator
             .generate(&fn_decl, &mock_type.generics);
-        let phantom_types_count = mock_type.generics.get_phantom_types_count();
         let args_checker_struct = self
             .args_checker_generator
             .generate(&fn_decl, &mock_type.generics);
         let args_checker_impl = self.args_checker_impl_generator.generate(
             &call_struct,
             &args_checker_struct,
-            phantom_types_count,
+            fn_decl.get_internal_phantom_types_count(),
         );
         let data_field_ident = self.generate_data_field_ident(&fn_decl);
         let maybe_base_caller_impl = fn_decl.maybe_base_fn_block.clone().map(|x| {

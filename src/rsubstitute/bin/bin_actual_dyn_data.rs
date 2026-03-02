@@ -71,7 +71,7 @@ trait Trait {
     fn work(&self, v: i32) -> i32;
 }
 #[cfg(test)]
-trait Trait<'rs> {
+trait Trait {
     fn work(&self, v: i32) -> i32;
 }
 #[cfg(test)]
@@ -123,7 +123,7 @@ mod __rsubstitute_generated_Trait {
         pub received: TraitMockReceived<'rs>,
         data: Arc<TraitMockData<'rs>>,
     }
-    impl<'rs> Trait<'rs> for TraitMock<'rs> {
+    impl<'rs> Trait for TraitMock<'rs> {
         fn work(&self, v: i32) -> i32 {
             let call = unsafe {
                 work_Call {
@@ -147,7 +147,7 @@ mod __rsubstitute_generated_Trait {
         }
     }
     impl<'rs> TraitMockSetup<'rs> {
-        pub fn work(&'rs self) -> FnTuner<'rs, Self, (&i32,), i32, false> {
+        pub fn work(&self, v: i32) -> FnTuner<'rs, Self, (&i32,), i32, false> {
             let work_args_checker = work_ArgsChecker {
                 _phantom_lifetime: PhantomData,
                 v: v.into(),
@@ -158,7 +158,7 @@ mod __rsubstitute_generated_Trait {
         }
     }
     impl<'rs> TraitMockReceived<'rs> {
-        pub fn work(self, times: Times) -> Self {
+        pub fn work(&self, v: i32, times: Times) -> Self {
             let work_args_checker = work_ArgsChecker {
                 _phantom_lifetime: PhantomData,
                 v: v.into(),

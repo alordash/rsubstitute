@@ -35,13 +35,11 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
     }
 
     fn generate_for_trait(&self, fn_info: &FnInfo, mock_type: &MockType) -> Signature {
-        let prepend_ref_self_arg = true;
         let result = self.generate(
             fn_info,
             fn_info.parent.fn_ident.clone(),
-            prepend_ref_self_arg,
             constants::SELF_TYPE.clone(),
-            MockGenericsUsage::JustGetPhantomTypesCount(&mock_type.generics),
+            MockGenericsUsage::JustGetPhantomTypesCount,
         );
         return result;
     }
@@ -57,11 +55,9 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
             .create_from_struct(&mock_received_struct.item_struct);
         self.reference_normalizer
             .staticify_anonymous_lifetimes(&mut return_ty);
-        let prepend_ref_self_arg = false;
         let result = self.generate(
             fn_info,
             constants::MOCK_RECEIVED_FIELD_IDENT.clone(),
-            prepend_ref_self_arg,
             return_ty,
             MockGenericsUsage::UseAsGenerics(&mock_type.generics),
         );
@@ -76,7 +72,6 @@ impl ReceivedSignatureGenerator {
         &self,
         fn_info: &FnInfo,
         fn_ident: Ident,
-        prepend_ref_self_arg: bool,
         return_ty: Type,
         mock_generics_usage: MockGenericsUsage,
     ) -> Signature {
@@ -94,15 +89,12 @@ impl ReceivedSignatureGenerator {
         });
         let mut inputs: Vec<_> = self
             .input_args_generator
-            .generate_input_args(fn_info, mock_generics_usage.get_phantom_types_count())
+            .generate_input_args(fn_info)
             .into_iter()
             .chain(iter::once(times_arg))
             .collect();
-        if prepend_ref_self_arg {
-            inputs.insert(0, constants::SELF_ARG.clone());
-        }
         let generics = match mock_generics_usage {
-            MockGenericsUsage::JustGetPhantomTypesCount(_) => Generics::default(),
+            MockGenericsUsage::JustGetPhantomTypesCount => Generics::default(),
             MockGenericsUsage::UseAsGenerics(mock_generics) => mock_generics.impl_generics.clone(),
         };
         let signature = Signature {
@@ -123,19 +115,6 @@ impl ReceivedSignatureGenerator {
 }
 
 enum MockGenericsUsage<'a> {
-    JustGetPhantomTypesCount(&'a MockGenerics),
+    JustGetPhantomTypesCount,
     UseAsGenerics(&'a MockGenerics),
-}
-
-impl<'a> MockGenericsUsage<'a> {
-    fn get_phantom_types_count(&self) -> usize {
-        match self {
-            MockGenericsUsage::JustGetPhantomTypesCount(mock_generics) => {
-                mock_generics.get_phantom_types_count()
-            }
-            MockGenericsUsage::UseAsGenerics(mock_generics) => {
-                mock_generics.get_phantom_types_count()
-            }
-        }
-    }
 }

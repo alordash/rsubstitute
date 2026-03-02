@@ -12,6 +12,7 @@ pub(crate) struct FnDecl {
     pub visibility: Visibility,
     pub maybe_base_fn_block: Option<Block>,
     pub base_callable: bool, // TODO - set actual value
+    pub has_phantom_return_type: bool,
 }
 
 impl FnDecl {
@@ -41,5 +42,9 @@ impl FnDecl {
             ReturnType::Default => false,
             ReturnType::Type(_, _) => true,
         }
+    }
+
+    pub fn get_internal_phantom_types_count(&self) -> usize {
+        if self.has_phantom_return_type { 2 } else { 1 }
     }
 }

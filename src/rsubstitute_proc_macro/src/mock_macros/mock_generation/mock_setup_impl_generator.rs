@@ -56,7 +56,6 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
                     x,
                     use_fn_info_ident_as_method_ident,
                     output,
-                    mock_type.generics.get_phantom_types_count(),
                 ));
             })
             .collect();
@@ -83,7 +82,6 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
             fn_info,
             use_fn_info_ident_as_method_ident,
             output,
-            mock_type.generics.get_phantom_types_count(),
         ));
 
         let item_impl =
@@ -103,7 +101,6 @@ impl MockSetupImplGenerator {
         fn_info: &FnInfo,
         use_fn_info_ident_as_method_ident: bool,
         output: ReturnType,
-        phantom_types_count: usize,
     ) -> ImplItemFn {
         let sig = Signature {
             constness: None,
@@ -118,11 +115,10 @@ impl MockSetupImplGenerator {
             },
             generics: Generics::default(),
             paren_token: Default::default(),
-            inputs: iter::once(constants::REF_SELF_ARG_WITH_LIFETIME.clone())
-                .chain(
-                    self.input_args_generator
-                        .generate_input_args(fn_info, phantom_types_count),
-                )
+            inputs: self
+                .input_args_generator
+                .generate_input_args(fn_info)
+                .into_iter()
                 .collect(),
             variadic: None,
             output,
