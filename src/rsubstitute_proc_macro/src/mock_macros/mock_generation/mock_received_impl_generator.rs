@@ -110,7 +110,7 @@ impl MockReceivedImplGenerator {
     fn generate_fn_received(&self, fn_info: &FnInfo, mock_type: &MockType) -> ImplItemFn {
         let sig = self
             .received_signature_generator
-            .generate_for_trait(fn_info, mock_type);
+            .generate_for_trait(fn_info);
         let block = self.generate_fn_received_block(fn_info);
         let impl_item_fn = ImplItemFn {
             attrs: Vec::new(),

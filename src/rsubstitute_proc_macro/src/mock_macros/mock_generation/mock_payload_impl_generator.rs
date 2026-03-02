@@ -12,14 +12,14 @@ pub trait IMockPayloadImplGenerator {
         trait_ident: Ident,
         mock_type: &MockType,
         fn_infos: &[FnInfo],
-    ) -> MockTraitImpl;
+    ) -> MockPayloadImpl;
 
     fn generate_for_struct(
         &self,
         attrs: Vec<Attribute>,
         mock_type: &MockType,
         fn_infos: &[FnInfo],
-    ) -> MockTraitImpl;
+    ) -> MockPayloadImpl;
 }
 
 pub(crate) struct MockPayloadImplGenerator {
@@ -34,7 +34,7 @@ impl IMockPayloadImplGenerator for MockPayloadImplGenerator {
         trait_ident: Ident,
         mock_type: &MockType,
         fn_infos: &[FnInfo],
-    ) -> MockTraitImpl {
+    ) -> MockPayloadImpl {
         let trait_path = self
             .path_factory
             .create_with_generics(trait_ident, mock_type.generics.source_generics.clone());
@@ -54,7 +54,7 @@ impl IMockPayloadImplGenerator for MockPayloadImplGenerator {
         attrs: Vec<Attribute>,
         mock_type: &MockType,
         fn_infos: &[FnInfo],
-    ) -> MockTraitImpl {
+    ) -> MockPayloadImpl {
         let mock_impl = self.generate_core(
             attrs,
             mock_type.ty.clone(),
@@ -74,7 +74,7 @@ impl MockPayloadImplGenerator {
         generics: Generics,
         fn_infos: &[FnInfo],
         maybe_trait_path: Option<Path>,
-    ) -> MockTraitImpl {
+    ) -> MockPayloadImpl {
         let items = fn_infos
             .iter()
             .map(|x| self.generate_impl_item_fn(x))
@@ -93,7 +93,7 @@ impl MockPayloadImplGenerator {
             brace_token: Default::default(),
             items,
         };
-        let mock_impl = MockTraitImpl { item_impl };
+        let mock_impl = MockPayloadImpl { item_impl };
         return mock_impl;
     }
 

@@ -138,7 +138,7 @@ impl BaseCallerImplGenerator {
             .item_struct
             .fields
             .iter()
-            .skip(1 + mock_type.generics.get_phantom_types_count());
+            .skip(fn_decl.get_internal_phantom_types_count());
         let fields = fn_decl
             .arguments
             .iter()

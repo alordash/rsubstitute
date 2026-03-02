@@ -13,7 +13,7 @@ use syn::*;
 pub trait IReceivedSignatureGenerator {
     fn get_times_arg_ident(&self) -> Ident;
 
-    fn generate_for_trait(&self, fn_info: &FnInfo, mock_type: &MockType) -> Signature;
+    fn generate_for_trait(&self, fn_info: &FnInfo) -> Signature;
 
     fn generate_for_static(
         &self,
@@ -34,14 +34,14 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
         format_ident!("times")
     }
 
-    fn generate_for_trait(&self, fn_info: &FnInfo, mock_type: &MockType) -> Signature {
+    fn generate_for_trait(&self, fn_info: &FnInfo) -> Signature {
         let prepend_ref_self_arg = true;
         let result = self.generate(
             fn_info,
             fn_info.parent.fn_ident.clone(),
             prepend_ref_self_arg,
             constants::SELF_TYPE.clone(),
-            MockGenericsUsage::JustGetPhantomTypesCount(&mock_type.generics),
+            MockGenericsUsage::JustGetPhantomTypesCount,
         );
         return result;
     }
@@ -94,7 +94,7 @@ impl ReceivedSignatureGenerator {
         });
         let mut inputs: Vec<_> = self
             .input_args_generator
-            .generate_input_args(fn_info, mock_generics_usage.get_phantom_types_count())
+            .generate_input_args(fn_info)
             .into_iter()
             .chain(iter::once(times_arg))
             .collect();
@@ -102,7 +102,7 @@ impl ReceivedSignatureGenerator {
             inputs.insert(0, constants::SELF_ARG.clone());
         }
         let generics = match mock_generics_usage {
-            MockGenericsUsage::JustGetPhantomTypesCount(_) => Generics::default(),
+            MockGenericsUsage::JustGetPhantomTypesCount => Generics::default(),
             MockGenericsUsage::UseAsGenerics(mock_generics) => mock_generics.impl_generics.clone(),
         };
         let signature = Signature {
@@ -123,19 +123,6 @@ impl ReceivedSignatureGenerator {
 }
 
 enum MockGenericsUsage<'a> {
-    JustGetPhantomTypesCount(&'a MockGenerics),
+    JustGetPhantomTypesCount,
     UseAsGenerics(&'a MockGenerics),
-}
-
-impl<'a> MockGenericsUsage<'a> {
-    fn get_phantom_types_count(&self) -> usize {
-        match self {
-            MockGenericsUsage::JustGetPhantomTypesCount(mock_generics) => {
-                mock_generics.get_phantom_types_count()
-            }
-            MockGenericsUsage::UseAsGenerics(mock_generics) => {
-                mock_generics.get_phantom_types_count()
-            }
-        }
-    }
 }

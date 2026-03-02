@@ -115,6 +115,7 @@ impl FnDeclExtractor {
         maybe_base_fn_block: Option<Block>,
         maybe_parent_trait_ident: Option<Ident>,
     ) -> FnDecl {
+        let has_phantom_return_type = self.is_return_type_generic(&sig.output, &sig.generics);
         let fn_decl = FnDecl {
             attrs,
             maybe_parent_trait_ident,
@@ -123,8 +124,29 @@ impl FnDeclExtractor {
             return_value: sig.output.clone(),
             visibility,
             maybe_base_fn_block,
-            base_callable: false    // TODO - set base callable properly (depending on argument in macro and if fn has base)
+            base_callable: false, // TODO - set base callable properly (depending on argument in macro and if fn has base)
+            has_phantom_return_type,
         };
         return fn_decl;
+    }
+
+    fn is_return_type_generic(&self, return_type: &ReturnType, generics: &Generics) -> bool {
+        let ReturnType::Type(_, ty) = return_type else {
+            return false;
+        };
+        let Type::Path(TypePath { path, .. }) = &**ty else {
+            return false;
+        };
+
+        let type_params: Vec<_> = generics.type_params().collect();
+        for segment in path.segments.iter() {
+            if type_params
+                .iter()
+                .any(|type_param| segment.ident == type_param.ident)
+            {
+                return true;
+            }
+        }
+        return false;
     }
 }

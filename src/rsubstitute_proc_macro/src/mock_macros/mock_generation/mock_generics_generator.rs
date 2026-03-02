@@ -3,6 +3,7 @@ use crate::mock_macros::mock_generation::models::*;
 use crate::syntax::*;
 use quote::format_ident;
 use std::sync::Arc;
+use syn::punctuated::Punctuated;
 use syn::*;
 
 pub trait IMockGenericsGenerator {
@@ -18,11 +19,18 @@ impl IMockGenericsGenerator for MockGenericsGenerator {
     fn generate(&self, source_generics: &Generics) -> MockGenerics {
         let mut modified_source_generics = source_generics.clone();
         self.add_required_for_lib_type_trait_constraints(&mut modified_source_generics);
-        let phantom_type_fields = self.get_all_phantom_fields_from_generics(source_generics);
+        modified_source_generics.params.insert(
+            0,
+            GenericParam::Lifetime(LifetimeParam {
+                attrs: Vec::new(),
+                lifetime: constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
+                colon_token: None,
+                bounds: Punctuated::new(),
+            }),
+        );
         let mock_generics = MockGenerics {
             source_generics: source_generics.clone(),
             impl_generics: modified_source_generics,
-            phantom_type_fields,
         };
         return mock_generics;
     }
@@ -127,23 +135,6 @@ impl MockGenericsGenerator {
             where_clause: None,
         };
         return generics;
-    }
-
-    fn get_all_phantom_fields_from_generics(&self, generics: &Generics) -> Vec<Field> {
-        let fields = generics
-            .params
-            .iter()
-            .filter_map(|generic_param| match generic_param {
-                GenericParam::Lifetime(lifetime_param) => {
-                    Some(self.convert_lifetime_param_to_phantom_field(lifetime_param))
-                }
-                GenericParam::Type(type_param) => {
-                    Some(self.convert_type_param_to_phantom_field(type_param))
-                }
-                _ => None,
-            })
-            .collect();
-        return fields;
     }
 
     fn convert_lifetime_param_to_phantom_field(&self, lifetime_param: &LifetimeParam) -> Field {
