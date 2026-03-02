@@ -26,7 +26,7 @@ pub(crate) struct MockImplGenerator {
     pub type_factory: Arc<dyn ITypeFactory>,
     pub mock_constructor_block_generator: Arc<dyn IMockConstructorBlockGenerator>,
     pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
-    pub std_mem_transmute_expr_factory: Arc<dyn IStdMemTransmuteExprFactory>,
+    pub core_mem_transmute_expr_factory: Arc<dyn ICoreMemTransmuteExprFactory>,
 }
 
 impl IMockImplGenerator for MockImplGenerator {

@@ -153,7 +153,7 @@ impl ArgsCheckerTraitImplGenerator {
             .item_struct
             .fields
             .iter()
-            .skip(1 + phantom_types_count)
+            .skip(phantom_types_count)
             .map(|field| self.generate_check_exprs(field))
             .collect();
         let vec_expr = Expr::Macro(ExprMacro {

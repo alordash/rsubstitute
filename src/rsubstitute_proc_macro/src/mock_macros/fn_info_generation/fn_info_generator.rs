@@ -26,6 +26,7 @@ impl IFnInfoGenerator for FnInfoGenerator {
         let args_checker_struct = self
             .args_checker_generator
             .generate(&fn_decl, &mock_type.generics);
+        dbg!(fn_decl.get_internal_phantom_types_count());
         let args_checker_impl = self.args_checker_impl_generator.generate(
             &call_struct,
             &args_checker_struct,
@@ -52,7 +53,11 @@ impl FnInfoGenerator {
     const DATA_FIELD_IDENT_SUFFIX: &'static str = "data";
 
     fn generate_data_field_ident(&self, fn_decl: &FnDecl) -> Ident {
-        let data_field_ident = format_ident!("{}_{}", fn_decl.get_full_ident(), Self::DATA_FIELD_IDENT_SUFFIX);
+        let data_field_ident = format_ident!(
+            "{}_{}",
+            fn_decl.get_full_ident(),
+            Self::DATA_FIELD_IDENT_SUFFIX
+        );
         return data_field_ident;
     }
 }

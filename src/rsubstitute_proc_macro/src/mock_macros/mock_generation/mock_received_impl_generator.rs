@@ -175,9 +175,7 @@ impl MockReceivedImplGenerator {
                 ident: format_ident!("no_other_calls"),
                 generics: Generics::default(),
                 paren_token: Default::default(),
-                inputs: [constants::REF_SELF_ARG_WITH_LIFETIME.clone()]
-                    .into_iter()
-                    .collect(),
+                inputs: [constants::REF_SELF_ARG.clone()].into_iter().collect(),
                 variadic: None,
                 output: ReturnType::Default,
             },

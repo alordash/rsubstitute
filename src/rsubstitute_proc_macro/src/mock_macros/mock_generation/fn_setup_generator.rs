@@ -33,7 +33,7 @@ impl IFnSetupGenerator for FnSetupGenerator {
         mock_setup_struct: &MockSetupStruct,
         mock_type: &MockType,
     ) -> ItemFn {
-        let output = self
+        let output_type = self
             .setup_output_generator
             .generate_for_static(fn_info, mock_setup_struct);
         let sig = Signature {
@@ -51,7 +51,7 @@ impl IFnSetupGenerator for FnSetupGenerator {
                 .into_iter()
                 .collect(),
             variadic: None,
-            output,
+            output: ReturnType::Type(Default::default(), Box::new(Type::Path(output_type))),
         };
         let block = self.generate_fn_setup_block(fn_info, mock_type);
         let item_fn = ItemFn {

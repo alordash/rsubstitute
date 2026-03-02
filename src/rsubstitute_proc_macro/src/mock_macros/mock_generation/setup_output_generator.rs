@@ -7,13 +7,13 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait ISetupOutputGenerator {
-    fn generate_for_trait(&self, fn_info: &FnInfo) -> ReturnType;
+    fn generate_for_trait(&self, fn_info: &FnInfo) -> TypePath;
 
     fn generate_for_static(
         &self,
         fn_info: &FnInfo,
         mock_setup_struct: &MockSetupStruct,
-    ) -> ReturnType;
+    ) -> TypePath;
 }
 
 pub(crate) struct SetupOutputGenerator {
@@ -21,21 +21,20 @@ pub(crate) struct SetupOutputGenerator {
 }
 
 impl ISetupOutputGenerator for SetupOutputGenerator {
-    fn generate_for_trait(&self, fn_info: &FnInfo) -> ReturnType {
+    fn generate_for_trait(&self, fn_info: &FnInfo) -> TypePath {
         let ty = self.generate(
             fn_info,
             constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
             constants::SELF_TYPE.clone(),
         );
-        let result = ReturnType::Type(Default::default(), Box::new(ty));
-        return result;
+        return ty;
     }
 
     fn generate_for_static(
         &self,
         fn_info: &FnInfo,
         mock_setup_struct: &MockSetupStruct,
-    ) -> ReturnType {
+    ) -> TypePath {
         let owner_type = self
             .type_factory
             .create_from_struct(&mock_setup_struct.item_struct);
@@ -44,15 +43,14 @@ impl ISetupOutputGenerator for SetupOutputGenerator {
             constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
             owner_type,
         );
-        let result = ReturnType::Type(Default::default(), Box::new(ty));
-        return result;
+        return ty;
     }
 }
 
 impl SetupOutputGenerator {
-    fn generate(&self, fn_info: &FnInfo, lifetime: Lifetime, owner_type: Type) -> Type {
+    fn generate(&self, fn_info: &FnInfo, lifetime: Lifetime, owner_type: Type) -> TypePath {
         let arg_refs_tuple = self.generate_arg_refs_tuple(&fn_info.parent.arguments);
-        let result = Type::Path(TypePath {
+        let result = TypePath {
             qself: None,
             path: Path {
                 leading_colon: None,
@@ -82,7 +80,7 @@ impl SetupOutputGenerator {
                 .into_iter()
                 .collect(),
             },
-        });
+        };
         return result;
     }
 

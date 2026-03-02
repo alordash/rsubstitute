@@ -34,7 +34,7 @@ mod tests {
             .returns(r2)
             .work(Arg::Is(|x| *x < 0))
             .returns(r3)
-            .and_does(|args| println!("amogus received number: {}", args))
+            .and_does(|args| println!("amogus received number: {:?}", args))
             .work(Arg::Any)
             .returns
             .always(r45);
@@ -99,7 +99,7 @@ mod __rsubstitute_generated_Trait {
     impl<'rs> IArgsChecker for work_ArgsChecker<'rs> {
         fn check(&self, dyn_call: &DynCall) -> Vec<ArgCheckResult> {
             let call: &work_Call<'rs> = dyn_call.downcast_ref();
-            vec![]
+            vec![self.v.check("v", &call.v)]
         }
     }
     #[doc(hidden)]
@@ -152,9 +152,9 @@ mod __rsubstitute_generated_Trait {
                 _phantom_lifetime: PhantomData,
                 v: v.into(),
             };
-            let fn_config = self.data.work_data.add_config(work_args_checker);
-            let fn_tuner = FnTuner::new(fn_config, self);
-            return fn_tuner;
+            let fn_tuner: FnTuner<'_, Self, (&i32,), i32, false> =
+                self.data.work_data.add_config(work_args_checker, self);
+            return unsafe { core::mem::transmute(fn_tuner) };
         }
     }
     impl<'rs> TraitMockReceived<'rs> {
@@ -168,7 +168,7 @@ mod __rsubstitute_generated_Trait {
                 .verify_received(work_args_checker, times);
             return self;
         }
-        pub fn no_other_calls(&'rs self) {
+        pub fn no_other_calls(&self) {
             self.data.verify_received_nothing_else();
         }
     }

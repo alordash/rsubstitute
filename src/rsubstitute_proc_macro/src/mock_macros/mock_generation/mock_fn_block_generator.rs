@@ -18,7 +18,7 @@ pub(crate) struct MockFnBlockGenerator {
     pub path_factory: Arc<dyn IPathFactory>,
     pub expr_reference_factory: Arc<dyn IExprReferenceFactory>,
     pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
-    pub std_mem_transmute_expr_factory: Arc<dyn IStdMemTransmuteExprFactory>,
+    pub core_mem_transmute_expr_factory: Arc<dyn ICoreMemTransmuteExprFactory>,
     pub field_value_factory: Arc<dyn IFieldValueFactory>,
     pub get_global_mock_expr_generator: Arc<dyn IGetGlobalMockExprGenerator>,
     pub field_checker: Arc<dyn IFieldChecker>,
@@ -79,7 +79,7 @@ impl MockFnBlockGenerator {
                     attrs: Vec::new(),
                     member: Member::Named(field_ident.clone()),
                     colon_token: Some(Default::default()),
-                    expr: self.std_mem_transmute_expr_factory.create(field_ident),
+                    expr: self.core_mem_transmute_expr_factory.create(field_ident),
                 };
                 return field_value;
             })

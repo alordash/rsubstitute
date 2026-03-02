@@ -15,7 +15,7 @@ mod local_factory;
 mod path_factory;
 mod reference_normalizer;
 mod reference_type_crawler;
-mod std_mem_transmute_expr_factory;
+mod core_mem_transmute_expr_factory;
 mod struct_factory;
 mod type_factory;
 
@@ -36,6 +36,6 @@ pub use local_factory::*;
 pub use path_factory::*;
 pub use reference_normalizer::*;
 pub use reference_type_crawler::*;
-pub use std_mem_transmute_expr_factory::*;
+pub use core_mem_transmute_expr_factory::*;
 pub use struct_factory::*;
 pub use type_factory::*;
