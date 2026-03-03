@@ -19,7 +19,6 @@ pub(crate) struct ServiceCollection {
     pub path_factory: Arc<dyn IPathFactory>,
     pub type_factory: Arc<dyn ITypeFactory>,
     pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
-    pub expr_reference_factory: Arc<dyn IExprReferenceFactory>,
     pub derive_args_formatter_macro_handler: Arc<dyn IDeriveArgsFormatterMacroHandler>,
     pub derive_args_infos_provider_macro_handler: Arc<dyn IDeriveArgsInfosProviderMacroHandler>,
     pub derive_args_tuple_provider_macro_handler: Arc<dyn IDeriveArgsTupleProviderMacroHandler>,
@@ -93,10 +92,7 @@ fn create_services() -> ServiceCollection {
         expr_method_call_factory: expr_method_call_factory.clone(),
         expr_reference_factory: expr_reference_factory.clone(),
     });
-    let mock_generics_generator = Arc::new(MockGenericsGenerator {
-        type_factory: type_factory.clone(),
-        field_factory: field_factory.clone(),
-    });
+    let mock_generics_generator = Arc::new(MockGenericsGenerator);
     let base_caller_impl_generator = Arc::new(BaseCallerImplGenerator {
         type_factory: type_factory.clone(),
         path_factory: path_factory.clone(),
@@ -108,7 +104,6 @@ fn create_services() -> ServiceCollection {
         base_caller_impl_generator: base_caller_impl_generator.clone(),
     });
     let mock_data_struct_generator = Arc::new(MockDataStructGenerator {
-        type_factory: type_factory.clone(),
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
     });
@@ -168,8 +163,6 @@ fn create_services() -> ServiceCollection {
     let mock_impl_generator = Arc::new(MockImplGenerator {
         type_factory: type_factory.clone(),
         mock_constructor_block_generator: mock_constructor_block_generator.clone(),
-        expr_method_call_factory: expr_method_call_factory.clone(),
-        core_mem_transmute_expr_factory: core_mem_transmute_expr_factory.clone(),
     });
     let mock_struct_default_impl_generator = Arc::new(MockStructDefaultImplGenerator {
         type_factory: type_factory.clone(),
@@ -369,7 +362,6 @@ fn create_services() -> ServiceCollection {
         path_factory,
         type_factory,
         expr_method_call_factory,
-        expr_reference_factory,
         derive_args_formatter_macro_handler,
         derive_args_infos_provider_macro_handler,
         derive_args_tuple_provider_macro_handler,

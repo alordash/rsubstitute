@@ -1,6 +1,5 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::FnInfo;
-use crate::mock_macros::mock_generation::*;
 use crate::syntax::*;
 use proc_macro2::Ident;
 use quote::format_ident;

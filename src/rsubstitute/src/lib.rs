@@ -1,3 +1,4 @@
+#![allow(clippy::needless_return)]
 pub use rsubstitute_core::args::*;
 pub use rsubstitute_core::*;
 

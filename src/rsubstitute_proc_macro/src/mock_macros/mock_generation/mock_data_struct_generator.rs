@@ -16,7 +16,6 @@ pub trait IMockDataStructGenerator {
 
 // TODO - verify all impls are internal
 pub(crate) struct MockDataStructGenerator {
-    pub type_factory: Arc<dyn ITypeFactory>,
     pub field_factory: Arc<dyn IFieldFactory>,
     pub struct_factory: Arc<dyn IStructFactory>,
 }

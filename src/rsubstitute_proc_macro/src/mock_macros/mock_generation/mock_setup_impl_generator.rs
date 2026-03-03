@@ -94,7 +94,6 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
 }
 
 impl MockSetupImplGenerator {
-    const FN_CONFIG_VAR_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("fn_config"));
     const FN_TUNER_VAR_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("fn_tuner"));
 
     fn generate_fn_setup(
@@ -167,31 +166,6 @@ impl MockSetupImplGenerator {
                 diverge: None,
             },
         ));
-        // let fn_tuner_decl_stmt = Stmt::Local(
-        //     self.local_factory.create_with_type(
-        //         Self::FN_TUNER_VAR_IDENT.clone(),
-        //         Type::Path(fn_tuner_type),
-        //         LocalInit {
-        //             eq_token: Default::default(),
-        //             expr: Box::new(Expr::Call(ExprCall {
-        //                 attrs: Vec::new(),
-        //                 func: Box::new(self.path_factory.create_expr_from_parts(vec![
-        //                     constants::FN_TUNER_TYPE_IDENT.clone(),
-        //                     constants::FN_TUNER_NEW_FN_IDENT.clone(),
-        //                 ])),
-        //                 paren_token: Default::default(),
-        //                 args: [
-        //                     self.path_factory
-        //                         .create_expr(Self::FN_CONFIG_VAR_IDENT.clone()),
-        //                     self.path_factory.create_expr(constants::SELF_IDENT.clone()),
-        //                 ]
-        //                 .into_iter()
-        //                 .collect(),
-        //             })),
-        //             diverge: None,
-        //         },
-        //     ),
-        // );
         let return_stmt = Stmt::Expr(
             Expr::Return(ExprReturn {
                 attrs: Vec::new(),

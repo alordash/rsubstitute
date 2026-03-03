@@ -100,7 +100,7 @@ impl FnDeclExtractor {
         return fn_decl;
     }
 
-    fn validate_signature(&self, sig: &Signature) {
+    fn validate_signature(&self, _sig: &Signature) {
         // TODO - remove? is it fully supported?
         // if !sig.generics.params.is_empty() {
         //     panic!("Generic type parameters for associated functions are not supported.");

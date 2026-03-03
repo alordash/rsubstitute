@@ -53,8 +53,7 @@ impl IBaseCallerImplGenerator for BaseCallerImplGenerator {
             .into_iter()
             .collect(),
         };
-        let call_base_fn =
-            self.generate_call_base_fn(mock_type, fn_decl, call_struct, base_impl_fn_block);
+        let call_base_fn = self.generate_call_base_fn(fn_decl, call_struct, base_impl_fn_block);
         let item_impl = ItemImpl {
             attrs: Vec::new(),
             defaultness: None,
@@ -77,7 +76,6 @@ impl BaseCallerImplGenerator {
 
     fn generate_call_base_fn(
         &self,
-        mock_type: &MockType,
         fn_decl: &FnDecl,
         call_struct: &CallStruct,
         base_impl_fn_block: Block,
@@ -114,8 +112,7 @@ impl BaseCallerImplGenerator {
             variadic: None,
             output: fn_decl.return_value.clone(),
         };
-        let block =
-            self.generate_call_base_fn_block(mock_type, fn_decl, call_struct, base_impl_fn_block);
+        let block = self.generate_call_base_fn_block(fn_decl, call_struct, base_impl_fn_block);
         let impl_item_fn = ImplItemFn {
             attrs: Vec::new(),
             vis: Visibility::Inherited,
@@ -129,7 +126,6 @@ impl BaseCallerImplGenerator {
 
     fn generate_call_base_fn_block(
         &self,
-        mock_type: &MockType,
         fn_decl: &FnDecl,
         call_struct: &CallStruct,
         base_impl_fn_block: Block,

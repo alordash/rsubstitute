@@ -6,7 +6,7 @@ pub trait ILifetimesSpecifier {
 }
 
 #[cfg(not(feature = "arg_lifetime_protection"))]
-pub use stub_impl::*;
+pub(crate) use stub_impl::*;
 #[cfg(not(feature = "arg_lifetime_protection"))]
 mod stub_impl {
     use super::*;
@@ -27,7 +27,7 @@ mod stub_impl {
 }
 
 #[cfg(feature = "arg_lifetime_protection")]
-pub use actual_impl::*;
+pub(crate) use actual_impl::*;
 #[cfg(feature = "arg_lifetime_protection")]
 mod actual_impl {
     use super::*;

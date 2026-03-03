@@ -1,3 +1,4 @@
+#![allow(clippy::needless_return)]
 use crate::di::SERVICES;
 
 mod constants;
