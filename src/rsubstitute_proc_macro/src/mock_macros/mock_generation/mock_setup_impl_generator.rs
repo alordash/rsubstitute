@@ -114,7 +114,7 @@ impl MockSetupImplGenerator {
             } else {
                 constants::MOCK_SETUP_FIELD_IDENT.clone()
             },
-            generics: Generics::default(),
+            generics: fn_info.parent.own_generics.clone(),
             paren_token: Default::default(),
             inputs: iter::once(constants::REF_SELF_ARG.clone())
                 .chain(self.input_args_generator.generate_input_args(fn_info))

@@ -34,15 +34,19 @@ impl IItemTraitHandler for ItemTraitHandler {
         let mock_item_trait = self
             .lifetimes_specifier
             .add_default_arg_lifetime(item_trait.clone());
-        
+
         let mock_ident = format_ident!(
             "{}{}",
             mock_item_trait.ident,
             constants::MOCK_STRUCT_IDENT_PREFIX
         );
-        let fn_decls = self.fn_decl_extractor.extract(&mock_item_trait.items);
+        let mock_generics = self
+            .mock_generics_generator
+            .generate(&mock_item_trait.generics);
+        let fn_decls = self
+            .fn_decl_extractor
+            .extract(&mock_generics, &mock_item_trait.items);
         let target_ident = mock_item_trait.ident.clone();
-        let mock_generics = self.mock_generics_generator.generate(&mock_item_trait.generics);
         let mock_type = self
             .mock_type_generator
             .generate(mock_ident.clone(), mock_generics);

@@ -41,7 +41,6 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
             fn_info.parent.fn_ident.clone(),
             prepend_ref_self_arg,
             constants::SELF_TYPE.clone(),
-            MockGenericsUsage::JustGetPhantomTypesCount,
         );
         return result;
     }
@@ -63,7 +62,6 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
             constants::MOCK_RECEIVED_FIELD_IDENT.clone(),
             prepend_ref_self_arg,
             return_ty,
-            MockGenericsUsage::UseAsGenerics(&mock_type.generics),
         );
         return result;
     }
@@ -78,7 +76,6 @@ impl ReceivedSignatureGenerator {
         fn_ident: Ident,
         prepend_ref_self_arg: bool,
         return_ty: Type,
-        mock_generics_usage: MockGenericsUsage,
     ) -> Signature {
         let times_arg = FnArg::Typed(PatType {
             attrs: Vec::new(),
@@ -101,10 +98,6 @@ impl ReceivedSignatureGenerator {
         if prepend_ref_self_arg {
             inputs.insert(0, constants::SELF_ARG.clone());
         }
-        let generics = match mock_generics_usage {
-            MockGenericsUsage::JustGetPhantomTypesCount => Generics::default(),
-            MockGenericsUsage::UseAsGenerics(mock_generics) => mock_generics.impl_generics.clone(),
-        };
         let signature = Signature {
             constness: None,
             asyncness: None,
@@ -112,7 +105,7 @@ impl ReceivedSignatureGenerator {
             abi: None,
             fn_token: Default::default(),
             ident: fn_ident,
-            generics,
+            generics: fn_info.parent.own_generics.clone(),
             paren_token: Default::default(),
             inputs: inputs.into_iter().collect(),
             variadic: None,
@@ -120,9 +113,4 @@ impl ReceivedSignatureGenerator {
         };
         return signature;
     }
-}
-
-enum MockGenericsUsage<'a> {
-    JustGetPhantomTypesCount,
-    UseAsGenerics(&'a MockGenerics),
 }

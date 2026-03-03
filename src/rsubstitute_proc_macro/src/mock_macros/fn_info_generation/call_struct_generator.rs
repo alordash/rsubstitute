@@ -1,6 +1,5 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::*;
-use crate::mock_macros::mock_generation::models::MockGenerics;
 use crate::mock_macros::models::*;
 use crate::syntax::*;
 use quote::format_ident;
@@ -8,7 +7,7 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait ICallStructGenerator {
-    fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> CallStruct;
+    fn generate(&self, fn_decl: &FnDecl) -> CallStruct;
 }
 
 pub(crate) struct CallStructGenerator {
@@ -20,7 +19,7 @@ pub(crate) struct CallStructGenerator {
 }
 
 impl ICallStructGenerator for CallStructGenerator {
-    fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> CallStruct {
+    fn generate(&self, fn_decl: &FnDecl) -> CallStruct {
         let attrs = vec![
             constants::DOC_HIDDEN_ATTRIBUTE.clone(),
             self.generate_call_derive_traits_attribute(),
@@ -39,12 +38,9 @@ impl ICallStructGenerator for CallStructGenerator {
             named: struct_fields,
         };
 
-        let mut item_struct = self.struct_factory.create(
-            attrs,
-            ident,
-            mock_generics.impl_generics.clone(),
-            fields_named,
-        );
+        let mut item_struct =
+            self.struct_factory
+                .create(attrs, ident, fn_decl.merged_generics.clone(), fields_named);
         self.reference_normalizer
             .normalize_anonymous_lifetimes_in_struct(&mut item_struct);
         let call_struct = CallStruct { item_struct };

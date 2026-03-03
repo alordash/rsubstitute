@@ -1,6 +1,5 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::*;
-use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::models::*;
 use crate::syntax::*;
 use quote::format_ident;
@@ -8,7 +7,7 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait IArgsCheckerGenerator {
-    fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> ArgsCheckerStruct;
+    fn generate(&self, fn_decl: &FnDecl) -> ArgsCheckerStruct;
 }
 
 pub(crate) struct ArgsCheckerGenerator {
@@ -21,7 +20,7 @@ pub(crate) struct ArgsCheckerGenerator {
 }
 
 impl IArgsCheckerGenerator for ArgsCheckerGenerator {
-    fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> ArgsCheckerStruct {
+    fn generate(&self, fn_decl: &FnDecl) -> ArgsCheckerStruct {
         let attrs = vec![
             constants::DOC_HIDDEN_ATTRIBUTE.clone(),
             self.generate_arg_checker_derive_traits_attribute(),
@@ -45,12 +44,9 @@ impl IArgsCheckerGenerator for ArgsCheckerGenerator {
             named: struct_fields,
         };
 
-        let mut item_struct = self.struct_factory.create(
-            attrs,
-            ident,
-            mock_generics.impl_generics.clone(),
-            fields_named,
-        );
+        let mut item_struct =
+            self.struct_factory
+                .create(attrs, ident, fn_decl.merged_generics.clone(), fields_named);
         self.reference_normalizer
             .normalize_anonymous_lifetimes_in_struct(&mut item_struct);
         let args_checker_struct = ArgsCheckerStruct { item_struct };

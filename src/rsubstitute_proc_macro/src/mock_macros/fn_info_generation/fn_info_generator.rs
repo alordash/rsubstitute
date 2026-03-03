@@ -20,12 +20,8 @@ pub(crate) struct FnInfoGenerator {
 
 impl IFnInfoGenerator for FnInfoGenerator {
     fn generate(&self, fn_decl: FnDecl, mock_type: &MockType) -> FnInfo {
-        let call_struct = self
-            .call_struct_generator
-            .generate(&fn_decl, &mock_type.generics);
-        let args_checker_struct = self
-            .args_checker_generator
-            .generate(&fn_decl, &mock_type.generics);
+        let call_struct = self.call_struct_generator.generate(&fn_decl);
+        let args_checker_struct = self.args_checker_generator.generate(&fn_decl);
         dbg!(fn_decl.get_internal_phantom_types_count());
         let args_checker_impl = self.args_checker_impl_generator.generate(
             &call_struct,

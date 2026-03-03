@@ -1,4 +1,5 @@
 use rsubstitute::macros::*;
+
 #[mock]
 trait Trait {
     fn work(&self, v: i32) -> i32;

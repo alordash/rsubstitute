@@ -61,7 +61,7 @@ impl IStructMockHandler for StructMockHandler {
             .collect();
         let struct_fn_decls = self
             .fn_decl_extractor
-            .extract_struct_fns(&struct_mock_syntax.get_struct_fns());
+            .extract_struct_fns(&mock_type.generics, &struct_mock_syntax.get_struct_fns());
         let target_ident = struct_mock_syntax.r#struct.ident.clone();
         let struct_fn_infos: Vec<_> = struct_fn_decls
             .into_iter()

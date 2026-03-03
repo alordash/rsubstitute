@@ -26,7 +26,7 @@ impl IMockStructTraitInfoGenerator for MockStructTraitInfoGenerator {
         let trait_ident_from_path = trait_impl.get_trait_ident_from_path();
         let fn_decls = self
             .fn_decl_extractor
-            .extract_struct_trait_impl_fns(&trait_impl);
+            .extract_struct_trait_impl_fns(&mock_type.generics, &trait_impl);
         let fn_infos: Vec<_> = fn_decls
             .into_iter()
             .map(|fn_decl| self.fn_info_generator.generate(fn_decl, &mock_type))

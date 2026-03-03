@@ -105,7 +105,7 @@ impl MockPayloadImplGenerator {
             abi: None,
             fn_token: Default::default(),
             ident: fn_info.parent.fn_ident.clone(),
-            generics: Generics::default(),
+            generics: fn_info.parent.own_generics.clone(),
             paren_token: Default::default(),
             inputs: self
                 .mock_fn_inputs_generator

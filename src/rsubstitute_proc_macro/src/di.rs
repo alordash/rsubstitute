@@ -31,7 +31,10 @@ pub(crate) struct ServiceCollection {
 }
 
 fn create_services() -> ServiceCollection {
-    let fn_decl_extractor = Arc::new(FnDeclExtractor);
+    let generics_merger = Arc::new(GenericsMerger);
+    let fn_decl_extractor = Arc::new(FnDeclExtractor {
+        generics_merger: generics_merger.clone(),
+    });
     let generic_argument_factory_cell = Arc::new(OnceCell::new());
     let attribute_factory = Arc::new(AttributeFactory);
     let path_factory = Arc::new(PathFactory {
@@ -40,7 +43,6 @@ fn create_services() -> ServiceCollection {
     let type_factory = Arc::new(TypeFactory {
         path_factory: path_factory.clone(),
     });
-    let generics_merger = Arc::new(GenericsMerger);
     let field_factory = Arc::new(FieldFactory {
         type_factory: type_factory.clone(),
     });
