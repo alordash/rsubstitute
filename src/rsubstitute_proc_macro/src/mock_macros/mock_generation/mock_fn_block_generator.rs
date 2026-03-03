@@ -85,6 +85,7 @@ impl MockFnBlockGenerator {
                 return field_value;
             })
             .collect();
+        // TODO - store all custom structs types in them, otherwise too many calls to `type_factory.create_from_struct`
         let call_struct_type = self
             .type_factory
             .create_from_struct(&fn_info.call_struct.item_struct);
