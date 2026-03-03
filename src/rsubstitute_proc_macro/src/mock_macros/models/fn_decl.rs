@@ -14,7 +14,8 @@ pub(crate) struct FnDecl {
     pub visibility: Visibility,
     pub maybe_base_fn_block: Option<Block>,
     pub base_callable: bool, // TODO - set actual value
-    pub has_phantom_return_type: bool,
+    pub maybe_phantom_return_field: Option<Field>,
+    pub arg_refs_tuple: Type
 }
 
 impl FnDecl {
@@ -47,6 +48,17 @@ impl FnDecl {
     }
 
     pub fn get_internal_phantom_types_count(&self) -> usize {
-        if self.has_phantom_return_type { 2 } else { 1 }
+        if self.maybe_phantom_return_field.is_some() {
+            2
+        } else {
+            1
+        }
+    }
+
+    // pub fn get_internal_phantom_types_count_without_return_type(&self) -> usize {
+    //     1
+    // }
+    pub fn get_internal_phantom_types_count_without_return_type(&self) -> usize {
+        self.get_internal_phantom_types_count()
     }
 }

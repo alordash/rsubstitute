@@ -49,7 +49,6 @@ impl ISetupOutputGenerator for SetupOutputGenerator {
 
 impl SetupOutputGenerator {
     fn generate(&self, fn_info: &FnInfo, lifetime: Lifetime, owner_type: Type) -> TypePath {
-        let arg_refs_tuple = self.generate_arg_refs_tuple(&fn_info.parent.arguments);
         let result = TypePath {
             qself: None,
             path: Path {
@@ -62,7 +61,7 @@ impl SetupOutputGenerator {
                         args: [
                             GenericArgument::Lifetime(lifetime),
                             GenericArgument::Type(owner_type),
-                            GenericArgument::Type(arg_refs_tuple),
+                            GenericArgument::Type(fn_info.parent.arg_refs_tuple.clone()),
                             GenericArgument::Type(fn_info.parent.get_return_value_type()),
                             GenericArgument::Const(Expr::Lit(ExprLit {
                                 attrs: Vec::new(),
@@ -81,21 +80,6 @@ impl SetupOutputGenerator {
                 .collect(),
             },
         };
-        return result;
-    }
-
-    fn generate_arg_refs_tuple(&self, fn_args: &[FnArg]) -> Type {
-        let result = Type::Tuple(TypeTuple {
-            paren_token: Default::default(),
-            elems: fn_args
-                .iter()
-                .filter_map(|fn_arg| match fn_arg {
-                    FnArg::Receiver(_) => None,
-                    FnArg::Typed(pat_type) => Some(*pat_type.ty.clone()),
-                })
-                .map(|ty| self.type_factory.reference(ty, None))
-                .collect(),
-        });
         return result;
     }
 }

@@ -25,6 +25,8 @@ pub trait IFnDeclExtractor {
 
 pub(crate) struct FnDeclExtractor {
     pub generics_merger: Arc<dyn IGenericsMerger>,
+    pub type_factory: Arc<dyn ITypeFactory>,
+    pub field_factory: Arc<dyn IFieldFactory>,
 }
 
 impl IFnDeclExtractor for FnDeclExtractor {
@@ -149,43 +151,69 @@ impl FnDeclExtractor {
         maybe_base_fn_block: Option<Block>,
         maybe_parent_trait_ident: Option<Ident>,
     ) -> FnDecl {
-        let has_phantom_return_type = self.is_return_type_generic(&sig.output, &sig.generics);
+        let maybe_phantom_return_field =
+            self.try_get_phantom_return_field(&sig.output, &sig.generics);
         let merged_generics = self
             .generics_merger
             .merge(&mock_generics.impl_generics, &sig.generics);
+        let arguments: Vec<_> = sig.inputs.iter().cloned().collect();
+        let arg_refs_tuple = self.generate_arg_refs_tuple(&arguments);
         let fn_decl = FnDecl {
             attrs,
             maybe_parent_trait_ident,
             fn_ident: sig.ident.clone(),
-            arguments: sig.inputs.iter().cloned().collect(),
+            arguments,
             return_value: sig.output.clone(),
             own_generics: sig.generics.clone(),
             merged_generics,
             visibility,
             maybe_base_fn_block,
             base_callable: false, // TODO - set base callable properly (depending on argument in macro and if fn has base)
-            has_phantom_return_type,
+            maybe_phantom_return_field,
+            arg_refs_tuple,
         };
         return fn_decl;
     }
 
-    fn is_return_type_generic(&self, return_type: &ReturnType, generics: &Generics) -> bool {
+    fn try_get_phantom_return_field(
+        &self,
+        return_type: &ReturnType,
+        generics: &Generics,
+    ) -> Option<Field> {
         let ReturnType::Type(_, ty) = return_type else {
-            return false;
+            return None;
         };
         let Type::Path(TypePath { path, .. }) = &**ty else {
-            return false;
+            return None;
         };
+        let last_segment = path.segments.last()?;
 
         let type_params: Vec<_> = generics.type_params().collect();
-        for segment in path.segments.iter() {
-            if type_params
-                .iter()
-                .any(|type_param| segment.ident == type_param.ident)
-            {
-                return true;
-            }
+        if type_params
+            .iter()
+            .any(|type_param| last_segment.ident == type_param.ident)
+        {
+            let field = self.field_factory.create(
+                constants::RETURN_TYPE_PHANTOM_FIELD_IDENT.clone(),
+                self.type_factory.phantom_data(last_segment.ident.clone()),
+            );
+            return Some(field);
         }
-        return false;
+        return None;
+    }
+
+    fn generate_arg_refs_tuple(&self, fn_args: &[FnArg]) -> Type {
+        let result = Type::Tuple(TypeTuple {
+            paren_token: Default::default(),
+            elems: fn_args
+                .iter()
+                .filter_map(|fn_arg| match fn_arg {
+                    FnArg::Receiver(_) => None,
+                    FnArg::Typed(pat_type) => Some(*pat_type.ty.clone()),
+                })
+                .map(|ty| self.type_factory.reference(ty, None))
+                .collect(),
+        });
+        return result;
     }
 }

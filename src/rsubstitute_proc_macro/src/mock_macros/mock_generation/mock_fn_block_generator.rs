@@ -23,6 +23,7 @@ pub(crate) struct MockFnBlockGenerator {
     pub get_global_mock_expr_generator: Arc<dyn IGetGlobalMockExprGenerator>,
     pub field_checker: Arc<dyn IFieldChecker>,
     pub local_factory: Arc<dyn ILocalFactory>,
+    pub type_factory: Arc<dyn ITypeFactory>,
 }
 
 impl IMockFnBlockGenerator for MockFnBlockGenerator {
@@ -84,41 +85,42 @@ impl MockFnBlockGenerator {
                 return field_value;
             })
             .collect();
-        let call_stmt = Stmt::Local(Local {
-            attrs: Vec::new(),
-            let_token: Default::default(),
-            pat: Pat::Path(PatPath {
-                attrs: Vec::new(),
-                qself: None,
-                path: self.path_factory.create(Self::CALL_VARIABLE_IDENT.clone()),
-            }),
-            init: Some(LocalInit {
-                eq_token: Default::default(),
-                expr: Box::new(Expr::Unsafe(ExprUnsafe {
-                    attrs: Vec::new(),
-                    unsafe_token: Default::default(),
-                    block: Block {
-                        brace_token: Default::default(),
-                        stmts: vec![Stmt::Expr(
-                            Expr::Struct(ExprStruct {
-                                attrs: Vec::new(),
-                                qself: None,
-                                path: self
-                                    .path_factory
-                                    .create(fn_info.call_struct.item_struct.ident.clone()),
-                                brace_token: Default::default(),
-                                fields: field_values.into_iter().collect(),
-                                dot2_token: None,
-                                rest: None,
-                            }),
-                            None,
-                        )],
-                    },
-                })),
-                diverge: None,
-            }),
-            semi_token: Default::default(),
-        });
+        let call_struct_type = self
+            .type_factory
+            .create_from_struct(&fn_info.call_struct.item_struct);
+        let call_stmt =
+            Stmt::Local(self.local_factory.create_with_type(
+                Self::CALL_VARIABLE_IDENT.clone(),
+                call_struct_type,
+                LocalInit {
+                    eq_token: Default::default(),
+                    expr: Box::new(Expr::Unsafe(ExprUnsafe {
+                        attrs: Vec::new(),
+                        unsafe_token: Default::default(),
+                        block: Block {
+                            brace_token: Default::default(),
+                            stmts: vec![Stmt::Expr(
+                                Expr::Struct(
+                                    ExprStruct {
+                                        attrs: Vec::new(),
+                                        qself: None,
+                                        path:
+                                            self.path_factory.create(
+                                                fn_info.call_struct.item_struct.ident.clone(),
+                                            ),
+                                        brace_token: Default::default(),
+                                        fields: field_values.into_iter().collect(),
+                                        dot2_token: None,
+                                        rest: None,
+                                    },
+                                ),
+                                None,
+                            )],
+                        },
+                    })),
+                    diverge: None,
+                },
+            ));
         return call_stmt;
     }
 

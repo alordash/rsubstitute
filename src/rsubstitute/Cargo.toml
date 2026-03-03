@@ -61,6 +61,10 @@ test = false
 doctest = false
 bench = false
 
+[[bin]]
+name = "gen_dyn_data_generics"
+path = "bin/bin_gen_dyn_data_generics.rs"
+
 [dependencies]
 rsubstitute_core = { workspace = true, features = ["debug_naming"] }
 rsubstitute_proc_macro = { workspace = true }

@@ -14,18 +14,14 @@ pub const MOCK_SETUP_FIELD_IDENT: LazyCell<Ident> = LazyCell::new(|| format_iden
 pub const MOCK_RECEIVED_FIELD_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("received"));
 
 pub const SELF_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("self"));
-
-pub const RETURN_SELF_STMT: LazyCell<Stmt> = LazyCell::new(|| {
+pub const SELF_EXPR: LazyCell<Expr> = LazyCell::new(|| {
     let path_factory = &SERVICES.path_factory;
-    let return_self_stmt = Stmt::Expr(
-        Expr::Return(ExprReturn {
-            attrs: Vec::new(),
-            return_token: Default::default(),
-            expr: Some(Box::new(path_factory.create_expr(SELF_IDENT.clone()))),
-        }),
-        Some(Default::default()),
-    );
-    return return_self_stmt;
+    let result = Expr::Path(ExprPath {
+        attrs: Vec::new(),
+        qself: None,
+        path: path_factory.create(SELF_IDENT.clone()),
+    });
+    return result;
 });
 
 pub const MACRO_VEC_PATH: LazyCell<Path> = LazyCell::new(|| {
@@ -145,6 +141,14 @@ pub const FN_DATA_VERIFY_RECEIVED_FN_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("verify_received"));
 
 pub const FN_TUNER_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("FnTuner"));
+
+pub const FN_VERIFIER_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("FnVerifier"));
+pub const FN_VERIFIER_NEW_FN_EXPR: LazyCell<Expr> = LazyCell::new(|| {
+    let path_factory = &SERVICES.path_factory;
+    let result = path_factory
+        .create_expr_from_parts(vec![FN_VERIFIER_TYPE_IDENT.clone(), NEW_IDENT.clone()]);
+    return result;
+});
 
 pub const ALLOW_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("allow"));
 
@@ -330,18 +334,6 @@ pub const VEC_OF_VEC_OF_STRINGS_TYPE: LazyCell<Type> = LazyCell::new(|| {
 
 pub const ARC_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Arc"));
 
-pub const SELF_ARG: LazyCell<FnArg> = LazyCell::new(|| {
-    let result = FnArg::Receiver(Receiver {
-        attrs: Vec::new(),
-        reference: None,
-        mutability: None,
-        self_token: Default::default(),
-        colon_token: None,
-        ty: Box::new(SELF_TYPE.clone()),
-    });
-    return result;
-});
-
 pub const REF_SELF_ARG: LazyCell<FnArg> = LazyCell::new(|| {
     let result = FnArg::Receiver(Receiver {
         attrs: Vec::new(),
@@ -417,6 +409,9 @@ pub const DEFAULT_ARG_FIELD_LIFETIME_FIELD: LazyCell<Field> = LazyCell::new(|| {
     };
     return result;
 });
+
+pub const RETURN_TYPE_PHANTOM_FIELD_IDENT: LazyCell<Ident> =
+    LazyCell::new(|| format_ident!("_return_type"));
 
 pub const ANONYMOUS_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
     apostrophe: Span::call_site(),

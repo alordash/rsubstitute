@@ -122,7 +122,7 @@ impl MockSetupImplGenerator {
             inputs: iter::once(constants::REF_SELF_ARG.clone())
                 .chain(self.input_args_generator.generate_input_args(
                     fn_info,
-                    fn_info.parent.get_internal_phantom_types_count()
+                    fn_info.parent.get_internal_phantom_types_count_without_return_type()
                         + mock_type.generics.get_phantom_fields_count(),
                 ))
                 .collect(),

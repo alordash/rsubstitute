@@ -24,6 +24,7 @@ pub(crate) struct InputArgsGenerator {
     pub local_factory: Arc<dyn ILocalFactory>,
     pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
     pub field_checker: Arc<dyn IFieldChecker>,
+    pub type_factory: Arc<dyn ITypeFactory>,
 }
 
 impl IInputArgsGenerator for InputArgsGenerator {
@@ -113,8 +114,12 @@ impl IInputArgsGenerator for InputArgsGenerator {
                 return self.field_value_factory.create_with_into_conversion(field);
             })
             .collect();
-        let args_checker_decl_stmt = Stmt::Local(self.local_factory.create(
+        let args_checker_struct_type = self
+            .type_factory
+            .create_from_struct(&fn_info.args_checker_struct.item_struct);
+        let args_checker_decl_stmt = Stmt::Local(self.local_factory.create_with_type(
             args_checker_var_ident.clone(),
+            args_checker_struct_type,
             LocalInit {
                 eq_token: Default::default(),
                 expr:

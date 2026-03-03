@@ -141,11 +141,20 @@ impl MockReceivedImplGenerator {
             )),
             Some(Default::default()),
         );
-        let stmts = vec![
-            args_checker_decl_stmt,
-            verify_received_stmt,
-            constants::RETURN_SELF_STMT.clone(),
-        ];
+        let return_stmt = Stmt::Expr(
+            Expr::Return(ExprReturn {
+                attrs: Vec::new(),
+                return_token: Default::default(),
+                expr: Some(Box::new(Expr::Call(ExprCall {
+                    attrs: Vec::new(),
+                    func: Box::new(constants::FN_VERIFIER_NEW_FN_EXPR.clone()),
+                    paren_token: Default::default(),
+                    args: [constants::SELF_EXPR.clone()].into_iter().collect(),
+                }))),
+            }),
+            Some(Default::default()),
+        );
+        let stmts = vec![args_checker_decl_stmt, verify_received_stmt, return_stmt];
         let block = Block {
             brace_token: Default::default(),
             stmts,

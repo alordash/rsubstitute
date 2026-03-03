@@ -32,11 +32,7 @@ pub(crate) struct ServiceCollection {
 
 fn create_services() -> ServiceCollection {
     let generics_merger = Arc::new(GenericsMerger);
-    let fn_decl_extractor = Arc::new(FnDeclExtractor {
-        generics_merger: generics_merger.clone(),
-    });
     let generic_argument_factory_cell = Arc::new(OnceCell::new());
-    let attribute_factory = Arc::new(AttributeFactory);
     let path_factory = Arc::new(PathFactory {
         generic_argument_factory: generic_argument_factory_cell.clone(),
     });
@@ -46,6 +42,12 @@ fn create_services() -> ServiceCollection {
     let field_factory = Arc::new(FieldFactory {
         type_factory: type_factory.clone(),
     });
+    let fn_decl_extractor = Arc::new(FnDeclExtractor {
+        generics_merger: generics_merger.clone(),
+        type_factory: type_factory.clone(),
+        field_factory: field_factory.clone(),
+    });
+    let attribute_factory = Arc::new(AttributeFactory);
     let struct_factory = Arc::new(StructFactory);
     let reference_type_crawler = Arc::new(ReferenceTypeCrawler);
     let reference_normalizer = Arc::new(ReferenceNormalizer {
@@ -155,6 +157,7 @@ fn create_services() -> ServiceCollection {
         field_checker: field_checker.clone(),
         local_factory: local_factory.clone(),
         expr_reference_factory: expr_reference_factory.clone(),
+        type_factory: type_factory.clone(),
     });
     let mock_payload_impl_generator = Arc::new(MockPayloadImplGenerator {
         path_factory: path_factory.clone(),
@@ -179,6 +182,7 @@ fn create_services() -> ServiceCollection {
         local_factory: local_factory.clone(),
         reference_normalizer: reference_normalizer.clone(),
         field_checker: field_checker.clone(),
+        type_factory: type_factory.clone(),
     });
     let impl_factory = Arc::new(ImplFactory);
     let setup_output_generator = Arc::new(SetupOutputGenerator {
