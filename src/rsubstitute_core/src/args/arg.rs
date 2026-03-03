@@ -130,8 +130,8 @@ impl<'rs, T> Arg<'rs, T> {
     }
 }
 
-impl<'rs, T: ?Sized> Arg<'rs, &'rs T> {
-    pub fn check_ref(&self, arg_name: &'static str, actual_value: &&'rs T) -> ArgCheckResult {
+impl<'rs, 'a, T: ?Sized> Arg<'rs, &'a T> {
+    pub fn check_ref(&self, arg_name: &'static str, actual_value: &&'a T) -> ArgCheckResult {
         let arg_info = ArgInfo::new(
             arg_name,
             actual_value,
@@ -186,7 +186,7 @@ impl<'rs, T: ?Sized> Arg<'rs, *mut T> {
     }
 }
 
-impl<'rs, T: ?Sized> Arg<'rs, &'rs mut T> {
+impl<'rs, 'a, T: ?Sized> Arg<'rs, &'a mut T> {
     pub fn check_mut(&self, arg_name: &'static str, actual_value_ptr: &*mut T) -> ArgCheckResult {
         let actual_value = unsafe {
             &(*actual_value_ptr)

@@ -70,7 +70,10 @@ impl FnReceivedGenerator {
                             .item_struct
                             .fields
                             .iter()
-                            .skip(fn_info.parent.get_internal_phantom_types_count())
+                            .skip(
+                                fn_info.parent.get_internal_phantom_types_count()
+                                    + mock_type.generics.get_phantom_fields_count(),
+                            )
                             .map(IFieldRequiredIdentGetter::get_required_ident)
                             .chain(std::iter::once(
                                 self.received_signature_generator.get_times_arg_ident(),

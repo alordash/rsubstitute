@@ -13,7 +13,7 @@ use syn::*;
 pub trait IReceivedSignatureGenerator {
     fn get_times_arg_ident(&self) -> Ident;
 
-    fn generate_for_trait(&self, fn_info: &FnInfo) -> Signature;
+    fn generate_for_trait(&self, fn_info: &FnInfo, mock_type: &MockType) -> Signature;
 
     fn generate_for_static(
         &self,
@@ -34,13 +34,14 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
         format_ident!("times")
     }
 
-    fn generate_for_trait(&self, fn_info: &FnInfo) -> Signature {
+    fn generate_for_trait(&self, fn_info: &FnInfo, mock_type: &MockType) -> Signature {
         let prepend_ref_self_arg = true;
         let result = self.generate(
             fn_info,
             fn_info.parent.fn_ident.clone(),
             prepend_ref_self_arg,
             constants::SELF_TYPE.clone(),
+            mock_type,
         );
         return result;
     }
@@ -62,6 +63,7 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
             constants::MOCK_RECEIVED_FIELD_IDENT.clone(),
             prepend_ref_self_arg,
             return_ty,
+            mock_type,
         );
         return result;
     }
@@ -76,6 +78,7 @@ impl ReceivedSignatureGenerator {
         fn_ident: Ident,
         prepend_ref_self_arg: bool,
         return_ty: Type,
+        mock_type: &MockType,
     ) -> Signature {
         let times_arg = FnArg::Typed(PatType {
             attrs: Vec::new(),
@@ -91,7 +94,11 @@ impl ReceivedSignatureGenerator {
         });
         let mut inputs: Vec<_> = self
             .input_args_generator
-            .generate_input_args(fn_info)
+            .generate_input_args(
+                fn_info,
+                fn_info.parent.get_internal_phantom_types_count()
+                    + mock_type.generics.get_phantom_fields_count(),
+            )
             .into_iter()
             .chain(iter::once(times_arg))
             .collect();

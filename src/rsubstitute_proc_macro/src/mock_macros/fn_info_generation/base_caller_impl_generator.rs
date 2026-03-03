@@ -53,7 +53,12 @@ impl IBaseCallerImplGenerator for BaseCallerImplGenerator {
             .into_iter()
             .collect(),
         };
-        let call_base_fn = self.generate_call_base_fn(fn_decl, call_struct, base_impl_fn_block);
+        let call_base_fn = self.generate_call_base_fn(
+            fn_decl,
+            call_struct,
+            base_impl_fn_block,
+            mock_type.generics.get_phantom_fields_count(),
+        );
         let item_impl = ItemImpl {
             attrs: Vec::new(),
             defaultness: None,
@@ -79,6 +84,7 @@ impl BaseCallerImplGenerator {
         fn_decl: &FnDecl,
         call_struct: &CallStruct,
         base_impl_fn_block: Block,
+        phantom_fields_count: usize,
     ) -> ImplItem {
         let sig = Signature {
             constness: None,
@@ -112,7 +118,12 @@ impl BaseCallerImplGenerator {
             variadic: None,
             output: fn_decl.return_value.clone(),
         };
-        let block = self.generate_call_base_fn_block(fn_decl, call_struct, base_impl_fn_block);
+        let block = self.generate_call_base_fn_block(
+            fn_decl,
+            call_struct,
+            base_impl_fn_block,
+            phantom_fields_count,
+        );
         let impl_item_fn = ImplItemFn {
             attrs: Vec::new(),
             vis: Visibility::Inherited,
@@ -129,12 +140,13 @@ impl BaseCallerImplGenerator {
         fn_decl: &FnDecl,
         call_struct: &CallStruct,
         base_impl_fn_block: Block,
+        phantom_fields_count: usize,
     ) -> Block {
         let call_struct_fields = call_struct
             .item_struct
             .fields
             .iter()
-            .skip(fn_decl.get_internal_phantom_types_count());
+            .skip(fn_decl.get_internal_phantom_types_count() + phantom_fields_count);
         let fields = fn_decl
             .arguments
             .iter()

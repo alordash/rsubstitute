@@ -15,7 +15,7 @@ pub trait IArgsCheckerTraitImplGenerator {
         &self,
         call_struct: &CallStruct,
         args_checker_struct: &ArgsCheckerStruct,
-        phantom_types_count: usize,
+        skipped_fields_count: usize,
     ) -> ArgsCheckerTraitImpl;
 }
 
@@ -32,7 +32,7 @@ impl IArgsCheckerTraitImplGenerator for ArgsCheckerTraitImplGenerator {
         &self,
         call_struct: &CallStruct,
         args_checker_struct: &ArgsCheckerStruct,
-        phantom_types_count: usize,
+        skipped_fields_count: usize,
     ) -> ArgsCheckerTraitImpl {
         let trait_ident = constants::I_ARGS_CHECKER_TRAIT_IDENT.clone();
         let trait_path = Path {
@@ -48,7 +48,7 @@ impl IArgsCheckerTraitImplGenerator for ArgsCheckerTraitImplGenerator {
             self.type_factory
                 .create_from_struct(&args_checker_struct.item_struct),
         );
-        let items = self.generate_check_fn(call_struct, phantom_types_count);
+        let items = self.generate_check_fn(call_struct, skipped_fields_count);
         let item_impl = ItemImpl {
             attrs: Vec::new(),
             defaultness: None,
@@ -78,9 +78,9 @@ impl ArgsCheckerTraitImplGenerator {
     const DYN_CALL_ARG_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("dyn_call"));
     const CALL_VAR_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("call"));
 
-    fn generate_check_fn(&self, call_struct: &CallStruct, phantom_types_count: usize) -> ImplItem {
+    fn generate_check_fn(&self, call_struct: &CallStruct, skipped_fields_count: usize) -> ImplItem {
         let call_var_stmt = self.generate_call_var_stmt(call_struct);
-        let check_stmt = self.generate_check_stmt(call_struct, phantom_types_count);
+        let check_stmt = self.generate_check_stmt(call_struct, skipped_fields_count);
         let block = Block {
             brace_token: Default::default(),
             stmts: vec![call_var_stmt, check_stmt],
@@ -148,12 +148,12 @@ impl ArgsCheckerTraitImplGenerator {
         return stmt;
     }
 
-    fn generate_check_stmt(&self, call_struct: &CallStruct, phantom_types_count: usize) -> Stmt {
+    fn generate_check_stmt(&self, call_struct: &CallStruct, skipped_fields_count: usize) -> Stmt {
         let check_exprs: Punctuated<_, Token![,]> = call_struct
             .item_struct
             .fields
             .iter()
-            .skip(phantom_types_count)
+            .skip(skipped_fields_count)
             .map(|field| self.generate_check_exprs(field))
             .collect();
         let vec_expr = Expr::Macro(ExprMacro {

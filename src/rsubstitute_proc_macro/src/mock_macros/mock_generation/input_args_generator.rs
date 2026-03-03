@@ -7,9 +7,13 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait IInputArgsGenerator {
-    fn generate_input_args(&self, fn_info: &FnInfo) -> Vec<FnArg>;
+    fn generate_input_args(&self, fn_info: &FnInfo, skipped_fields_count: usize) -> Vec<FnArg>;
 
-    fn generate_input_args_with_static_lifetimes(&self, fn_info: &FnInfo) -> Vec<FnArg>;
+    fn generate_input_args_with_static_lifetimes(
+        &self,
+        fn_info: &FnInfo,
+        skipped_fields_count: usize,
+    ) -> Vec<FnArg>;
 
     fn generate_args_checker_var_ident_and_decl_stmt(&self, fn_info: &FnInfo) -> (Ident, Stmt);
 }
@@ -23,13 +27,13 @@ pub(crate) struct InputArgsGenerator {
 }
 
 impl IInputArgsGenerator for InputArgsGenerator {
-    fn generate_input_args(&self, fn_info: &FnInfo) -> Vec<FnArg> {
+    fn generate_input_args(&self, fn_info: &FnInfo, skipped_fields_count: usize) -> Vec<FnArg> {
         let result = fn_info
             .args_checker_struct
             .item_struct
             .fields
             .iter()
-            .skip(fn_info.parent.get_internal_phantom_types_count())
+            .skip(skipped_fields_count)
             .map(|field| {
                 FnArg::Typed(PatType {
                     attrs: Vec::new(),
@@ -75,8 +79,12 @@ impl IInputArgsGenerator for InputArgsGenerator {
         return result;
     }
 
-    fn generate_input_args_with_static_lifetimes(&self, fn_info: &FnInfo) -> Vec<FnArg> {
-        let mut fn_args = self.generate_input_args(fn_info);
+    fn generate_input_args_with_static_lifetimes(
+        &self,
+        fn_info: &FnInfo,
+        skipped_fields_count: usize,
+    ) -> Vec<FnArg> {
+        let mut fn_args = self.generate_input_args(fn_info, skipped_fields_count);
         for fn_arg in fn_args.iter_mut() {
             if let FnArg::Typed(pat_type) = fn_arg {
                 self.reference_normalizer

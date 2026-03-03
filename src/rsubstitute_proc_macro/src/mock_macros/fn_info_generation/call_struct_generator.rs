@@ -1,5 +1,6 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::*;
+use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::models::*;
 use crate::syntax::*;
 use quote::format_ident;
@@ -7,7 +8,7 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait ICallStructGenerator {
-    fn generate(&self, fn_decl: &FnDecl) -> CallStruct;
+    fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> CallStruct;
 }
 
 pub(crate) struct CallStructGenerator {
@@ -19,7 +20,7 @@ pub(crate) struct CallStructGenerator {
 }
 
 impl ICallStructGenerator for CallStructGenerator {
-    fn generate(&self, fn_decl: &FnDecl) -> CallStruct {
+    fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> CallStruct {
         let attrs = vec![
             constants::DOC_HIDDEN_ATTRIBUTE.clone(),
             self.generate_call_derive_traits_attribute(),
@@ -31,6 +32,7 @@ impl ICallStructGenerator for CallStructGenerator {
             .enumerate()
             .flat_map(|(i, x)| self.try_convert_fn_arg_to_field(i, x));
         let struct_fields = std::iter::once(constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD.clone())
+            .chain(mock_generics.phantom_fields.iter().cloned())
             .chain(fn_fields)
             .collect();
         let fields_named = FieldsNamed {

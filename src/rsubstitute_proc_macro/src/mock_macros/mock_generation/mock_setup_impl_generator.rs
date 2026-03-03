@@ -55,6 +55,7 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
                 let output_type = self.setup_output_generator.generate_for_trait(x);
                 return ImplItem::Fn(self.generate_fn_setup(
                     x,
+                    mock_type,
                     use_fn_info_ident_as_method_ident,
                     output_type,
                 ));
@@ -81,6 +82,7 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
         let output_type = self.setup_output_generator.generate_for_trait(fn_info);
         let fn_setup = ImplItem::Fn(self.generate_fn_setup(
             fn_info,
+            mock_type,
             use_fn_info_ident_as_method_ident,
             output_type,
         ));
@@ -99,6 +101,7 @@ impl MockSetupImplGenerator {
     fn generate_fn_setup(
         &self,
         fn_info: &FnInfo,
+        mock_type: &MockType,
         use_fn_info_ident_as_method_ident: bool,
         output_type: TypePath,
     ) -> ImplItemFn {
@@ -117,7 +120,11 @@ impl MockSetupImplGenerator {
             generics: fn_info.parent.own_generics.clone(),
             paren_token: Default::default(),
             inputs: iter::once(constants::REF_SELF_ARG.clone())
-                .chain(self.input_args_generator.generate_input_args(fn_info))
+                .chain(self.input_args_generator.generate_input_args(
+                    fn_info,
+                    fn_info.parent.get_internal_phantom_types_count()
+                        + mock_type.generics.get_phantom_fields_count(),
+                ))
                 .collect(),
             variadic: None,
             output: ReturnType::Type(Default::default(), Box::new(Type::Path(output_type))),

@@ -47,7 +47,11 @@ impl IFnSetupGenerator for FnSetupGenerator {
             paren_token: Default::default(),
             inputs: self
                 .input_args_generator
-                .generate_input_args_with_static_lifetimes(fn_info)
+                .generate_input_args_with_static_lifetimes(
+                    fn_info,
+                    fn_info.parent.get_internal_phantom_types_count()
+                        + mock_type.generics.get_phantom_fields_count(),
+                )
                 .into_iter()
                 .collect(),
             variadic: None,
@@ -108,7 +112,10 @@ impl FnSetupGenerator {
                             .item_struct
                             .fields
                             .iter()
-                            .skip(fn_info.parent.get_internal_phantom_types_count())
+                            .skip(
+                                fn_info.parent.get_internal_phantom_types_count()
+                                    + mock_type.generics.get_phantom_fields_count(),
+                            )
                             .map(IFieldRequiredIdentGetter::get_required_ident)
                             .collect(),
                     ),

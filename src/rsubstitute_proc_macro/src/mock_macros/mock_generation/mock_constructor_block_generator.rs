@@ -34,7 +34,7 @@ impl IMockConstructorBlockGenerator for MockConstructorBlockGenerator {
         mock_struct_traits: Vec<&MockStructTrait>,
         maybe_inner_data_param: Option<InnerDataParam>,
     ) -> Block {
-        let data_fields: Vec<_> = mock_data_struct
+        let data_fn_fields: Vec<_> = mock_data_struct
             .field_and_fn_idents
             .iter()
             .map(|(field_ident, fn_ident)| FieldValue {
@@ -56,6 +56,19 @@ impl IMockConstructorBlockGenerator for MockConstructorBlockGenerator {
                     .collect(),
                 }),
             })
+            .collect();
+        let data_fields = mock_data_struct
+            .item_struct
+            .fields
+            .iter()
+            .take(mock_data_struct.item_struct.fields.len() - data_fn_fields.len())
+            .map(|field| FieldValue {
+                attrs: Vec::new(),
+                member: Member::Named(field.get_required_ident()),
+                colon_token: Some(Default::default()),
+                expr: constants::PHANTOM_DATA_EXPR_PATH.clone(),
+            })
+            .chain(data_fn_fields)
             .collect();
         let data_stmt = Stmt::Local(Local {
             attrs: Vec::new(),
@@ -83,7 +96,7 @@ impl IMockConstructorBlockGenerator for MockConstructorBlockGenerator {
                             .path_factory
                             .create(mock_data_struct.item_struct.ident.clone()),
                         brace_token: Default::default(),
-                        fields: data_fields.into_iter().collect(),
+                        fields: data_fields,
                         dot2_token: None,
                         rest: None,
                     })]

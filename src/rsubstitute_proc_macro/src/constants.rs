@@ -406,34 +406,14 @@ pub const DEFAULT_ARG_FIELD_LIFETIME_FIELD_IDENT: LazyCell<Ident> =
 
 pub const DEFAULT_ARG_FIELD_LIFETIME_FIELD: LazyCell<Field> = LazyCell::new(|| {
     let type_factory = &SERVICES.type_factory;
+    let ty = type_factory.phantom_data_lifetime(DEFAULT_ARG_FIELD_LIFETIME.clone());
     let result = Field {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
         mutability: FieldMutability::None,
         ident: Some(DEFAULT_ARG_FIELD_LIFETIME_FIELD_IDENT.clone()),
         colon_token: Some(Default::default()),
-        ty: Type::Path(TypePath {
-            qself: None,
-            path: Path {
-                leading_colon: None,
-                segments: [PathSegment {
-                    ident: PHANTOM_DATA_IDENT.clone(),
-                    arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
-                        colon2_token: None,
-                        lt_token: Default::default(),
-                        args: [GenericArgument::Type(type_factory.reference(
-                            VOID_TYPE.clone(),
-                            Some(DEFAULT_ARG_FIELD_LIFETIME.clone()),
-                        ))]
-                        .into_iter()
-                        .collect(),
-                        gt_token: Default::default(),
-                    }),
-                }]
-                .into_iter()
-                .collect(),
-            },
-        }),
+        ty,
     };
     return result;
 });

@@ -94,7 +94,10 @@ fn create_services() -> ServiceCollection {
         expr_method_call_factory: expr_method_call_factory.clone(),
         expr_reference_factory: expr_reference_factory.clone(),
     });
-    let mock_generics_generator = Arc::new(MockGenericsGenerator);
+    let mock_generics_generator = Arc::new(MockGenericsGenerator {
+        type_factory: type_factory.clone(),
+        field_factory: field_factory.clone(),
+    });
     let base_caller_impl_generator = Arc::new(BaseCallerImplGenerator {
         type_factory: type_factory.clone(),
         path_factory: path_factory.clone(),

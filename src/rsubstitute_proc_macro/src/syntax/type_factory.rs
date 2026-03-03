@@ -19,6 +19,10 @@ pub trait ITypeFactory {
     fn reference(&self, ty: Type, lifetime: Option<Lifetime>) -> Type;
 
     fn mut_reference(&self, ty: Type, lifetime: Option<Lifetime>) -> Type;
+
+    fn phantom_data_lifetime(&self, lifetime: Lifetime) -> Type;
+
+    fn phantom_data(&self, ty_ident: Ident) -> Type;
 }
 
 pub struct TypeFactory {
@@ -86,6 +90,54 @@ impl ITypeFactory for TypeFactory {
             lifetime,
             mutability: Some(Default::default()),
             elem: Box::new(ty.clone()),
+        });
+        return result;
+    }
+
+    fn phantom_data_lifetime(&self, lifetime: Lifetime) -> Type {
+        let result = Type::Path(TypePath {
+            qself: None,
+            path: Path {
+                leading_colon: None,
+                segments: [PathSegment {
+                    ident: constants::PHANTOM_DATA_IDENT.clone(),
+                    arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
+                        colon2_token: None,
+                        lt_token: Default::default(),
+                        args: [GenericArgument::Type(
+                            self.reference(constants::VOID_TYPE.clone(), Some(lifetime)),
+                        )]
+                        .into_iter()
+                        .collect(),
+                        gt_token: Default::default(),
+                    }),
+                }]
+                .into_iter()
+                .collect(),
+            },
+        });
+        return result;
+    }
+
+    fn phantom_data(&self, ty_ident: Ident) -> Type {
+        let result = Type::Path(TypePath {
+            qself: None,
+            path: Path {
+                leading_colon: None,
+                segments: [PathSegment {
+                    ident: constants::PHANTOM_DATA_IDENT.clone(),
+                    arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
+                        colon2_token: None,
+                        lt_token: Default::default(),
+                        args: [GenericArgument::Type(self.create(ty_ident))]
+                            .into_iter()
+                            .collect(),
+                        gt_token: Default::default(),
+                    }),
+                }]
+                .into_iter()
+                .collect(),
+            },
         });
         return result;
     }

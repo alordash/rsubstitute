@@ -1,5 +1,6 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::*;
+use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::models::*;
 use crate::syntax::*;
 use quote::format_ident;
@@ -7,7 +8,7 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait IArgsCheckerGenerator {
-    fn generate(&self, fn_decl: &FnDecl) -> ArgsCheckerStruct;
+    fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> ArgsCheckerStruct;
 }
 
 pub(crate) struct ArgsCheckerGenerator {
@@ -20,7 +21,7 @@ pub(crate) struct ArgsCheckerGenerator {
 }
 
 impl IArgsCheckerGenerator for ArgsCheckerGenerator {
-    fn generate(&self, fn_decl: &FnDecl) -> ArgsCheckerStruct {
+    fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> ArgsCheckerStruct {
         let attrs = vec![
             constants::DOC_HIDDEN_ATTRIBUTE.clone(),
             self.generate_arg_checker_derive_traits_attribute(),
@@ -37,6 +38,7 @@ impl IArgsCheckerGenerator for ArgsCheckerGenerator {
             .flat_map(|(i, x)| self.try_convert_fn_arg_to_field(i, x))
             .collect();
         let struct_fields = std::iter::once(constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD.clone())
+            .chain(mock_generics.phantom_fields.iter().cloned())
             .chain(fn_fields)
             .collect();
         let fields_named = FieldsNamed {

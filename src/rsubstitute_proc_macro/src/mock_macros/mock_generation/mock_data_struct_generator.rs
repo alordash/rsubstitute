@@ -45,9 +45,17 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
                 )
             })
             .collect();
+        let fields = mock_type
+            .generics
+            .phantom_fields
+            .iter()
+            .cloned()
+            .chain(fn_fields)
+            .into_iter()
+            .collect();
         let fields_named = FieldsNamed {
             brace_token: Default::default(),
-            named: fn_fields.into_iter().collect(),
+            named: fields,
         };
 
         let item_struct = self.struct_factory.create(
