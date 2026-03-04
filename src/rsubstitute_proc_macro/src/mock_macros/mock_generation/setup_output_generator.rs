@@ -66,7 +66,7 @@ impl SetupOutputGenerator {
                             GenericArgument::Const(Expr::Lit(ExprLit {
                                 attrs: Vec::new(),
                                 lit: Lit::Bool(LitBool::new(
-                                    fn_info.parent.base_callable,
+                                    fn_info.parent.maybe_base_fn_block.is_some(),
                                     Span::call_site(),
                                 )),
                             })),

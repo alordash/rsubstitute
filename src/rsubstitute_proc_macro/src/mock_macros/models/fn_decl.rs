@@ -13,7 +13,6 @@ pub(crate) struct FnDecl {
     pub merged_generics: Generics,
     pub visibility: Visibility,
     pub maybe_base_fn_block: Option<Block>,
-    pub base_callable: bool, // TODO - set actual value
     pub maybe_phantom_return_field: Option<Field>,
     pub arg_refs_tuple: Type
 }
