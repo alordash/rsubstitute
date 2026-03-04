@@ -19,6 +19,7 @@ mod mock_payload_impl;
 mod mock_type;
 mod send_sync_impls;
 mod static_fn;
+mod base_fn;
 
 pub use generated_mod::*;
 pub use implemented_trait_configurator::*;
@@ -41,3 +42,4 @@ pub use mock_payload_impl::*;
 pub use mock_type::*;
 pub use send_sync_impls::*;
 pub use static_fn::*;
+pub use base_fn::*;

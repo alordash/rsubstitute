@@ -52,6 +52,8 @@ pub const I_GENERICS_HASH_KEY_PROVIDER_TRAIT_PATH: LazyCell<Path> = LazyCell::ne
     return result;
 });
 
+pub const CLONE_FOR_RSUBSTITUTE_TRAIT_NAME: &'static str = "CloneForRSubstitute";
+
 pub const I_ARGS_FORMATTER_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("fmt_args"));
 
 pub const I_ARGS_CHECKER_TRAIT_IDENT: LazyCell<Ident> =
@@ -64,12 +66,6 @@ pub const I_ARGS_INFOS_PROVIDER_TRAIT_IDENT: LazyCell<Ident> =
 pub const I_ARGS_TUPLE_PROVIDER_TRAIT_NAME: &'static str = "IArgsTupleProvider";
 pub const I_ARGS_TUPLE_PROVIDER_TRAIT_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("{I_ARGS_TUPLE_PROVIDER_TRAIT_NAME}"));
-
-pub const I_BASE_CALLER_TRAIT_IDENT: LazyCell<Ident> =
-    LazyCell::new(|| format_ident!("IBaseCaller"));
-
-pub const I_BASE_CALLER_CALL_BASE_FN_IDENT: LazyCell<Ident> =
-    LazyCell::new(|| format_ident!("call_base"));
 
 pub const I_MOCK_DATA_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("IMockData"));
 
@@ -483,5 +479,11 @@ pub const DYN_CALL_REF_TYPE: LazyCell<Type> = LazyCell::new(|| {
 pub const DYN_CALL_DOWNCAST_REF_FN_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("downcast_ref"));
 
+#[cfg(not(feature = "support_base_by_default"))]
 pub const SUPPORT_BASE_PARAMETER: &'static str = "base";
+
+#[cfg(feature = "support_base_by_default")]
 pub const DO_NOT_SUPPORT_BASE_PARAMETER: &'static str = "no_base";
+
+pub const BASE_FN_IDENT_PREFIX: &'static str = "base";
+

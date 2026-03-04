@@ -45,7 +45,7 @@ impl IItemFnHandler for ItemFnHandler {
             .mock_type_generator
             .generate(mock_ident.clone(), mock_generics);
         let fn_ident = item_fn.sig.ident.clone();
-        let fn_info = self.fn_info_generator.generate(fn_decl, &mock_type);
+        let fn_info = self.fn_info_generator.generate(ctx, fn_decl, &mock_type);
         let fn_infos = [fn_info];
         let all_fn_infos: Vec<_> = fn_infos.iter().collect();
         let mock_data_struct = self

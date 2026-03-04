@@ -59,13 +59,15 @@ impl IStructMockHandler for StructMockHandler {
                     .generate(ctx, &mock_type, x)
             })
             .collect();
-        let struct_fn_decls = self
-            .fn_decl_extractor
-            .extract_struct_fns(ctx, &mock_type.generics, &struct_mock_syntax.get_struct_fns());
+        let struct_fn_decls = self.fn_decl_extractor.extract_struct_fns(
+            ctx,
+            &mock_type.generics,
+            &struct_mock_syntax.get_struct_fns(),
+        );
         let target_ident = struct_mock_syntax.r#struct.ident.clone();
         let struct_fn_infos: Vec<_> = struct_fn_decls
             .into_iter()
-            .map(|x| self.fn_info_generator.generate(x, &mock_type))
+            .map(|x| self.fn_info_generator.generate(ctx, x, &mock_type))
             .collect();
         let all_fn_infos: Vec<_> = struct_fn_infos
             .iter()
@@ -142,6 +144,10 @@ impl IStructMockHandler for StructMockHandler {
         let inner_data_impl = self
             .inner_data_impl_generator
             .generate(&inner_data_struct, struct_mock_syntax.new_fn);
+        let again_all_fn_infos: Vec<_> = mock_struct_traits
+            .iter()
+            .flat_map(|mock_struct_trait| mock_struct_trait.info.fn_infos.iter())
+            .collect();
         let mock_impl = self.mock_impl_generator.generate(
             &mock_type,
             &mock_struct,
@@ -150,6 +156,7 @@ impl IStructMockHandler for StructMockHandler {
             &mock_received_struct,
             mock_struct_traits.iter().collect(),
             Some(inner_data_param),
+            &again_all_fn_infos,
         );
         let mock_setup_impl = self.mock_setup_impl_generator.generate_for_trait(
             &mock_type,

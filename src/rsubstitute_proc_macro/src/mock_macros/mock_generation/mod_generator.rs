@@ -187,19 +187,11 @@ impl IModGenerator for ModGenerator {
                     Item::Impl(x.received_impl.item_impl),
                 ])
             }))
-            .chain(struct_fn_infos.into_iter().flat_map(|x| {
-                [
-                    Item::Struct(x.call_struct.item_struct),
-                    Item::Struct(x.args_checker_struct.item_struct),
-                    Item::Impl(x.args_checker_impl.item_impl),
-                ]
-                .into_iter()
-                .chain(
-                    x.maybe_base_caller_impl
-                        .map(|base_caller_impl| Item::Impl(base_caller_impl.item_impl))
-                        .into_iter(),
-                )
-            }))
+            .chain(
+                struct_fn_infos
+                    .into_iter()
+                    .flat_map(|x| self.convert_fn_info(x)),
+            )
             .chain([
                 Item::Struct(mock_data_struct.item_struct),
                 Item::Struct(mock_setup_struct.item_struct),
@@ -235,20 +227,12 @@ impl IModGenerator for ModGenerator {
 impl ModGenerator {
     const GENERATED_MOD_IDENT: LazyCell<Ident> =
         LazyCell::new(|| format_ident!("__rsubstitute_generated"));
-    fn convert_fn_info(&self, fn_info: FnInfo) -> Vec<Item> {
+    fn convert_fn_info(&self, fn_info: FnInfo) -> [Item; 3] {
         [
             Item::Struct(fn_info.call_struct.item_struct),
             Item::Struct(fn_info.args_checker_struct.item_struct),
             Item::Impl(fn_info.args_checker_impl.item_impl),
         ]
-        .into_iter()
-        .chain(
-            fn_info
-                .maybe_base_caller_impl
-                .map(|base_caller_impl| Item::Impl(base_caller_impl.item_impl))
-                .into_iter(),
-        )
-        .collect()
     }
 
     fn convert_fn_infos(&self, fn_infos: Vec<FnInfo>) -> Vec<Item> {

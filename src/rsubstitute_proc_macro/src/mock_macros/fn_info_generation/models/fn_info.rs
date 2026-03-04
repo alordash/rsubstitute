@@ -10,5 +10,4 @@ pub(crate) struct FnInfo {
     pub args_checker_struct: ArgsCheckerStruct,
     pub args_checker_impl: ArgsCheckerTraitImpl,
     pub data_field_ident: Ident,
-    pub maybe_base_caller_impl: Option<BaseCallerImpl>,
 }

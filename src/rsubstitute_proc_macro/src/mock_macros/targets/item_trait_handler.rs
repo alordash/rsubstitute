@@ -53,7 +53,7 @@ impl IItemTraitHandler for ItemTraitHandler {
             .generate(mock_ident.clone(), mock_generics);
         let fn_infos: Vec<_> = fn_decls
             .into_iter()
-            .map(|x| self.fn_info_generator.generate(x, &mock_type))
+            .map(|x| self.fn_info_generator.generate(ctx, x, &mock_type))
             .collect();
         let all_fn_infos: Vec<_> = fn_infos.iter().collect();
         let mock_data_struct = self
@@ -90,6 +90,7 @@ impl IItemTraitHandler for ItemTraitHandler {
             &mock_received_struct,
             Vec::new(),
             None,
+            &fn_infos.iter().collect::<Vec<_>>(),
         );
         let mock_setup_impl = self.mock_setup_impl_generator.generate_for_trait(
             &mock_type,

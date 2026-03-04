@@ -8,92 +8,59 @@ use std::cell::LazyCell;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IBaseCallerImplGenerator {
+pub trait IBaseFnGenerator {
     fn generate(
         &self,
         mock_type: &MockType,
         fn_decl: &FnDecl,
         call_struct: &CallStruct,
-        base_impl_fn_block: Block,
-    ) -> BaseCallerImpl;
+        base_fn_block: Block,
+    ) -> BaseFn;
 }
 
-pub(crate) struct BaseCallerImplGenerator {
+pub(crate) struct BaseFnGenerator {
     pub type_factory: Arc<dyn ITypeFactory>,
     pub path_factory: Arc<dyn IPathFactory>,
 }
 
-impl IBaseCallerImplGenerator for BaseCallerImplGenerator {
+impl IBaseFnGenerator for BaseFnGenerator {
     fn generate(
         &self,
         mock_type: &MockType,
         fn_decl: &FnDecl,
         call_struct: &CallStruct,
-        base_impl_fn_block: Block,
-    ) -> BaseCallerImpl {
-        let trait_path = Path {
-            leading_colon: None,
-            segments: [PathSegment {
-                ident: constants::I_BASE_CALLER_TRAIT_IDENT.clone(),
-                arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
-                    colon2_token: None,
-                    lt_token: Default::default(),
-                    args: [
-                        GenericArgument::Type(
-                            self.type_factory
-                                .create_from_struct(&call_struct.item_struct),
-                        ),
-                        GenericArgument::Type(fn_decl.get_return_value_type()),
-                    ]
-                    .into_iter()
-                    .collect(),
-                    gt_token: Default::default(),
-                }),
-            }]
-            .into_iter()
-            .collect(),
-        };
-        let call_base_fn = self.generate_call_base_fn(
+        base_fn_block: Block,
+    ) -> BaseFn {
+        let impl_item_fn = self.generate_call_base_fn(
             fn_decl,
             call_struct,
-            base_impl_fn_block,
+            base_fn_block,
             mock_type.generics.get_phantom_fields_count(),
         );
-        let item_impl = ItemImpl {
-            attrs: Vec::new(),
-            defaultness: None,
-            unsafety: None,
-            impl_token: Default::default(),
-            generics: mock_type.generics.impl_generics.clone(),
-            trait_: Some((None, trait_path, Default::default())),
-            self_ty: Box::new(mock_type.ty.clone()),
-            brace_token: Default::default(),
-            items: vec![call_base_fn],
-        };
 
-        let base_caller_impl = BaseCallerImpl { item_impl };
-        return base_caller_impl;
+        let base_fn = BaseFn { impl_item_fn };
+        return base_fn;
     }
 }
 
-impl BaseCallerImplGenerator {
+impl BaseFnGenerator {
     const CALL_ARG_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("call"));
 
     fn generate_call_base_fn(
         &self,
         fn_decl: &FnDecl,
         call_struct: &CallStruct,
-        base_impl_fn_block: Block,
+        base_fn_block: Block,
         phantom_fields_count: usize,
-    ) -> ImplItem {
+    ) -> ImplItemFn {
         let sig = Signature {
             constness: None,
             asyncness: None,
             unsafety: None,
             abi: None,
             fn_token: Default::default(),
-            ident: constants::I_BASE_CALLER_CALL_BASE_FN_IDENT.clone(),
-            generics: Generics::default(),
+            ident: format_ident!("{}_{}", constants::BASE_FN_IDENT_PREFIX, fn_decl.fn_ident),
+            generics: fn_decl.own_generics.clone(),
             paren_token: Default::default(),
             inputs: [
                 constants::REF_SELF_ARG.clone(),
@@ -121,7 +88,7 @@ impl BaseCallerImplGenerator {
         let block = self.generate_call_base_fn_block(
             fn_decl,
             call_struct,
-            base_impl_fn_block,
+            base_fn_block,
             phantom_fields_count,
         );
         let impl_item_fn = ImplItemFn {
@@ -131,15 +98,14 @@ impl BaseCallerImplGenerator {
             sig,
             block,
         };
-        let impl_item = ImplItem::Fn(impl_item_fn);
-        return impl_item;
+        return impl_item_fn;
     }
 
     fn generate_call_base_fn_block(
         &self,
         fn_decl: &FnDecl,
         call_struct: &CallStruct,
-        base_impl_fn_block: Block,
+        base_fn_block: Block,
         phantom_fields_count: usize,
     ) -> Block {
         let call_struct_fields = call_struct
@@ -186,7 +152,7 @@ impl BaseCallerImplGenerator {
             semi_token: Default::default(),
         });
         let stmts = std::iter::once(deconstruct_call_stmt)
-            .chain(base_impl_fn_block.stmts)
+            .chain(base_fn_block.stmts)
             .collect();
         let block = Block {
             brace_token: Default::default(),

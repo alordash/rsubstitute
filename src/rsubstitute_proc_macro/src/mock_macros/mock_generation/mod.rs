@@ -1,5 +1,6 @@
 pub mod models;
 
+mod base_fn_generator;
 mod debug_string_expr_generator;
 mod fn_received_generator;
 mod fn_setup_generator;
@@ -10,6 +11,7 @@ mod inner_data_impl_generator;
 mod inner_data_param_generator;
 mod inner_data_struct_generator;
 mod input_args_generator;
+mod lifetimes_specifier;
 mod mock_constructor_block_generator;
 mod mock_data_struct_generator;
 mod mock_fn_block_generator;
@@ -31,8 +33,8 @@ mod received_signature_generator;
 mod send_sync_impls_generator;
 mod setup_output_generator;
 mod static_fn_generator;
-mod lifetimes_specifier;
 
+pub use base_fn_generator::*;
 pub use debug_string_expr_generator::*;
 pub use fn_received_generator::*;
 pub use fn_setup_generator::*;
@@ -43,6 +45,7 @@ pub use inner_data_impl_generator::*;
 pub use inner_data_param_generator::*;
 pub use inner_data_struct_generator::*;
 pub use input_args_generator::*;
+pub use lifetimes_specifier::*;
 pub use mock_constructor_block_generator::*;
 pub use mock_data_struct_generator::*;
 pub use mock_fn_block_generator::*;
@@ -64,4 +67,3 @@ pub use received_signature_generator::*;
 pub use send_sync_impls_generator::*;
 pub use setup_output_generator::*;
 pub use static_fn_generator::*;
-pub use lifetimes_specifier::*;

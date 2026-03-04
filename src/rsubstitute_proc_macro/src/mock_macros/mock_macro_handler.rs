@@ -14,9 +14,11 @@ pub trait IMockMacroHandler {
 
     fn handle_macro_mocked(&self, token_stream: TokenStream) -> TokenStream;
 
+    // TODO - add macro
     #[cfg(not(feature = "support_base_by_default"))]
     fn handle_macro_mocked_base(&self, token_stream: TokenStream) -> TokenStream;
 
+    // TODO - add macro
     #[cfg(feature = "support_base_by_default")]
     fn handle_macro_mocked_no_base(&self, token_stream: TokenStream) -> TokenStream;
 }

@@ -8,7 +8,7 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait ICallStructGenerator {
-    fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> CallStruct;
+    fn generate(&self, ctx: &Ctx, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> CallStruct;
 }
 
 pub(crate) struct CallStructGenerator {
@@ -20,10 +20,10 @@ pub(crate) struct CallStructGenerator {
 }
 
 impl ICallStructGenerator for CallStructGenerator {
-    fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> CallStruct {
+    fn generate(&self, ctx: &Ctx, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> CallStruct {
         let attrs = vec![
             constants::DOC_HIDDEN_ATTRIBUTE.clone(),
-            self.generate_call_derive_traits_attribute(),
+            self.generate_call_derive_traits_attribute(ctx),
         ];
         let ident = format_ident!("{}_{}", fn_decl.get_full_ident(), Self::CALL_STRUCT_SUFFIX);
         let fn_fields = fn_decl
@@ -64,16 +64,19 @@ impl ICallStructGenerator for CallStructGenerator {
 impl CallStructGenerator {
     pub const CALL_STRUCT_SUFFIX: &'static str = "Call";
 
-    fn generate_call_derive_traits_attribute(&self) -> Attribute {
-        let derive_attribute = self.attribute_factory.create(
-            constants::DERIVE_IDENT.clone(),
-            &format!(
-                "{}, {}, {}",
-                constants::I_ARGS_INFOS_PROVIDER_TRAIT_NAME,
-                constants::I_ARGS_TUPLE_PROVIDER_TRAIT_NAME,
-                constants::I_GENERICS_HASH_KEY_PROVIDER_TRAIT_NAME,
-            ),
-        );
+    fn generate_call_derive_traits_attribute(&self, ctx: &Ctx) -> Attribute {
+        let mut arguments = vec![
+            constants::I_ARGS_INFOS_PROVIDER_TRAIT_NAME,
+            constants::I_ARGS_TUPLE_PROVIDER_TRAIT_NAME,
+            constants::I_GENERICS_HASH_KEY_PROVIDER_TRAIT_NAME,
+        ];
+        if ctx.support_base_calling {
+            arguments.push(constants::CLONE_FOR_RSUBSTITUTE_TRAIT_NAME);
+        }
+        let arguments_str = arguments.join(", ");
+        let derive_attribute = self
+            .attribute_factory
+            .create(constants::DERIVE_IDENT.clone(), &arguments_str);
         return derive_attribute;
     }
 

@@ -171,7 +171,7 @@ impl MockFnBlockGenerator {
             _ => false,
         };
         let method_name = match (
-            fn_info.maybe_base_caller_impl.is_some(),
+            fn_info.parent.maybe_base_fn_block.is_some(),
             fn_info.parent.has_return_value(),
             return_type_is_mut_ref,
         ) {
@@ -182,11 +182,19 @@ impl MockFnBlockGenerator {
             (true, true, false) => Self::HANDLE_BASE_RETURNING_METHOD_IDENT.clone(),
             (true, true, true) => Self::HANDLE_BASE_RETURNING_MUT_REF_METHOD_IDENT.clone(),
         };
-        let args = if fn_info.maybe_base_caller_impl.is_some() {
+        let args = if fn_info.parent.maybe_base_fn_block.is_some() {
             vec![
                 self.expr_reference_factory.create(base_receiver.clone()),
                 self.path_factory
                     .create_expr(Self::CALL_VARIABLE_IDENT.clone()),
+                self.path_factory.create_expr_from_parts(vec![
+                    constants::SELF_TYPE_IDENT.clone(),
+                    format_ident!(
+                        "{}_{}",
+                        constants::BASE_FN_IDENT_PREFIX,
+                        fn_info.parent.fn_ident
+                    ),
+                ]),
             ]
         } else {
             vec![

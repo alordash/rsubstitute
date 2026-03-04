@@ -68,6 +68,8 @@ path = "bin/bin_gen_dyn_data_generics.rs"
 [[bin]]
 name = "gen_dyn_data_base_and_generics"
 path = "bin/bin_gen_dyn_data_base_and_generics.rs"
+test = false
+doctest = false
 
 [dependencies]
 rsubstitute_core = { workspace = true, features = ["debug_naming"] }
