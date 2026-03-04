@@ -2,6 +2,7 @@ use crate::constants;
 use crate::mock_macros::fn_info_generation::IFnInfoGenerator;
 use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::mock_generation::*;
+use crate::mock_macros::models::Ctx;
 use crate::mock_macros::*;
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
@@ -9,7 +10,7 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait IItemFnHandler {
-    fn handle(&self, item_fn: ItemFn) -> TokenStream;
+    fn handle(&self, ctx: &Ctx, item_fn: ItemFn) -> TokenStream;
 }
 
 pub(crate) struct ItemFnHandler {
@@ -32,14 +33,14 @@ pub(crate) struct ItemFnHandler {
 }
 
 impl IItemFnHandler for ItemFnHandler {
-    fn handle(&self, item_fn: ItemFn) -> TokenStream {
+    fn handle(&self, ctx: &Ctx, item_fn: ItemFn) -> TokenStream {
         let mock_ident = format_ident!(
             "{}{}",
             item_fn.sig.ident,
             constants::MOCK_STRUCT_IDENT_PREFIX
         );
         let mock_generics = self.mock_generics_generator.generate(&item_fn.sig.generics);
-        let fn_decl = self.fn_decl_extractor.extract_fn(&mock_generics, &item_fn);
+        let fn_decl = self.fn_decl_extractor.extract_fn(ctx, &mock_generics, &item_fn);
         let mock_type = self
             .mock_type_generator
             .generate(mock_ident.clone(), mock_generics);

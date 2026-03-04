@@ -76,4 +76,6 @@ typeid = { workspace = true }
 not_enough_asserts = { workspace = true }
 
 [features]
-debug_naming = []
+debug_naming = ["rsubstitute_core/debug_naming"]
+arg_lifetime_protection = ["rsubstitute_proc_macro/arg_lifetime_protection"]
+support_base_by_default = ["rsubstitute_proc_macro/support_base_by_default"]

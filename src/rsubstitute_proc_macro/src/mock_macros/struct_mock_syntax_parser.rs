@@ -63,11 +63,11 @@ impl IStructMockSyntaxParser for StructMockSyntaxParser {
 }
 
 impl StructMockSyntaxParser {
-    const STRUCT_MOCK_INVALID_IMPL_TARGET_PATH_ERROR_MSG: &'static str =
-        "(`impl` target's path length) Struct type ident in `impl` block can not be long path, it should be just a single ident.";
+    const STRUCT_MOCK_INVALID_IMPL_TARGET_PATH_ERROR_MSG: &'static str = "(`impl` target's path length) Struct type ident in `impl` block can not be long path, it should be just a single ident.";
     const STRUCT_MOCK_INVALID_IDENT_ERROR_MESSAGE: &'static str =
         "Struct mock should contain only `impl` blocks for it's own type.";
-    const STRUCT_MOCK_INVALID_FN_SIG_ERROR_MESSAGE: &'static str = "Struct mock `impl` functions should all be associated. ℹ You can ignore `impl` block with `#[unmock]` attribute.";
+    const STRUCT_MOCK_INVALID_FN_SIG_ERROR_MESSAGE: &'static str = "Struct mock `impl` functions should all be associated.\
+(!) Note: You can ignore `impl` block with `#[unmock]` attribute.";
     const NO_NEW_FN_ERROR_MESSAGE: &'static str = "In order to be mockable structure must have function `pub fn new(args) -> Self`, where `args` is arbitrary collection of user-defined arguments.";
     const NEW_FN_MUST_BE_PUBLIC_ERROR_MESSAGE: &'static str = "Function `new` must be public.";
     const NEW_FN_MUST_HAVE_RETURN_TYPE_ERROR_MESSAGE_PART: &'static str =

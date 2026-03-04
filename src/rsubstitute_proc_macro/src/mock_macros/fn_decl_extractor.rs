@@ -6,21 +6,23 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait IFnDeclExtractor {
-    fn extract(&self, mock_generics: &MockGenerics, items: &[TraitItem]) -> Vec<FnDecl>;
+    fn extract(&self, ctx: &Ctx, mock_generics: &MockGenerics, items: &[TraitItem]) -> Vec<FnDecl>;
 
     fn extract_struct_fns(
         &self,
+        ctx: &Ctx,
         mock_generics: &MockGenerics,
         impl_item_fns: &[&ImplItemFn],
     ) -> Vec<FnDecl>;
 
     fn extract_struct_trait_impl_fns(
         &self,
+        ctx: &Ctx,
         mock_generics: &MockGenerics,
         trait_impl: &TraitImpl,
     ) -> Vec<FnDecl>;
 
-    fn extract_fn(&self, mock_generics: &MockGenerics, item_fn: &ItemFn) -> FnDecl;
+    fn extract_fn(&self, ctx: &Ctx, mock_generics: &MockGenerics, item_fn: &ItemFn) -> FnDecl;
 }
 
 pub(crate) struct FnDeclExtractor {
@@ -30,29 +32,36 @@ pub(crate) struct FnDeclExtractor {
 }
 
 impl IFnDeclExtractor for FnDeclExtractor {
-    fn extract(&self, mock_generics: &MockGenerics, trait_items: &[TraitItem]) -> Vec<FnDecl> {
+    fn extract(
+        &self,
+        ctx: &Ctx,
+        mock_generics: &MockGenerics,
+        trait_items: &[TraitItem],
+    ) -> Vec<FnDecl> {
         let fn_decls = trait_items
             .into_iter()
-            .flat_map(|x| self.try_map_trait_item_fn(mock_generics, x))
+            .flat_map(|x| self.try_map_trait_item_fn(ctx, mock_generics, x))
             .collect();
         return fn_decls;
     }
 
     fn extract_struct_fns(
         &self,
+        ctx: &Ctx,
         mock_generics: &MockGenerics,
         impl_item_fns: &[&ImplItemFn],
     ) -> Vec<FnDecl> {
         let fn_decls = impl_item_fns
             .iter()
             .filter(|impl_item_fn| impl_item_fn.sig.ident != constants::NEW_IDENT.clone())
-            .map(|x| self.map_impl_item_fn(mock_generics, x))
+            .map(|x| self.map_impl_item_fn(ctx, mock_generics, x))
             .collect();
         return fn_decls;
     }
 
     fn extract_struct_trait_impl_fns(
         &self,
+        ctx: &Ctx,
         mock_generics: &MockGenerics,
         trait_impl: &TraitImpl,
     ) -> Vec<FnDecl> {
@@ -62,6 +71,7 @@ impl IFnDeclExtractor for FnDeclExtractor {
             .iter()
             .map(move |trait_impl_fn| {
                 self.create_fn_decl(
+                    ctx,
                     mock_generics,
                     trait_impl_fn.attrs.clone(),
                     &trait_impl_fn.sig,
@@ -74,8 +84,9 @@ impl IFnDeclExtractor for FnDeclExtractor {
         return fn_decls;
     }
 
-    fn extract_fn(&self, mock_generics: &MockGenerics, item_fn: &ItemFn) -> FnDecl {
+    fn extract_fn(&self, ctx: &Ctx, mock_generics: &MockGenerics, item_fn: &ItemFn) -> FnDecl {
         let fn_decl = self.create_fn_decl(
+            ctx,
             mock_generics,
             item_fn.attrs.clone(),
             &item_fn.sig,
@@ -90,6 +101,7 @@ impl IFnDeclExtractor for FnDeclExtractor {
 impl FnDeclExtractor {
     fn try_map_trait_item_fn(
         &self,
+        ctx: &Ctx,
         mock_generics: &MockGenerics,
         trait_item: &TraitItem,
     ) -> Option<FnDecl> {
@@ -97,8 +109,7 @@ impl FnDeclExtractor {
             TraitItem::Fn(trait_item_fn)
                 if trait_item_fn.sig.ident != constants::NEW_IDENT.clone() =>
             {
-                self.validate_signature(&trait_item_fn.sig);
-                Some(self.map_trait_item_fn(mock_generics, trait_item_fn))
+                Some(self.map_trait_item_fn(ctx, mock_generics, trait_item_fn))
             }
             _ => None,
         }
@@ -106,11 +117,13 @@ impl FnDeclExtractor {
 
     fn map_trait_item_fn(
         &self,
+        ctx: &Ctx,
         mock_generics: &MockGenerics,
         trait_item_fn: &TraitItemFn,
     ) -> FnDecl {
         let sig = &trait_item_fn.sig;
         let fn_decl = self.create_fn_decl(
+            ctx,
             mock_generics,
             trait_item_fn.attrs.clone(),
             sig,
@@ -121,10 +134,15 @@ impl FnDeclExtractor {
         return fn_decl;
     }
 
-    fn map_impl_item_fn(&self, mock_generics: &MockGenerics, impl_item_fn: &ImplItemFn) -> FnDecl {
+    fn map_impl_item_fn(
+        &self,
+        ctx: &Ctx,
+        mock_generics: &MockGenerics,
+        impl_item_fn: &ImplItemFn,
+    ) -> FnDecl {
         let sig = &impl_item_fn.sig;
-        self.validate_signature(sig);
         let fn_decl = self.create_fn_decl(
+            ctx,
             mock_generics,
             impl_item_fn.attrs.clone(),
             sig,
@@ -135,15 +153,9 @@ impl FnDeclExtractor {
         return fn_decl;
     }
 
-    fn validate_signature(&self, _sig: &Signature) {
-        // TODO - remove? is it fully supported?
-        // if !sig.generics.params.is_empty() {
-        //     panic!("Generic type parameters for associated functions are not supported.");
-        // }
-    }
-
     fn create_fn_decl(
         &self,
+        ctx: &Ctx,
         mock_generics: &MockGenerics,
         attrs: Vec<Attribute>,
         sig: &Signature,
@@ -167,7 +179,7 @@ impl FnDeclExtractor {
             own_generics: sig.generics.clone(),
             merged_generics,
             visibility,
-            maybe_base_fn_block,    // TODO - set base callable properly (depending on argument in macro and if fn has base)
+            maybe_base_fn_block: maybe_base_fn_block.filter(|_| ctx.support_base_calling),
             maybe_phantom_return_field,
             arg_refs_tuple,
         };

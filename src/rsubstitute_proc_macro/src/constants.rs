@@ -482,3 +482,6 @@ pub const DYN_CALL_REF_TYPE: LazyCell<Type> = LazyCell::new(|| {
 });
 pub const DYN_CALL_DOWNCAST_REF_FN_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("downcast_ref"));
+
+pub const SUPPORT_BASE_PARAMETER: &'static str = "base";
+pub const DO_NOT_SUPPORT_BASE_PARAMETER: &'static str = "no_base";

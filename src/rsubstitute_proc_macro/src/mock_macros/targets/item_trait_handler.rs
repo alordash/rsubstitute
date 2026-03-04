@@ -2,6 +2,7 @@ use crate::constants;
 use crate::mock_macros::fn_info_generation::IFnInfoGenerator;
 use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::mock_generation::*;
+use crate::mock_macros::models::*;
 use crate::mock_macros::*;
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
@@ -9,7 +10,7 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait IItemTraitHandler {
-    fn handle(&self, item_trait: ItemTrait) -> TokenStream;
+    fn handle(&self, ctx: &Ctx, item_trait: ItemTrait) -> TokenStream;
 }
 
 pub(crate) struct ItemTraitHandler {
@@ -30,7 +31,7 @@ pub(crate) struct ItemTraitHandler {
 }
 
 impl IItemTraitHandler for ItemTraitHandler {
-    fn handle(&self, item_trait: ItemTrait) -> TokenStream {
+    fn handle(&self, ctx: &Ctx, item_trait: ItemTrait) -> TokenStream {
         let mock_item_trait = self
             .lifetimes_specifier
             .add_default_arg_lifetime(item_trait.clone());
@@ -45,7 +46,7 @@ impl IItemTraitHandler for ItemTraitHandler {
             .generate(&mock_item_trait.generics);
         let fn_decls = self
             .fn_decl_extractor
-            .extract(&mock_generics, &mock_item_trait.items);
+            .extract(ctx, &mock_generics, &mock_item_trait.items);
         let target_ident = mock_item_trait.ident.clone();
         let mock_type = self
             .mock_type_generator

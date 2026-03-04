@@ -9,7 +9,7 @@ use quote::{format_ident, quote};
 use std::sync::Arc;
 
 pub trait IStructMockHandler {
-    fn handle(&self, struct_mock_syntax: StructMockSyntax) -> TokenStream;
+    fn handle(&self, ctx: &Ctx, struct_mock_syntax: StructMockSyntax) -> TokenStream;
 }
 
 pub struct StructMockHandler {
@@ -36,7 +36,7 @@ pub struct StructMockHandler {
 }
 
 impl IStructMockHandler for StructMockHandler {
-    fn handle(&self, mut struct_mock_syntax: StructMockSyntax) -> TokenStream {
+    fn handle(&self, ctx: &Ctx, mut struct_mock_syntax: StructMockSyntax) -> TokenStream {
         let source_struct_impls_syntax =
             self.generate_source_struct_impls_syntax(&struct_mock_syntax);
 
@@ -56,12 +56,12 @@ impl IStructMockHandler for StructMockHandler {
             .into_iter()
             .map(|x| {
                 self.mock_struct_trait_info_generator
-                    .generate(&mock_type, x)
+                    .generate(ctx, &mock_type, x)
             })
             .collect();
         let struct_fn_decls = self
             .fn_decl_extractor
-            .extract_struct_fns(&mock_type.generics, &struct_mock_syntax.get_struct_fns());
+            .extract_struct_fns(ctx, &mock_type.generics, &struct_mock_syntax.get_struct_fns());
         let target_ident = struct_mock_syntax.r#struct.ident.clone();
         let struct_fn_infos: Vec<_> = struct_fn_decls
             .into_iter()

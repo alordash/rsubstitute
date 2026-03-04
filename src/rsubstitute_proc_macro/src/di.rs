@@ -358,7 +358,10 @@ fn create_services() -> ServiceCollection {
         mod_generator: mod_generator.clone(),
     });
 
+    let ctx_factory = Arc::new(CtxFactory);
+
     let mock_macro_handler = Arc::new(MockMacroHandler {
+        ctx_factory,
         item_trait_handler,
         item_fn_handler,
         struct_mock_handler,
