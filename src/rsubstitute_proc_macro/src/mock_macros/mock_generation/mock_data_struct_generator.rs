@@ -45,11 +45,9 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
                 )
             })
             .collect();
-        let fields = mock_type
-            .generics
-            .phantom_fields
-            .iter()
-            .cloned()
+        let fields = [constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD.clone()]
+            .into_iter()
+            .chain(mock_type.generics.phantom_fields.clone())
             .chain(fn_fields)
             .into_iter()
             .collect();
