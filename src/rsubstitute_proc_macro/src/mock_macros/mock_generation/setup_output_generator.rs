@@ -22,11 +22,7 @@ pub(crate) struct SetupOutputGenerator {
 
 impl ISetupOutputGenerator for SetupOutputGenerator {
     fn generate_for_trait(&self, fn_info: &FnInfo) -> TypePath {
-        let ty = self.generate(
-            fn_info,
-            constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
-            constants::SELF_TYPE.clone(),
-        );
+        let ty = self.generate(fn_info, constants::SELF_TYPE.clone());
         return ty;
     }
 
@@ -38,17 +34,13 @@ impl ISetupOutputGenerator for SetupOutputGenerator {
         let owner_type = self
             .type_factory
             .create_from_struct(&mock_setup_struct.item_struct);
-        let ty = self.generate(
-            fn_info,
-            constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
-            owner_type,
-        );
+        let ty = self.generate(fn_info, owner_type);
         return ty;
     }
 }
 
 impl SetupOutputGenerator {
-    fn generate(&self, fn_info: &FnInfo, lifetime: Lifetime, owner_type: Type) -> TypePath {
+    fn generate(&self, fn_info: &FnInfo, owner_type: Type) -> TypePath {
         let result = TypePath {
             qself: None,
             path: Path {
@@ -59,7 +51,7 @@ impl SetupOutputGenerator {
                         colon2_token: None,
                         lt_token: Default::default(),
                         args: [
-                            GenericArgument::Lifetime(lifetime),
+                            GenericArgument::Lifetime(constants::DERIVED_LIFETIME.clone()),
                             GenericArgument::Type(owner_type),
                             GenericArgument::Type(fn_info.parent.arg_refs_tuple.clone()),
                             GenericArgument::Type(fn_info.parent.get_return_value_type()),

@@ -409,6 +409,11 @@ pub const DEFAULT_ARG_FIELD_LIFETIME_FIELD: LazyCell<Field> = LazyCell::new(|| {
 pub const RETURN_TYPE_PHANTOM_FIELD_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("_return_type"));
 
+pub const DERIVED_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
+    apostrophe: Span::call_site(),
+    ident: format_ident!("_"),
+});
+
 pub const ANONYMOUS_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
     apostrophe: Span::call_site(),
     ident: format_ident!("__rsubstitute_arg_anonymous"),
@@ -486,4 +491,3 @@ pub const SUPPORT_BASE_PARAMETER: &'static str = "base";
 pub const DO_NOT_SUPPORT_BASE_PARAMETER: &'static str = "no_base";
 
 pub const BASE_FN_IDENT_PREFIX: &'static str = "base";
-

@@ -133,7 +133,7 @@ impl<'rs, TMock> FnData<'rs, TMock, false> {
 }
 
 impl<'rs, TMock> FnData<'rs, TMock, true> {
-    pub fn handle_base<TCall: ICall + Clone + 'rs>(
+    pub fn handle_base<'a, TCall: ICall + Clone + 'a>(
         &self,
         mock: &TMock,
         the_call: TCall,

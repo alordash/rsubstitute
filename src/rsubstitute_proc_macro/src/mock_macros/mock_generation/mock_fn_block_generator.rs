@@ -86,9 +86,17 @@ impl MockFnBlockGenerator {
             })
             .collect();
         // TODO - store all custom structs types in them, otherwise too many calls to `type_factory.create_from_struct`
-        let call_struct_type = self
-            .type_factory
-            .create_from_struct(&fn_info.call_struct.item_struct);
+        let mut call_struct_type_generics = fn_info.call_struct.item_struct.generics.clone();
+        let Some(GenericParam::Lifetime(first_lifetime_param)) =
+            call_struct_type_generics.params.first_mut()
+        else {
+            panic!("Call struct should have default lifetime as first generics parameter");
+        };
+        first_lifetime_param.lifetime = constants::DERIVED_LIFETIME.clone();
+        let call_struct_type = self.type_factory.create_with_generics(
+            fn_info.call_struct.item_struct.ident.clone(),
+            call_struct_type_generics,
+        );
         let call_stmt =
             Stmt::Local(self.local_factory.create_with_type(
                 Self::CALL_VARIABLE_IDENT.clone(),
