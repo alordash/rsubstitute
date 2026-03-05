@@ -1,6 +1,6 @@
-use crate::mock_macros::ICtxFactory;
 use crate::mock_macros::models::StructMockSyntax;
 use crate::mock_macros::targets::{IItemFnHandler, IItemTraitHandler, IStructMockHandler};
+use crate::mock_macros::{ICtxFactory, MockedMacroTarget};
 use proc_macro::TokenStream;
 use std::sync::Arc;
 use syn::*;
@@ -12,7 +12,11 @@ pub trait IMockMacroHandler {
         proc_macro_item: proc_macro::TokenStream,
     ) -> proc_macro::TokenStream;
 
-    fn handle_macro_mocked(&self, token_stream: TokenStream) -> TokenStream;
+    fn handle_macro_mocked(
+        &self,
+        token_stream: TokenStream,
+        mocked_macro_target: MockedMacroTarget,
+    ) -> TokenStream;
 
     // TODO - add macro
     #[cfg(not(feature = "support_base_by_default"))]
@@ -46,7 +50,7 @@ impl IMockMacroHandler for MockMacroHandler {
         panic!("Expected `trait`, `impl` or `fn`.");
     }
 
-    fn handle_macro_mocked(&self, token_stream: TokenStream) -> TokenStream {
+    fn handle_macro_mocked(&self, token_stream: TokenStream, mocked_macro_target: MockedMacroTarget) -> TokenStream {
         let ctx = self.ctx_factory.create_for_macro_mocked();
         let struct_mock_syntax = parse_macro_input!(token_stream as StructMockSyntax);
         return self.struct_mock_handler.handle(&ctx, struct_mock_syntax);
