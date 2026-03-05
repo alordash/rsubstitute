@@ -33,7 +33,7 @@ mod tests {
             .returns(r2)
             .work(Arg::Is(|x| *x < 0))
             .returns
-            .with(move |args| args.0 + r3)
+            .with(move |(number,)| number + r3)
             .and_does(|args| println!("amogus received number: {:?}", args))
             .work(Arg::Any)
             .returns
