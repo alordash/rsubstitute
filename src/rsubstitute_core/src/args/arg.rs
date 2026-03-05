@@ -60,8 +60,9 @@ impl<'rs, T: Debug> Debug for Arg<'rs, T> {
 // Beautify API ✨
 impl<'rs, T> Arg<'rs, T> {
     #[allow(non_snake_case)]
-    pub fn Is<TFn: Fn(&T) -> bool + 'rs>(predicate: TFn) -> Self {
-        let reference = Box::new(predicate) as Box<dyn Fn(&T) -> bool + 'rs>;
+    pub fn Is<'a, TFn: Fn(&T) -> bool + 'a>(predicate: TFn) -> Self {
+        let reference: Box<dyn Fn(&T) -> bool + 'rs> =
+            unsafe { core::mem::transmute(Box::new(predicate) as Box<dyn Fn(&T) -> bool + 'a>) };
         return Self::PrivateIs(reference, Private);
     }
 

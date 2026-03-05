@@ -98,7 +98,7 @@ impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool> FnData<'rs, TMock, SUPPORTS_
 }
 
 impl<'rs, TMock> FnData<'rs, TMock, false> {
-    pub fn handle<TArgRefsTuple, TCall: ICall + 'rs>(&self, the_call: TCall) {
+    pub fn handle<'a, TCall: ICall + 'a>(&self, the_call: TCall) {
         let call = Arc::new(DynCall::new(the_call));
         let maybe_fn_config = self.try_get_matching_config(&call);
         self.register_call(call.clone());
@@ -133,7 +133,7 @@ impl<'rs, TMock> FnData<'rs, TMock, false> {
 }
 
 impl<'rs, TMock> FnData<'rs, TMock, true> {
-    pub fn handle_base<TArgRefsTuple, TCall: ICall + Clone + 'rs>(
+    pub fn handle_base<TCall: ICall + Clone + 'rs>(
         &self,
         mock: &TMock,
         the_call: TCall,

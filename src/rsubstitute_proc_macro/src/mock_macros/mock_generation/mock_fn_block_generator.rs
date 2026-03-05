@@ -55,14 +55,14 @@ impl MockFnBlockGenerator {
     const HANDLE_METHOD_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("handle"));
     const HANDLE_RETURNING_METHOD_IDENT: LazyCell<Ident> =
         LazyCell::new(|| format_ident!("handle_returning"));
-    const HANDLE_RETURNING_MUT_REF_METHOD_IDENT: LazyCell<Ident> =
-        LazyCell::new(|| format_ident!("handle_returning_mut_ref"));
+    // const HANDLE_RETURNING_MUT_REF_METHOD_IDENT: LazyCell<Ident> =
+    //     LazyCell::new(|| format_ident!("handle_returning_mut_ref"));
     const HANDLE_BASE_METHOD_IDENT: LazyCell<Ident> =
         LazyCell::new(|| format_ident!("handle_base"));
     const HANDLE_BASE_RETURNING_METHOD_IDENT: LazyCell<Ident> =
         LazyCell::new(|| format_ident!("handle_base_returning"));
-    const HANDLE_BASE_RETURNING_MUT_REF_METHOD_IDENT: LazyCell<Ident> =
-        LazyCell::new(|| format_ident!("handle_base_returning_mut_ref"));
+    // const HANDLE_BASE_RETURNING_MUT_REF_METHOD_IDENT: LazyCell<Ident> =
+    //     LazyCell::new(|| format_ident!("handle_base_returning_mut_ref"));
     const MOCK_VARIABLE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("mock"));
 
     fn generate_call_stmt(&self, fn_info: &FnInfo) -> Stmt {
@@ -176,11 +176,11 @@ impl MockFnBlockGenerator {
             return_type_is_mut_ref,
         ) {
             (false, false, _) => Self::HANDLE_METHOD_IDENT.clone(),
-            (false, true, false) => Self::HANDLE_RETURNING_METHOD_IDENT.clone(),
-            (false, true, true) => Self::HANDLE_RETURNING_MUT_REF_METHOD_IDENT.clone(),
+            (false, true, _) => Self::HANDLE_RETURNING_METHOD_IDENT.clone(),
+            // (false, true, true) => Self::HANDLE_RETURNING_MUT_REF_METHOD_IDENT.clone(),
             (true, false, _) => Self::HANDLE_BASE_METHOD_IDENT.clone(),
-            (true, true, false) => Self::HANDLE_BASE_RETURNING_METHOD_IDENT.clone(),
-            (true, true, true) => Self::HANDLE_BASE_RETURNING_MUT_REF_METHOD_IDENT.clone(),
+            (true, true, _) => Self::HANDLE_BASE_RETURNING_METHOD_IDENT.clone(),
+            // (true, true, true) => Self::HANDLE_BASE_RETURNING_MUT_REF_METHOD_IDENT.clone(),
         };
         let args = if fn_info.parent.maybe_base_fn_block.is_some() {
             vec![

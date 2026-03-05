@@ -42,50 +42,51 @@ mod tests {
     fn flex() {
         let mut mock = TraitMock::new();
 
-        mock.setup().sbox().returns(12);
-        mock.setup().src().returns(12);
-        mock.setup().sarc().returns(12);
+        mock.setup.sbox().returns(12);
+        mock.setup.src().returns(12);
+        mock.setup.sarc().returns(12);
 
-        mock.setup().spbox().returns(12);
-        mock.setup().sprc().returns(12);
-        mock.setup().sparc().returns(12);
+        mock.setup.spbox().returns(12);
+        mock.setup.sprc().returns(12);
+        mock.setup.sparc().returns(12);
 
         assert_eq!(12, Box::new(mock.clone()).sbox());
         assert_eq!(12, Box::new(mock.clone()).sbox());
         assert_eq!(12, Box::new(mock.clone()).sbox());
-        mock.received().sbox(Times::Exactly(3));
+        mock.received.sbox(Times::Exactly(3));
 
         assert_eq!(12, Box::new(mock.clone()).sbox());
         assert_eq!(12, Rc::new(mock.clone()).src());
         assert_eq!(12, Arc::new(mock.clone()).sarc());
-        mock.received().sbox(Times::Exactly(4));
-        mock.received().src(Times::Once);
-        mock.received().sarc(Times::Once);
+        mock.received.sbox(Times::Exactly(4));
+        mock.received.src(Times::Once);
+        mock.received.sarc(Times::Once);
 
         assert_eq!(12, Pin::new(Box::new(mock.clone())).spbox());
         assert_eq!(12, Pin::new(Rc::new(mock.clone())).sprc());
         assert_eq!(12, Pin::new(Arc::new(mock.clone())).sparc());
-        mock.received().spbox(Times::Once);
-        mock.received().sprc(Times::Once);
-        mock.received().sparc(Times::Once);
+        mock.received.spbox(Times::Once);
+        mock.received.sprc(Times::Once);
+        mock.received.sparc(Times::Once);
 
         let flag = Rc::new(Cell::new(false));
         let flag_clone = flag.clone();
 
-        mock.setup().mutate().does(move || flag_clone.set(true));
-        mock.setup().consume().returns(22);
+        mock.setup.mutate().does(move |_| flag_clone.set(true));
+        mock.setup.consume().returns(22);
 
         mock.mutate();
         assert!(flag.get());
         let value = mock.clone().consume();
         assert_eq!(22, value);
 
-        mock.received()
+        mock.received
             .mutate(Times::Once)
             .consume(Times::Once)
             .no_other_calls();
     }
 
+    // TODO - remove this thing
     #[test]
     fn compile() {}
 }

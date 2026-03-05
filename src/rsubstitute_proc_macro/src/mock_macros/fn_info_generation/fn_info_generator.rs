@@ -25,7 +25,6 @@ impl IFnInfoGenerator for FnInfoGenerator {
         let args_checker_struct = self
             .args_checker_generator
             .generate(&fn_decl, &mock_type.generics);
-        dbg!(fn_decl.get_internal_phantom_types_count());
         let args_checker_impl = self.args_checker_impl_generator.generate(
             &call_struct,
             &args_checker_struct,
