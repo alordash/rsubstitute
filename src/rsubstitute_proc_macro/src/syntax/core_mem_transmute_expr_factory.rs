@@ -1,5 +1,5 @@
 use crate::di::SERVICES;
-use crate::syntax::IPathFactory;
+use crate::syntax::*;
 use proc_macro2::Ident;
 use quote::format_ident;
 use std::cell::LazyCell;
@@ -14,6 +14,7 @@ pub trait ICoreMemTransmuteExprFactory {
 
 pub(crate) struct CoreMemTransmuteExprFactory {
     pub path_factory: Arc<dyn IPathFactory>,
+    pub expr_call_factory: Arc<dyn IExprCallFactory>,
 }
 
 impl ICoreMemTransmuteExprFactory for CoreMemTransmuteExprFactory {
@@ -23,13 +24,10 @@ impl ICoreMemTransmuteExprFactory for CoreMemTransmuteExprFactory {
     }
 
     fn create_for_expr(&self, expr: Expr) -> Expr {
-        let expr = Expr::Call(ExprCall {
-            attrs: Vec::new(),
-            func: Box::new(Self::CORE_MEM_TRANSMUTE_FUNC_PATH_EXPR.clone()),
-            paren_token: Default::default(),
-            args: [expr].into_iter().collect(),
-        });
-        return expr;
+        let result = self
+            .expr_call_factory
+            .create(Self::CORE_MEM_TRANSMUTE_FUNC_PATH_EXPR.clone(), expr);
+        return result;
     }
 }
 

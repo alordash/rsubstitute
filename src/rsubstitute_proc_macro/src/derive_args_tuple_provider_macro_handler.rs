@@ -17,6 +17,7 @@ pub(crate) struct DeriveArgsTupleProviderMacroHandler {
     pub field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
     pub expr_reference_factory: Arc<dyn IExprReferenceFactory>,
     pub field_checker: Arc<dyn IFieldChecker>,
+    pub expr_call_factory: Arc<dyn IExprCallFactory>,
 }
 
 impl IDeriveArgsTupleProviderMacroHandler for DeriveArgsTupleProviderMacroHandler {
@@ -27,7 +28,7 @@ impl IDeriveArgsTupleProviderMacroHandler for DeriveArgsTupleProviderMacroHandle
             .path_factory
             .create(constants::I_ARGS_TUPLE_PROVIDER_TRAIT_IDENT.clone());
         let self_ty = Box::new(self.type_factory.create_from_struct(&item_struct));
-        let get_arg_infos_fn = self.generate_provide_ptr_to_tuple_of_refs_fn(&item_struct);
+        let get_arg_infos_fn = self.generate_get_ptr_to_boxed_tuple_of_refs_fn(&item_struct);
         let item_impl = ItemImpl {
             attrs: Vec::new(),
             defaultness: None,
@@ -44,27 +45,27 @@ impl IDeriveArgsTupleProviderMacroHandler for DeriveArgsTupleProviderMacroHandle
 }
 
 impl DeriveArgsTupleProviderMacroHandler {
-    const PROVIDE_PTR_TO_TUPLE_OF_REFS_FN_SIGNATURE: LazyCell<Signature> = LazyCell::new(|| {
+    const GET_PTR_TO_BOXED_TUPLE_OF_REFS_FN_SIGNATURE: LazyCell<Signature> = LazyCell::new(|| {
         let signature = Signature {
             constness: None,
             asyncness: None,
             unsafety: None,
             abi: None,
             fn_token: Default::default(),
-            ident: format_ident!("provide_ptr_to_tuple_of_refs"),
+            ident: format_ident!("get_ptr_to_boxed_tuple_of_refs"),
             generics: Generics::default(),
             paren_token: Default::default(),
             inputs: [constants::REF_SELF_ARG.clone()].into_iter().collect(),
             variadic: None,
             output: ReturnType::Type(
                 Default::default(),
-                Box::new(constants::VOID_PTR_TYPE.clone()),
+                Box::new(constants::MUT_VOID_PTR_TYPE.clone()),
             ),
         };
         return signature;
     });
 
-    fn generate_provide_ptr_to_tuple_of_refs_fn(&self, item_struct: &ItemStruct) -> ImplItem {
+    fn generate_get_ptr_to_boxed_tuple_of_refs_fn(&self, item_struct: &ItemStruct) -> ImplItem {
         let return_stmt = self.generate_return_stmt(item_struct);
         let block = Block {
             brace_token: Default::default(),
@@ -74,7 +75,7 @@ impl DeriveArgsTupleProviderMacroHandler {
             attrs: Vec::new(),
             vis: Visibility::Inherited,
             defaultness: None,
-            sig: Self::PROVIDE_PTR_TO_TUPLE_OF_REFS_FN_SIGNATURE.clone(),
+            sig: Self::GET_PTR_TO_BOXED_TUPLE_OF_REFS_FN_SIGNATURE.clone(),
             block,
         });
         return impl_item;
@@ -87,32 +88,31 @@ impl DeriveArgsTupleProviderMacroHandler {
             .filter(|field| !self.field_checker.is_phantom_data(field))
             .map(|field| self.generate_field_expr_ref_expr(field))
             .collect();
-
-        let ptr_expr = Expr::Call(ExprCall {
+        let tuple_expr = Expr::Tuple(ExprTuple {
             attrs: Vec::new(),
-            func: Box::new(self.path_factory.create_expr_from_parts(vec![
-                format_ident!("core"),
-                format_ident!("ptr"),
-                format_ident!("from_ref"),
-            ])),
             paren_token: Default::default(),
-            args: [self.expr_reference_factory.create(Expr::Tuple(ExprTuple {
-                attrs: Vec::new(),
-                paren_token: Default::default(),
-                elems: fields_exprs,
-            }))]
-            .into_iter()
-            .collect(),
+            elems: fields_exprs,
         });
-
-        let ptr_cast_expr = Expr::Cast(ExprCast {
+        let box_new_expr = self
+            .expr_call_factory
+            .create(constants::BOX_NEW_EXPR.clone(), tuple_expr);
+        let box_leak_expr = self
+            .expr_call_factory
+            .create(constants::BOX_LEAK_EXPR.clone(), box_new_expr);
+        let as_mut_anonymous_expr = Expr::Cast(ExprCast {
             attrs: Vec::new(),
-            expr: Box::new(ptr_expr),
+            expr: Box::new(box_leak_expr),
             as_token: Default::default(),
-            ty: Box::new(constants::VOID_PTR_TYPE.clone()),
+            ty: Box::new(constants::MUT_INFER_PTR_TYPE.clone()),
+        });
+        let as_mut_expr = Expr::Cast(ExprCast {
+            attrs: Vec::new(),
+            expr: Box::new(as_mut_anonymous_expr),
+            as_token: Default::default(),
+            ty: Box::new(constants::MUT_VOID_PTR_TYPE.clone()),
         });
 
-        let stmt = Stmt::Expr(ptr_cast_expr, None);
+        let stmt = Stmt::Expr(as_mut_expr, None);
         return stmt;
     }
 

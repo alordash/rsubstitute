@@ -86,7 +86,7 @@ impl ArgsCheckerTraitImplGenerator {
             stmts: vec![call_var_stmt, check_stmt],
         };
         let impl_item = ImplItem::Fn(ImplItemFn {
-            attrs: Vec::new(),
+            attrs: vec![constants::ALLOW_UNUSED_ATTRIBUTE.clone()],
             vis: Visibility::Inherited,
             defaultness: None,
             sig: Signature {

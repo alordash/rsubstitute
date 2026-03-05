@@ -42,9 +42,10 @@ impl<'rs> FnConfig<'rs> {
         mut callback: impl FnMut(TArgRefsTuple) + 'static,
     ) {
         let dyn_callback = move |dyn_call: &DynCall<'rs>| {
-            let arg_refs_tuple_ptr =
-                dyn_call.provide_ptr_to_tuple_of_refs() as *const _ as *const TArgRefsTuple;
-            let arg_refs_tuple = unsafe { *arg_refs_tuple_ptr };
+            let raw_arg_refs_tuple_ptr = dyn_call.get_ptr_to_boxed_tuple_of_refs();
+            let arg_refs_tuple_ptr = raw_arg_refs_tuple_ptr as *mut TArgRefsTuple;
+            let boxed_arg_refs_tuple = unsafe { Box::from_raw(arg_refs_tuple_ptr) };
+            let arg_refs_tuple = *boxed_arg_refs_tuple;
             callback(arg_refs_tuple)
         };
         self.callback = Some(Arc::new(RefCell::new(dyn_callback)));

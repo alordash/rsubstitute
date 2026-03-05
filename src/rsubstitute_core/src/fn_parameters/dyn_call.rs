@@ -24,8 +24,8 @@ impl<'rs> IGenericsHashKeyProvider for DynCall<'rs> {
 }
 
 impl<'rs> IArgsTupleProvider for DynCall<'rs> {
-    fn provide_ptr_to_tuple_of_refs(&self) -> *const () {
-        self.inner.provide_ptr_to_tuple_of_refs()
+    fn get_ptr_to_boxed_tuple_of_refs(&self) -> *mut () {
+        self.inner.get_ptr_to_boxed_tuple_of_refs()
     }
 }
 

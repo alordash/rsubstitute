@@ -11,6 +11,7 @@ pub(crate) struct DebugStringExprGenerator {
     pub path_factory: Arc<dyn IPathFactory>,
     pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
     pub expr_reference_factory: Arc<dyn IExprReferenceFactory>,
+    pub expr_call_factory: Arc<dyn IExprCallFactory>,
 }
 
 impl IDebugStringExprGenerator for DebugStringExprGenerator {
@@ -21,17 +22,13 @@ impl IDebugStringExprGenerator for DebugStringExprGenerator {
                     attrs: Vec::new(),
                     paren_token: Default::default(),
                     expr: Box::new(
-                        self.expr_reference_factory.create(Expr::Call(ExprCall {
-                            attrs: Vec::new(),
-                            func: Box::new(
+                        self.expr_reference_factory.create(
+                            self.expr_call_factory.create(
                                 self.path_factory
                                     .create_expr(constants::ARG_PRINTER_STRUCT_IDENT.clone()),
+                                self.expr_reference_factory.create(expr),
                             ),
-                            paren_token: Default::default(),
-                            args: [self.expr_reference_factory.create(expr)]
-                                .into_iter()
-                                .collect(),
-                        })),
+                        ),
                     ),
                 }),
                 Vec::new(),

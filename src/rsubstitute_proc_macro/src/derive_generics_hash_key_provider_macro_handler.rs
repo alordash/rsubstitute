@@ -15,6 +15,7 @@ pub(crate) struct DeriveGenericsHashKeyProviderMacroHandler {
     pub type_factory: Arc<dyn ITypeFactory>,
     pub path_factory: Arc<dyn IPathFactory>,
     pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
+    pub expr_call_factory: Arc<dyn IExprCallFactory>,
 }
 
 impl IDeriveGenericsHashKeyProviderMacroHandler for DeriveGenericsHashKeyProviderMacroHandler {
@@ -170,59 +171,49 @@ impl DeriveGenericsHashKeyProviderMacroHandler {
     }
 
     fn generate_tid_expr(&self, type_param: &TypeParam) -> Expr {
-        let expr_call = ExprCall {
+        let func = Expr::Path(ExprPath {
             attrs: Vec::new(),
-            func: Box::new(Expr::Path(ExprPath {
-                attrs: Vec::new(),
-                qself: None,
-                path: Path {
-                    leading_colon: None,
-                    segments: [PathSegment {
-                        ident: Self::TID_FN_IDENT.clone(),
-                        arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
-                            colon2_token: Some(Default::default()),
-                            lt_token: Default::default(),
-                            args: [GenericArgument::Type(
-                                self.type_factory.create(type_param.ident.clone()),
-                            )]
-                            .into_iter()
-                            .collect(),
-                            gt_token: Default::default(),
-                        }),
-                    }]
-                    .into_iter()
-                    .collect(),
-                },
-            })),
-            paren_token: Default::default(),
-            args: Punctuated::new(),
-        };
-        let expr = Expr::Call(expr_call);
+            qself: None,
+            path: Path {
+                leading_colon: None,
+                segments: [PathSegment {
+                    ident: Self::TID_FN_IDENT.clone(),
+                    arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
+                        colon2_token: Some(Default::default()),
+                        lt_token: Default::default(),
+                        args: [GenericArgument::Type(
+                            self.type_factory.create(type_param.ident.clone()),
+                        )]
+                        .into_iter()
+                        .collect(),
+                        gt_token: Default::default(),
+                    }),
+                }]
+                .into_iter()
+                .collect(),
+            },
+        });
+        let expr = self.expr_call_factory.create_without_args(func);
         return expr;
     }
 
     fn generate_const_hash_stmt(&self, const_param: &ConstParam) -> Stmt {
-        let expr_call = ExprCall {
-            attrs: Vec::new(),
-            func: Box::new(
-                self.path_factory
-                    .create_expr(Self::CONST_HASH_FN_IDENT.clone()),
-            ),
-            paren_token: Default::default(),
-            args: [
-                Expr::Reference(ExprReference {
-                    attrs: Vec::new(),
-                    and_token: Default::default(),
-                    mutability: None,
-                    expr: Box::new(self.path_factory.create_expr(const_param.ident.clone())),
-                }),
-                self.path_factory
-                    .create_expr(Self::HASHER_ARG_IDENT.clone()),
-            ]
-            .into_iter()
-            .collect(),
-        };
-        let stmt = Stmt::Expr(Expr::Call(expr_call), Some(Default::default()));
+        let args = vec![
+            Expr::Reference(ExprReference {
+                attrs: Vec::new(),
+                and_token: Default::default(),
+                mutability: None,
+                expr: Box::new(self.path_factory.create_expr(const_param.ident.clone())),
+            }),
+            self.path_factory
+                .create_expr(Self::HASHER_ARG_IDENT.clone()),
+        ];
+        let expr = self.expr_call_factory.create_with_args(
+            self.path_factory
+                .create_expr(Self::CONST_HASH_FN_IDENT.clone()),
+            args,
+        );
+        let stmt = Stmt::Expr(expr, Some(Default::default()));
         return stmt;
     }
 }

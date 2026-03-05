@@ -36,11 +36,11 @@ mod tests {
             mock.setup.consume().returns(33);
         }
 
-        // mock.mutate();
-        assert!(!flag.get());
+        mock.mutate();
+        assert!(flag.get());
 
-        // let v = mock.consume();
-        // assert_eq!(33, v);
+        let v = mock.consume();
+        assert_eq!(33, v);
     }
 
     #[test]

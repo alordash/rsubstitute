@@ -20,7 +20,8 @@ pub(crate) struct DeriveArgsInfosProviderMacroHandler {
     pub field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
     pub expr_reference_factory: Arc<dyn IExprReferenceFactory>,
     pub debug_string_expr_generator: Arc<dyn IDebugStringExprGenerator>,
-    pub field_checker: Arc<dyn IFieldChecker>
+    pub field_checker: Arc<dyn IFieldChecker>,
+    pub expr_call_factory: Arc<dyn IExprCallFactory>,
 }
 
 impl IDeriveArgsInfosProviderMacroHandler for DeriveArgsInfosProviderMacroHandler {
@@ -124,17 +125,13 @@ impl DeriveArgsInfosProviderMacroHandler {
                 .create(vec![constants::SELF_IDENT.clone(), field_ident]),
         );
 
-        let expr = Expr::Call(ExprCall {
-            attrs: Vec::new(),
-            func: Box::new(self.path_factory.create_expr_from_parts(vec![
+        let expr = self.expr_call_factory.create_with_args(
+            self.path_factory.create_expr_from_parts(vec![
                 Self::ARG_INFO_TYPE_IDENT.clone(),
                 constants::NEW_IDENT.clone(),
-            ])),
-            paren_token: Default::default(),
-            args: [field_name_arg, field_value_arg, field_debug_string_arg]
-                .into_iter()
-                .collect(),
-        });
+            ]),
+            vec![field_name_arg, field_value_arg, field_debug_string_arg],
+        );
         return expr;
     }
 }

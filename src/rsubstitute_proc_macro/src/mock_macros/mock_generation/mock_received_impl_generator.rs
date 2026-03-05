@@ -35,6 +35,7 @@ pub(crate) struct MockReceivedImplGenerator {
     pub type_factory: Arc<dyn ITypeFactory>,
     pub impl_factory: Arc<dyn IImplFactory>,
     pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
+    pub expr_call_factory: Arc<dyn IExprCallFactory>,
     pub input_args_generator: Arc<dyn IInputArgsGenerator>,
     pub received_signature_generator: Arc<dyn IReceivedSignatureGenerator>,
 }
@@ -145,12 +146,10 @@ impl MockReceivedImplGenerator {
             Expr::Return(ExprReturn {
                 attrs: Vec::new(),
                 return_token: Default::default(),
-                expr: Some(Box::new(Expr::Call(ExprCall {
-                    attrs: Vec::new(),
-                    func: Box::new(constants::FN_VERIFIER_NEW_FN_EXPR.clone()),
-                    paren_token: Default::default(),
-                    args: [constants::SELF_EXPR.clone()].into_iter().collect(),
-                }))),
+                expr: Some(Box::new(self.expr_call_factory.create(
+                    constants::FN_VERIFIER_NEW_FN_EXPR.clone(),
+                    constants::SELF_EXPR.clone(),
+                ))),
             }),
             Some(Default::default()),
         );

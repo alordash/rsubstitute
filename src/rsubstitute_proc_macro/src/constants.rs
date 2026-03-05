@@ -148,6 +148,12 @@ pub const FN_VERIFIER_NEW_FN_EXPR: LazyCell<Expr> = LazyCell::new(|| {
 
 pub const ALLOW_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("allow"));
 
+pub const ALLOW_UNUSED_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+    let attribute_factory = &SERVICES.attribute_factory;
+    let result = attribute_factory.create(ALLOW_IDENT.clone(), "unused");
+    return result;
+});
+
 pub const ALLOW_UNUSED_PARENS_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     let attribute_factory = &SERVICES.attribute_factory;
     let result = attribute_factory.create(ALLOW_IDENT.clone(), "unused_parens");
@@ -467,11 +473,22 @@ pub const HASH_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("hash"
 pub const ARG_PRINTER_STRUCT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("ArgPrinter"));
 pub const DEBUG_STRING_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("debug_string"));
 
-pub const VOID_PTR_TYPE: LazyCell<Type> = LazyCell::new(|| {
+pub const MUT_INFER_PTR_TYPE: LazyCell<Type> = LazyCell::new(|| {
     Type::Ptr(TypePtr {
         star_token: Default::default(),
         const_token: Some(Default::default()),
-        mutability: None,
+        mutability: Some(Default::default()),
+        elem: Box::new(Type::Infer(TypeInfer {
+            underscore_token: Default::default(),
+        })),
+    })
+});
+
+pub const MUT_VOID_PTR_TYPE: LazyCell<Type> = LazyCell::new(|| {
+    Type::Ptr(TypePtr {
+        star_token: Default::default(),
+        const_token: Some(Default::default()),
+        mutability: Some(Default::default()),
         elem: Box::new(VOID_TYPE.clone()),
     })
 });
@@ -491,3 +508,16 @@ pub const SUPPORT_BASE_PARAMETER: &'static str = "base";
 pub const DO_NOT_SUPPORT_BASE_PARAMETER: &'static str = "no_base";
 
 pub const BASE_FN_IDENT_PREFIX: &'static str = "base";
+
+pub const BOX_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Box"));
+pub const BOX_NEW_EXPR: LazyCell<Expr> = LazyCell::new(|| {
+    let path_factory = &SERVICES.path_factory;
+    let result = path_factory.create_expr_from_parts(vec![BOX_IDENT.clone(), NEW_IDENT.clone()]);
+    return result;
+});
+pub const BOX_LEAK_EXPR: LazyCell<Expr> = LazyCell::new(|| {
+    let path_factory = &SERVICES.path_factory;
+    let result =
+        path_factory.create_expr_from_parts(vec![BOX_IDENT.clone(), format_ident!("leak")]);
+    return result;
+});

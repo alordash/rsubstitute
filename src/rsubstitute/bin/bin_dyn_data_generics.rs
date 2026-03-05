@@ -152,7 +152,11 @@ mod tests {
         mock.setup
             .work::<_, _, true, 2>(10, &"amogus")
             .returns(v1)
-            .and_does(|(number, string)| println!("Received number = {number}, string = {string}"))
+            .and_does(|(number, string)| {
+                println!("Received number = {number}, string = {string}");
+                assert_eq!(10, *number);
+                assert_eq!("amogus", **string);
+            })
             .work::<_, _, true, 4>(10, &"amogus")
             .returns(v2)
             .and_does(|_| println!("I don't care what was received"))
