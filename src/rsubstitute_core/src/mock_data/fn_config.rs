@@ -59,7 +59,10 @@ impl<'rs> FnConfig<'rs> {
         self.args_checker.check(&call)
     }
 
-    pub(crate) fn select_next_return_value(&mut self) -> Option<DynReturnValue<'rs>> {
+    pub(crate) fn select_next_return_value(
+        &mut self,
+        call: &DynCall<'rs>,
+    ) -> Option<DynReturnValue<'rs>> {
         let Some(return_value_source) = self.return_value_sources.front() else {
             return None;
         };
@@ -77,6 +80,11 @@ impl<'rs> FnConfig<'rs> {
             ReturnValueSource::Perpetual(return_value_factory) => {
                 let return_value = return_value_factory();
                 Some(return_value)
+            }
+            ReturnValueSource::Factory(f) => {
+                let dyn_arg_refs_tuple = call.get_dyn_tuple_of_refs();
+                let return_value = f(dyn_arg_refs_tuple);
+                return Some(return_value);
             }
         };
     }

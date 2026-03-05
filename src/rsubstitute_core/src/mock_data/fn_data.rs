@@ -124,7 +124,7 @@ impl<'rs, TMock> FnData<'rs, TMock, false> {
             callback.borrow_mut()(call.as_ref());
         }
         drop(fn_config_ref);
-        let Some(return_value) = fn_config.borrow_mut().select_next_return_value() else {
+        let Some(return_value) = fn_config.borrow_mut().select_next_return_value(&call) else {
             self.error_printer
                 .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
         };
@@ -183,7 +183,7 @@ impl<'rs, TMock> FnData<'rs, TMock, true> {
             callback.borrow_mut()(call.as_ref());
         }
         drop(fn_config_ref);
-        let Some(return_value) = fn_config.borrow_mut().select_next_return_value() else {
+        let Some(return_value) = fn_config.borrow_mut().select_next_return_value(&call) else {
             self.error_printer
                 .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
         };

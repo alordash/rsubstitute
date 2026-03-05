@@ -53,4 +53,21 @@ impl<'rs, TOwner, TArgRefsTuple: Copy, TReturnValue>
             .add_return_value_source(return_value_source);
         return &self.fn_return_callback_tuner;
     }
+
+    pub fn with<'a>(
+        &self,
+        f: impl Fn(TArgRefsTuple) -> TReturnValue + 'rs,
+    ) -> &FnReturnCallbackTuner<'rs, TOwner, TArgRefsTuple> {
+        let return_value_source = ReturnValueSource::Factory(Box::new(
+            move |dyn_arg_refs_tuple: DynArgRefsTuple<'rs>| {
+                let arg_refs_tuple: TArgRefsTuple = dyn_arg_refs_tuple.downcast_into();
+                let result = f(arg_refs_tuple);
+                return unsafe { core::mem::transmute(DynReturnValue::new(result)) };
+            },
+        ));
+        self.fn_config
+            .borrow_mut()
+            .add_return_value_source(return_value_source);
+        return &self.fn_return_callback_tuner;
+    }
 }

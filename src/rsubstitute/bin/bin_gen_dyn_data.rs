@@ -32,7 +32,8 @@ mod tests {
             .work(v2)
             .returns(r2)
             .work(Arg::Is(|x| *x < 0))
-            .returns(r3)
+            .returns
+            .with(move |args| args.0 + r3)
             .and_does(|args| println!("amogus received number: {:?}", args))
             .work(Arg::Any)
             .returns
@@ -48,7 +49,7 @@ mod tests {
         // Assert
         assert_eq!(r1, actual_r1);
         assert_eq!(r2, actual_r2);
-        assert_eq!(r3, actual_r3);
+        assert_eq!(r3 + v3, actual_r3);
         assert_eq!(r45, actual_r4);
         assert_eq!(r45, actual_r5);
 
