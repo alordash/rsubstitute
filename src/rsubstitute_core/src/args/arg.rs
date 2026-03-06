@@ -31,11 +31,7 @@ impl<T> ArgCmp<T> {
 
 impl<'rs, T: PartialEq> From<T> for Arg<'rs, T> {
     fn from(value: T) -> Self {
-        let arg_cmp = ArgCmp {
-            value,
-            comparator: PartialEq::eq,
-        };
-        return Self::PrivateEq(arg_cmp, Private);
+        Arg::Eq(value)
     }
 }
 
@@ -71,7 +67,11 @@ impl<'rs, T> Arg<'rs, T> {
     where
         T: PartialEq,
     {
-        value.into()
+        let arg_cmp = ArgCmp {
+            value,
+            comparator: PartialEq::eq,
+        };
+        return Self::PrivateEq(arg_cmp, Private);
     }
 
     #[allow(non_snake_case)]
@@ -79,7 +79,11 @@ impl<'rs, T> Arg<'rs, T> {
     where
         T: PartialEq,
     {
-        value.into()
+        let arg_cmp = ArgCmp {
+            value,
+            comparator: PartialEq::eq,
+        };
+        return Self::PrivateNotEq(arg_cmp, Private);
     }
 }
 
