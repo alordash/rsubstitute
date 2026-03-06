@@ -72,18 +72,18 @@ impl<'rs> FnConfig<'rs> {
                     self.return_value_sources.pop_front()
                 else {
                     panic!(
-                        "Front return value source must be single time because it was just checked."
+                        "Front return value source must be not empty and single time because it was just checked."
                     )
                 };
                 Some(return_value)
             }
-            ReturnValueSource::Perpetual(return_value_factory) => {
-                let return_value = return_value_factory();
+            ReturnValueSource::Perpetual(perpetual_factory) => {
+                let return_value = perpetual_factory();
                 Some(return_value)
             }
-            ReturnValueSource::Factory(f) => {
+            ReturnValueSource::Factory(factory) => {
                 let dyn_arg_refs_tuple = call.get_dyn_tuple_of_refs();
-                let return_value = f(dyn_arg_refs_tuple);
+                let return_value = factory(dyn_arg_refs_tuple);
                 return Some(return_value);
             }
         };

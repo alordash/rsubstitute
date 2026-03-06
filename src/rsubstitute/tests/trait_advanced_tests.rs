@@ -24,11 +24,28 @@ trait Trait<'a, 'b> {
 mod tests {
     #![allow(non_snake_case)]
     use super::*;
-    use not_enough_asserts::panics::*;
     use rsubstitute::*;
 
     #[test]
-    fn compile() {}
+    fn accept_ref_Ok() {
+        // Arrange
+        let v = &&&&32;
+        let r = &&&&8;
+
+        let trait_mock = TraitMock::new();
+        trait_mock.setup.accept_ref(v).returns(r);
+
+        // Act
+        let actual_r = trait_mock.accept_ref(v);
+
+        // Assert
+        assert_eq!(r, actual_r);
+
+        trait_mock
+            .received
+            .accept_ref(v, Times::Once)
+            .no_other_calls();
+    }
 
     #[test]
     fn flex() {

@@ -132,12 +132,10 @@ mod tests {
             .work(v2)
             .returns(r2)
             .work(Arg::Is(|x| *x < 0))
-            .returns
-            .with(move |args| r3 + args)
+            .returns_with(move |args| r3 + args)
             .and_does(|args| println!("amogus received number: {}", args))
             .work(Arg::Any)
-            .returns
-            .always(r45);
+            .returns_always(r45);
 
         // Act
         let actual_r1 = mock.work(v1);
