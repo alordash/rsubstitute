@@ -167,6 +167,7 @@ impl IStructMockHandler for StructMockHandler {
             &mock_type,
             &mock_received_struct,
             &struct_fn_infos,
+            OutputTypeLifetime::Derived,
         );
         self.ignored_impl_fixer
             .fix(&mock_type, &mut struct_mock_syntax.ignored_impls);

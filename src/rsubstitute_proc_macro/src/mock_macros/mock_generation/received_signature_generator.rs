@@ -13,7 +13,12 @@ use syn::*;
 pub trait IReceivedSignatureGenerator {
     fn get_times_arg_ident(&self) -> Ident;
 
-    fn generate_for_trait(&self, fn_info: &FnInfo, mock_type: &MockType) -> Signature;
+    fn generate_for_trait(
+        &self,
+        fn_info: &FnInfo,
+        mock_type: &MockType,
+        output_type_lifetime: OutputTypeLifetime,
+    ) -> Signature;
 
     fn generate_for_static(
         &self,
@@ -34,7 +39,12 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
         format_ident!("times")
     }
 
-    fn generate_for_trait(&self, fn_info: &FnInfo, mock_type: &MockType) -> Signature {
+    fn generate_for_trait(
+        &self,
+        fn_info: &FnInfo,
+        mock_type: &MockType,
+        output_type_lifetime: OutputTypeLifetime,
+    ) -> Signature {
         let prepend_ref_self_arg = true;
         let result = self.generate(
             fn_info,
@@ -42,6 +52,8 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
             prepend_ref_self_arg,
             constants::SELF_TYPE.clone(),
             mock_type,
+            output_type_lifetime,
+            OutputTypeGenerics::FnOwn,
         );
         return result;
     }
@@ -64,6 +76,8 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
             prepend_ref_self_arg,
             owner_type,
             mock_type,
+            OutputTypeLifetime::Default,
+            OutputTypeGenerics::Mock,
         );
         return result;
     }
@@ -79,6 +93,8 @@ impl ReceivedSignatureGenerator {
         prepend_ref_self_arg: bool,
         owner_type: Type,
         mock_type: &MockType,
+        output_type_lifetime: OutputTypeLifetime,
+        output_type_generics: OutputTypeGenerics,
     ) -> Signature {
         let times_arg = FnArg::Typed(PatType {
             attrs: Vec::new(),
@@ -107,8 +123,15 @@ impl ReceivedSignatureGenerator {
         if prepend_ref_self_arg {
             inputs.insert(0, constants::REF_SELF_ARG.clone());
         }
-        let output_type =
-            self.generate_output_type(fn_info.parent.arg_refs_tuple.clone(), owner_type);
+        let output_type = self.generate_output_type(
+            fn_info.parent.arg_refs_tuple.clone(),
+            owner_type,
+            output_type_lifetime,
+        );
+        let generics = match output_type_generics {
+            OutputTypeGenerics::FnOwn => fn_info.parent.own_generics.clone(),
+            OutputTypeGenerics::Mock => mock_type.generics.impl_generics.clone(),
+        };
         let signature = Signature {
             constness: None,
             asyncness: None,
@@ -116,7 +139,7 @@ impl ReceivedSignatureGenerator {
             abi: None,
             fn_token: Default::default(),
             ident: fn_ident,
-            generics: fn_info.parent.own_generics.clone(),
+            generics,
             paren_token: Default::default(),
             inputs: inputs.into_iter().collect(),
             variadic: None,
@@ -125,7 +148,12 @@ impl ReceivedSignatureGenerator {
         return signature;
     }
 
-    fn generate_output_type(&self, arg_refs_tuple: Type, owner_type: Type) -> Type {
+    fn generate_output_type(
+        &self,
+        arg_refs_tuple: Type,
+        owner_type: Type,
+        output_type_lifetime: OutputTypeLifetime,
+    ) -> Type {
         let result = Type::Path(TypePath {
             qself: None,
             path: Path {
@@ -136,7 +164,7 @@ impl ReceivedSignatureGenerator {
                         colon2_token: None,
                         lt_token: Default::default(),
                         args: [
-                            GenericArgument::Lifetime(constants::DERIVED_LIFETIME.clone()),
+                            GenericArgument::Lifetime(output_type_lifetime.get()),
                             GenericArgument::Type(owner_type),
                             GenericArgument::Type(arg_refs_tuple),
                         ]
@@ -151,4 +179,9 @@ impl ReceivedSignatureGenerator {
         });
         return result;
     }
+}
+
+enum OutputTypeGenerics {
+    FnOwn,
+    Mock,
 }
