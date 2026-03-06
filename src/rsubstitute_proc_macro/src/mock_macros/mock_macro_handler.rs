@@ -1,6 +1,6 @@
 use crate::mock_macros::models::StructMockSyntax;
-use crate::mock_macros::targets::{IItemFnHandler, IItemTraitHandler, IStructMockHandler};
-use crate::mock_macros::{ICtxFactory, MockedMacroTarget};
+use crate::mock_macros::targets::*;
+use crate::mock_macros::*;
 use proc_macro::TokenStream;
 use std::sync::Arc;
 use syn::*;
@@ -15,16 +15,8 @@ pub trait IMockMacroHandler {
     fn handle_macro_mocked(
         &self,
         token_stream: TokenStream,
-        mocked_macro_target: MockedMacroTarget,
+        mocked_macro_target: MockedMacroMode,
     ) -> TokenStream;
-
-    // TODO - add macro
-    #[cfg(not(feature = "support_base_by_default"))]
-    fn handle_macro_mocked_base(&self, token_stream: TokenStream) -> TokenStream;
-
-    // TODO - add macro
-    #[cfg(feature = "support_base_by_default")]
-    fn handle_macro_mocked_no_base(&self, token_stream: TokenStream) -> TokenStream;
 }
 
 pub(crate) struct MockMacroHandler {
@@ -50,22 +42,12 @@ impl IMockMacroHandler for MockMacroHandler {
         panic!("Expected `trait`, `impl` or `fn`.");
     }
 
-    fn handle_macro_mocked(&self, token_stream: TokenStream, mocked_macro_target: MockedMacroTarget) -> TokenStream {
-        let ctx = self.ctx_factory.create_for_macro_mocked();
-        let struct_mock_syntax = parse_macro_input!(token_stream as StructMockSyntax);
-        return self.struct_mock_handler.handle(&ctx, struct_mock_syntax);
-    }
-
-    #[cfg(not(feature = "support_base_by_default"))]
-    fn handle_macro_mocked_base(&self, token_stream: TokenStream) -> TokenStream {
-        let ctx = self.ctx_factory.create_for_macro_mocked_base();
-        let struct_mock_syntax = parse_macro_input!(token_stream as StructMockSyntax);
-        return self.struct_mock_handler.handle(&ctx, struct_mock_syntax);
-    }
-
-    #[cfg(feature = "support_base_by_default")]
-    fn handle_macro_mocked_no_base(&self, token_stream: TokenStream) -> TokenStream {
-        let ctx = self.ctx_factory.create_for_macro_mocked_no_base();
+    fn handle_macro_mocked(
+        &self,
+        token_stream: TokenStream,
+        mocked_macro_mode: MockedMacroMode,
+    ) -> TokenStream {
+        let ctx = self.ctx_factory.create_for_macro_mocked(mocked_macro_mode);
         let struct_mock_syntax = parse_macro_input!(token_stream as StructMockSyntax);
         return self.struct_mock_handler.handle(&ctx, struct_mock_syntax);
     }

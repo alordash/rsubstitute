@@ -1,5 +1,6 @@
 #![allow(clippy::needless_return)]
 use crate::di::SERVICES;
+use crate::mock_macros::MockedMacroMode;
 
 mod constants;
 mod derive_args_formatter_macro_handler;
@@ -34,7 +35,23 @@ pub fn unmock(
 pub fn mocked(proc_macro_item: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let mock_macro_handler = &SERVICES.mock_macro_handler;
 
-    return mock_macro_handler.handle_macro_mocked(proc_macro_item);
+    return mock_macro_handler.handle_macro_mocked(proc_macro_item, MockedMacroMode::Unspecified);
+}
+
+#[cfg(not(feature = "support_base_by_default"))]
+#[proc_macro]
+pub fn mocked_base(proc_macro_item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let mock_macro_handler = &SERVICES.mock_macro_handler;
+
+    return mock_macro_handler.handle_macro_mocked(proc_macro_item, MockedMacroMode::WithBase);
+}
+
+#[cfg(feature = "support_base_by_default")]
+#[proc_macro]
+pub fn mocked_no_base(proc_macro_item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    let mock_macro_handler = &SERVICES.mock_macro_handler;
+
+    return mock_macro_handler.handle_macro_mocked(proc_macro_item, MockedMacroMode::WithoutBase);
 }
 
 #[proc_macro_derive(IArgsFormatter)]
