@@ -1,10 +1,9 @@
 use crate::constants;
 use crate::syntax::*;
 use proc_macro::TokenStream;
-use quote::{ToTokens, format_ident};
+use quote::{format_ident, ToTokens};
 use std::cell::LazyCell;
 use std::sync::Arc;
-use syn::punctuated::Punctuated;
 use syn::*;
 
 pub trait IDeriveGenericsHashKeyProviderMacroHandler {

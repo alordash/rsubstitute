@@ -12,5 +12,5 @@ mod struct_mock_syntax_parser;
 pub use ctx_factory::*;
 pub use fn_decl_extractor::*;
 pub use mock_macro_handler::*;
-pub use mocked_macro_mode::*;
+pub(crate) use mocked_macro_mode::*;
 pub use struct_mock_syntax_parser::*;
