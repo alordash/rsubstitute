@@ -29,6 +29,7 @@ pub(crate) struct ItemFnHandler {
     pub fn_setup_generator: Arc<dyn IFnSetupGenerator>,
     pub fn_received_generator: Arc<dyn IFnReceivedGenerator>,
     pub static_fn_generator: Arc<dyn IStaticFnGenerator>,
+    pub base_fn_generator: Arc<dyn IBaseFnGenerator>,
     pub mod_generator: Arc<dyn IModGenerator>,
 }
 
@@ -40,7 +41,9 @@ impl IItemFnHandler for ItemFnHandler {
             constants::MOCK_STRUCT_IDENT_PREFIX
         );
         let mock_generics = self.mock_generics_generator.generate(&item_fn.sig.generics);
-        let fn_decl = self.fn_decl_extractor.extract_fn(ctx, &mock_generics, &item_fn);
+        let fn_decl = self
+            .fn_decl_extractor
+            .extract_fn(ctx, &mock_generics, &item_fn);
         let mock_type = self
             .mock_type_generator
             .generate(mock_ident.clone(), mock_generics);
@@ -97,6 +100,16 @@ impl IItemFnHandler for ItemFnHandler {
             self.fn_received_generator
                 .generate(&fn_info, &mock_received_struct, &mock_type);
         let static_fn = self.static_fn_generator.generate(&fn_info, &mock_type);
+        let static_base_fn = self.base_fn_generator.generate_static(
+            &mock_type,
+            &fn_info.parent,
+            &fn_info.call_struct,
+            fn_info
+                .parent
+                .maybe_base_fn_block
+                .clone()
+                .expect("Static function must have a block."),
+        );
 
         let generated_mod = self.mod_generator.generate_fn(
             fn_ident,
@@ -112,6 +125,7 @@ impl IItemFnHandler for ItemFnHandler {
             fn_setup,
             fn_received,
             static_fn,
+            static_base_fn,
         );
         let GeneratedMod {
             item_mod,

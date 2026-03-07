@@ -2,7 +2,7 @@ use rsubstitute_proc_macro::mock;
 use std::cell::RefCell;
 use std::sync::Arc;
 
-#[mock]
+#[mock(base)]
 fn f() {}
 
 #[cfg(test)]
@@ -117,4 +117,3 @@ Received no non-matching calls"#,
         );
     }
 }
-

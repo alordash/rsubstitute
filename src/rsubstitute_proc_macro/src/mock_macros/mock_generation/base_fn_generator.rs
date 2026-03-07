@@ -1,6 +1,7 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::*;
 use crate::mock_macros::mock_generation::models::*;
+use crate::mock_macros::mock_generation::*;
 use crate::mock_macros::models::FnDecl;
 use crate::syntax::*;
 use quote::format_ident;
@@ -16,11 +17,20 @@ pub trait IBaseFnGenerator {
         call_struct: &CallStruct,
         base_fn_block: Block,
     ) -> BaseFn;
+
+    fn generate_static(
+        &self,
+        mock_type: &MockType,
+        fn_decl: &FnDecl,
+        call_struct: &CallStruct,
+        base_fn_block: Block,
+    ) -> StaticBaseFn;
 }
 
 pub(crate) struct BaseFnGenerator {
     pub type_factory: Arc<dyn ITypeFactory>,
     pub path_factory: Arc<dyn IPathFactory>,
+    pub base_fn_ident_formatter: Arc<dyn IBaseFnIdentFormatter>,
 }
 
 impl IBaseFnGenerator for BaseFnGenerator {
@@ -31,65 +41,12 @@ impl IBaseFnGenerator for BaseFnGenerator {
         call_struct: &CallStruct,
         base_fn_block: Block,
     ) -> BaseFn {
-        let impl_item_fn = self.generate_call_base_fn(
+        let (sig, block) = self.generate_call_base_fn_parts(
             fn_decl,
             call_struct,
             base_fn_block,
-            mock_type.generics.get_phantom_fields_count(),
-        );
-
-        let base_fn = BaseFn { impl_item_fn };
-        return base_fn;
-    }
-}
-
-impl BaseFnGenerator {
-    const CALL_ARG_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("call"));
-
-    fn generate_call_base_fn(
-        &self,
-        fn_decl: &FnDecl,
-        call_struct: &CallStruct,
-        base_fn_block: Block,
-        phantom_fields_count: usize,
-    ) -> ImplItemFn {
-        let sig = Signature {
-            constness: None,
-            asyncness: None,
-            unsafety: None,
-            abi: None,
-            fn_token: Default::default(),
-            ident: format_ident!("{}_{}", constants::BASE_FN_IDENT_PREFIX, fn_decl.fn_ident),
-            generics: fn_decl.own_generics.clone(),
-            paren_token: Default::default(),
-            inputs: [
-                constants::REF_SELF_ARG.clone(),
-                FnArg::Typed(PatType {
-                    attrs: Vec::new(),
-                    pat: Box::new(Pat::Ident(PatIdent {
-                        attrs: Vec::new(),
-                        by_ref: None,
-                        mutability: None,
-                        ident: Self::CALL_ARG_IDENT.clone(),
-                        subpat: None,
-                    })),
-                    colon_token: Default::default(),
-                    ty: Box::new(
-                        self.type_factory
-                            .create_from_struct(&call_struct.item_struct),
-                    ),
-                }),
-            ]
-            .into_iter()
-            .collect(),
-            variadic: None,
-            output: fn_decl.return_value.clone(),
-        };
-        let block = self.generate_call_base_fn_block(
-            fn_decl,
-            call_struct,
-            base_fn_block,
-            phantom_fields_count,
+            mock_type,
+            Target::Other,
         );
         let impl_item_fn = ImplItemFn {
             attrs: Vec::new(),
@@ -98,7 +55,100 @@ impl BaseFnGenerator {
             sig,
             block,
         };
-        return impl_item_fn;
+
+        let base_fn = BaseFn { impl_item_fn };
+        return base_fn;
+    }
+
+    fn generate_static(
+        &self,
+        mock_type: &MockType,
+        fn_decl: &FnDecl,
+        call_struct: &CallStruct,
+        base_fn_block: Block,
+    ) -> StaticBaseFn {
+        let (sig, block) = self.generate_call_base_fn_parts(
+            fn_decl,
+            call_struct,
+            base_fn_block,
+            mock_type,
+            Target::StaticFn,
+        );
+        let item_fn = ItemFn {
+            attrs: Vec::new(),
+            vis: Visibility::Inherited,
+            sig,
+            block: Box::new(block),
+        };
+
+        let static_base_fn = StaticBaseFn { item_fn };
+        return static_base_fn;
+    }
+}
+
+impl BaseFnGenerator {
+    const CALL_ARG_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("call"));
+
+    fn generate_call_base_fn_parts(
+        &self,
+        fn_decl: &FnDecl,
+        call_struct: &CallStruct,
+        base_fn_block: Block,
+        mock_type: &MockType,
+        target: Target,
+    ) -> (Signature, Block) {
+        let generics = match target {
+            Target::StaticFn => fn_decl.merged_generics.clone(),
+            Target::Other => fn_decl.own_generics.clone(),
+        };
+        let first_arg = match target {
+            Target::StaticFn => FnArg::Typed(PatType {
+                attrs: Vec::new(),
+                pat: Box::new(Pat::Wild(PatWild {
+                    attrs: Vec::new(),
+                    underscore_token: Default::default(),
+                })),
+                colon_token: Default::default(),
+                ty: Box::new(self.type_factory.reference(mock_type.ty.clone(), None)),
+            }),
+            Target::Other => constants::REF_SELF_ARG.clone(),
+        };
+        let call_arg = FnArg::Typed(PatType {
+            attrs: Vec::new(),
+            pat: Box::new(Pat::Ident(PatIdent {
+                attrs: Vec::new(),
+                by_ref: None,
+                mutability: None,
+                ident: Self::CALL_ARG_IDENT.clone(),
+                subpat: None,
+            })),
+            colon_token: Default::default(),
+            ty: Box::new(
+                self.type_factory
+                    .create_from_struct(&call_struct.item_struct),
+            ),
+        });
+        let inputs = [first_arg, call_arg];
+        let sig = Signature {
+            constness: None,
+            asyncness: None,
+            unsafety: None,
+            abi: None,
+            fn_token: Default::default(),
+            ident: self.base_fn_ident_formatter.format(&fn_decl.fn_ident),
+            generics,
+            paren_token: Default::default(),
+            inputs: inputs.into_iter().collect(),
+            variadic: None,
+            output: fn_decl.return_value.clone(),
+        };
+        let block = self.generate_call_base_fn_block(
+            fn_decl,
+            call_struct,
+            base_fn_block,
+            mock_type.generics.get_phantom_fields_count(),
+        );
+        return (sig, block);
     }
 
     fn generate_call_base_fn_block(
@@ -160,4 +210,9 @@ impl BaseFnGenerator {
         };
         return block;
     }
+}
+
+enum Target {
+    StaticFn,
+    Other,
 }

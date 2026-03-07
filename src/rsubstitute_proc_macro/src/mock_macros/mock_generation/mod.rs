@@ -1,6 +1,7 @@
 pub mod models;
 
 mod base_fn_generator;
+mod base_fn_ident_formatter;
 mod debug_string_expr_generator;
 mod fn_received_generator;
 mod fn_setup_generator;
@@ -35,6 +36,7 @@ mod setup_output_generator;
 mod static_fn_generator;
 
 pub use base_fn_generator::*;
+pub use base_fn_ident_formatter::*;
 pub use debug_string_expr_generator::*;
 pub use fn_received_generator::*;
 pub use fn_setup_generator::*;

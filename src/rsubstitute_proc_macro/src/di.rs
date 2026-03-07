@@ -102,9 +102,11 @@ fn create_services() -> ServiceCollection {
         type_factory: type_factory.clone(),
         field_factory: field_factory.clone(),
     });
+    let base_fn_ident_formatter = Arc::new(BaseFnIdentFormatter);
     let base_fn_generator = Arc::new(BaseFnGenerator {
         type_factory: type_factory.clone(),
         path_factory: path_factory.clone(),
+        base_fn_ident_formatter: base_fn_ident_formatter.clone(),
     });
     let fn_info_generator = Arc::new(FnInfoGenerator {
         call_struct_generator: call_struct_generator.clone(),
@@ -162,6 +164,7 @@ fn create_services() -> ServiceCollection {
         local_factory: local_factory.clone(),
         expr_reference_factory: expr_reference_factory.clone(),
         type_factory: type_factory.clone(),
+        base_fn_ident_formatter: base_fn_ident_formatter.clone(),
     });
     let mock_payload_impl_generator = Arc::new(MockPayloadImplGenerator {
         path_factory: path_factory.clone(),
@@ -193,6 +196,7 @@ fn create_services() -> ServiceCollection {
     let impl_factory = Arc::new(ImplFactory);
     let setup_output_generator = Arc::new(SetupOutputGenerator {
         type_factory: type_factory.clone(),
+        reference_normalizer: reference_normalizer.clone(),
     });
     let mock_setup_impl_generator = Arc::new(MockSetupImplGenerator {
         path_factory: path_factory.clone(),
@@ -339,10 +343,11 @@ fn create_services() -> ServiceCollection {
         mock_struct_default_impl_generator: mock_struct_default_impl_generator.clone(),
         mock_setup_impl_generator: mock_setup_impl_generator.clone(),
         mock_received_impl_generator: mock_received_impl_generator.clone(),
-        mod_generator: mod_generator.clone(),
         fn_setup_generator: fn_setup_generator.clone(),
         fn_received_generator: fn_received_generator.clone(),
         static_fn_generator: static_fn_generator.clone(),
+        base_fn_generator: base_fn_generator.clone(),
+        mod_generator: mod_generator.clone(),
     });
 
     let struct_mock_handler = Arc::new(StructMockHandler {

@@ -36,6 +36,7 @@ pub trait IModGenerator {
         fn_setup: ItemFn,
         fn_received: ItemFn,
         static_fn: StaticFn,
+        static_base_fn: StaticBaseFn,
     ) -> GeneratedMod;
 
     fn generate_struct(
@@ -119,6 +120,7 @@ impl IModGenerator for ModGenerator {
         fn_setup: ItemFn,
         fn_received: ItemFn,
         static_fn: StaticFn,
+        static_base_fn: StaticBaseFn,
     ) -> GeneratedMod {
         let usings = [
             constants::USE_SUPER.clone(),
@@ -141,6 +143,7 @@ impl IModGenerator for ModGenerator {
                 Item::Fn(fn_setup),
                 Item::Fn(fn_received),
                 Item::Fn(static_fn.item_fn),
+                Item::Fn(static_base_fn.item_fn),
             ])
             .collect();
         let item_mod = self.create_item_mod(fn_ident.clone(), items);

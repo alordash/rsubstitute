@@ -18,6 +18,7 @@ pub trait ISetupOutputGenerator {
 
 pub(crate) struct SetupOutputGenerator {
     pub type_factory: Arc<dyn ITypeFactory>,
+    pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
 }
 
 impl ISetupOutputGenerator for SetupOutputGenerator {
@@ -50,6 +51,13 @@ impl SetupOutputGenerator {
         owner_type: Type,
         output_type_lifetime: OutputTypeLifetime,
     ) -> TypePath {
+        let mut arg_refs_tuple = fn_info.parent.arg_refs_tuple.clone();
+        match output_type_lifetime {
+            OutputTypeLifetime::Default => self
+                .reference_normalizer
+                .normalize_anonymous_lifetimes(&mut arg_refs_tuple),
+            _ => (),
+        }
         let result = TypePath {
             qself: None,
             path: Path {
@@ -62,7 +70,7 @@ impl SetupOutputGenerator {
                         args: [
                             GenericArgument::Lifetime(output_type_lifetime.get()),
                             GenericArgument::Type(owner_type),
-                            GenericArgument::Type(fn_info.parent.arg_refs_tuple.clone()),
+                            GenericArgument::Type(arg_refs_tuple),
                             GenericArgument::Type(fn_info.parent.get_return_value_type()),
                             GenericArgument::Const(Expr::Lit(ExprLit {
                                 attrs: Vec::new(),

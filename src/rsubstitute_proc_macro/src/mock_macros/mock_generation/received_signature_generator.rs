@@ -1,7 +1,7 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::*;
-use crate::mock_macros::mock_generation::IInputArgsGenerator;
 use crate::mock_macros::mock_generation::models::*;
+use crate::mock_macros::mock_generation::IInputArgsGenerator;
 use crate::syntax::{IReferenceNormalizer, ITypeFactory};
 use proc_macro2::Ident;
 use quote::format_ident;
@@ -150,10 +150,16 @@ impl ReceivedSignatureGenerator {
 
     fn generate_output_type(
         &self,
-        arg_refs_tuple: Type,
+        mut arg_refs_tuple: Type,
         owner_type: Type,
         output_type_lifetime: OutputTypeLifetime,
     ) -> Type {
+        match output_type_lifetime {
+            OutputTypeLifetime::Default => self
+                .reference_normalizer
+                .normalize_anonymous_lifetimes(&mut arg_refs_tuple),
+            _ => (),
+        }
         let result = Type::Path(TypePath {
             qself: None,
             path: Path {

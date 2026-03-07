@@ -20,6 +20,7 @@ mod mock_struct_trait_info;
 mod mock_type;
 mod output_type_lifetime;
 mod send_sync_impls;
+mod static_base_fn;
 mod static_fn;
 
 pub use base_fn::*;
@@ -44,4 +45,5 @@ pub use mock_struct_trait_info::*;
 pub use mock_type::*;
 pub use output_type_lifetime::*;
 pub use send_sync_impls::*;
+pub use static_base_fn::*;
 pub use static_fn::*;
