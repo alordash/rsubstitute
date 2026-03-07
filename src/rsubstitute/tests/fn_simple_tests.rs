@@ -2,7 +2,7 @@ use rsubstitute_proc_macro::mock;
 use std::cell::RefCell;
 use std::sync::Arc;
 
-#[mock(base)]
+#[mock]
 fn f() {}
 
 #[cfg(test)]

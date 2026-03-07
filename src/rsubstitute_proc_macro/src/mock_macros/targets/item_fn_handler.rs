@@ -100,16 +100,15 @@ impl IItemFnHandler for ItemFnHandler {
             self.fn_received_generator
                 .generate(&fn_info, &mock_received_struct, &mock_type);
         let static_fn = self.static_fn_generator.generate(&fn_info, &mock_type);
-        let static_base_fn = self.base_fn_generator.generate_static(
+        let maybe_static_base_fn = fn_info
+            .parent
+            .maybe_base_fn_block
+            .clone().map(|base_fn_block| self.base_fn_generator.generate_static(
             &mock_type,
             &fn_info.parent,
             &fn_info.call_struct,
-            fn_info
-                .parent
-                .maybe_base_fn_block
-                .clone()
-                .expect("Static function must have a block."),
-        );
+            base_fn_block
+        ));
 
         let generated_mod = self.mod_generator.generate_fn(
             fn_ident,
@@ -125,7 +124,7 @@ impl IItemFnHandler for ItemFnHandler {
             fn_setup,
             fn_received,
             static_fn,
-            static_base_fn,
+            maybe_static_base_fn,
         );
         let GeneratedMod {
             item_mod,
