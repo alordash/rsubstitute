@@ -5,7 +5,7 @@ use std::cell::{Cell, RefCell};
 use std::sync::Arc;
 
 thread_local! {
-    pub static BASE_CALLED_FLAG: Cell   <bool> = Cell::new(false);
+    pub static BASE_CALLED_FLAG: Cell<bool> = Cell::new(false);
 }
 
 #[mock(base)]
