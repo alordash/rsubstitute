@@ -58,6 +58,7 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
                     mock_type,
                     use_fn_info_ident_as_method_ident,
                     output_type,
+                    GenericsStrategy::UseFnOwn,
                 ));
             })
             .collect();
@@ -85,6 +86,7 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
             mock_type,
             use_fn_info_ident_as_method_ident,
             output_type,
+            GenericsStrategy::DoNotUse,
         ));
 
         let item_impl =
@@ -104,8 +106,13 @@ impl MockSetupImplGenerator {
         mock_type: &MockType,
         use_fn_info_ident_as_method_ident: bool,
         output_type: TypePath,
+        generics_strategy: GenericsStrategy,
     ) -> ImplItemFn {
         let block = self.generate_fn_setup_block(fn_info, &output_type);
+        let generics = match generics_strategy {
+            GenericsStrategy::UseFnOwn => fn_info.parent.own_generics.clone(),
+            GenericsStrategy::DoNotUse => Default::default(),
+        };
         let sig = Signature {
             constness: None,
             asyncness: None,
@@ -117,7 +124,7 @@ impl MockSetupImplGenerator {
             } else {
                 constants::MOCK_SETUP_FIELD_IDENT.clone()
             },
-            generics: fn_info.parent.own_generics.clone(),
+            generics,
             paren_token: Default::default(),
             inputs: iter::once(constants::REF_SELF_ARG.clone())
                 .chain(
@@ -206,4 +213,9 @@ impl MockSetupImplGenerator {
         };
         return block;
     }
+}
+
+enum GenericsStrategy {
+    UseFnOwn,
+    DoNotUse,
 }

@@ -54,7 +54,14 @@ impl IMockReceivedImplGenerator for MockReceivedImplGenerator {
             .create_from_struct(&mock_received_struct.item_struct);
         let fns = fn_infos
             .iter()
-            .map(|x| ImplItem::Fn(self.generate_fn_received(mock_type, x, output_type_lifetime)))
+            .map(|x| {
+                ImplItem::Fn(self.generate_fn_received(
+                    mock_type,
+                    x,
+                    output_type_lifetime,
+                    OutputTypeGenerics::UseFnOwn,
+                ))
+            })
             .chain(std::iter::once(self.generate_only_fn()))
             .collect();
 
@@ -77,7 +84,12 @@ impl IMockReceivedImplGenerator for MockReceivedImplGenerator {
         let fns = fn_infos
             .iter()
             .map(|x| {
-                ImplItem::Fn(self.generate_fn_received(mock_type, x, OutputTypeLifetime::Derived))
+                ImplItem::Fn(self.generate_fn_received(
+                    mock_type,
+                    x,
+                    OutputTypeLifetime::Derived,
+                    OutputTypeGenerics::UseFnOwn,
+                ))
             })
             .collect();
 
@@ -97,8 +109,12 @@ impl IMockReceivedImplGenerator for MockReceivedImplGenerator {
         let self_ty = self
             .type_factory
             .create_from_struct(&mock_received_struct.item_struct);
-        let mut fn_received =
-            self.generate_fn_received(mock_type, fn_info, OutputTypeLifetime::Default);
+        let mut fn_received = self.generate_fn_received(
+            mock_type,
+            fn_info,
+            OutputTypeLifetime::Default,
+            OutputTypeGenerics::DoNotUse,
+        );
         fn_received.sig.ident = constants::MOCK_RECEIVED_FIELD_IDENT.clone();
         let only_fn = self.generate_only_fn();
 
@@ -118,11 +134,13 @@ impl MockReceivedImplGenerator {
         mock_type: &MockType,
         fn_info: &FnInfo,
         output_type_lifetime: OutputTypeLifetime,
+        output_type_generics: OutputTypeGenerics,
     ) -> ImplItemFn {
         let sig = self.received_signature_generator.generate_for_trait(
             fn_info,
             mock_type,
             output_type_lifetime,
+            output_type_generics,
         );
         let block = self.generate_fn_received_block(fn_info);
         let impl_item_fn = ImplItemFn {

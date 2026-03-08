@@ -1,7 +1,7 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::*;
-use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::mock_generation::IInputArgsGenerator;
+use crate::mock_macros::mock_generation::models::*;
 use crate::syntax::{IReferenceNormalizer, ITypeFactory};
 use proc_macro2::Ident;
 use quote::format_ident;
@@ -18,6 +18,7 @@ pub trait IReceivedSignatureGenerator {
         fn_info: &FnInfo,
         mock_type: &MockType,
         output_type_lifetime: OutputTypeLifetime,
+        output_type_generics: OutputTypeGenerics,
     ) -> Signature;
 
     fn generate_for_static(
@@ -44,6 +45,7 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
         fn_info: &FnInfo,
         mock_type: &MockType,
         output_type_lifetime: OutputTypeLifetime,
+        output_type_generics: OutputTypeGenerics,
     ) -> Signature {
         let prepend_ref_self_arg = true;
         let result = self.generate(
@@ -53,7 +55,7 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
             constants::SELF_TYPE.clone(),
             mock_type,
             output_type_lifetime,
-            OutputTypeGenerics::FnOwn,
+            output_type_generics,
         );
         return result;
     }
@@ -77,7 +79,7 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
             owner_type,
             mock_type,
             OutputTypeLifetime::Default,
-            OutputTypeGenerics::Mock,
+            OutputTypeGenerics::UseMock,
         );
         return result;
     }
@@ -129,8 +131,9 @@ impl ReceivedSignatureGenerator {
             output_type_lifetime,
         );
         let generics = match output_type_generics {
-            OutputTypeGenerics::FnOwn => fn_info.parent.own_generics.clone(),
-            OutputTypeGenerics::Mock => mock_type.generics.impl_generics.clone(),
+            OutputTypeGenerics::UseFnOwn => fn_info.parent.own_generics.clone(),
+            OutputTypeGenerics::UseMock => mock_type.generics.impl_generics.clone(),
+            OutputTypeGenerics::DoNotUse => Default::default(),
         };
         let signature = Signature {
             constness: None,
@@ -184,9 +187,4 @@ impl ReceivedSignatureGenerator {
         });
         return result;
     }
-}
-
-enum OutputTypeGenerics {
-    FnOwn,
-    Mock,
 }
