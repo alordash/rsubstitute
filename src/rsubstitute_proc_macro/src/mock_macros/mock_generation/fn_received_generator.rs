@@ -49,21 +49,14 @@ impl FnReceivedGenerator {
         let static_mock_expr = self
             .get_global_mock_expr_generator
             .generate(mock_type.ty.clone());
-        let received_clone_expr =
-            Expr::MethodCall(self.expr_method_call_factory.create_with_base_receiver(
-                static_mock_expr,
-                vec![constants::MOCK_RECEIVED_FIELD_IDENT.clone()],
-                constants::CLONE_FN_IDENT.clone(),
-                Vec::new(),
-            ));
         let return_stmt = Stmt::Expr(
             Expr::Return(ExprReturn {
                 attrs: Vec::new(),
                 return_token: Default::default(),
                 expr: Some(Box::new(Expr::MethodCall(
                     self.expr_method_call_factory.create_with_base_receiver(
-                        received_clone_expr,
-                        Vec::new(),
+                        static_mock_expr,
+                        vec![constants::MOCK_RECEIVED_FIELD_IDENT.clone()],
                         constants::MOCK_RECEIVED_FIELD_IDENT.clone(),
                         fn_info
                             .args_checker_struct
