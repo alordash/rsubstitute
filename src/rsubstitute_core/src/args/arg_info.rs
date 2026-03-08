@@ -1,4 +1,4 @@
-#[derive(Debug)]    // TODO - remove #[derive(Debug)]
+#[derive(Debug)] // TODO - remove #[derive(Debug)]
 pub struct ArgInfo {
     arg_name: &'static str,
     arg_type_name: &'static str,
@@ -23,7 +23,7 @@ impl ArgInfo {
         self.arg_type_name
     }
 
-    pub fn arg_debug_string(&self) -> &str {
-        &self.arg_debug_string
+    pub fn clone_arg_debug_string(&self) -> String {
+        self.arg_debug_string.to_owned()
     }
 }

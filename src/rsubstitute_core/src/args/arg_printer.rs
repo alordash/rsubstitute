@@ -6,12 +6,6 @@ const UNKNOWN_ARG_STRING: &'static str = "?";
 // https://github.com/asomers/mockall/blob/4401e5ac4aa7b05227c157f569d1147d732944b0/mockall/src/lib.rs#L1496
 pub struct ArgPrinter<'a, T: ?Sized>(pub &'a T);
 
-impl<'a, T: Debug> Debug for ArgPrinter<'a, T> {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        self.0.fmt(f)
-    }
-}
-
 #[cfg(not(feature = "debug_naming"))]
 pub use default_printing::*;
 #[cfg(not(feature = "debug_naming"))]

@@ -142,7 +142,7 @@ List of existing configuration ordered by number of correctly matched arguments 
     ) -> String {
         let call_args_msgs: Vec<_> = call_args
             .into_iter()
-            .map(|call_arg| format!("{:?}", call_arg.arg_debug_string()))
+            .map(|call_arg| call_arg.clone_arg_debug_string())
             .collect();
         let call_args_msg = call_args_msgs.join(", ");
         let error_msg = format!("{fn_name}({call_args_msg})");
@@ -215,12 +215,8 @@ impl ErrorPrinter {
         let args_msgs: Vec<_> = call
             .into_iter()
             .map(|x| match x {
-                ArgCheckResult::Ok(x) => {
-                    format!("{:?}", x.arg_info.arg_debug_string())
-                }
-                ArgCheckResult::Err(x) => {
-                    format!("*{:?}*", x.arg_info.arg_debug_string())
-                }
+                ArgCheckResult::Ok(x) => x.arg_info.clone_arg_debug_string(),
+                ArgCheckResult::Err(x) => x.arg_info.clone_arg_debug_string(),
             })
             .collect();
         let args_msgs_joined = args_msgs.join(", ");
