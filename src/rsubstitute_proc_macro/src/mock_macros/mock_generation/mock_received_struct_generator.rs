@@ -32,7 +32,7 @@ impl IMockReceivedStructGenerator for MockReceivedStructGenerator {
     ) -> MockReceivedStruct {
         let attrs = vec![
             constants::DOC_HIDDEN_ATTRIBUTE.clone(),
-            constants::DERIVE_CLONE_ATTRIBUTE.clone(),
+            constants::DERIVE_CLONE_FOR_RSUBSTITUTE_ATTRIBUTE.clone(),
         ];
         let ident = format_ident!("{}{}", mock_ident, Self::MOCK_RECEIVED_STRUCT_IDENT_SUFFIX);
         let data_type = self

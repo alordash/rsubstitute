@@ -53,6 +53,11 @@ pub const I_GENERICS_HASH_KEY_PROVIDER_TRAIT_PATH: LazyCell<Path> = LazyCell::ne
 });
 
 pub const CLONE_FOR_RSUBSTITUTE_TRAIT_NAME: &'static str = "CloneForRSubstitute";
+pub const DERIVE_CLONE_FOR_RSUBSTITUTE_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+    let attribute_factory = &SERVICES.attribute_factory;
+    let result = attribute_factory.create(DERIVE_IDENT.clone(), CLONE_FOR_RSUBSTITUTE_TRAIT_NAME);
+    return result;
+});
 
 pub const I_ARGS_FORMATTER_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("fmt_args"));
 
