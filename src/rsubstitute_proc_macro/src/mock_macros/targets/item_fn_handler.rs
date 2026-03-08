@@ -96,15 +96,19 @@ impl IItemFnHandler for ItemFnHandler {
             self.fn_received_generator
                 .generate(&fn_info, &mock_received_struct, &mock_type);
         let static_fn = self.static_fn_generator.generate(&fn_info, &mock_type);
-        let maybe_static_base_fn = fn_info
-            .parent
-            .maybe_base_fn_block
-            .clone().map(|base_fn_block| self.base_fn_generator.generate_static(
-            &mock_type,
-            &fn_info.parent,
-            &fn_info.call_struct,
-            base_fn_block
-        ));
+        let maybe_static_base_fn =
+            fn_info
+                .parent
+                .maybe_base_fn_block
+                .clone()
+                .map(|base_fn_block| {
+                    self.base_fn_generator.generate_static(
+                        &mock_type,
+                        &fn_info.parent,
+                        &fn_info.call_struct,
+                        base_fn_block,
+                    )
+                });
 
         let generated_mod = self.mod_generator.generate_fn(
             fn_ident,

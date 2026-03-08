@@ -1,4 +1,4 @@
-use syn::{Generics, WhereClause};
+use syn::*;
 
 pub trait IGenericsMerger {
     fn merge(&self, first: &Generics, second: &Generics) -> Generics;

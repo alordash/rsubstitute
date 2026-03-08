@@ -72,7 +72,7 @@ impl IFnDeclExtractor for FnDeclExtractor {
             .map(move |trait_impl_fn| {
                 self.create_fn_decl(
                     ctx,
-                    mock_generics,
+                    GenericsStrategy::MergeWithMockGenerics(mock_generics),
                     trait_impl_fn.attrs.clone(),
                     &trait_impl_fn.sig,
                     trait_impl_fn.vis.clone(),
@@ -87,7 +87,7 @@ impl IFnDeclExtractor for FnDeclExtractor {
     fn extract_fn(&self, ctx: &Ctx, mock_generics: &MockGenerics, item_fn: &ItemFn) -> FnDecl {
         let fn_decl = self.create_fn_decl(
             ctx,
-            mock_generics,
+            GenericsStrategy::UseMockGenerics(mock_generics),
             item_fn.attrs.clone(),
             &item_fn.sig,
             item_fn.vis.clone(),
@@ -124,7 +124,7 @@ impl FnDeclExtractor {
         let sig = &trait_item_fn.sig;
         let fn_decl = self.create_fn_decl(
             ctx,
-            mock_generics,
+            GenericsStrategy::MergeWithMockGenerics(mock_generics),
             trait_item_fn.attrs.clone(),
             sig,
             Visibility::Inherited,
@@ -143,7 +143,7 @@ impl FnDeclExtractor {
         let sig = &impl_item_fn.sig;
         let fn_decl = self.create_fn_decl(
             ctx,
-            mock_generics,
+            GenericsStrategy::MergeWithMockGenerics(mock_generics),
             impl_item_fn.attrs.clone(),
             sig,
             impl_item_fn.vis.clone(),
@@ -156,7 +156,7 @@ impl FnDeclExtractor {
     fn create_fn_decl(
         &self,
         ctx: &Ctx,
-        mock_generics: &MockGenerics,
+        generics_strategy: GenericsStrategy,
         attrs: Vec<Attribute>,
         sig: &Signature,
         visibility: Visibility,
@@ -165,9 +165,12 @@ impl FnDeclExtractor {
     ) -> FnDecl {
         let maybe_phantom_return_field =
             self.try_get_phantom_return_field(&sig.output, &sig.generics);
-        let merged_generics = self
-            .generics_merger
-            .merge(&mock_generics.impl_generics, &sig.generics);
+        let merged_generics = match generics_strategy {
+            GenericsStrategy::MergeWithMockGenerics(mock_generics) => self
+                .generics_merger
+                .merge(&mock_generics.impl_generics, &sig.generics),
+            GenericsStrategy::UseMockGenerics(mock_generics) => mock_generics.impl_generics.clone(),
+        };
         let arguments: Vec<_> = sig.inputs.iter().cloned().collect();
         let arg_refs_tuple = self.generate_arg_refs_tuple(&arguments);
         let fn_decl = FnDecl {
@@ -227,4 +230,9 @@ impl FnDeclExtractor {
         });
         return result;
     }
+}
+
+enum GenericsStrategy<'a> {
+    MergeWithMockGenerics(&'a MockGenerics),
+    UseMockGenerics(&'a MockGenerics),
 }
