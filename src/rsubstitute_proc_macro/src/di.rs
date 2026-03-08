@@ -136,10 +136,6 @@ fn create_services() -> ServiceCollection {
         struct_factory: struct_factory.clone(),
         reference_normalizer: reference_normalizer.clone(),
     });
-    let send_sync_impls_generator = Arc::new(SendSyncImplsGenerator {
-        path_factory: path_factory.clone(),
-        type_factory: type_factory.clone(),
-    });
     let field_value_factory = Arc::new(FieldValueFactory {
         expr_method_call_factory: expr_method_call_factory.clone(),
     });
@@ -339,7 +335,6 @@ fn create_services() -> ServiceCollection {
         mock_setup_struct_generator: mock_setup_struct_generator.clone(),
         mock_received_struct_generator: mock_received_struct_generator.clone(),
         mock_struct_generator: mock_struct_generator.clone(),
-        send_sync_impls_generator: send_sync_impls_generator.clone(),
         mock_struct_default_impl_generator: mock_struct_default_impl_generator.clone(),
         mock_setup_impl_generator: mock_setup_impl_generator.clone(),
         mock_received_impl_generator: mock_received_impl_generator.clone(),

@@ -22,7 +22,6 @@ pub(crate) struct ItemFnHandler {
     pub mock_setup_struct_generator: Arc<dyn IMockSetupStructGenerator>,
     pub mock_received_struct_generator: Arc<dyn IMockReceivedStructGenerator>,
     pub mock_struct_generator: Arc<dyn IMockStructGenerator>,
-    pub send_sync_impls_generator: Arc<dyn ISendSyncImplsGenerator>,
     pub mock_struct_default_impl_generator: Arc<dyn IMockStructDefaultImplGenerator>,
     pub mock_setup_impl_generator: Arc<dyn IMockSetupImplGenerator>,
     pub mock_received_impl_generator: Arc<dyn IMockReceivedImplGenerator>,
@@ -72,9 +71,6 @@ impl IItemFnHandler for ItemFnHandler {
             &mock_received_struct,
             &mock_data_struct,
         );
-        let send_sync_impls = self
-            .send_sync_impls_generator
-            .generate(&mock_struct.item_struct);
         let mock_struct_default_impl = self.mock_struct_default_impl_generator.generate(
             &mock_struct,
             &mock_data_struct,
@@ -117,7 +113,6 @@ impl IItemFnHandler for ItemFnHandler {
             mock_setup_struct,
             mock_received_struct,
             mock_struct,
-            send_sync_impls,
             mock_struct_default_impl,
             mock_setup_impl,
             mock_received_impl,

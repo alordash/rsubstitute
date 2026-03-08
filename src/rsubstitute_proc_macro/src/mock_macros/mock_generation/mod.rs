@@ -31,7 +31,6 @@ mod mock_struct_trait_info_generator;
 mod mock_type_generator;
 mod mod_generator;
 mod received_signature_generator;
-mod send_sync_impls_generator;
 mod setup_output_generator;
 mod static_fn_generator;
 
@@ -66,6 +65,5 @@ pub use mock_struct_trait_info_generator::*;
 pub use mock_type_generator::*;
 pub use mod_generator::*;
 pub use received_signature_generator::*;
-pub use send_sync_impls_generator::*;
 pub use setup_output_generator::*;
 pub use static_fn_generator::*;
