@@ -105,7 +105,7 @@ impl<'rs, T> Arg<'rs, T> {
                         // error_msg: format!(
                         //     "\t\tExpected: {expected_value:?}\n\t\tActual:   {actual_value:?}"
                         // ),
-                        error_msg: format!("TODO - debug string"),
+                        error_msg: format!("111 TODO - debug string"),
                     });
                 }
             }
@@ -114,7 +114,7 @@ impl<'rs, T> Arg<'rs, T> {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         // error_msg: format!("\t\tDid not expect to be {not_expected_value:?}"),
-                        error_msg: format!("TODO - debug string"),
+                        error_msg: format!("222 TODO - debug string"),
                     });
                 }
             }
@@ -147,11 +147,13 @@ impl<'rs, 'a, T: ?Sized> Arg<'rs, &'a T> {
             Arg::PrivateEq(arg_cmp, _) => {
                 let expected_ptr = core::ptr::from_ref(arg_cmp.value);
                 if !core::ptr::eq(actual_ptr, expected_ptr) {
+                    let actual_value_str = arg_info.clone_arg_debug_string();
+                    let expected_value_str = &ArgPrinter(arg_cmp.value).debug_string();
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
-                            // "\t\tExpected reference (ptr: {expected_ptr:?}): {expected_value:?}\n\t\tActual reference   (ptr: {actual_ptr:?}): {actual_value:?}"
-                            "TODO - debug string"
+                            "\t\tExpected reference (ptr: {expected_ptr:?}): {expected_value_str}\n\t\tActual reference   (ptr: {actual_ptr:?}): {actual_value_str}"
+                            // "333 TODO - debug string"
                         ),
                     });
                 }
@@ -163,7 +165,7 @@ impl<'rs, 'a, T: ?Sized> Arg<'rs, &'a T> {
                         arg_info,
                         error_msg: format!(
                             // "\t\tDid not expect reference (ptr: {not_expected_ptr:?}): {not_expected_value:?}"
-                            "TODO - debug string"
+                            "444 TODO - debug string"
                         ),
                     });
                 }
@@ -174,7 +176,7 @@ impl<'rs, 'a, T: ?Sized> Arg<'rs, &'a T> {
                         arg_info,
                         error_msg: format!(
                             // "\t\tCustom predicate didn't match passed reference value. Received value (ptr: {actual_ptr:?}): {actual_value:?}"
-                            "TODO - debug string"
+                            "555 TODO - debug string"
                         ),
                     });
                 }
@@ -217,7 +219,7 @@ impl<'rs, 'a, T: ?Sized> Arg<'rs, &'a mut T> {
                         arg_info,
                         error_msg: format!(
                             // "\t\tExpected reference (ptr: {expected_ptr:?}): {expected_value:?}\n\t\tActual reference   (ptr: {actual_ptr:?}): {actual_value:?}"
-                            "TODO - debug string"
+                            "666 TODO - debug string"
                         ),
                     });
                 }
@@ -229,7 +231,7 @@ impl<'rs, 'a, T: ?Sized> Arg<'rs, &'a mut T> {
                         arg_info,
                         error_msg: format!(
                             // "\t\tDid not expect reference (ptr: {not_expected_ptr:?}): {not_expected_value:?}"
-                            "TODO - debug string"
+                            "777 TODO - debug string"
                         ),
                     });
                 }
@@ -240,7 +242,7 @@ impl<'rs, 'a, T: ?Sized> Arg<'rs, &'a mut T> {
                         arg_info,
                         error_msg: format!(
                             // "\t\tCustom predicate didn't match passed reference value. Received value (ptr: {actual_ptr:?}): {actual_value:?}"
-                            "TODO - debug string"
+                            "888 TODO - debug string"
                         ),
                     });
                 }
@@ -270,7 +272,7 @@ impl<'rs, T: ?Sized> Arg<'rs, Rc<T>> {
                         arg_info,
                         error_msg: format!(
                             // "\t\tExpected Rc (ptr: {expected_ptr:?}): {expected_value:?}\n\t\tActual Rc   (ptr: {actual_ptr:?}): {actual_value:?}"
-                            "TODO - debug string"
+                            "999 TODO - debug string"
                         ),
                     });
                 }
@@ -282,14 +284,14 @@ impl<'rs, T: ?Sized> Arg<'rs, Rc<T>> {
                         arg_info,
                         error_msg: format!(
                             // "\t\tDid not expect Rc (ptr: {not_expected_ptr:?}): {not_expected_value:?}"
-                            "TODO - debug string"
+                            "10 TODO - debug string"
                         ),
                     });
                 }
             }
             Arg::PrivateIs(predicate, _) => {
                 // let actual_value_str = format!("{:?}", actual_value);
-                let actual_value_str = format!("TODO - debug string");
+                let actual_value_str = format!("11 TODO - debug string");
                 if !predicate(actual_value) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
@@ -324,7 +326,7 @@ impl<'rs, T: ?Sized> Arg<'rs, Arc<T>> {
                         arg_info,
                         error_msg: format!(
                             // "\t\tExpected Arc (ptr: {expected_ptr:?}): {expected_value:?}\n\t\tActual Arc   (ptr: {actual_ptr:?}): {actual_value:?}"
-                            "TODO - debug string"
+                            "12 TODO - debug string"
                         ),
                     });
                 }
@@ -336,14 +338,14 @@ impl<'rs, T: ?Sized> Arg<'rs, Arc<T>> {
                         arg_info,
                         error_msg: format!(
                             // "\t\tDid not expect Arc (ptr: {not_expected_ptr:?}): {not_expected_value:?}"
-                            "TODO - debug string"
+                            "13 TODO - debug string"
                         ),
                     });
                 }
             }
             Arg::PrivateIs(predicate, _) => {
                 // let actual_value_str = format!("{:?}", actual_value);
-                let actual_value_str = format!("TODO - debug string");
+                let actual_value_str = format!("14 TODO - debug string");
                 if !predicate(actual_value) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,

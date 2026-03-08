@@ -216,7 +216,7 @@ impl ErrorPrinter {
             .into_iter()
             .map(|x| match x {
                 ArgCheckResult::Ok(x) => x.arg_info.clone_arg_debug_string(),
-                ArgCheckResult::Err(x) => x.arg_info.clone_arg_debug_string(),
+                ArgCheckResult::Err(x) => format!("*{}*", x.arg_info.clone_arg_debug_string()),
             })
             .collect();
         let args_msgs_joined = args_msgs.join(", ");
