@@ -18,7 +18,8 @@ pub(crate) struct MockGenericsGenerator {
 impl IMockGenericsGenerator for MockGenericsGenerator {
     fn generate(&self, source_generics: &Generics) -> MockGenerics {
         let mut modified_source_generics = source_generics.clone();
-        self.add_required_for_lib_type_trait_constraints(&mut modified_source_generics);
+        // TODO - remove?
+        // self.add_required_for_lib_type_trait_constraints(&mut modified_source_generics);
         modified_source_generics.params.insert(
             0,
             GenericParam::Lifetime(LifetimeParam {
