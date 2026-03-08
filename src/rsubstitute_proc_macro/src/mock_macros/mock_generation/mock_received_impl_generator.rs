@@ -160,7 +160,12 @@ impl MockReceivedImplGenerator {
                 return_token: Default::default(),
                 expr: Some(Box::new(self.expr_call_factory.create(
                     constants::FN_VERIFIER_NEW_FN_EXPR.clone(),
-                    constants::SELF_EXPR.clone(),
+                    Expr::MethodCall(self.expr_method_call_factory.create_with_base_receiver(
+                        constants::SELF_EXPR.clone(),
+                        Vec::new(),
+                        constants::CLONE_FN_IDENT.clone(),
+                        Vec::new(),
+                    )),
                 ))),
             }),
             Some(Default::default()),

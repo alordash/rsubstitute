@@ -436,9 +436,6 @@ pub const STATIC_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
     ident: format_ident!("static"),
 });
 
-pub const SEND_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Send"));
-pub const SYNC_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Sync"));
-
 pub const CLONE_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("clone"));
 
 pub const RESET_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("reset"));

@@ -170,7 +170,6 @@ impl ReceivedSignatureGenerator {
                         colon2_token: None,
                         lt_token: Default::default(),
                         args: [
-                            GenericArgument::Lifetime(output_type_lifetime.get()),
                             GenericArgument::Type(owner_type),
                             GenericArgument::Type(arg_refs_tuple),
                         ]
