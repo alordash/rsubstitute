@@ -2,8 +2,8 @@ use rsubstitute_proc_macro::mock;
 use std::cell::RefCell;
 use std::sync::Arc;
 
-// #[mock]
-// fn f() {}
+#[mock]
+fn f() {}
 
 #[cfg(test)]
 mod tests {
@@ -115,108 +115,5 @@ Actually received 3 matching calls:
 	f()
 Received no non-matching calls"#,
         );
-    }
-}
-
-#[cfg(not(test))]
-fn f() {}
-#[cfg(test)]
-pub use f::*;
-#[cfg(test)]
-#[allow(unused_parens)]
-#[allow(non_snake_case)]
-#[allow(non_camel_case_types)]
-#[allow(mismatched_lifetime_syntaxes)]
-mod f {
-    use super::*;
-    use rsubstitute::for_generated::*;
-    #[doc(hidden)]
-    #[derive(IArgsInfosProvider, IArgsTupleProvider, IGenericsHashKeyProvider)]
-    pub struct f_Call<'rs> {
-        _phantom_lifetime: PhantomData<&'rs ()>,
-    }
-    #[doc(hidden)]
-    #[derive(Debug, IArgsFormatter, IGenericsHashKeyProvider)]
-    pub struct f_ArgsChecker<'rs> {
-        _phantom_lifetime: PhantomData<&'rs ()>,
-    }
-    impl<'rs> IArgsChecker for f_ArgsChecker<'rs> {
-        #[allow(unused)]
-        fn check(&self, dyn_call: &DynCall) -> Vec<ArgCheckResult> {
-            let call: &f_Call<'rs> = dyn_call.downcast_ref();
-            vec![]
-        }
-    }
-    #[doc(hidden)]
-    #[derive(IMockData)]
-    pub struct fMockData<'rs> {
-        _phantom_lifetime: PhantomData<&'rs ()>,
-        f_data: FnData<'rs, fMock<'rs>, false>,
-    }
-    #[doc(hidden)]
-    pub struct fMockSetup<'rs> {
-        data: Arc<fMockData<'rs>>,
-    }
-    #[doc(hidden)]
-    pub struct fMockReceived<'rs> {
-        data: Arc<fMockData<'rs>>,
-    }
-    #[doc(hidden)]
-    pub struct fMock<'rs> {
-        pub setup: fMockSetup<'rs>,
-        pub received: fMockReceived<'rs>,
-        data: Arc<fMockData<'rs>>,
-    }
-    impl<'rs> Default for fMock<'rs> {
-        fn default() -> Self {
-            let data = Arc::new(fMockData {
-                _phantom_lifetime: PhantomData,
-                f_data: FnData::new("f"),
-            });
-            return fMock {
-                setup: fMockSetup { data: data.clone() },
-                received: fMockReceived { data: data.clone() },
-                data,
-            };
-        }
-    }
-    impl<'rs> fMockSetup<'rs> {
-        pub fn setup(&self) -> FnTuner<'_, Self, (), (), false> {
-            let f_args_checker: f_ArgsChecker<'rs> = f_ArgsChecker {
-                _phantom_lifetime: PhantomData,
-            };
-            let fn_tuner: FnTuner<'_, Self, (), (), false> =
-                self.data.f_data.add_config(f_args_checker, self);
-            return unsafe { core::mem::transmute(fn_tuner) };
-        }
-    }
-    impl<'rs> fMockReceived<'rs> {
-        pub fn received(&self, times: Times) -> FnVerifier<'rs, Self, ()> {
-            let f_args_checker: f_ArgsChecker<'rs> = f_ArgsChecker {
-                _phantom_lifetime: PhantomData,
-            };
-            self.data.f_data.verify_received(f_args_checker, times);
-            return FnVerifier::new(self);
-        }
-        pub fn no_other_calls(&self) {
-            self.data.verify_received_nothing_else();
-        }
-    }
-    pub fn setup<'rs>() -> FnTuner<'rs, fMockSetup<'rs>, (), (), false> {
-        let mock = get_global_mock::<fMock<'rs>>();
-        mock.data.f_data.reset();
-        return mock.setup.setup();
-    }
-    pub fn received<'rs>(times: Times) -> FnVerifier<'rs, fMockReceived<'rs>, ()> {
-        return get_global_mock::<fMock<'rs>>().received.received(times);
-    }
-    pub fn f<'__rsubstitute_arg_anonymous, 'rs>() {
-        let call: f_Call<'_> = unsafe {
-            f_Call {
-                _phantom_lifetime: PhantomData,
-            }
-        };
-        let mock = get_global_mock::<fMock<'rs>>();
-        mock.data.f_data.handle(call);
     }
 }
