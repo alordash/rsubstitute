@@ -11,6 +11,8 @@ use syn::*;
 pub trait IMockFnBlockGenerator {
     fn generate_for_trait(&self, fn_info: &FnInfo) -> Block;
 
+    fn generate_for_struct_trait_fn(&self, fn_info: &FnInfo, trait_ident: &Ident) -> Block;
+
     fn generate_for_static(&self, fn_info: &FnInfo, mock_type: &MockType) -> Block;
 }
 
@@ -30,7 +32,18 @@ pub(crate) struct MockFnBlockGenerator {
 impl IMockFnBlockGenerator for MockFnBlockGenerator {
     fn generate_for_trait(&self, fn_info: &FnInfo) -> Block {
         let call_stmt = self.generate_call_stmt(fn_info);
-        let last_stmts = self.generate_last_stmts(fn_info, Target::Other);
+        let last_stmts = self.generate_last_stmts(fn_info, Target::Other, None);
+        let stmts = [call_stmt].into_iter().chain(last_stmts).collect();
+        let block = Block {
+            brace_token: Default::default(),
+            stmts,
+        };
+        return block;
+    }
+
+    fn generate_for_struct_trait_fn(&self, fn_info: &FnInfo, trait_ident: &Ident) -> Block {
+        let call_stmt = self.generate_call_stmt(fn_info);
+        let last_stmts = self.generate_last_stmts(fn_info, Target::Other, Some(trait_ident));
         let stmts = [call_stmt].into_iter().chain(last_stmts).collect();
         let block = Block {
             brace_token: Default::default(),
@@ -41,7 +54,7 @@ impl IMockFnBlockGenerator for MockFnBlockGenerator {
 
     fn generate_for_static(&self, fn_info: &FnInfo, mock_type: &MockType) -> Block {
         let call_stmt = self.generate_call_stmt(fn_info);
-        let last_stmts = self.generate_last_stmts(fn_info, Target::StaticFn(mock_type));
+        let last_stmts = self.generate_last_stmts(fn_info, Target::StaticFn(mock_type), None);
         let stmts = [call_stmt].into_iter().chain(last_stmts).collect();
         let block = Block {
             brace_token: Default::default(),
@@ -130,12 +143,18 @@ impl MockFnBlockGenerator {
         return call_stmt;
     }
 
-    fn generate_last_stmts(&self, fn_info: &FnInfo, target: Target) -> Vec<Stmt> {
+    fn generate_last_stmts(
+        &self,
+        fn_info: &FnInfo,
+        target: Target,
+        maybe_containing_trait_ident: Option<&Ident>,
+    ) -> Vec<Stmt> {
         let base_receiver = self.path_factory.create_expr(match target {
             Target::Other => constants::SELF_IDENT.clone(),
             Target::StaticFn(_) => Self::MOCK_VARIABLE_IDENT.clone(),
         });
-        let mut handle_expr = self.generate_handle_expr(fn_info, base_receiver, target);
+        let mut handle_expr =
+            self.generate_handle_expr(fn_info, base_receiver, target, maybe_containing_trait_ident);
         if fn_info.parent.has_return_value() {
             handle_expr = Expr::Return(ExprReturn {
                 attrs: Vec::new(),
@@ -166,7 +185,13 @@ impl MockFnBlockGenerator {
         return last_stmts;
     }
 
-    fn generate_handle_expr(&self, fn_info: &FnInfo, base_receiver: Expr, target: Target) -> Expr {
+    fn generate_handle_expr(
+        &self,
+        fn_info: &FnInfo,
+        base_receiver: Expr,
+        target: Target,
+        maybe_containing_trait_ident: Option<&Ident>,
+    ) -> Expr {
         let idents = vec![
             constants::DATA_IDENT.clone(),
             fn_info.data_field_ident.clone(),
@@ -181,9 +206,13 @@ impl MockFnBlockGenerator {
             (true, true) => Self::HANDLE_BASE_RETURNING_METHOD_IDENT.clone(),
         };
         let args = if fn_info.parent.maybe_base_fn_block.is_some() {
-            let base_fn_ident = self
-                .base_fn_ident_formatter
-                .format(&fn_info.parent.fn_ident);
+            let specific_fn_info_ident = match maybe_containing_trait_ident {
+                None => &fn_info.parent.fn_ident,
+                Some(containing_trait_ident) => {
+                    &format_ident!("{}_{}", containing_trait_ident, fn_info.parent.fn_ident)
+                }
+            };
+            let base_fn_ident = self.base_fn_ident_formatter.format(specific_fn_info_ident);
             let base_fn_path = match target {
                 Target::StaticFn(_) => self.path_factory.create_expr(base_fn_ident),
                 Target::Other => self.path_factory.create_expr_from_parts(vec![

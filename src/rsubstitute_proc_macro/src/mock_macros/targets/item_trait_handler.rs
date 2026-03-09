@@ -27,6 +27,7 @@ pub(crate) struct ItemTraitHandler {
     pub mock_impl_generator: Arc<dyn IMockImplGenerator>,
     pub mock_setup_impl_generator: Arc<dyn IMockSetupImplGenerator>,
     pub mock_received_impl_generator: Arc<dyn IMockReceivedImplGenerator>,
+    pub base_fn_generator: Arc<dyn IBaseFnGenerator>,
     pub mod_generator: Arc<dyn IModGenerator>,
 }
 
@@ -82,6 +83,24 @@ impl IItemTraitHandler for ItemTraitHandler {
         let mock_trait_impl =
             self.mock_payload_impl_generator
                 .generate(target_ident.clone(), &mock_type, &fn_infos);
+        let base_fns: Vec<_> = fn_infos
+            .iter()
+            .filter_map(|fn_info| {
+                fn_info
+                    .parent
+                    .maybe_base_fn_block
+                    .clone()
+                    .map(|base_fn_block| {
+                        self.base_fn_generator.generate(
+                            &mock_type,
+                            &fn_info.parent,
+                            &fn_info.call_struct,
+                            base_fn_block,
+                        )
+                    })
+            })
+            .map(|base_fn| ImplItem::Fn(base_fn.impl_item_fn))
+            .collect();
         let mock_impl = self.mock_impl_generator.generate(
             &mock_type,
             &mock_struct,
@@ -90,7 +109,7 @@ impl IItemTraitHandler for ItemTraitHandler {
             &mock_received_struct,
             Vec::new(),
             None,
-            &fn_infos.iter().collect::<Vec<_>>(),
+            base_fns,
         );
         let mock_setup_impl = self.mock_setup_impl_generator.generate_for_trait(
             &mock_type,

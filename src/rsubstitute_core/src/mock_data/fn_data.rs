@@ -158,13 +158,12 @@ impl<'rs, TMock> FnData<'rs, TMock, true> {
 
     pub fn handle_base_returning<
         'a,
-        'b,
         TCall: ICall + Clone + 'a,
-        TReturnValue: IReturnValue<'b>,
-        TBaseCall: FnMut(&TMock, TCall) -> TReturnValue,
+        TReturnValue: IReturnValue<'a>,
+        TBaseCall: FnMut(&'a TMock, TCall) -> TReturnValue + 'a,
     >(
         &self,
-        mock: &TMock,
+        mock: &'a TMock,
         the_call: TCall,
         mut base_call: TBaseCall,
     ) -> TReturnValue {

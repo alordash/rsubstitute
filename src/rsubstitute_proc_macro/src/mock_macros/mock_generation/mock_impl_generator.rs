@@ -1,5 +1,4 @@
 use crate::constants;
-use crate::mock_macros::fn_info_generation::models::FnInfo;
 use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::mock_generation::*;
 use crate::syntax::*;
@@ -20,14 +19,13 @@ pub trait IMockImplGenerator {
         mock_received_struct: &MockReceivedStruct,
         mock_struct_traits: Vec<&MockStructTrait>,
         maybe_inner_data_param: Option<InnerDataParam>,
-        fn_infos: &[&FnInfo],
+        base_fns: Vec<ImplItem>,
     ) -> MockImpl;
 }
 
 pub(crate) struct MockImplGenerator {
     pub type_factory: Arc<dyn ITypeFactory>,
     pub mock_constructor_block_generator: Arc<dyn IMockConstructorBlockGenerator>,
-    pub base_fn_generator: Arc<dyn IBaseFnGenerator>,
 }
 
 impl IMockImplGenerator for MockImplGenerator {
@@ -40,7 +38,7 @@ impl IMockImplGenerator for MockImplGenerator {
         mock_received_struct: &MockReceivedStruct,
         mock_struct_traits: Vec<&MockStructTrait>,
         maybe_inner_data_param: Option<InnerDataParam>,
-        fn_infos: &[&FnInfo],
+        base_fns: Vec<ImplItem>,
     ) -> MockImpl {
         let self_ty = self
             .type_factory
@@ -53,24 +51,6 @@ impl IMockImplGenerator for MockImplGenerator {
             mock_struct_traits,
             maybe_inner_data_param,
         );
-        let base_fn_items: Vec<_> = fn_infos
-            .iter()
-            .filter_map(|fn_info| {
-                fn_info
-                    .parent
-                    .maybe_base_fn_block
-                    .clone()
-                    .map(|base_fn_block| {
-                        self.base_fn_generator.generate(
-                            mock_type,
-                            &fn_info.parent,
-                            &fn_info.call_struct,
-                            base_fn_block,
-                        )
-                    })
-            })
-            .map(|base_fn| ImplItem::Fn(base_fn.impl_item_fn))
-            .collect();
 
         let item_impl = ItemImpl {
             attrs: Vec::new(),
@@ -81,7 +61,7 @@ impl IMockImplGenerator for MockImplGenerator {
             trait_: None,
             self_ty: Box::new(self_ty),
             brace_token: Default::default(),
-            items: [constructor].into_iter().chain(base_fn_items).collect(),
+            items: [constructor].into_iter().chain(base_fns).collect(),
         };
         let mock_impl = MockImpl { item_impl };
         return mock_impl;

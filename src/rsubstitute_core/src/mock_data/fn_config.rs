@@ -37,7 +37,7 @@ impl<'rs> FnConfig<'rs> {
         self.return_value_sources.extend(return_values.into_iter());
     }
 
-    pub(crate) fn set_callback<TArgRefsTuple: Copy>(
+    pub(crate) fn set_callback<TArgRefsTuple>(
         &mut self,
         mut callback: impl FnMut(TArgRefsTuple) + 'static,
     ) {

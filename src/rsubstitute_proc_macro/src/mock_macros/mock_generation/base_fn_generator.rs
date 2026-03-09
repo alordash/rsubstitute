@@ -18,6 +18,15 @@ pub trait IBaseFnGenerator {
         base_fn_block: Block,
     ) -> BaseFn;
 
+    fn generate_struct_trait_fn(
+        &self,
+        mock_type: &MockType,
+        fn_decl: &FnDecl,
+        call_struct: &CallStruct,
+        base_fn_block: Block,
+        trait_ident: &Ident,
+    ) -> BaseFn;
+
     fn generate_static(
         &self,
         mock_type: &MockType,
@@ -47,6 +56,35 @@ impl IBaseFnGenerator for BaseFnGenerator {
             base_fn_block,
             mock_type,
             Target::Other,
+            None
+        );
+        let impl_item_fn = ImplItemFn {
+            attrs: Vec::new(),
+            vis: Visibility::Inherited,
+            defaultness: None,
+            sig,
+            block,
+        };
+
+        let base_fn = BaseFn { impl_item_fn };
+        return base_fn;
+    }
+
+    fn generate_struct_trait_fn(
+        &self,
+        mock_type: &MockType,
+        fn_decl: &FnDecl,
+        call_struct: &CallStruct,
+        base_fn_block: Block,
+        trait_ident: &Ident,
+    ) -> BaseFn {
+        let (sig, block) = self.generate_call_base_fn_parts(
+            fn_decl,
+            call_struct,
+            base_fn_block,
+            mock_type,
+            Target::Other,
+            Some(trait_ident)
         );
         let impl_item_fn = ImplItemFn {
             attrs: Vec::new(),
@@ -73,6 +111,7 @@ impl IBaseFnGenerator for BaseFnGenerator {
             base_fn_block,
             mock_type,
             Target::StaticFn,
+            None
         );
         let item_fn = ItemFn {
             attrs: Vec::new(),
@@ -96,6 +135,7 @@ impl BaseFnGenerator {
         base_fn_block: Block,
         mock_type: &MockType,
         target: Target,
+        maybe_containing_trait_ident: Option<&Ident>,
     ) -> (Signature, Block) {
         let generics = match target {
             Target::StaticFn => fn_decl.merged_generics.clone(),
@@ -128,6 +168,13 @@ impl BaseFnGenerator {
                     .create_from_struct(&call_struct.item_struct),
             ),
         });
+        let ident =
+            match maybe_containing_trait_ident {
+                Some(containing_trait_ident) => self.base_fn_ident_formatter.format(
+                    &format_ident!("{}_{}", containing_trait_ident, fn_decl.fn_ident),
+                ),
+                None => self.base_fn_ident_formatter.format(&fn_decl.fn_ident),
+            };
         let inputs = [first_arg, call_arg];
         let sig = Signature {
             constness: None,
@@ -135,7 +182,7 @@ impl BaseFnGenerator {
             unsafety: None,
             abi: None,
             fn_token: Default::default(),
-            ident: self.base_fn_ident_formatter.format(&fn_decl.fn_ident),
+            ident,
             generics,
             paren_token: Default::default(),
             inputs: inputs.into_iter().collect(),

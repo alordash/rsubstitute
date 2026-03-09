@@ -179,7 +179,6 @@ fn create_services() -> ServiceCollection {
     let mock_impl_generator = Arc::new(MockImplGenerator {
         type_factory: type_factory.clone(),
         mock_constructor_block_generator: mock_constructor_block_generator.clone(),
-        base_fn_generator: base_fn_generator.clone(),
     });
     let mock_struct_default_impl_generator = Arc::new(MockStructDefaultImplGenerator {
         type_factory: type_factory.clone(),
@@ -327,6 +326,7 @@ fn create_services() -> ServiceCollection {
         mock_impl_generator: mock_impl_generator.clone(),
         mock_setup_impl_generator: mock_setup_impl_generator.clone(),
         mock_received_impl_generator: mock_received_impl_generator.clone(),
+        base_fn_generator: base_fn_generator.clone(),
         mod_generator: mod_generator.clone(),
     });
 
@@ -369,6 +369,7 @@ fn create_services() -> ServiceCollection {
         mock_setup_impl_generator: mock_setup_impl_generator.clone(),
         mock_received_impl_generator: mock_received_impl_generator.clone(),
         ignored_impl_fixer: ignored_impl_fixer.clone(),
+        base_fn_generator: base_fn_generator.clone(),
         mod_generator: mod_generator.clone(),
     });
 
