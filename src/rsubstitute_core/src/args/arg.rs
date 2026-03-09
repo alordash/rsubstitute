@@ -88,24 +88,26 @@ impl<'rs, T> Arg<'rs, T> {
 }
 
 impl<'rs, T> Arg<'rs, T> {
-    pub fn check<'a>(&self, arg_name: &'static str, actual_value: &T) -> ArgCheckResult
+    pub fn check<'a>(
+        &self,
+        arg_name: &'static str,
+        actual_value: &T,
+        actual_value_str: String,
+    ) -> ArgCheckResult
     where
         T: 'a,
     {
-        let arg_info = ArgInfo::new(
-            arg_name,
-            actual_value,
-            (&ArgPrinter(actual_value)).debug_string(),
-        );
+        let arg_info = ArgInfo::new(arg_name, actual_value, actual_value_str.clone());
         match self {
             Arg::PrivateEq(arg_cmp, _) => {
                 if !arg_cmp.is_arg_equal_to(actual_value) {
+                    let expected_value_str = (&ArgPrinter(&arg_cmp.value)).debug_string();
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
-                        // error_msg: format!(
-                        //     "\t\tExpected: {expected_value:?}\n\t\tActual:   {actual_value:?}"
-                        // ),
-                        error_msg: format!("111 TODO - debug string"),
+                        error_msg: format!(
+                            "\t\tExpected: {expected_value_str}\n\t\tActual:   {actual_value_str}"
+                        ),
+                        // error_msg: format!("111 TODO - debug string"),
                     });
                 }
             }
@@ -136,24 +138,23 @@ impl<'rs, T> Arg<'rs, T> {
 }
 
 impl<'rs, 'a, T: ?Sized> Arg<'rs, &'a T> {
-    pub fn check_ref(&self, arg_name: &'static str, actual_value: &&'a T) -> ArgCheckResult {
-        let arg_info = ArgInfo::new(
-            arg_name,
-            actual_value,
-            (&ArgPrinter(*actual_value)).debug_string(),
-        );
+    pub fn check_ref(
+        &self,
+        arg_name: &'static str,
+        actual_value: &&'a T,
+        actual_value_str: String,
+    ) -> ArgCheckResult {
+        let arg_info = ArgInfo::new(arg_name, actual_value, actual_value_str.clone());
         let actual_ptr = core::ptr::from_ref(*actual_value);
         match self {
             Arg::PrivateEq(arg_cmp, _) => {
                 let expected_ptr = core::ptr::from_ref(arg_cmp.value);
                 if !core::ptr::eq(actual_ptr, expected_ptr) {
-                    let actual_value_str = arg_info.clone_arg_debug_string();
-                    let expected_value_str = &ArgPrinter(arg_cmp.value).debug_string();
+                    let expected_value_str = (&ArgPrinter(arg_cmp.value)).debug_string();
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
-                            "\t\tExpected reference (ptr: {expected_ptr:?}): {expected_value_str}\n\t\tActual reference   (ptr: {actual_ptr:?}): {actual_value_str}"
-                            // "333 TODO - debug string"
+                            "\t\tExpected reference (ptr: {expected_ptr:?}): {expected_value_str}\n\t\tActual reference   (ptr: {actual_ptr:?}): {actual_value_str}" // "333 TODO - debug string"
                         ),
                     });
                 }
@@ -188,13 +189,23 @@ impl<'rs, 'a, T: ?Sized> Arg<'rs, &'a T> {
 }
 
 impl<'rs, T: ?Sized> Arg<'rs, *mut T> {
-    pub fn check_mut(&self, arg_name: &'static str, actual_value: &*mut T) -> ArgCheckResult {
-        self.check(arg_name, actual_value)
+    pub fn check_mut(
+        &self,
+        arg_name: &'static str,
+        actual_value: &*mut T,
+        actual_value_str: String,
+    ) -> ArgCheckResult {
+        self.check(arg_name, actual_value, actual_value_str)
     }
 }
 
 impl<'rs, 'a, T: ?Sized> Arg<'rs, &'a mut T> {
-    pub fn check_mut(&self, arg_name: &'static str, actual_value_ptr: &*mut T) -> ArgCheckResult {
+    pub fn check_mut(
+        &self,
+        arg_name: &'static str,
+        actual_value_ptr: &*mut T,
+        actual_value_str: String,
+    ) -> ArgCheckResult {
         let actual_value = unsafe {
             &(*actual_value_ptr)
                 .as_ref()
@@ -205,11 +216,7 @@ impl<'rs, 'a, T: ?Sized> Arg<'rs, &'a mut T> {
                 .as_mut()
                 .expect("Mutable reference to call argument should not be null.")
         };
-        let arg_info = ArgInfo::new(
-            arg_name,
-            actual_value,
-            (&ArgPrinter(*actual_value)).debug_string(),
-        );
+        let arg_info = ArgInfo::new(arg_name, actual_value, actual_value_str.clone());
         let actual_ptr = core::ptr::from_ref(*actual_value);
         match self {
             Arg::PrivateEq(arg_cmp, _) => {
@@ -254,15 +261,16 @@ impl<'rs, 'a, T: ?Sized> Arg<'rs, &'a mut T> {
 }
 
 impl<'rs, T: ?Sized> Arg<'rs, Rc<T>> {
-    pub fn check_rc<'a>(&self, arg_name: &'static str, actual_value: &Rc<T>) -> ArgCheckResult
+    pub fn check_rc<'a>(
+        &self,
+        arg_name: &'static str,
+        actual_value: &Rc<T>,
+        actual_value_str: String,
+    ) -> ArgCheckResult
     where
         T: 'a,
     {
-        let arg_info = ArgInfo::new(
-            arg_name,
-            actual_value,
-            (&ArgPrinter(actual_value)).debug_string(),
-        );
+        let arg_info = ArgInfo::new(arg_name, actual_value, actual_value_str.clone());
         let actual_ptr = Rc::as_ptr(&actual_value);
         match self {
             Arg::PrivateEq(arg_cmp, _) => {
@@ -308,15 +316,16 @@ impl<'rs, T: ?Sized> Arg<'rs, Rc<T>> {
 }
 
 impl<'rs, T: ?Sized> Arg<'rs, Arc<T>> {
-    pub fn check_arc<'a>(&self, arg_name: &'static str, actual_value: &Arc<T>) -> ArgCheckResult
+    pub fn check_arc<'a>(
+        &self,
+        arg_name: &'static str,
+        actual_value: &Arc<T>,
+        actual_value_str: String,
+    ) -> ArgCheckResult
     where
         T: 'a,
     {
-        let arg_info = ArgInfo::new(
-            arg_name,
-            actual_value,
-            (&ArgPrinter(actual_value)).debug_string(),
-        );
+        let arg_info = ArgInfo::new(arg_name, actual_value, actual_value_str.clone());
         let actual_ptr = Arc::as_ptr(&actual_value);
         match self {
             Arg::PrivateEq(arg_cmp, _) => {

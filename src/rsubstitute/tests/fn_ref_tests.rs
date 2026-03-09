@@ -67,7 +67,7 @@ mod tests {
             {
                 let v2 = 24;
                 let r2 = &v2;
-                accept_ref::setup(r2).does(|| {});
+                accept_ref::setup(r2).does(|_| {});
             }
 
             // Act

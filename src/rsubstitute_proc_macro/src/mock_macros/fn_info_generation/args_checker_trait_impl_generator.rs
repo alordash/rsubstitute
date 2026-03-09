@@ -1,8 +1,9 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::*;
+use crate::mock_macros::mock_generation::*;
 use crate::syntax::*;
 use proc_macro2::{Ident, Span};
-use quote::{ToTokens, format_ident};
+use quote::{format_ident, ToTokens};
 use std::cell::LazyCell;
 use std::sync::Arc;
 use syn::punctuated::Punctuated;
@@ -25,6 +26,7 @@ pub(crate) struct ArgsCheckerTraitImplGenerator {
     pub field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
     pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
     pub expr_reference_factory: Arc<dyn IExprReferenceFactory>,
+    pub debug_string_expr_generator: Arc<dyn IDebugStringExprGenerator>,
 }
 
 impl IArgsCheckerTraitImplGenerator for ArgsCheckerTraitImplGenerator {
@@ -182,6 +184,9 @@ impl ArgsCheckerTraitImplGenerator {
             self.field_access_expr_factory
                 .create(vec![Self::CALL_VAR_IDENT.clone(), field_ident]),
         );
+        let field_string_value_arg = self
+            .debug_string_expr_generator
+            .generate(field_access_arg.clone());
         let method = self.get_check_fn_ident(&field.ty);
         let expr = Expr::MethodCall(ExprMethodCall {
             attrs: Vec::new(),
@@ -190,7 +195,9 @@ impl ArgsCheckerTraitImplGenerator {
             method,
             turbofish: None,
             paren_token: Default::default(),
-            args: [field_name_arg, field_access_arg].into_iter().collect(),
+            args: [field_name_arg, field_access_arg, field_string_value_arg]
+                .into_iter()
+                .collect(),
         });
         return expr;
     }
