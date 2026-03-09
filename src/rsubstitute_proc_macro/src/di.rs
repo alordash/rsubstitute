@@ -117,15 +117,18 @@ fn create_services() -> ServiceCollection {
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
     });
+    let implemented_trait_ident_formatter = Arc::new(ImplementedTraitIdentFormatter);
     let mock_setup_struct_generator = Arc::new(MockSetupStructGenerator {
         type_factory: type_factory.clone(),
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
+        implemented_trait_ident_formatter: implemented_trait_ident_formatter.clone(),
     });
     let mock_received_struct_generator = Arc::new(MockReceivedStructGenerator {
         type_factory: type_factory.clone(),
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
+        implemented_trait_ident_formatter: implemented_trait_ident_formatter.clone(),
     });
     let mock_type_generator = Arc::new(MockTypeGenerator {
         type_factory: type_factory.clone(),
@@ -171,6 +174,7 @@ fn create_services() -> ServiceCollection {
         path_factory: path_factory.clone(),
         local_factory: local_factory.clone(),
         expr_call_factory: expr_call_factory.clone(),
+        implemented_trait_ident_formatter: implemented_trait_ident_formatter.clone(),
     });
     let mock_impl_generator = Arc::new(MockImplGenerator {
         type_factory: type_factory.clone(),

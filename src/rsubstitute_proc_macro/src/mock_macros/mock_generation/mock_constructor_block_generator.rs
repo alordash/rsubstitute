@@ -1,5 +1,6 @@
 use crate::constants;
 use crate::mock_macros::mock_generation::models::*;
+use crate::mock_macros::mock_generation::*;
 use crate::syntax::*;
 use proc_macro2::Span;
 use quote::format_ident;
@@ -23,6 +24,7 @@ pub(crate) struct MockConstructorBlockGenerator {
     pub path_factory: Arc<dyn IPathFactory>,
     pub local_factory: Arc<dyn ILocalFactory>,
     pub expr_call_factory: Arc<dyn IExprCallFactory>,
+    pub implemented_trait_ident_formatter: Arc<dyn IImplementedTraitIdentFormatter>,
 }
 
 impl IMockConstructorBlockGenerator for MockConstructorBlockGenerator {
@@ -203,7 +205,10 @@ impl MockConstructorBlockGenerator {
     ) -> FieldValue {
         let field_value = FieldValue {
             attrs: Vec::new(),
-            member: Member::Named(trait_ident),
+            member: Member::Named(
+                self.implemented_trait_ident_formatter
+                    .format_for_field(&trait_ident),
+            ),
             colon_token: Some(Default::default()),
             expr: Expr::Struct(ExprStruct {
                 attrs: Vec::new(),

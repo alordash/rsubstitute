@@ -184,40 +184,9 @@ pub const ALLOW_NON_SNAKE_CASE_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(||
 });
 
 pub const DEBUG_TRAIT_NAME: &'static str = "Debug";
-pub const DEBUG_TRAIT_IDENT: LazyCell<Ident> =
-    LazyCell::new(|| format_ident!("{DEBUG_TRAIT_NAME}"));
-pub const DEBUG_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
-    let path_factory = &SERVICES.path_factory;
-    let result = path_factory.create_from_parts(vec![
-        format_ident!("std"),
-        format_ident!("fmt"),
-        DEBUG_TRAIT_IDENT.clone(),
-    ]);
-    return result;
-});
-
-pub const PARTIAL_ORD_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("PartialOrd"));
-pub const PARTIAL_ORD_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
-    let path_factory = &SERVICES.path_factory;
-    let result = path_factory.create_from_parts(vec![
-        format_ident!("core"),
-        format_ident!("cmp"),
-        PARTIAL_ORD_TRAIT_IDENT.clone(),
-    ]);
-    return result;
-});
 
 pub const CLONE_TRAIT_STR: &'static str = "Clone";
 pub const CLONE_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("{CLONE_TRAIT_STR}"));
-pub const CLONE_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
-    let path_factory = &SERVICES.path_factory;
-    let result = path_factory.create_from_parts(vec![
-        format_ident!("core"),
-        format_ident!("clone"),
-        CLONE_TRAIT_IDENT.clone(),
-    ]);
-    return result;
-});
 pub const CLONE_FN_SIGNATURE: LazyCell<Signature> = LazyCell::new(|| {
     let signature = Signature {
         constness: None,
@@ -236,11 +205,6 @@ pub const CLONE_FN_SIGNATURE: LazyCell<Signature> = LazyCell::new(|| {
 });
 
 pub const DERIVE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("derive"));
-pub const DERIVE_CLONE_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
-    let attribute_factory = &SERVICES.attribute_factory;
-    let result = attribute_factory.create(DERIVE_IDENT.clone(), &CLONE_TRAIT_IDENT.to_string());
-    return result;
-});
 
 pub const DERIVE_MOCK_DATA_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
     let attribute_factory = &SERVICES.attribute_factory;

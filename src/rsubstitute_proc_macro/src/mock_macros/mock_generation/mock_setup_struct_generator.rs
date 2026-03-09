@@ -1,5 +1,6 @@
 use crate::constants;
 use crate::mock_macros::mock_generation::models::*;
+use crate::mock_macros::mock_generation::*;
 use crate::syntax::*;
 use proc_macro2::Ident;
 use quote::format_ident;
@@ -20,6 +21,7 @@ pub(crate) struct MockSetupStructGenerator {
     pub type_factory: Arc<dyn ITypeFactory>,
     pub field_factory: Arc<dyn IFieldFactory>,
     pub struct_factory: Arc<dyn IStructFactory>,
+    pub implemented_trait_ident_formatter: Arc<dyn IImplementedTraitIdentFormatter>,
 }
 
 impl IMockSetupStructGenerator for MockSetupStructGenerator {
@@ -50,7 +52,8 @@ impl IMockSetupStructGenerator for MockSetupStructGenerator {
                 .chain(implemented_traits_configurators.into_iter().map(
                     |implemented_trait_setup| {
                         self.field_factory.create_pub_from_struct(
-                            implemented_trait_setup.trait_ident,
+                            self.implemented_trait_ident_formatter
+                                .format_for_field(&implemented_trait_setup.trait_ident),
                             &implemented_trait_setup.item_struct,
                         )
                     },
