@@ -55,6 +55,7 @@ impl<'rs, T: Debug> Debug for Arg<'rs, T> {
 
 // Beautify API ✨
 impl<'rs, T> Arg<'rs, T> {
+    // TODO - should not be public, should be passed via Into
     #[allow(non_snake_case)]
     pub fn Is<'a, TFn: Fn(&T) -> bool + 'a>(predicate: TFn) -> Self {
         let reference: Box<dyn Fn(&T) -> bool + 'rs> =
@@ -62,6 +63,7 @@ impl<'rs, T> Arg<'rs, T> {
         return Self::PrivateIs(reference, Private);
     }
 
+    // TODO - should not be public, should be passed via Into
     #[allow(non_snake_case)]
     pub fn Eq(value: T) -> Self
     where

@@ -834,7 +834,7 @@ accept_two_values_return_value(*10*, *20.2*)
 
             // Assert
             let expected_error_msg = format!(
-                "No return value was configured for following call: accept_two_values_return_value({unexpected_v1}, {unexpected_v2})"
+                "No return value found for following call: accept_two_values_return_value({unexpected_v1}, {unexpected_v2})"
             );
             assert_eq!(expected_error_msg, actual_error_msg);
         }

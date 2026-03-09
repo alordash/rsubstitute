@@ -174,7 +174,7 @@ List of existing configuration ordered by number of correctly matched arguments 
         call_args: Vec<ArgInfo>,
     ) -> ! {
         let call_msg = self.format_received_unexpected_call_error(fn_name, call_args);
-        let error_msg = format!("No return value was configured for following call: {call_msg}");
+        let error_msg = format!("No return value found for following call: {call_msg}");
         panic!("{error_msg}");
     }
 }
