@@ -18,6 +18,7 @@ pub trait IMockDataStructGenerator {
 pub(crate) struct MockDataStructGenerator {
     pub field_factory: Arc<dyn IFieldFactory>,
     pub struct_factory: Arc<dyn IStructFactory>,
+    pub bool_lit_factory: Arc<dyn IBoolLitFactory>,
 }
 
 impl IMockDataStructGenerator for MockDataStructGenerator {
@@ -136,13 +137,13 @@ impl MockDataStructGenerator {
                                 Span::call_site(),
                             )),
                             GenericArgument::Type(mock_type.ty.clone()),
-                            GenericArgument::Const(Expr::Lit(ExprLit {
-                                attrs: Vec::new(),
-                                lit: Lit::Bool(LitBool::new(
-                                    fn_info.parent.maybe_base_fn_block.is_some(),
-                                    Span::call_site(),
-                                )),
-                            })),
+                            GenericArgument::Const(
+                                self.bool_lit_factory
+                                    .create(fn_info.parent.maybe_base_fn_block.is_some()),
+                            ),
+                            GenericArgument::Const(
+                                self.bool_lit_factory.create(mock_type.stores_mock_data),
+                            ),
                         ]
                         .into_iter()
                         .collect(),

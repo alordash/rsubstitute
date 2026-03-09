@@ -27,13 +27,13 @@ impl IMockStructTraitGenerator for MockStructTraitGenerator {
             &mock_struct_trait_info.trait_ident_from_path,
             &mock_struct_trait_info.mock_type,
             data_struct,
-            Vec::new()
+            Vec::new(),
         );
         let received_struct = self.mock_received_struct_generator.generate(
             &mock_struct_trait_info.trait_ident_from_path,
             &mock_struct_trait_info.mock_type,
             data_struct,
-            Vec::new()
+            Vec::new(),
         );
         let setup_impl = self.mock_setup_impl_generator.generate_for_trait(
             &mock_struct_trait_info.mock_type,

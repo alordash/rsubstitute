@@ -66,7 +66,7 @@ mod tests {
             let callback_flag_clone = callback_flag.clone();
             mock.setup
                 .accept_value(Arg::Any)
-                .does(move |_| *callback_flag_clone.borrow_mut() = true);
+                .does(move |_, _| *callback_flag_clone.borrow_mut() = true);
 
             // Act
             mock.accept_value(1);
@@ -398,12 +398,12 @@ accept_value(*{first_value}*)
                 .returns(first_value)
                 .return_value()
                 .returns(second_value)
-                .and_does(move |_| {
+                .and_does(move |_, _| {
                     *first_callback_counter_clone.borrow_mut() = Result::SecondConfigChanged
                 })
                 .return_value()
                 .returns(third_value)
-                .and_does(move |_| {
+                .and_does(move |_, _| {
                     *second_callback_counter_clone.borrow_mut() = Result::ThirdConfigChanged
                 });
 
@@ -450,7 +450,7 @@ accept_value(*{first_value}*)
             mock.setup
                 .return_value()
                 .returns_many([first_value, second_value])
-                .and_does(move |_| *callback_counter_clone.borrow_mut() += 1);
+                .and_does(move |_, _| *callback_counter_clone.borrow_mut() += 1);
 
             // Act
             let actual_first_value = mock.return_value();
@@ -632,12 +632,12 @@ accept_value(*{first_value}*)
             mock.setup
                 .accept_value_return_value(Arg::Eq(first_accepted_value))
                 .returns(first_returned_value)
-                .and_does(move |_| {
+                .and_does(move |_, _| {
                     *first_callback_number_clone.borrow_mut() = 1;
                 })
                 .accept_value_return_value(Arg::Eq(second_accepted_value))
                 .returns(second_returned_value)
-                .and_does(move |_| {
+                .and_does(move |_, _| {
                     *second_callback_number_clone.borrow_mut() = 2;
                 });
 

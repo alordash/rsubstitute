@@ -2,15 +2,15 @@ use crate::constants;
 use crate::mock_macros::fn_info_generation::models::*;
 use crate::mock_macros::mock_generation::models::*;
 use crate::syntax::*;
-use proc_macro2::Span;
 use std::sync::Arc;
 use syn::*;
 
 pub trait ISetupOutputGenerator {
-    fn generate_for_trait(&self, fn_info: &FnInfo) -> TypePath;
+    fn generate_for_trait(&self, mock_type: &MockType, fn_info: &FnInfo) -> TypePath;
 
     fn generate_for_static(
         &self,
+        mock_type: &MockType,
         fn_info: &FnInfo,
         mock_setup_struct: &MockSetupStruct,
     ) -> TypePath;
@@ -19,27 +19,38 @@ pub trait ISetupOutputGenerator {
 pub(crate) struct SetupOutputGenerator {
     pub type_factory: Arc<dyn ITypeFactory>,
     pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
+    pub bool_lit_factory: Arc<dyn IBoolLitFactory>,
 }
 
 impl ISetupOutputGenerator for SetupOutputGenerator {
-    fn generate_for_trait(&self, fn_info: &FnInfo) -> TypePath {
+    fn generate_for_trait(&self, mock_type: &MockType, fn_info: &FnInfo) -> TypePath {
         let ty = self.generate(
+            mock_type,
             fn_info,
             constants::SELF_TYPE.clone(),
             OutputTypeLifetime::Derived,
+            mock_type.stores_mock_data,
         );
         return ty;
     }
 
     fn generate_for_static(
         &self,
+        mock_type: &MockType,
         fn_info: &FnInfo,
         mock_setup_struct: &MockSetupStruct,
     ) -> TypePath {
         let owner_type = self
             .type_factory
             .create_from_struct(&mock_setup_struct.item_struct);
-        let ty = self.generate(fn_info, owner_type, OutputTypeLifetime::Default);
+        let stores_mock_data = false;
+        let ty = self.generate(
+            mock_type,
+            fn_info,
+            owner_type,
+            OutputTypeLifetime::Default,
+            stores_mock_data,
+        );
         return ty;
     }
 }
@@ -47,17 +58,15 @@ impl ISetupOutputGenerator for SetupOutputGenerator {
 impl SetupOutputGenerator {
     fn generate(
         &self,
+        mock_type: &MockType,
         fn_info: &FnInfo,
         owner_type: Type,
         output_type_lifetime: OutputTypeLifetime,
+        stores_mock_data: bool,
     ) -> TypePath {
         let mut arg_refs_tuple = fn_info.parent.arg_refs_tuple.clone();
-        match output_type_lifetime {
-            OutputTypeLifetime::Default => self
-                .reference_normalizer
-                .normalize_anonymous_lifetimes(&mut arg_refs_tuple),
-            _ => (),
-        }
+        self.reference_normalizer
+            .normalize_anonymous_lifetimes(&mut arg_refs_tuple);
         let result = TypePath {
             qself: None,
             path: Path {
@@ -69,16 +78,15 @@ impl SetupOutputGenerator {
                         lt_token: Default::default(),
                         args: [
                             GenericArgument::Lifetime(output_type_lifetime.get()),
+                            GenericArgument::Type(mock_type.ty.clone()),
                             GenericArgument::Type(owner_type),
                             GenericArgument::Type(arg_refs_tuple),
                             GenericArgument::Type(fn_info.parent.get_return_value_type()),
-                            GenericArgument::Const(Expr::Lit(ExprLit {
-                                attrs: Vec::new(),
-                                lit: Lit::Bool(LitBool::new(
-                                    fn_info.parent.maybe_base_fn_block.is_some(),
-                                    Span::call_site(),
-                                )),
-                            })),
+                            GenericArgument::Const(
+                                self.bool_lit_factory
+                                    .create(fn_info.parent.maybe_base_fn_block.is_some()),
+                            ),
+                            GenericArgument::Const(self.bool_lit_factory.create(stores_mock_data)),
                         ]
                         .into_iter()
                         .collect(),

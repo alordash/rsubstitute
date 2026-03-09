@@ -68,7 +68,7 @@ mod tests {
         let flag = Rc::new(Cell::new(false));
         let flag_clone = flag.clone();
 
-        mock.setup.mutate().does(move |_| flag_clone.set(true));
+        mock.setup.mutate().does(move |_, _| flag_clone.set(true));
         mock.setup.consume().call_base();
 
         mock.mutate();

@@ -114,9 +114,11 @@ fn create_services() -> ServiceCollection {
         args_checker_generator: args_checker_generator.clone(),
         args_checker_impl_generator: args_checker_impl_generator.clone(),
     });
+    let bool_lit_factory = Arc::new(BoolLitFactory);
     let mock_data_struct_generator = Arc::new(MockDataStructGenerator {
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
+        bool_lit_factory: bool_lit_factory.clone(),
     });
     let implemented_trait_ident_formatter = Arc::new(ImplementedTraitIdentFormatter);
     let mock_setup_struct_generator = Arc::new(MockSetupStructGenerator {
@@ -197,6 +199,7 @@ fn create_services() -> ServiceCollection {
     let setup_output_generator = Arc::new(SetupOutputGenerator {
         type_factory: type_factory.clone(),
         reference_normalizer: reference_normalizer.clone(),
+        bool_lit_factory: bool_lit_factory.clone(),
     });
     let mock_setup_impl_generator = Arc::new(MockSetupImplGenerator {
         path_factory: path_factory.clone(),

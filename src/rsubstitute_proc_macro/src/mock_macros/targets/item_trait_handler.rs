@@ -120,7 +120,6 @@ impl IItemTraitHandler for ItemTraitHandler {
             &mock_type,
             &mock_received_struct,
             &fn_infos,
-            OutputTypeLifetime::Derived,
         );
         let generated_mod = self.mod_generator.generate_trait(
             target_ident,

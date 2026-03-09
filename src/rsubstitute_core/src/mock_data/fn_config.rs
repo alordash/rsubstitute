@@ -2,22 +2,25 @@ use crate::args::*;
 use crate::fn_parameters::*;
 use std::cell::RefCell;
 use std::collections::VecDeque;
+use std::marker::PhantomData;
 use std::sync::Arc;
 
 // TODO - maybe remove `TMock`? What is it's purpose now that we have dyn fn parameters?
 // All information needed to handle certain function is stored in it's `FnConfig`.
 // Previously `TMock` was needed only to handle IBaseCaller.
-pub struct FnConfig<'rs> {
+pub struct FnConfig<'rs, TMock> {
+    _phantom_mock: PhantomData<TMock>,
     args_checker: DynArgsChecker<'rs>,
     return_value_sources: VecDeque<ReturnValueSource<'rs>>,
     calls: Vec<Arc<DynCall<'rs>>>,
-    callback: Option<Arc<RefCell<dyn FnMut(&DynCall<'rs>)>>>,
+    callback: Option<Arc<RefCell<dyn FnMut(&TMock, &DynCall<'rs>)>>>,
     call_base: bool,
 }
 
-impl<'rs> FnConfig<'rs> {
+impl<'rs, TMock> FnConfig<'rs, TMock> {
     pub(crate) fn new(args_checker: DynArgsChecker<'rs>) -> Self {
         FnConfig {
+            _phantom_mock: PhantomData,
             args_checker,
             return_value_sources: VecDeque::new(),
             calls: Vec::new(),
@@ -39,14 +42,14 @@ impl<'rs> FnConfig<'rs> {
 
     pub(crate) fn set_callback<TArgRefsTuple>(
         &mut self,
-        mut callback: impl FnMut(TArgRefsTuple) + 'static,
+        mut callback: impl FnMut(&TMock, TArgRefsTuple) + 'static,
     ) {
-        let dyn_callback = move |dyn_call: &DynCall<'rs>| {
+        let dyn_callback = move |mock: &TMock, dyn_call: &DynCall<'rs>| {
             let raw_arg_refs_tuple_ptr = dyn_call.get_ptr_to_boxed_tuple_of_refs();
             let arg_refs_tuple_ptr = raw_arg_refs_tuple_ptr as *mut TArgRefsTuple;
             let boxed_arg_refs_tuple = unsafe { Box::from_raw(arg_refs_tuple_ptr) };
             let arg_refs_tuple = *boxed_arg_refs_tuple;
-            callback(arg_refs_tuple)
+            callback(mock, arg_refs_tuple)
         };
         self.callback = Some(Arc::new(RefCell::new(dyn_callback)));
     }
@@ -89,7 +92,7 @@ impl<'rs> FnConfig<'rs> {
         };
     }
 
-    pub(crate) fn get_callback(&self) -> Option<Arc<RefCell<dyn FnMut(&DynCall<'rs>)>>> {
+    pub(crate) fn get_callback(&self) -> Option<Arc<RefCell<dyn FnMut(&TMock, &DynCall<'rs>)>>> {
         self.callback.clone()
     }
 

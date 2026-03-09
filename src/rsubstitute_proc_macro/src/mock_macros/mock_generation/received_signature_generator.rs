@@ -17,7 +17,6 @@ pub trait IReceivedSignatureGenerator {
         &self,
         fn_info: &FnInfo,
         mock_type: &MockType,
-        output_type_lifetime: OutputTypeLifetime,
         output_type_generics: OutputTypeGenerics,
     ) -> Signature;
 
@@ -44,7 +43,6 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
         &self,
         fn_info: &FnInfo,
         mock_type: &MockType,
-        output_type_lifetime: OutputTypeLifetime,
         output_type_generics: OutputTypeGenerics,
     ) -> Signature {
         let prepend_ref_self_arg = true;
@@ -54,7 +52,6 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
             prepend_ref_self_arg,
             constants::SELF_TYPE.clone(),
             mock_type,
-            output_type_lifetime,
             output_type_generics,
         );
         return result;
@@ -78,7 +75,6 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
             prepend_ref_self_arg,
             owner_type,
             mock_type,
-            OutputTypeLifetime::Default,
             OutputTypeGenerics::UseMock,
         );
         return result;
@@ -95,7 +91,6 @@ impl ReceivedSignatureGenerator {
         prepend_ref_self_arg: bool,
         owner_type: Type,
         mock_type: &MockType,
-        output_type_lifetime: OutputTypeLifetime,
         output_type_generics: OutputTypeGenerics,
     ) -> Signature {
         let times_arg = FnArg::Typed(PatType {
@@ -125,11 +120,8 @@ impl ReceivedSignatureGenerator {
         if prepend_ref_self_arg {
             inputs.insert(0, constants::REF_SELF_ARG.clone());
         }
-        let output_type = self.generate_output_type(
-            fn_info.parent.arg_refs_tuple.clone(),
-            owner_type,
-            output_type_lifetime,
-        );
+        let output_type =
+            self.generate_output_type(fn_info.parent.arg_refs_tuple.clone(), owner_type);
         let generics = match output_type_generics {
             OutputTypeGenerics::UseFnOwn => fn_info.parent.own_generics.clone(),
             OutputTypeGenerics::UseMock => mock_type.generics.impl_generics.clone(),
@@ -151,18 +143,9 @@ impl ReceivedSignatureGenerator {
         return signature;
     }
 
-    fn generate_output_type(
-        &self,
-        mut arg_refs_tuple: Type,
-        owner_type: Type,
-        output_type_lifetime: OutputTypeLifetime,
-    ) -> Type {
-        match output_type_lifetime {
-            OutputTypeLifetime::Default => self
-                .reference_normalizer
-                .normalize_anonymous_lifetimes(&mut arg_refs_tuple),
-            _ => (),
-        }
+    fn generate_output_type(&self, mut arg_refs_tuple: Type, owner_type: Type) -> Type {
+        self.reference_normalizer
+            .normalize_anonymous_lifetimes(&mut arg_refs_tuple);
         let result = Type::Path(TypePath {
             qself: None,
             path: Path {

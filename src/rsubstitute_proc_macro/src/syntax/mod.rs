@@ -1,6 +1,7 @@
 mod arg_ident_extractor;
 mod arg_type_factory;
 mod attribute_factory;
+mod bool_lit_factory;
 mod core_mem_transmute_expr_factory;
 mod expr_call_factory;
 mod expr_method_call_factory;
@@ -23,6 +24,7 @@ mod type_factory;
 pub use arg_ident_extractor::*;
 pub use arg_type_factory::*;
 pub use attribute_factory::*;
+pub use bool_lit_factory::*;
 pub use core_mem_transmute_expr_factory::*;
 pub use expr_call_factory::*;
 pub use expr_method_call_factory::*;

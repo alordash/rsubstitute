@@ -6,4 +6,5 @@ pub struct MockType {
     pub ident: Ident,
     pub ty: Type,
     pub generics: MockGenerics,
+    pub stores_mock_data: bool
 }

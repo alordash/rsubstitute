@@ -53,7 +53,7 @@ impl IStructMockHandler for StructMockHandler {
             .generate(&struct_mock_syntax.r#struct.generics);
         let mock_type = self
             .mock_type_generator
-            .generate(mock_ident.clone(), mock_generics);
+            .generate_for_struct(mock_ident.clone(), mock_generics);
         let mock_struct_trait_infos: Vec<_> = std::mem::take(&mut struct_mock_syntax.trait_impls)
             .into_iter()
             .map(|x| {
@@ -213,7 +213,6 @@ impl IStructMockHandler for StructMockHandler {
             &mock_type,
             &mock_received_struct,
             &struct_fn_infos,
-            OutputTypeLifetime::Derived,
         );
         self.ignored_impl_fixer
             .fix(&mock_type, &mut struct_mock_syntax.ignored_impls);

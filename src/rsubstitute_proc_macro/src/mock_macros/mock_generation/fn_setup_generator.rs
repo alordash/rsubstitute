@@ -33,9 +33,9 @@ impl IFnSetupGenerator for FnSetupGenerator {
         mock_setup_struct: &MockSetupStruct,
         mock_type: &MockType,
     ) -> ItemFn {
-        let output_type = self
-            .setup_output_generator
-            .generate_for_static(fn_info, mock_setup_struct);
+        let output_type =
+            self.setup_output_generator
+                .generate_for_static(mock_type, fn_info, mock_setup_struct);
         let sig = Signature {
             constness: None,
             asyncness: None,

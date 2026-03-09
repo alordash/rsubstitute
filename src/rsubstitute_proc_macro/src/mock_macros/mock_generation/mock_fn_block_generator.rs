@@ -228,6 +228,7 @@ impl MockFnBlockGenerator {
             ]
         } else {
             vec![
+                self.expr_reference_factory.create(base_receiver.clone()),
                 self.path_factory
                     .create_expr(Self::CALL_VARIABLE_IDENT.clone()),
             ]

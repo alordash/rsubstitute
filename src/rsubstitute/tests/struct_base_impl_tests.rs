@@ -76,6 +76,12 @@ mod tests {
             .returns(struct_value)
             .get_plus_one()
             .call_base()
+            .and_does(|mock, _| {
+                println!(
+                    "doing something, mock name: {}",
+                    core::any::type_name_of_val(mock)
+                )
+            })
             .as_FirstTrait
             .get()
             .returns(trait_value);
@@ -153,12 +159,12 @@ mod tests {
             .get(Times::Once);
         mock.received.no_other_calls();
     }
-    
+
     #[test]
     fn get_SelfAndBothTraits_Ok() {
         // Arrange
         let mock = StructMock::new();
-        
+
         let self_value = 5;
         let first_trait_value = 15;
         let second_trait_value = "veridis quo";
@@ -166,17 +172,17 @@ mod tests {
         setup.get().returns(self_value);
         setup.as_FirstTrait.get().returns(first_trait_value);
         setup.as_SecondTrait.get().returns(second_trait_value);
-        
+
         // Act
         let actual_self_value = mock.get();
         let actual_first_trait_value = FirstTrait::get(&mock);
         let actual_second_trait_value = (&mock as &dyn SecondTrait).get();
-        
+
         // Assert
         assert_eq!(self_value, actual_self_value);
         assert_eq!(first_trait_value, actual_first_trait_value);
         assert_eq!(second_trait_value, actual_second_trait_value);
-        
+
         let received = &mock.received;
         received.get(Times::Once);
         received.as_FirstTrait.get(Times::Once);

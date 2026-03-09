@@ -51,7 +51,7 @@ mod tests {
             mock.setup
                 .f()
                 .returns(return_value)
-                .and_does(move |_| *callback_flag_clone.borrow_mut() = true);
+                .and_does(move |_, _| *callback_flag_clone.borrow_mut() = true);
 
             // Act
             StructMock::non_associative();
@@ -167,7 +167,7 @@ Received no non-matching calls"#,
                 .as_Trait
                 .f()
                 .returns(return_value)
-                .and_does(move |_| *callback_flag_clone.borrow_mut() = true);
+                .and_does(move |_, _| *callback_flag_clone.borrow_mut() = true);
 
             // Act
             StructMock::non_associative();

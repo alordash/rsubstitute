@@ -52,7 +52,7 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
         let fn_setups = fn_infos
             .iter()
             .map(|x| {
-                let output_type = self.setup_output_generator.generate_for_trait(x);
+                let output_type = self.setup_output_generator.generate_for_trait(mock_type, x);
                 return ImplItem::Fn(self.generate_fn_setup(
                     x,
                     mock_type,
@@ -80,7 +80,9 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
             .type_factory
             .create_from_struct(&mock_setup_struct.item_struct);
         let use_fn_info_ident_as_method_ident = false;
-        let output_type = self.setup_output_generator.generate_for_trait(fn_info);
+        let output_type = self
+            .setup_output_generator
+            .generate_for_trait(mock_type, fn_info);
         let fn_setup = ImplItem::Fn(self.generate_fn_setup(
             fn_info,
             mock_type,
