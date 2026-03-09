@@ -1,17 +1,17 @@
 use rsubstitute::macros::mock;
 use std::fmt::{Debug, Display};
 
-#[mock]
-fn get_return<T>(value: T) -> T {
+#[mock(base)]
+fn get_return<T: Clone>(value: T) -> T {
     return value;
 }
 
-#[mock]
+#[mock(base)]
 fn return_constraint<T: Default>() -> T {
     return T::default();
 }
 
-#[mock]
+#[mock(base)]
 fn return_where_constraint<T: Default>() -> T
 where
     T: Debug,
@@ -19,7 +19,7 @@ where
     return T::default();
 }
 
-#[mock]
+#[mock(base)]
 fn get_return_different<T1: Debug, T2>(_value: T1) -> T2
 where
     T1: Clone + Display,

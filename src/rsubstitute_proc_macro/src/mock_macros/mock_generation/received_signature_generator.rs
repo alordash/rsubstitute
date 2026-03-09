@@ -13,7 +13,13 @@ use syn::*;
 pub trait IReceivedSignatureGenerator {
     fn get_times_arg_ident(&self) -> Ident;
 
-    fn generate_for_trait(&self, fn_info: &FnInfo, mock_type: &MockType) -> Signature;
+    fn generate_for_trait(
+        &self,
+        fn_info: &FnInfo,
+        mock_type: &MockType,
+        output_type_lifetime: OutputTypeLifetime,
+        output_type_generics: OutputTypeGenerics,
+    ) -> Signature;
 
     fn generate_for_static(
         &self,
@@ -34,14 +40,22 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
         format_ident!("times")
     }
 
-    fn generate_for_trait(&self, fn_info: &FnInfo, mock_type: &MockType) -> Signature {
+    fn generate_for_trait(
+        &self,
+        fn_info: &FnInfo,
+        mock_type: &MockType,
+        output_type_lifetime: OutputTypeLifetime,
+        output_type_generics: OutputTypeGenerics,
+    ) -> Signature {
         let prepend_ref_self_arg = true;
         let result = self.generate(
             fn_info,
             fn_info.parent.fn_ident.clone(),
             prepend_ref_self_arg,
             constants::SELF_TYPE.clone(),
-            MockGenericsUsage::JustGetPhantomTypesCount(&mock_type.generics),
+            mock_type,
+            output_type_lifetime,
+            output_type_generics,
         );
         return result;
     }
@@ -52,18 +66,20 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
         mock_received_struct: &MockReceivedStruct,
         mock_type: &MockType,
     ) -> Signature {
-        let mut return_ty = self
+        let mut owner_type = self
             .type_factory
             .create_from_struct(&mock_received_struct.item_struct);
         self.reference_normalizer
-            .staticify_anonymous_lifetimes(&mut return_ty);
+            .staticify_anonymous_lifetimes(&mut owner_type);
         let prepend_ref_self_arg = false;
         let result = self.generate(
             fn_info,
             constants::MOCK_RECEIVED_FIELD_IDENT.clone(),
             prepend_ref_self_arg,
-            return_ty,
-            MockGenericsUsage::UseAsGenerics(&mock_type.generics),
+            owner_type,
+            mock_type,
+            OutputTypeLifetime::Default,
+            OutputTypeGenerics::UseMock,
         );
         return result;
     }
@@ -77,8 +93,10 @@ impl ReceivedSignatureGenerator {
         fn_info: &FnInfo,
         fn_ident: Ident,
         prepend_ref_self_arg: bool,
-        return_ty: Type,
-        mock_generics_usage: MockGenericsUsage,
+        owner_type: Type,
+        mock_type: &MockType,
+        output_type_lifetime: OutputTypeLifetime,
+        output_type_generics: OutputTypeGenerics,
     ) -> Signature {
         let times_arg = FnArg::Typed(PatType {
             attrs: Vec::new(),
@@ -94,16 +112,28 @@ impl ReceivedSignatureGenerator {
         });
         let mut inputs: Vec<_> = self
             .input_args_generator
-            .generate_input_args(fn_info, mock_generics_usage.get_phantom_types_count())
+            .generate_input_args(
+                fn_info,
+                fn_info
+                    .parent
+                    .get_internal_phantom_types_count_without_return_type()
+                    + mock_type.generics.get_phantom_fields_count(),
+            )
             .into_iter()
             .chain(iter::once(times_arg))
             .collect();
         if prepend_ref_self_arg {
-            inputs.insert(0, constants::SELF_ARG.clone());
+            inputs.insert(0, constants::REF_SELF_ARG.clone());
         }
-        let generics = match mock_generics_usage {
-            MockGenericsUsage::JustGetPhantomTypesCount(_) => Generics::default(),
-            MockGenericsUsage::UseAsGenerics(mock_generics) => mock_generics.impl_generics.clone(),
+        let output_type = self.generate_output_type(
+            fn_info.parent.arg_refs_tuple.clone(),
+            owner_type,
+            output_type_lifetime,
+        );
+        let generics = match output_type_generics {
+            OutputTypeGenerics::UseFnOwn => fn_info.parent.own_generics.clone(),
+            OutputTypeGenerics::UseMock => mock_type.generics.impl_generics.clone(),
+            OutputTypeGenerics::DoNotUse => Default::default(),
         };
         let signature = Signature {
             constness: None,
@@ -116,26 +146,45 @@ impl ReceivedSignatureGenerator {
             paren_token: Default::default(),
             inputs: inputs.into_iter().collect(),
             variadic: None,
-            output: ReturnType::Type(Default::default(), Box::new(return_ty)),
+            output: ReturnType::Type(Default::default(), Box::new(output_type)),
         };
         return signature;
     }
-}
 
-enum MockGenericsUsage<'a> {
-    JustGetPhantomTypesCount(&'a MockGenerics),
-    UseAsGenerics(&'a MockGenerics),
-}
-
-impl<'a> MockGenericsUsage<'a> {
-    fn get_phantom_types_count(&self) -> usize {
-        match self {
-            MockGenericsUsage::JustGetPhantomTypesCount(mock_generics) => {
-                mock_generics.get_phantom_types_count()
-            }
-            MockGenericsUsage::UseAsGenerics(mock_generics) => {
-                mock_generics.get_phantom_types_count()
-            }
+    fn generate_output_type(
+        &self,
+        mut arg_refs_tuple: Type,
+        owner_type: Type,
+        output_type_lifetime: OutputTypeLifetime,
+    ) -> Type {
+        match output_type_lifetime {
+            OutputTypeLifetime::Default => self
+                .reference_normalizer
+                .normalize_anonymous_lifetimes(&mut arg_refs_tuple),
+            _ => (),
         }
+        let result = Type::Path(TypePath {
+            qself: None,
+            path: Path {
+                leading_colon: None,
+                segments: [PathSegment {
+                    ident: constants::FN_VERIFIER_TYPE_IDENT.clone(),
+                    arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
+                        colon2_token: None,
+                        lt_token: Default::default(),
+                        args: [
+                            GenericArgument::Type(owner_type),
+                            GenericArgument::Type(arg_refs_tuple),
+                        ]
+                        .into_iter()
+                        .collect(),
+                        gt_token: Default::default(),
+                    }),
+                }]
+                .into_iter()
+                .collect(),
+            },
+        });
+        return result;
     }
 }

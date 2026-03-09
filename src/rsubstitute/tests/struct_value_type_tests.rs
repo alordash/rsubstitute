@@ -43,7 +43,7 @@ mod tests {
             mock.accept_value(second_value);
 
             // Assert
-            mock.received()
+            mock.received
                 .accept_value(Arg::Any, Times::Exactly(3))
                 .accept_value(first_value, Times::Once)
                 .accept_value(
@@ -64,9 +64,9 @@ mod tests {
             let mock = StructMock::new();
             let callback_flag = Arc::new(RefCell::new(false));
             let callback_flag_clone = callback_flag.clone();
-            mock.setup()
+            mock.setup
                 .accept_value(Arg::Any)
-                .does(move || *callback_flag_clone.borrow_mut() = true);
+                .does(move |_| *callback_flag_clone.borrow_mut() = true);
 
             // Act
             mock.accept_value(1);
@@ -88,7 +88,7 @@ mod tests {
 
             // Assert
             assert_panics(
-                || mock.received().accept_value(Arg::Any, Times::Never),
+                || mock.received.accept_value(Arg::Any, Times::Never),
                 format!(
                     r#"Expected to never receive a call matching:
 	accept_value((i32): any)
@@ -99,7 +99,7 @@ Received no non-matching calls"#
                 ),
             );
             assert_panics(
-                || mock.received().accept_value(Arg::Any, Times::Once),
+                || mock.received.accept_value(Arg::Any, Times::Once),
                 format!(
                     r#"Expected to receive a call exactly once matching:
 	accept_value((i32): any)
@@ -110,7 +110,7 @@ Received no non-matching calls"#
                 ),
             );
             assert_panics(
-                || mock.received().accept_value(Arg::Any, Times::Exactly(3)),
+                || mock.received.accept_value(Arg::Any, Times::Exactly(3)),
                 format!(
                     r#"Expected to receive a call 3 times matching:
 	accept_value((i32): any)
@@ -136,7 +136,7 @@ Received no non-matching calls"#
             // Assert
             assert_panics(
                 || {
-                    mock.received()
+                    mock.received
                         .accept_value(Arg::Eq(first_value), Times::Never)
                 },
                 format!(
@@ -153,7 +153,7 @@ accept_value(*{second_value}*)
             );
             assert_panics(
                 || {
-                    mock.received()
+                    mock.received
                         .accept_value(Arg::Eq(first_value), Times::Exactly(3))
                 },
                 format!(
@@ -170,7 +170,7 @@ accept_value(*{second_value}*)
             );
             assert_panics(
                 || {
-                    mock.received()
+                    mock.received
                         .accept_value(Arg::Eq(second_value), Times::Never)
                 },
                 format!(
@@ -187,7 +187,7 @@ accept_value(*{first_value}*)
             );
             assert_panics(
                 || {
-                    mock.received()
+                    mock.received
                         .accept_value(Arg::Eq(second_value), Times::Exactly(3))
                 },
                 format!(
@@ -218,7 +218,7 @@ accept_value(*{first_value}*)
             // Assert
             assert_panics(
                 || {
-                    mock.received().accept_value(
+                    mock.received.accept_value(
                         Arg::Is(|actual_value| *actual_value == first_value),
                         Times::Never,
                     )
@@ -236,7 +236,7 @@ accept_value(*{second_value}*)
             );
             assert_panics(
                 || {
-                    mock.received().accept_value(
+                    mock.received.accept_value(
                         Arg::Is(|actual_value| *actual_value == first_value),
                         Times::Exactly(3),
                     )
@@ -254,7 +254,7 @@ accept_value(*{second_value}*)
             );
             assert_panics(
                 || {
-                    mock.received().accept_value(
+                    mock.received.accept_value(
                         Arg::Is(|actual_value| *actual_value == second_value),
                         Times::Never,
                     )
@@ -272,7 +272,7 @@ accept_value(*{first_value}*)
             );
             assert_panics(
                 || {
-                    mock.received().accept_value(
+                    mock.received.accept_value(
                         Arg::Is(|actual_value| *actual_value == second_value),
                         Times::Exactly(3),
                     )
@@ -300,7 +300,7 @@ accept_value(*{first_value}*)
             mock.accept_value(value);
 
             // Assert
-            mock.received()
+            mock.received
                 .accept_value(value, Times::Once)
                 .no_other_calls();
         }
@@ -319,7 +319,7 @@ accept_value(*{first_value}*)
             // Assert
             assert_panics(
                 || {
-                    mock.received()
+                    mock.received
                         .accept_value(first_value, Times::Once)
                         .no_other_calls()
                 },
@@ -346,7 +346,7 @@ accept_value(*{first_value}*)
             // Assert
             assert_panics(
                 || {
-                    mock.received()
+                    mock.received
                         .accept_value(first_value, Times::Once)
                         .no_other_calls()
                 },
@@ -367,7 +367,7 @@ accept_value(*{first_value}*)
             // Arrange
             let mock = StructMock::new();
             let value = 10;
-            mock.setup().return_value().returns(value);
+            mock.setup.return_value().returns(value);
 
             // Act
             let actual_value = mock.return_value();
@@ -393,15 +393,17 @@ accept_value(*{first_value}*)
             let callback_result = Arc::new(RefCell::new(Result::DidNotChange));
             let first_callback_counter_clone = callback_result.clone();
             let second_callback_counter_clone = callback_result.clone();
-            mock.setup()
+            mock.setup
                 .return_value()
                 .returns(first_value)
                 .return_value()
-                .returns_and_does(second_value, move || {
+                .returns(second_value)
+                .and_does(move |_| {
                     *first_callback_counter_clone.borrow_mut() = Result::SecondConfigChanged
                 })
                 .return_value()
-                .returns_and_does(third_value, move || {
+                .returns(third_value)
+                .and_does(move |_| {
                     *second_callback_counter_clone.borrow_mut() = Result::ThirdConfigChanged
                 });
 
@@ -424,7 +426,7 @@ accept_value(*{first_value}*)
             let first_value = 10;
             let second_value = 22;
             let third_value = 333;
-            mock.setup()
+            mock.setup
                 .return_value()
                 .returns_many([first_value, second_value, third_value]);
 
@@ -446,7 +448,7 @@ accept_value(*{first_value}*)
             // Arrange
             let mock = StructMock::new();
             let second_value = 22;
-            mock.setup()
+            mock.setup
                 .return_value()
                 .returns_many([1, 2, 3])
                 .return_value()
@@ -469,11 +471,10 @@ accept_value(*{first_value}*)
             let callback_counter_clone = callback_counter.clone();
             let first_value = 10;
             let second_value = 22;
-            mock.setup()
+            mock.setup
                 .return_value()
-                .returns_many_and_does([first_value, second_value], move || {
-                    *callback_counter_clone.borrow_mut() += 1
-                });
+                .returns_many([first_value, second_value])
+                .and_does(move |_| *callback_counter_clone.borrow_mut() += 1);
 
             // Act
             let actual_first_value = mock.return_value();
@@ -516,7 +517,7 @@ accept_value(*{first_value}*)
             let second_returned_value = 22.2;
             let third_accepted_value = 30;
             let third_returned_value = 33.3;
-            mock.setup()
+            mock.setup
                 .accept_value_return_value(Arg::Any)
                 .returns(first_returned_value)
                 .accept_value_return_value(Arg::Eq(second_accepted_value))
@@ -535,7 +536,7 @@ accept_value(*{first_value}*)
             assert_eq!(second_returned_value, actual_second_returned_value);
             assert_eq!(third_returned_value, actual_third_returned_value);
 
-            mock.received()
+            mock.received
                 .accept_value_return_value(first_accepted_value, Times::Once)
                 .accept_value_return_value(second_accepted_value, Times::Once)
                 .accept_value_return_value(third_accepted_value, Times::Once)
@@ -552,7 +553,7 @@ accept_value(*{first_value}*)
             let second_returned_value = 22.2;
             let third_returned_value = 33.3;
 
-            mock.setup()
+            mock.setup
                 .accept_value_return_value(Arg::Any)
                 .returns_many([
                     first_returned_value,
@@ -571,7 +572,7 @@ accept_value(*{first_value}*)
             assert_eq!(second_returned_value, actual_second_returned_value);
             assert_eq!(third_returned_value, actual_third_returned_value);
 
-            mock.received()
+            mock.received
                 .accept_value_return_value(single_accepted_value, Times::Once)
                 .accept_value_return_value(double_accepted_value, Times::Exactly(2))
                 .no_other_calls();
@@ -590,7 +591,7 @@ accept_value(*{first_value}*)
             let second_second_returned_value = 202.2;
             let second_third_returned_value = 203.3;
 
-            mock.setup()
+            mock.setup
                 .accept_value_return_value(Arg::Eq(first_accepted_value))
                 .returns_many([first_first_returned_value, first_second_returned_value])
                 .accept_value_return_value(Arg::Eq(second_accepted_value))
@@ -648,7 +649,7 @@ accept_value(*{first_value}*)
                 actual_second_fourth_returned_value
             );
 
-            mock.received()
+            mock.received
                 .accept_value_return_value(first_accepted_value, Times::Exactly(3))
                 .accept_value_return_value(second_accepted_value, Times::Exactly(4))
                 .no_other_calls();
@@ -666,13 +667,15 @@ accept_value(*{first_value}*)
             let second_callback_number = Arc::new(RefCell::new(1));
             let second_callback_number_clone = second_callback_number.clone();
             let second_returned_value = 22.2;
-            mock.setup()
+            mock.setup
                 .accept_value_return_value(Arg::Eq(first_accepted_value))
-                .returns_and_does(first_returned_value, move || {
+                .returns(first_returned_value)
+                .and_does(move |_| {
                     *first_callback_number_clone.borrow_mut() = 1;
                 })
                 .accept_value_return_value(Arg::Eq(second_accepted_value))
-                .returns_and_does(second_returned_value, move || {
+                .returns(second_returned_value)
+                .and_does(move |_| {
                     *second_callback_number_clone.borrow_mut() = 2;
                 });
 
@@ -688,7 +691,7 @@ accept_value(*{first_value}*)
             assert_eq!(1, *first_callback_number.borrow());
             assert_eq!(2, *second_callback_number.borrow());
 
-            mock.received()
+            mock.received
                 .accept_value_return_value(first_accepted_value, Times::Once)
                 .accept_value_return_value(second_accepted_value, Times::Once)
                 .no_other_calls();
@@ -709,7 +712,7 @@ accept_value(*{first_value}*)
             mock.accept_two_values(v1, v2);
 
             // Assert
-            mock.received()
+            mock.received
                 .accept_two_values(v1, v2, Times::Once)
                 .no_other_calls();
         }
@@ -725,7 +728,7 @@ accept_value(*{first_value}*)
             let v1 = 10;
             let v2 = 20.2;
             let returned_value = String::from("quo vadis");
-            mock.setup()
+            mock.setup
                 .accept_two_values_return_value(v1, v2)
                 .returns(returned_value.clone());
 
@@ -735,7 +738,7 @@ accept_value(*{first_value}*)
             // Assert
             assert_eq!(returned_value, actual_returned_value);
 
-            mock.received()
+            mock.received
                 .accept_two_values_return_value(v1, v2, Times::Once)
                 .no_other_calls();
         }
@@ -747,7 +750,7 @@ accept_value(*{first_value}*)
             let v1 = 10;
             let v2 = 20.2;
             let returned_value = String::from("veridis quo");
-            mock.setup()
+            mock.setup
                 .accept_two_values_return_value(Arg::Any, Arg::Any)
                 .returns(returned_value.clone());
 
@@ -759,7 +762,7 @@ accept_value(*{first_value}*)
 
             assert_panics(
                 || {
-                    mock.received()
+                    mock.received
                         .accept_two_values_return_value(v1, v2, Times::Never)
                 },
                 format!(
@@ -773,7 +776,7 @@ Received no non-matching calls"#
 
             assert_panics(
                 || {
-                    mock.received()
+                    mock.received
                         .accept_two_values_return_value(v1, v2, Times::Exactly(3))
                 },
                 format!(
@@ -789,7 +792,7 @@ Received no non-matching calls"#
             let invalid_expected_v2 = v2 + 1.0;
             assert_panics(
                 || {
-                    mock.received().accept_two_values_return_value(
+                    mock.received.accept_two_values_return_value(
                         invalid_expected_v1,
                         invalid_expected_v2,
                         Times::Once,
@@ -819,9 +822,9 @@ accept_two_values_return_value(*10*, *20.2*)
             let unexpected_v2 = 22.2;
             let expected_v1 = 30;
             let expected_v2 = 44.4;
-            mock.setup()
+            mock.setup
                 .accept_two_values_return_value(unexpected_v1, unexpected_v2);
-            mock.setup()
+            mock.setup
                 .accept_two_values_return_value(expected_v1, expected_v2)
                 .returns(String::from("should not be returned"));
 

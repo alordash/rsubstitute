@@ -27,10 +27,12 @@ pub fn get_global_mock<'a, T: Default + ?Sized>() -> &'a T {
         .or_insert(Box::leak(Box::new(<T as Default>::default())) as *mut _ as *const _);
     let mock_ptr = (*raw_ptr) as *const T;
     let mock_ref = unsafe {
-        &*mock_ptr.as_ref().expect(&format!(
-            "Pointer to global static mock of type '{}' should not be null.",
-            std::any::type_name::<T>()
-        ))
+        mock_ptr.as_ref().unwrap_or_else(|| {
+            panic!(
+                "Pointer to global static mock of type '{}' should not be null.",
+                std::any::type_name::<T>()
+            )
+        })
     };
     return mock_ref;
 }

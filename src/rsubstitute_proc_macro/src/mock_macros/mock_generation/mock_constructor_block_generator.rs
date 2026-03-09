@@ -1,5 +1,6 @@
 use crate::constants;
 use crate::mock_macros::mock_generation::models::*;
+use crate::mock_macros::mock_generation::*;
 use crate::syntax::*;
 use proc_macro2::Span;
 use quote::format_ident;
@@ -22,6 +23,8 @@ pub trait IMockConstructorBlockGenerator {
 pub(crate) struct MockConstructorBlockGenerator {
     pub path_factory: Arc<dyn IPathFactory>,
     pub local_factory: Arc<dyn ILocalFactory>,
+    pub expr_call_factory: Arc<dyn IExprCallFactory>,
+    pub implemented_trait_ident_formatter: Arc<dyn IImplementedTraitIdentFormatter>,
 }
 
 impl IMockConstructorBlockGenerator for MockConstructorBlockGenerator {
@@ -34,34 +37,54 @@ impl IMockConstructorBlockGenerator for MockConstructorBlockGenerator {
         mock_struct_traits: Vec<&MockStructTrait>,
         maybe_inner_data_param: Option<InnerDataParam>,
     ) -> Block {
-        let mut data_fields: Vec<_> = mock_data_struct
+        let data_fn_fields: Vec<_> = mock_data_struct
             .field_and_fn_idents
             .iter()
-            .map(|(field_ident, fn_ident)| FieldValue {
-                attrs: Vec::new(),
-                member: Member::Named(field_ident.clone()),
-                colon_token: Some(Default::default()),
-                expr: Expr::Call(ExprCall {
+            .map(|(field_ident, fn_ident)| {
+                let func = self.path_factory.create_expr_from_parts(vec![
+                    constants::FN_DATA_TYPE_IDENT.clone(),
+                    constants::NEW_IDENT.clone(),
+                ]);
+                let args = vec![Expr::Lit(ExprLit {
                     attrs: Vec::new(),
-                    func: Box::new(self.path_factory.create_expr_from_parts(vec![
-                        constants::FN_DATA_TYPE_IDENT.clone(),
-                        constants::NEW_IDENT.clone(),
-                    ])),
-                    paren_token: Default::default(),
-                    args: [
-                        Expr::Lit(ExprLit {
-                            attrs: Vec::new(),
-                            lit: Lit::Str(LitStr::new(&fn_ident.to_string(), Span::call_site())),
-                        }),
-                        constants::SERVICES_REF_EXPR.clone(),
-                    ]
-                    .into_iter()
-                    .collect(),
-                }),
+                    lit: Lit::Str(LitStr::new(&fn_ident.to_string(), Span::call_site())),
+                })];
+                FieldValue {
+                    attrs: Vec::new(),
+                    member: Member::Named(field_ident.clone()),
+                    colon_token: Some(Default::default()),
+                    expr: self.expr_call_factory.create_with_args(func, args),
+                }
             })
             .collect();
-        let phantom_lifetime_field = constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD_VALUE.clone();
-        data_fields.insert(0, phantom_lifetime_field);
+        let data_fields = mock_data_struct
+            .item_struct
+            .fields
+            .iter()
+            .take(mock_data_struct.item_struct.fields.len() - data_fn_fields.len())
+            .map(|field| FieldValue {
+                attrs: Vec::new(),
+                member: Member::Named(field.get_required_ident()),
+                colon_token: Some(Default::default()),
+                expr: constants::PHANTOM_DATA_EXPR_PATH.clone(),
+            })
+            .chain(data_fn_fields)
+            .collect();
+        let func = self.path_factory.create_expr_from_parts(vec![
+            constants::ARC_IDENT.clone(),
+            constants::NEW_IDENT.clone(),
+        ]);
+        let arg = Expr::Struct(ExprStruct {
+            attrs: Vec::new(),
+            qself: None,
+            path: self
+                .path_factory
+                .create(mock_data_struct.item_struct.ident.clone()),
+            brace_token: Default::default(),
+            fields: data_fields,
+            dot2_token: None,
+            rest: None,
+        });
         let data_stmt = Stmt::Local(Local {
             attrs: Vec::new(),
             let_token: Default::default(),
@@ -74,27 +97,7 @@ impl IMockConstructorBlockGenerator for MockConstructorBlockGenerator {
             }),
             init: Some(LocalInit {
                 eq_token: Default::default(),
-                expr: Box::new(Expr::Call(ExprCall {
-                    attrs: Vec::new(),
-                    func: Box::new(self.path_factory.create_expr_from_parts(vec![
-                        constants::ARC_IDENT.clone(),
-                        constants::NEW_IDENT.clone(),
-                    ])),
-                    paren_token: Default::default(),
-                    args: [Expr::Struct(ExprStruct {
-                        attrs: Vec::new(),
-                        qself: None,
-                        path: self
-                            .path_factory
-                            .create(mock_data_struct.item_struct.ident.clone()),
-                        brace_token: Default::default(),
-                        fields: data_fields.into_iter().collect(),
-                        dot2_token: None,
-                        rest: None,
-                    })]
-                    .into_iter()
-                    .collect(),
-                })),
+                expr: Box::new(self.expr_call_factory.create(func, arg)),
                 diverge: None,
             }),
             semi_token: Default::default(),
@@ -202,7 +205,10 @@ impl MockConstructorBlockGenerator {
     ) -> FieldValue {
         let field_value = FieldValue {
             attrs: Vec::new(),
-            member: Member::Named(trait_ident),
+            member: Member::Named(
+                self.implemented_trait_ident_formatter
+                    .format_for_field(&trait_ident),
+            ),
             colon_token: Some(Default::default()),
             expr: Expr::Struct(ExprStruct {
                 attrs: Vec::new(),
@@ -220,24 +226,21 @@ impl MockConstructorBlockGenerator {
     }
 
     fn generate_inner_data_stmt(&self, inner_data_param: InnerDataParam) -> Stmt {
+        let func = self.path_factory.create_expr_from_parts(vec![
+            inner_data_param.inner_data_struct.item_struct.ident.clone(),
+            constants::NEW_IDENT.clone(),
+        ]);
+        let args = inner_data_param
+            .constructor_arguments
+            .iter()
+            .map(|constructor_argument| {
+                self.path_factory
+                    .create_expr(constructor_argument.0.clone())
+            })
+            .collect();
         let local_init = LocalInit {
             eq_token: Default::default(),
-            expr: Box::new(Expr::Call(ExprCall {
-                attrs: Vec::new(),
-                func: Box::new(self.path_factory.create_expr_from_parts(vec![
-                    inner_data_param.inner_data_struct.item_struct.ident.clone(),
-                    constants::NEW_IDENT.clone(),
-                ])),
-                paren_token: Default::default(),
-                args: inner_data_param
-                    .constructor_arguments
-                    .iter()
-                    .map(|constructor_argument| {
-                        self.path_factory
-                            .create_expr(constructor_argument.0.clone())
-                    })
-                    .collect(),
-            })),
+            expr: Box::new(self.expr_call_factory.create_with_args(func, args)),
             diverge: None,
         };
         let local = self

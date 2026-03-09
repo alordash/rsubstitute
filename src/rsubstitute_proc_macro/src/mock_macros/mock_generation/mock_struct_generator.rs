@@ -51,11 +51,11 @@ impl IMockStructGenerator for MockStructGenerator {
         let fields = FieldsNamed {
             brace_token: Default::default(),
             named: [
-                self.field_factory.create_from_struct(
+                self.field_factory.create_pub_from_struct(
                     constants::MOCK_SETUP_FIELD_IDENT.clone(),
                     &mock_setup_struct.item_struct,
                 ),
-                self.field_factory.create_from_struct(
+                self.field_factory.create_pub_from_struct(
                     constants::MOCK_RECEIVED_FIELD_IDENT.clone(),
                     &mock_received_struct.item_struct,
                 ),

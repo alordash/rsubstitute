@@ -1,8 +1,12 @@
 use crate::derive_args_formatter_macro_handler::*;
+use crate::derive_args_infos_provider_macro_handler::*;
+use crate::derive_args_tuple_provider_macro_handler::*;
+use crate::derive_clone_for_r_substitute_macro_handler::*;
+use crate::derive_generics_hash_key_provider_macro_handler::*;
 use crate::derive_mock_data_macro_handler::*;
 use crate::mock_macros::fn_info_generation::*;
 use crate::mock_macros::mock_generation::*;
-use crate::mock_macros::targets::{ItemFnHandler, ItemTraitHandler, StructMockHandler};
+use crate::mock_macros::targets::*;
 use crate::mock_macros::*;
 use crate::syntax::*;
 use std::cell::{LazyCell, OnceCell};
@@ -15,15 +19,19 @@ pub(crate) struct ServiceCollection {
     pub path_factory: Arc<dyn IPathFactory>,
     pub type_factory: Arc<dyn ITypeFactory>,
     pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
-    pub expr_reference_factory: Arc<dyn IExprReferenceFactory>,
     pub derive_args_formatter_macro_handler: Arc<dyn IDeriveArgsFormatterMacroHandler>,
+    pub derive_args_infos_provider_macro_handler: Arc<dyn IDeriveArgsInfosProviderMacroHandler>,
+    pub derive_args_tuple_provider_macro_handler: Arc<dyn IDeriveArgsTupleProviderMacroHandler>,
     pub derive_mock_data_macro_handler: Arc<dyn IDeriveMockDataMacroHandler>,
+    pub derive_generics_hash_key_provider_macro_handler:
+        Arc<dyn IDeriveGenericsHashKeyProviderMacroHandler>,
+    pub derive_clone_for_rsubstitute_macro_handler: Arc<dyn IDeriveCloneForRSubstituteMacroHandler>,
     pub mock_macro_handler: Arc<dyn IMockMacroHandler>,
     pub struct_mock_syntax_parser: Arc<dyn IStructMockSyntaxParser>,
 }
 
 fn create_services() -> ServiceCollection {
-    let fn_decl_extractor = Arc::new(FnDeclExtractor);
+    let generics_merger = Arc::new(GenericsMerger);
     let generic_argument_factory_cell = Arc::new(OnceCell::new());
     let path_factory = Arc::new(PathFactory {
         generic_argument_factory: generic_argument_factory_cell.clone(),
@@ -31,10 +39,15 @@ fn create_services() -> ServiceCollection {
     let type_factory = Arc::new(TypeFactory {
         path_factory: path_factory.clone(),
     });
-    let generics_merger = Arc::new(GenericsMerger);
     let field_factory = Arc::new(FieldFactory {
         type_factory: type_factory.clone(),
     });
+    let fn_decl_extractor = Arc::new(FnDeclExtractor {
+        generics_merger: generics_merger.clone(),
+        type_factory: type_factory.clone(),
+        field_factory: field_factory.clone(),
+    });
+    let attribute_factory = Arc::new(AttributeFactory);
     let struct_factory = Arc::new(StructFactory);
     let reference_type_crawler = Arc::new(ReferenceTypeCrawler);
     let reference_normalizer = Arc::new(ReferenceNormalizer {
@@ -42,6 +55,7 @@ fn create_services() -> ServiceCollection {
     });
     let arg_ident_extractor = Arc::new(ArgIdentExtractor);
     let call_struct_generator = Arc::new(CallStructGenerator {
+        attribute_factory: attribute_factory.clone(),
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
         reference_normalizer: reference_normalizer.clone(),
@@ -49,6 +63,7 @@ fn create_services() -> ServiceCollection {
     });
     let arg_type_factory = Arc::new(ArgTypeFactory);
     let args_checker_generator = Arc::new(ArgsCheckerGenerator {
+        attribute_factory: attribute_factory.clone(),
         arg_type_factory: arg_type_factory.clone(),
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
@@ -68,46 +83,52 @@ fn create_services() -> ServiceCollection {
         path_factory: path_factory.clone(),
         field_access_expr_factory: field_access_expr_factory.clone(),
     });
-    let call_arg_infos_provider_impl_generator = Arc::new(CallArgInfosProviderImplGenerator {
+    let expr_call_factory = Arc::new(ExprCallFactory);
+    let debug_string_expr_generator = Arc::new(DebugStringExprGenerator {
         path_factory: path_factory.clone(),
-        type_factory: type_factory.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
+        expr_reference_factory: expr_reference_factory.clone(),
+        expr_call_factory: expr_call_factory.clone(),
     });
+    let local_factory = Arc::new(LocalFactory);
     let args_checker_impl_generator = Arc::new(ArgsCheckerTraitImplGenerator {
         type_factory: type_factory.clone(),
+        local_factory: local_factory.clone(),
         field_access_expr_factory: field_access_expr_factory.clone(),
+        expr_method_call_factory: expr_method_call_factory.clone(),
         expr_reference_factory: expr_reference_factory.clone(),
     });
     let mock_generics_generator = Arc::new(MockGenericsGenerator {
         type_factory: type_factory.clone(),
         field_factory: field_factory.clone(),
-        generics_merger: generics_merger.clone(),
     });
-    let base_caller_impl_generator = Arc::new(BaseCallerImplGenerator {
+    let base_fn_ident_formatter = Arc::new(BaseFnIdentFormatter);
+    let base_fn_generator = Arc::new(BaseFnGenerator {
         type_factory: type_factory.clone(),
         path_factory: path_factory.clone(),
+        base_fn_ident_formatter: base_fn_ident_formatter.clone(),
     });
     let fn_info_generator = Arc::new(FnInfoGenerator {
         call_struct_generator: call_struct_generator.clone(),
-        call_arg_infos_provider_impl_generator: call_arg_infos_provider_impl_generator.clone(),
         args_checker_generator: args_checker_generator.clone(),
         args_checker_impl_generator: args_checker_impl_generator.clone(),
-        base_caller_impl_generator: base_caller_impl_generator.clone(),
     });
     let mock_data_struct_generator = Arc::new(MockDataStructGenerator {
-        type_factory: type_factory.clone(),
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
     });
+    let implemented_trait_ident_formatter = Arc::new(ImplementedTraitIdentFormatter);
     let mock_setup_struct_generator = Arc::new(MockSetupStructGenerator {
         type_factory: type_factory.clone(),
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
+        implemented_trait_ident_formatter: implemented_trait_ident_formatter.clone(),
     });
     let mock_received_struct_generator = Arc::new(MockReceivedStructGenerator {
         type_factory: type_factory.clone(),
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
+        implemented_trait_ident_formatter: implemented_trait_ident_formatter.clone(),
     });
     let mock_type_generator = Arc::new(MockTypeGenerator {
         type_factory: type_factory.clone(),
@@ -118,31 +139,31 @@ fn create_services() -> ServiceCollection {
         struct_factory: struct_factory.clone(),
         reference_normalizer: reference_normalizer.clone(),
     });
-    let send_sync_impls_generator = Arc::new(SendSyncImplsGenerator {
-        path_factory: path_factory.clone(),
-        type_factory: type_factory.clone(),
-    });
     let field_value_factory = Arc::new(FieldValueFactory {
         expr_method_call_factory: expr_method_call_factory.clone(),
     });
-    let std_mem_transmute_expr_factory = Arc::new(StdMemTransmuteExprFactory {
+    let core_mem_transmute_expr_factory = Arc::new(CoreMemTransmuteExprFactory {
         path_factory: path_factory.clone(),
+        expr_call_factory: expr_call_factory.clone(),
     });
-    let get_global_mock_expr_generator = Arc::new(GetGlobalMockExprGenerator);
+    let get_global_mock_expr_generator = Arc::new(GetGlobalMockExprGenerator {
+        expr_call_factory: expr_call_factory.clone(),
+    });
     let field_checker = Arc::new(FieldChecker);
-    let local_factory = Arc::new(LocalFactory);
     let mock_fn_inputs_generator = Arc::new(MockFnInputsGenerator {
         arg_ident_extractor: arg_ident_extractor.clone(),
     });
     let mock_fn_block_generator = Arc::new(MockFnBlockGenerator {
         path_factory: path_factory.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
-        std_mem_transmute_expr_factory: std_mem_transmute_expr_factory.clone(),
+        core_mem_transmute_expr_factory: core_mem_transmute_expr_factory.clone(),
         field_value_factory: field_value_factory.clone(),
         get_global_mock_expr_generator: get_global_mock_expr_generator.clone(),
         field_checker: field_checker.clone(),
         local_factory: local_factory.clone(),
         expr_reference_factory: expr_reference_factory.clone(),
+        type_factory: type_factory.clone(),
+        base_fn_ident_formatter: base_fn_ident_formatter.clone(),
     });
     let mock_payload_impl_generator = Arc::new(MockPayloadImplGenerator {
         path_factory: path_factory.clone(),
@@ -152,12 +173,12 @@ fn create_services() -> ServiceCollection {
     let mock_constructor_block_generator = Arc::new(MockConstructorBlockGenerator {
         path_factory: path_factory.clone(),
         local_factory: local_factory.clone(),
+        expr_call_factory: expr_call_factory.clone(),
+        implemented_trait_ident_formatter: implemented_trait_ident_formatter.clone(),
     });
     let mock_impl_generator = Arc::new(MockImplGenerator {
         type_factory: type_factory.clone(),
         mock_constructor_block_generator: mock_constructor_block_generator.clone(),
-        expr_method_call_factory: expr_method_call_factory.clone(),
-        std_mem_transmute_expr_factory: std_mem_transmute_expr_factory.clone(),
     });
     let mock_struct_default_impl_generator = Arc::new(MockStructDefaultImplGenerator {
         type_factory: type_factory.clone(),
@@ -169,10 +190,12 @@ fn create_services() -> ServiceCollection {
         local_factory: local_factory.clone(),
         reference_normalizer: reference_normalizer.clone(),
         field_checker: field_checker.clone(),
+        type_factory: type_factory.clone(),
     });
     let impl_factory = Arc::new(ImplFactory);
     let setup_output_generator = Arc::new(SetupOutputGenerator {
         type_factory: type_factory.clone(),
+        reference_normalizer: reference_normalizer.clone(),
     });
     let mock_setup_impl_generator = Arc::new(MockSetupImplGenerator {
         path_factory: path_factory.clone(),
@@ -182,6 +205,7 @@ fn create_services() -> ServiceCollection {
         expr_method_call_factory: expr_method_call_factory.clone(),
         input_args_generator: input_args_generator.clone(),
         setup_output_generator: setup_output_generator.clone(),
+        core_mem_transmute_expr_factory: core_mem_transmute_expr_factory.clone(),
     });
     let received_signature_generator = Arc::new(ReceivedSignatureGenerator {
         type_factory: type_factory.clone(),
@@ -194,20 +218,53 @@ fn create_services() -> ServiceCollection {
         expr_method_call_factory: expr_method_call_factory.clone(),
         input_args_generator: input_args_generator.clone(),
         received_signature_generator: received_signature_generator.clone(),
+        expr_call_factory: expr_call_factory.clone(),
     });
     let mod_generator = Arc::new(ModGenerator);
 
     let derive_args_formatter_macro_handler = Arc::new(DeriveArgsFormatterMacroHandler {
-        path_factory: path_factory.clone(),
         type_factory: type_factory.clone(),
         field_access_expr_factory: field_access_expr_factory.clone(),
         field_checker: field_checker.clone(),
+        debug_string_expr_generator: debug_string_expr_generator.clone(),
+    });
+    let derive_args_infos_provider_macro_handler = Arc::new(DeriveArgsInfosProviderMacroHandler {
+        path_factory: path_factory.clone(),
+        type_factory: type_factory.clone(),
+        field_access_expr_factory: field_access_expr_factory.clone(),
+        expr_reference_factory: expr_reference_factory.clone(),
+        debug_string_expr_generator: debug_string_expr_generator.clone(),
+        field_checker: field_checker.clone(),
+        expr_call_factory: expr_call_factory.clone(),
+    });
+    let derive_args_tuple_provider_macro_handler = Arc::new(DeriveArgsTupleProviderMacroHandler {
+        path_factory: path_factory.clone(),
+        type_factory: type_factory.clone(),
+        field_access_expr_factory: field_access_expr_factory.clone(),
+        expr_reference_factory: expr_reference_factory.clone(),
+        field_checker: field_checker.clone(),
+        expr_call_factory: expr_call_factory.clone(),
     });
     let derive_mock_data_macro_handler = Arc::new(DeriveMockDataMacroHandler {
         path_factory: path_factory.clone(),
         type_factory: type_factory.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
     });
+    let derive_generics_hash_key_provider_macro_handler =
+        Arc::new(DeriveGenericsHashKeyProviderMacroHandler {
+            type_factory: type_factory.clone(),
+            path_factory: path_factory.clone(),
+            expr_method_call_factory: expr_method_call_factory.clone(),
+            expr_call_factory: expr_call_factory.clone(),
+        });
+    let derive_clone_for_rsubstitute_macro_handler =
+        Arc::new(DeriveCloneForRSubstituteMacroHandler {
+            path_factory: path_factory.clone(),
+            type_factory: type_factory.clone(),
+            field_access_expr_factory: field_access_expr_factory.clone(),
+            expr_reference_factory: expr_reference_factory.clone(),
+            expr_method_call_factory: expr_method_call_factory.clone(),
+        });
 
     let fn_setup_generator = Arc::new(FnSetupGenerator {
         input_args_generator: input_args_generator.clone(),
@@ -253,8 +310,10 @@ fn create_services() -> ServiceCollection {
     let ignored_impl_fixer = Arc::new(IgnoredImplFixer {
         generics_merger: generics_merger.clone(),
     });
+    let lifetimes_specifier = Arc::new(LifetimesSpecifier::new(reference_type_crawler.clone()));
 
     let item_trait_handler = Arc::new(ItemTraitHandler {
+        lifetimes_specifier: lifetimes_specifier.clone(),
         fn_decl_extractor: fn_decl_extractor.clone(),
         mock_generics_generator: mock_generics_generator.clone(),
         mock_type_generator: mock_type_generator.clone(),
@@ -267,6 +326,7 @@ fn create_services() -> ServiceCollection {
         mock_impl_generator: mock_impl_generator.clone(),
         mock_setup_impl_generator: mock_setup_impl_generator.clone(),
         mock_received_impl_generator: mock_received_impl_generator.clone(),
+        base_fn_generator: base_fn_generator.clone(),
         mod_generator: mod_generator.clone(),
     });
 
@@ -279,14 +339,14 @@ fn create_services() -> ServiceCollection {
         mock_setup_struct_generator: mock_setup_struct_generator.clone(),
         mock_received_struct_generator: mock_received_struct_generator.clone(),
         mock_struct_generator: mock_struct_generator.clone(),
-        send_sync_impls_generator: send_sync_impls_generator.clone(),
         mock_struct_default_impl_generator: mock_struct_default_impl_generator.clone(),
         mock_setup_impl_generator: mock_setup_impl_generator.clone(),
         mock_received_impl_generator: mock_received_impl_generator.clone(),
-        mod_generator: mod_generator.clone(),
         fn_setup_generator: fn_setup_generator.clone(),
         fn_received_generator: fn_received_generator.clone(),
         static_fn_generator: static_fn_generator.clone(),
+        base_fn_generator: base_fn_generator.clone(),
+        mod_generator: mod_generator.clone(),
     });
 
     let struct_mock_handler = Arc::new(StructMockHandler {
@@ -309,10 +369,14 @@ fn create_services() -> ServiceCollection {
         mock_setup_impl_generator: mock_setup_impl_generator.clone(),
         mock_received_impl_generator: mock_received_impl_generator.clone(),
         ignored_impl_fixer: ignored_impl_fixer.clone(),
+        base_fn_generator: base_fn_generator.clone(),
         mod_generator: mod_generator.clone(),
     });
 
+    let ctx_factory = Arc::new(CtxFactory);
+
     let mock_macro_handler = Arc::new(MockMacroHandler {
+        ctx_factory,
         item_trait_handler,
         item_fn_handler,
         struct_mock_handler,
@@ -320,16 +384,17 @@ fn create_services() -> ServiceCollection {
 
     let struct_mock_syntax_parser = Arc::new(StructMockSyntaxParser);
 
-    let attribute_factory = Arc::new(AttributeFactory);
-
     let services = ServiceCollection {
         attribute_factory,
         path_factory,
         type_factory,
         expr_method_call_factory,
-        expr_reference_factory,
         derive_args_formatter_macro_handler,
+        derive_args_infos_provider_macro_handler,
+        derive_args_tuple_provider_macro_handler,
         derive_mock_data_macro_handler,
+        derive_generics_hash_key_provider_macro_handler,
+        derive_clone_for_rsubstitute_macro_handler,
         mock_macro_handler,
         struct_mock_syntax_parser,
     };

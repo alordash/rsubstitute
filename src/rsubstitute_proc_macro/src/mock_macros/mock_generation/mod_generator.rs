@@ -15,7 +15,7 @@ pub trait IModGenerator {
         mock_setup_struct: MockSetupStruct,
         mock_received_struct: MockReceivedStruct,
         mock_struct: MockStruct,
-        mock_trait_impl: MockTraitImpl,
+        mock_trait_impl: MockPayloadImpl,
         mock_impl: MockImpl,
         mock_setup_impl: MockSetupImpl,
         mock_received_impl: MockReceivedImpl,
@@ -29,13 +29,13 @@ pub trait IModGenerator {
         mock_setup_struct: MockSetupStruct,
         mock_received_struct: MockReceivedStruct,
         mock_struct: MockStruct,
-        send_sync_impls: SendSyncImpls,
         mock_struct_default_impl: MockStructDefaultImpl,
         mock_setup_impl: MockSetupImpl,
         mock_received_impl: MockReceivedImpl,
         fn_setup: ItemFn,
         fn_received: ItemFn,
         static_fn: StaticFn,
+        maybe_static_base_fn: Option<StaticBaseFn>,
     ) -> GeneratedMod;
 
     fn generate_struct(
@@ -50,8 +50,8 @@ pub trait IModGenerator {
         inner_data_impl: InnerDataImpl,
         mock_struct: MockStruct,
         inner_data_deref_impl: InnerDataDerefImpl,
-        trait_mock_impls: Vec<MockTraitImpl>,
-        mock_trait_impl: MockTraitImpl,
+        trait_mock_impls: Vec<MockPayloadImpl>,
+        mock_trait_impl: MockPayloadImpl,
         mock_impl: MockImpl,
         mock_setup_impl: MockSetupImpl,
         mock_received_impl: MockReceivedImpl,
@@ -70,7 +70,7 @@ impl IModGenerator for ModGenerator {
         mock_setup_struct: MockSetupStruct,
         mock_received_struct: MockReceivedStruct,
         mock_struct: MockStruct,
-        mock_trait_impl: MockTraitImpl,
+        mock_trait_impl: MockPayloadImpl,
         mock_impl: MockImpl,
         mock_setup_impl: MockSetupImpl,
         mock_received_impl: MockReceivedImpl,
@@ -112,13 +112,13 @@ impl IModGenerator for ModGenerator {
         mock_setup_struct: MockSetupStruct,
         mock_received_struct: MockReceivedStruct,
         mock_struct: MockStruct,
-        send_sync_impls: SendSyncImpls,
         mock_struct_default_impl: MockStructDefaultImpl,
         mock_setup_impl: MockSetupImpl,
         mock_received_impl: MockReceivedImpl,
         fn_setup: ItemFn,
         fn_received: ItemFn,
         static_fn: StaticFn,
+        maybe_static_base_fn: Option<StaticBaseFn>,
     ) -> GeneratedMod {
         let usings = [
             constants::USE_SUPER.clone(),
@@ -133,8 +133,6 @@ impl IModGenerator for ModGenerator {
                 Item::Struct(mock_setup_struct.item_struct),
                 Item::Struct(mock_received_struct.item_struct),
                 Item::Struct(mock_struct.item_struct),
-                Item::Impl(send_sync_impls.send_impl),
-                Item::Impl(send_sync_impls.sync_impl),
                 Item::Impl(mock_struct_default_impl.item_impl),
                 Item::Impl(mock_setup_impl.item_impl),
                 Item::Impl(mock_received_impl.item_impl),
@@ -142,6 +140,7 @@ impl IModGenerator for ModGenerator {
                 Item::Fn(fn_received),
                 Item::Fn(static_fn.item_fn),
             ])
+            .chain(maybe_static_base_fn.map(|static_base_fn| Item::Fn(static_base_fn.item_fn)))
             .collect();
         let item_mod = self.create_item_mod(fn_ident.clone(), items);
         let use_generated_mod = self.create_use_generated_mod(item_mod.ident.clone());
@@ -164,8 +163,8 @@ impl IModGenerator for ModGenerator {
         inner_data_impl: InnerDataImpl,
         mock_struct: MockStruct,
         inner_data_deref_impl: InnerDataDerefImpl,
-        mock_trait_impls: Vec<MockTraitImpl>,
-        mock_trait_impl: MockTraitImpl,
+        mock_trait_impls: Vec<MockPayloadImpl>,
+        mock_trait_impl: MockPayloadImpl,
         mock_impl: MockImpl,
         mock_setup_impl: MockSetupImpl,
         mock_received_impl: MockReceivedImpl,
@@ -187,20 +186,11 @@ impl IModGenerator for ModGenerator {
                     Item::Impl(x.received_impl.item_impl),
                 ])
             }))
-            .chain(struct_fn_infos.into_iter().flat_map(|x| {
-                [
-                    Item::Struct(x.call_struct.item_struct),
-                    Item::Impl(x.call_arg_infos_provider_impl.item_impl),
-                    Item::Struct(x.args_checker_struct.item_struct),
-                    Item::Impl(x.args_checker_impl.item_impl),
-                ]
-                .into_iter()
-                .chain(
-                    x.maybe_base_caller_impl
-                        .map(|base_caller_impl| Item::Impl(base_caller_impl.item_impl))
-                        .into_iter(),
-                )
-            }))
+            .chain(
+                struct_fn_infos
+                    .into_iter()
+                    .flat_map(|x| self.convert_fn_info(x)),
+            )
             .chain([
                 Item::Struct(mock_data_struct.item_struct),
                 Item::Struct(mock_setup_struct.item_struct),
@@ -236,21 +226,12 @@ impl IModGenerator for ModGenerator {
 impl ModGenerator {
     const GENERATED_MOD_IDENT: LazyCell<Ident> =
         LazyCell::new(|| format_ident!("__rsubstitute_generated"));
-    fn convert_fn_info(&self, fn_info: FnInfo) -> Vec<Item> {
+    fn convert_fn_info(&self, fn_info: FnInfo) -> [Item; 3] {
         [
             Item::Struct(fn_info.call_struct.item_struct),
-            Item::Impl(fn_info.call_arg_infos_provider_impl.item_impl),
             Item::Struct(fn_info.args_checker_struct.item_struct),
             Item::Impl(fn_info.args_checker_impl.item_impl),
         ]
-        .into_iter()
-        .chain(
-            fn_info
-                .maybe_base_caller_impl
-                .map(|base_caller_impl| Item::Impl(base_caller_impl.item_impl))
-                .into_iter(),
-        )
-        .collect()
     }
 
     fn convert_fn_infos(&self, fn_infos: Vec<FnInfo>) -> Vec<Item> {
@@ -264,10 +245,10 @@ impl ModGenerator {
         let item_mod = ItemMod {
             attrs: vec![
                 constants::CFG_TEST_ATTRIBUTE.clone(),
-                constants::ALLOW_DEAD_CODE_ATTRIBUTE.clone(),
-                constants::ALLOW_UNUSED_ATTRIBUTE.clone(),
+                constants::ALLOW_UNUSED_PARENS_ATTRIBUTE.clone(),
                 constants::ALLOW_NON_SNAKE_CASE_ATTRIBUTE.clone(),
                 constants::ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE.clone(),
+                constants::ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE.clone(),
             ],
             vis: Visibility::Inherited,
             unsafety: None,

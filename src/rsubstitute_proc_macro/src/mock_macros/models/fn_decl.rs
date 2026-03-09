@@ -9,8 +9,12 @@ pub(crate) struct FnDecl {
     pub fn_ident: Ident,
     pub arguments: Vec<FnArg>,
     pub return_value: ReturnType,
+    pub own_generics: Generics,
+    pub merged_generics: Generics,
     pub visibility: Visibility,
     pub maybe_base_fn_block: Option<Block>,
+    pub maybe_phantom_return_field: Option<Field>,
+    pub arg_refs_tuple: Type
 }
 
 impl FnDecl {
@@ -40,5 +44,20 @@ impl FnDecl {
             ReturnType::Default => false,
             ReturnType::Type(_, _) => true,
         }
+    }
+
+    pub fn get_internal_phantom_types_count(&self) -> usize {
+        if self.maybe_phantom_return_field.is_some() {
+            2
+        } else {
+            1
+        }
+    }
+
+    // pub fn get_internal_phantom_types_count_without_return_type(&self) -> usize {
+    //     1
+    // }
+    pub fn get_internal_phantom_types_count_without_return_type(&self) -> usize {
+        self.get_internal_phantom_types_count()
     }
 }

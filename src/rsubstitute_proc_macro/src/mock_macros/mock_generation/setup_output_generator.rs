@@ -2,53 +2,45 @@ use crate::constants;
 use crate::mock_macros::fn_info_generation::models::*;
 use crate::mock_macros::mock_generation::models::*;
 use crate::syntax::*;
+use proc_macro2::Span;
 use std::sync::Arc;
 use syn::*;
 
 pub trait ISetupOutputGenerator {
-    fn generate_for_trait(&self, fn_info: &FnInfo, mock_type: &MockType) -> ReturnType;
+    fn generate_for_trait(&self, fn_info: &FnInfo) -> TypePath;
 
     fn generate_for_static(
         &self,
         fn_info: &FnInfo,
-        mock_type: &MockType,
         mock_setup_struct: &MockSetupStruct,
-    ) -> ReturnType;
+    ) -> TypePath;
 }
 
 pub(crate) struct SetupOutputGenerator {
     pub type_factory: Arc<dyn ITypeFactory>,
+    pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
 }
 
 impl ISetupOutputGenerator for SetupOutputGenerator {
-    fn generate_for_trait(&self, fn_info: &FnInfo, mock_type: &MockType) -> ReturnType {
+    fn generate_for_trait(&self, fn_info: &FnInfo) -> TypePath {
         let ty = self.generate(
             fn_info,
-            mock_type,
-            constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
             constants::SELF_TYPE.clone(),
+            OutputTypeLifetime::Derived,
         );
-        let result = ReturnType::Type(Default::default(), Box::new(ty));
-        return result;
+        return ty;
     }
 
     fn generate_for_static(
         &self,
         fn_info: &FnInfo,
-        mock_type: &MockType,
         mock_setup_struct: &MockSetupStruct,
-    ) -> ReturnType {
+    ) -> TypePath {
         let owner_type = self
             .type_factory
             .create_from_struct(&mock_setup_struct.item_struct);
-        let ty = self.generate(
-            fn_info,
-            mock_type,
-            constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
-            owner_type,
-        );
-        let result = ReturnType::Type(Default::default(), Box::new(ty));
-        return result;
+        let ty = self.generate(fn_info, owner_type, OutputTypeLifetime::Default);
+        return ty;
     }
 }
 
@@ -56,32 +48,37 @@ impl SetupOutputGenerator {
     fn generate(
         &self,
         fn_info: &FnInfo,
-        mock_type: &MockType,
-        lifetime: Lifetime,
         owner_type: Type,
-    ) -> Type {
-        let result = Type::Path(TypePath {
+        output_type_lifetime: OutputTypeLifetime,
+    ) -> TypePath {
+        let mut arg_refs_tuple = fn_info.parent.arg_refs_tuple.clone();
+        match output_type_lifetime {
+            OutputTypeLifetime::Default => self
+                .reference_normalizer
+                .normalize_anonymous_lifetimes(&mut arg_refs_tuple),
+            _ => (),
+        }
+        let result = TypePath {
             qself: None,
             path: Path {
                 leading_colon: None,
                 segments: [PathSegment {
-                    ident: constants::SHARED_FN_CONFIG_TYPE_IDENT.clone(),
+                    ident: constants::FN_TUNER_TYPE_IDENT.clone(),
                     arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
                         colon2_token: None,
                         lt_token: Default::default(),
                         args: [
-                            GenericArgument::Lifetime(lifetime),
-                            GenericArgument::Type(mock_type.ty.clone()),
-                            GenericArgument::Type(
-                                self.type_factory
-                                    .create_from_struct(&fn_info.call_struct.item_struct),
-                            ),
-                            GenericArgument::Type(
-                                self.type_factory
-                                    .create_from_struct(&fn_info.args_checker_struct.item_struct),
-                            ),
-                            GenericArgument::Type(fn_info.parent.get_return_value_type()),
+                            GenericArgument::Lifetime(output_type_lifetime.get()),
                             GenericArgument::Type(owner_type),
+                            GenericArgument::Type(arg_refs_tuple),
+                            GenericArgument::Type(fn_info.parent.get_return_value_type()),
+                            GenericArgument::Const(Expr::Lit(ExprLit {
+                                attrs: Vec::new(),
+                                lit: Lit::Bool(LitBool::new(
+                                    fn_info.parent.maybe_base_fn_block.is_some(),
+                                    Span::call_site(),
+                                )),
+                            })),
                         ]
                         .into_iter()
                         .collect(),
@@ -91,7 +88,7 @@ impl SetupOutputGenerator {
                 .into_iter()
                 .collect(),
             },
-        });
+        };
         return result;
     }
 }

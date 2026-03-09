@@ -1,33 +1,33 @@
 #![allow(unused)]
 use rsubstitute::macros::mock;
 
-// #[mock]
-// fn accept_ref<'a>(r: &'a i32) -> &'a i32 {
-//     todo!()
-// }
+#[mock]
+fn accept_ref<'a>(r: &'a i32) -> &'a i32 {
+    todo!()
+}
 
 #[mock]
 fn return_mut_ref<'a>() -> &'a mut i32 {
     todo!()
 }
 
-// #[mock]
-// fn accept_mut_ref<'a>(mut r: i32) -> i32 {
-//     r += 1;
-//     return r;
-// }
-// 
-// #[derive(Clone, Debug, PartialOrd, PartialEq)]
-// struct Foo {
-//     pub number: Vec<i32>,
-// }
-// 
-// #[mock]
-// fn accept_foo(Foo { mut number }: Foo) {
-//     let q = Foo { number };
-// 
-//     println!("number: ???");
-// }
+#[mock]
+fn accept_mut_ref<'a>(mut r: i32) -> i32 {
+    r += 1;
+    return r;
+}
+
+#[derive(Clone, Debug, PartialOrd, PartialEq)]
+struct Foo {
+    pub number: Vec<i32>,
+}
+
+#[mock]
+fn accept_foo(Foo { mut number }: Foo) {
+    let q = Foo { number };
+
+    println!("number: ???");
+}
 
 #[mock]
 fn accept_many_ref<'a, 'b>(mut r: &'a &'b &'a &i32, _em: &()) -> &'a &'b &'a &'b i32 {
@@ -46,18 +46,18 @@ mod tests {
 
     #[test]
     fn accept_ref_test() {
-        // let v1 = 1;
-        // let v2 = 2;
-        // let r1 = &v1;
-        // {
-        //     let r2 = &v2;
-        //
-        //     accept_ref::setup(r1).returns(r2);
-        //
-        //     accept_ref(r1);
-        //
-        //     accept_ref::received(r1, Times::Once).no_other_calls();
-        // }
+        let v1 = 1;
+        let v2 = 2;
+        let r1 = &v1;
+        {
+            let r2 = &v2;
+        
+            accept_ref::setup(r1).returns(r2);
+        
+            accept_ref(r1);
+        
+            accept_ref::received(r1, Times::Once).no_other_calls();
+        }
     }
 
     #[test]

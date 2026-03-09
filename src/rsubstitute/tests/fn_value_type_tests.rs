@@ -5,35 +5,35 @@ use std::cell::{Cell, RefCell};
 use std::sync::Arc;
 
 thread_local! {
-    pub static BASE_CALLED_FLAG: Cell   <bool> = Cell::new(false);
+    pub static BASE_CALLED_FLAG: Cell<bool> = Cell::new(false);
 }
 
-#[mock]
+#[mock(base)]
 fn accept_value(v: i32) {
     BASE_CALLED_FLAG.set(true);
 }
 
 const BASE_RETURN_VALUE: i32 = 12321;
-#[mock]
+#[mock(base)]
 fn return_value() -> i32 {
     BASE_CALLED_FLAG.set(true);
     return BASE_RETURN_VALUE;
 }
 
 const BASE_ACCEPT_VALUE_RETURN_VALUE: f32 = 44.2;
-#[mock]
+#[mock(base)]
 fn accept_value_return_value(v: i32) -> f32 {
     BASE_CALLED_FLAG.set(true);
     return BASE_ACCEPT_VALUE_RETURN_VALUE;
 }
 
-#[mock]
+#[mock(base)]
 fn accept_two_values(v1: i32, v2: f32) {
     BASE_CALLED_FLAG.set(true);
 }
 
 const BASE_ACCEPT_TWO_VALUES_RETURN_VALUE: &'static str = "quo vadis";
-#[mock]
+#[mock(base)]
 fn accept_two_values_return_value(v1: i32, v2: f32) -> &'static str {
     BASE_CALLED_FLAG.set(true);
     return BASE_ACCEPT_TWO_VALUES_RETURN_VALUE;
@@ -95,7 +95,7 @@ mod tests {
             // Arrange
             let callback_flag = Arc::new(RefCell::new(false));
             let callback_flag_clone = callback_flag.clone();
-            accept_value::setup(Arg::Any).does(move || *callback_flag_clone.borrow_mut() = true);
+            accept_value::setup(Arg::Any).does(move |_| *callback_flag_clone.borrow_mut() = true);
 
             // Act
             accept_value(1);
@@ -436,11 +436,13 @@ accept_value(*{first_value}*)
             return_value::setup()
                 .returns(first_value)
                 .setup()
-                .returns_and_does(second_value, move || {
+                .returns(second_value)
+                .and_does(move |_| {
                     *first_callback_counter_clone.borrow_mut() = Result::SecondConfigChanged
                 })
                 .setup()
-                .returns_and_does(third_value, move || {
+                .returns(third_value)
+                .and_does(move |_| {
                     *second_callback_counter_clone.borrow_mut() = Result::ThirdConfigChanged
                 });
 
@@ -502,9 +504,9 @@ accept_value(*{first_value}*)
             let callback_counter_clone = callback_counter.clone();
             let first_value = 10;
             let second_value = 22;
-            return_value::setup().returns_many_and_does([first_value, second_value], move || {
-                *callback_counter_clone.borrow_mut() += 1
-            });
+            return_value::setup()
+                .returns_many([first_value, second_value])
+                .and_does(move |_| *callback_counter_clone.borrow_mut() += 1);
 
             // Act
             let actual_first_value = return_value();
@@ -686,11 +688,13 @@ accept_value(*{first_value}*)
             let second_callback_number_clone = second_callback_number.clone();
             let second_returned_value = 22.2;
             accept_value_return_value::setup(Arg::Eq(first_accepted_value))
-                .returns_and_does(first_returned_value, move || {
+                .returns(first_returned_value)
+                .and_does(move |_| {
                     *first_callback_number_clone.borrow_mut() = 1;
                 })
                 .setup(Arg::Eq(second_accepted_value))
-                .returns_and_does(second_returned_value, move || {
+                .returns(second_returned_value)
+                .and_does(move |_| {
                     *second_callback_number_clone.borrow_mut() = 2;
                 });
 

@@ -7,12 +7,12 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait IInputArgsGenerator {
-    fn generate_input_args(&self, fn_info: &FnInfo, phantom_types_count: usize) -> Vec<FnArg>;
+    fn generate_input_args(&self, fn_info: &FnInfo, skipped_fields_count: usize) -> Vec<FnArg>;
 
     fn generate_input_args_with_static_lifetimes(
         &self,
         fn_info: &FnInfo,
-        phantom_types_count: usize,
+        skipped_fields_count: usize,
     ) -> Vec<FnArg>;
 
     fn generate_args_checker_var_ident_and_decl_stmt(&self, fn_info: &FnInfo) -> (Ident, Stmt);
@@ -23,17 +23,18 @@ pub(crate) struct InputArgsGenerator {
     pub field_value_factory: Arc<dyn IFieldValueFactory>,
     pub local_factory: Arc<dyn ILocalFactory>,
     pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
-    pub field_checker: Arc<dyn IFieldChecker>
+    pub field_checker: Arc<dyn IFieldChecker>,
+    pub type_factory: Arc<dyn ITypeFactory>,
 }
 
 impl IInputArgsGenerator for InputArgsGenerator {
-    fn generate_input_args(&self, fn_info: &FnInfo, phantom_types_count: usize) -> Vec<FnArg> {
+    fn generate_input_args(&self, fn_info: &FnInfo, skipped_fields_count: usize) -> Vec<FnArg> {
         let result = fn_info
             .args_checker_struct
             .item_struct
             .fields
             .iter()
-            .skip(1 + phantom_types_count)
+            .skip(skipped_fields_count)
             .map(|field| {
                 FnArg::Typed(PatType {
                     attrs: Vec::new(),
@@ -41,10 +42,7 @@ impl IInputArgsGenerator for InputArgsGenerator {
                         attrs: Vec::new(),
                         by_ref: None,
                         mutability: None,
-                        ident: field
-                            .ident
-                            .clone()
-                            .expect("Field in args checker struct should be named"),
+                        ident: field.get_required_ident(),
                         subpat: None,
                     })),
                     colon_token: Default::default(),
@@ -85,12 +83,13 @@ impl IInputArgsGenerator for InputArgsGenerator {
     fn generate_input_args_with_static_lifetimes(
         &self,
         fn_info: &FnInfo,
-        phantom_types_count: usize,
+        skipped_fields_count: usize,
     ) -> Vec<FnArg> {
-        let mut fn_args = self.generate_input_args(fn_info, phantom_types_count);
+        let mut fn_args = self.generate_input_args(fn_info, skipped_fields_count);
         for fn_arg in fn_args.iter_mut() {
             if let FnArg::Typed(pat_type) = fn_arg {
-                self.reference_normalizer.staticify_anonymous_lifetimes(&mut pat_type.ty);
+                self.reference_normalizer
+                    .staticify_anonymous_lifetimes(&mut pat_type.ty);
             }
         }
         return fn_args;
@@ -115,8 +114,12 @@ impl IInputArgsGenerator for InputArgsGenerator {
                 return self.field_value_factory.create_with_into_conversion(field);
             })
             .collect();
-        let args_checker_decl_stmt = Stmt::Local(self.local_factory.create(
+        let args_checker_struct_type = self
+            .type_factory
+            .create_from_struct(&fn_info.args_checker_struct.item_struct);
+        let args_checker_decl_stmt = Stmt::Local(self.local_factory.create_with_type(
             args_checker_var_ident.clone(),
+            args_checker_struct_type,
             LocalInit {
                 eq_token: Default::default(),
                 expr:

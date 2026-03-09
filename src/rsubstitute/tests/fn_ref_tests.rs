@@ -1,50 +1,52 @@
 #![allow(unused)]
 use rsubstitute::macros::mock;
 
-#[mock]
+#[mock(base)]
 fn accept_ref(r: &i32) {}
 
 const BASE_RETURN_REF: &'static i32 = &1000;
-#[mock]
+#[mock(base)]
 fn return_ref() -> &'static i32 {
     BASE_RETURN_REF
 }
 
 const BASE_ACCEPT_REF_RETURN_REF: &'static i32 = &2000;
-#[mock]
+#[mock(base)]
 fn accept_ref_return_ref(r: &i32) -> &'static i32 {
     BASE_ACCEPT_REF_RETURN_REF
 }
 
-#[mock]
+#[mock(base)]
 fn accept_two_refs(r1: &i32, r2: &f32) {}
 
 const ACCEPT_TWO_REFS_RETURN_REF: &'static str = "quo vadis";
-#[mock]
+#[mock(base)]
 fn accept_two_refs_return_ref(r1: &i32, r2: &f32) -> &'static str {
     ACCEPT_TWO_REFS_RETURN_REF
 }
 
-// #[mock]
-// fn accept_mut_ref(r: &mut i32) {}
-//
-// #[mock]
-// fn return_mut_ref() -> &'static mut i32 {
-//     BASE_RETURN_REF
-// }
-//
-// #[mock]
-// fn accept_mut_ref_return_mut_ref(r: &mut i32) -> &'static i32 {
-//     BASE_ACCEPT_REF_RETURN_REF
-// }
-//
-// #[mock]
-// fn accept_two_mut_refs(r1: &mut i32, r2: &mut f32) {}
-//
-// #[mock]
-// fn accept_two_mut_refs_return_mut_ref(r1: &mut i32, r2: &mut f32) -> &'static mut str {
-//     ACCEPT_TWO_REFS_RETURN_REF
-// }
+#[mock(base)]
+fn accept_mut_ref(r: &mut i32) {}
+
+static mut BASE_RETURN_MUT_REF: i32 = 12;
+#[mock(base)]
+fn return_mut_ref() -> &'static mut i32 {
+    unsafe { &mut *&raw mut BASE_RETURN_MUT_REF }
+}
+
+#[mock(base)]
+fn accept_mut_ref_return_mut_ref(r: &mut i32) -> &'static i32 {
+    BASE_ACCEPT_REF_RETURN_REF
+}
+
+#[mock(base)]
+fn accept_two_mut_refs(r1: &mut i32, r2: &mut f32) {}
+
+static mut ACCEPT_TWO_REFS_RETURN_MUT_REF: i32 = 382;
+#[mock(base)]
+fn accept_two_mut_refs_return_mut_ref(r1: &mut i32, r2: &mut f32) -> &'static mut i32 {
+    unsafe { &mut *&raw mut ACCEPT_TWO_REFS_RETURN_MUT_REF }
+}
 
 #[cfg(test)]
 mod tests {
@@ -79,7 +81,7 @@ mod tests {
         fn accept_value_Panics() {
             // Arrange
             let r = &11;
-            let r_ptr = std::ptr::from_ref(r);
+            let r_ptr = core::ptr::from_ref(r);
 
             // Act
             accept_ref(r);
@@ -91,7 +93,7 @@ mod tests {
                     "Expected to never receive a call matching:
 	accept_ref((&i32): any)
 Actually received 1 matching call:
-	accept_ref({r})
+	accept_ref(\"{r}\")
 Received no non-matching calls"
                 ),
             );
@@ -102,13 +104,13 @@ Received no non-matching calls"
                     "Expected to receive a call 3 times matching:
 	accept_ref((&i32): any)
 Actually received 1 matching call:
-	accept_ref({r})
+	accept_ref(\"{r}\")
 Received no non-matching calls"
                 ),
             );
 
             let invalid_r = &22;
-            let invalid_r_ptr = std::ptr::from_ref(invalid_r);
+            let invalid_r_ptr = core::ptr::from_ref(invalid_r);
             assert_panics(
                 || accept_ref::received(invalid_r, Times::Once),
                 format!(
@@ -116,7 +118,7 @@ Received no non-matching calls"
 	accept_ref((&i32): equal to {invalid_r})
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-accept_ref(*{r}*)
+accept_ref(*\"{r}\"*)
 	1. r (&i32):
 		Expected reference (ptr: {invalid_r_ptr:?}): {invalid_r}
 		Actual reference   (ptr: {r_ptr:?}): {r}"

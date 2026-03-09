@@ -1,4 +1,4 @@
-use rsubstitute::macros::mock;
+use rsubstitute_proc_macro::mock;
 use std::cell::RefCell;
 use std::sync::Arc;
 
@@ -17,7 +17,9 @@ mod tests {
         // Arrange
         let callback_flag = Arc::new(RefCell::new(false));
         let callback_flag_clone = callback_flag.clone();
-        f::setup().returns_and_does((), move || *callback_flag_clone.borrow_mut() = true);
+        f::setup()
+            .returns(())
+            .and_does(move |_| *callback_flag_clone.borrow_mut() = true);
 
         // Act
         let result = f();

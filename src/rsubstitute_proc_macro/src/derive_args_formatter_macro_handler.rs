@@ -1,4 +1,5 @@
 use crate::constants;
+use crate::mock_macros::mock_generation::IDebugStringExprGenerator;
 use crate::syntax::*;
 use proc_macro::TokenStream;
 use proc_macro2::Literal;
@@ -12,10 +13,10 @@ pub trait IDeriveArgsFormatterMacroHandler {
 }
 
 pub(crate) struct DeriveArgsFormatterMacroHandler {
-    pub path_factory: Arc<dyn IPathFactory>,
     pub type_factory: Arc<dyn ITypeFactory>,
     pub field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
     pub field_checker: Arc<dyn IFieldChecker>,
+    pub debug_string_expr_generator: Arc<dyn IDebugStringExprGenerator>,
 }
 
 impl IDeriveArgsFormatterMacroHandler for DeriveArgsFormatterMacroHandler {
@@ -31,8 +32,7 @@ impl IDeriveArgsFormatterMacroHandler for DeriveArgsFormatterMacroHandler {
             generics: item_struct.generics.clone(),
             trait_: Some((
                 None,
-                self.path_factory
-                    .create(constants::I_ARGS_FORMATTER_TRAIT_IDENT.clone()),
+                constants::I_ARGS_FORMATTER_TRAIT_PATH.clone(),
                 Default::default(),
             )),
             self_ty: Box::new(self.type_factory.create_from_struct(&item_struct)),
@@ -75,7 +75,7 @@ impl DeriveArgsFormatterMacroHandler {
             .fields
             .iter()
             .skip_while(|field| self.field_checker.is_phantom_data(field))
-            .map(|_| "{:?}")
+            .map(|_| "{}")
             .collect::<Vec<_>>()
             .join(", ");
         let literal = Literal::string(&literal_str);
@@ -84,10 +84,11 @@ impl DeriveArgsFormatterMacroHandler {
             .iter()
             .skip_while(|field| self.field_checker.is_phantom_data(field))
             .map(|field| {
-                self.field_access_expr_factory.create(vec![
-                    constants::SELF_IDENT.clone(),
-                    field.get_required_ident(),
-                ])
+                self.debug_string_expr_generator
+                    .generate(self.field_access_expr_factory.create(vec![
+                        constants::SELF_IDENT.clone(),
+                        field.get_required_ident(),
+                    ]))
             })
             .collect();
         let tokens = quote! { #literal, #(#args),* };

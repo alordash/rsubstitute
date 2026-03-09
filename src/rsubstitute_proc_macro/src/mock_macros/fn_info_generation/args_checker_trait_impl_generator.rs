@@ -9,18 +9,21 @@ use syn::punctuated::Punctuated;
 use syn::token::Bracket;
 use syn::*;
 
+// TODO - turn into #[derive()] macro?
 pub trait IArgsCheckerTraitImplGenerator {
     fn generate(
         &self,
         call_struct: &CallStruct,
         args_checker_struct: &ArgsCheckerStruct,
-        phantom_types_count: usize,
+        skipped_fields_count: usize,
     ) -> ArgsCheckerTraitImpl;
 }
 
 pub(crate) struct ArgsCheckerTraitImplGenerator {
     pub type_factory: Arc<dyn ITypeFactory>,
+    pub local_factory: Arc<dyn ILocalFactory>,
     pub field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
+    pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
     pub expr_reference_factory: Arc<dyn IExprReferenceFactory>,
 }
 
@@ -29,37 +32,23 @@ impl IArgsCheckerTraitImplGenerator for ArgsCheckerTraitImplGenerator {
         &self,
         call_struct: &CallStruct,
         args_checker_struct: &ArgsCheckerStruct,
-        phantom_types_count: usize,
+        skipped_fields_count: usize,
     ) -> ArgsCheckerTraitImpl {
         let trait_ident = constants::I_ARGS_CHECKER_TRAIT_IDENT.clone();
         let trait_path = Path {
             leading_colon: None,
             segments: [PathSegment {
                 ident: trait_ident,
-                arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
-                    colon2_token: None,
-                    lt_token: Default::default(),
-                    args: [GenericArgument::Type(
-                        self.type_factory
-                            .create_from_struct(&call_struct.item_struct),
-                    )]
-                    .into_iter()
-                    .collect(),
-                    gt_token: Default::default(),
-                }),
+                arguments: PathArguments::None,
             }]
             .into_iter()
             .collect(),
         };
-        let call_ty = Box::new(
-            self.type_factory
-                .create_from_struct(&call_struct.item_struct),
-        );
         let self_ty = Box::new(
             self.type_factory
                 .create_from_struct(&args_checker_struct.item_struct),
         );
-        let items = self.generate_check_fn(call_struct, call_ty, phantom_types_count);
+        let items = self.generate_check_fn(call_struct, skipped_fields_count);
         let item_impl = ItemImpl {
             attrs: Vec::new(),
             defaultness: None,
@@ -86,21 +75,18 @@ impl ArgsCheckerTraitImplGenerator {
     const ARG_CHECK_RC_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("check_rc"));
     const ARG_CHECK_ARC_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("check_arc"));
 
-    const CALL_ARG_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("call"));
+    const DYN_CALL_ARG_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("dyn_call"));
+    const CALL_VAR_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("call"));
 
-    fn generate_check_fn(
-        &self,
-        call_struct: &CallStruct,
-        call_type: Box<Type>,
-        phantom_types_count: usize,
-    ) -> ImplItem {
-        let check_stmt = self.generate_check_stmt(call_struct, phantom_types_count);
+    fn generate_check_fn(&self, call_struct: &CallStruct, skipped_fields_count: usize) -> ImplItem {
+        let call_var_stmt = self.generate_call_var_stmt(call_struct);
+        let check_stmt = self.generate_check_stmt(call_struct, skipped_fields_count);
         let block = Block {
             brace_token: Default::default(),
-            stmts: vec![check_stmt],
+            stmts: vec![call_var_stmt, check_stmt],
         };
         let impl_item = ImplItem::Fn(ImplItemFn {
-            attrs: Vec::new(),
+            attrs: vec![constants::ALLOW_UNUSED_ATTRIBUTE.clone()],
             vis: Visibility::Inherited,
             defaultness: None,
             sig: Signature {
@@ -120,11 +106,11 @@ impl ArgsCheckerTraitImplGenerator {
                             attrs: Vec::new(),
                             by_ref: None,
                             mutability: None,
-                            ident: Self::CALL_ARG_IDENT.clone(),
+                            ident: Self::DYN_CALL_ARG_IDENT.clone(),
                             subpat: None,
                         })),
                         colon_token: Default::default(),
-                        ty: Box::new(self.type_factory.reference(*call_type.clone(), None)),
+                        ty: Box::new(constants::DYN_CALL_REF_TYPE.clone()),
                     }),
                 ]
                 .into_iter()
@@ -140,12 +126,34 @@ impl ArgsCheckerTraitImplGenerator {
         return impl_item;
     }
 
-    fn generate_check_stmt(&self, call_struct: &CallStruct, phantom_types_count: usize) -> Stmt {
+    fn generate_call_var_stmt(&self, call_struct: &CallStruct) -> Stmt {
+        let call_var_type = self.type_factory.reference(
+            self.type_factory
+                .create_from_struct(&call_struct.item_struct),
+            None,
+        );
+        let stmt = Stmt::Local(self.local_factory.create_with_type(
+            Self::CALL_VAR_IDENT.clone(),
+            call_var_type,
+            LocalInit {
+                eq_token: Default::default(),
+                expr: Box::new(Expr::MethodCall(self.expr_method_call_factory.create(
+                    vec![Self::DYN_CALL_ARG_IDENT.clone()],
+                    constants::DYN_CALL_DOWNCAST_REF_FN_IDENT.clone(),
+                    Vec::new(),
+                ))),
+                diverge: None,
+            },
+        ));
+        return stmt;
+    }
+
+    fn generate_check_stmt(&self, call_struct: &CallStruct, skipped_fields_count: usize) -> Stmt {
         let check_exprs: Punctuated<_, Token![,]> = call_struct
             .item_struct
             .fields
             .iter()
-            .skip(1 + phantom_types_count)
+            .skip(skipped_fields_count)
             .map(|field| self.generate_check_exprs(field))
             .collect();
         let vec_expr = Expr::Macro(ExprMacro {
@@ -172,7 +180,7 @@ impl ArgsCheckerTraitImplGenerator {
         });
         let field_access_arg = self.expr_reference_factory.create(
             self.field_access_expr_factory
-                .create(vec![Self::CALL_ARG_IDENT.clone(), field_ident]),
+                .create(vec![Self::CALL_VAR_IDENT.clone(), field_ident]),
         );
         let method = self.get_check_fn_ident(&field.ty);
         let expr = Expr::MethodCall(ExprMethodCall {

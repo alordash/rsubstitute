@@ -2,6 +2,7 @@ use crate::constants;
 use crate::mock_macros::fn_info_generation::models::FnInfo;
 use crate::mock_macros::mock_generation::models::*;
 use crate::syntax::*;
+use proc_macro2::Span;
 use quote::format_ident;
 use std::sync::Arc;
 use syn::*;
@@ -15,7 +16,6 @@ pub trait IMockDataStructGenerator {
 
 // TODO - verify all impls are internal
 pub(crate) struct MockDataStructGenerator {
-    pub type_factory: Arc<dyn ITypeFactory>,
     pub field_factory: Arc<dyn IFieldFactory>,
     pub struct_factory: Arc<dyn IStructFactory>,
 }
@@ -45,8 +45,11 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
                 )
             })
             .collect();
-        let fields = std::iter::once(constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD.clone())
+        let fields = [constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD.clone()]
+            .into_iter()
+            .chain(mock_type.generics.phantom_fields.clone())
             .chain(fn_fields)
+            .into_iter()
             .collect();
         let fields_named = FieldsNamed {
             brace_token: Default::default(),
@@ -92,6 +95,7 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
             .collect();
         let fields = [constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD.clone()]
             .into_iter()
+            .chain(mock_type.generics.phantom_fields.clone())
             .chain(fn_fields)
             .collect();
         let fields_named = FieldsNamed {
@@ -127,16 +131,18 @@ impl MockDataStructGenerator {
                         colon2_token: None,
                         lt_token: Default::default(),
                         args: [
+                            GenericArgument::Lifetime(Lifetime::new(
+                                &format!("'{}", constants::DEFAULT_ARG_FIELD_LIFETIME_NAME),
+                                Span::call_site(),
+                            )),
                             GenericArgument::Type(mock_type.ty.clone()),
-                            GenericArgument::Type(
-                                self.type_factory
-                                    .create_from_struct(&fn_info.call_struct.item_struct),
-                            ),
-                            GenericArgument::Type(
-                                self.type_factory
-                                    .create_from_struct(&fn_info.args_checker_struct.item_struct),
-                            ),
-                            GenericArgument::Type(fn_info.parent.get_return_value_type()),
+                            GenericArgument::Const(Expr::Lit(ExprLit {
+                                attrs: Vec::new(),
+                                lit: Lit::Bool(LitBool::new(
+                                    fn_info.parent.maybe_base_fn_block.is_some(),
+                                    Span::call_site(),
+                                )),
+                            })),
                         ]
                         .into_iter()
                         .collect(),

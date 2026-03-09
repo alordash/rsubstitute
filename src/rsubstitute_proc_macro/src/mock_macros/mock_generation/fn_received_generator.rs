@@ -33,11 +33,7 @@ impl IFnReceivedGenerator for FnReceivedGenerator {
             mock_received_struct,
             mock_type,
         );
-        let block = self.generate_fn_received_block(
-            fn_info,
-            mock_type,
-            mock_type.generics.get_phantom_types_count(),
-        );
+        let block = self.generate_fn_received_block(fn_info, mock_type);
         let item_fn = ItemFn {
             attrs: Vec::new(),
             vis: Visibility::Public(Default::default()),
@@ -49,16 +45,12 @@ impl IFnReceivedGenerator for FnReceivedGenerator {
 }
 
 impl FnReceivedGenerator {
-    fn generate_fn_received_block(
-        &self,
-        fn_info: &FnInfo,
-        mock_type: &MockType,
-        phantom_types_count: usize,
-    ) -> Block {
+    fn generate_fn_received_block(&self, fn_info: &FnInfo, mock_type: &MockType) -> Block {
         let static_mock_expr = self
             .get_global_mock_expr_generator
             .generate(mock_type.ty.clone());
         let received_clone_expr =
+        // TODO - make factory for clone expressions
             Expr::MethodCall(self.expr_method_call_factory.create_with_base_receiver(
                 static_mock_expr,
                 vec![constants::MOCK_RECEIVED_FIELD_IDENT.clone()],
@@ -79,7 +71,10 @@ impl FnReceivedGenerator {
                             .item_struct
                             .fields
                             .iter()
-                            .skip(1 + phantom_types_count)
+                            .skip(
+                                fn_info.parent.get_internal_phantom_types_count()
+                                    + mock_type.generics.get_phantom_fields_count(),
+                            )
                             .map(IFieldRequiredIdentGetter::get_required_ident)
                             .chain(std::iter::once(
                                 self.received_signature_generator.get_times_arg_ident(),

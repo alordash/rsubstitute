@@ -3,24 +3,81 @@ name = "rsubstitute"
 version = "0.1.0"
 edition = "2024"
 
-[[bin]]
-name = "trait"
-path = "bin/bin_trait.rs"
+#[[bin]]
+#name = "trait"
+#path = "bin/bin_trait.rs"
+#
+#[[bin]]
+#name = "trait_generics"
+#path = "bin/bin_trait_generics.rs"
+#
+#[[bin]]
+#name = "fn"
+#path = "bin/bin_fn.rs"
+#
+#[[bin]]
+#name = "struct"
+#path = "bin/bin_struct.rs"
 
-[[bin]]
-name = "trait_generics"
-path = "bin/bin_trait_generics.rs"
-
-[[bin]]
-name = "fn"
-path = "bin/bin_fn.rs"
-
-[[bin]]
-name = "struct"
-path = "bin/bin_struct.rs"
+#[[bin]]
+#name = "dyn_data"
+#path = "bin/bin_dyn_data.rs"
+#test = false
+#doctest = false
+#bench = false
+#
+#[[bin]]
+#name = "dyn_data_ref"
+#path = "bin/bin_dyn_data_ref.rs"
+#test = false
+#doctest = false
+#bench = false
+#
+#[[bin]]
+#name = "dyn_data_generics"
+#path = "bin/bin_dyn_data_generics.rs"
+#test = false
+#doctest = false
+#bench = false
+#
+#[[bin]]
+#name = "dyn_data_base_and_generics"
+#path = "bin/bin_dyn_data_base_and_generics.rs"
+#test = false
+#doctest = false
+#bench = false
+#
+#[[bin]]
+#name = "gen_dyn_data"
+#path = "bin/bin_gen_dyn_data.rs"
+#test = false
+#doctest = false
+#bench = false
+#
+#[[bin]]
+#name = "gen_dyn_data_ref"
+#path = "bin/bin_gen_dyn_data_ref.rs"
+#test = false
+#doctest = false
+#bench = false
+#
+#[[bin]]
+#name = "gen_dyn_data_generics"
+#path = "bin/bin_gen_dyn_data_generics.rs"
+#
+#[[bin]]
+#name = "gen_dyn_data_base_and_generics"
+#path = "bin/bin_gen_dyn_data_base_and_generics.rs"
+#test = false
+#doctest = false
 
 [dependencies]
-rsubstitute_core = { workspace = true }
+rsubstitute_core = { workspace = true, features = ["debug_naming"] }
 rsubstitute_proc_macro = { workspace = true }
 typeid = { workspace = true }
 not_enough_asserts = { workspace = true }
+
+[features]
+debug_naming = ["rsubstitute_core/debug_naming"]
+arg_lifetime_protection = ["rsubstitute_proc_macro/arg_lifetime_protection"]
+support_base_by_default = ["rsubstitute_proc_macro/support_base_by_default"]

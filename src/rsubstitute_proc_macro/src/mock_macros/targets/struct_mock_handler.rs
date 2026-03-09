@@ -7,9 +7,10 @@ use crate::mock_macros::*;
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
 use std::sync::Arc;
+use syn::ImplItem;
 
 pub trait IStructMockHandler {
-    fn handle(&self, struct_mock_syntax: StructMockSyntax) -> TokenStream;
+    fn handle(&self, ctx: &Ctx, struct_mock_syntax: StructMockSyntax) -> TokenStream;
 }
 
 pub struct StructMockHandler {
@@ -32,11 +33,12 @@ pub struct StructMockHandler {
     pub mock_setup_impl_generator: Arc<dyn IMockSetupImplGenerator>,
     pub mock_received_impl_generator: Arc<dyn IMockReceivedImplGenerator>,
     pub ignored_impl_fixer: Arc<dyn IIgnoredImplFixer>,
+    pub base_fn_generator: Arc<dyn IBaseFnGenerator>,
     pub mod_generator: Arc<dyn IModGenerator>,
 }
 
 impl IStructMockHandler for StructMockHandler {
-    fn handle(&self, mut struct_mock_syntax: StructMockSyntax) -> TokenStream {
+    fn handle(&self, ctx: &Ctx, mut struct_mock_syntax: StructMockSyntax) -> TokenStream {
         let source_struct_impls_syntax =
             self.generate_source_struct_impls_syntax(&struct_mock_syntax);
 
@@ -56,16 +58,18 @@ impl IStructMockHandler for StructMockHandler {
             .into_iter()
             .map(|x| {
                 self.mock_struct_trait_info_generator
-                    .generate(&mock_type, x)
+                    .generate(ctx, &mock_type, x)
             })
             .collect();
-        let struct_fn_decls = self
-            .fn_decl_extractor
-            .extract_struct_fns(&struct_mock_syntax.get_struct_fns());
+        let struct_fn_decls = self.fn_decl_extractor.extract_struct_fns(
+            ctx,
+            &mock_type.generics,
+            &struct_mock_syntax.get_struct_fns(),
+        );
         let target_ident = struct_mock_syntax.r#struct.ident.clone();
         let struct_fn_infos: Vec<_> = struct_fn_decls
             .into_iter()
-            .map(|x| self.fn_info_generator.generate(x, &mock_type))
+            .map(|x| self.fn_info_generator.generate(ctx, x, &mock_type))
             .collect();
         let all_fn_infos: Vec<_> = struct_fn_infos
             .iter()
@@ -124,10 +128,11 @@ impl IStructMockHandler for StructMockHandler {
         let mock_trait_impls = mock_struct_traits
             .iter()
             .map(|mock_struct_trait| {
-                self.mock_payload_impl_generator.generate(
+                self.mock_payload_impl_generator.generate_for_struct_trait(
                     mock_struct_trait.info.trait_ident_from_path.clone(),
                     &mock_type,
                     &mock_struct_trait.info.fn_infos,
+                    &mock_struct_trait.info.trait_ident_from_path,
                 )
             })
             .collect();
@@ -142,6 +147,53 @@ impl IStructMockHandler for StructMockHandler {
         let inner_data_impl = self
             .inner_data_impl_generator
             .generate(&inner_data_struct, struct_mock_syntax.new_fn);
+        let struct_base_fns: Vec<_> = struct_fn_infos
+            .iter()
+            .filter_map(|fn_info| {
+                fn_info
+                    .parent
+                    .maybe_base_fn_block
+                    .clone()
+                    .map(|base_fn_block| {
+                        self.base_fn_generator.generate(
+                            &mock_type,
+                            &fn_info.parent,
+                            &fn_info.call_struct,
+                            base_fn_block,
+                        )
+                    })
+            })
+            .map(|base_fn| ImplItem::Fn(base_fn.impl_item_fn))
+            .collect();
+        let struct_traits_base_fns: Vec<_> = mock_struct_traits
+            .iter()
+            .flat_map(|mock_struct_trait| {
+                mock_struct_trait
+                    .info
+                    .fn_infos
+                    .iter()
+                    .flat_map(|trait_fn_info| {
+                        trait_fn_info
+                            .parent
+                            .maybe_base_fn_block
+                            .clone()
+                            .map(|base_fn_block| {
+                                self.base_fn_generator.generate_struct_trait_fn(
+                                    &mock_type,
+                                    &trait_fn_info.parent,
+                                    &trait_fn_info.call_struct,
+                                    base_fn_block,
+                                    &mock_struct_trait.info.trait_ident_from_path,
+                                )
+                            })
+                    })
+            })
+            .map(|base_fn| ImplItem::Fn(base_fn.impl_item_fn))
+            .collect();
+        let all_base_fns = struct_base_fns
+            .into_iter()
+            .chain(struct_traits_base_fns)
+            .collect();
         let mock_impl = self.mock_impl_generator.generate(
             &mock_type,
             &mock_struct,
@@ -150,6 +202,7 @@ impl IStructMockHandler for StructMockHandler {
             &mock_received_struct,
             mock_struct_traits.iter().collect(),
             Some(inner_data_param),
+            all_base_fns,
         );
         let mock_setup_impl = self.mock_setup_impl_generator.generate_for_trait(
             &mock_type,
@@ -160,6 +213,7 @@ impl IStructMockHandler for StructMockHandler {
             &mock_type,
             &mock_received_struct,
             &struct_fn_infos,
+            OutputTypeLifetime::Derived,
         );
         self.ignored_impl_fixer
             .fix(&mock_type, &mut struct_mock_syntax.ignored_impls);

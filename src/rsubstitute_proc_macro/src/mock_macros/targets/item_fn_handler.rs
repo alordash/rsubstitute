@@ -2,6 +2,7 @@ use crate::constants;
 use crate::mock_macros::fn_info_generation::IFnInfoGenerator;
 use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::mock_generation::*;
+use crate::mock_macros::models::Ctx;
 use crate::mock_macros::*;
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
@@ -9,7 +10,7 @@ use std::sync::Arc;
 use syn::*;
 
 pub trait IItemFnHandler {
-    fn handle(&self, item_fn: ItemFn) -> TokenStream;
+    fn handle(&self, ctx: &Ctx, item_fn: ItemFn) -> TokenStream;
 }
 
 pub(crate) struct ItemFnHandler {
@@ -21,30 +22,32 @@ pub(crate) struct ItemFnHandler {
     pub mock_setup_struct_generator: Arc<dyn IMockSetupStructGenerator>,
     pub mock_received_struct_generator: Arc<dyn IMockReceivedStructGenerator>,
     pub mock_struct_generator: Arc<dyn IMockStructGenerator>,
-    pub send_sync_impls_generator: Arc<dyn ISendSyncImplsGenerator>,
     pub mock_struct_default_impl_generator: Arc<dyn IMockStructDefaultImplGenerator>,
     pub mock_setup_impl_generator: Arc<dyn IMockSetupImplGenerator>,
     pub mock_received_impl_generator: Arc<dyn IMockReceivedImplGenerator>,
     pub fn_setup_generator: Arc<dyn IFnSetupGenerator>,
     pub fn_received_generator: Arc<dyn IFnReceivedGenerator>,
     pub static_fn_generator: Arc<dyn IStaticFnGenerator>,
+    pub base_fn_generator: Arc<dyn IBaseFnGenerator>,
     pub mod_generator: Arc<dyn IModGenerator>,
 }
 
 impl IItemFnHandler for ItemFnHandler {
-    fn handle(&self, item_fn: ItemFn) -> TokenStream {
+    fn handle(&self, ctx: &Ctx, item_fn: ItemFn) -> TokenStream {
         let mock_ident = format_ident!(
             "{}{}",
             item_fn.sig.ident,
             constants::MOCK_STRUCT_IDENT_PREFIX
         );
-        let fn_decl = self.fn_decl_extractor.extract_fn(&item_fn);
         let mock_generics = self.mock_generics_generator.generate(&item_fn.sig.generics);
+        let fn_decl = self
+            .fn_decl_extractor
+            .extract_fn(ctx, &mock_generics, &item_fn);
         let mock_type = self
             .mock_type_generator
             .generate(mock_ident.clone(), mock_generics);
         let fn_ident = item_fn.sig.ident.clone();
-        let fn_info = self.fn_info_generator.generate(fn_decl, &mock_type);
+        let fn_info = self.fn_info_generator.generate(ctx, fn_decl, &mock_type);
         let fn_infos = [fn_info];
         let all_fn_infos: Vec<_> = fn_infos.iter().collect();
         let mock_data_struct = self
@@ -68,9 +71,6 @@ impl IItemFnHandler for ItemFnHandler {
             &mock_received_struct,
             &mock_data_struct,
         );
-        let send_sync_impls = self
-            .send_sync_impls_generator
-            .generate(&mock_struct.item_struct);
         let mock_struct_default_impl = self.mock_struct_default_impl_generator.generate(
             &mock_struct,
             &mock_data_struct,
@@ -96,6 +96,19 @@ impl IItemFnHandler for ItemFnHandler {
             self.fn_received_generator
                 .generate(&fn_info, &mock_received_struct, &mock_type);
         let static_fn = self.static_fn_generator.generate(&fn_info, &mock_type);
+        let maybe_static_base_fn =
+            fn_info
+                .parent
+                .maybe_base_fn_block
+                .clone()
+                .map(|base_fn_block| {
+                    self.base_fn_generator.generate_static(
+                        &mock_type,
+                        &fn_info.parent,
+                        &fn_info.call_struct,
+                        base_fn_block,
+                    )
+                });
 
         let generated_mod = self.mod_generator.generate_fn(
             fn_ident,
@@ -104,13 +117,13 @@ impl IItemFnHandler for ItemFnHandler {
             mock_setup_struct,
             mock_received_struct,
             mock_struct,
-            send_sync_impls,
             mock_struct_default_impl,
             mock_setup_impl,
             mock_received_impl,
             fn_setup,
             fn_received,
             static_fn,
+            maybe_static_base_fn,
         );
         let GeneratedMod {
             item_mod,

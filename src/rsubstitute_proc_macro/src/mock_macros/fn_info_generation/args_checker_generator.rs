@@ -12,6 +12,7 @@ pub trait IArgsCheckerGenerator {
 }
 
 pub(crate) struct ArgsCheckerGenerator {
+    pub attribute_factory: Arc<dyn IAttributeFactory>,
     pub arg_type_factory: Arc<dyn IArgTypeFactory>,
     pub field_factory: Arc<dyn IFieldFactory>,
     pub struct_factory: Arc<dyn IStructFactory>,
@@ -23,7 +24,7 @@ impl IArgsCheckerGenerator for ArgsCheckerGenerator {
     fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> ArgsCheckerStruct {
         let attrs = vec![
             constants::DOC_HIDDEN_ATTRIBUTE.clone(),
-            constants::DERIVE_DEBUG_AND_I_ARGS_FORMATTER_ATTRIBUTE.clone(),
+            self.generate_arg_checker_derive_traits_attribute(),
         ];
         let ident = format_ident!(
             "{}_{}",
@@ -36,8 +37,19 @@ impl IArgsCheckerGenerator for ArgsCheckerGenerator {
             .enumerate()
             .flat_map(|(i, x)| self.try_convert_fn_arg_to_field(i, x))
             .collect();
-        let struct_fields = std::iter::once(constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD.clone())
-            .chain(mock_generics.phantom_type_fields.clone())
+        let internal_phantom_fields =
+            if let Some(ref phantom_return_type) = fn_decl.maybe_phantom_return_field {
+                vec![
+                    constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD.clone(),
+                    phantom_return_type.clone(),
+                ]
+            } else {
+                vec![constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD.clone()]
+            };
+        let struct_fields = internal_phantom_fields
+            .into_iter()
+            .clone()
+            .chain(mock_generics.phantom_fields.iter().cloned())
             .chain(fn_fields)
             .collect();
         let fields_named = FieldsNamed {
@@ -45,12 +57,9 @@ impl IArgsCheckerGenerator for ArgsCheckerGenerator {
             named: struct_fields,
         };
 
-        let mut item_struct = self.struct_factory.create(
-            attrs,
-            ident,
-            mock_generics.impl_generics.clone(),
-            fields_named,
-        );
+        let mut item_struct =
+            self.struct_factory
+                .create(attrs, ident, fn_decl.merged_generics.clone(), fields_named);
         self.reference_normalizer
             .normalize_anonymous_lifetimes_in_struct(&mut item_struct);
         let args_checker_struct = ArgsCheckerStruct { item_struct };
@@ -61,6 +70,19 @@ impl IArgsCheckerGenerator for ArgsCheckerGenerator {
 
 impl ArgsCheckerGenerator {
     const ARGS_CHECKER_STRUCT_SUFFIX: &'static str = "ArgsChecker";
+
+    fn generate_arg_checker_derive_traits_attribute(&self) -> Attribute {
+        let derive_attribute = self.attribute_factory.create(
+            constants::DERIVE_IDENT.clone(),
+            &format!(
+                "{}, {}, {}",
+                constants::DEBUG_TRAIT_NAME,
+                constants::I_ARGS_FORMATTER_TRAIT_NAME,
+                constants::I_GENERICS_HASH_KEY_PROVIDER_TRAIT_NAME,
+            ),
+        );
+        return derive_attribute;
+    }
 
     fn try_convert_fn_arg_to_field(&self, arg_number: usize, fn_arg: &FnArg) -> Option<Field> {
         let pat_type = match fn_arg {
