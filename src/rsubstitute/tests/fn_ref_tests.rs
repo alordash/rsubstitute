@@ -63,6 +63,13 @@ mod tests {
             // Arrange
             let r = &1;
 
+            // TODO - what will happen?
+            {
+                let v2 = 24;
+                let r2 = &v2;
+                accept_ref::setup(r2).does(|| {});
+            }
+
             // Act
             accept_ref(r);
 
