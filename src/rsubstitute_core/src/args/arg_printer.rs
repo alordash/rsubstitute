@@ -1,4 +1,4 @@
-use std::fmt::{Debug, Formatter};
+use std::fmt::Debug;
 
 const UNKNOWN_ARG_STRING: &'static str = "?";
 

@@ -144,9 +144,13 @@ impl IStructMockHandler for StructMockHandler {
         let inner_data_impl = self
             .inner_data_impl_generator
             .generate(&inner_data_struct, struct_mock_syntax.new_fn);
-        let again_all_fn_infos: Vec<_> = mock_struct_traits
+        let again_all_fn_infos: Vec<_> = struct_fn_infos
             .iter()
-            .flat_map(|mock_struct_trait| mock_struct_trait.info.fn_infos.iter())
+            .chain(
+                mock_struct_traits
+                    .iter()
+                    .flat_map(|mock_struct_trait| mock_struct_trait.info.fn_infos.iter()),
+            )
             .collect();
         let mock_impl = self.mock_impl_generator.generate(
             &mock_type,
