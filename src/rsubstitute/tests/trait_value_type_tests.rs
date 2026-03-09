@@ -386,20 +386,20 @@ accept_value(*{first_value}*)
             let second_value = 22;
             let third_value = 333;
             let callback_result = Arc::new(RefCell::new(Result::DidNotChange));
-            let first_callback_counter_clone = callback_result.clone();
-            let second_callback_counter_clone = callback_result.clone();
+            let first_callback_result = callback_result.clone();
+            let second_callback_result = callback_result.clone();
             mock.setup
                 .return_value()
                 .returns(first_value)
                 .return_value()
                 .returns(second_value)
                 .and_does(move |_| {
-                    *first_callback_counter_clone.borrow_mut() = Result::SecondConfigChanged
+                    *first_callback_result.borrow_mut() = Result::SecondConfigChanged
                 })
                 .return_value()
                 .returns(third_value)
                 .and_does(move |_| {
-                    *second_callback_counter_clone.borrow_mut() = Result::ThirdConfigChanged
+                    *second_callback_result.borrow_mut() = Result::ThirdConfigChanged
                 });
 
             // Act

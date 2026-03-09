@@ -418,7 +418,7 @@ accept_value(*{first_value}*)
         }
 
         #[test]
-        fn return_value_UsesLastConfiguration_Ok() {
+        fn return_value_UsesFirstConfiguration_Ok() {
             // Arrange
             #[derive(Debug, PartialEq)]
             enum Result {
@@ -431,31 +431,29 @@ accept_value(*{first_value}*)
             let second_value = 22;
             let third_value = 333;
             let callback_result = Arc::new(RefCell::new(Result::DidNotChange));
-            let first_callback_counter_clone = callback_result.clone();
-            let second_callback_counter_clone = callback_result.clone();
+            let first_callback_result = callback_result.clone();
+            let second_callback_result = callback_result.clone();
             return_value::setup()
                 .returns(first_value)
                 .setup()
                 .returns(second_value)
                 .and_does(move |_| {
-                    *first_callback_counter_clone.borrow_mut() = Result::SecondConfigChanged
+                    *first_callback_result.borrow_mut() = Result::SecondConfigChanged
                 })
                 .setup()
                 .returns(third_value)
                 .and_does(move |_| {
-                    *second_callback_counter_clone.borrow_mut() = Result::ThirdConfigChanged
+                    *second_callback_result.borrow_mut() = Result::ThirdConfigChanged
                 });
 
             // Act
             let actual_first_value = return_value();
-            let actual_second_value = return_value();
-            let actual_third_value = return_value();
+            let error_second_value = record_panic(|| return_value());
 
             // Assert
-            assert_eq!(third_value, actual_first_value);
-            assert_eq!(third_value, actual_second_value);
-            assert_eq!(third_value, actual_third_value);
-            assert_eq!(Result::ThirdConfigChanged, *callback_result.borrow());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!("No return value found for following call: return_value()", error_second_value);
+            assert_eq!(Result::DidNotChange, *callback_result.borrow());
         }
 
         #[test]
@@ -470,31 +468,11 @@ accept_value(*{first_value}*)
             let actual_first_value = return_value();
             let actual_second_value = return_value();
             let actual_third_value = return_value();
-            let actual_fourth_value = return_value();
 
             // Assert
             assert_eq!(first_value, actual_first_value);
             assert_eq!(second_value, actual_second_value);
             assert_eq!(third_value, actual_third_value);
-            assert_eq!(third_value, actual_fourth_value);
-        }
-
-        #[test]
-        fn return_value_ManyToSingle_Ok() {
-            // Arrange
-            let second_value = 22;
-            return_value::setup()
-                .returns_many([1, 2, 3])
-                .setup()
-                .returns(second_value);
-
-            // Act
-            let actual_first_value = return_value();
-            let actual_second_value = return_value();
-
-            // Assert
-            assert_eq!(second_value, actual_first_value);
-            assert_eq!(second_value, actual_second_value);
         }
 
         #[test]
@@ -511,14 +489,12 @@ accept_value(*{first_value}*)
             // Act
             let actual_first_value = return_value();
             let actual_second_value = return_value();
-            let actual_third_value = return_value();
 
             // Assert
-            assert_eq!(3, *callback_counter.borrow());
+            assert_eq!(2, *callback_counter.borrow());
 
             assert_eq!(first_value, actual_first_value);
             assert_eq!(second_value, actual_second_value);
-            assert_eq!(second_value, actual_third_value);
         }
     }
 
@@ -534,11 +510,11 @@ accept_value(*{first_value}*)
             let second_returned_value = 22.2;
             let third_accepted_value = 30;
             let third_returned_value = 33.3;
-            accept_value_return_value::setup(Arg::Any)
+            accept_value_return_value::setup(Arg::Is(move |x| *x == first_accepted_value))
                 .returns(first_returned_value)
                 .setup(Arg::Eq(second_accepted_value))
                 .returns(second_returned_value)
-                .setup(Arg::Is(move |x| *x == third_accepted_value))
+                .setup(Arg::Any)
                 .returns(third_returned_value);
 
             // Act
@@ -629,15 +605,12 @@ accept_value(*{first_value}*)
             let actual_first_first_returned_value = accept_value_return_value(first_accepted_value);
             let actual_first_second_returned_value =
                 accept_value_return_value(first_accepted_value);
-            let actual_first_third_returned_value = accept_value_return_value(first_accepted_value);
 
             let actual_second_first_returned_value =
                 accept_value_return_value(second_accepted_value);
             let actual_second_second_returned_value =
                 accept_value_return_value(second_accepted_value);
             let actual_second_third_returned_value =
-                accept_value_return_value(second_accepted_value);
-            let actual_second_fourth_returned_value =
                 accept_value_return_value(second_accepted_value);
 
             // Assert
@@ -648,10 +621,6 @@ accept_value(*{first_value}*)
             assert_eq!(
                 first_second_returned_value,
                 actual_first_second_returned_value
-            );
-            assert_eq!(
-                first_second_returned_value,
-                actual_first_third_returned_value
             );
 
             assert_eq!(
@@ -666,13 +635,9 @@ accept_value(*{first_value}*)
                 second_third_returned_value,
                 actual_second_third_returned_value
             );
-            assert_eq!(
-                second_third_returned_value,
-                actual_second_fourth_returned_value
-            );
 
-            accept_value_return_value::received(first_accepted_value, Times::Exactly(3))
-                .received(second_accepted_value, Times::Exactly(4))
+            accept_value_return_value::received(first_accepted_value, Times::Exactly(2))
+                .received(second_accepted_value, Times::Exactly(3))
                 .no_other_calls();
         }
 

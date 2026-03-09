@@ -54,7 +54,7 @@ mod tests {
                     "Expected to never receive a call matching:
 	accept_arc((alloc::sync::Arc<i32>): any)
 Actually received 1 matching call:
-	accept_arc(\"{r}\")
+	accept_arc({r})
 Received no non-matching calls"
                 ),
             );
@@ -65,7 +65,7 @@ Received no non-matching calls"
                     "Expected to receive a call 3 times matching:
 	accept_arc((alloc::sync::Arc<i32>): any)
 Actually received 1 matching call:
-	accept_arc(\"{r}\")
+	accept_arc({r})
 Received no non-matching calls"
                 ),
             );

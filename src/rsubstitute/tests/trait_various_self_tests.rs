@@ -42,7 +42,7 @@ mod tests {
     fn flex() {
         let mut mock = TraitMock::new();
 
-        mock.setup.sbox().returns(12);
+        mock.setup.sbox().returns_always(12);
         mock.setup.src().returns(12);
         mock.setup.sarc().returns(12);
 
