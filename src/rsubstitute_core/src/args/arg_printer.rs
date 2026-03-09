@@ -6,6 +6,11 @@ const UNKNOWN_ARG_STRING: &'static str = "?";
 // https://github.com/asomers/mockall/blob/4401e5ac4aa7b05227c157f569d1147d732944b0/mockall/src/lib.rs#L1496
 pub struct ArgPrinter<'a, T: ?Sized>(pub &'a T);
 
+// Works only with `debug_naming` feature, otherwise returns unknown arg string.
+pub(crate) fn print_arg<T>(value: &T) -> String {
+    (&ArgPrinter(value)).debug_string()
+}
+
 #[cfg(not(feature = "debug_naming"))]
 pub use default_printing::*;
 #[cfg(not(feature = "debug_naming"))]
