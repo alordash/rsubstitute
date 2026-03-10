@@ -8,13 +8,29 @@ use std::iter::{IntoIterator, Iterator};
 use syn::punctuated::Punctuated;
 use syn::*;
 
-pub const DATA_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("data"));
-pub const MOCK_STRUCT_IDENT_PREFIX: &'static str = "Mock";
-pub const MOCK_SETUP_FIELD_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("setup"));
-pub const MOCK_RECEIVED_FIELD_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("received"));
+macro_rules! ident {
+    ($symbol:ident, $value:literal) => {
+        pub const $symbol: LazyCell<Ident> = LazyCell::new(|| format_ident!($value));
+    };
+    ($symbol:ident, $value:ident) => {
+        pub const $symbol: LazyCell<Ident> = LazyCell::new(|| format_ident!($value));
+    };
+}
 
-pub const SELF_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("self"));
-pub const SELF_EXPR: LazyCell<Expr> = LazyCell::new(|| {
+macro_rules! define_const {
+    ($symbol:ident, $ty:ty, $block:block) => {
+        pub const $symbol: LazyCell<$ty> = LazyCell::new(|| $block)
+    }
+}
+
+ident!(DATA_IDENT, "data");
+// pub const DATA_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("data"));
+pub const MOCK_STRUCT_IDENT_PREFIX: &'static str = "Mock";
+ident!(MOCK_SETUP_FIELD_IDENT, "setup");
+ident!(MOCK_RECEIVED_FIELD_IDENT, "received");
+
+ident!(SELF_IDENT, "self");
+define_const!(SELF_EXPR, Expr, {
     let path_factory = &SERVICES.path_factory;
     let result = Expr::Path(ExprPath {
         attrs: Vec::new(),
