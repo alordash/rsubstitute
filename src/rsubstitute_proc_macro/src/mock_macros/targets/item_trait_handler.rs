@@ -14,7 +14,6 @@ pub trait IItemTraitHandler {
 }
 
 pub(crate) struct ItemTraitHandler {
-    pub lifetimes_specifier: Arc<dyn ILifetimesSpecifier>,
     pub fn_decl_extractor: Arc<dyn IFnDeclExtractor>,
     pub mock_generics_generator: Arc<dyn IMockGenericsGenerator>,
     pub mock_type_generator: Arc<dyn IMockTypeGenerator>,
@@ -33,22 +32,18 @@ pub(crate) struct ItemTraitHandler {
 
 impl IItemTraitHandler for ItemTraitHandler {
     fn handle(&self, ctx: &Ctx, item_trait: ItemTrait) -> TokenStream {
-        let mock_item_trait = self
-            .lifetimes_specifier
-            .add_default_arg_lifetime(item_trait.clone());
-
         let mock_ident = format_ident!(
             "{}{}",
-            mock_item_trait.ident,
+            item_trait.ident,
             constants::MOCK_STRUCT_IDENT_PREFIX
         );
         let mock_generics = self
             .mock_generics_generator
-            .generate(&mock_item_trait.generics);
+            .generate(&item_trait.generics);
         let fn_decls = self
             .fn_decl_extractor
-            .extract(ctx, &mock_generics, &mock_item_trait.items);
-        let target_ident = mock_item_trait.ident.clone();
+            .extract(ctx, &mock_generics, &item_trait.items);
+        let target_ident = item_trait.ident.clone();
         let mock_type = self
             .mock_type_generator
             .generate(mock_ident.clone(), mock_generics);
@@ -133,19 +128,13 @@ impl IItemTraitHandler for ItemTraitHandler {
             mock_setup_impl,
             mock_received_impl,
         );
-        let cfg_test_attribute = constants::CFG_TEST_ATTRIBUTE.clone();
-        let cfg_not_test_attribute = constants::CFG_NOT_TEST_ATTRIBUTE.clone();
 
         let GeneratedMod {
             item_mod,
             use_generated_mod,
         } = generated_mod;
         let result = quote! {
-            #cfg_not_test_attribute
             #item_trait
-
-            #cfg_test_attribute
-            #mock_item_trait
 
             #use_generated_mod
             #item_mod

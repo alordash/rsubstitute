@@ -82,6 +82,5 @@ rsubstitute_core = { workspace = true, features = ["debug_naming"] }
 
 [features]
 debug_naming = ["rsubstitute_core/debug_naming"]
-arg_lifetime_protection = ["rsubstitute_proc_macro/arg_lifetime_protection"]
 # TODO - rename to "mock_base_by_default"
 support_base_by_default = ["rsubstitute_proc_macro/support_base_by_default"]
