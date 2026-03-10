@@ -1,7 +1,7 @@
 pub(crate) enum MockedMacroMode {
     Unspecified,
-    #[cfg(not(feature = "support_base_by_default"))]
+    #[cfg(not(feature = "mock_base_by_default"))]
     WithBase,
-    #[cfg(feature = "support_base_by_default")]
+    #[cfg(feature = "mock_base_by_default")]
     WithoutBase,
 }

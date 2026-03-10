@@ -82,5 +82,4 @@ rsubstitute_core = { workspace = true, features = ["debug_naming"] }
 
 [features]
 debug_naming = ["rsubstitute_core/debug_naming"]
-# TODO - rename to "mock_base_by_default"
-support_base_by_default = ["rsubstitute_proc_macro/support_base_by_default"]
+mock_base_by_default = ["rsubstitute_proc_macro/mock_base_by_default"]

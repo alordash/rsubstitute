@@ -38,7 +38,7 @@ pub fn mocked(proc_macro_item: proc_macro::TokenStream) -> proc_macro::TokenStre
     return mock_macro_handler.handle_macro_mocked(proc_macro_item, MockedMacroMode::Unspecified);
 }
 
-#[cfg(not(feature = "support_base_by_default"))]
+#[cfg(not(feature = "mock_base_by_default"))]
 #[proc_macro]
 pub fn mocked_base(proc_macro_item: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let mock_macro_handler = &SERVICES.mock_macro_handler;
@@ -46,7 +46,7 @@ pub fn mocked_base(proc_macro_item: proc_macro::TokenStream) -> proc_macro::Toke
     return mock_macro_handler.handle_macro_mocked(proc_macro_item, MockedMacroMode::WithBase);
 }
 
-#[cfg(feature = "support_base_by_default")]
+#[cfg(feature = "mock_base_by_default")]
 #[proc_macro]
 pub fn mocked_no_base(proc_macro_item: proc_macro::TokenStream) -> proc_macro::TokenStream {
     let mock_macro_handler = &SERVICES.mock_macro_handler;

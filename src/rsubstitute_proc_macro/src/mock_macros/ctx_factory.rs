@@ -34,9 +34,9 @@ impl ICtxFactory for CtxFactory {
     fn create_for_macro_mocked(&self, mocked_macro_target: MockedMacroMode) -> Ctx {
         let support_base_calling = match mocked_macro_target {
             MockedMacroMode::Unspecified => self.default_support_base_calling(),
-            #[cfg(not(feature = "support_base_by_default"))]
+            #[cfg(not(feature = "mock_base_by_default"))]
             MockedMacroMode::WithBase => true,
-            #[cfg(feature = "support_base_by_default")]
+            #[cfg(feature = "mock_base_by_default")]
             MockedMacroMode::WithoutBase => false,
         };
         let ctx = Ctx {
@@ -48,23 +48,23 @@ impl ICtxFactory for CtxFactory {
 
 impl CtxFactory {
     fn support_base_calling_from_parameters(&self, parameters: &[&str]) -> bool {
-        #[cfg(not(feature = "support_base_by_default"))]
+        #[cfg(not(feature = "mock_base_by_default"))]
         return parameters
             .iter()
             .any(|parameter| *parameter == constants::SUPPORT_BASE_PARAMETER);
 
-        #[cfg(feature = "support_base_by_default")]
+        #[cfg(feature = "mock_base_by_default")]
         return !parameters
             .iter()
             .any(|parameter| *parameter == constants::DO_NOT_SUPPORT_BASE_PARAMETER);
     }
 
-    #[cfg(not(feature = "support_base_by_default"))]
+    #[cfg(not(feature = "mock_base_by_default"))]
     fn default_support_base_calling(&self) -> bool {
         false
     }
 
-    #[cfg(feature = "support_base_by_default")]
+    #[cfg(feature = "mock_base_by_default")]
     fn default_support_base_calling(&self) -> bool {
         true
     }

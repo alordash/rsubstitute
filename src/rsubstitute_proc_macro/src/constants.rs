@@ -467,10 +467,10 @@ pub const DYN_CALL_REF_TYPE: LazyCell<Type> = LazyCell::new(|| {
 pub const DYN_CALL_DOWNCAST_REF_FN_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("downcast_ref"));
 
-#[cfg(not(feature = "support_base_by_default"))]
+#[cfg(not(feature = "mock_base_by_default"))]
 pub const SUPPORT_BASE_PARAMETER: &'static str = "base";
 
-#[cfg(feature = "support_base_by_default")]
+#[cfg(feature = "mock_base_by_default")]
 pub const DO_NOT_SUPPORT_BASE_PARAMETER: &'static str = "no_base";
 
 pub const BASE_FN_IDENT_PREFIX: &'static str = "base";
