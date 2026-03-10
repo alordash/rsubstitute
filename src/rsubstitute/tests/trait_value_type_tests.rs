@@ -42,12 +42,12 @@ mod tests {
                 .accept_value(Arg::Any, Times::Exactly(3))
                 .accept_value(first_value, Times::Once)
                 .accept_value(
-                    Arg::Is(|actual_value| *actual_value == first_value),
+                    Arg::is(|actual_value| *actual_value == first_value),
                     Times::Once,
                 )
-                .accept_value(Arg::Eq(second_value), Times::Exactly(2))
+                .accept_value(Arg::eq(second_value), Times::Exactly(2))
                 .accept_value(
-                    Arg::Is(|actual_value| *actual_value == second_value),
+                    Arg::is(|actual_value| *actual_value == second_value),
                     Times::Exactly(2),
                 )
                 .no_other_calls();
@@ -132,7 +132,7 @@ Received no non-matching calls"#
             assert_panics(
                 || {
                     mock.received
-                        .accept_value(Arg::Eq(first_value), Times::Never)
+                        .accept_value(Arg::eq(first_value), Times::Never)
                 },
                 format!(
                     r#"Expected to never receive a call matching:
@@ -149,7 +149,7 @@ accept_value(*{second_value}*)
             assert_panics(
                 || {
                     mock.received
-                        .accept_value(Arg::Eq(first_value), Times::Exactly(3))
+                        .accept_value(Arg::eq(first_value), Times::Exactly(3))
                 },
                 format!(
                     r#"Expected to receive a call 3 times matching:
@@ -166,7 +166,7 @@ accept_value(*{second_value}*)
             assert_panics(
                 || {
                     mock.received
-                        .accept_value(Arg::Eq(second_value), Times::Never)
+                        .accept_value(Arg::eq(second_value), Times::Never)
                 },
                 format!(
                     r#"Expected to never receive a call matching:
@@ -183,7 +183,7 @@ accept_value(*{first_value}*)
             assert_panics(
                 || {
                     mock.received
-                        .accept_value(Arg::Eq(second_value), Times::Exactly(3))
+                        .accept_value(Arg::eq(second_value), Times::Exactly(3))
                 },
                 format!(
                     r#"Expected to receive a call 3 times matching:
@@ -214,7 +214,7 @@ accept_value(*{first_value}*)
             assert_panics(
                 || {
                     mock.received.accept_value(
-                        Arg::Is(|actual_value| *actual_value == first_value),
+                        Arg::is(|actual_value| *actual_value == first_value),
                         Times::Never,
                     )
                 },
@@ -232,7 +232,7 @@ accept_value(*{second_value}*)
             assert_panics(
                 || {
                     mock.received.accept_value(
-                        Arg::Is(|actual_value| *actual_value == first_value),
+                        Arg::is(|actual_value| *actual_value == first_value),
                         Times::Exactly(3),
                     )
                 },
@@ -250,7 +250,7 @@ accept_value(*{second_value}*)
             assert_panics(
                 || {
                     mock.received.accept_value(
-                        Arg::Is(|actual_value| *actual_value == second_value),
+                        Arg::is(|actual_value| *actual_value == second_value),
                         Times::Never,
                     )
                 },
@@ -268,7 +268,7 @@ accept_value(*{first_value}*)
             assert_panics(
                 || {
                     mock.received.accept_value(
-                        Arg::Is(|actual_value| *actual_value == second_value),
+                        Arg::is(|actual_value| *actual_value == second_value),
                         Times::Exactly(3),
                     )
                 },
@@ -492,9 +492,9 @@ accept_value(*{first_value}*)
             let third_accepted_value = 30;
             let third_returned_value = 33.3;
             mock.setup
-                .accept_value_return_value(Arg::Is(|x| *x == first_accepted_value))
+                .accept_value_return_value(Arg::is(|x| *x == first_accepted_value))
                 .returns(first_returned_value)
-                .accept_value_return_value(Arg::Eq(second_accepted_value))
+                .accept_value_return_value(Arg::eq(second_accepted_value))
                 .returns(second_returned_value)
                 .accept_value_return_value(Arg::Any)
                 .returns(third_returned_value);
@@ -566,9 +566,9 @@ accept_value(*{first_value}*)
             let second_third_returned_value = 203.3;
 
             mock.setup
-                .accept_value_return_value(Arg::Eq(first_accepted_value))
+                .accept_value_return_value(Arg::eq(first_accepted_value))
                 .returns_many([first_first_returned_value, first_second_returned_value])
-                .accept_value_return_value(Arg::Eq(second_accepted_value))
+                .accept_value_return_value(Arg::eq(second_accepted_value))
                 .returns_many([
                     second_first_returned_value,
                     second_second_returned_value,
@@ -630,12 +630,12 @@ accept_value(*{first_value}*)
             let second_callback_number_clone = second_callback_number.clone();
             let second_returned_value = 22.2;
             mock.setup
-                .accept_value_return_value(Arg::Eq(first_accepted_value))
+                .accept_value_return_value(Arg::eq(first_accepted_value))
                 .returns(first_returned_value)
                 .and_does(move |_| {
                     *first_callback_number_clone.borrow_mut() = 1;
                 })
-                .accept_value_return_value(Arg::Eq(second_accepted_value))
+                .accept_value_return_value(Arg::eq(second_accepted_value))
                 .returns(second_returned_value)
                 .and_does(move |_| {
                     *second_callback_number_clone.borrow_mut() = 2;

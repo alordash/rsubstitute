@@ -64,12 +64,12 @@ mod tests {
             accept_value::received(Arg::Any, Times::Exactly(3))
                 .received(first_value, Times::Once)
                 .received(
-                    Arg::Is(move |actual_value| *actual_value == first_value),
+                    Arg::is(move |actual_value| *actual_value == first_value),
                     Times::Once,
                 )
-                .received(Arg::Eq(second_value), Times::Exactly(2))
+                .received(Arg::eq(second_value), Times::Exactly(2))
                 .received(
-                    Arg::Is(move |actual_value| *actual_value == second_value),
+                    Arg::is(move |actual_value| *actual_value == second_value),
                     Times::Exactly(2),
                 )
                 .no_other_calls();
@@ -162,7 +162,7 @@ Received no non-matching calls"
 
             // Assert
             assert_panics(
-                || accept_value::received(Arg::Eq(first_value), Times::Never),
+                || accept_value::received(Arg::eq(first_value), Times::Never),
                 format!(
                     "Expected to never receive a call matching:
 	accept_value((i32): equal to {first_value})
@@ -176,7 +176,7 @@ accept_value(*{second_value}*)
                 ),
             );
             assert_panics(
-                || accept_value::received(Arg::Eq(first_value), Times::Exactly(3)),
+                || accept_value::received(Arg::eq(first_value), Times::Exactly(3)),
                 format!(
                     "Expected to receive a call 3 times matching:
 	accept_value((i32): equal to {first_value})
@@ -190,7 +190,7 @@ accept_value(*{second_value}*)
                 ),
             );
             assert_panics(
-                || accept_value::received(Arg::Eq(second_value), Times::Never),
+                || accept_value::received(Arg::eq(second_value), Times::Never),
                 format!(
                     "Expected to never receive a call matching:
 	accept_value((i32): equal to {second_value})
@@ -204,7 +204,7 @@ accept_value(*{first_value}*)
                 ),
             );
             assert_panics(
-                || accept_value::received(Arg::Eq(second_value), Times::Exactly(3)),
+                || accept_value::received(Arg::eq(second_value), Times::Exactly(3)),
                 format!(
                     "Expected to receive a call 3 times matching:
 	accept_value((i32): equal to {second_value})
@@ -233,7 +233,7 @@ accept_value(*{first_value}*)
             assert_panics(
                 || {
                     accept_value::received(
-                        Arg::Is(move |actual_value| *actual_value == first_value),
+                        Arg::is(move |actual_value| *actual_value == first_value),
                         Times::Never,
                     )
                 },
@@ -251,7 +251,7 @@ accept_value(*{second_value}*)
             assert_panics(
                 || {
                     accept_value::received(
-                        Arg::Is(move |actual_value| *actual_value == first_value),
+                        Arg::is(move |actual_value| *actual_value == first_value),
                         Times::Exactly(3),
                     )
                 },
@@ -269,7 +269,7 @@ accept_value(*{second_value}*)
             assert_panics(
                 || {
                     accept_value::received(
-                        Arg::Is(move |actual_value| *actual_value == second_value),
+                        Arg::is(move |actual_value| *actual_value == second_value),
                         Times::Never,
                     )
                 },
@@ -287,7 +287,7 @@ accept_value(*{first_value}*)
             assert_panics(
                 || {
                     accept_value::received(
-                        Arg::Is(move |actual_value| *actual_value == second_value),
+                        Arg::is(move |actual_value| *actual_value == second_value),
                         Times::Exactly(3),
                     )
                 },
@@ -316,7 +316,7 @@ accept_value(*{first_value}*)
 
             // Assert
             assert_panics(
-                || accept_value::received(Arg::NotEq(first_value), Times::Never),
+                || accept_value::received(Arg::not_eq(first_value), Times::Never),
                 format!(
                     "Expected to never receive a call matching:
 	accept_value((i32): NOT equal to {first_value})
@@ -510,9 +510,9 @@ accept_value(*{first_value}*)
             let second_returned_value = 22.2;
             let third_accepted_value = 30;
             let third_returned_value = 33.3;
-            accept_value_return_value::setup(Arg::Is(move |x| *x == first_accepted_value))
+            accept_value_return_value::setup(Arg::is(move |x| *x == first_accepted_value))
                 .returns(first_returned_value)
-                .setup(Arg::Eq(second_accepted_value))
+                .setup(Arg::eq(second_accepted_value))
                 .returns(second_returned_value)
                 .setup(Arg::Any)
                 .returns(third_returned_value);
@@ -592,9 +592,9 @@ accept_value(*{first_value}*)
             let second_second_returned_value = 202.2;
             let second_third_returned_value = 203.3;
 
-            accept_value_return_value::setup(Arg::Eq(first_accepted_value))
+            accept_value_return_value::setup(Arg::eq(first_accepted_value))
                 .returns_many([first_first_returned_value, first_second_returned_value])
-                .setup(Arg::Eq(second_accepted_value))
+                .setup(Arg::eq(second_accepted_value))
                 .returns_many([
                     second_first_returned_value,
                     second_second_returned_value,
@@ -652,12 +652,12 @@ accept_value(*{first_value}*)
             let second_callback_number = Arc::new(RefCell::new(1));
             let second_callback_number_clone = second_callback_number.clone();
             let second_returned_value = 22.2;
-            accept_value_return_value::setup(Arg::Eq(first_accepted_value))
+            accept_value_return_value::setup(Arg::eq(first_accepted_value))
                 .returns(first_returned_value)
                 .and_does(move |_| {
                     *first_callback_number_clone.borrow_mut() = 1;
                 })
-                .setup(Arg::Eq(second_accepted_value))
+                .setup(Arg::eq(second_accepted_value))
                 .returns(second_returned_value)
                 .and_does(move |_| {
                     *second_callback_number_clone.borrow_mut() = 2;

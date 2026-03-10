@@ -13,8 +13,6 @@ pub enum Arg<'rs, T> {
     #[doc(hidden)]
     PrivateNotEq(ArgCmp<T>, Private),
     #[doc(hidden)]
-    // TODO - add ability to pass closure straight-away like in `mockiato`:
-    // |arg| arg.partial_eq("Paul"), |arg| arg.any()
     PrivateIs(Box<dyn Fn(&T) -> bool + 'rs>, Private),
 }
 
@@ -31,7 +29,7 @@ impl<T> ArgCmp<T> {
 
 impl<'rs, T: PartialEq> From<T> for Arg<'rs, T> {
     fn from(value: T) -> Self {
-        Arg::Eq(value)
+        Arg::eq(value)
     }
 }
 
@@ -53,19 +51,14 @@ impl<'rs, T: Debug> Debug for Arg<'rs, T> {
     }
 }
 
-// Beautify API ✨
 impl<'rs, T> Arg<'rs, T> {
-    // TODO - should not be public, should be passed via Into
-    #[allow(non_snake_case)]
-    pub fn Is<'a, TFn: Fn(&T) -> bool + 'a>(predicate: TFn) -> Self {
+    pub fn is<'a, TFn: Fn(&T) -> bool + 'a>(predicate: TFn) -> Self {
         let reference: Box<dyn Fn(&T) -> bool + 'rs> =
             unsafe { core::mem::transmute(Box::new(predicate) as Box<dyn Fn(&T) -> bool + 'a>) };
         return Self::PrivateIs(reference, Private);
     }
 
-    // TODO - should not be public, should be passed via Into
-    #[allow(non_snake_case)]
-    pub fn Eq(value: T) -> Self
+    pub fn eq(value: T) -> Self
     where
         T: PartialEq,
     {
@@ -76,8 +69,7 @@ impl<'rs, T> Arg<'rs, T> {
         return Self::PrivateEq(arg_cmp, Private);
     }
 
-    #[allow(non_snake_case)]
-    pub fn NotEq(value: T) -> Self
+    pub fn not_eq(value: T) -> Self
     where
         T: PartialEq,
     {

@@ -126,7 +126,7 @@ accept_ref(*{r}*)
 
             mock.received
                 .accept_ref_return_ref(accepted_r, Times::Once)
-                .accept_ref_return_ref(Arg::NotEq(accepted_r), Times::Never)
+                .accept_ref_return_ref(Arg::not_eq(accepted_r), Times::Never)
                 .no_other_calls();
         }
     }
@@ -147,7 +147,7 @@ accept_ref(*{r}*)
             // Assert
             mock.received
                 .accept_two_refs(r1, r2, Times::Once)
-                .accept_two_refs(Arg::NotEq(r1), Arg::NotEq(r2), Times::Never)
+                .accept_two_refs(Arg::not_eq(r1), Arg::not_eq(r2), Times::Never)
                 .no_other_calls();
         }
     }

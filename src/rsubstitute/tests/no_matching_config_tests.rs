@@ -24,22 +24,22 @@ mod tests {
         let mock = TraitMock::new();
         let (v1, v2, v3, v4) = (10, 20, 30, 40);
         mock.setup
-            .work(Arg::Any, Arg::Any, Arg::Any, Arg::Is(|_| false))
+            .work(Arg::Any, Arg::Any, Arg::Any, Arg::is(|_| false))
             .returns(1)
-            .work(Arg::Any, Arg::Any, Arg::Is(|_| false), Arg::Is(|_| false))
+            .work(Arg::Any, Arg::Any, Arg::is(|_| false), Arg::is(|_| false))
             .returns(1)
             .work(
                 Arg::Any,
-                Arg::Is(|_| false),
-                Arg::Is(|_| false),
-                Arg::Is(|_| false),
+                Arg::is(|_| false),
+                Arg::is(|_| false),
+                Arg::is(|_| false),
             )
             .returns(1)
             .work(
-                Arg::Is(|_| false),
-                Arg::Is(|_| false),
-                Arg::Is(|_| false),
-                Arg::Is(|_| false),
+                Arg::is(|_| false),
+                Arg::is(|_| false),
+                Arg::is(|_| false),
+                Arg::is(|_| false),
             )
             .returns(1);
 
@@ -61,22 +61,22 @@ List of existing configuration ordered by number of correctly matched arguments 
     fn fn_work_Panics() {
         // Arrange
         let (v1, v2, v3, v4) = (10, 20, 30, 40);
-        work::setup(Arg::Any, Arg::Any, Arg::Any, Arg::Is(|_| false))
+        work::setup(Arg::Any, Arg::Any, Arg::Any, Arg::is(|_| false))
             .returns(1)
-            .setup(Arg::Any, Arg::Any, Arg::Is(|_| false), Arg::Is(|_| false))
+            .setup(Arg::Any, Arg::Any, Arg::is(|_| false), Arg::is(|_| false))
             .returns(1)
             .setup(
                 Arg::Any,
-                Arg::Is(|_| false),
-                Arg::Is(|_| false),
-                Arg::Is(|_| false),
+                Arg::is(|_| false),
+                Arg::is(|_| false),
+                Arg::is(|_| false),
             )
             .returns(1)
             .setup(
-                Arg::Is(|_| false),
-                Arg::Is(|_| false),
-                Arg::Is(|_| false),
-                Arg::Is(|_| false),
+                Arg::is(|_| false),
+                Arg::is(|_| false),
+                Arg::is(|_| false),
+                Arg::is(|_| false),
             )
             .returns(1);
 

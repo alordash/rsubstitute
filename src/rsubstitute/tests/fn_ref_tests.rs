@@ -173,7 +173,7 @@ accept_ref(*{r}*)
             assert_eq!(returned_r, actual_returned_r);
 
             accept_ref_return_ref::received(accepted_r, Times::Once)
-                .received(Arg::NotEq(accepted_r), Times::Never)
+                .received(Arg::not_eq(accepted_r), Times::Never)
                 .no_other_calls();
         }
 
@@ -206,7 +206,7 @@ accept_ref(*{r}*)
 
             // Assert
             accept_two_refs::received(r1, r2, Times::Once)
-                .received(Arg::NotEq(r1), Arg::NotEq(r2), Times::Never)
+                .received(Arg::not_eq(r1), Arg::not_eq(r2), Times::Never)
                 .no_other_calls();
         }
     }
