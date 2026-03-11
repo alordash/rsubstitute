@@ -43,10 +43,7 @@ impl IMockStructGenerator for MockStructGenerator {
     ) -> MockStruct {
         let data_field = self.field_factory.create(
             constants::DATA_IDENT.clone(),
-            self.type_factory.wrap_in_arc(
-                self.type_factory
-                    .create_from_struct(&mock_data_struct.item_struct),
-            ),
+            self.type_factory.wrap_in_arc(mock_data_struct.ty.clone()),
         );
         let fields = FieldsNamed {
             brace_token: Default::default(),
@@ -80,7 +77,8 @@ impl IMockStructGenerator for MockStructGenerator {
             mock_type.generics.impl_generics.clone(),
             fields,
         );
-        let result = MockStruct { item_struct };
+        let ty = self.type_factory.create_from_struct(&item_struct);
+        let result = MockStruct { item_struct, ty };
         return result;
     }
 

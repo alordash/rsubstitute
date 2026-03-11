@@ -56,7 +56,7 @@ impl IBaseFnGenerator for BaseFnGenerator {
             base_fn_block,
             mock_type,
             Target::Other,
-            None
+            None,
         );
         let impl_item_fn = ImplItemFn {
             attrs: Vec::new(),
@@ -84,7 +84,7 @@ impl IBaseFnGenerator for BaseFnGenerator {
             base_fn_block,
             mock_type,
             Target::Other,
-            Some(trait_ident)
+            Some(trait_ident),
         );
         let impl_item_fn = ImplItemFn {
             attrs: Vec::new(),
@@ -111,7 +111,7 @@ impl IBaseFnGenerator for BaseFnGenerator {
             base_fn_block,
             mock_type,
             Target::StaticFn,
-            None
+            None,
         );
         let item_fn = ItemFn {
             attrs: Vec::new(),
@@ -163,10 +163,7 @@ impl BaseFnGenerator {
                 subpat: None,
             })),
             colon_token: Default::default(),
-            ty: Box::new(
-                self.type_factory
-                    .create_from_struct(&call_struct.item_struct),
-            ),
+            ty: Box::new(call_struct.ty.clone()),
         });
         let ident =
             match maybe_containing_trait_ident {

@@ -37,9 +37,7 @@ impl IMockReceivedStructGenerator for MockReceivedStructGenerator {
             constants::DERIVE_CLONE_FOR_RSUBSTITUTE_ATTRIBUTE.clone(),
         ];
         let ident = format_ident!("{}{}", mock_ident, Self::MOCK_RECEIVED_STRUCT_IDENT_SUFFIX);
-        let data_type = self
-            .type_factory
-            .create_from_struct(&mock_data_struct.item_struct);
+        let data_type = mock_data_struct.ty.clone();
         let data_arc_type = self.type_factory.wrap_in_arc(data_type);
         let fields = FieldsNamed {
             brace_token: Default::default(),
@@ -64,7 +62,8 @@ impl IMockReceivedStructGenerator for MockReceivedStructGenerator {
             mock_type.generics.impl_generics.clone(),
             fields,
         );
-        let mock_received_struct = MockReceivedStruct { item_struct };
+        let ty = self.type_factory.create_from_struct(&item_struct);
+        let mock_received_struct = MockReceivedStruct { item_struct, ty };
         return mock_received_struct;
     }
 }

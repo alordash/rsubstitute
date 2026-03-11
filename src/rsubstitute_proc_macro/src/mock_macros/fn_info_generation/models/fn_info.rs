@@ -2,9 +2,7 @@ use crate::mock_macros::fn_info_generation::models::*;
 use crate::mock_macros::models::FnDecl;
 use proc_macro2::Ident;
 
-// TODO - make all models internal
 pub(crate) struct FnInfo {
-    // TODO - make FnDecl here as interface (for easier mocking)
     pub parent: FnDecl,
     pub call_struct: CallStruct,
     pub args_checker_struct: ArgsCheckerStruct,

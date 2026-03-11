@@ -47,9 +47,7 @@ impl IMockReceivedImplGenerator for MockReceivedImplGenerator {
         mock_received_struct: &MockReceivedStruct,
         fn_infos: &[FnInfo],
     ) -> MockReceivedImpl {
-        let self_ty = self
-            .type_factory
-            .create_from_struct(&mock_received_struct.item_struct);
+        let self_ty = mock_received_struct.ty.clone();
         let fns = fn_infos
             .iter()
             .map(|x| {
@@ -71,9 +69,7 @@ impl IMockReceivedImplGenerator for MockReceivedImplGenerator {
         mock_received_struct: &MockReceivedStruct,
         fn_infos: &[FnInfo],
     ) -> MockReceivedImpl {
-        let self_ty = self
-            .type_factory
-            .create_from_struct(&mock_received_struct.item_struct);
+        let self_ty = mock_received_struct.ty.clone();
         let fns = fn_infos
             .iter()
             .map(|x| {
@@ -94,9 +90,7 @@ impl IMockReceivedImplGenerator for MockReceivedImplGenerator {
         mock_received_struct: &MockReceivedStruct,
         fn_info: &FnInfo,
     ) -> MockReceivedImpl {
-        let self_ty = self
-            .type_factory
-            .create_from_struct(&mock_received_struct.item_struct);
+        let self_ty = mock_received_struct.ty.clone();
         let mut fn_received =
             self.generate_fn_received(mock_type, fn_info, OutputTypeGenerics::DoNotUse);
         fn_received.sig.ident = constants::MOCK_RECEIVED_FIELD_IDENT.clone();

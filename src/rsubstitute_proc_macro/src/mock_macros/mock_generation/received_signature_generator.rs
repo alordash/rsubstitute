@@ -1,7 +1,7 @@
 use crate::constants;
 use crate::mock_macros::fn_info_generation::models::*;
-use crate::mock_macros::mock_generation::IInputArgsGenerator;
 use crate::mock_macros::mock_generation::models::*;
+use crate::mock_macros::mock_generation::IInputArgsGenerator;
 use crate::syntax::{IReferenceNormalizer, ITypeFactory};
 use proc_macro2::Ident;
 use quote::format_ident;
@@ -63,9 +63,7 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
         mock_received_struct: &MockReceivedStruct,
         mock_type: &MockType,
     ) -> Signature {
-        let mut owner_type = self
-            .type_factory
-            .create_from_struct(&mock_received_struct.item_struct);
+        let mut owner_type = mock_received_struct.ty.clone();
         self.reference_normalizer
             .staticify_anonymous_lifetimes(&mut owner_type);
         let prepend_ref_self_arg = false;

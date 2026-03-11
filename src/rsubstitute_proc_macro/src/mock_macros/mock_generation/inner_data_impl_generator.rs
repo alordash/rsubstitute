@@ -13,9 +13,7 @@ pub(crate) struct InnerDataImplGenerator {
 
 impl IInnerDataImplGenerator for InnerDataImplGenerator {
     fn generate(&self, inner_data_struct: &InnerDataStruct, new_fn: ImplItemFn) -> InnerDataImpl {
-        let self_ty = self
-            .type_factory
-            .create_from_struct(&inner_data_struct.item_struct);
+        let self_ty = inner_data_struct.ty.clone();
         let item = ImplItem::Fn(new_fn);
         let item_impl = ItemImpl {
             attrs: Vec::new(),

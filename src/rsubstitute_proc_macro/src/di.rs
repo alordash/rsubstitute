@@ -60,6 +60,7 @@ fn create_services() -> ServiceCollection {
         struct_factory: struct_factory.clone(),
         reference_normalizer: reference_normalizer.clone(),
         arg_ident_extractor: arg_ident_extractor.clone(),
+        type_factory: type_factory.clone(),
     });
     let arg_type_factory = Arc::new(ArgTypeFactory);
     let args_checker_generator = Arc::new(ArgsCheckerGenerator {
@@ -69,6 +70,7 @@ fn create_services() -> ServiceCollection {
         struct_factory: struct_factory.clone(),
         reference_normalizer: reference_normalizer.clone(),
         arg_ident_extractor: arg_ident_extractor.clone(),
+        type_factory: type_factory.clone(),
     });
     let generic_argument_factory = Arc::new(GenericArgumentFactory {
         path_factory: path_factory.clone(),
@@ -119,6 +121,7 @@ fn create_services() -> ServiceCollection {
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
         bool_lit_factory: bool_lit_factory.clone(),
+        type_factory: type_factory.clone(),
     });
     let implemented_trait_ident_formatter = Arc::new(ImplementedTraitIdentFormatter);
     let mock_setup_struct_generator = Arc::new(MockSetupStructGenerator {
@@ -299,7 +302,9 @@ fn create_services() -> ServiceCollection {
         mock_received_impl_generator: mock_received_impl_generator.clone(),
     });
 
-    let inner_data_struct_generator = Arc::new(InnerDataStructGenerator);
+    let inner_data_struct_generator = Arc::new(InnerDataStructGenerator {
+        type_factory: type_factory.clone(),
+    });
     let inner_data_impl_generator = Arc::new(InnerDataImplGenerator {
         type_factory: type_factory.clone(),
     });

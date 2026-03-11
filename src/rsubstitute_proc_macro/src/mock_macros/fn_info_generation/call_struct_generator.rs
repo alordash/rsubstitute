@@ -17,6 +17,7 @@ pub(crate) struct CallStructGenerator {
     pub(crate) struct_factory: Arc<dyn IStructFactory>,
     pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
     pub arg_ident_extractor: Arc<dyn IArgIdentExtractor>,
+    pub type_factory: Arc<dyn ITypeFactory>,
 }
 
 impl ICallStructGenerator for CallStructGenerator {
@@ -55,7 +56,8 @@ impl ICallStructGenerator for CallStructGenerator {
                 .create(attrs, ident, fn_decl.merged_generics.clone(), fields_named);
         self.reference_normalizer
             .normalize_anonymous_lifetimes_in_struct(&mut item_struct);
-        let call_struct = CallStruct { item_struct };
+        let ty = self.type_factory.create_from_struct(&item_struct);
+        let call_struct = CallStruct { item_struct, ty };
 
         return call_struct;
     }

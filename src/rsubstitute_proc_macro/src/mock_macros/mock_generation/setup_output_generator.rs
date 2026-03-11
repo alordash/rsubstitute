@@ -40,9 +40,7 @@ impl ISetupOutputGenerator for SetupOutputGenerator {
         fn_info: &FnInfo,
         mock_setup_struct: &MockSetupStruct,
     ) -> TypePath {
-        let owner_type = self
-            .type_factory
-            .create_from_struct(&mock_setup_struct.item_struct);
+        let owner_type = mock_setup_struct.ty.clone();
         let stores_mock_data = false;
         let ty = self.generate(
             mock_type,

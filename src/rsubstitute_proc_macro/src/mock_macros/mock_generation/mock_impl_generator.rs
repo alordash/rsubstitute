@@ -40,9 +40,7 @@ impl IMockImplGenerator for MockImplGenerator {
         maybe_inner_data_param: Option<InnerDataParam>,
         base_fns: Vec<ImplItem>,
     ) -> MockImpl {
-        let self_ty = self
-            .type_factory
-            .create_from_struct(&mock_struct.item_struct);
+        let self_ty = mock_struct.ty.clone();
         let constructor = self.generate_constructor(
             mock_struct,
             mock_data_struct,

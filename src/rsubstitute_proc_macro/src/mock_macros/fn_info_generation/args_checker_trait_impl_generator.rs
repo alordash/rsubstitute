@@ -10,7 +10,6 @@ use syn::punctuated::Punctuated;
 use syn::token::Bracket;
 use syn::*;
 
-// TODO - turn into #[derive()] macro?
 pub(crate) trait IArgsCheckerTraitImplGenerator {
     fn generate(
         &self,
@@ -46,10 +45,7 @@ impl IArgsCheckerTraitImplGenerator for ArgsCheckerTraitImplGenerator {
             .into_iter()
             .collect(),
         };
-        let self_ty = Box::new(
-            self.type_factory
-                .create_from_struct(&args_checker_struct.item_struct),
-        );
+        let self_ty = Box::new(args_checker_struct.ty.clone());
         let items = self.generate_check_fn(call_struct, skipped_fields_count);
         let item_impl = ItemImpl {
             attrs: Vec::new(),
@@ -129,11 +125,7 @@ impl ArgsCheckerTraitImplGenerator {
     }
 
     fn generate_call_var_stmt(&self, call_struct: &CallStruct) -> Stmt {
-        let call_var_type = self.type_factory.reference(
-            self.type_factory
-                .create_from_struct(&call_struct.item_struct),
-            None,
-        );
+        let call_var_type = self.type_factory.reference(call_struct.ty.clone(), None);
         let stmt = Stmt::Local(self.local_factory.create_with_type(
             Self::CALL_VAR_IDENT.clone(),
             call_var_type,

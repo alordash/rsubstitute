@@ -14,11 +14,11 @@ pub(crate) trait IMockDataStructGenerator {
     -> MockDataStruct;
 }
 
-// TODO - verify all impls are internal
 pub(crate) struct MockDataStructGenerator {
     pub field_factory: Arc<dyn IFieldFactory>,
     pub(crate) struct_factory: Arc<dyn IStructFactory>,
     pub bool_lit_factory: Arc<dyn IBoolLitFactory>,
+    pub type_factory: Arc<dyn ITypeFactory>,
 }
 
 impl IMockDataStructGenerator for MockDataStructGenerator {
@@ -63,8 +63,10 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
             mock_type.generics.impl_generics.clone(),
             fields_named,
         );
+        let ty = self.type_factory.create_from_struct(&item_struct);
         let mock_struct = MockDataStruct {
             item_struct,
+            ty,
             field_and_fn_idents,
         };
         return mock_struct;
@@ -110,8 +112,10 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
             mock_type.generics.impl_generics.clone(),
             fields_named,
         );
+        let ty = self.type_factory.create_from_struct(&item_struct);
         let mock_struct = MockDataStruct {
             item_struct,
+            ty,
             field_and_fn_idents,
         };
         return mock_struct;

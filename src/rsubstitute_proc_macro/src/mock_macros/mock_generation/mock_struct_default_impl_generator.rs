@@ -31,9 +31,7 @@ impl IMockStructDefaultImplGenerator for MockStructDefaultImplGenerator {
         mock_received_struct: &MockReceivedStruct,
         mock_type: &MockType,
     ) -> MockStructDefaultImpl {
-        let self_ty = self
-            .type_factory
-            .create_from_struct(&mock_struct.item_struct);
+        let self_ty = mock_struct.ty.clone();
         let block = self.mock_constructor_block_generator.generate(
             mock_struct,
             mock_data_struct,

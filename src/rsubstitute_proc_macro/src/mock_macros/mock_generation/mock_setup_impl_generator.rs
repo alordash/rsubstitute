@@ -45,9 +45,7 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
         mock_setup_struct: &MockSetupStruct,
         fn_infos: &[FnInfo],
     ) -> MockSetupImpl {
-        let self_ty = self
-            .type_factory
-            .create_from_struct(&mock_setup_struct.item_struct);
+        let self_ty = mock_setup_struct.ty.clone();
         let use_fn_info_ident_as_method_ident = true;
         let fn_setups = fn_infos
             .iter()
@@ -76,9 +74,7 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
         mock_setup_struct: &MockSetupStruct,
         fn_info: &FnInfo,
     ) -> MockSetupImpl {
-        let self_ty = self
-            .type_factory
-            .create_from_struct(&mock_setup_struct.item_struct);
+        let self_ty = mock_setup_struct.ty.clone();
         let use_fn_info_ident_as_method_ident = false;
         let output_type = self
             .setup_output_generator

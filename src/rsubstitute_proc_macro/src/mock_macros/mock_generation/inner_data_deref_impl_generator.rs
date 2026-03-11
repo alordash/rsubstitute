@@ -25,12 +25,8 @@ impl IInnerDataDerefImplGenerator for InnerDataDerefImplGenerator {
         mock_struct: &MockStruct,
         inner_data_struct: &InnerDataStruct,
     ) -> InnerDataDerefImpl {
-        let self_ty = self
-            .type_factory
-            .create_from_struct(&mock_struct.item_struct);
-        let inner_data_type = self
-            .type_factory
-            .create_from_struct(&inner_data_struct.item_struct);
+        let self_ty = mock_struct.ty.clone();
+        let inner_data_type = inner_data_struct.ty.clone();
         let target_type_item = self.generate_target_type_item(inner_data_type.clone());
         let deref_fn_item = self.generate_deref_fn_item();
         let items = vec![target_type_item, deref_fn_item];
