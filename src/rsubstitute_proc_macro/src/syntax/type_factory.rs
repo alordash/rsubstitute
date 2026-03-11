@@ -1,4 +1,3 @@
-// TODO - replace everywhere with `use syn::*`
 use crate::constants;
 use crate::syntax::IPathFactory;
 use proc_macro2::Ident;

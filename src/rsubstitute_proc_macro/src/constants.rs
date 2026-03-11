@@ -393,10 +393,10 @@ pub(crate) const DERIVED_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetim
 
 pub(crate) const ANONYMOUS_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
     apostrophe: Span::call_site(),
-    ident: format_ident!("__rsubstitute_arg_anonymous"),
+    ident: format_ident!("__rsa"),
 });
 
-pub(crate) const DEFAULT_ARG_LIFETIME_NAME: &'static str = "rs"; // TODO - return to __rsubstitute_arg_field_lifetime
+pub(crate) const DEFAULT_ARG_LIFETIME_NAME: &'static str = "__rs";
 pub(crate) const DEFAULT_ARG_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
     apostrophe: Span::call_site(),
     ident: format_ident!("{DEFAULT_ARG_LIFETIME_NAME}"),

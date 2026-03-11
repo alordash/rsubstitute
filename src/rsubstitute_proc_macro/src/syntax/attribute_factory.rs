@@ -1,6 +1,6 @@
 use proc_macro2::{Ident, TokenStream};
 use std::str::FromStr;
-use syn::{AttrStyle, Attribute, MacroDelimiter, Meta, MetaList, Path, PathArguments, PathSegment};
+use syn::*;
 
 pub(crate) trait IAttributeFactory {
     fn create(&self, ident: Ident, arguments: &str) -> Attribute;

@@ -95,7 +95,6 @@ impl MockFnBlockGenerator {
                 return field_value;
             })
             .collect();
-        // TODO - store all custom structs types in them, otherwise too many calls to `type_factory.create_from_struct`
         let mut call_struct_type_generics = fn_info.call_struct.item_struct.generics.clone();
         let Some(GenericParam::Lifetime(first_lifetime_param)) =
             call_struct_type_generics.params.first_mut()

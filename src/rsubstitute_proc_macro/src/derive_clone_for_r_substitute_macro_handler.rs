@@ -27,7 +27,6 @@ impl IDeriveCloneForRSubstituteMacroHandler for DeriveCloneForRSubstituteMacroHa
             .create(constants::CLONE_TRAIT_IDENT.clone());
         let self_ty = Box::new(self.type_factory.create_from_struct(&item_struct));
         let get_arg_infos_fn = self.generate_clone_fn(&item_struct);
-        // TODO - make factory of ItemImpl
         let item_impl = ItemImpl {
             attrs: Vec::new(),
             defaultness: None,
