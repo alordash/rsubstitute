@@ -1,6 +1,6 @@
 use crate::fn_parameters::{IArgRefsTuple, IReturnValue};
 
-pub struct DynArgRefsTuple<'rs> {
+pub(crate) struct DynArgRefsTuple<'rs> {
     inner: Box<dyn IArgRefsTuple<'rs> + 'rs>,
 }
 

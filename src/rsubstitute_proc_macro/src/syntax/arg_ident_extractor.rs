@@ -1,7 +1,7 @@
 use quote::format_ident;
 use syn::*;
 
-pub trait IArgIdentExtractor {
+pub(crate) trait IArgIdentExtractor {
     fn extract(&self, arg_number: usize, fn_arg_pat_type: &PatType) -> Ident;
 }
 

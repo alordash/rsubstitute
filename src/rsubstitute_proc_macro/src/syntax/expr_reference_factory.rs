@@ -1,6 +1,6 @@
 use syn::*;
 
-pub trait IExprReferenceFactory {
+pub(crate) trait IExprReferenceFactory {
     fn create(&self, base_expr: Expr) -> Expr;
 }
 

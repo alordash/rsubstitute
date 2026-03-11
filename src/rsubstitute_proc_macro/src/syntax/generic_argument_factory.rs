@@ -2,7 +2,7 @@ use crate::syntax::{IPathFactory, ITypeFactory};
 use std::sync::Arc;
 use syn::*;
 
-pub trait IGenericArgumentFactory {
+pub(crate) trait IGenericArgumentFactory {
     fn create(&self, generic_param: GenericParam) -> GenericArgument;
 }
 

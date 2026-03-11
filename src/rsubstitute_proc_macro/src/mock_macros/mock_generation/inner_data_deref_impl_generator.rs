@@ -4,7 +4,7 @@ use crate::syntax::*;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IInnerDataDerefImplGenerator {
+pub(crate) trait IInnerDataDerefImplGenerator {
     fn generate(
         &self,
         mock_struct: &MockStruct,

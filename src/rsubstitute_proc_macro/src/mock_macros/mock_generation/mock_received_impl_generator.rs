@@ -8,7 +8,7 @@ use quote::format_ident;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IMockReceivedImplGenerator {
+pub(crate) trait IMockReceivedImplGenerator {
     fn generate_for_trait(
         &self,
         mock_type: &MockType,

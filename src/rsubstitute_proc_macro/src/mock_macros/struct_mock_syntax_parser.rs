@@ -4,11 +4,11 @@ use quote::ToTokens;
 use syn::parse::*;
 use syn::*;
 
-pub trait IStructMockSyntaxParser {
+pub(crate) trait IStructMockSyntaxParser {
     fn parse(&self, input: ParseStream) -> Result<StructMockSyntax>;
 }
 
-pub struct StructMockSyntaxParser;
+pub(crate) struct StructMockSyntaxParser;
 
 impl IStructMockSyntaxParser for StructMockSyntaxParser {
     fn parse(&self, input: ParseStream) -> Result<StructMockSyntax> {
@@ -68,7 +68,7 @@ impl StructMockSyntaxParser {
         "Struct mock should contain only `impl` blocks for it's own type.";
     const STRUCT_MOCK_INVALID_FN_SIG_ERROR_MESSAGE: &'static str = "Struct mock `impl` functions should all be associated.\
 (!) Note: You can ignore `impl` block with `#[unmock]` attribute.";
-    const NO_NEW_FN_ERROR_MESSAGE: &'static str = "In order to be mockable structure must have function `pub fn new(args) -> Self`, where `args` is arbitrary collection of user-defined arguments.";
+    const NO_NEW_FN_ERROR_MESSAGE: &'static str = "In order to be mockable structure must have function `pub(crate) fn new(args) -> Self`, where `args` is arbitrary collection of user-defined arguments.";
     const NEW_FN_MUST_BE_PUBLIC_ERROR_MESSAGE: &'static str = "Function `new` must be public.";
     const NEW_FN_MUST_HAVE_RETURN_TYPE_ERROR_MESSAGE_PART: &'static str =
         "Function `new` must have return type that is equal to `Self`";

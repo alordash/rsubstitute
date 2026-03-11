@@ -1,7 +1,7 @@
 use syn::punctuated::Punctuated;
 use syn::*;
 
-pub trait IExprCallFactory {
+pub(crate) trait IExprCallFactory {
     fn create(&self, func: Expr, arg: Expr) -> Expr;
 
     fn create_with_args(&self, func: Expr, args: Vec<Expr>) -> Expr;

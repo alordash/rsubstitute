@@ -6,7 +6,7 @@ use std::sync::Arc;
 use syn::punctuated::Punctuated;
 use syn::*;
 
-pub trait IStaticFnGenerator {
+pub(crate) trait IStaticFnGenerator {
     fn generate(&self, fn_info: &FnInfo, mock_type: &MockType) -> StaticFn;
 }
 

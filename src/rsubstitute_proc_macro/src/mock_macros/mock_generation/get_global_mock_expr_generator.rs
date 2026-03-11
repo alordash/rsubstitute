@@ -3,7 +3,7 @@ use crate::syntax::*;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IGetGlobalMockExprGenerator {
+pub(crate) trait IGetGlobalMockExprGenerator {
     fn generate(&self, ty: Type) -> Expr;
 }
 

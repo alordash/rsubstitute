@@ -1,5 +1,5 @@
 use syn::ItemStruct;
 
-pub struct CallStruct {
-    pub(crate) item_struct: ItemStruct,
+pub(crate) struct CallStruct {
+    pub item_struct: ItemStruct,
 }

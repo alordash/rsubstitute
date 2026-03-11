@@ -2,11 +2,11 @@ use proc_macro2::{Ident, TokenStream};
 use std::str::FromStr;
 use syn::{AttrStyle, Attribute, MacroDelimiter, Meta, MetaList, Path, PathArguments, PathSegment};
 
-pub trait IAttributeFactory {
+pub(crate) trait IAttributeFactory {
     fn create(&self, ident: Ident, arguments: &str) -> Attribute;
 }
 
-pub struct AttributeFactory;
+pub(crate) struct AttributeFactory;
 
 impl IAttributeFactory for AttributeFactory {
     fn create(&self, ident: Ident, arguments: &str) -> Attribute {

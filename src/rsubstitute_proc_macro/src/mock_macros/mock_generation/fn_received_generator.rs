@@ -6,7 +6,7 @@ use crate::syntax::*;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IFnReceivedGenerator {
+pub(crate) trait IFnReceivedGenerator {
     fn generate(
         &self,
         fn_info: &FnInfo,

@@ -9,15 +9,15 @@ use quote::{format_ident, quote};
 use std::sync::Arc;
 use syn::*;
 
-pub trait IItemFnHandler {
+pub(crate) trait IItemFnHandler {
     fn handle(&self, ctx: &Ctx, item_fn: ItemFn) -> TokenStream;
 }
 
 pub(crate) struct ItemFnHandler {
-    pub fn_decl_extractor: Arc<dyn IFnDeclExtractor>,
+    pub(crate) fn_decl_extractor: Arc<dyn IFnDeclExtractor>,
     pub mock_generics_generator: Arc<dyn IMockGenericsGenerator>,
     pub mock_type_generator: Arc<dyn IMockTypeGenerator>,
-    pub fn_info_generator: Arc<dyn IFnInfoGenerator>,
+    pub(crate) fn_info_generator: Arc<dyn IFnInfoGenerator>,
     pub mock_data_struct_generator: Arc<dyn IMockDataStructGenerator>,
     pub mock_setup_struct_generator: Arc<dyn IMockSetupStructGenerator>,
     pub mock_received_struct_generator: Arc<dyn IMockReceivedStructGenerator>,
@@ -25,11 +25,11 @@ pub(crate) struct ItemFnHandler {
     pub mock_struct_default_impl_generator: Arc<dyn IMockStructDefaultImplGenerator>,
     pub mock_setup_impl_generator: Arc<dyn IMockSetupImplGenerator>,
     pub mock_received_impl_generator: Arc<dyn IMockReceivedImplGenerator>,
-    pub fn_setup_generator: Arc<dyn IFnSetupGenerator>,
-    pub fn_received_generator: Arc<dyn IFnReceivedGenerator>,
+    pub(crate) fn_setup_generator: Arc<dyn IFnSetupGenerator>,
+    pub(crate) fn_received_generator: Arc<dyn IFnReceivedGenerator>,
     pub static_fn_generator: Arc<dyn IStaticFnGenerator>,
     pub base_fn_generator: Arc<dyn IBaseFnGenerator>,
-    pub mod_generator: Arc<dyn IModGenerator>,
+    pub(crate) mod_generator: Arc<dyn IModGenerator>,
 }
 
 impl IItemFnHandler for ItemFnHandler {

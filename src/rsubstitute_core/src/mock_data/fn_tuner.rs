@@ -39,7 +39,7 @@ impl<
         STORES_MOCK_DATA,
     >
 {
-    pub fn new(fn_config: Arc<RefCell<FnConfig<'rs, TMock>>>, owner: &'rs TOwner) -> Self {
+    pub(crate) fn new(fn_config: Arc<RefCell<FnConfig<'rs, TMock>>>, owner: &'rs TOwner) -> Self {
         Self {
             _phantom_return_value: PhantomData,
             fn_config: fn_config.clone(),

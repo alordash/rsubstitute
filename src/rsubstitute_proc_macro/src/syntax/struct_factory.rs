@@ -1,7 +1,7 @@
 use proc_macro2::Ident;
 use syn::*;
 
-pub trait IStructFactory {
+pub(crate) trait IStructFactory {
     fn create(
         &self,
         attrs: Vec<Attribute>,
@@ -11,7 +11,7 @@ pub trait IStructFactory {
     ) -> ItemStruct;
 }
 
-pub struct StructFactory;
+pub(crate) struct StructFactory;
 
 impl IStructFactory for StructFactory {
     fn create(

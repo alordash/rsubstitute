@@ -3,7 +3,7 @@ use crate::syntax::*;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IInnerDataImplGenerator {
+pub(crate) trait IInnerDataImplGenerator {
     fn generate(&self, inner_data_struct: &InnerDataStruct, new_fn: ImplItemFn) -> InnerDataImpl;
 }
 

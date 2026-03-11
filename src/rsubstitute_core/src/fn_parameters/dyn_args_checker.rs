@@ -3,7 +3,7 @@ use crate::fn_parameters::DynCall;
 use crate::*;
 use std::ops::Deref;
 
-pub struct DynArgsChecker<'rs> {
+pub(crate) struct DynArgsChecker<'rs> {
     inner: Box<dyn IArgsChecker + 'rs>,
 }
 

@@ -5,7 +5,7 @@ use crate::syntax::*;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IFnDeclExtractor {
+pub(crate) trait IFnDeclExtractor {
     fn extract(&self, ctx: &Ctx, mock_generics: &MockGenerics, items: &[TraitItem]) -> Vec<FnDecl>;
 
     fn extract_struct_fns(

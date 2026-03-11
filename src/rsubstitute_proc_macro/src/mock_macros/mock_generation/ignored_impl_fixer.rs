@@ -3,7 +3,7 @@ use crate::syntax::*;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IIgnoredImplFixer {
+pub(crate) trait IIgnoredImplFixer {
     fn fix(&self, mock_type: &MockType, ignored_impls: &mut [ItemImpl]);
 }
 

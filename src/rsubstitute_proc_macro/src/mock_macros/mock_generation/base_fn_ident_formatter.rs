@@ -2,7 +2,7 @@ use crate::constants;
 use proc_macro2::Ident;
 use quote::format_ident;
 
-pub trait IBaseFnIdentFormatter {
+pub(crate) trait IBaseFnIdentFormatter {
     fn format(&self, fn_ident: &Ident) -> Ident;
 }
 

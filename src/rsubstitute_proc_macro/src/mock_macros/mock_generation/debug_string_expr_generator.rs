@@ -3,7 +3,7 @@ use crate::syntax::*;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IDebugStringExprGenerator {
+pub(crate) trait IDebugStringExprGenerator {
     fn generate(&self, expr: Expr) -> Expr;
 }
 

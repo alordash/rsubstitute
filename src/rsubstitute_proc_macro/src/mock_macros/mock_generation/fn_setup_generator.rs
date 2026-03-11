@@ -8,7 +8,7 @@ use std::cell::LazyCell;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IFnSetupGenerator {
+pub(crate) trait IFnSetupGenerator {
     fn generate(
         &self,
         fn_info: &FnInfo,

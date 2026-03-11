@@ -27,7 +27,7 @@ pub(crate) struct ServiceCollection {
         Arc<dyn IDeriveGenericsHashKeyProviderMacroHandler>,
     pub derive_clone_for_rsubstitute_macro_handler: Arc<dyn IDeriveCloneForRSubstituteMacroHandler>,
     pub mock_macro_handler: Arc<dyn IMockMacroHandler>,
-    pub struct_mock_syntax_parser: Arc<dyn IStructMockSyntaxParser>,
+    pub(crate) struct_mock_syntax_parser: Arc<dyn IStructMockSyntaxParser>,
 }
 
 fn create_services() -> ServiceCollection {

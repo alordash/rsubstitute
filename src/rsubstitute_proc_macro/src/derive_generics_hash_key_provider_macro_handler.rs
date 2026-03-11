@@ -6,7 +6,7 @@ use std::cell::LazyCell;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IDeriveGenericsHashKeyProviderMacroHandler {
+pub(crate) trait IDeriveGenericsHashKeyProviderMacroHandler {
     fn handle(&self, item: proc_macro::TokenStream) -> proc_macro::TokenStream;
 }
 

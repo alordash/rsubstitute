@@ -20,15 +20,15 @@ pub trait IGenericsHashKeyProvider {
     }
 }
 
-// Helper method for clearer `IGenericsHashKeyProvider::hash_generics_type_ids`
-// auto-generated implementation.
+// Helper method for clearer `IGenericsHashKeyProvider::hash_generics_type_ids` auto-generated implementation.
 pub fn tid<T>() -> TypeId {
     typeid::of::<T>()
 }
 
-// Helper method for calculating hash in `IGenericsHashKeyProvider::hash_consts_values`
-// of any sized const value (passed as const parameter). Not calling `t.hash` because
-// `T` is not guaranteed to implement `Hash`. This approach anticipates adt_const_params feature:
+// Helper method for calculating hash in `IGenericsHashKeyProvider::hash_consts_values` of any sized
+// const value (passed as const parameter) by using types raw bytes. Not calling `t.hash` because
+// `T` is not guaranteed to implement `Hash`.
+// This approach anticipates adt_const_params feature:
 // https://doc.rust-lang.org/beta/unstable-book/language-features/adt-const-params.html
 pub fn const_hash<T: Sized + 'static>(t: &T, hasher: &mut GenericsHasher) {
     let t_size = size_of::<T>();

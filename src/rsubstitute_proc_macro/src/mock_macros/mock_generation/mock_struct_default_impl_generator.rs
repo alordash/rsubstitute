@@ -6,7 +6,7 @@ use std::sync::Arc;
 use syn::punctuated::Punctuated;
 use syn::*;
 
-pub trait IMockStructDefaultImplGenerator {
+pub(crate) trait IMockStructDefaultImplGenerator {
     fn generate(
         &self,
         mock_struct: &MockStruct,

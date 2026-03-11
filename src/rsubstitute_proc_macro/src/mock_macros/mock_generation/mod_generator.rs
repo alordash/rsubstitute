@@ -6,7 +6,7 @@ use quote::format_ident;
 use std::cell::LazyCell;
 use syn::*;
 
-pub trait IModGenerator {
+pub(crate) trait IModGenerator {
     fn generate_trait(
         &self,
         trait_ident: Ident,

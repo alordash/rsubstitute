@@ -17,17 +17,6 @@ pub enum Arg<'rs, T> {
     PrivateIs(Box<dyn Fn(&T) -> bool + 'rs>, Private),
 }
 
-struct ArgCmp<T> {
-    value: T,
-    comparator: fn(&T, &T) -> bool,
-}
-
-impl<T> ArgCmp<T> {
-    pub fn is_arg_equal_to(&self, other: &T) -> bool {
-        (self.comparator)(&self.value, other)
-    }
-}
-
 impl<'rs, T: PartialEq> From<T> for Arg<'rs, T> {
     fn from(value: T) -> Self {
         Arg::eq(value)

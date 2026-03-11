@@ -1,5 +1,5 @@
 use syn::*;
 
-pub struct MockStructDefaultImpl {
+pub(crate) struct MockStructDefaultImpl {
     pub item_impl: ItemImpl
 }

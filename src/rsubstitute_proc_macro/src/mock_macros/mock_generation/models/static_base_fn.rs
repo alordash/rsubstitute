@@ -1,5 +1,5 @@
 use syn::*;
 
-pub struct StaticBaseFn {
+pub(crate) struct StaticBaseFn {
     pub item_fn: ItemFn,
 }

@@ -7,7 +7,7 @@ use quote::format_ident;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IMockDataStructGenerator {
+pub(crate) trait IMockDataStructGenerator {
     fn generate_for_trait(&self, mock_type: &MockType, all_fn_infos: &[&FnInfo]) -> MockDataStruct;
 
     fn generate_for_static(&self, mock_type: &MockType, all_fn_infos: &[&FnInfo])
@@ -17,7 +17,7 @@ pub trait IMockDataStructGenerator {
 // TODO - verify all impls are internal
 pub(crate) struct MockDataStructGenerator {
     pub field_factory: Arc<dyn IFieldFactory>,
-    pub struct_factory: Arc<dyn IStructFactory>,
+    pub(crate) struct_factory: Arc<dyn IStructFactory>,
     pub bool_lit_factory: Arc<dyn IBoolLitFactory>,
 }
 

@@ -1,7 +1,7 @@
 use proc_macro2::Span;
 use syn::*;
 
-pub trait IBoolLitFactory {
+pub(crate) trait IBoolLitFactory {
     fn create(&self, value: bool) -> Expr;
 }
 

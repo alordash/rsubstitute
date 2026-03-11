@@ -7,7 +7,7 @@ use quote::format_ident;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IMockSetupStructGenerator {
+pub(crate) trait IMockSetupStructGenerator {
     fn generate(
         &self,
         mock_ident: &Ident,
@@ -20,7 +20,7 @@ pub trait IMockSetupStructGenerator {
 pub(crate) struct MockSetupStructGenerator {
     pub type_factory: Arc<dyn ITypeFactory>,
     pub field_factory: Arc<dyn IFieldFactory>,
-    pub struct_factory: Arc<dyn IStructFactory>,
+    pub(crate) struct_factory: Arc<dyn IStructFactory>,
     pub implemented_trait_ident_formatter: Arc<dyn IImplementedTraitIdentFormatter>,
 }
 

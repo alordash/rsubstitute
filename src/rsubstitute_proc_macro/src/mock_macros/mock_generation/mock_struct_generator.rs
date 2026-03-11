@@ -4,7 +4,7 @@ use crate::syntax::*;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IMockStructGenerator {
+pub(crate) trait IMockStructGenerator {
     fn generate(
         &self,
         attrs: Vec<Attribute>,
@@ -27,7 +27,7 @@ pub trait IMockStructGenerator {
 pub(crate) struct MockStructGenerator {
     pub field_factory: Arc<dyn IFieldFactory>,
     pub type_factory: Arc<dyn ITypeFactory>,
-    pub struct_factory: Arc<dyn IStructFactory>,
+    pub(crate) struct_factory: Arc<dyn IStructFactory>,
     pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
 }
 

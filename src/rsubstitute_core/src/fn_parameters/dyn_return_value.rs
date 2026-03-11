@@ -1,6 +1,6 @@
 use crate::fn_parameters::IReturnValue;
 
-pub struct DynReturnValue<'rs> {
+pub(crate) struct DynReturnValue<'rs> {
     inner: Box<dyn IReturnValue<'rs> + 'rs>,
 }
 

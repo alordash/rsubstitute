@@ -8,7 +8,7 @@ use std::sync::Arc;
 use syn::token::Paren;
 use syn::*;
 
-pub trait IDeriveArgsFormatterMacroHandler {
+pub(crate) trait IDeriveArgsFormatterMacroHandler {
     fn handle(&self, item: proc_macro::TokenStream) -> proc_macro::TokenStream;
 }
 

@@ -11,7 +11,7 @@ use syn::token::Bracket;
 use syn::*;
 
 // TODO - turn into #[derive()] macro?
-pub trait IArgsCheckerTraitImplGenerator {
+pub(crate) trait IArgsCheckerTraitImplGenerator {
     fn generate(
         &self,
         call_struct: &CallStruct,

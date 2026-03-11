@@ -1,7 +1,7 @@
 use crate::constants;
 use syn::*;
 
-pub trait IFieldChecker {
+pub(crate) trait IFieldChecker {
     fn is_phantom_data(&self, field: &Field) -> bool;
 }
 

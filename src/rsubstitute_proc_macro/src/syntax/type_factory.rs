@@ -5,7 +5,7 @@ use proc_macro2::Ident;
 use std::sync::Arc;
 use syn::*;
 
-pub trait ITypeFactory {
+pub(crate) trait ITypeFactory {
     fn create(&self, ident: Ident) -> Type;
 
     fn create_with_generics(&self, ident: Ident, generics: Generics) -> Type;
@@ -25,8 +25,8 @@ pub trait ITypeFactory {
     fn phantom_data(&self, ty_ident: Ident) -> Type;
 }
 
-pub struct TypeFactory {
-    pub(crate) path_factory: Arc<dyn IPathFactory>,
+pub(crate) struct TypeFactory {
+    pub path_factory: Arc<dyn IPathFactory>,
 }
 
 impl ITypeFactory for TypeFactory {

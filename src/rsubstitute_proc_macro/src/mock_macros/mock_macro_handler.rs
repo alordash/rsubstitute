@@ -5,7 +5,7 @@ use proc_macro::TokenStream;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IMockMacroHandler {
+pub(crate) trait IMockMacroHandler {
     fn handle_attribute_macro(
         &self,
         proc_macro_attribute: proc_macro::TokenStream,
@@ -23,7 +23,7 @@ pub(crate) struct MockMacroHandler {
     pub ctx_factory: Arc<dyn ICtxFactory>,
     pub item_trait_handler: Arc<dyn IItemTraitHandler>,
     pub item_fn_handler: Arc<dyn IItemFnHandler>,
-    pub struct_mock_handler: Arc<dyn IStructMockHandler>,
+    pub(crate) struct_mock_handler: Arc<dyn IStructMockHandler>,
 }
 
 impl IMockMacroHandler for MockMacroHandler {

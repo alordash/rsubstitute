@@ -3,7 +3,7 @@ use crate::syntax::*;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IFieldValueFactory {
+pub(crate) trait IFieldValueFactory {
     fn create_with_into_conversion(&self, field: &Field) -> FieldValue;
 
     fn create_as_phantom_data(&self, field_ident: Ident) -> FieldValue;

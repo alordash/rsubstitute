@@ -1,5 +1,5 @@
 use syn::*;
 
-pub struct InnerDataDerefImpl {
+pub(crate) struct InnerDataDerefImpl {
     pub item_impl: ItemImpl,
 }

@@ -3,7 +3,7 @@ use crate::syntax::*;
 use proc_macro2::Ident;
 use std::sync::Arc;
 
-pub trait IMockTypeGenerator {
+pub(crate) trait IMockTypeGenerator {
     fn generate(&self, mock_ident: Ident, mock_generics: MockGenerics) -> MockType;
 
     fn generate_for_struct(&self, mock_ident: Ident, mock_generics: MockGenerics) -> MockType;

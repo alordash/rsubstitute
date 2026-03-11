@@ -1,5 +1,5 @@
 use syn::ItemImpl;
 
-pub struct MockImpl {
+pub(crate) struct MockImpl {
     pub item_impl: ItemImpl,
 }

@@ -3,7 +3,7 @@ use crate::syntax::IReferenceTypeCrawler;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IReferenceNormalizer {
+pub(crate) trait IReferenceNormalizer {
     fn staticify_anonymous_lifetimes(&self, ty: &mut Type);
 
     fn normalize_anonymous_lifetimes(&self, ty: &mut Type);

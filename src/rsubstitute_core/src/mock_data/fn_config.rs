@@ -5,10 +5,7 @@ use std::collections::VecDeque;
 use std::marker::PhantomData;
 use std::sync::Arc;
 
-// TODO - maybe remove `TMock`? What is it's purpose now that we have dyn fn parameters?
-// All information needed to handle certain function is stored in it's `FnConfig`.
-// Previously `TMock` was needed only to handle IBaseCaller.
-pub struct FnConfig<'rs, TMock> {
+pub(crate) struct FnConfig<'rs, TMock> {
     _phantom_mock: PhantomData<TMock>,
     args_checker: DynArgsChecker<'rs>,
     return_value_sources: VecDeque<ReturnValueSource<'rs>>,

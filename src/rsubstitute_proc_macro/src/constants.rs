@@ -10,17 +10,17 @@ use syn::*;
 macro_rules! define {
     // For idents
     ($symbol:ident, $value:literal) => {
-        pub const $symbol: LazyCell<Ident> = LazyCell::new(|| format_ident!($value));
+        pub(crate) const $symbol: LazyCell<Ident> = LazyCell::new(|| format_ident!($value));
     };
 
     // For everything else
     ($symbol:ident, $ty:ty, $block:block) => {
-        pub const $symbol: LazyCell<$ty> = LazyCell::new(|| $block);
+        pub(crate) const $symbol: LazyCell<$ty> = LazyCell::new(|| $block);
     };
 }
 
 define!(DATA_IDENT, "data");
-pub const MOCK_STRUCT_IDENT_PREFIX: &'static str = "Mock";
+pub(crate) const MOCK_STRUCT_IDENT_PREFIX: &'static str = "Mock";
 define!(MOCK_SETUP_FIELD_IDENT, "setup");
 define!(MOCK_RECEIVED_FIELD_IDENT, "received");
 
@@ -46,21 +46,21 @@ define!(FOR_GENERATED_IDENT, "for_generated");
 define!(CRATE_IDENT, "rsubstitute");
 define!(ARG_TYPE_IDENT, "Arg");
 
-pub const I_ARGS_FORMATTER_TRAIT_NAME: &'static str = "IArgsFormatter";
+pub(crate) const I_ARGS_FORMATTER_TRAIT_NAME: &'static str = "IArgsFormatter";
 define!(I_ARGS_FORMATTER_TRAIT_PATH, Path, {
     let path_factory = &SERVICES.path_factory;
     let result = path_factory.create(format_ident!("{I_ARGS_FORMATTER_TRAIT_NAME}"));
     return result;
 });
 
-pub const I_GENERICS_HASH_KEY_PROVIDER_TRAIT_NAME: &'static str = "IGenericsHashKeyProvider";
+pub(crate) const I_GENERICS_HASH_KEY_PROVIDER_TRAIT_NAME: &'static str = "IGenericsHashKeyProvider";
 define!(I_GENERICS_HASH_KEY_PROVIDER_TRAIT_PATH, Path, {
     let path_factory = &SERVICES.path_factory;
     let result = path_factory.create(format_ident!("{I_GENERICS_HASH_KEY_PROVIDER_TRAIT_NAME}"));
     return result;
 });
 
-pub const CLONE_FOR_RSUBSTITUTE_TRAIT_NAME: &'static str = "CloneForRSubstitute";
+pub(crate) const CLONE_FOR_RSUBSTITUTE_TRAIT_NAME: &'static str = "CloneForRSubstitute";
 define!(DERIVE_CLONE_FOR_RSUBSTITUTE_ATTRIBUTE, Attribute, {
     let attribute_factory = &SERVICES.attribute_factory;
     let result = attribute_factory.create(DERIVE_IDENT.clone(), CLONE_FOR_RSUBSTITUTE_TRAIT_NAME);
@@ -70,17 +70,17 @@ define!(DERIVE_CLONE_FOR_RSUBSTITUTE_ATTRIBUTE, Attribute, {
 define!(I_ARGS_FORMATTER_FN_IDENT, "fmt_args");
 define!(I_ARGS_CHECKER_TRAIT_IDENT, "IArgsChecker");
 
-pub const I_ARGS_INFOS_PROVIDER_TRAIT_NAME: &'static str = "IArgsInfosProvider";
-pub const I_ARGS_INFOS_PROVIDER_TRAIT_IDENT: LazyCell<Ident> =
+pub(crate) const I_ARGS_INFOS_PROVIDER_TRAIT_NAME: &'static str = "IArgsInfosProvider";
+pub(crate) const I_ARGS_INFOS_PROVIDER_TRAIT_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("{I_ARGS_INFOS_PROVIDER_TRAIT_NAME}"));
 
-pub const I_ARGS_TUPLE_PROVIDER_TRAIT_NAME: &'static str = "IArgsTupleProvider";
-pub const I_ARGS_TUPLE_PROVIDER_TRAIT_IDENT: LazyCell<Ident> =
+pub(crate) const I_ARGS_TUPLE_PROVIDER_TRAIT_NAME: &'static str = "IArgsTupleProvider";
+pub(crate) const I_ARGS_TUPLE_PROVIDER_TRAIT_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("{I_ARGS_TUPLE_PROVIDER_TRAIT_NAME}"));
 
 define!(I_MOCK_DATA_TRAIT_IDENT, "IMockData");
 
-pub const I_MOCK_DATA_GET_RECEIVED_NOTHING_ELSE_ERROR_MSGS_FN_SIGNATURE: LazyCell<Signature> =
+pub(crate) const I_MOCK_DATA_GET_RECEIVED_NOTHING_ELSE_ERROR_MSGS_FN_SIGNATURE: LazyCell<Signature> =
     LazyCell::new(|| {
         let signature = Signature {
             constness: None,
@@ -105,8 +105,8 @@ define!(FN_DATA_TYPE_IDENT, "FnData");
 
 define!(NEW_IDENT, "new");
 
-pub const SETUP_MEMBER: LazyCell<Member> = LazyCell::new(|| Member::Named(format_ident!("setup")));
-pub const RECEIVED_MEMBER: LazyCell<Member> =
+pub(crate) const SETUP_MEMBER: LazyCell<Member> = LazyCell::new(|| Member::Named(format_ident!("setup")));
+pub(crate) const RECEIVED_MEMBER: LazyCell<Member> =
     LazyCell::new(|| Member::Named(format_ident!("received")));
 
 define!(EMPTY_PATH_EXPR, Expr, {
@@ -120,7 +120,7 @@ define!(EMPTY_PATH_EXPR, Expr, {
     })
 });
 
-pub const DATA_SHORT_FIELD_VALUE: LazyCell<FieldValue> = LazyCell::new(|| FieldValue {
+pub(crate) const DATA_SHORT_FIELD_VALUE: LazyCell<FieldValue> = LazyCell::new(|| FieldValue {
     attrs: Vec::new(),
     member: Member::Named(DATA_IDENT.clone()),
     colon_token: None,
@@ -187,10 +187,10 @@ define!(ALLOW_NON_SNAKE_CASE_ATTRIBUTE, Attribute, {
     return result;
 });
 
-pub const DEBUG_TRAIT_NAME: &'static str = "Debug";
+pub(crate) const DEBUG_TRAIT_NAME: &'static str = "Debug";
 
-pub const CLONE_TRAIT_STR: &'static str = "Clone";
-pub const CLONE_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("{CLONE_TRAIT_STR}"));
+pub(crate) const CLONE_TRAIT_STR: &'static str = "Clone";
+pub(crate) const CLONE_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("{CLONE_TRAIT_STR}"));
 define!(CLONE_FN_SIGNATURE, Signature, {
     let signature = Signature {
         constness: None,
@@ -386,23 +386,23 @@ define!(DEFAULT_ARG_LIFETIME_FIELD, Field, {
 
 define!(RETURN_TYPE_PHANTOM_FIELD_IDENT, "_return_type");
 
-pub const DERIVED_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
+pub(crate) const DERIVED_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
     apostrophe: Span::call_site(),
     ident: format_ident!("_"),
 });
 
-pub const ANONYMOUS_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
+pub(crate) const ANONYMOUS_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
     apostrophe: Span::call_site(),
     ident: format_ident!("__rsubstitute_arg_anonymous"),
 });
 
-pub const DEFAULT_ARG_LIFETIME_NAME: &'static str = "rs"; // TODO - return to __rsubstitute_arg_field_lifetime
-pub const DEFAULT_ARG_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
+pub(crate) const DEFAULT_ARG_LIFETIME_NAME: &'static str = "rs"; // TODO - return to __rsubstitute_arg_field_lifetime
+pub(crate) const DEFAULT_ARG_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
     apostrophe: Span::call_site(),
     ident: format_ident!("{DEFAULT_ARG_LIFETIME_NAME}"),
 });
 
-pub const STATIC_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
+pub(crate) const STATIC_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
     apostrophe: Span::call_site(),
     ident: format_ident!("static"),
 });
@@ -468,12 +468,12 @@ define!(DYN_CALL_REF_TYPE, Type, {
 define!(DYN_CALL_DOWNCAST_REF_FN_IDENT, "downcast_ref");
 
 #[cfg(not(feature = "mock_base_by_default"))]
-pub const SUPPORT_BASE_PARAMETER: &'static str = "base";
+pub(crate) const SUPPORT_BASE_PARAMETER: &'static str = "base";
 
 #[cfg(feature = "mock_base_by_default")]
-pub const DO_NOT_SUPPORT_BASE_PARAMETER: &'static str = "no_base";
+pub(crate) const DO_NOT_SUPPORT_BASE_PARAMETER: &'static str = "no_base";
 
-pub const BASE_FN_IDENT_PREFIX: &'static str = "base";
+pub(crate) const BASE_FN_IDENT_PREFIX: &'static str = "base";
 
 define!(BOX_IDENT, "Box");
 define!(BOX_NEW_EXPR, Expr, {

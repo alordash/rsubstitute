@@ -1,10 +1,10 @@
 use syn::*;
 
-pub trait IReferenceTypeCrawler {
+pub(crate) trait IReferenceTypeCrawler {
     fn get_all_optional_lifetimes<'a>(&self, ty: &'a mut Type) -> Vec<&'a mut Option<Lifetime>>;
 }
 
-pub struct ReferenceTypeCrawler;
+pub(crate) struct ReferenceTypeCrawler;
 
 impl IReferenceTypeCrawler for ReferenceTypeCrawler {
     fn get_all_optional_lifetimes<'a>(&self, ty: &'a mut Type) -> Vec<&'a mut Option<Lifetime>> {

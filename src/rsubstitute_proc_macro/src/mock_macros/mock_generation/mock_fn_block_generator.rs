@@ -8,7 +8,7 @@ use std::cell::LazyCell;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IMockFnBlockGenerator {
+pub(crate) trait IMockFnBlockGenerator {
     fn generate_for_trait(&self, fn_info: &FnInfo) -> Block;
 
     fn generate_for_struct_trait_fn(&self, fn_info: &FnInfo, trait_ident: &Ident) -> Block;

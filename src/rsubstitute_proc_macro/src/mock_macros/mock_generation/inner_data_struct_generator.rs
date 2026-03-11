@@ -3,7 +3,7 @@ use crate::mock_macros::mock_generation::models::*;
 use quote::format_ident;
 use syn::*;
 
-pub trait IInnerDataStructGenerator {
+pub(crate) trait IInnerDataStructGenerator {
     fn generate(&self, source_struct: ItemStruct) -> InnerDataStruct;
 }
 

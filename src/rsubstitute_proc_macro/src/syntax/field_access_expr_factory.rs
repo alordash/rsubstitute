@@ -3,14 +3,14 @@ use proc_macro2::Ident;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IFieldAccessExprFactory {
+pub(crate) trait IFieldAccessExprFactory {
     fn create(&self, members_idents: Vec<Ident>) -> Expr;
 
     fn create_with_base_expr(&self, base_expr: Expr, member_idents: Vec<Ident>) -> Expr;
 }
 
-pub struct FieldAccessExprFactory {
-    pub(crate) path_factory: Arc<dyn IPathFactory>,
+pub(crate) struct FieldAccessExprFactory {
+    pub path_factory: Arc<dyn IPathFactory>,
 }
 
 impl IFieldAccessExprFactory for FieldAccessExprFactory {

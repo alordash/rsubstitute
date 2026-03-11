@@ -7,14 +7,14 @@ use quote::format_ident;
 use std::sync::Arc;
 use syn::*;
 
-pub trait ICallStructGenerator {
+pub(crate) trait ICallStructGenerator {
     fn generate(&self, ctx: &Ctx, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> CallStruct;
 }
 
 pub(crate) struct CallStructGenerator {
     pub attribute_factory: Arc<dyn IAttributeFactory>,
     pub field_factory: Arc<dyn IFieldFactory>,
-    pub struct_factory: Arc<dyn IStructFactory>,
+    pub(crate) struct_factory: Arc<dyn IStructFactory>,
     pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
     pub arg_ident_extractor: Arc<dyn IArgIdentExtractor>,
 }
@@ -62,7 +62,7 @@ impl ICallStructGenerator for CallStructGenerator {
 }
 
 impl CallStructGenerator {
-    pub const CALL_STRUCT_SUFFIX: &'static str = "Call";
+    pub(crate) const CALL_STRUCT_SUFFIX: &'static str = "Call";
 
     fn generate_call_derive_traits_attribute(&self, ctx: &Ctx) -> Attribute {
         let mut arguments = vec![

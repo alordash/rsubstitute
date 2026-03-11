@@ -1,7 +1,7 @@
 use proc_macro2::Ident;
 use syn::*;
 
-pub trait ILocalFactory {
+pub(crate) trait ILocalFactory {
     fn create(&self, variable_ident: Ident, init: LocalInit) -> Local;
 
     fn create_with_type(
@@ -12,7 +12,7 @@ pub trait ILocalFactory {
     ) -> Local;
 }
 
-pub struct LocalFactory;
+pub(crate) struct LocalFactory;
 
 impl ILocalFactory for LocalFactory {
     fn create(&self, variable_ident: Ident, init: LocalInit) -> Local {

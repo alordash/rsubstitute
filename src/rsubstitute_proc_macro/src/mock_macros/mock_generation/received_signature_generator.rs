@@ -10,7 +10,7 @@ use std::iter;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IReceivedSignatureGenerator {
+pub(crate) trait IReceivedSignatureGenerator {
     fn get_times_arg_ident(&self) -> Ident;
 
     fn generate_for_trait(

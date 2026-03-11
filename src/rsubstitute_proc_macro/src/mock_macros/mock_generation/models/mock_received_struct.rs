@@ -1,5 +1,5 @@
 use syn::ItemStruct;
 
-pub struct MockReceivedStruct {
+pub(crate) struct MockReceivedStruct {
     pub item_struct: ItemStruct,
 }

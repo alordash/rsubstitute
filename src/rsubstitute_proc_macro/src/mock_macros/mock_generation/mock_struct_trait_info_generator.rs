@@ -4,7 +4,7 @@ use crate::mock_macros::models::*;
 use crate::mock_macros::*;
 use std::sync::Arc;
 
-pub trait IMockStructTraitInfoGenerator {
+pub(crate) trait IMockStructTraitInfoGenerator {
     fn generate(
         &self,
         ctx: &Ctx,
@@ -14,8 +14,8 @@ pub trait IMockStructTraitInfoGenerator {
 }
 
 pub(crate) struct MockStructTraitInfoGenerator {
-    pub fn_decl_extractor: Arc<dyn IFnDeclExtractor>,
-    pub fn_info_generator: Arc<dyn IFnInfoGenerator>,
+    pub(crate) fn_decl_extractor: Arc<dyn IFnDeclExtractor>,
+    pub(crate) fn_info_generator: Arc<dyn IFnInfoGenerator>,
 }
 
 impl IMockStructTraitInfoGenerator for MockStructTraitInfoGenerator {

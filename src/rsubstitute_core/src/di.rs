@@ -2,9 +2,9 @@ use crate::error_printer::*;
 use std::cell::LazyCell;
 use std::sync::Arc;
 
-pub const SERVICES: LazyCell<ServiceCollection> = LazyCell::new(create_services);
+pub(crate) const SERVICES: LazyCell<ServiceCollection> = LazyCell::new(create_services);
 
-pub struct ServiceCollection {
+pub(crate) struct ServiceCollection {
     pub(crate) error_printer: Arc<dyn IErrorPrinter>,
 }
 

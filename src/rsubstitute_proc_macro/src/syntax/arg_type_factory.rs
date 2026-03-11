@@ -1,11 +1,11 @@
 use crate::constants;
 use syn::*;
 
-pub trait IArgTypeFactory {
+pub(crate) trait IArgTypeFactory {
     fn create(&self, ty: Type) -> Type;
 }
 
-pub struct ArgTypeFactory;
+pub(crate) struct ArgTypeFactory;
 
 impl IArgTypeFactory for ArgTypeFactory {
     fn create(&self, ty: Type) -> Type {

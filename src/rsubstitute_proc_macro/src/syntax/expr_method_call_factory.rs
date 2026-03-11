@@ -3,7 +3,7 @@ use proc_macro2::Ident;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IExprMethodCallFactory {
+pub(crate) trait IExprMethodCallFactory {
     fn create(&self, members_idents: Vec<Ident>, method: Ident, args: Vec<Ident>)
     -> ExprMethodCall;
 
@@ -31,9 +31,9 @@ pub trait IExprMethodCallFactory {
     ) -> ExprMethodCall;
 }
 
-pub struct ExprMethodCallFactory {
-    pub(crate) path_factory: Arc<dyn IPathFactory>,
-    pub(crate) field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
+pub(crate) struct ExprMethodCallFactory {
+    pub path_factory: Arc<dyn IPathFactory>,
+    pub field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
 }
 
 impl IExprMethodCallFactory for ExprMethodCallFactory {

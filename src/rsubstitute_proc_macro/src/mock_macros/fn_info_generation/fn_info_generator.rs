@@ -7,7 +7,7 @@ use proc_macro2::Ident;
 use quote::format_ident;
 use std::sync::Arc;
 
-pub trait IFnInfoGenerator {
+pub(crate) trait IFnInfoGenerator {
     fn generate(&self, ctx: &Ctx, fn_decl: FnDecl, mock_type: &MockType) -> FnInfo;
 }
 

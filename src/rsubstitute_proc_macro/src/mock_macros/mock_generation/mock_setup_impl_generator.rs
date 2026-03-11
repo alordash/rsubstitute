@@ -11,7 +11,7 @@ use std::iter;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IMockSetupImplGenerator {
+pub(crate) trait IMockSetupImplGenerator {
     fn generate_for_trait(
         &self,
         mock_type: &MockType,

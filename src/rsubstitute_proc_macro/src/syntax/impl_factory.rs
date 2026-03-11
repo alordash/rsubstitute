@@ -1,7 +1,7 @@
 use crate::mock_macros::mock_generation::models::*;
 use syn::*;
 
-pub trait IImplFactory {
+pub(crate) trait IImplFactory {
     fn create_with_default_lifetime(
         &self,
         mock_type: &MockType,

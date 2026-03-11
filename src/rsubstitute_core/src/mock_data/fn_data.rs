@@ -27,6 +27,11 @@ impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool
         }
     }
 
+    pub fn reset(&self) {
+        self.call_infos.borrow_mut().clear();
+        self.configs.borrow_mut().clear();
+    }
+
     pub fn add_config<
         'a,
         TArgsChecker: IArgsChecker + 'a,
@@ -81,7 +86,6 @@ impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool
     }
 
     pub fn get_unexpected_calls_error_msgs(&self) -> Vec<String> {
-        // TODO - turn next two lines into method?
         let all_call_infos = self.call_infos.borrow();
         let unexpected_call_infos: Vec<_> = all_call_infos
             .values()
@@ -204,12 +208,7 @@ mod internal {
     impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool>
         FnData<'rs, TMock, SUPPORTS_BASE_CALLING, STORES_MOCK_DATA>
     {
-        pub fn reset(&self) {
-            self.call_infos.borrow_mut().clear();
-            self.configs.borrow_mut().clear();
-        }
-
-        pub fn register_call(&self, call: Arc<DynCall<'rs>>) -> &Self {
+        pub(crate) fn register_call(&self, call: Arc<DynCall<'rs>>) -> &Self {
             let generics_hash_key = call.get_generics_hash_key();
             self.call_infos
                 .borrow_mut()
@@ -219,7 +218,7 @@ mod internal {
             self
         }
 
-        pub fn get_matching_and_non_matching_calls(
+        pub(crate) fn get_matching_and_non_matching_calls(
             &self,
             dyn_args_checker: &DynArgsChecker,
         ) -> (Vec<Vec<ArgCheckResult>>, Vec<Vec<ArgCheckResult>>) {
@@ -269,7 +268,7 @@ mod internal {
             });
         }
 
-        pub fn get_required_matching_config(
+        pub(crate) fn get_required_matching_config(
             &self,
             call: &DynCall<'rs>,
         ) -> Arc<RefCell<FnConfig<'rs, TMock>>> {

@@ -2,7 +2,7 @@ use std::fmt::Debug;
 
 const UNKNOWN_ARG_STRING: &'static str = "?";
 
-// Credits to mockall's way of printing arguments values.
+// Inspired by mockall's way of printing arguments values:
 // https://github.com/asomers/mockall/blob/4401e5ac4aa7b05227c157f569d1147d732944b0/mockall/src/lib.rs#L1496
 pub struct ArgPrinter<'a, T: ?Sized>(pub &'a T);
 

@@ -6,7 +6,7 @@ use quote::format_ident;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IInputArgsGenerator {
+pub(crate) trait IInputArgsGenerator {
     fn generate_input_args(&self, fn_info: &FnInfo, skipped_fields_count: usize) -> Vec<FnArg>;
 
     fn generate_input_args_with_static_lifetimes(

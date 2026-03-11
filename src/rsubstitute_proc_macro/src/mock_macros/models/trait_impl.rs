@@ -6,7 +6,7 @@ pub(crate) struct TraitImpl {
 }
 
 impl TraitImpl {
-    pub fn get_trait_ident_from_path(&self) -> Ident {
+    pub(crate) fn get_trait_ident_from_path(&self) -> Ident {
         let trait_path = &self
             .item_impl
             .trait_
@@ -22,7 +22,7 @@ impl TraitImpl {
         return format_ident!("{joined_parent_trait_path_idents}");
     }
 
-    pub fn get_fns(&self) -> Vec<&ImplItemFn> {
+    pub(crate) fn get_fns(&self) -> Vec<&ImplItemFn> {
         return self
             .item_impl
             .items

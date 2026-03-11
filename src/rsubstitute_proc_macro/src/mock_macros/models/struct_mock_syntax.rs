@@ -8,8 +8,8 @@ use syn::*;
 pub(crate) struct StructMockSyntax {
     pub r#struct: ItemStruct,
     pub new_fn: ImplItemFn,
-    pub trait_impls: Vec<TraitImpl>,
-    pub struct_impls: Vec<ItemImpl>,
+    pub(crate) trait_impls: Vec<TraitImpl>,
+    pub(crate) struct_impls: Vec<ItemImpl>,
     pub ignored_impls: Vec<ItemImpl>,
 }
 
@@ -40,7 +40,7 @@ impl Debug for StructMockSyntax {
 }
 
 impl StructMockSyntax {
-    pub fn get_struct_fns(&self) -> Vec<&ImplItemFn> {
+    pub(crate) fn get_struct_fns(&self) -> Vec<&ImplItemFn> {
         let fns = self
             .struct_impls
             .iter()
@@ -54,7 +54,7 @@ impl StructMockSyntax {
         return fns;
     }
 
-    pub fn get_struct_impls_attrs(&self) -> Vec<Attribute> {
+    pub(crate) fn get_struct_impls_attrs(&self) -> Vec<Attribute> {
         let attrs = self
             .struct_impls
             .iter()

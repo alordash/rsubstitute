@@ -9,16 +9,16 @@ use quote::{format_ident, quote};
 use std::sync::Arc;
 use syn::ImplItem;
 
-pub trait IStructMockHandler {
+pub(crate) trait IStructMockHandler {
     fn handle(&self, ctx: &Ctx, struct_mock_syntax: StructMockSyntax) -> TokenStream;
 }
 
-pub struct StructMockHandler {
+pub(crate) struct StructMockHandler {
     pub mock_struct_trait_info_generator: Arc<dyn IMockStructTraitInfoGenerator>,
-    pub fn_decl_extractor: Arc<dyn IFnDeclExtractor>,
+    pub(crate) fn_decl_extractor: Arc<dyn IFnDeclExtractor>,
     pub mock_generics_generator: Arc<dyn IMockGenericsGenerator>,
     pub mock_type_generator: Arc<dyn IMockTypeGenerator>,
-    pub fn_info_generator: Arc<dyn IFnInfoGenerator>,
+    pub(crate) fn_info_generator: Arc<dyn IFnInfoGenerator>,
     pub mock_data_struct_generator: Arc<dyn IMockDataStructGenerator>,
     pub mock_setup_struct_generator: Arc<dyn IMockSetupStructGenerator>,
     pub mock_received_struct_generator: Arc<dyn IMockReceivedStructGenerator>,
@@ -34,7 +34,7 @@ pub struct StructMockHandler {
     pub mock_received_impl_generator: Arc<dyn IMockReceivedImplGenerator>,
     pub ignored_impl_fixer: Arc<dyn IIgnoredImplFixer>,
     pub base_fn_generator: Arc<dyn IBaseFnGenerator>,
-    pub mod_generator: Arc<dyn IModGenerator>,
+    pub(crate) mod_generator: Arc<dyn IModGenerator>,
 }
 
 impl IStructMockHandler for StructMockHandler {

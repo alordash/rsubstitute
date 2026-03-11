@@ -2,7 +2,7 @@ use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::mock_generation::*;
 use std::sync::Arc;
 
-pub trait IMockStructTraitGenerator {
+pub(crate) trait IMockStructTraitGenerator {
     fn generate(
         &self,
         data_struct: &MockDataStruct,

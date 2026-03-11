@@ -7,7 +7,7 @@ use quote::format_ident;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IArgsCheckerGenerator {
+pub(crate) trait IArgsCheckerGenerator {
     fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> ArgsCheckerStruct;
 }
 
@@ -15,7 +15,7 @@ pub(crate) struct ArgsCheckerGenerator {
     pub attribute_factory: Arc<dyn IAttributeFactory>,
     pub arg_type_factory: Arc<dyn IArgTypeFactory>,
     pub field_factory: Arc<dyn IFieldFactory>,
-    pub struct_factory: Arc<dyn IStructFactory>,
+    pub(crate) struct_factory: Arc<dyn IStructFactory>,
     pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
     pub arg_ident_extractor: Arc<dyn IArgIdentExtractor>,
 }

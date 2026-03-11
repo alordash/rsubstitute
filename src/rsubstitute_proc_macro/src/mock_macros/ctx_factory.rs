@@ -3,7 +3,7 @@ use crate::mock_macros::MockedMacroMode;
 use crate::mock_macros::models::Ctx;
 use proc_macro::TokenStream;
 
-pub trait ICtxFactory {
+pub(crate) trait ICtxFactory {
     fn create(&self, proc_macro_attribute: TokenStream) -> Ctx;
 
     fn create_for_macro_mocked(&self, mocked_macro_target: MockedMacroMode) -> Ctx;

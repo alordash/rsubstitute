@@ -9,7 +9,7 @@ use std::cell::LazyCell;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IBaseFnGenerator {
+pub(crate) trait IBaseFnGenerator {
     fn generate(
         &self,
         mock_type: &MockType,

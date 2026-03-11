@@ -6,7 +6,7 @@ use proc_macro2::Ident;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IMockPayloadImplGenerator {
+pub(crate) trait IMockPayloadImplGenerator {
     fn generate(
         &self,
         trait_ident: Ident,

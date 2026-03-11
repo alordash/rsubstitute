@@ -3,7 +3,7 @@ use std::sync::Arc;
 use syn::punctuated::Punctuated;
 use syn::*;
 
-pub trait IMockFnInputsGenerator {
+pub(crate) trait IMockFnInputsGenerator {
     fn generate(&self, original_inputs: &[FnArg]) -> Punctuated<FnArg, Token![,]>;
 }
 

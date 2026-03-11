@@ -3,7 +3,7 @@ use proc_macro2::Ident;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IFieldFactory {
+pub(crate) trait IFieldFactory {
     fn create(&self, ident: Ident, ty: Type) -> Field;
 
     fn create_from_struct(&self, ident: Ident, item_struct: &ItemStruct) -> Field;

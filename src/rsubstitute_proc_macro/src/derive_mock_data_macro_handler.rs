@@ -7,7 +7,7 @@ use std::sync::Arc;
 use syn::punctuated::Punctuated;
 use syn::*;
 
-pub trait IDeriveMockDataMacroHandler {
+pub(crate) trait IDeriveMockDataMacroHandler {
     fn handle(&self, item: proc_macro::TokenStream) -> proc_macro::TokenStream;
 }
 

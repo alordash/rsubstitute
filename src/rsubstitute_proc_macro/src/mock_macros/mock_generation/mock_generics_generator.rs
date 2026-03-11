@@ -6,7 +6,7 @@ use std::sync::Arc;
 use syn::punctuated::Punctuated;
 use syn::*;
 
-pub trait IMockGenericsGenerator {
+pub(crate) trait IMockGenericsGenerator {
     fn generate(&self, source_generics: &Generics) -> MockGenerics;
 }
 

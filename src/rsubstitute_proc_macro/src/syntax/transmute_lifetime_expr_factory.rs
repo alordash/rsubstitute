@@ -6,7 +6,7 @@ use std::sync::Arc;
 use syn::token::Paren;
 use syn::*;
 
-pub trait ITransmuteLifetimeExprFactory {
+pub(crate) trait ITransmuteLifetimeExprFactory {
     fn create(&self, ident: Ident) -> Expr;
 
     fn create_for_expr(&self, expr: Expr) -> Expr;

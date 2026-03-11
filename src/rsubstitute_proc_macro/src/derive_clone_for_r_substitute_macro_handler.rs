@@ -6,7 +6,7 @@ use std::sync::Arc;
 use syn::punctuated::Punctuated;
 use syn::*;
 
-pub trait IDeriveCloneForRSubstituteMacroHandler {
+pub(crate) trait IDeriveCloneForRSubstituteMacroHandler {
     fn handle(&self, item: proc_macro::TokenStream) -> proc_macro::TokenStream;
 }
 

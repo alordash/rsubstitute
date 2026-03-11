@@ -9,7 +9,7 @@ use std::sync::Arc;
 use syn::punctuated::Punctuated;
 use syn::*;
 
-pub trait IMockImplGenerator {
+pub(crate) trait IMockImplGenerator {
     fn generate(
         &self,
         mock_type: &MockType,

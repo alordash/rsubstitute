@@ -1,6 +1,6 @@
 use syn::*;
 
-pub trait IGenericsMerger {
+pub(crate) trait IGenericsMerger {
     fn merge(&self, first: &Generics, second: &Generics) -> Generics;
 }
 

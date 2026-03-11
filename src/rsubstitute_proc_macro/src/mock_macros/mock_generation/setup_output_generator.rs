@@ -5,7 +5,7 @@ use crate::syntax::*;
 use std::sync::Arc;
 use syn::*;
 
-pub trait ISetupOutputGenerator {
+pub(crate) trait ISetupOutputGenerator {
     fn generate_for_trait(&self, mock_type: &MockType, fn_info: &FnInfo) -> TypePath;
 
     fn generate_for_static(

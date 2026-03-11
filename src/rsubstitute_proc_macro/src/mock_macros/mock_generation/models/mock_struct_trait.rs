@@ -1,6 +1,6 @@
 use crate::mock_macros::mock_generation::models::*;
 
-pub struct MockStructTrait {
+pub(crate) struct MockStructTrait {
     pub info: MockStructTraitInfo,
     pub setup_struct: MockSetupStruct,
     pub received_struct: MockReceivedStruct,

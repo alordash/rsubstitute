@@ -4,7 +4,7 @@ use std::cell::OnceCell;
 use std::sync::Arc;
 use syn::*;
 
-pub trait IPathFactory {
+pub(crate) trait IPathFactory {
     fn create(&self, ident: Ident) -> Path;
 
     fn create_with_generics(&self, ident: Ident, generics: Generics) -> Path;
