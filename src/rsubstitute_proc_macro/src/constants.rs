@@ -1,4 +1,3 @@
-// TODO - write macros for ident definition, replace all LazyCell<Ident>
 use crate::di::SERVICES;
 use proc_macro2::{Ident, Span};
 use quote::format_ident;
@@ -8,29 +7,26 @@ use std::iter::{IntoIterator, Iterator};
 use syn::punctuated::Punctuated;
 use syn::*;
 
-macro_rules! ident {
+macro_rules! define {
+    // For idents
     ($symbol:ident, $value:literal) => {
         pub const $symbol: LazyCell<Ident> = LazyCell::new(|| format_ident!($value));
     };
-    ($symbol:ident, $value:ident) => {
-        pub const $symbol: LazyCell<Ident> = LazyCell::new(|| format_ident!($value));
+
+    // For everything else
+    ($symbol:ident, $ty:ty, $block:block) => {
+        pub const $symbol: LazyCell<$ty> = LazyCell::new(|| $block);
     };
 }
 
-macro_rules! define_const {
-    ($symbol:ident, $ty:ty, $block:block) => {
-        pub const $symbol: LazyCell<$ty> = LazyCell::new(|| $block)
-    }
-}
-
-ident!(DATA_IDENT, "data");
-// pub const DATA_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("data"));
+define!(DATA_IDENT, "data");
+// define!(DATA_IDENT, "data");
 pub const MOCK_STRUCT_IDENT_PREFIX: &'static str = "Mock";
-ident!(MOCK_SETUP_FIELD_IDENT, "setup");
-ident!(MOCK_RECEIVED_FIELD_IDENT, "received");
+define!(MOCK_SETUP_FIELD_IDENT, "setup");
+define!(MOCK_RECEIVED_FIELD_IDENT, "received");
 
-ident!(SELF_IDENT, "self");
-define_const!(SELF_EXPR, Expr, {
+define!(SELF_IDENT, "self");
+define!(SELF_EXPR, Expr, {
     let path_factory = &SERVICES.path_factory;
     let result = Expr::Path(ExprPath {
         attrs: Vec::new(),
@@ -40,45 +36,40 @@ define_const!(SELF_EXPR, Expr, {
     return result;
 });
 
-pub const MACRO_VEC_PATH: LazyCell<Path> = LazyCell::new(|| {
+define!(MACRO_VEC_PATH, Path, {
     let path_factory = &SERVICES.path_factory;
     let result = path_factory.create(format_ident!("vec"));
     return result;
 });
 
-pub const SUPER_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("super"));
-
-pub const FOR_GENERATED_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("for_generated"));
-
-pub const CRATE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("rsubstitute"));
-
-pub const ARG_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Arg"));
+define!(SUPER_IDENT, "super");
+define!(FOR_GENERATED_IDENT, "for_generated");
+define!(CRATE_IDENT, "rsubstitute");
+define!(ARG_TYPE_IDENT, "Arg");
 
 pub const I_ARGS_FORMATTER_TRAIT_NAME: &'static str = "IArgsFormatter";
-pub const I_ARGS_FORMATTER_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
+define!(I_ARGS_FORMATTER_TRAIT_PATH, Path, {
     let path_factory = &SERVICES.path_factory;
     let result = path_factory.create(format_ident!("{I_ARGS_FORMATTER_TRAIT_NAME}"));
     return result;
 });
 
 pub const I_GENERICS_HASH_KEY_PROVIDER_TRAIT_NAME: &'static str = "IGenericsHashKeyProvider";
-pub const I_GENERICS_HASH_KEY_PROVIDER_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
+define!(I_GENERICS_HASH_KEY_PROVIDER_TRAIT_PATH, Path, {
     let path_factory = &SERVICES.path_factory;
     let result = path_factory.create(format_ident!("{I_GENERICS_HASH_KEY_PROVIDER_TRAIT_NAME}"));
     return result;
 });
 
 pub const CLONE_FOR_RSUBSTITUTE_TRAIT_NAME: &'static str = "CloneForRSubstitute";
-pub const DERIVE_CLONE_FOR_RSUBSTITUTE_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+define!(DERIVE_CLONE_FOR_RSUBSTITUTE_ATTRIBUTE, Attribute, {
     let attribute_factory = &SERVICES.attribute_factory;
     let result = attribute_factory.create(DERIVE_IDENT.clone(), CLONE_FOR_RSUBSTITUTE_TRAIT_NAME);
     return result;
 });
 
-pub const I_ARGS_FORMATTER_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("fmt_args"));
-
-pub const I_ARGS_CHECKER_TRAIT_IDENT: LazyCell<Ident> =
-    LazyCell::new(|| format_ident!("IArgsChecker"));
+define!(I_ARGS_FORMATTER_FN_IDENT, "fmt_args");
+define!(I_ARGS_CHECKER_TRAIT_IDENT, "IArgsChecker");
 
 pub const I_ARGS_INFOS_PROVIDER_TRAIT_NAME: &'static str = "IArgsInfosProvider";
 pub const I_ARGS_INFOS_PROVIDER_TRAIT_IDENT: LazyCell<Ident> =
@@ -88,7 +79,7 @@ pub const I_ARGS_TUPLE_PROVIDER_TRAIT_NAME: &'static str = "IArgsTupleProvider";
 pub const I_ARGS_TUPLE_PROVIDER_TRAIT_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("{I_ARGS_TUPLE_PROVIDER_TRAIT_NAME}"));
 
-pub const I_MOCK_DATA_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("IMockData"));
+define!(I_MOCK_DATA_TRAIT_IDENT, "IMockData");
 
 pub const I_MOCK_DATA_GET_RECEIVED_NOTHING_ELSE_ERROR_MSGS_FN_SIGNATURE: LazyCell<Signature> =
     LazyCell::new(|| {
@@ -111,15 +102,15 @@ pub const I_MOCK_DATA_GET_RECEIVED_NOTHING_ELSE_ERROR_MSGS_FN_SIGNATURE: LazyCel
         return signature;
     });
 
-pub const FN_DATA_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("FnData"));
+define!(FN_DATA_TYPE_IDENT, "FnData");
 
-pub const NEW_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("new"));
+define!(NEW_IDENT, "new");
 
 pub const SETUP_MEMBER: LazyCell<Member> = LazyCell::new(|| Member::Named(format_ident!("setup")));
 pub const RECEIVED_MEMBER: LazyCell<Member> =
     LazyCell::new(|| Member::Named(format_ident!("received")));
 
-pub const EMPTY_PATH_EXPR: LazyCell<Expr> = LazyCell::new(|| {
+define!(EMPTY_PATH_EXPR, Expr, {
     Expr::Path(ExprPath {
         attrs: Vec::new(),
         qself: None,
@@ -136,7 +127,7 @@ pub const DATA_SHORT_FIELD_VALUE: LazyCell<FieldValue> = LazyCell::new(|| FieldV
     colon_token: None,
     expr: EMPTY_PATH_EXPR.clone(),
 });
-pub const DATA_FIELD_VALUE: LazyCell<FieldValue> = LazyCell::new(|| {
+define!(DATA_FIELD_VALUE, FieldValue, {
     let expr_method_call_factory = &SERVICES.expr_method_call_factory;
     let result = FieldValue {
         attrs: Vec::new(),
@@ -151,49 +142,47 @@ pub const DATA_FIELD_VALUE: LazyCell<FieldValue> = LazyCell::new(|| {
     return result;
 });
 
-pub const FN_DATA_ADD_CONFIG_FN_IDENT: LazyCell<Ident> =
-    LazyCell::new(|| format_ident!("add_config"));
+define!(FN_DATA_ADD_CONFIG_FN_IDENT, "add_config");
 
-pub const FN_DATA_VERIFY_RECEIVED_FN_IDENT: LazyCell<Ident> =
-    LazyCell::new(|| format_ident!("verify_received"));
+define!(FN_DATA_VERIFY_RECEIVED_FN_IDENT, "verify_received");
 
-pub const FN_TUNER_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("FnTuner"));
+define!(FN_TUNER_TYPE_IDENT, "FnTuner");
 
-pub const FN_VERIFIER_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("FnVerifier"));
-pub const FN_VERIFIER_NEW_FN_EXPR: LazyCell<Expr> = LazyCell::new(|| {
+define!(FN_VERIFIER_TYPE_IDENT, "FnVerifier");
+define!(FN_VERIFIER_NEW_FN_EXPR, Expr, {
     let path_factory = &SERVICES.path_factory;
     let result = path_factory
         .create_expr_from_parts(vec![FN_VERIFIER_TYPE_IDENT.clone(), NEW_IDENT.clone()]);
     return result;
 });
 
-pub const ALLOW_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("allow"));
+define!(ALLOW_IDENT, "allow");
 
-pub const ALLOW_UNUSED_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+define!(ALLOW_UNUSED_ATTRIBUTE, Attribute, {
     let attribute_factory = &SERVICES.attribute_factory;
     let result = attribute_factory.create(ALLOW_IDENT.clone(), "unused");
     return result;
 });
 
-pub const ALLOW_UNUSED_PARENS_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+define!(ALLOW_UNUSED_PARENS_ATTRIBUTE, Attribute, {
     let attribute_factory = &SERVICES.attribute_factory;
     let result = attribute_factory.create(ALLOW_IDENT.clone(), "unused_parens");
     return result;
 });
 
-pub const ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+define!(ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE, Attribute, {
     let attribute_factory = &SERVICES.attribute_factory;
     let result = attribute_factory.create(ALLOW_IDENT.clone(), "mismatched_lifetime_syntaxes");
     return result;
 });
 
-pub const ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+define!(ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE, Attribute, {
     let attribute_factory = &SERVICES.attribute_factory;
     let result = attribute_factory.create(ALLOW_IDENT.clone(), "non_camel_case_types");
     return result;
 });
 
-pub const ALLOW_NON_SNAKE_CASE_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+define!(ALLOW_NON_SNAKE_CASE_ATTRIBUTE, Attribute, {
     let attribute_factory = &SERVICES.attribute_factory;
     let result = attribute_factory.create(ALLOW_IDENT.clone(), "non_snake_case");
     return result;
@@ -203,7 +192,7 @@ pub const DEBUG_TRAIT_NAME: &'static str = "Debug";
 
 pub const CLONE_TRAIT_STR: &'static str = "Clone";
 pub const CLONE_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("{CLONE_TRAIT_STR}"));
-pub const CLONE_FN_SIGNATURE: LazyCell<Signature> = LazyCell::new(|| {
+define!(CLONE_FN_SIGNATURE, Signature, {
     let signature = Signature {
         constness: None,
         asyncness: None,
@@ -220,37 +209,37 @@ pub const CLONE_FN_SIGNATURE: LazyCell<Signature> = LazyCell::new(|| {
     return signature;
 });
 
-pub const DERIVE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("derive"));
+define!(DERIVE_IDENT, "derive");
 
-pub const DERIVE_MOCK_DATA_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+define!(DERIVE_MOCK_DATA_ATTRIBUTE, Attribute, {
     let attribute_factory = &SERVICES.attribute_factory;
     let result =
         attribute_factory.create(DERIVE_IDENT.clone(), &I_MOCK_DATA_TRAIT_IDENT.to_string());
     return result;
 });
 
-pub const DOC_HIDDEN_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+define!(DOC_HIDDEN_ATTRIBUTE, Attribute, {
     let attribute_factory = &SERVICES.attribute_factory;
     let ident = format_ident!("doc");
     let result = attribute_factory.create(ident, "hidden");
     return result;
 });
 
-pub const CFG_TEST_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+define!(CFG_TEST_ATTRIBUTE, Attribute, {
     let attribute_factory = &SERVICES.attribute_factory;
     let ident = format_ident!("cfg");
     let result = attribute_factory.create(ident, "test");
     return result;
 });
 
-pub const CFG_NOT_TEST_ATTRIBUTE: LazyCell<Attribute> = LazyCell::new(|| {
+define!(CFG_NOT_TEST_ATTRIBUTE, Attribute, {
     let attribute_factory = &SERVICES.attribute_factory;
     let ident = format_ident!("cfg");
     let result = attribute_factory.create(ident, "not(test)");
     return result;
 });
 
-pub const VOID_TYPE: LazyCell<Type> = LazyCell::new(|| {
+define!(VOID_TYPE, Type, {
     let result = Type::Tuple(TypeTuple {
         paren_token: Default::default(),
         elems: Punctuated::new(),
@@ -258,27 +247,27 @@ pub const VOID_TYPE: LazyCell<Type> = LazyCell::new(|| {
     return result;
 });
 
-pub const MACRO_FORMAT_PATH: LazyCell<Path> = LazyCell::new(|| {
+define!(MACRO_FORMAT_PATH, Path, {
     let path_factory = &SERVICES.path_factory;
     let result = path_factory.create(format_ident!("format"));
     return result;
 });
 
-pub const SELF_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Self"));
+define!(SELF_TYPE_IDENT, "Self");
 
-pub const SELF_TYPE_PATH: LazyCell<Path> = LazyCell::new(|| {
+define!(SELF_TYPE_PATH, Path, {
     let path_factory = &SERVICES.path_factory;
     let result = path_factory.create(SELF_TYPE_IDENT.clone());
     return result;
 });
 
-pub const SELF_TYPE: LazyCell<Type> = LazyCell::new(|| {
+define!(SELF_TYPE, Type, {
     let type_factory = &SERVICES.type_factory;
     let result = type_factory.create(SELF_TYPE_IDENT.clone());
     return result;
 });
 
-pub const REF_SELF_TYPE: LazyCell<Type> = LazyCell::new(|| {
+define!(REF_SELF_TYPE, Type, {
     let type_factory = &SERVICES.type_factory;
     let result = type_factory.reference(
         Type::Path(TypePath {
@@ -290,27 +279,27 @@ pub const REF_SELF_TYPE: LazyCell<Type> = LazyCell::new(|| {
     return result;
 });
 
-pub const STRING_TYPE: LazyCell<Type> = LazyCell::new(|| {
+define!(STRING_TYPE, Type, {
     let type_factory = &SERVICES.type_factory;
     let result = type_factory.create(format_ident!("String"));
     return result;
 });
 
-pub const VEC_OF_ARG_CHECK_RESULT_TYPE: LazyCell<Type> = LazyCell::new(|| {
+define!(VEC_OF_ARG_CHECK_RESULT_TYPE, Type, {
     let type_factory = &SERVICES.type_factory;
     let arg_check_result_type = type_factory.create(format_ident!("ArgCheckResult"));
     let result = type_factory.wrap_in(arg_check_result_type, format_ident!("Vec"));
     return result;
 });
 
-pub const VEC_OF_ARG_INFO_RESULT_TYPE: LazyCell<Type> = LazyCell::new(|| {
+define!(VEC_OF_ARG_INFO_RESULT_TYPE, Type, {
     let type_factory = &SERVICES.type_factory;
     let arg_check_result_type = type_factory.create(format_ident!("ArgInfo"));
     let result = type_factory.wrap_in(arg_check_result_type, format_ident!("Vec"));
     return result;
 });
 
-pub const VEC_OF_VEC_OF_STRINGS_TYPE: LazyCell<Type> = LazyCell::new(|| {
+define!(VEC_OF_VEC_OF_STRINGS_TYPE, Type, {
     let type_factory = &SERVICES.type_factory;
     let result = type_factory.wrap_in(
         type_factory.wrap_in(STRING_TYPE.clone(), format_ident!("Vec")),
@@ -319,9 +308,9 @@ pub const VEC_OF_VEC_OF_STRINGS_TYPE: LazyCell<Type> = LazyCell::new(|| {
     return result;
 });
 
-pub const ARC_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Arc"));
+define!(ARC_IDENT, "Arc");
 
-pub const REF_SELF_ARG: LazyCell<FnArg> = LazyCell::new(|| {
+define!(REF_SELF_ARG, FnArg, {
     let result = FnArg::Receiver(Receiver {
         attrs: Vec::new(),
         reference: Some((Default::default(), None)),
@@ -333,7 +322,7 @@ pub const REF_SELF_ARG: LazyCell<FnArg> = LazyCell::new(|| {
     return result;
 });
 
-pub const USE_SUPER: LazyCell<ItemUse> = LazyCell::new(|| {
+define!(USE_SUPER, ItemUse, {
     let result = ItemUse {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
@@ -351,7 +340,7 @@ pub const USE_SUPER: LazyCell<ItemUse> = LazyCell::new(|| {
     return result;
 });
 
-pub const USE_FOR_GENERATED: LazyCell<ItemUse> = LazyCell::new(|| {
+define!(USE_FOR_GENERATED, ItemUse, {
     let result = ItemUse {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
@@ -373,17 +362,16 @@ pub const USE_FOR_GENERATED: LazyCell<ItemUse> = LazyCell::new(|| {
     return result;
 });
 
-pub const PHANTOM_DATA_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("PhantomData"));
-pub const PHANTOM_DATA_EXPR_PATH: LazyCell<Expr> = LazyCell::new(|| {
+define!(PHANTOM_DATA_IDENT, "PhantomData");
+define!(PHANTOM_DATA_EXPR_PATH, Expr, {
     let path_factory = &SERVICES.path_factory;
     let result = path_factory.create_expr(PHANTOM_DATA_IDENT.clone());
     return result;
 });
 
-pub const DEFAULT_ARG_FIELD_LIFETIME_FIELD_IDENT: LazyCell<Ident> =
-    LazyCell::new(|| format_ident!("_phantom_lifetime"));
+define!(DEFAULT_ARG_FIELD_LIFETIME_FIELD_IDENT, "_phantom_lifetime");
 
-pub const DEFAULT_ARG_FIELD_LIFETIME_FIELD: LazyCell<Field> = LazyCell::new(|| {
+define!(DEFAULT_ARG_FIELD_LIFETIME_FIELD, Field, {
     let type_factory = &SERVICES.type_factory;
     let ty = type_factory.phantom_data_lifetime(DEFAULT_ARG_FIELD_LIFETIME.clone());
     let result = Field {
@@ -397,8 +385,7 @@ pub const DEFAULT_ARG_FIELD_LIFETIME_FIELD: LazyCell<Field> = LazyCell::new(|| {
     return result;
 });
 
-pub const RETURN_TYPE_PHANTOM_FIELD_IDENT: LazyCell<Ident> =
-    LazyCell::new(|| format_ident!("_return_type"));
+define!(RETURN_TYPE_PHANTOM_FIELD_IDENT, "_return_type");
 
 pub const DERIVED_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
     apostrophe: Span::call_site(),
@@ -421,41 +408,40 @@ pub const STATIC_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
     ident: format_ident!("static"),
 });
 
-pub const CLONE_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("clone"));
+define!(CLONE_FN_IDENT, "clone");
 
-pub const RESET_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("reset"));
+define!(RESET_IDENT, "reset");
 
-pub const INTO_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Into"));
-pub const INTO_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("into"));
+define!(INTO_TRAIT_IDENT, "Into");
+define!(INTO_FN_IDENT, "into");
 
-pub const GET_GLOBAL_MOCK_FN_IDENT: LazyCell<Ident> =
-    LazyCell::new(|| format_ident!("get_global_mock"));
+define!(GET_GLOBAL_MOCK_FN_IDENT, "get_global_mock");
 
-pub const DEFAULT_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
+define!(DEFAULT_TRAIT_PATH, Path, {
     let path_factory = &SERVICES.path_factory;
     let result = path_factory.create(format_ident!("Default"));
     return result;
 });
 
-pub const DEFAULT_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("default"));
-pub const INNER_DATA_FIELD_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("inner_data"));
+define!(DEFAULT_FN_IDENT, "default");
+define!(INNER_DATA_FIELD_IDENT, "inner_data");
 
-pub const DEREF_TRAIT_PATH: LazyCell<Path> = LazyCell::new(|| {
+define!(DEREF_TRAIT_PATH, Path, {
     let path_factory = &SERVICES.path_factory;
     let result = path_factory.create(format_ident!("Deref"));
     return result;
 });
-pub const DEREF_TARGET_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Target"));
-pub const DEREF_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("deref"));
+define!(DEREF_TARGET_TYPE_IDENT, "Target");
+define!(DEREF_FN_IDENT, "deref");
 
-pub const IGNORE_IMPL_ATTRIBUTE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("unmock"));
+define!(IGNORE_IMPL_ATTRIBUTE_IDENT, "unmock");
 
-pub const HASH_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("hash"));
+define!(HASH_FN_IDENT, "hash");
 
-pub const ARG_PRINTER_STRUCT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("ArgPrinter"));
-pub const DEBUG_STRING_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("debug_string"));
+define!(ARG_PRINTER_STRUCT_IDENT, "ArgPrinter");
+define!(DEBUG_STRING_FN_IDENT, "debug_string");
 
-pub const MUT_INFER_PTR_TYPE: LazyCell<Type> = LazyCell::new(|| {
+define!(MUT_INFER_PTR_TYPE, Type, {
     Type::Ptr(TypePtr {
         star_token: Default::default(),
         const_token: Some(Default::default()),
@@ -466,7 +452,7 @@ pub const MUT_INFER_PTR_TYPE: LazyCell<Type> = LazyCell::new(|| {
     })
 });
 
-pub const MUT_VOID_PTR_TYPE: LazyCell<Type> = LazyCell::new(|| {
+define!(MUT_VOID_PTR_TYPE, Type, {
     Type::Ptr(TypePtr {
         star_token: Default::default(),
         const_token: Some(Default::default()),
@@ -475,13 +461,12 @@ pub const MUT_VOID_PTR_TYPE: LazyCell<Type> = LazyCell::new(|| {
     })
 });
 
-pub const DYN_CALL_REF_TYPE: LazyCell<Type> = LazyCell::new(|| {
+define!(DYN_CALL_REF_TYPE, Type, {
     let type_factory = &SERVICES.type_factory;
     let result = type_factory.reference(type_factory.create(format_ident!("DynCall")), None);
     return result;
 });
-pub const DYN_CALL_DOWNCAST_REF_FN_IDENT: LazyCell<Ident> =
-    LazyCell::new(|| format_ident!("downcast_ref"));
+define!(DYN_CALL_DOWNCAST_REF_FN_IDENT, "downcast_ref");
 
 #[cfg(not(feature = "mock_base_by_default"))]
 pub const SUPPORT_BASE_PARAMETER: &'static str = "base";
@@ -491,13 +476,13 @@ pub const DO_NOT_SUPPORT_BASE_PARAMETER: &'static str = "no_base";
 
 pub const BASE_FN_IDENT_PREFIX: &'static str = "base";
 
-pub const BOX_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Box"));
-pub const BOX_NEW_EXPR: LazyCell<Expr> = LazyCell::new(|| {
+define!(BOX_IDENT, "Box");
+define!(BOX_NEW_EXPR, Expr, {
     let path_factory = &SERVICES.path_factory;
     let result = path_factory.create_expr_from_parts(vec![BOX_IDENT.clone(), NEW_IDENT.clone()]);
     return result;
 });
-pub const BOX_LEAK_EXPR: LazyCell<Expr> = LazyCell::new(|| {
+define!(BOX_LEAK_EXPR, Expr, {
     let path_factory = &SERVICES.path_factory;
     let result =
         path_factory.create_expr_from_parts(vec![BOX_IDENT.clone(), format_ident!("leak")]);
