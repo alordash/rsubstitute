@@ -13,6 +13,7 @@ impl<'rs> DynReturnValue<'rs> {
 
     pub fn downcast_into<'a, T: IReturnValue<'a>>(self) -> T {
         let raw_ptr = Box::into_raw(self.inner) as *mut T;
+        // SAFETY: for justification refer to module level documentation.
         let boxed = unsafe { Box::from_raw(raw_ptr) };
         let value = *boxed;
         return value;

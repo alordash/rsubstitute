@@ -20,12 +20,13 @@ impl GlobalMocksMap {
             .entry(type_id)
             .or_insert(Box::leak(Box::new(<T as Default>::default())) as *mut _ as *const _);
 
-        // SAFETY: `raw_ptr` is obtained from `Box::leak`, which
-        // means that it is safe to turn it into a reference.
+        // SAFETY: `raw_ptr` is obtained from `Box::<T>::leak`, which means that it is safe to cast
+        // a pointer to `T` and treat it as reference. `as_ref` could also be replaced with `as_ref_unchecked`
+        // since `Box::leak` returns a reference, which after casting to pointer can not be null.
         let mock_ref = unsafe {
             ((*raw_ptr) as *const T).as_ref().unwrap_or_else(|| {
                 panic!(
-                    "Pointer to global static mock of type '{}' should not be null.",
+                    "Pointer to global static mock of type '{}' obtained from `Box::leak` should not be null.",
                     std::any::type_name::<T>()
                 )
             })

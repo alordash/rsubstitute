@@ -198,11 +198,17 @@ impl<'rs, 'a, T: ?Sized> Arg<'rs, &'a mut T> {
         actual_value_ptr: &*mut T,
         actual_value_str: String,
     ) -> ArgCheckResult {
+        // SAFETY: mut reference are replaced with mut pointers to allow having multiple mutable
+        // references. This is needed to expose argument in `Arg::is` predicate as is, i.e. as a
+        // mutable and not a regular reference.
+        // It's ok to have multiple mutable references to mock arguments, their mutability should
+        // not matter for testing with mocks.
         let actual_value = unsafe {
             &(*actual_value_ptr)
                 .as_ref()
                 .expect("Mutable reference to call argument should not be null.")
         };
+        // SAFETY: see notes above.
         let mut_actual_value = unsafe {
             &(*actual_value_ptr)
                 .as_mut()

@@ -47,6 +47,9 @@ impl<'rs, TMock> FnConfig<'rs, TMock> {
         let dyn_callback = move |mock: &TMock, dyn_call: &DynCall<'rs>| {
             let raw_arg_refs_tuple_ptr = dyn_call.get_ptr_to_boxed_tuple_of_refs();
             let arg_refs_tuple_ptr = raw_arg_refs_tuple_ptr as *mut TArgRefsTuple;
+            // SAFETY: both `get_ptr_to_boxed_tuple_of_refs` implementation and `TArgRefsTuple` type
+            // are controlled by procedure macro. This guarantees that downcasting from `Box` is safe
+            // and won't lead to transmutation between different types.
             let boxed_arg_refs_tuple = unsafe { Box::from_raw(arg_refs_tuple_ptr) };
             let arg_refs_tuple = *boxed_arg_refs_tuple;
             callback(mock, arg_refs_tuple)
