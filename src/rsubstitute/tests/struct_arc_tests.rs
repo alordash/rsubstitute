@@ -15,23 +15,23 @@ mocked! {
 
         #[allow(unused)]
         pub(crate) fn accept_arc(&self, r: Arc<i32>) {
-            todo!()
+            unreachable!()
         }
 
         pub(crate) fn return_arc(&self) -> Arc<i32> {
-            todo!()
+            unreachable!()
         }
 
         pub(crate) fn accept_arc_return_arc(&self, r: Arc<i32>) -> Arc<i32> {
-            todo!()
+            unreachable!()
         }
 
         pub(crate) fn accept_two_arcs(&self, r1: Arc<i32>, r2: Arc<f32>) {
-            todo!()
+            unreachable!()
         }
 
         pub(crate) fn accept_two_arcs_return_arc(&self, r1: Arc<i32>, r2: Arc<f32>) -> Arc<String> {
-            todo!()
+            unreachable!()
         }
     }
 }

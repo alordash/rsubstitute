@@ -6,15 +6,15 @@ mocked! {
     impl Struct {
         pub fn new() -> Self { Self }
 
-        pub fn accept_value(&self, v: i32) { todo!() }
+        pub fn accept_value(&self, v: i32) { unreachable!() }
 
-        pub fn return_value(&self) -> i32 { todo!() }
+        pub fn return_value(&self) -> i32 { unreachable!() }
 
-        pub fn accept_value_return_value(&self, v: i32) -> f32 { todo!() }
+        pub fn accept_value_return_value(&self, v: i32) -> f32 { unreachable!() }
 
-        pub fn accept_two_values(&self, v1: i32, v2: f32) { todo!() }
+        pub fn accept_two_values(&self, v1: i32, v2: f32) { unreachable!() }
 
-        pub fn accept_two_values_return_value(&self, v1: i32, v2: f32) -> String { todo!() }
+        pub fn accept_two_values_return_value(&self, v1: i32, v2: f32) -> String { unreachable!() }
     }
 }
 

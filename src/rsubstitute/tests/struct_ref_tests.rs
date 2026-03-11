@@ -6,15 +6,15 @@ mocked! {
     impl Struct {
         pub fn new() -> Self { Self }
 
-        pub fn accept_ref(&self, r: &i32) { todo!() }
+        pub fn accept_ref(&self, r: &i32) { unreachable!() }
 
-        pub fn return_ref(&self) -> &'static i32 { todo!() }
+        pub fn return_ref(&self) -> &'static i32 { unreachable!() }
 
-        pub fn accept_ref_return_ref(&self, r: &i32) -> &'static i32 { todo!() }
+        pub fn accept_ref_return_ref(&self, r: &i32) -> &'static i32 { unreachable!() }
 
-        pub fn accept_two_refs(&self, r1: &i32, r2: &f32) { todo!() }
+        pub fn accept_two_refs(&self, r1: &i32, r2: &f32) { unreachable!() }
 
-        pub fn accept_two_refs_return_ref(&self, r1: &i32, r2: &f32) -> &'static str { todo!() }
+        pub fn accept_two_refs_return_ref(&self, r1: &i32, r2: &f32) -> &'static str { unreachable!() }
     }
 }
 

@@ -71,7 +71,6 @@ mod __rsubstitute_generated_Trait {
                     t2: core::mem::transmute(t2),
                 }
             };
-            // dbg!(call.get_arg_infos()); // TODO remove
             return self.data.work_data.handle_returning(call);
         }
     }
@@ -189,7 +188,6 @@ mod tests {
             .work::<_, i32, true, 4>(10, &"amogus", Times::Once)
             .work::<_, i32, false, 2>(10, &"amogus", Times::Once)
             .work::<_, [i32; 5], false, 2>(10, &"amogus", Times::Once)
-            // TODO - mock.received - value used after move
             .work::<_, i32, true, 2>(10, &"quo vadis", Times::Never)
             .work::<_, i32, true, 4>(11, &"amogus", Times::Never)
             .work::<_, i32, false, 2>(10, &"quo vadis", Times::Never)

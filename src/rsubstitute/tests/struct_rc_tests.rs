@@ -7,15 +7,15 @@ mocked! {
     impl Struct {
         pub fn new() -> Self { Self }
 
-        pub(crate) fn accept_rc(&self, r: Rc<i32>) { todo!() }
+        pub(crate) fn accept_rc(&self, r: Rc<i32>) { unreachable!() }
 
-        pub(crate) fn return_rc(&self) -> Rc<i32> { todo!() }
+        pub(crate) fn return_rc(&self) -> Rc<i32> { unreachable!() }
 
-        pub(crate) fn accept_rc_return_rc(&self, r: Rc<i32>) -> Rc<i32> { todo!() }
+        pub(crate) fn accept_rc_return_rc(&self, r: Rc<i32>) -> Rc<i32> { unreachable!() }
 
-        pub(crate) fn accept_two_rcs(&self, r1: Rc<i32>, r2: Rc<f32>) { todo!() }
+        pub(crate) fn accept_two_rcs(&self, r1: Rc<i32>, r2: Rc<f32>) { unreachable!() }
 
-        pub(crate) fn accept_two_rcs_return_rc(&self, r1: Rc<i32>, r2: Rc<f32>) -> Rc<String> { todo!() }
+        pub(crate) fn accept_two_rcs_return_rc(&self, r1: Rc<i32>, r2: Rc<f32>) -> Rc<String> { unreachable!() }
     }
 }
 

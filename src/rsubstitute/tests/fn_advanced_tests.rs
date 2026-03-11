@@ -3,12 +3,12 @@ use rsubstitute::macros::mock;
 
 #[mock]
 fn accept_ref<'a>(r: &'a i32) -> &'a i32 {
-    todo!()
+    unreachable!()
 }
 
 #[mock]
 fn return_mut_ref<'a>() -> &'a mut i32 {
-    todo!()
+    unreachable!()
 }
 
 #[mock]
@@ -31,7 +31,7 @@ fn accept_foo(Foo { mut number }: Foo) {
 
 #[mock]
 fn accept_many_ref<'a, 'b>(mut r: &'a &'b &'a &i32, _em: &()) -> &'a &'b &'a &'b i32 {
-    todo!()
+    unreachable!()
 }
 
 #[cfg(test)]
