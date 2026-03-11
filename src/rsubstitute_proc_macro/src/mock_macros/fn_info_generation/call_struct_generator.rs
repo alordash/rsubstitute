@@ -34,11 +34,11 @@ impl ICallStructGenerator for CallStructGenerator {
         let internal_phantom_fields =
             if let Some(ref phantom_return_type) = fn_decl.maybe_phantom_return_field {
                 vec![
-                    constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD.clone(),
+                    constants::DEFAULT_ARG_LIFETIME_FIELD.clone(),
                     phantom_return_type.clone(),
                 ]
             } else {
-                vec![constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD.clone()]
+                vec![constants::DEFAULT_ARG_LIFETIME_FIELD.clone()]
             };
         let struct_fields = internal_phantom_fields
             .into_iter()

@@ -30,7 +30,7 @@ impl IReferenceNormalizer for ReferenceNormalizer {
         let optional_lifetimes: Vec<_> = self.reference_type_crawler.get_all_optional_lifetimes(ty);
         for optional_lifetime in optional_lifetimes {
             if optional_lifetime.is_none() {
-                *optional_lifetime = Some(constants::DEFAULT_ARG_FIELD_LIFETIME.clone());
+                *optional_lifetime = Some(constants::DEFAULT_ARG_LIFETIME.clone());
             }
         }
     }

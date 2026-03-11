@@ -35,7 +35,7 @@ pub(crate) struct MockSetupImplGenerator {
     pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
     pub input_args_generator: Arc<dyn IInputArgsGenerator>,
     pub setup_output_generator: Arc<dyn ISetupOutputGenerator>,
-    pub core_mem_transmute_expr_factory: Arc<dyn ICoreMemTransmuteExprFactory>,
+    pub transmute_lifetime_expr_factory: Arc<dyn ITransmuteLifetimeExprFactory>,
 }
 
 impl IMockSetupImplGenerator for MockSetupImplGenerator {
@@ -190,21 +190,12 @@ impl MockSetupImplGenerator {
             Expr::Return(ExprReturn {
                 attrs: Vec::new(),
                 return_token: Default::default(),
-                // TODO - make factory for wrapping stuff in Expr::Unsafe
-                expr: Some(Box::new(Expr::Unsafe(ExprUnsafe {
-                    attrs: Vec::new(),
-                    unsafe_token: Default::default(),
-                    block: Block {
-                        brace_token: Default::default(),
-                        stmts: vec![Stmt::Expr(
-                            self.core_mem_transmute_expr_factory.create_for_expr(
-                                self.path_factory
-                                    .create_expr(Self::FN_TUNER_VAR_IDENT.clone()),
-                            ),
-                            None,
-                        )],
-                    },
-                }))),
+                expr: Some(Box::new(
+                    self.transmute_lifetime_expr_factory.create_for_expr(
+                        self.path_factory
+                            .create_expr(Self::FN_TUNER_VAR_IDENT.clone()),
+                    ),
+                )),
             }),
             Some(Default::default()),
         );

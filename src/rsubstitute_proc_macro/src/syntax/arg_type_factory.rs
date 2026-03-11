@@ -20,7 +20,7 @@ impl IArgTypeFactory for ArgTypeFactory {
                         lt_token: Default::default(),
                         args: [
                             GenericArgument::Lifetime(
-                                constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
+                                constants::DEFAULT_ARG_LIFETIME.clone(),
                             ),
                             GenericArgument::Type(ty),
                         ]

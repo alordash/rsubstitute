@@ -1,4 +1,5 @@
 use crate::args::*;
+use crate::transmute_lifetime;
 use std::fmt::{Debug, Formatter};
 use std::rc::Rc;
 use std::sync::Arc;
@@ -54,7 +55,7 @@ impl<'rs, T: Debug> Debug for Arg<'rs, T> {
 impl<'rs, T> Arg<'rs, T> {
     pub fn is<'a, TFn: Fn(&T) -> bool + 'a>(predicate: TFn) -> Self {
         let reference: Box<dyn Fn(&T) -> bool + 'rs> =
-            unsafe { core::mem::transmute(Box::new(predicate) as Box<dyn Fn(&T) -> bool + 'a>) };
+            transmute_lifetime!(Box::new(predicate) as Box<dyn Fn(&T) -> bool + 'a>);
         return Self::PrivateIs(reference, Private);
     }
 

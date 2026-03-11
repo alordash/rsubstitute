@@ -54,7 +54,7 @@ impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool
             .borrow_mut()
             .entry(generics_hash_key)
             .or_default()
-            .push(unsafe { core::mem::transmute(arc_config.clone()) });
+            .push(transmute_lifetime!(arc_config.clone()));
         let fn_tuner = FnTuner::new(arc_config, fn_tuner_owner);
         return fn_tuner;
     }

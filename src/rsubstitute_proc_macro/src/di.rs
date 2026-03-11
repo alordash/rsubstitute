@@ -145,9 +145,8 @@ fn create_services() -> ServiceCollection {
     let field_value_factory = Arc::new(FieldValueFactory {
         expr_method_call_factory: expr_method_call_factory.clone(),
     });
-    let core_mem_transmute_expr_factory = Arc::new(CoreMemTransmuteExprFactory {
+    let transmute_lifetime_expr_factory = Arc::new(TransmuteLifetimeExprFactory {
         path_factory: path_factory.clone(),
-        expr_call_factory: expr_call_factory.clone(),
     });
     let get_global_mock_expr_generator = Arc::new(GetGlobalMockExprGenerator {
         expr_call_factory: expr_call_factory.clone(),
@@ -159,7 +158,7 @@ fn create_services() -> ServiceCollection {
     let mock_fn_block_generator = Arc::new(MockFnBlockGenerator {
         path_factory: path_factory.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
-        core_mem_transmute_expr_factory: core_mem_transmute_expr_factory.clone(),
+        transmute_lifetime_expr_factory: transmute_lifetime_expr_factory.clone(),
         field_value_factory: field_value_factory.clone(),
         get_global_mock_expr_generator: get_global_mock_expr_generator.clone(),
         field_checker: field_checker.clone(),
@@ -209,7 +208,7 @@ fn create_services() -> ServiceCollection {
         expr_method_call_factory: expr_method_call_factory.clone(),
         input_args_generator: input_args_generator.clone(),
         setup_output_generator: setup_output_generator.clone(),
-        core_mem_transmute_expr_factory: core_mem_transmute_expr_factory.clone(),
+        transmute_lifetime_expr_factory: transmute_lifetime_expr_factory.clone(),
     });
     let received_signature_generator = Arc::new(ReceivedSignatureGenerator {
         type_factory: type_factory.clone(),

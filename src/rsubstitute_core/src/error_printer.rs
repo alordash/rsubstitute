@@ -1,6 +1,5 @@
-use crate::Times;
+use crate::{read_config, Times};
 use crate::args::{ArgCheckResult, ArgInfo, IArgsFormatter};
-use crate::config::get_max_invalid_calls_listed_count;
 use crate::matching_config_search_result::MatchingConfigSearchErr;
 
 pub(crate) trait IErrorPrinter {
@@ -67,7 +66,7 @@ impl IErrorPrinter for ErrorPrinter {
         let non_matching_calls_report = if non_matching_calls_count == 0 {
             "Received no non-matching calls".to_string()
         } else {
-            let max_invalid_calls_listed_count = get_max_invalid_calls_listed_count();
+            let max_invalid_calls_listed_count = read_config().max_invalid_calls_listed_count;
             let call_fmt = self.fmt_calls(non_matching_calls_count);
             let non_matching_calls_args_msgs: Vec<_> = non_matching_calls
                 .into_iter()

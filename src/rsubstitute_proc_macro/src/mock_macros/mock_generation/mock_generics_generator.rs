@@ -22,7 +22,7 @@ impl IMockGenericsGenerator for MockGenericsGenerator {
             0,
             GenericParam::Lifetime(LifetimeParam {
                 attrs: Vec::new(),
-                lifetime: constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
+                lifetime: constants::DEFAULT_ARG_LIFETIME.clone(),
                 colon_token: None,
                 bounds: Punctuated::new(),
             }),

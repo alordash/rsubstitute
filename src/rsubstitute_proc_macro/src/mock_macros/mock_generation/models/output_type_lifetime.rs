@@ -11,7 +11,7 @@ impl OutputTypeLifetime {
     pub fn get(&self) -> Lifetime {
         match self {
             OutputTypeLifetime::Derived => constants::DERIVED_LIFETIME.clone(),
-            OutputTypeLifetime::Default => constants::DEFAULT_ARG_FIELD_LIFETIME.clone(),
+            OutputTypeLifetime::Default => constants::DEFAULT_ARG_LIFETIME.clone(),
         }
     }
 }

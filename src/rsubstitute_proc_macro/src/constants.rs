@@ -20,7 +20,6 @@ macro_rules! define {
 }
 
 define!(DATA_IDENT, "data");
-// define!(DATA_IDENT, "data");
 pub const MOCK_STRUCT_IDENT_PREFIX: &'static str = "Mock";
 define!(MOCK_SETUP_FIELD_IDENT, "setup");
 define!(MOCK_RECEIVED_FIELD_IDENT, "received");
@@ -274,7 +273,7 @@ define!(REF_SELF_TYPE, Type, {
             qself: None,
             path: SELF_TYPE_PATH.clone(),
         }),
-        Some(DEFAULT_ARG_FIELD_LIFETIME.clone()),
+        Some(DEFAULT_ARG_LIFETIME.clone()),
     );
     return result;
 });
@@ -369,16 +368,16 @@ define!(PHANTOM_DATA_EXPR_PATH, Expr, {
     return result;
 });
 
-define!(DEFAULT_ARG_FIELD_LIFETIME_FIELD_IDENT, "_phantom_lifetime");
+define!(DEFAULT_ARG_LIFETIME_FIELD_IDENT, "_phantom_lifetime");
 
-define!(DEFAULT_ARG_FIELD_LIFETIME_FIELD, Field, {
+define!(DEFAULT_ARG_LIFETIME_FIELD, Field, {
     let type_factory = &SERVICES.type_factory;
-    let ty = type_factory.phantom_data_lifetime(DEFAULT_ARG_FIELD_LIFETIME.clone());
+    let ty = type_factory.phantom_data_lifetime(DEFAULT_ARG_LIFETIME.clone());
     let result = Field {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
         mutability: FieldMutability::None,
-        ident: Some(DEFAULT_ARG_FIELD_LIFETIME_FIELD_IDENT.clone()),
+        ident: Some(DEFAULT_ARG_LIFETIME_FIELD_IDENT.clone()),
         colon_token: Some(Default::default()),
         ty,
     };
@@ -397,10 +396,10 @@ pub const ANONYMOUS_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
     ident: format_ident!("__rsubstitute_arg_anonymous"),
 });
 
-pub const DEFAULT_ARG_FIELD_LIFETIME_NAME: &'static str = "rs"; // TODO - return to __rsubstitute_arg_field_lifetime
-pub const DEFAULT_ARG_FIELD_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
+pub const DEFAULT_ARG_LIFETIME_NAME: &'static str = "rs"; // TODO - return to __rsubstitute_arg_field_lifetime
+pub const DEFAULT_ARG_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
     apostrophe: Span::call_site(),
-    ident: format_ident!("{DEFAULT_ARG_FIELD_LIFETIME_NAME}"),
+    ident: format_ident!("{DEFAULT_ARG_LIFETIME_NAME}"),
 });
 
 pub const STATIC_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
@@ -486,5 +485,11 @@ define!(BOX_LEAK_EXPR, Expr, {
     let path_factory = &SERVICES.path_factory;
     let result =
         path_factory.create_expr_from_parts(vec![BOX_IDENT.clone(), format_ident!("leak")]);
+    return result;
+});
+
+define!(TRANSMUTE_LIFETIME_MACRO_PATH, Path, {
+    let path_factory = &SERVICES.path_factory;
+    let result = path_factory.create(format_ident!("transmute_lifetime"));
     return result;
 });

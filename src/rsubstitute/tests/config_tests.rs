@@ -1,3 +1,5 @@
+#![feature(rwlock_downgrade)]
+
 use rsubstitute::macros::mock;
 
 #[mock]
@@ -11,14 +13,31 @@ mod max_invalid_calls_listed_count_tests {
     use super::*;
     use not_enough_asserts::panics::*;
     use rsubstitute::*;
+    use std::sync::*;
+
+    // Used to run tests sequentially, otherwise `write_config` may cause deadlock
+    // since `std::sync::RwLock` does not have priority policy for read and write locks.
+    static TESTS_SYNCER: LazyLock<Mutex<()>> = LazyLock::new(|| Default::default());
+
+    fn sync_test<'a>() -> MutexGuard<'a, ()> {
+        TESTS_SYNCER.lock().expect("Unable to lock `TESTS_SYNCER`.")
+    }
 
     mod default {
         use super::*;
         #[test]
-        fn DefaultMaxInvalidCallsListedCount_LessThanLimit_PrintsAll() {
+        fn CallsCountLessThanLimit_PrintsAll() {
+            let _lock = sync_test();
+
             // Arrange
             let mock = TraitMock::new();
-            let calls_count = DEFAULT_CONFIG.max_invalid_calls_listed_count - 1;
+            let max_invalid_calls_listed_count = 4;
+            let calls_count = max_invalid_calls_listed_count - 1;
+
+            let mut write_config = write_config();
+            write_config.max_invalid_calls_listed_count = max_invalid_calls_listed_count;
+            let _read_config_lock = RwLockWriteGuard::downgrade(write_config);
+
             let unexpected_v = 10;
             let expected_v = 20;
 
@@ -29,57 +48,37 @@ mod max_invalid_calls_listed_count_tests {
             let actual_error_msg = record_panic(|| mock.received.work(expected_v, Times::Once));
 
             // Assert
-            let expected_error_msg = format!(
-                "Expected to receive a call exactly once matching:
-	work((i32): equal to {expected_v})
-Actually received no matching calls
-Received {calls_count} non-matching calls (non-matching arguments indicated with '*' characters):
-work(*{unexpected_v}*)
-	1. v (i32):
-		Expected: {expected_v}
-		Actual:   {unexpected_v}
-work(*{unexpected_v}*)
-	1. v (i32):
-		Expected: {expected_v}
-		Actual:   {unexpected_v}
-work(*{unexpected_v}*)
-	1. v (i32):
-		Expected: {expected_v}
-		Actual:   {unexpected_v}
-work(*{unexpected_v}*)
-	1. v (i32):
-		Expected: {expected_v}
-		Actual:   {unexpected_v}
-work(*{unexpected_v}*)
-	1. v (i32):
-		Expected: {expected_v}
-		Actual:   {unexpected_v}
-work(*{unexpected_v}*)
-	1. v (i32):
-		Expected: {expected_v}
-		Actual:   {unexpected_v}
-work(*{unexpected_v}*)
-	1. v (i32):
-		Expected: {expected_v}
-		Actual:   {unexpected_v}
-work(*{unexpected_v}*)
-	1. v (i32):
-		Expected: {expected_v}
-		Actual:   {unexpected_v}
+            let calls_error_msgs = format!(
+                "
 work(*{unexpected_v}*)
 	1. v (i32):
 		Expected: {expected_v}
 		Actual:   {unexpected_v}"
+            )
+            .repeat(calls_count);
+            let expected_error_msg = format!(
+                "Expected to receive a call exactly once matching:
+	work((i32): equal to {expected_v})
+Actually received no matching calls
+Received {calls_count} non-matching calls (non-matching arguments indicated with '*' characters):{calls_error_msgs}"
             );
             assert_eq!(expected_error_msg, actual_error_msg);
+            println!("First read");
         }
 
         #[test]
-        fn DefaultMaxInvalidCallsListedCount_MoreThanLimit_PrintsTrimmed() {
+        fn CallsCountMoreThanLimit_PrintsTrimmed() {
+            let _lock = sync_test();
+
             // Arrange
             let mock = TraitMock::new();
-            let max_invalid_calls_listed_count = DEFAULT_CONFIG.max_invalid_calls_listed_count;
+            let max_invalid_calls_listed_count = 4;
             let calls_count = max_invalid_calls_listed_count + 1;
+
+            let mut write_config = write_config();
+            write_config.max_invalid_calls_listed_count = max_invalid_calls_listed_count;
+            let _read_config_lock = RwLockWriteGuard::downgrade(write_config);
+
             let unexpected_v = 10;
             let expected_v = 20;
 
@@ -90,143 +89,22 @@ work(*{unexpected_v}*)
             let actual_error_msg = record_panic(|| mock.received.work(expected_v, Times::Once));
 
             // Assert
+            let calls_error_msgs = format!(
+                "
+work(*{unexpected_v}*)
+	1. v (i32):
+		Expected: {expected_v}
+		Actual:   {unexpected_v}"
+            )
+            .repeat(max_invalid_calls_listed_count);
             let expected_error_msg = format!(
                 "Expected to receive a call exactly once matching:
 	work((i32): equal to {expected_v})
 Actually received no matching calls
-Received {calls_count} non-matching calls (listing only first {max_invalid_calls_listed_count}) (non-matching arguments indicated with '*' characters):
-work(*{unexpected_v}*)
-	1. v (i32):
-		Expected: {expected_v}
-		Actual:   {unexpected_v}
-work(*{unexpected_v}*)
-	1. v (i32):
-		Expected: {expected_v}
-		Actual:   {unexpected_v}
-work(*{unexpected_v}*)
-	1. v (i32):
-		Expected: {expected_v}
-		Actual:   {unexpected_v}
-work(*{unexpected_v}*)
-	1. v (i32):
-		Expected: {expected_v}
-		Actual:   {unexpected_v}
-work(*{unexpected_v}*)
-	1. v (i32):
-		Expected: {expected_v}
-		Actual:   {unexpected_v}
-work(*{unexpected_v}*)
-	1. v (i32):
-		Expected: {expected_v}
-		Actual:   {unexpected_v}
-work(*{unexpected_v}*)
-	1. v (i32):
-		Expected: {expected_v}
-		Actual:   {unexpected_v}
-work(*{unexpected_v}*)
-	1. v (i32):
-		Expected: {expected_v}
-		Actual:   {unexpected_v}
-work(*{unexpected_v}*)
-	1. v (i32):
-		Expected: {expected_v}
-		Actual:   {unexpected_v}
-work(*{unexpected_v}*)
-	1. v (i32):
-		Expected: {expected_v}
-		Actual:   {unexpected_v}"
+Received {calls_count} non-matching calls (listing only first {max_invalid_calls_listed_count}) (non-matching arguments indicated with '*' characters):{calls_error_msgs}"
             );
             assert_eq!(expected_error_msg, actual_error_msg);
+            println!("Second read");
         }
-    }
-
-    #[test]
-    fn set_max_invalid_calls_listed_count_Ok() {
-        // Arrange
-        let mock = TraitMock::new();
-        let max_invalid_calls_listed_count = 3;
-        let calls_count = max_invalid_calls_listed_count + 1;
-        let unexpected_v = 10;
-        let expected_v = 20;
-        set_max_invalid_calls_listed_count(max_invalid_calls_listed_count);
-
-        // Act
-        for _ in 0..calls_count {
-            mock.work(unexpected_v);
-        }
-        let actual_error_msg = record_panic(|| mock.received.work(expected_v, Times::Once));
-
-        // Assert
-        let expected_error_msg = format!(
-            "Expected to receive a call exactly once matching:
-	work((i32): equal to {expected_v})
-Actually received no matching calls
-Received {calls_count} non-matching calls (listing only first {max_invalid_calls_listed_count}) (non-matching arguments indicated with '*' characters):
-work(*{unexpected_v}*)
-	1. v (i32):
-		Expected: {expected_v}
-		Actual:   {unexpected_v}
-work(*{unexpected_v}*)
-	1. v (i32):
-		Expected: {expected_v}
-		Actual:   {unexpected_v}
-work(*{unexpected_v}*)
-	1. v (i32):
-		Expected: {expected_v}
-		Actual:   {unexpected_v}"
-        );
-        assert_eq!(expected_error_msg, actual_error_msg);
-    }
-
-    #[test]
-    fn set_local_max_invalid_calls_listed_count_Ok() {
-        // Arrange
-        let old_max_invalid_calls_listed_count = 1;
-        set_max_invalid_calls_listed_count(old_max_invalid_calls_listed_count);
-
-        // Act
-        {
-            // Arrange
-            let mock = TraitMock::new();
-            let max_invalid_calls_listed_count = 3;
-            let calls_count = max_invalid_calls_listed_count + 1;
-            let unexpected_v = 10;
-            let expected_v = 20;
-            let _guard = set_local_max_invalid_calls_listed_count(max_invalid_calls_listed_count);
-
-            // Act
-            for _ in 0..calls_count {
-                mock.work(unexpected_v);
-            }
-            let actual_error_msg = record_panic(|| mock.received.work(expected_v, Times::Once));
-
-            // Assert
-            let expected_error_msg = format!(
-                "Expected to receive a call exactly once matching:
-	work((i32): equal to {expected_v})
-Actually received no matching calls
-Received {calls_count} non-matching calls (listing only first {max_invalid_calls_listed_count}) (non-matching arguments indicated with '*' characters):
-work(*{unexpected_v}*)
-	1. v (i32):
-		Expected: {expected_v}
-		Actual:   {unexpected_v}
-work(*{unexpected_v}*)
-	1. v (i32):
-		Expected: {expected_v}
-		Actual:   {unexpected_v}
-work(*{unexpected_v}*)
-	1. v (i32):
-		Expected: {expected_v}
-		Actual:   {unexpected_v}"
-            );
-            assert_eq!(expected_error_msg, actual_error_msg);
-        }
-
-        // Assert
-        let actual_max_invalid_calls_listed_count = get_max_invalid_calls_listed_count();
-        assert_eq!(
-            old_max_invalid_calls_listed_count,
-            actual_max_invalid_calls_listed_count
-        );
     }
 }

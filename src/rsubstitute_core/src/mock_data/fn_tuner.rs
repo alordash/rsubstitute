@@ -1,5 +1,6 @@
 use crate::fn_parameters::*;
 use crate::mock_data::*;
+use crate::*;
 use std::cell::RefCell;
 use std::marker::PhantomData;
 use std::sync::Arc;
@@ -54,7 +55,7 @@ impl<
     where
         TReturnValue: IReturnValue<'a> + 'a,
     {
-        let dyn_return_value = unsafe { core::mem::transmute(DynReturnValue::new(return_value)) };
+        let dyn_return_value = transmute_lifetime!(DynReturnValue::new(return_value));
         let return_value_source = ReturnValueSource::SingleTime(dyn_return_value);
         self.fn_config
             .borrow_mut()
@@ -71,7 +72,7 @@ impl<
     {
         let return_value_sources = return_values
             .into_iter()
-            .map(|x| unsafe { core::mem::transmute(DynReturnValue::new(x)) })
+            .map(|x| transmute_lifetime!(DynReturnValue::new(x)))
             .map(ReturnValueSource::SingleTime);
         self.fn_config
             .borrow_mut()
@@ -86,8 +87,8 @@ impl<
     where
         TReturnValue: 'rs + 'a + IReturnValue<'a> + Clone,
     {
-        let return_value_source = ReturnValueSource::Perpetual(Box::new(move || unsafe {
-            core::mem::transmute(DynReturnValue::new(return_value.clone()))
+        let return_value_source = ReturnValueSource::Perpetual(Box::new(move || {
+            transmute_lifetime!(DynReturnValue::new(return_value.clone()))
         }));
         self.fn_config
             .borrow_mut()
@@ -103,7 +104,7 @@ impl<
             move |dyn_arg_refs_tuple: DynArgRefsTuple<'rs>| {
                 let arg_refs_tuple: TArgRefsTuple = dyn_arg_refs_tuple.downcast_into();
                 let result = f(arg_refs_tuple);
-                return unsafe { core::mem::transmute(DynReturnValue::new(result)) };
+                return transmute_lifetime!(DynReturnValue::new(result));
             },
         ));
         self.fn_config

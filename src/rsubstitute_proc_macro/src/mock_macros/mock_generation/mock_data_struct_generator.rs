@@ -46,7 +46,7 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
                 )
             })
             .collect();
-        let fields = [constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD.clone()]
+        let fields = [constants::DEFAULT_ARG_LIFETIME_FIELD.clone()]
             .into_iter()
             .chain(mock_type.generics.phantom_fields.clone())
             .chain(fn_fields)
@@ -94,7 +94,7 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
                 )
             })
             .collect();
-        let fields = [constants::DEFAULT_ARG_FIELD_LIFETIME_FIELD.clone()]
+        let fields = [constants::DEFAULT_ARG_LIFETIME_FIELD.clone()]
             .into_iter()
             .chain(mock_type.generics.phantom_fields.clone())
             .chain(fn_fields)
@@ -133,7 +133,7 @@ impl MockDataStructGenerator {
                         lt_token: Default::default(),
                         args: [
                             GenericArgument::Lifetime(Lifetime::new(
-                                &format!("'{}", constants::DEFAULT_ARG_FIELD_LIFETIME_NAME),
+                                &format!("'{}", constants::DEFAULT_ARG_LIFETIME_NAME),
                                 Span::call_site(),
                             )),
                             GenericArgument::Type(mock_type.ty.clone()),

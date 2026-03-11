@@ -20,7 +20,7 @@ pub(crate) struct MockFnBlockGenerator {
     pub path_factory: Arc<dyn IPathFactory>,
     pub expr_reference_factory: Arc<dyn IExprReferenceFactory>,
     pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
-    pub core_mem_transmute_expr_factory: Arc<dyn ICoreMemTransmuteExprFactory>,
+    pub transmute_lifetime_expr_factory: Arc<dyn ITransmuteLifetimeExprFactory>,
     pub field_value_factory: Arc<dyn IFieldValueFactory>,
     pub get_global_mock_expr_generator: Arc<dyn IGetGlobalMockExprGenerator>,
     pub field_checker: Arc<dyn IFieldChecker>,
@@ -90,7 +90,7 @@ impl MockFnBlockGenerator {
                     attrs: Vec::new(),
                     member: Member::Named(field_ident.clone()),
                     colon_token: Some(Default::default()),
-                    expr: self.core_mem_transmute_expr_factory.create(field_ident),
+                    expr: self.transmute_lifetime_expr_factory.create(field_ident),
                 };
                 return field_value;
             })
@@ -107,39 +107,27 @@ impl MockFnBlockGenerator {
             fn_info.call_struct.item_struct.ident.clone(),
             call_struct_type_generics,
         );
-        let call_stmt =
-            Stmt::Local(self.local_factory.create_with_type(
+        let call_stmt = Stmt::Local(
+            self.local_factory.create_with_type(
                 Self::CALL_VARIABLE_IDENT.clone(),
                 call_struct_type,
                 LocalInit {
                     eq_token: Default::default(),
-                    expr: Box::new(Expr::Unsafe(ExprUnsafe {
+                    expr: Box::new(Expr::Struct(ExprStruct {
                         attrs: Vec::new(),
-                        unsafe_token: Default::default(),
-                        block: Block {
-                            brace_token: Default::default(),
-                            stmts: vec![Stmt::Expr(
-                                Expr::Struct(
-                                    ExprStruct {
-                                        attrs: Vec::new(),
-                                        qself: None,
-                                        path:
-                                            self.path_factory.create(
-                                                fn_info.call_struct.item_struct.ident.clone(),
-                                            ),
-                                        brace_token: Default::default(),
-                                        fields: field_values.into_iter().collect(),
-                                        dot2_token: None,
-                                        rest: None,
-                                    },
-                                ),
-                                None,
-                            )],
-                        },
+                        qself: None,
+                        path: self
+                            .path_factory
+                            .create(fn_info.call_struct.item_struct.ident.clone()),
+                        brace_token: Default::default(),
+                        fields: field_values.into_iter().collect(),
+                        dot2_token: None,
+                        rest: None,
                     })),
                     diverge: None,
                 },
-            ));
+            ),
+        );
         return call_stmt;
     }
 
