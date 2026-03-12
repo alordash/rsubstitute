@@ -1,8 +1,8 @@
-use crate::constants;
 use crate::mock_macros::fn_info_generation::models::*;
 use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::models::*;
 use crate::syntax::*;
+use crate::*;
 use quote::format_ident;
 use std::sync::Arc;
 use syn::*;
@@ -12,12 +12,9 @@ pub(crate) trait IArgsCheckerGenerator {
 }
 
 pub(crate) struct ArgsCheckerGenerator {
-    pub attribute_factory: Arc<dyn IAttributeFactory>,
-    pub arg_type_factory: Arc<dyn IArgTypeFactory>,
     pub field_factory: Arc<dyn IFieldFactory>,
     pub(crate) struct_factory: Arc<dyn IStructFactory>,
     pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
-    pub arg_ident_extractor: Arc<dyn IArgIdentExtractor>,
     pub type_factory: Arc<dyn ITypeFactory>,
 }
 
@@ -74,7 +71,7 @@ impl ArgsCheckerGenerator {
     const ARGS_CHECKER_STRUCT_SUFFIX: &'static str = "ArgsChecker";
 
     fn generate_arg_checker_derive_traits_attribute(&self) -> Attribute {
-        let derive_attribute = self.attribute_factory.create(
+        let derive_attribute = attribute::create(
             constants::DERIVE_IDENT.clone(),
             &format!(
                 "{}, {}, {}",
@@ -91,8 +88,8 @@ impl ArgsCheckerGenerator {
             FnArg::Receiver(_) => return None,
             FnArg::Typed(pat_type) => pat_type,
         };
-        let ty = self.arg_type_factory.create(*pat_type.ty.clone());
-        let ident = self.arg_ident_extractor.extract(arg_number, pat_type);
+        let ty = arg_type::create(*pat_type.ty.clone());
+        let ident = arg_ident::extract(arg_number, pat_type);
 
         let result = self.field_factory.create(ident, ty);
         return Some(result);

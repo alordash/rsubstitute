@@ -15,7 +15,6 @@ use std::sync::Arc;
 pub(crate) const SERVICES: LazyCell<ServiceCollection> = LazyCell::new(create_services);
 
 pub(crate) struct ServiceCollection {
-    pub attribute_factory: Arc<dyn IAttributeFactory>,
     pub path_factory: Arc<dyn IPathFactory>,
     pub type_factory: Arc<dyn ITypeFactory>,
     pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
@@ -47,29 +46,21 @@ fn create_services() -> ServiceCollection {
         type_factory: type_factory.clone(),
         field_factory: field_factory.clone(),
     });
-    let attribute_factory = Arc::new(AttributeFactory);
     let struct_factory = Arc::new(StructFactory);
     let reference_type_crawler = Arc::new(ReferenceTypeCrawler);
     let reference_normalizer = Arc::new(ReferenceNormalizer {
         reference_type_crawler: reference_type_crawler.clone(),
     });
-    let arg_ident_extractor = Arc::new(ArgIdentExtractor);
     let call_struct_generator = Arc::new(CallStructGenerator {
-        attribute_factory: attribute_factory.clone(),
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
         reference_normalizer: reference_normalizer.clone(),
-        arg_ident_extractor: arg_ident_extractor.clone(),
         type_factory: type_factory.clone(),
     });
-    let arg_type_factory = Arc::new(ArgTypeFactory);
     let args_checker_generator = Arc::new(ArgsCheckerGenerator {
-        attribute_factory: attribute_factory.clone(),
-        arg_type_factory: arg_type_factory.clone(),
         field_factory: field_factory.clone(),
         struct_factory: struct_factory.clone(),
         reference_normalizer: reference_normalizer.clone(),
-        arg_ident_extractor: arg_ident_extractor.clone(),
         type_factory: type_factory.clone(),
     });
     let generic_argument_factory = Arc::new(GenericArgumentFactory {
@@ -155,9 +146,7 @@ fn create_services() -> ServiceCollection {
         expr_call_factory: expr_call_factory.clone(),
     });
     let field_checker = Arc::new(FieldChecker);
-    let mock_fn_inputs_generator = Arc::new(MockFnInputsGenerator {
-        arg_ident_extractor: arg_ident_extractor.clone(),
-    });
+    let mock_fn_inputs_generator = Arc::new(MockFnInputsGenerator);
     let mock_fn_block_generator = Arc::new(MockFnBlockGenerator {
         path_factory: path_factory.clone(),
         expr_method_call_factory: expr_method_call_factory.clone(),
@@ -391,7 +380,6 @@ fn create_services() -> ServiceCollection {
     let struct_mock_syntax_parser = Arc::new(StructMockSyntaxParser);
 
     let services = ServiceCollection {
-        attribute_factory,
         path_factory,
         type_factory,
         expr_method_call_factory,

@@ -1,4 +1,5 @@
 use crate::di::SERVICES;
+use crate::syntax::*;
 use proc_macro2::{Ident, Span};
 use quote::format_ident;
 use std::cell::LazyCell;
@@ -62,8 +63,7 @@ define!(I_GENERICS_HASH_KEY_PROVIDER_TRAIT_PATH, Path, {
 
 pub(crate) const CLONE_FOR_RSUBSTITUTE_TRAIT_NAME: &'static str = "CloneForRSubstitute";
 define!(DERIVE_CLONE_FOR_RSUBSTITUTE_ATTRIBUTE, Attribute, {
-    let attribute_factory = &SERVICES.attribute_factory;
-    let result = attribute_factory.create(DERIVE_IDENT.clone(), CLONE_FOR_RSUBSTITUTE_TRAIT_NAME);
+    let result = attribute::create(DERIVE_IDENT.clone(), CLONE_FOR_RSUBSTITUTE_TRAIT_NAME);
     return result;
 });
 
@@ -80,32 +80,34 @@ pub(crate) const I_ARGS_TUPLE_PROVIDER_TRAIT_IDENT: LazyCell<Ident> =
 
 define!(I_MOCK_DATA_TRAIT_IDENT, "IMockData");
 
-pub(crate) const I_MOCK_DATA_GET_RECEIVED_NOTHING_ELSE_ERROR_MSGS_FN_SIGNATURE: LazyCell<Signature> =
-    LazyCell::new(|| {
-        let signature = Signature {
-            constness: None,
-            asyncness: None,
-            unsafety: None,
-            abi: None,
-            fn_token: Default::default(),
-            ident: format_ident!("get_received_nothing_else_error_msgs"),
-            generics: Generics::default(),
-            paren_token: Default::default(),
-            inputs: [REF_SELF_ARG.clone()].into_iter().collect(),
-            variadic: None,
-            output: ReturnType::Type(
-                Default::default(),
-                Box::new(VEC_OF_VEC_OF_STRINGS_TYPE.clone()),
-            ),
-        };
-        return signature;
-    });
+pub(crate) const I_MOCK_DATA_GET_RECEIVED_NOTHING_ELSE_ERROR_MSGS_FN_SIGNATURE: LazyCell<
+    Signature,
+> = LazyCell::new(|| {
+    let signature = Signature {
+        constness: None,
+        asyncness: None,
+        unsafety: None,
+        abi: None,
+        fn_token: Default::default(),
+        ident: format_ident!("get_received_nothing_else_error_msgs"),
+        generics: Generics::default(),
+        paren_token: Default::default(),
+        inputs: [REF_SELF_ARG.clone()].into_iter().collect(),
+        variadic: None,
+        output: ReturnType::Type(
+            Default::default(),
+            Box::new(VEC_OF_VEC_OF_STRINGS_TYPE.clone()),
+        ),
+    };
+    return signature;
+});
 
 define!(FN_DATA_TYPE_IDENT, "FnData");
 
 define!(NEW_IDENT, "new");
 
-pub(crate) const SETUP_MEMBER: LazyCell<Member> = LazyCell::new(|| Member::Named(format_ident!("setup")));
+pub(crate) const SETUP_MEMBER: LazyCell<Member> =
+    LazyCell::new(|| Member::Named(format_ident!("setup")));
 pub(crate) const RECEIVED_MEMBER: LazyCell<Member> =
     LazyCell::new(|| Member::Named(format_ident!("received")));
 
@@ -158,39 +160,35 @@ define!(FN_VERIFIER_NEW_FN_EXPR, Expr, {
 define!(ALLOW_IDENT, "allow");
 
 define!(ALLOW_UNUSED_ATTRIBUTE, Attribute, {
-    let attribute_factory = &SERVICES.attribute_factory;
-    let result = attribute_factory.create(ALLOW_IDENT.clone(), "unused");
+    let result = attribute::create(ALLOW_IDENT.clone(), "unused");
     return result;
 });
 
 define!(ALLOW_UNUSED_PARENS_ATTRIBUTE, Attribute, {
-    let attribute_factory = &SERVICES.attribute_factory;
-    let result = attribute_factory.create(ALLOW_IDENT.clone(), "unused_parens");
+    let result = attribute::create(ALLOW_IDENT.clone(), "unused_parens");
     return result;
 });
 
 define!(ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE, Attribute, {
-    let attribute_factory = &SERVICES.attribute_factory;
-    let result = attribute_factory.create(ALLOW_IDENT.clone(), "mismatched_lifetime_syntaxes");
+    let result = attribute::create(ALLOW_IDENT.clone(), "mismatched_lifetime_syntaxes");
     return result;
 });
 
 define!(ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE, Attribute, {
-    let attribute_factory = &SERVICES.attribute_factory;
-    let result = attribute_factory.create(ALLOW_IDENT.clone(), "non_camel_case_types");
+    let result = attribute::create(ALLOW_IDENT.clone(), "non_camel_case_types");
     return result;
 });
 
 define!(ALLOW_NON_SNAKE_CASE_ATTRIBUTE, Attribute, {
-    let attribute_factory = &SERVICES.attribute_factory;
-    let result = attribute_factory.create(ALLOW_IDENT.clone(), "non_snake_case");
+    let result = attribute::create(ALLOW_IDENT.clone(), "non_snake_case");
     return result;
 });
 
 pub(crate) const DEBUG_TRAIT_NAME: &'static str = "Debug";
 
 pub(crate) const CLONE_TRAIT_STR: &'static str = "Clone";
-pub(crate) const CLONE_TRAIT_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("{CLONE_TRAIT_STR}"));
+pub(crate) const CLONE_TRAIT_IDENT: LazyCell<Ident> =
+    LazyCell::new(|| format_ident!("{CLONE_TRAIT_STR}"));
 define!(CLONE_FN_SIGNATURE, Signature, {
     let signature = Signature {
         constness: None,
@@ -211,30 +209,25 @@ define!(CLONE_FN_SIGNATURE, Signature, {
 define!(DERIVE_IDENT, "derive");
 
 define!(DERIVE_MOCK_DATA_ATTRIBUTE, Attribute, {
-    let attribute_factory = &SERVICES.attribute_factory;
-    let result =
-        attribute_factory.create(DERIVE_IDENT.clone(), &I_MOCK_DATA_TRAIT_IDENT.to_string());
+    let result = attribute::create(DERIVE_IDENT.clone(), &I_MOCK_DATA_TRAIT_IDENT.to_string());
     return result;
 });
 
 define!(DOC_HIDDEN_ATTRIBUTE, Attribute, {
-    let attribute_factory = &SERVICES.attribute_factory;
     let ident = format_ident!("doc");
-    let result = attribute_factory.create(ident, "hidden");
+    let result = attribute::create(ident, "hidden");
     return result;
 });
 
 define!(CFG_TEST_ATTRIBUTE, Attribute, {
-    let attribute_factory = &SERVICES.attribute_factory;
     let ident = format_ident!("cfg");
-    let result = attribute_factory.create(ident, "test");
+    let result = attribute::create(ident, "test");
     return result;
 });
 
 define!(CFG_NOT_TEST_ATTRIBUTE, Attribute, {
-    let attribute_factory = &SERVICES.attribute_factory;
     let ident = format_ident!("cfg");
-    let result = attribute_factory.create(ident, "not(test)");
+    let result = attribute::create(ident, "not(test)");
     return result;
 });
 

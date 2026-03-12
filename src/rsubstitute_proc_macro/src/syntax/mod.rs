@@ -1,6 +1,6 @@
-mod arg_ident_extractor;
-mod arg_type_factory;
-mod attribute_factory;
+pub(crate) mod arg_ident;
+pub(crate) mod arg_type;
+pub(crate) mod attribute;
 mod bool_lit_factory;
 mod expr_call_factory;
 mod expr_method_call_factory;
@@ -21,9 +21,6 @@ mod struct_factory;
 mod transmute_lifetime_expr_factory;
 mod type_factory;
 
-pub(crate) use arg_ident_extractor::*;
-pub(crate) use arg_type_factory::*;
-pub(crate) use attribute_factory::*;
 pub(crate) use bool_lit_factory::*;
 pub(crate) use expr_call_factory::*;
 pub(crate) use expr_method_call_factory::*;

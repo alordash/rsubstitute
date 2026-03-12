@@ -1,5 +1,4 @@
-use crate::syntax::IArgIdentExtractor;
-use std::sync::Arc;
+use crate::syntax::*;
 use syn::punctuated::Punctuated;
 use syn::*;
 
@@ -7,9 +6,7 @@ pub(crate) trait IMockFnInputsGenerator {
     fn generate(&self, original_inputs: &[FnArg]) -> Punctuated<FnArg, Token![,]>;
 }
 
-pub(crate) struct MockFnInputsGenerator {
-    pub arg_ident_extractor: Arc<dyn IArgIdentExtractor>,
-}
+pub(crate) struct MockFnInputsGenerator;
 
 impl IMockFnInputsGenerator for MockFnInputsGenerator {
     fn generate(&self, original_inputs: &[FnArg]) -> Punctuated<FnArg, Token!(,)> {
@@ -27,7 +24,7 @@ impl IMockFnInputsGenerator for MockFnInputsGenerator {
 
 impl MockFnInputsGenerator {
     fn generate_typed_fn_arg(&self, arg_number: usize, typed: &PatType) -> FnArg {
-        let arg_ident = self.arg_ident_extractor.extract(arg_number, typed);
+        let arg_ident = arg_ident::extract(arg_number, typed);
         let fn_arg = FnArg::Typed(PatType {
             attrs: Vec::new(),
             pat: Box::new(Pat::Ident(PatIdent {

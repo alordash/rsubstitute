@@ -1,8 +1,8 @@
-use crate::constants;
 use crate::mock_macros::fn_info_generation::models::*;
 use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::models::*;
 use crate::syntax::*;
+use crate::*;
 use quote::format_ident;
 use std::sync::Arc;
 use syn::*;
@@ -12,11 +12,9 @@ pub(crate) trait ICallStructGenerator {
 }
 
 pub(crate) struct CallStructGenerator {
-    pub attribute_factory: Arc<dyn IAttributeFactory>,
     pub field_factory: Arc<dyn IFieldFactory>,
     pub(crate) struct_factory: Arc<dyn IStructFactory>,
     pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
-    pub arg_ident_extractor: Arc<dyn IArgIdentExtractor>,
     pub type_factory: Arc<dyn ITypeFactory>,
 }
 
@@ -76,9 +74,7 @@ impl CallStructGenerator {
             arguments.push(constants::CLONE_FOR_RSUBSTITUTE_TRAIT_NAME);
         }
         let arguments_str = arguments.join(", ");
-        let derive_attribute = self
-            .attribute_factory
-            .create(constants::DERIVE_IDENT.clone(), &arguments_str);
+        let derive_attribute = attribute::create(constants::DERIVE_IDENT.clone(), &arguments_str);
         return derive_attribute;
     }
 
@@ -96,7 +92,7 @@ impl CallStructGenerator {
             }),
             rest => rest.clone(),
         };
-        let ident = self.arg_ident_extractor.extract(arg_number, pat_type);
+        let ident = arg_ident::extract(arg_number, pat_type);
 
         let result = self.field_factory.create(ident, ty);
         return Some(result);
