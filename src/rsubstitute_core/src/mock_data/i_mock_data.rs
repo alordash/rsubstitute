@@ -1,4 +1,4 @@
-use crate::SERVICES;
+use crate::error_printing;
 
 pub trait IMockData {
     fn get_received_nothing_else_error_msgs(&self) -> Vec<Vec<String>>;
@@ -9,7 +9,6 @@ pub trait IMockData {
         if error_msgs.is_empty() {
             return;
         }
-        let error_printer = &SERVICES.error_printer;
-        error_printer.panic_received_unexpected_calls_error(error_msgs);
+        error_printing::panic_received_unexpected_calls_error(error_msgs);
     }
 }

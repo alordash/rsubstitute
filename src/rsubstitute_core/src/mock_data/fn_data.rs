@@ -1,5 +1,4 @@
 use crate::args::*;
-use crate::error_printer::IErrorPrinter;
 use crate::fn_parameters::*;
 use crate::matching_config_search_result::*;
 use crate::mock_data::*;
@@ -12,7 +11,6 @@ pub struct FnData<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MO
     fn_name: &'static str,
     call_infos: RefCell<HashMap<GenericsHashKey, Vec<CallCheck<'rs>>>>,
     configs: RefCell<HashMap<GenericsHashKey, Vec<Arc<RefCell<FnConfig<'rs, TMock>>>>>>,
-    error_printer: Arc<dyn IErrorPrinter>,
 }
 
 impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool>
@@ -23,7 +21,6 @@ impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool
             fn_name,
             call_infos: RefCell::new(HashMap::new()),
             configs: RefCell::new(HashMap::new()),
-            error_printer: SERVICES.error_printer.clone(),
         }
     }
 
@@ -75,7 +72,7 @@ impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool
         let matching_calls_count = matching_calls.len();
         let valid = times.matches(matching_calls_count);
         if !valid {
-            self.error_printer.panic_received_verification_error(
+            error_printing::panic_received_verification_error(
                 self.fn_name,
                 &dyn_args_checker,
                 matching_calls,
@@ -98,7 +95,7 @@ impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool
         let unexpected_call_arg_infos = unexpected_call_infos
             .into_iter()
             .map(|x| {
-                self.error_printer.format_received_unexpected_call_error(
+                error_printing::format_received_unexpected_call_error(
                     self.fn_name,
                     x.get_call().get_arg_infos(),
                 )
@@ -137,8 +134,10 @@ impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, false, STORES_
         }
         drop(fn_config_ref);
         let Some(return_value) = fn_config.borrow_mut().select_next_return_value(&call) else {
-            self.error_printer
-                .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
+            error_printing::panic_no_return_value_was_configured(
+                self.fn_name,
+                call.get_arg_infos(),
+            );
         };
         return return_value.downcast_into();
     }
@@ -195,8 +194,10 @@ impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, true, STORES_M
         }
         drop(fn_config_ref);
         let Some(return_value) = fn_config.borrow_mut().select_next_return_value(&call) else {
-            self.error_printer
-                .panic_no_return_value_was_configured(self.fn_name, call.get_arg_infos());
+            error_printing::panic_no_return_value_was_configured(
+                self.fn_name,
+                call.get_arg_infos(),
+            );
         };
         return return_value.downcast_into();
     }
@@ -275,7 +276,7 @@ mod internal {
             let fn_config = match self.try_get_matching_config(&call) {
                 MatchingConfigSearchResult::Ok(matching_config) => matching_config,
                 MatchingConfigSearchResult::Err(matching_config_search_err) => {
-                    self.error_printer.panic_no_suitable_fn_configuration_found(
+                    error_printing::panic_no_suitable_fn_configuration_found(
                         self.fn_name,
                         call.get_arg_infos(),
                         matching_config_search_err,

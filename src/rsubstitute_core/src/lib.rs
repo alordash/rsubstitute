@@ -7,8 +7,7 @@ pub mod fn_parameters;
 pub mod mock_data;
 
 mod config;
-mod di;
-mod error_printer;
+mod error_printing;
 mod generics_hash_key;
 mod lifetimes_transmutation;
 mod matching_config_search_result;
@@ -17,5 +16,3 @@ mod times;
 pub use config::*;
 pub use generics_hash_key::*;
 pub use times::*;
-
-pub(crate) use crate::di::SERVICES;
