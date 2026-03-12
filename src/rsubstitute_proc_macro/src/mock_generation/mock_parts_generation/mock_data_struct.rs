@@ -137,6 +137,6 @@ fn generate_field(fn_info: &FnInfo, mock_type: &MockType) -> Field {
             .collect(),
         },
     });
-    let field = field::create(fn_info.data_field_ident.clone(), ty);
+    let field = field::create_pub(fn_info.data_field_ident.clone(), ty);
     return field;
 }

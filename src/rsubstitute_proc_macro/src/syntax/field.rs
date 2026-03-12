@@ -15,6 +15,12 @@ pub(crate) fn create(ident: Ident, ty: Type) -> Field {
     return result;
 }
 
+pub(crate) fn create_pub(ident: Ident, ty: Type) -> Field {
+    let mut result = create(ident, ty);
+    result.vis = Visibility::Public(Default::default());
+    return result;
+}
+
 pub(crate) fn create_from_struct(ident: Ident, item_struct: &ItemStruct) -> Field {
     let ty = r#type::create_from_struct(item_struct);
     let result = create(ident, ty);

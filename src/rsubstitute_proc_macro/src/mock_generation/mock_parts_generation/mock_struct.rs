@@ -11,7 +11,7 @@ pub(crate) fn generate(
     mock_data_struct: &MockDataStruct,
     maybe_inner_data_struct: Option<&InnerDataStruct>,
 ) -> MockStruct {
-    let data_field = field::create(
+    let data_field = field::create_pub(
         constants::DATA_IDENT.clone(),
         r#type::wrap_in_arc(mock_data_struct.ty.clone()),
     );

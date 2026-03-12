@@ -13,7 +13,7 @@ pub(crate) fn generate(ctx: &Ctx, fn_decl: FnDecl, mock_type: &MockType) -> FnIn
         &args_checker_struct,
         fn_decl.get_internal_phantom_types_count() + mock_type.generics.get_phantom_fields_count(),
     );
-    let data_field_ident = generate_data_field_ident(&fn_decl);
+    let data_field_ident = fn_decl.get_full_ident();
     let fn_info = FnInfo {
         parent: fn_decl,
         call_struct,
@@ -22,12 +22,4 @@ pub(crate) fn generate(ctx: &Ctx, fn_decl: FnDecl, mock_type: &MockType) -> FnIn
         data_field_ident,
     };
     return fn_info;
-}
-
-const DATA_FIELD_IDENT_SUFFIX: &'static str = "data";
-
-fn generate_data_field_ident(fn_decl: &FnDecl) -> Ident {
-    let data_field_ident =
-        format_ident!("{}_{}", fn_decl.get_full_ident(), DATA_FIELD_IDENT_SUFFIX);
-    return data_field_ident;
 }
