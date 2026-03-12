@@ -2,7 +2,7 @@ use crate::constants;
 use crate::mock_macros::fn_info_generation::models::*;
 use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::mock_generation::IInputArgsGenerator;
-use crate::syntax::{IReferenceNormalizer, ITypeFactory};
+use crate::syntax::*;
 use proc_macro2::Ident;
 use quote::format_ident;
 use std::cell::LazyCell;
@@ -29,9 +29,7 @@ pub(crate) trait IReceivedSignatureGenerator {
 }
 
 pub(crate) struct ReceivedSignatureGenerator {
-    pub type_factory: Arc<dyn ITypeFactory>,
     pub input_args_generator: Arc<dyn IInputArgsGenerator>,
-    pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
 }
 
 impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
@@ -64,8 +62,7 @@ impl IReceivedSignatureGenerator for ReceivedSignatureGenerator {
         mock_type: &MockType,
     ) -> Signature {
         let mut owner_type = mock_received_struct.ty.clone();
-        self.reference_normalizer
-            .staticify_anonymous_lifetimes(&mut owner_type);
+        reference::staticify_anonymous_lifetimes(&mut owner_type);
         let prepend_ref_self_arg = false;
         let result = self.generate(
             fn_info,
@@ -101,7 +98,7 @@ impl ReceivedSignatureGenerator {
                 subpat: None,
             })),
             colon_token: Default::default(),
-            ty: Box::new(self.type_factory.create(Self::TIMES_TYPE_IDENT.clone())),
+            ty: Box::new(r#type::create(Self::TIMES_TYPE_IDENT.clone())),
         });
         let mut inputs: Vec<_> = self
             .input_args_generator
@@ -142,8 +139,7 @@ impl ReceivedSignatureGenerator {
     }
 
     fn generate_output_type(&self, mut arg_refs_tuple: Type, owner_type: Type) -> Type {
-        self.reference_normalizer
-            .normalize_anonymous_lifetimes(&mut arg_refs_tuple);
+        reference::normalize_anonymous_lifetimes(&mut arg_refs_tuple);
         let result = Type::Path(TypePath {
             qself: None,
             path: Path {

@@ -32,10 +32,6 @@ pub(crate) trait IMockReceivedImplGenerator {
 }
 
 pub(crate) struct MockReceivedImplGenerator {
-    pub type_factory: Arc<dyn ITypeFactory>,
-    pub impl_factory: Arc<dyn IImplFactory>,
-    pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
-    pub expr_call_factory: Arc<dyn IExprCallFactory>,
     pub input_args_generator: Arc<dyn IInputArgsGenerator>,
     pub received_signature_generator: Arc<dyn IReceivedSignatureGenerator>,
 }
@@ -56,9 +52,7 @@ impl IMockReceivedImplGenerator for MockReceivedImplGenerator {
             .chain(std::iter::once(self.generate_only_fn()))
             .collect();
 
-        let item_impl = self
-            .impl_factory
-            .create_with_default_lifetime(mock_type, self_ty, fns);
+        let item_impl = r#impl::create_with_default_lifetime(mock_type, self_ty, fns);
         let mock_received_impl = MockReceivedImpl { item_impl };
         return mock_received_impl;
     }
@@ -77,9 +71,7 @@ impl IMockReceivedImplGenerator for MockReceivedImplGenerator {
             })
             .collect();
 
-        let item_impl = self
-            .impl_factory
-            .create_with_default_lifetime(mock_type, self_ty, fns);
+        let item_impl = r#impl::create_with_default_lifetime(mock_type, self_ty, fns);
         let mock_received_impl = MockReceivedImpl { item_impl };
         return mock_received_impl;
     }
@@ -96,7 +88,7 @@ impl IMockReceivedImplGenerator for MockReceivedImplGenerator {
         fn_received.sig.ident = constants::MOCK_RECEIVED_FIELD_IDENT.clone();
         let only_fn = self.generate_only_fn();
 
-        let item_impl = self.impl_factory.create_with_default_lifetime(
+        let item_impl = r#impl::create_with_default_lifetime(
             mock_type,
             self_ty,
             vec![ImplItem::Fn(fn_received), only_fn],
@@ -134,7 +126,7 @@ impl MockReceivedImplGenerator {
             .input_args_generator
             .generate_args_checker_var_ident_and_decl_stmt(fn_info);
         let verify_received_stmt = Stmt::Expr(
-            Expr::MethodCall(self.expr_method_call_factory.create(
+            Expr::MethodCall(expr_method_call::create(
                 vec![
                     constants::SELF_IDENT.clone(),
                     constants::DATA_IDENT.clone(),
@@ -152,9 +144,9 @@ impl MockReceivedImplGenerator {
             Expr::Return(ExprReturn {
                 attrs: Vec::new(),
                 return_token: Default::default(),
-                expr: Some(Box::new(self.expr_call_factory.create(
+                expr: Some(Box::new(expr_call::create(
                     constants::FN_VERIFIER_NEW_FN_EXPR.clone(),
-                    Expr::MethodCall(self.expr_method_call_factory.create_with_base_receiver(
+                    Expr::MethodCall(expr_method_call::create_with_base_receiver(
                         constants::SELF_EXPR.clone(),
                         Vec::new(),
                         constants::CLONE_FN_IDENT.clone(),
@@ -174,7 +166,7 @@ impl MockReceivedImplGenerator {
 
     fn generate_only_fn(&self) -> ImplItem {
         let verify_received_nothing_else_stmt = Stmt::Expr(
-            Expr::MethodCall(self.expr_method_call_factory.create(
+            Expr::MethodCall(expr_method_call::create(
                 vec![constants::SELF_IDENT.clone(), constants::DATA_IDENT.clone()],
                 format_ident!("verify_received_nothing_else"),
                 Vec::new(),

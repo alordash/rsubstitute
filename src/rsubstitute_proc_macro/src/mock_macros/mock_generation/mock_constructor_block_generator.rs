@@ -21,9 +21,6 @@ pub(crate) trait IMockConstructorBlockGenerator {
 }
 
 pub(crate) struct MockConstructorBlockGenerator {
-    pub path_factory: Arc<dyn IPathFactory>,
-    pub local_factory: Arc<dyn ILocalFactory>,
-    pub expr_call_factory: Arc<dyn IExprCallFactory>,
     pub implemented_trait_ident_formatter: Arc<dyn IImplementedTraitIdentFormatter>,
 }
 
@@ -41,7 +38,7 @@ impl IMockConstructorBlockGenerator for MockConstructorBlockGenerator {
             .field_and_fn_idents
             .iter()
             .map(|(field_ident, fn_ident)| {
-                let func = self.path_factory.create_expr_from_parts(vec![
+                let func = path::create_expr_from_parts(vec![
                     constants::FN_DATA_TYPE_IDENT.clone(),
                     constants::NEW_IDENT.clone(),
                 ]);
@@ -53,7 +50,7 @@ impl IMockConstructorBlockGenerator for MockConstructorBlockGenerator {
                     attrs: Vec::new(),
                     member: Member::Named(field_ident.clone()),
                     colon_token: Some(Default::default()),
-                    expr: self.expr_call_factory.create_with_args(func, args),
+                    expr: expr_call::create_with_args(func, args),
                 }
             })
             .collect();
@@ -70,16 +67,14 @@ impl IMockConstructorBlockGenerator for MockConstructorBlockGenerator {
             })
             .chain(data_fn_fields)
             .collect();
-        let func = self.path_factory.create_expr_from_parts(vec![
+        let func = path::create_expr_from_parts(vec![
             constants::ARC_IDENT.clone(),
             constants::NEW_IDENT.clone(),
         ]);
         let arg = Expr::Struct(ExprStruct {
             attrs: Vec::new(),
             qself: None,
-            path: self
-                .path_factory
-                .create(mock_data_struct.item_struct.ident.clone()),
+            path: path::create(mock_data_struct.item_struct.ident.clone()),
             brace_token: Default::default(),
             fields: data_fields,
             dot2_token: None,
@@ -97,14 +92,12 @@ impl IMockConstructorBlockGenerator for MockConstructorBlockGenerator {
             }),
             init: Some(LocalInit {
                 eq_token: Default::default(),
-                expr: Box::new(self.expr_call_factory.create(func, arg)),
+                expr: Box::new(expr_call::create(func, arg)),
                 diverge: None,
             }),
             semi_token: Default::default(),
         });
-        let returned_type_path = self
-            .path_factory
-            .create(mock_struct.item_struct.ident.clone());
+        let returned_type_path = path::create(mock_struct.item_struct.ident.clone());
         let mut return_stmt_fields = vec![
             FieldValue {
                 attrs: Vec::new(),
@@ -113,9 +106,7 @@ impl IMockConstructorBlockGenerator for MockConstructorBlockGenerator {
                 expr: Expr::Struct(ExprStruct {
                     attrs: Vec::new(),
                     qself: None,
-                    path: self
-                        .path_factory
-                        .create(mock_setup_struct.item_struct.ident.clone()),
+                    path: path::create(mock_setup_struct.item_struct.ident.clone()),
                     brace_token: Default::default(),
                     fields: [constants::DATA_FIELD_VALUE.clone()]
                         .into_iter()
@@ -137,9 +128,7 @@ impl IMockConstructorBlockGenerator for MockConstructorBlockGenerator {
                 expr: Expr::Struct(ExprStruct {
                     attrs: Vec::new(),
                     qself: None,
-                    path: self
-                        .path_factory
-                        .create(mock_received_struct.item_struct.ident.clone()),
+                    path: path::create(mock_received_struct.item_struct.ident.clone()),
                     brace_token: Default::default(),
                     fields: [constants::DATA_FIELD_VALUE.clone()]
                         .into_iter()
@@ -213,9 +202,7 @@ impl MockConstructorBlockGenerator {
             expr: Expr::Struct(ExprStruct {
                 attrs: Vec::new(),
                 qself: None,
-                path: self
-                    .path_factory
-                    .create(mock_struct_trait_struct.ident.clone()),
+                path: path::create(mock_struct_trait_struct.ident.clone()),
                 brace_token: Default::default(),
                 fields: [constants::DATA_FIELD_VALUE.clone()].into_iter().collect(),
                 dot2_token: None,
@@ -226,26 +213,21 @@ impl MockConstructorBlockGenerator {
     }
 
     fn generate_inner_data_stmt(&self, inner_data_param: InnerDataParam) -> Stmt {
-        let func = self.path_factory.create_expr_from_parts(vec![
+        let func = path::create_expr_from_parts(vec![
             inner_data_param.inner_data_struct.item_struct.ident.clone(),
             constants::NEW_IDENT.clone(),
         ]);
         let args = inner_data_param
             .constructor_arguments
             .iter()
-            .map(|constructor_argument| {
-                self.path_factory
-                    .create_expr(constructor_argument.0.clone())
-            })
+            .map(|constructor_argument| path::create_expr(constructor_argument.0.clone()))
             .collect();
         let local_init = LocalInit {
             eq_token: Default::default(),
-            expr: Box::new(self.expr_call_factory.create_with_args(func, args)),
+            expr: Box::new(expr_call::create_with_args(func, args)),
             diverge: None,
         };
-        let local = self
-            .local_factory
-            .create(constants::INNER_DATA_FIELD_IDENT.clone(), local_init);
+        let local = local::create(constants::INNER_DATA_FIELD_IDENT.clone(), local_init);
         let stmt = Stmt::Local(local);
         return stmt;
     }

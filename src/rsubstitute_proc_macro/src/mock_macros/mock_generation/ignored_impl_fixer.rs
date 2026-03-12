@@ -1,15 +1,12 @@
 use crate::mock_macros::mock_generation::models::*;
 use crate::syntax::*;
-use std::sync::Arc;
 use syn::*;
 
 pub(crate) trait IIgnoredImplFixer {
     fn fix(&self, mock_type: &MockType, ignored_impls: &mut [ItemImpl]);
 }
 
-pub(crate) struct IgnoredImplFixer {
-    pub generics_merger: Arc<dyn IGenericsMerger>,
-}
+pub(crate) struct IgnoredImplFixer;
 
 impl IIgnoredImplFixer for IgnoredImplFixer {
     fn fix(&self, mock_type: &MockType, ignored_impls: &mut [ItemImpl]) {
@@ -21,9 +18,8 @@ impl IIgnoredImplFixer for IgnoredImplFixer {
 
 impl IgnoredImplFixer {
     fn fix_single(&self, mock_type: &MockType, ignored_impl: &mut ItemImpl) {
-        let merged_generics = self
-            .generics_merger
-            .merge(&mock_type.generics.impl_generics, &ignored_impl.generics);
+        let merged_generics =
+            generics::merge(&mock_type.generics.impl_generics, &ignored_impl.generics);
         ignored_impl.generics = merged_generics;
         *ignored_impl.self_ty = mock_type.ty.clone();
     }

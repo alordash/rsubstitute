@@ -1,9 +1,8 @@
 use crate::constants;
 use crate::syntax::*;
 use proc_macro::TokenStream;
-use quote::{ToTokens, format_ident};
+use quote::{format_ident, ToTokens};
 use std::cell::LazyCell;
-use std::sync::Arc;
 use syn::punctuated::Punctuated;
 use syn::*;
 
@@ -11,23 +10,14 @@ pub(crate) trait IDeriveArgsTupleProviderMacroHandler {
     fn handle(&self, item: proc_macro::TokenStream) -> proc_macro::TokenStream;
 }
 
-pub(crate) struct DeriveArgsTupleProviderMacroHandler {
-    pub path_factory: Arc<dyn IPathFactory>,
-    pub type_factory: Arc<dyn ITypeFactory>,
-    pub field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
-    pub expr_reference_factory: Arc<dyn IExprReferenceFactory>,
-    pub field_checker: Arc<dyn IFieldChecker>,
-    pub expr_call_factory: Arc<dyn IExprCallFactory>,
-}
+pub(crate) struct DeriveArgsTupleProviderMacroHandler;
 
 impl IDeriveArgsTupleProviderMacroHandler for DeriveArgsTupleProviderMacroHandler {
     fn handle(&self, item: TokenStream) -> TokenStream {
         let item_struct = parse_macro_input!(item as ItemStruct);
 
-        let trait_path = self
-            .path_factory
-            .create(constants::I_ARGS_TUPLE_PROVIDER_TRAIT_IDENT.clone());
-        let self_ty = Box::new(self.type_factory.create_from_struct(&item_struct));
+        let trait_path = path::create(constants::I_ARGS_TUPLE_PROVIDER_TRAIT_IDENT.clone());
+        let self_ty = Box::new(r#type::create_from_struct(&item_struct));
         let get_arg_infos_fn = self.generate_get_ptr_to_boxed_tuple_of_refs_fn(&item_struct);
         let item_impl = ItemImpl {
             attrs: Vec::new(),
@@ -85,7 +75,7 @@ impl DeriveArgsTupleProviderMacroHandler {
         let fields_exprs: Punctuated<_, Token![,]> = item_struct
             .fields
             .iter()
-            .filter(|field| !self.field_checker.is_phantom_data(field))
+            .filter(|field| !field::is_phantom_data(field))
             .map(|field| self.generate_field_expr_ref_expr(field))
             .collect();
         let tuple_expr = Expr::Tuple(ExprTuple {
@@ -93,12 +83,8 @@ impl DeriveArgsTupleProviderMacroHandler {
             paren_token: Default::default(),
             elems: fields_exprs,
         });
-        let box_new_expr = self
-            .expr_call_factory
-            .create(constants::BOX_NEW_EXPR.clone(), tuple_expr);
-        let box_leak_expr = self
-            .expr_call_factory
-            .create(constants::BOX_LEAK_EXPR.clone(), box_new_expr);
+        let box_new_expr = expr_call::create(constants::BOX_NEW_EXPR.clone(), tuple_expr);
+        let box_leak_expr = expr_call::create(constants::BOX_LEAK_EXPR.clone(), box_new_expr);
         let as_mut_anonymous_expr = Expr::Cast(ExprCast {
             attrs: Vec::new(),
             expr: Box::new(box_leak_expr),
@@ -121,10 +107,9 @@ impl DeriveArgsTupleProviderMacroHandler {
             .ident
             .clone()
             .expect("Call struct fields should have ident.");
-        let field_access = self
-            .field_access_expr_factory
-            .create(vec![constants::SELF_IDENT.clone(), field_ident.clone()]);
-        let field_reference = self.expr_reference_factory.create(field_access);
+        let field_access =
+            field_access_expr::create(vec![constants::SELF_IDENT.clone(), field_ident.clone()]);
+        let field_reference = expr_reference::create(field_access);
         return field_reference;
     }
 }

@@ -3,7 +3,7 @@ use crate::mock_macros::mock_generation::IDebugStringExprGenerator;
 use crate::syntax::*;
 use proc_macro::TokenStream;
 use proc_macro2::Literal;
-use quote::{ToTokens, quote};
+use quote::{quote, ToTokens};
 use std::sync::Arc;
 use syn::token::Paren;
 use syn::*;
@@ -13,9 +13,6 @@ pub(crate) trait IDeriveArgsFormatterMacroHandler {
 }
 
 pub(crate) struct DeriveArgsFormatterMacroHandler {
-    pub type_factory: Arc<dyn ITypeFactory>,
-    pub field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
-    pub field_checker: Arc<dyn IFieldChecker>,
     pub debug_string_expr_generator: Arc<dyn IDebugStringExprGenerator>,
 }
 
@@ -35,7 +32,7 @@ impl IDeriveArgsFormatterMacroHandler for DeriveArgsFormatterMacroHandler {
                 constants::I_ARGS_FORMATTER_TRAIT_PATH.clone(),
                 Default::default(),
             )),
-            self_ty: Box::new(self.type_factory.create_from_struct(&item_struct)),
+            self_ty: Box::new(r#type::create_from_struct(&item_struct)),
             brace_token: Default::default(),
             items: vec![fmt_args_impl],
         };
@@ -74,7 +71,7 @@ impl DeriveArgsFormatterMacroHandler {
         let literal_str = item_struct
             .fields
             .iter()
-            .skip_while(|field| self.field_checker.is_phantom_data(field))
+            .skip_while(|field| field::is_phantom_data(field))
             .map(|_| "{}")
             .collect::<Vec<_>>()
             .join(", ");
@@ -82,10 +79,10 @@ impl DeriveArgsFormatterMacroHandler {
         let args: Vec<_> = item_struct
             .fields
             .iter()
-            .skip_while(|field| self.field_checker.is_phantom_data(field))
+            .skip_while(|field| field::is_phantom_data(field))
             .map(|field| {
                 self.debug_string_expr_generator
-                    .generate(self.field_access_expr_factory.create(vec![
+                    .generate(field_access_expr::create(vec![
                         constants::SELF_IDENT.clone(),
                         field.get_required_ident(),
                     ]))

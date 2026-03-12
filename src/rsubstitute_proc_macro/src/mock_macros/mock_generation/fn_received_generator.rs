@@ -17,7 +17,6 @@ pub(crate) trait IFnReceivedGenerator {
 
 pub(crate) struct FnReceivedGenerator {
     pub received_signature_generator: Arc<dyn IReceivedSignatureGenerator>,
-    pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
     pub get_global_mock_expr_generator: Arc<dyn IGetGlobalMockExprGenerator>,
 }
 
@@ -50,7 +49,7 @@ impl FnReceivedGenerator {
             .get_global_mock_expr_generator
             .generate(mock_type.ty.clone());
         let received_clone_expr =
-            Expr::MethodCall(self.expr_method_call_factory.create_with_base_receiver(
+            Expr::MethodCall(expr_method_call::create_with_base_receiver(
                 static_mock_expr,
                 vec![constants::MOCK_RECEIVED_FIELD_IDENT.clone()],
                 constants::CLONE_FN_IDENT.clone(),
@@ -61,7 +60,7 @@ impl FnReceivedGenerator {
                 attrs: Vec::new(),
                 return_token: Default::default(),
                 expr: Some(Box::new(Expr::MethodCall(
-                    self.expr_method_call_factory.create_with_base_receiver(
+                    expr_method_call::create_with_base_receiver(
                         received_clone_expr,
                         Vec::new(),
                         constants::MOCK_RECEIVED_FIELD_IDENT.clone(),
@@ -74,7 +73,7 @@ impl FnReceivedGenerator {
                                 fn_info.parent.get_internal_phantom_types_count()
                                     + mock_type.generics.get_phantom_fields_count(),
                             )
-                            .map(IFieldRequiredIdentGetter::get_required_ident)
+                            .map(IFieldRequiredIdentExtension::get_required_ident)
                             .chain(std::iter::once(
                                 self.received_signature_generator.get_times_arg_ident(),
                             ))

@@ -4,19 +4,13 @@ use crate::mock_macros::models::*;
 use crate::syntax::*;
 use crate::*;
 use quote::format_ident;
-use std::sync::Arc;
 use syn::*;
 
 pub(crate) trait IArgsCheckerGenerator {
     fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> ArgsCheckerStruct;
 }
 
-pub(crate) struct ArgsCheckerGenerator {
-    pub field_factory: Arc<dyn IFieldFactory>,
-    pub(crate) struct_factory: Arc<dyn IStructFactory>,
-    pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
-    pub type_factory: Arc<dyn ITypeFactory>,
-}
+pub(crate) struct ArgsCheckerGenerator;
 
 impl IArgsCheckerGenerator for ArgsCheckerGenerator {
     fn generate(&self, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> ArgsCheckerStruct {
@@ -56,11 +50,9 @@ impl IArgsCheckerGenerator for ArgsCheckerGenerator {
         };
 
         let mut item_struct =
-            self.struct_factory
-                .create(attrs, ident, fn_decl.merged_generics.clone(), fields_named);
-        self.reference_normalizer
-            .normalize_anonymous_lifetimes_in_struct(&mut item_struct);
-        let ty = self.type_factory.create_from_struct(&item_struct);
+            r#struct::create(attrs, ident, fn_decl.merged_generics.clone(), fields_named);
+        reference::normalize_anonymous_lifetimes_in_struct(&mut item_struct);
+        let ty = r#type::create_from_struct(&item_struct);
         let args_checker_struct = ArgsCheckerStruct { item_struct, ty };
 
         return args_checker_struct;
@@ -91,7 +83,7 @@ impl ArgsCheckerGenerator {
         let ty = arg_type::create(*pat_type.ty.clone());
         let ident = arg_ident::extract(arg_number, pat_type);
 
-        let result = self.field_factory.create(ident, ty);
+        let result = field::create(ident, ty);
         return Some(result);
     }
 }

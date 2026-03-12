@@ -28,14 +28,8 @@ pub(crate) trait IMockSetupImplGenerator {
 }
 
 pub(crate) struct MockSetupImplGenerator {
-    pub path_factory: Arc<dyn IPathFactory>,
-    pub type_factory: Arc<dyn ITypeFactory>,
-    pub impl_factory: Arc<dyn IImplFactory>,
-    pub local_factory: Arc<dyn ILocalFactory>,
-    pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
     pub input_args_generator: Arc<dyn IInputArgsGenerator>,
     pub setup_output_generator: Arc<dyn ISetupOutputGenerator>,
-    pub transmute_lifetime_expr_factory: Arc<dyn ITransmuteLifetimeExprFactory>,
 }
 
 impl IMockSetupImplGenerator for MockSetupImplGenerator {
@@ -61,9 +55,7 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
             })
             .collect();
 
-        let item_impl = self
-            .impl_factory
-            .create_with_default_lifetime(mock_type, self_ty, fn_setups);
+        let item_impl = r#impl::create_with_default_lifetime(mock_type, self_ty, fn_setups);
         let mock_setup_impl = MockSetupImpl { item_impl };
         return mock_setup_impl;
     }
@@ -87,9 +79,7 @@ impl IMockSetupImplGenerator for MockSetupImplGenerator {
             GenericsStrategy::DoNotUse,
         ));
 
-        let item_impl =
-            self.impl_factory
-                .create_with_default_lifetime(mock_type, self_ty, vec![fn_setup]);
+        let item_impl = r#impl::create_with_default_lifetime(mock_type, self_ty, vec![fn_setup]);
         let mock_setup_impl = MockSetupImpl { item_impl };
         return mock_setup_impl;
     }
@@ -165,12 +155,12 @@ impl MockSetupImplGenerator {
             )
         };
         *fn_tuner_lifetime = Lifetime::new("'_", Span::call_site());
-        let fn_tuner_decl_stmt = Stmt::Local(self.local_factory.create_with_type(
+        let fn_tuner_decl_stmt = Stmt::Local(local::create_with_type(
             Self::FN_TUNER_VAR_IDENT.clone(),
             Type::Path(fn_tuner_type),
             LocalInit {
                 eq_token: Default::default(),
-                expr: Box::new(Expr::MethodCall(self.expr_method_call_factory.create(
+                expr: Box::new(Expr::MethodCall(expr_method_call::create(
                     vec![
                         constants::SELF_IDENT.clone(),
                         constants::DATA_IDENT.clone(),
@@ -186,12 +176,9 @@ impl MockSetupImplGenerator {
             Expr::Return(ExprReturn {
                 attrs: Vec::new(),
                 return_token: Default::default(),
-                expr: Some(Box::new(
-                    self.transmute_lifetime_expr_factory.create_for_expr(
-                        self.path_factory
-                            .create_expr(Self::FN_TUNER_VAR_IDENT.clone()),
-                    ),
-                )),
+                expr: Some(Box::new(transmute_lifetime_expr::create_for_expr(
+                    path::create_expr(Self::FN_TUNER_VAR_IDENT.clone()),
+                ))),
             }),
             Some(Default::default()),
         );

@@ -2,7 +2,6 @@ use crate::constants;
 use crate::mock_macros::fn_info_generation::models::*;
 use crate::mock_macros::mock_generation::models::*;
 use crate::syntax::*;
-use std::sync::Arc;
 use syn::*;
 
 pub(crate) trait ISetupOutputGenerator {
@@ -16,11 +15,7 @@ pub(crate) trait ISetupOutputGenerator {
     ) -> TypePath;
 }
 
-pub(crate) struct SetupOutputGenerator {
-    pub type_factory: Arc<dyn ITypeFactory>,
-    pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
-    pub bool_lit_factory: Arc<dyn IBoolLitFactory>,
-}
+pub(crate) struct SetupOutputGenerator;
 
 impl ISetupOutputGenerator for SetupOutputGenerator {
     fn generate_for_trait(&self, mock_type: &MockType, fn_info: &FnInfo) -> TypePath {
@@ -63,8 +58,7 @@ impl SetupOutputGenerator {
         stores_mock_data: bool,
     ) -> TypePath {
         let mut arg_refs_tuple = fn_info.parent.arg_refs_tuple.clone();
-        self.reference_normalizer
-            .normalize_anonymous_lifetimes(&mut arg_refs_tuple);
+        reference::normalize_anonymous_lifetimes(&mut arg_refs_tuple);
         let result = TypePath {
             qself: None,
             path: Path {
@@ -80,11 +74,10 @@ impl SetupOutputGenerator {
                             GenericArgument::Type(owner_type),
                             GenericArgument::Type(arg_refs_tuple),
                             GenericArgument::Type(fn_info.parent.get_return_value_type()),
-                            GenericArgument::Const(
-                                self.bool_lit_factory
-                                    .create(fn_info.parent.maybe_base_fn_block.is_some()),
-                            ),
-                            GenericArgument::Const(self.bool_lit_factory.create(stores_mock_data)),
+                            GenericArgument::Const(bool_lit::create(
+                                fn_info.parent.maybe_base_fn_block.is_some(),
+                            )),
+                            GenericArgument::Const(bool_lit::create(stores_mock_data)),
                         ]
                         .into_iter()
                         .collect(),

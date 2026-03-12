@@ -17,15 +17,7 @@ pub(crate) trait IMockFnBlockGenerator {
 }
 
 pub(crate) struct MockFnBlockGenerator {
-    pub path_factory: Arc<dyn IPathFactory>,
-    pub expr_reference_factory: Arc<dyn IExprReferenceFactory>,
-    pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
-    pub transmute_lifetime_expr_factory: Arc<dyn ITransmuteLifetimeExprFactory>,
-    pub field_value_factory: Arc<dyn IFieldValueFactory>,
     pub get_global_mock_expr_generator: Arc<dyn IGetGlobalMockExprGenerator>,
-    pub field_checker: Arc<dyn IFieldChecker>,
-    pub local_factory: Arc<dyn ILocalFactory>,
-    pub type_factory: Arc<dyn ITypeFactory>,
     pub base_fn_ident_formatter: Arc<dyn IBaseFnIdentFormatter>,
 }
 
@@ -83,14 +75,14 @@ impl MockFnBlockGenerator {
             .iter()
             .map(|field| {
                 let field_ident = field.get_required_ident();
-                if self.field_checker.is_phantom_data(field) {
-                    return self.field_value_factory.create_as_phantom_data(field_ident);
+                if field::is_phantom_data(field) {
+                    return field_value::create_as_phantom_data(field_ident);
                 }
                 let field_value = FieldValue {
                     attrs: Vec::new(),
                     member: Member::Named(field_ident.clone()),
                     colon_token: Some(Default::default()),
-                    expr: self.transmute_lifetime_expr_factory.create(field_ident),
+                    expr: transmute_lifetime_expr::create(field_ident),
                 };
                 return field_value;
             })
@@ -102,31 +94,27 @@ impl MockFnBlockGenerator {
             panic!("Call struct should have default lifetime as first generics parameter");
         };
         first_lifetime_param.lifetime = constants::DERIVED_LIFETIME.clone();
-        let call_struct_type = self.type_factory.create_with_generics(
+        let call_struct_type = r#type::create_with_generics(
             fn_info.call_struct.item_struct.ident.clone(),
             call_struct_type_generics,
         );
-        let call_stmt = Stmt::Local(
-            self.local_factory.create_with_type(
-                Self::CALL_VARIABLE_IDENT.clone(),
-                call_struct_type,
-                LocalInit {
-                    eq_token: Default::default(),
-                    expr: Box::new(Expr::Struct(ExprStruct {
-                        attrs: Vec::new(),
-                        qself: None,
-                        path: self
-                            .path_factory
-                            .create(fn_info.call_struct.item_struct.ident.clone()),
-                        brace_token: Default::default(),
-                        fields: field_values.into_iter().collect(),
-                        dot2_token: None,
-                        rest: None,
-                    })),
-                    diverge: None,
-                },
-            ),
-        );
+        let call_stmt = Stmt::Local(local::create_with_type(
+            Self::CALL_VARIABLE_IDENT.clone(),
+            call_struct_type,
+            LocalInit {
+                eq_token: Default::default(),
+                expr: Box::new(Expr::Struct(ExprStruct {
+                    attrs: Vec::new(),
+                    qself: None,
+                    path: path::create(fn_info.call_struct.item_struct.ident.clone()),
+                    brace_token: Default::default(),
+                    fields: field_values.into_iter().collect(),
+                    dot2_token: None,
+                    rest: None,
+                })),
+                diverge: None,
+            },
+        ));
         return call_stmt;
     }
 
@@ -136,7 +124,7 @@ impl MockFnBlockGenerator {
         target: Target,
         maybe_containing_trait_ident: Option<&Ident>,
     ) -> Vec<Stmt> {
-        let base_receiver = self.path_factory.create_expr(match target {
+        let base_receiver = path::create_expr(match target {
             Target::Other => constants::SELF_IDENT.clone(),
             Target::StaticFn(_) => Self::MOCK_VARIABLE_IDENT.clone(),
         });
@@ -153,19 +141,17 @@ impl MockFnBlockGenerator {
         let last_stmts = match target {
             Target::Other => vec![handle_stmt],
             Target::StaticFn(mock_type) => {
-                let mock_var_stmt = Stmt::Local(
-                    self.local_factory.create(
-                        Self::MOCK_VARIABLE_IDENT.clone(),
-                        LocalInit {
-                            eq_token: Default::default(),
-                            expr: Box::new(
-                                self.get_global_mock_expr_generator
-                                    .generate(mock_type.ty.clone()),
-                            ),
-                            diverge: None,
-                        },
-                    ),
-                );
+                let mock_var_stmt = Stmt::Local(local::create(
+                    Self::MOCK_VARIABLE_IDENT.clone(),
+                    LocalInit {
+                        eq_token: Default::default(),
+                        expr: Box::new(
+                            self.get_global_mock_expr_generator
+                                .generate(mock_type.ty.clone()),
+                        ),
+                        diverge: None,
+                    },
+                ));
                 vec![mock_var_stmt, handle_stmt]
             }
         };
@@ -201,28 +187,29 @@ impl MockFnBlockGenerator {
             };
             let base_fn_ident = self.base_fn_ident_formatter.format(specific_fn_info_ident);
             let base_fn_path = match target {
-                Target::StaticFn(_) => self.path_factory.create_expr(base_fn_ident),
-                Target::Other => self.path_factory.create_expr_from_parts(vec![
+                Target::StaticFn(_) => path::create_expr(base_fn_ident),
+                Target::Other => path::create_expr_from_parts(vec![
                     constants::SELF_TYPE_IDENT.clone(),
                     base_fn_ident,
                 ]),
             };
             vec![
-                self.expr_reference_factory.create(base_receiver.clone()),
-                self.path_factory
-                    .create_expr(Self::CALL_VARIABLE_IDENT.clone()),
+                expr_reference::create(base_receiver.clone()),
+                path::create_expr(Self::CALL_VARIABLE_IDENT.clone()),
                 base_fn_path,
             ]
         } else {
             vec![
-                self.expr_reference_factory.create(base_receiver.clone()),
-                self.path_factory
-                    .create_expr(Self::CALL_VARIABLE_IDENT.clone()),
+                expr_reference::create(base_receiver.clone()),
+                path::create_expr(Self::CALL_VARIABLE_IDENT.clone()),
             ]
         };
-        let expr_method_call = self
-            .expr_method_call_factory
-            .create_with_base_receiver_and_expr_args(base_receiver, idents, method_name, args);
+        let expr_method_call = expr_method_call::create_with_base_receiver_and_expr_args(
+            base_receiver,
+            idents,
+            method_name,
+            args,
+        );
         let expr = Expr::MethodCall(expr_method_call);
         return expr;
     }

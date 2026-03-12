@@ -1,15 +1,12 @@
 use crate::constants;
 use crate::syntax::*;
-use std::sync::Arc;
 use syn::*;
 
 pub(crate) trait IGetGlobalMockExprGenerator {
     fn generate(&self, ty: Type) -> Expr;
 }
 
-pub(crate) struct GetGlobalMockExprGenerator {
-    pub expr_call_factory: Arc<dyn IExprCallFactory>,
-}
+pub(crate) struct GetGlobalMockExprGenerator;
 
 impl IGetGlobalMockExprGenerator for GetGlobalMockExprGenerator {
     fn generate(&self, ty: Type) -> Expr {
@@ -31,7 +28,7 @@ impl IGetGlobalMockExprGenerator for GetGlobalMockExprGenerator {
                 .collect(),
             },
         });
-        let global_mock_expr = self.expr_call_factory.create_without_args(func);
+        let global_mock_expr = expr_call::create_without_args(func);
         return global_mock_expr;
     }
 }

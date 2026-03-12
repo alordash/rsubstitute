@@ -20,11 +20,6 @@ pub(crate) trait IArgsCheckerTraitImplGenerator {
 }
 
 pub(crate) struct ArgsCheckerTraitImplGenerator {
-    pub type_factory: Arc<dyn ITypeFactory>,
-    pub local_factory: Arc<dyn ILocalFactory>,
-    pub field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
-    pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
-    pub expr_reference_factory: Arc<dyn IExprReferenceFactory>,
     pub debug_string_expr_generator: Arc<dyn IDebugStringExprGenerator>,
 }
 
@@ -125,13 +120,13 @@ impl ArgsCheckerTraitImplGenerator {
     }
 
     fn generate_call_var_stmt(&self, call_struct: &CallStruct) -> Stmt {
-        let call_var_type = self.type_factory.reference(call_struct.ty.clone(), None);
-        let stmt = Stmt::Local(self.local_factory.create_with_type(
+        let call_var_type = r#type::reference(call_struct.ty.clone(), None);
+        let stmt = Stmt::Local(local::create_with_type(
             Self::CALL_VAR_IDENT.clone(),
             call_var_type,
             LocalInit {
                 eq_token: Default::default(),
-                expr: Box::new(Expr::MethodCall(self.expr_method_call_factory.create(
+                expr: Box::new(Expr::MethodCall(expr_method_call::create(
                     vec![Self::DYN_CALL_ARG_IDENT.clone()],
                     constants::DYN_CALL_DOWNCAST_REF_FN_IDENT.clone(),
                     Vec::new(),
@@ -165,17 +160,16 @@ impl ArgsCheckerTraitImplGenerator {
 
     fn generate_check_exprs(&self, field: &Field) -> Expr {
         let field_ident = field.get_required_ident();
-        let receiver = self
-            .field_access_expr_factory
-            .create(vec![constants::SELF_IDENT.clone(), field_ident.clone()]);
+        let receiver =
+            field_access_expr::create(vec![constants::SELF_IDENT.clone(), field_ident.clone()]);
         let field_name_arg = Expr::Lit(ExprLit {
             attrs: Vec::new(),
             lit: Lit::Str(LitStr::new(&field_ident.to_string(), Span::call_site())),
         });
-        let field_access_arg = self.expr_reference_factory.create(
-            self.field_access_expr_factory
-                .create(vec![Self::CALL_VAR_IDENT.clone(), field_ident]),
-        );
+        let field_access_arg = expr_reference::create(field_access_expr::create(vec![
+            Self::CALL_VAR_IDENT.clone(),
+            field_ident,
+        ]));
         let field_string_value_arg = self
             .debug_string_expr_generator
             .generate(field_access_arg.clone());

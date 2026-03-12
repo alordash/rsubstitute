@@ -2,7 +2,6 @@ use crate::constants;
 use crate::mock_macros::mock_generation::models::*;
 use crate::syntax::*;
 use quote::format_ident;
-use std::sync::Arc;
 use syn::punctuated::Punctuated;
 use syn::*;
 
@@ -10,10 +9,7 @@ pub(crate) trait IMockGenericsGenerator {
     fn generate(&self, source_generics: &Generics) -> MockGenerics;
 }
 
-pub(crate) struct MockGenericsGenerator {
-    pub type_factory: Arc<dyn ITypeFactory>,
-    pub field_factory: Arc<dyn IFieldFactory>,
-}
+pub(crate) struct MockGenericsGenerator;
 
 impl IMockGenericsGenerator for MockGenericsGenerator {
     fn generate(&self, source_generics: &Generics) -> MockGenerics {
@@ -44,16 +40,13 @@ impl IMockGenericsGenerator for MockGenericsGenerator {
 impl MockGenericsGenerator {
     fn try_map_generic_param_to_field(&self, generic_param: &GenericParam) -> Option<Field> {
         match generic_param {
-            GenericParam::Lifetime(generic_lifetime) => Some(
-                self.field_factory.create(
-                    self.format_phantom_field_name(&generic_lifetime.lifetime.ident),
-                    self.type_factory
-                        .phantom_data_lifetime(generic_lifetime.lifetime.clone()),
-                ),
-            ),
-            GenericParam::Type(generic_type) => Some(self.field_factory.create(
+            GenericParam::Lifetime(generic_lifetime) => Some(field::create(
+                self.format_phantom_field_name(&generic_lifetime.lifetime.ident),
+                r#type::phantom_data_lifetime(generic_lifetime.lifetime.clone()),
+            )),
+            GenericParam::Type(generic_type) => Some(field::create(
                 self.format_phantom_field_name(&generic_type.ident),
-                self.type_factory.phantom_data(generic_type.ident.clone()),
+                r#type::phantom_data(generic_type.ident.clone()),
             )),
             _ => None,
         }

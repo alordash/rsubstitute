@@ -20,9 +20,6 @@ pub(crate) trait IFnSetupGenerator {
 pub(crate) struct FnSetupGenerator {
     pub input_args_generator: Arc<dyn IInputArgsGenerator>,
     pub setup_output_generator: Arc<dyn ISetupOutputGenerator>,
-    pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
-    pub local_factory: Arc<dyn ILocalFactory>,
-    pub path_factory: Arc<dyn IPathFactory>,
     pub get_global_mock_expr_generator: Arc<dyn IGetGlobalMockExprGenerator>,
 }
 
@@ -72,22 +69,20 @@ impl FnSetupGenerator {
     const MOCK_VAR_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("mock"));
 
     fn generate_fn_setup_block(&self, fn_info: &FnInfo, mock_type: &MockType) -> Block {
-        let mock_var_stmt = Stmt::Local(
-            self.local_factory.create(
-                Self::MOCK_VAR_IDENT.clone(),
-                LocalInit {
-                    eq_token: Default::default(),
-                    expr: Box::new(
-                        self.get_global_mock_expr_generator
-                            .generate(mock_type.ty.clone()),
-                    ),
-                    diverge: None,
-                },
-            ),
-        );
-        let mock_var_expr = self.path_factory.create_expr(Self::MOCK_VAR_IDENT.clone());
+        let mock_var_stmt = Stmt::Local(local::create(
+            Self::MOCK_VAR_IDENT.clone(),
+            LocalInit {
+                eq_token: Default::default(),
+                expr: Box::new(
+                    self.get_global_mock_expr_generator
+                        .generate(mock_type.ty.clone()),
+                ),
+                diverge: None,
+            },
+        ));
+        let mock_var_expr = path::create_expr(Self::MOCK_VAR_IDENT.clone());
         let reset_stmt = Stmt::Expr(
-            Expr::MethodCall(self.expr_method_call_factory.create_with_base_receiver(
+            Expr::MethodCall(expr_method_call::create_with_base_receiver(
                 mock_var_expr.clone(),
                 vec![
                     constants::DATA_IDENT.clone(),
@@ -103,7 +98,7 @@ impl FnSetupGenerator {
                 attrs: Vec::new(),
                 return_token: Default::default(),
                 expr: Some(Box::new(Expr::MethodCall(
-                    self.expr_method_call_factory.create_with_base_receiver(
+                    expr_method_call::create_with_base_receiver(
                         mock_var_expr.clone(),
                         vec![constants::MOCK_SETUP_FIELD_IDENT.clone()],
                         constants::MOCK_SETUP_FIELD_IDENT.clone(),
@@ -116,7 +111,7 @@ impl FnSetupGenerator {
                                 fn_info.parent.get_internal_phantom_types_count()
                                     + mock_type.generics.get_phantom_fields_count(),
                             )
-                            .map(IFieldRequiredIdentGetter::get_required_ident)
+                            .map(IFieldRequiredIdentExtension::get_required_ident)
                             .collect(),
                     ),
                 ))),

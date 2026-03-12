@@ -37,8 +37,6 @@ pub(crate) trait IBaseFnGenerator {
 }
 
 pub(crate) struct BaseFnGenerator {
-    pub type_factory: Arc<dyn ITypeFactory>,
-    pub path_factory: Arc<dyn IPathFactory>,
     pub base_fn_ident_formatter: Arc<dyn IBaseFnIdentFormatter>,
 }
 
@@ -149,7 +147,7 @@ impl BaseFnGenerator {
                     underscore_token: Default::default(),
                 })),
                 colon_token: Default::default(),
-                ty: Box::new(self.type_factory.reference(mock_type.ty.clone(), None)),
+                ty: Box::new(r#type::reference(mock_type.ty.clone(), None)),
             }),
             Target::Other => constants::REF_SELF_ARG.clone(),
         };
@@ -228,9 +226,7 @@ impl BaseFnGenerator {
             pat: Pat::Struct(PatStruct {
                 attrs: Vec::new(),
                 qself: None,
-                path: self
-                    .path_factory
-                    .create(call_struct.item_struct.ident.clone()),
+                path: path::create(call_struct.item_struct.ident.clone()),
                 brace_token: Default::default(),
                 fields,
                 rest: Some(PatRest {
@@ -240,7 +236,7 @@ impl BaseFnGenerator {
             }),
             init: Some(LocalInit {
                 eq_token: Default::default(),
-                expr: Box::new(self.path_factory.create_expr(Self::CALL_ARG_IDENT.clone())),
+                expr: Box::new(path::create_expr(Self::CALL_ARG_IDENT.clone())),
                 diverge: None,
             }),
             semi_token: Default::default(),

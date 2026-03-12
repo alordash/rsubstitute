@@ -3,7 +3,7 @@ use crate::mock_macros::mock_generation::*;
 use crate::syntax::*;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};
-use quote::{ToTokens, format_ident};
+use quote::{format_ident, ToTokens};
 use std::cell::LazyCell;
 use std::sync::Arc;
 use syn::punctuated::Punctuated;
@@ -15,23 +15,15 @@ pub(crate) trait IDeriveArgsInfosProviderMacroHandler {
 }
 
 pub(crate) struct DeriveArgsInfosProviderMacroHandler {
-    pub path_factory: Arc<dyn IPathFactory>,
-    pub type_factory: Arc<dyn ITypeFactory>,
-    pub field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
-    pub expr_reference_factory: Arc<dyn IExprReferenceFactory>,
     pub debug_string_expr_generator: Arc<dyn IDebugStringExprGenerator>,
-    pub field_checker: Arc<dyn IFieldChecker>,
-    pub expr_call_factory: Arc<dyn IExprCallFactory>,
 }
 
 impl IDeriveArgsInfosProviderMacroHandler for DeriveArgsInfosProviderMacroHandler {
     fn handle(&self, item: TokenStream) -> TokenStream {
         let item_struct = parse_macro_input!(item as ItemStruct);
 
-        let trait_path = self
-            .path_factory
-            .create(constants::I_ARGS_INFOS_PROVIDER_TRAIT_IDENT.clone());
-        let self_ty = Box::new(self.type_factory.create_from_struct(&item_struct));
+        let trait_path = path::create(constants::I_ARGS_INFOS_PROVIDER_TRAIT_IDENT.clone());
+        let self_ty = Box::new(r#type::create_from_struct(&item_struct));
         let get_arg_infos_fn = self.generate_get_arg_infos_fn(&item_struct);
         let item_impl = ItemImpl {
             attrs: Vec::new(),
@@ -91,7 +83,7 @@ impl DeriveArgsInfosProviderMacroHandler {
         let check_exprs: Punctuated<_, Token![,]> = item_struct
             .fields
             .iter()
-            .filter(|field| !self.field_checker.is_phantom_data(field))
+            .filter(|field| !field::is_phantom_data(field))
             .map(|field| self.generate_arg_info_new_expr(field))
             .collect();
         let vec_expr = Expr::Macro(ExprMacro {
@@ -116,17 +108,19 @@ impl DeriveArgsInfosProviderMacroHandler {
             attrs: Vec::new(),
             lit: Lit::Str(LitStr::new(&field_ident.to_string(), Span::call_site())),
         });
-        let field_value_arg = self.expr_reference_factory.create(
-            self.field_access_expr_factory
-                .create(vec![constants::SELF_IDENT.clone(), field_ident.clone()]),
-        );
-        let field_debug_string_arg = self.debug_string_expr_generator.generate(
-            self.field_access_expr_factory
-                .create(vec![constants::SELF_IDENT.clone(), field_ident]),
-        );
+        let field_value_arg = expr_reference::create(field_access_expr::create(vec![
+            constants::SELF_IDENT.clone(),
+            field_ident.clone(),
+        ]));
+        let field_debug_string_arg =
+            self.debug_string_expr_generator
+                .generate(field_access_expr::create(vec![
+                    constants::SELF_IDENT.clone(),
+                    field_ident,
+                ]));
 
-        let expr = self.expr_call_factory.create_with_args(
-            self.path_factory.create_expr_from_parts(vec![
+        let expr = expr_call::create_with_args(
+            path::create_expr_from_parts(vec![
                 Self::ARG_INFO_TYPE_IDENT.clone(),
                 constants::NEW_IDENT.clone(),
             ]),

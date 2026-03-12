@@ -1,15 +1,11 @@
 use crate::mock_macros::mock_generation::models::*;
-use crate::syntax::*;
-use std::sync::Arc;
 use syn::*;
 
 pub(crate) trait IInnerDataImplGenerator {
     fn generate(&self, inner_data_struct: &InnerDataStruct, new_fn: ImplItemFn) -> InnerDataImpl;
 }
 
-pub(crate) struct InnerDataImplGenerator {
-    pub type_factory: Arc<dyn ITypeFactory>,
-}
+pub(crate) struct InnerDataImplGenerator;
 
 impl IInnerDataImplGenerator for InnerDataImplGenerator {
     fn generate(&self, inner_data_struct: &InnerDataStruct, new_fn: ImplItemFn) -> InnerDataImpl {

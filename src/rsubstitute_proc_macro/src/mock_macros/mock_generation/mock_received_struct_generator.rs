@@ -18,9 +18,6 @@ pub(crate) trait IMockReceivedStructGenerator {
 }
 
 pub(crate) struct MockReceivedStructGenerator {
-    pub type_factory: Arc<dyn ITypeFactory>,
-    pub field_factory: Arc<dyn IFieldFactory>,
-    pub(crate) struct_factory: Arc<dyn IStructFactory>,
     pub implemented_trait_ident_formatter: Arc<dyn IImplementedTraitIdentFormatter>,
 }
 
@@ -38,31 +35,29 @@ impl IMockReceivedStructGenerator for MockReceivedStructGenerator {
         ];
         let ident = format_ident!("{}{}", mock_ident, Self::MOCK_RECEIVED_STRUCT_IDENT_SUFFIX);
         let data_type = mock_data_struct.ty.clone();
-        let data_arc_type = self.type_factory.wrap_in_arc(data_type);
+        let data_arc_type = r#type::wrap_in_arc(data_type);
         let fields = FieldsNamed {
             brace_token: Default::default(),
-            named: [self
-                .field_factory
-                .create(constants::DATA_IDENT.clone(), data_arc_type)]
-            .into_iter()
-            .chain(implemented_traits_configurators.into_iter().map(
-                |implemented_traits_received| {
-                    self.field_factory.create_pub_from_struct(
-                        self.implemented_trait_ident_formatter
-                            .format_for_field(&implemented_traits_received.trait_ident),
-                        &implemented_traits_received.item_struct,
-                    )
-                },
-            ))
-            .collect(),
+            named: [field::create(constants::DATA_IDENT.clone(), data_arc_type)]
+                .into_iter()
+                .chain(implemented_traits_configurators.into_iter().map(
+                    |implemented_traits_received| {
+                        field::create_pub_from_struct(
+                            self.implemented_trait_ident_formatter
+                                .format_for_field(&implemented_traits_received.trait_ident),
+                            &implemented_traits_received.item_struct,
+                        )
+                    },
+                ))
+                .collect(),
         };
-        let item_struct = self.struct_factory.create(
+        let item_struct = r#struct::create(
             attrs,
             ident,
             mock_type.generics.impl_generics.clone(),
             fields,
         );
-        let ty = self.type_factory.create_from_struct(&item_struct);
+        let ty = r#type::create_from_struct(&item_struct);
         let mock_received_struct = MockReceivedStruct { item_struct, ty };
         return mock_received_struct;
     }

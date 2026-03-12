@@ -3,7 +3,6 @@ use crate::mock_macros::fn_info_generation::models::FnInfo;
 use crate::syntax::*;
 use proc_macro2::Ident;
 use quote::format_ident;
-use std::sync::Arc;
 use syn::*;
 
 pub(crate) trait IInputArgsGenerator {
@@ -18,14 +17,7 @@ pub(crate) trait IInputArgsGenerator {
     fn generate_args_checker_var_ident_and_decl_stmt(&self, fn_info: &FnInfo) -> (Ident, Stmt);
 }
 
-pub(crate) struct InputArgsGenerator {
-    pub path_factory: Arc<dyn IPathFactory>,
-    pub field_value_factory: Arc<dyn IFieldValueFactory>,
-    pub local_factory: Arc<dyn ILocalFactory>,
-    pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
-    pub field_checker: Arc<dyn IFieldChecker>,
-    pub type_factory: Arc<dyn ITypeFactory>,
-}
+pub(crate) struct InputArgsGenerator;
 
 impl IInputArgsGenerator for InputArgsGenerator {
     fn generate_input_args(&self, fn_info: &FnInfo, skipped_fields_count: usize) -> Vec<FnArg> {
@@ -88,8 +80,7 @@ impl IInputArgsGenerator for InputArgsGenerator {
         let mut fn_args = self.generate_input_args(fn_info, skipped_fields_count);
         for fn_arg in fn_args.iter_mut() {
             if let FnArg::Typed(pat_type) = fn_arg {
-                self.reference_normalizer
-                    .staticify_anonymous_lifetimes(&mut pat_type.ty);
+                reference::staticify_anonymous_lifetimes(&mut pat_type.ty);
             }
         }
         return fn_args;
@@ -107,36 +98,28 @@ impl IInputArgsGenerator for InputArgsGenerator {
             .fields
             .iter()
             .map(|field| {
-                if self.field_checker.is_phantom_data(field) {
+                if field::is_phantom_data(field) {
                     let field_ident = field.get_required_ident();
-                    return self.field_value_factory.create_as_phantom_data(field_ident);
+                    return field_value::create_as_phantom_data(field_ident);
                 }
-                return self.field_value_factory.create_with_into_conversion(field);
+                return field_value::create_with_into_conversion(field);
             })
             .collect();
         let args_checker_struct_type = fn_info.args_checker_struct.ty.clone();
-        let args_checker_decl_stmt = Stmt::Local(self.local_factory.create_with_type(
+        let args_checker_decl_stmt = Stmt::Local(local::create_with_type(
             args_checker_var_ident.clone(),
             args_checker_struct_type,
             LocalInit {
                 eq_token: Default::default(),
-                expr:
-                    Box::new(
-                        Expr::Struct(
-                            ExprStruct {
-                                attrs: Vec::new(),
-                                qself: None,
-                                path:
-                                    self.path_factory.create(
-                                        fn_info.args_checker_struct.item_struct.ident.clone(),
-                                    ),
-                                brace_token: Default::default(),
-                                fields: field_values.into_iter().collect(),
-                                dot2_token: None,
-                                rest: None,
-                            },
-                        ),
-                    ),
+                expr: Box::new(Expr::Struct(ExprStruct {
+                    attrs: Vec::new(),
+                    qself: None,
+                    path: path::create(fn_info.args_checker_struct.item_struct.ident.clone()),
+                    brace_token: Default::default(),
+                    fields: field_values.into_iter().collect(),
+                    dot2_token: None,
+                    rest: None,
+                })),
                 diverge: None,
             },
         ));

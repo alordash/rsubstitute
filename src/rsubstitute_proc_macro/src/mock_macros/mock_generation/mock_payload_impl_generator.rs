@@ -31,7 +31,6 @@ pub(crate) trait IMockPayloadImplGenerator {
 }
 
 pub(crate) struct MockPayloadImplGenerator {
-    pub path_factory: Arc<dyn IPathFactory>,
     pub mock_fn_inputs_generator: Arc<dyn IMockFnInputsGenerator>,
     pub mock_fn_block_generator: Arc<dyn IMockFnBlockGenerator>,
 }
@@ -43,9 +42,8 @@ impl IMockPayloadImplGenerator for MockPayloadImplGenerator {
         mock_type: &MockType,
         fn_infos: &[FnInfo],
     ) -> MockPayloadImpl {
-        let trait_path = self
-            .path_factory
-            .create_with_generics(trait_ident, mock_type.generics.source_generics.clone());
+        let trait_path =
+            path::create_with_generics(trait_ident, mock_type.generics.source_generics.clone());
 
         let mock_impl = self.generate_core(
             Vec::new(),
@@ -65,9 +63,8 @@ impl IMockPayloadImplGenerator for MockPayloadImplGenerator {
         fn_infos: &[FnInfo],
         containing_trait_ident: &Ident,
     ) -> MockPayloadImpl {
-        let trait_path = self
-            .path_factory
-            .create_with_generics(trait_ident, mock_type.generics.source_generics.clone());
+        let trait_path =
+            path::create_with_generics(trait_ident, mock_type.generics.source_generics.clone());
 
         let mock_impl = self.generate_core(
             Vec::new(),

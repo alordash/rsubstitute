@@ -3,19 +3,13 @@ use crate::syntax::*;
 use proc_macro::TokenStream;
 use quote::{format_ident, ToTokens};
 use std::cell::LazyCell;
-use std::sync::Arc;
 use syn::*;
 
 pub(crate) trait IDeriveGenericsHashKeyProviderMacroHandler {
     fn handle(&self, item: proc_macro::TokenStream) -> proc_macro::TokenStream;
 }
 
-pub(crate) struct DeriveGenericsHashKeyProviderMacroHandler {
-    pub type_factory: Arc<dyn ITypeFactory>,
-    pub path_factory: Arc<dyn IPathFactory>,
-    pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
-    pub expr_call_factory: Arc<dyn IExprCallFactory>,
-}
+pub(crate) struct DeriveGenericsHashKeyProviderMacroHandler;
 
 impl IDeriveGenericsHashKeyProviderMacroHandler for DeriveGenericsHashKeyProviderMacroHandler {
     fn handle(&self, item: TokenStream) -> TokenStream {
@@ -33,7 +27,7 @@ impl IDeriveGenericsHashKeyProviderMacroHandler for DeriveGenericsHashKeyProvide
                 constants::I_GENERICS_HASH_KEY_PROVIDER_TRAIT_PATH.clone(),
                 Default::default(),
             )),
-            self_ty: Box::new(self.type_factory.create_from_struct(&item_struct)),
+            self_ty: Box::new(r#type::create_from_struct(&item_struct)),
             brace_token: Default::default(),
             items: vec![
                 impl_items.hash_generics_type_ids_item,
@@ -86,7 +80,7 @@ impl DeriveGenericsHashKeyProviderMacroHandler {
                 bracket_token: Default::default(),
                 elems: tid_exprs.collect(),
             };
-            let hash_method_call = self.expr_method_call_factory.create_with_base_receiver(
+            let hash_method_call = expr_method_call::create_with_base_receiver(
                 Expr::Array(tid_array_expr),
                 Vec::new(),
                 constants::HASH_FN_IDENT.clone(),
@@ -142,13 +136,10 @@ impl DeriveGenericsHashKeyProviderMacroHandler {
                     subpat: None,
                 })),
                 colon_token: Default::default(),
-                ty: Box::new(
-                    self.type_factory.mut_reference(
-                        self.type_factory
-                            .create(Self::GENERICS_HASHER_IDENT.clone()),
-                        None,
-                    ),
-                ),
+                ty: Box::new(r#type::mut_reference(
+                    r#type::create(Self::GENERICS_HASHER_IDENT.clone()),
+                    None,
+                )),
             }),
         ]
         .into_iter()
@@ -180,9 +171,9 @@ impl DeriveGenericsHashKeyProviderMacroHandler {
                     arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
                         colon2_token: Some(Default::default()),
                         lt_token: Default::default(),
-                        args: [GenericArgument::Type(
-                            self.type_factory.create(type_param.ident.clone()),
-                        )]
+                        args: [GenericArgument::Type(r#type::create(
+                            type_param.ident.clone(),
+                        ))]
                         .into_iter()
                         .collect(),
                         gt_token: Default::default(),
@@ -192,7 +183,7 @@ impl DeriveGenericsHashKeyProviderMacroHandler {
                 .collect(),
             },
         });
-        let expr = self.expr_call_factory.create_without_args(func);
+        let expr = expr_call::create_without_args(func);
         return expr;
     }
 
@@ -202,16 +193,12 @@ impl DeriveGenericsHashKeyProviderMacroHandler {
                 attrs: Vec::new(),
                 and_token: Default::default(),
                 mutability: None,
-                expr: Box::new(self.path_factory.create_expr(const_param.ident.clone())),
+                expr: Box::new(path::create_expr(const_param.ident.clone())),
             }),
-            self.path_factory
-                .create_expr(Self::HASHER_ARG_IDENT.clone()),
+            path::create_expr(Self::HASHER_ARG_IDENT.clone()),
         ];
-        let expr = self.expr_call_factory.create_with_args(
-            self.path_factory
-                .create_expr(Self::CONST_HASH_FN_IDENT.clone()),
-            args,
-        );
+        let expr =
+            expr_call::create_with_args(path::create_expr(Self::CONST_HASH_FN_IDENT.clone()), args);
         let stmt = Stmt::Expr(expr, Some(Default::default()));
         return stmt;
     }

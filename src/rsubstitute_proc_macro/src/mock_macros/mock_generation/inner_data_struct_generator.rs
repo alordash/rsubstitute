@@ -2,7 +2,6 @@ use crate::constants;
 use crate::mock_macros::mock_generation::models::*;
 use crate::syntax::*;
 use quote::format_ident;
-use std::sync::Arc;
 use syn::*;
 
 // TODO - replace all classes with static fns!
@@ -10,9 +9,7 @@ pub(crate) trait IInnerDataStructGenerator {
     fn generate(&self, source_struct: ItemStruct) -> InnerDataStruct;
 }
 
-pub(crate) struct InnerDataStructGenerator {
-    pub type_factory: Arc<dyn ITypeFactory>,
-}
+pub(crate) struct InnerDataStructGenerator;
 
 impl IInnerDataStructGenerator for InnerDataStructGenerator {
     fn generate(&self, source_struct: ItemStruct) -> InnerDataStruct {
@@ -26,7 +23,7 @@ impl IInnerDataStructGenerator for InnerDataStructGenerator {
             Self::INNER_DATA_STRUCT_IDENT_SUFFIX
         );
         item_struct.vis = Visibility::Public(Default::default());
-        let ty = self.type_factory.create_from_struct(&item_struct);
+        let ty = r#type::create_from_struct(&item_struct);
         let inner_data_struct = InnerDataStruct { item_struct, ty };
         return inner_data_struct;
     }

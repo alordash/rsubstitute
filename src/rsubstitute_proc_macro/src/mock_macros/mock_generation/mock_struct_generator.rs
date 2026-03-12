@@ -1,7 +1,6 @@
 use crate::constants;
 use crate::mock_macros::mock_generation::models::*;
 use crate::syntax::*;
-use std::sync::Arc;
 use syn::*;
 
 pub(crate) trait IMockStructGenerator {
@@ -24,12 +23,7 @@ pub(crate) trait IMockStructGenerator {
     ) -> MockStruct;
 }
 
-pub(crate) struct MockStructGenerator {
-    pub field_factory: Arc<dyn IFieldFactory>,
-    pub type_factory: Arc<dyn ITypeFactory>,
-    pub(crate) struct_factory: Arc<dyn IStructFactory>,
-    pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
-}
+pub(crate) struct MockStructGenerator;
 
 impl IMockStructGenerator for MockStructGenerator {
     fn generate(
@@ -41,18 +35,18 @@ impl IMockStructGenerator for MockStructGenerator {
         mock_data_struct: &MockDataStruct,
         maybe_inner_data_struct: Option<&InnerDataStruct>,
     ) -> MockStruct {
-        let data_field = self.field_factory.create(
+        let data_field = field::create(
             constants::DATA_IDENT.clone(),
-            self.type_factory.wrap_in_arc(mock_data_struct.ty.clone()),
+            r#type::wrap_in_arc(mock_data_struct.ty.clone()),
         );
         let fields = FieldsNamed {
             brace_token: Default::default(),
             named: [
-                self.field_factory.create_pub_from_struct(
+                field::create_pub_from_struct(
                     constants::MOCK_SETUP_FIELD_IDENT.clone(),
                     &mock_setup_struct.item_struct,
                 ),
-                self.field_factory.create_pub_from_struct(
+                field::create_pub_from_struct(
                     constants::MOCK_RECEIVED_FIELD_IDENT.clone(),
                     &mock_received_struct.item_struct,
                 ),
@@ -62,7 +56,7 @@ impl IMockStructGenerator for MockStructGenerator {
             .chain(
                 maybe_inner_data_struct
                     .map(|inner_data_struct| {
-                        self.field_factory.create_from_struct(
+                        field::create_from_struct(
                             constants::INNER_DATA_FIELD_IDENT.clone(),
                             &inner_data_struct.item_struct,
                         )
@@ -71,13 +65,13 @@ impl IMockStructGenerator for MockStructGenerator {
             )
             .collect(),
         };
-        let item_struct = self.struct_factory.create(
+        let item_struct = r#struct::create(
             attrs,
             mock_type.ident.clone(),
             mock_type.generics.impl_generics.clone(),
             fields,
         );
-        let ty = self.type_factory.create_from_struct(&item_struct);
+        let ty = r#type::create_from_struct(&item_struct);
         let result = MockStruct { item_struct, ty };
         return result;
     }
@@ -102,8 +96,7 @@ impl IMockStructGenerator for MockStructGenerator {
             .attrs
             .insert(0, constants::DOC_HIDDEN_ATTRIBUTE.clone());
         for field in mock_struct.item_struct.fields.iter_mut() {
-            self.reference_normalizer
-                .staticify_anonymous_lifetimes(&mut field.ty);
+            reference::staticify_anonymous_lifetimes(&mut field.ty);
         }
 
         return mock_struct;

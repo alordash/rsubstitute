@@ -1,7 +1,6 @@
 use crate::constants;
 use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::mock_generation::*;
-use crate::syntax::*;
 use proc_macro2::Ident;
 use quote::format_ident;
 use std::cell::LazyCell;
@@ -24,7 +23,6 @@ pub(crate) trait IMockImplGenerator {
 }
 
 pub(crate) struct MockImplGenerator {
-    pub type_factory: Arc<dyn ITypeFactory>,
     pub mock_constructor_block_generator: Arc<dyn IMockConstructorBlockGenerator>,
 }
 

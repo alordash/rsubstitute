@@ -1,9 +1,8 @@
 use crate::constants;
 use crate::syntax::*;
 use proc_macro::TokenStream;
-use quote::{ToTokens, format_ident};
+use quote::{format_ident, ToTokens};
 use std::cell::LazyCell;
-use std::sync::Arc;
 use syn::punctuated::Punctuated;
 use syn::*;
 
@@ -11,11 +10,7 @@ pub(crate) trait IDeriveMockDataMacroHandler {
     fn handle(&self, item: proc_macro::TokenStream) -> proc_macro::TokenStream;
 }
 
-pub(crate) struct DeriveMockDataMacroHandler {
-    pub path_factory: Arc<dyn IPathFactory>,
-    pub type_factory: Arc<dyn ITypeFactory>,
-    pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
-}
+pub(crate) struct DeriveMockDataMacroHandler;
 
 impl IDeriveMockDataMacroHandler for DeriveMockDataMacroHandler {
     fn handle(&self, item: TokenStream) -> TokenStream {
@@ -31,14 +26,10 @@ impl IDeriveMockDataMacroHandler for DeriveMockDataMacroHandler {
             generics: item_struct.generics.clone(),
             trait_: Some((
                 None,
-                self.path_factory
-                    .create(constants::I_MOCK_DATA_TRAIT_IDENT.clone()),
+                path::create(constants::I_MOCK_DATA_TRAIT_IDENT.clone()),
                 Default::default(),
             )),
-            self_ty: Box::new(
-                self.type_factory
-                    .create_from_struct(&item_struct),
-            ),
+            self_ty: Box::new(r#type::create_from_struct(&item_struct)),
             brace_token: Default::default(),
             items: vec![fmt_args_impl],
         };
@@ -71,23 +62,18 @@ impl DeriveMockDataMacroHandler {
         let vec_macro_args: Punctuated<_, Token![,]> = item_struct
             .fields
             .iter()
-            .filter(|field| {
-                match &field.ty {
-                    Type::Path(type_path) => {
-                        let Some(first_segment) = type_path.path.segments.first() else {
-                            return false;
-                        };
-                        return first_segment.ident == constants::FN_DATA_TYPE_IDENT.clone();
-                    }
-                    _ => false,
+            .filter(|field| match &field.ty {
+                Type::Path(type_path) => {
+                    let Some(first_segment) = type_path.path.segments.first() else {
+                        return false;
+                    };
+                    return first_segment.ident == constants::FN_DATA_TYPE_IDENT.clone();
                 }
+                _ => false,
             })
             .map(|field| {
-                self.expr_method_call_factory.create(
-                    vec![
-                        constants::SELF_IDENT.clone(),
-                        field.get_required_ident(),
-                    ],
+                expr_method_call::create(
+                    vec![constants::SELF_IDENT.clone(), field.get_required_ident()],
                     Self::GET_UNEXPECTED_CALLS_ERROR_MSGS_FN_IDENT.clone(),
                     Vec::new(),
                 )

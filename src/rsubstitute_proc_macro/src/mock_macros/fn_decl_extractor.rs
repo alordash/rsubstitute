@@ -2,7 +2,6 @@ use crate::constants;
 use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::models::*;
 use crate::syntax::*;
-use std::sync::Arc;
 use syn::*;
 
 pub(crate) trait IFnDeclExtractor {
@@ -25,11 +24,7 @@ pub(crate) trait IFnDeclExtractor {
     fn extract_fn(&self, ctx: &Ctx, mock_generics: &MockGenerics, item_fn: &ItemFn) -> FnDecl;
 }
 
-pub(crate) struct FnDeclExtractor {
-    pub generics_merger: Arc<dyn IGenericsMerger>,
-    pub type_factory: Arc<dyn ITypeFactory>,
-    pub field_factory: Arc<dyn IFieldFactory>,
-}
+pub(crate) struct FnDeclExtractor;
 
 impl IFnDeclExtractor for FnDeclExtractor {
     fn extract(
@@ -166,9 +161,9 @@ impl FnDeclExtractor {
         let maybe_phantom_return_field =
             self.try_get_phantom_return_field(&sig.output, &sig.generics);
         let merged_generics = match generics_strategy {
-            GenericsStrategy::MergeWithMockGenerics(mock_generics) => self
-                .generics_merger
-                .merge(&mock_generics.impl_generics, &sig.generics),
+            GenericsStrategy::MergeWithMockGenerics(mock_generics) => {
+                generics::merge(&mock_generics.impl_generics, &sig.generics)
+            }
             GenericsStrategy::UseMockGenerics(mock_generics) => mock_generics.impl_generics.clone(),
         };
         let arguments: Vec<_> = sig.inputs.iter().cloned().collect();
@@ -207,9 +202,9 @@ impl FnDeclExtractor {
             .iter()
             .any(|type_param| last_segment.ident == type_param.ident)
         {
-            let field = self.field_factory.create(
+            let field = field::create(
                 constants::RETURN_TYPE_PHANTOM_FIELD_IDENT.clone(),
-                self.type_factory.phantom_data(last_segment.ident.clone()),
+                r#type::phantom_data(last_segment.ident.clone()),
             );
             return Some(field);
         }
@@ -225,7 +220,7 @@ impl FnDeclExtractor {
                     FnArg::Receiver(_) => None,
                     FnArg::Typed(pat_type) => Some(*pat_type.ty.clone()),
                 })
-                .map(|ty| self.type_factory.reference(ty, None))
+                .map(|ty| r#type::reference(ty, None))
                 .collect(),
         });
         return result;

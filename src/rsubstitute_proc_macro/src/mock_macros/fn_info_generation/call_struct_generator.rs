@@ -4,19 +4,13 @@ use crate::mock_macros::models::*;
 use crate::syntax::*;
 use crate::*;
 use quote::format_ident;
-use std::sync::Arc;
 use syn::*;
 
 pub(crate) trait ICallStructGenerator {
     fn generate(&self, ctx: &Ctx, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> CallStruct;
 }
 
-pub(crate) struct CallStructGenerator {
-    pub field_factory: Arc<dyn IFieldFactory>,
-    pub(crate) struct_factory: Arc<dyn IStructFactory>,
-    pub reference_normalizer: Arc<dyn IReferenceNormalizer>,
-    pub type_factory: Arc<dyn ITypeFactory>,
-}
+pub(crate) struct CallStructGenerator;
 
 impl ICallStructGenerator for CallStructGenerator {
     fn generate(&self, ctx: &Ctx, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> CallStruct {
@@ -50,11 +44,9 @@ impl ICallStructGenerator for CallStructGenerator {
         };
 
         let mut item_struct =
-            self.struct_factory
-                .create(attrs, ident, fn_decl.merged_generics.clone(), fields_named);
-        self.reference_normalizer
-            .normalize_anonymous_lifetimes_in_struct(&mut item_struct);
-        let ty = self.type_factory.create_from_struct(&item_struct);
+            r#struct::create(attrs, ident, fn_decl.merged_generics.clone(), fields_named);
+        reference::normalize_anonymous_lifetimes_in_struct(&mut item_struct);
+        let ty = r#type::create_from_struct(&item_struct);
         let call_struct = CallStruct { item_struct, ty };
 
         return call_struct;
@@ -94,7 +86,7 @@ impl CallStructGenerator {
         };
         let ident = arg_ident::extract(arg_number, pat_type);
 
-        let result = self.field_factory.create(ident, ty);
+        let result = field::create(ident, ty);
         return Some(result);
     }
 }

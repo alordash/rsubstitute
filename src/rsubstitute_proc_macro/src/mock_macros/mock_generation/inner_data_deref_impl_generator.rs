@@ -1,7 +1,6 @@
 use crate::constants;
 use crate::mock_macros::mock_generation::models::*;
 use crate::syntax::*;
-use std::sync::Arc;
 use syn::*;
 
 pub(crate) trait IInnerDataDerefImplGenerator {
@@ -12,12 +11,7 @@ pub(crate) trait IInnerDataDerefImplGenerator {
     ) -> InnerDataDerefImpl;
 }
 
-pub(crate) struct InnerDataDerefImplGenerator {
-    pub type_factory: Arc<dyn ITypeFactory>,
-    pub path_factory: Arc<dyn IPathFactory>,
-    pub field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
-    pub expr_reference_factory: Arc<dyn IExprReferenceFactory>,
-}
+pub(crate) struct InnerDataDerefImplGenerator;
 
 impl IInnerDataDerefImplGenerator for InnerDataDerefImplGenerator {
     fn generate(
@@ -80,10 +74,10 @@ impl InnerDataDerefImplGenerator {
             variadic: None,
             output: ReturnType::Type(
                 Default::default(),
-                Box::new(self.type_factory.reference(
+                Box::new(r#type::reference(
                     Type::Path(TypePath {
                         qself: None,
-                        path: self.path_factory.create_from_parts(vec![
+                        path: path::create_from_parts(vec![
                             constants::SELF_TYPE_IDENT.clone(),
                             constants::DEREF_TARGET_TYPE_IDENT.clone(),
                         ]),
@@ -95,11 +89,10 @@ impl InnerDataDerefImplGenerator {
         let block = Block {
             brace_token: Default::default(),
             stmts: vec![Stmt::Expr(
-                self.expr_reference_factory
-                    .create(self.field_access_expr_factory.create(vec![
-                        constants::SELF_IDENT.clone(),
-                        constants::INNER_DATA_FIELD_IDENT.clone(),
-                    ])),
+                expr_reference::create(field_access_expr::create(vec![
+                    constants::SELF_IDENT.clone(),
+                    constants::INNER_DATA_FIELD_IDENT.clone(),
+                ])),
                 None,
             )],
         };

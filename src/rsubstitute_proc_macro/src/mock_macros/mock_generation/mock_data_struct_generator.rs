@@ -4,7 +4,6 @@ use crate::mock_macros::mock_generation::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
 use quote::format_ident;
-use std::sync::Arc;
 use syn::*;
 
 pub(crate) trait IMockDataStructGenerator {
@@ -14,12 +13,7 @@ pub(crate) trait IMockDataStructGenerator {
     -> MockDataStruct;
 }
 
-pub(crate) struct MockDataStructGenerator {
-    pub field_factory: Arc<dyn IFieldFactory>,
-    pub(crate) struct_factory: Arc<dyn IStructFactory>,
-    pub bool_lit_factory: Arc<dyn IBoolLitFactory>,
-    pub type_factory: Arc<dyn ITypeFactory>,
-}
+pub(crate) struct MockDataStructGenerator;
 
 impl IMockDataStructGenerator for MockDataStructGenerator {
     fn generate_for_trait(&self, mock_type: &MockType, fn_infos: &[&FnInfo]) -> MockDataStruct {
@@ -57,13 +51,13 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
             named: fields,
         };
 
-        let item_struct = self.struct_factory.create(
+        let item_struct = r#struct::create(
             attrs,
             ident,
             mock_type.generics.impl_generics.clone(),
             fields_named,
         );
-        let ty = self.type_factory.create_from_struct(&item_struct);
+        let ty = r#type::create_from_struct(&item_struct);
         let mock_struct = MockDataStruct {
             item_struct,
             ty,
@@ -106,13 +100,13 @@ impl IMockDataStructGenerator for MockDataStructGenerator {
             named: fields,
         };
 
-        let item_struct = self.struct_factory.create(
+        let item_struct = r#struct::create(
             attrs,
             ident,
             mock_type.generics.impl_generics.clone(),
             fields_named,
         );
-        let ty = self.type_factory.create_from_struct(&item_struct);
+        let ty = r#type::create_from_struct(&item_struct);
         let mock_struct = MockDataStruct {
             item_struct,
             ty,
@@ -141,13 +135,10 @@ impl MockDataStructGenerator {
                                 Span::call_site(),
                             )),
                             GenericArgument::Type(mock_type.ty.clone()),
-                            GenericArgument::Const(
-                                self.bool_lit_factory
-                                    .create(fn_info.parent.maybe_base_fn_block.is_some()),
-                            ),
-                            GenericArgument::Const(
-                                self.bool_lit_factory.create(mock_type.stores_mock_data),
-                            ),
+                            GenericArgument::Const(bool_lit::create(
+                                fn_info.parent.maybe_base_fn_block.is_some(),
+                            )),
+                            GenericArgument::Const(bool_lit::create(mock_type.stores_mock_data)),
                         ]
                         .into_iter()
                         .collect(),
@@ -158,9 +149,7 @@ impl MockDataStructGenerator {
                 .collect(),
             },
         });
-        let field = self
-            .field_factory
-            .create(fn_info.data_field_ident.clone(), ty);
+        let field = field::create(fn_info.data_field_ident.clone(), ty);
         return field;
     }
 }

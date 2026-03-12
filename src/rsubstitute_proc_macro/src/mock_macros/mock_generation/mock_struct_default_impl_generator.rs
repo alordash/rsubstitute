@@ -1,7 +1,6 @@
 use crate::constants;
 use crate::mock_macros::mock_generation::models::*;
 use crate::mock_macros::mock_generation::*;
-use crate::syntax::*;
 use std::sync::Arc;
 use syn::punctuated::Punctuated;
 use syn::*;
@@ -18,7 +17,6 @@ pub(crate) trait IMockStructDefaultImplGenerator {
 }
 
 pub(crate) struct MockStructDefaultImplGenerator {
-    pub type_factory: Arc<dyn ITypeFactory>,
     pub mock_constructor_block_generator: Arc<dyn IMockConstructorBlockGenerator>,
 }
 

@@ -2,7 +2,6 @@ use crate::constants;
 use crate::syntax::*;
 use proc_macro::TokenStream;
 use quote::ToTokens;
-use std::sync::Arc;
 use syn::punctuated::Punctuated;
 use syn::*;
 
@@ -10,22 +9,14 @@ pub(crate) trait IDeriveCloneForRSubstituteMacroHandler {
     fn handle(&self, item: proc_macro::TokenStream) -> proc_macro::TokenStream;
 }
 
-pub(crate) struct DeriveCloneForRSubstituteMacroHandler {
-    pub path_factory: Arc<dyn IPathFactory>,
-    pub type_factory: Arc<dyn ITypeFactory>,
-    pub field_access_expr_factory: Arc<dyn IFieldAccessExprFactory>,
-    pub expr_reference_factory: Arc<dyn IExprReferenceFactory>,
-    pub expr_method_call_factory: Arc<dyn IExprMethodCallFactory>,
-}
+pub(crate) struct DeriveCloneForRSubstituteMacroHandler;
 
 impl IDeriveCloneForRSubstituteMacroHandler for DeriveCloneForRSubstituteMacroHandler {
     fn handle(&self, item: TokenStream) -> TokenStream {
         let item_struct = parse_macro_input!(item as ItemStruct);
 
-        let trait_path = self
-            .path_factory
-            .create(constants::CLONE_TRAIT_IDENT.clone());
-        let self_ty = Box::new(self.type_factory.create_from_struct(&item_struct));
+        let trait_path = path::create(constants::CLONE_TRAIT_IDENT.clone());
+        let self_ty = Box::new(r#type::create_from_struct(&item_struct));
         let get_arg_infos_fn = self.generate_clone_fn(&item_struct);
         let item_impl = ItemImpl {
             attrs: Vec::new(),
@@ -84,16 +75,14 @@ impl DeriveCloneForRSubstituteMacroHandler {
             .ident
             .clone()
             .expect("Call struct fields should have ident.");
-        let field_clone_expr = self.expr_method_call_factory.create_with_base_receiver(
+        let field_clone_expr = expr_method_call::create_with_base_receiver(
             Expr::Paren(ExprParen {
                 attrs: Vec::new(),
                 paren_token: Default::default(),
-                expr: Box::new(
-                    self.expr_reference_factory.create(
-                        self.field_access_expr_factory
-                            .create(vec![constants::SELF_IDENT.clone(), field_ident.clone()]),
-                    ),
-                ),
+                expr: Box::new(expr_reference::create(field_access_expr::create(vec![
+                    constants::SELF_IDENT.clone(),
+                    field_ident.clone(),
+                ]))),
             }),
             Vec::new(),
             constants::CLONE_FN_IDENT.clone(),

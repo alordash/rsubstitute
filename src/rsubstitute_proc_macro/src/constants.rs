@@ -1,4 +1,3 @@
-use crate::di::SERVICES;
 use crate::syntax::*;
 use proc_macro2::{Ident, Span};
 use quote::format_ident;
@@ -27,18 +26,16 @@ define!(MOCK_RECEIVED_FIELD_IDENT, "received");
 
 define!(SELF_IDENT, "self");
 define!(SELF_EXPR, Expr, {
-    let path_factory = &SERVICES.path_factory;
     let result = Expr::Path(ExprPath {
         attrs: Vec::new(),
         qself: None,
-        path: path_factory.create(SELF_IDENT.clone()),
+        path: path::create(SELF_IDENT.clone()),
     });
     return result;
 });
 
 define!(MACRO_VEC_PATH, Path, {
-    let path_factory = &SERVICES.path_factory;
-    let result = path_factory.create(format_ident!("vec"));
+    let result = path::create(format_ident!("vec"));
     return result;
 });
 
@@ -49,15 +46,13 @@ define!(ARG_TYPE_IDENT, "Arg");
 
 pub(crate) const I_ARGS_FORMATTER_TRAIT_NAME: &'static str = "IArgsFormatter";
 define!(I_ARGS_FORMATTER_TRAIT_PATH, Path, {
-    let path_factory = &SERVICES.path_factory;
-    let result = path_factory.create(format_ident!("{I_ARGS_FORMATTER_TRAIT_NAME}"));
+    let result = path::create(format_ident!("{I_ARGS_FORMATTER_TRAIT_NAME}"));
     return result;
 });
 
 pub(crate) const I_GENERICS_HASH_KEY_PROVIDER_TRAIT_NAME: &'static str = "IGenericsHashKeyProvider";
 define!(I_GENERICS_HASH_KEY_PROVIDER_TRAIT_PATH, Path, {
-    let path_factory = &SERVICES.path_factory;
-    let result = path_factory.create(format_ident!("{I_GENERICS_HASH_KEY_PROVIDER_TRAIT_NAME}"));
+    let result = path::create(format_ident!("{I_GENERICS_HASH_KEY_PROVIDER_TRAIT_NAME}"));
     return result;
 });
 
@@ -129,12 +124,11 @@ pub(crate) const DATA_SHORT_FIELD_VALUE: LazyCell<FieldValue> = LazyCell::new(||
     expr: EMPTY_PATH_EXPR.clone(),
 });
 define!(DATA_FIELD_VALUE, FieldValue, {
-    let expr_method_call_factory = &SERVICES.expr_method_call_factory;
     let result = FieldValue {
         attrs: Vec::new(),
         member: Member::Named(DATA_IDENT.clone()),
         colon_token: Some(Default::default()),
-        expr: Expr::MethodCall(expr_method_call_factory.create(
+        expr: Expr::MethodCall(expr_method_call::create(
             vec![DATA_IDENT.clone()],
             format_ident!("clone"),
             Vec::new(),
@@ -151,9 +145,8 @@ define!(FN_TUNER_TYPE_IDENT, "FnTuner");
 
 define!(FN_VERIFIER_TYPE_IDENT, "FnVerifier");
 define!(FN_VERIFIER_NEW_FN_EXPR, Expr, {
-    let path_factory = &SERVICES.path_factory;
-    let result = path_factory
-        .create_expr_from_parts(vec![FN_VERIFIER_TYPE_IDENT.clone(), NEW_IDENT.clone()]);
+    let result =
+        path::create_expr_from_parts(vec![FN_VERIFIER_TYPE_IDENT.clone(), NEW_IDENT.clone()]);
     return result;
 });
 
@@ -240,28 +233,24 @@ define!(VOID_TYPE, Type, {
 });
 
 define!(MACRO_FORMAT_PATH, Path, {
-    let path_factory = &SERVICES.path_factory;
-    let result = path_factory.create(format_ident!("format"));
+    let result = path::create(format_ident!("format"));
     return result;
 });
 
 define!(SELF_TYPE_IDENT, "Self");
 
 define!(SELF_TYPE_PATH, Path, {
-    let path_factory = &SERVICES.path_factory;
-    let result = path_factory.create(SELF_TYPE_IDENT.clone());
+    let result = path::create(SELF_TYPE_IDENT.clone());
     return result;
 });
 
 define!(SELF_TYPE, Type, {
-    let type_factory = &SERVICES.type_factory;
-    let result = type_factory.create(SELF_TYPE_IDENT.clone());
+    let result = r#type::create(SELF_TYPE_IDENT.clone());
     return result;
 });
 
 define!(REF_SELF_TYPE, Type, {
-    let type_factory = &SERVICES.type_factory;
-    let result = type_factory.reference(
+    let result = r#type::reference(
         Type::Path(TypePath {
             qself: None,
             path: SELF_TYPE_PATH.clone(),
@@ -272,29 +261,25 @@ define!(REF_SELF_TYPE, Type, {
 });
 
 define!(STRING_TYPE, Type, {
-    let type_factory = &SERVICES.type_factory;
-    let result = type_factory.create(format_ident!("String"));
+    let result = r#type::create(format_ident!("String"));
     return result;
 });
 
 define!(VEC_OF_ARG_CHECK_RESULT_TYPE, Type, {
-    let type_factory = &SERVICES.type_factory;
-    let arg_check_result_type = type_factory.create(format_ident!("ArgCheckResult"));
-    let result = type_factory.wrap_in(arg_check_result_type, format_ident!("Vec"));
+    let arg_check_result_type = r#type::create(format_ident!("ArgCheckResult"));
+    let result = r#type::wrap_in(arg_check_result_type, format_ident!("Vec"));
     return result;
 });
 
 define!(VEC_OF_ARG_INFO_RESULT_TYPE, Type, {
-    let type_factory = &SERVICES.type_factory;
-    let arg_check_result_type = type_factory.create(format_ident!("ArgInfo"));
-    let result = type_factory.wrap_in(arg_check_result_type, format_ident!("Vec"));
+    let arg_check_result_type = r#type::create(format_ident!("ArgInfo"));
+    let result = r#type::wrap_in(arg_check_result_type, format_ident!("Vec"));
     return result;
 });
 
 define!(VEC_OF_VEC_OF_STRINGS_TYPE, Type, {
-    let type_factory = &SERVICES.type_factory;
-    let result = type_factory.wrap_in(
-        type_factory.wrap_in(STRING_TYPE.clone(), format_ident!("Vec")),
+    let result = r#type::wrap_in(
+        r#type::wrap_in(STRING_TYPE.clone(), format_ident!("Vec")),
         format_ident!("Vec"),
     );
     return result;
@@ -356,16 +341,14 @@ define!(USE_FOR_GENERATED, ItemUse, {
 
 define!(PHANTOM_DATA_IDENT, "PhantomData");
 define!(PHANTOM_DATA_EXPR_PATH, Expr, {
-    let path_factory = &SERVICES.path_factory;
-    let result = path_factory.create_expr(PHANTOM_DATA_IDENT.clone());
+    let result = path::create_expr(PHANTOM_DATA_IDENT.clone());
     return result;
 });
 
 define!(DEFAULT_ARG_LIFETIME_FIELD_IDENT, "_phantom_lifetime");
 
 define!(DEFAULT_ARG_LIFETIME_FIELD, Field, {
-    let type_factory = &SERVICES.type_factory;
-    let ty = type_factory.phantom_data_lifetime(DEFAULT_ARG_LIFETIME.clone());
+    let ty = r#type::phantom_data_lifetime(DEFAULT_ARG_LIFETIME.clone());
     let result = Field {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
@@ -410,8 +393,7 @@ define!(INTO_FN_IDENT, "into");
 define!(GET_GLOBAL_MOCK_FN_IDENT, "get_global_mock");
 
 define!(DEFAULT_TRAIT_PATH, Path, {
-    let path_factory = &SERVICES.path_factory;
-    let result = path_factory.create(format_ident!("Default"));
+    let result = path::create(format_ident!("Default"));
     return result;
 });
 
@@ -419,8 +401,7 @@ define!(DEFAULT_FN_IDENT, "default");
 define!(INNER_DATA_FIELD_IDENT, "inner_data");
 
 define!(DEREF_TRAIT_PATH, Path, {
-    let path_factory = &SERVICES.path_factory;
-    let result = path_factory.create(format_ident!("Deref"));
+    let result = path::create(format_ident!("Deref"));
     return result;
 });
 define!(DEREF_TARGET_TYPE_IDENT, "Target");
@@ -454,8 +435,7 @@ define!(MUT_VOID_PTR_TYPE, Type, {
 });
 
 define!(DYN_CALL_REF_TYPE, Type, {
-    let type_factory = &SERVICES.type_factory;
-    let result = type_factory.reference(type_factory.create(format_ident!("DynCall")), None);
+    let result = r#type::reference(r#type::create(format_ident!("DynCall")), None);
     return result;
 });
 define!(DYN_CALL_DOWNCAST_REF_FN_IDENT, "downcast_ref");
@@ -470,19 +450,15 @@ pub(crate) const BASE_FN_IDENT_PREFIX: &'static str = "base";
 
 define!(BOX_IDENT, "Box");
 define!(BOX_NEW_EXPR, Expr, {
-    let path_factory = &SERVICES.path_factory;
-    let result = path_factory.create_expr_from_parts(vec![BOX_IDENT.clone(), NEW_IDENT.clone()]);
+    let result = path::create_expr_from_parts(vec![BOX_IDENT.clone(), NEW_IDENT.clone()]);
     return result;
 });
 define!(BOX_LEAK_EXPR, Expr, {
-    let path_factory = &SERVICES.path_factory;
-    let result =
-        path_factory.create_expr_from_parts(vec![BOX_IDENT.clone(), format_ident!("leak")]);
+    let result = path::create_expr_from_parts(vec![BOX_IDENT.clone(), format_ident!("leak")]);
     return result;
 });
 
 define!(TRANSMUTE_LIFETIME_MACRO_PATH, Path, {
-    let path_factory = &SERVICES.path_factory;
-    let result = path_factory.create(format_ident!("transmute_lifetime"));
+    let result = path::create(format_ident!("transmute_lifetime"));
     return result;
 });
