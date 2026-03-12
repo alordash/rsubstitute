@@ -61,20 +61,35 @@ mod tests {
         #[test]
         fn accept_ref_Ok() {
             // Arrange
-            let r = &1;
+            let r = &12;
 
-            // TODO - what will happen?
+            // What will happen?
+            // Tested - received_r2 is replaced with latest value in stack, in this example it's `12` from first element in `some_data` array.
+            // TODO - add API for calls inspection
             {
                 let v2 = 24;
                 let r2 = &v2;
-                accept_ref::setup(r2).does(|_| {});
+                accept_ref::setup(r2)
+                    .does(|(ref received_r2,)| println!("received_r2 = {received_r2}"));
+                accept_ref(r2);
             }
+
+            let some_data = [12, 22, 32, 42, 52, 62, 72, 82, 92, 102];
+            println!("some_data = {some_data:?}");
 
             // Act
             accept_ref(r);
 
             // Assert
-            accept_ref::received(r, Times::Once).no_other_calls();
+            accept_ref::received(r, Times::Once)
+                .received(
+                    Arg::is(|ref received_r2| {
+                        println!("checking received, received_r2 = {received_r2}");
+                        return true;
+                    }),
+                    Times::Exactly(2),
+                )
+                .no_other_calls();
         }
 
         #[test]
