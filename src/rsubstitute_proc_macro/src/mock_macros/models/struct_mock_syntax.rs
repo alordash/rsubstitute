@@ -1,4 +1,3 @@
-use crate::di::SERVICES;
 use crate::mock_macros::models::*;
 use quote::ToTokens;
 use std::fmt::{Debug, Formatter};
@@ -15,8 +14,7 @@ pub(crate) struct StructMockSyntax {
 
 impl Parse for StructMockSyntax {
     fn parse(input: ParseStream) -> Result<Self> {
-        let struct_mock_syntax_parser = &SERVICES.struct_mock_syntax_parser;
-        return struct_mock_syntax_parser.parse(input);
+        return crate::mock_macros::struct_mock_syntax::parse(input);
     }
 }
 

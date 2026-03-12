@@ -1,7 +1,3 @@
-mod item_fn_handler;
-mod item_trait_handler;
-mod struct_mock_handler;
-
-pub(crate) use item_fn_handler::*;
-pub(crate) use item_trait_handler::*;
-pub(crate) use struct_mock_handler::*;
+pub(crate) mod item_fn;
+pub(crate) mod item_trait;
+pub(crate) mod struct_mock;
