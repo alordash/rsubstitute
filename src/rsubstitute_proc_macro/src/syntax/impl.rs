@@ -1,4 +1,4 @@
-use crate::mock_macros::mock_generation::models::*;
+use crate::mock_generation::mock_parts_generation::models::*;
 use syn::*;
 
 pub(crate) fn create_with_default_lifetime(

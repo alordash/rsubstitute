@@ -1,5 +1,6 @@
 #![allow(clippy::needless_return)]
-use crate::mock_macros::*;
+use crate::mock_generation::parameters::*;
+use crate::mock_generation::*;
 
 mod constants;
 mod derive_args_formatter_macro;
@@ -8,7 +9,7 @@ mod derive_args_tuple_provider_macro;
 mod derive_clone_for_rsubstitute_macro;
 mod derive_generics_hash_key_provider_macro;
 mod derive_mock_data_macro;
-mod mock_macros;
+mod mock_generation;
 mod syntax;
 
 #[proc_macro_attribute]

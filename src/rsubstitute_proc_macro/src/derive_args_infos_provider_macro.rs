@@ -1,5 +1,5 @@
 use crate::constants;
-use crate::mock_macros::mock_generation::*;
+use crate::mock_generation::mock_parts_generation::*;
 use crate::syntax::*;
 use proc_macro::TokenStream;
 use proc_macro2::{Ident, Span};

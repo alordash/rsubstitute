@@ -20,4 +20,4 @@ pub(crate) mod r#type;
 
 mod field_required_ident_extension;
 
-pub use field_required_ident_extension::*;
+pub(crate) use field_required_ident_extension::*;

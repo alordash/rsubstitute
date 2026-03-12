@@ -1,0 +1,124 @@
+use crate::mock_generation::fn_info_generation::models::*;
+use crate::mock_generation::mock_parts_generation::models::*;
+use crate::mock_generation::mock_parts_generation::*;
+use crate::syntax::*;
+use proc_macro2::Ident;
+use syn::*;
+
+pub(crate) fn generate(
+    trait_ident: Ident,
+    mock_type: &MockType,
+    fn_infos: &[FnInfo],
+) -> MockPayloadImpl {
+    let trait_path =
+        path::create_with_generics(trait_ident, mock_type.generics.source_generics.clone());
+
+    let mock_impl = generate_core(
+        Vec::new(),
+        mock_type.ty.clone(),
+        mock_type.generics.impl_generics.clone(),
+        fn_infos,
+        Some(trait_path),
+        None,
+    );
+    return mock_impl;
+}
+
+pub(crate) fn generate_for_struct_trait(
+    trait_ident: Ident,
+    mock_type: &MockType,
+    fn_infos: &[FnInfo],
+    containing_trait_ident: &Ident,
+) -> MockPayloadImpl {
+    let trait_path =
+        path::create_with_generics(trait_ident, mock_type.generics.source_generics.clone());
+
+    let mock_impl = generate_core(
+        Vec::new(),
+        mock_type.ty.clone(),
+        mock_type.generics.impl_generics.clone(),
+        fn_infos,
+        Some(trait_path),
+        Some(containing_trait_ident),
+    );
+    return mock_impl;
+}
+
+pub(crate) fn generate_for_struct(
+    attrs: Vec<Attribute>,
+    mock_type: &MockType,
+    fn_infos: &[FnInfo],
+) -> MockPayloadImpl {
+    let mock_impl = generate_core(
+        attrs,
+        mock_type.ty.clone(),
+        mock_type.generics.impl_generics.clone(),
+        fn_infos,
+        None,
+        None,
+    );
+    return mock_impl;
+}
+
+fn generate_core(
+    attrs: Vec<Attribute>,
+    self_ty: Type,
+    generics: Generics,
+    fn_infos: &[FnInfo],
+    maybe_trait_path: Option<Path>,
+    maybe_containing_trait_ident: Option<&Ident>,
+) -> MockPayloadImpl {
+    let items = fn_infos
+        .iter()
+        .map(|x| generate_impl_item_fn(x, maybe_containing_trait_ident))
+        .map(ImplItem::Fn)
+        .collect();
+    let trait_ = maybe_trait_path.map(|trait_path| (None, trait_path, Default::default()));
+
+    let item_impl = ItemImpl {
+        attrs,
+        defaultness: None,
+        unsafety: None,
+        impl_token: Default::default(),
+        generics,
+        trait_,
+        self_ty: Box::new(self_ty),
+        brace_token: Default::default(),
+        items,
+    };
+    let mock_impl = MockPayloadImpl { item_impl };
+    return mock_impl;
+}
+
+fn generate_impl_item_fn(
+    fn_info: &FnInfo,
+    maybe_containing_trait_ident: Option<&Ident>,
+) -> ImplItemFn {
+    let sig = Signature {
+        constness: None,
+        asyncness: None,
+        unsafety: None,
+        abi: None,
+        fn_token: Default::default(),
+        ident: fn_info.parent.fn_ident.clone(),
+        generics: fn_info.parent.own_generics.clone(),
+        paren_token: Default::default(),
+        inputs: mock_fn_inputs::generate(&fn_info.parent.arguments),
+        variadic: None,
+        output: fn_info.parent.return_value.clone(),
+    };
+    let block = match maybe_containing_trait_ident {
+        None => mock_fn_block::generate_for_trait(fn_info),
+        Some(containing_trait_ident) => {
+            mock_fn_block::generate_for_struct_trait_fn(fn_info, containing_trait_ident)
+        }
+    };
+    let impl_item_fn = ImplItemFn {
+        attrs: fn_info.parent.attrs.clone(),
+        vis: fn_info.parent.visibility.clone(),
+        defaultness: None,
+        sig,
+        block,
+    };
+    return impl_item_fn;
+}
