@@ -1,6 +1,6 @@
 /// This is marker macro used to transmute ONLY lifetimes.
-/// `Src` and `Dst` passed to [`core::mem::transmute`] from this macro must always have same type
-/// differing only in lifetime, e.g. `Src: 'a, Dst: 'b`.
+/// `Src` and `Dst` passed to [`core::mem::transmute`] from this macro must always have the same
+/// type differing only in lifetime, e.g. `Src: 'a, Dst: 'b`.
 ///
 /// This macro is used to verify that transmutations in this crate are only used to convert lifetimes.
 ///
@@ -11,16 +11,16 @@
 /// that corresponds to mock object lifetime.
 ///
 /// In order to keep source lifetime constraints as is in mocked traits/structs/functions and to use
-/// [`DEFAULT_ARG_LIFETIME`] internally lifetimes transmutation is used. Without it a trait
-/// `trait Trait { fn work<'a>(&'a self) -> &'a i32; }` will/ have in its mock extra generic
+/// [`DEFAULT_ARG_LIFETIME`] internally, lifetimes transmutation is used. Without it a trait
+/// `trait Trait { fn work<'a>(&'a self) -> &'a i32; }` will have in its mock extra generic
 /// constraint: `trait Trait<'rs> { fn work<'a: 'rs>(&'a self) -> &'a i32; }`
 ///
 /// For user it means that you just should keep your arguments alive for the duration of mock object.
 /// Not doing so will result in Undefined Behaviour as mock object will try to check whether given
-/// argument is suitable for some configuration. If this argument was a reference to value that was
-/// dropped, checker function will get a dangling reference.
+/// argument is suitable for some configuration. If this argument was a reference to a value that
+/// was dropped, checker function will get a dangling reference.
 ///
-/// This leads to UB:
+/// For example, this leads to UB:
 /// ```ignore
 /// let mock = Mock::new();
 /// {
