@@ -2,8 +2,6 @@ use crate::mock_generation::fn_info_generation::models::*;
 use crate::mock_generation::fn_info_generation::*;
 use crate::mock_generation::mock_parts_generation::models::*;
 use crate::mock_generation::models::*;
-use proc_macro2::Ident;
-use quote::format_ident;
 
 pub(crate) fn generate(ctx: &Ctx, fn_decl: FnDecl, mock_type: &MockType) -> FnInfo {
     let call_struct = call_struct::generate(ctx, &fn_decl, &mock_type.generics);

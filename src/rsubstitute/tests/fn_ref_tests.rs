@@ -63,8 +63,6 @@ mod tests {
             // Arrange
             let r = &12;
 
-            // What will happen?
-            // Tested - received_r2 is replaced with latest value in stack, in this example it's `12` from first element in `some_data` array.
             // TODO - add API for calls inspection
             {
                 let v2 = 24;
@@ -74,7 +72,7 @@ mod tests {
                 accept_ref(r2);
             }
 
-            let some_data = [12, 22, 32, 42, 52, 62, 72, 82, 92, 102];
+            let some_data = [15, 22, 32, 42, 52, 62, 72, 82, 92, 102];
             println!("some_data = {some_data:?}");
 
             // Act
