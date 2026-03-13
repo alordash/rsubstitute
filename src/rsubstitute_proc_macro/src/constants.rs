@@ -406,9 +406,24 @@ pub(crate) const DEFAULT_ARG_LIFETIME_NAME: &'static str = "__rs";
 define!(
     DEFAULT_ARG_LIFETIME,
     Lifetime,
-    Lifetime {
-        apostrophe: Span::call_site(),
-        ident: format_ident!("{DEFAULT_ARG_LIFETIME_NAME}"),
+    Lifetime::new(&format!("'{DEFAULT_ARG_LIFETIME_NAME}"), Span::call_site())
+);
+
+pub(crate) const PLACEHOLDER_LIFETIME_NAME: &'static str = "__rsa";
+ident!(PLACEHOLDER_LIFETIME_IDENT, PLACEHOLDER_LIFETIME_NAME);
+define!(
+    PLACEHOLDER_LIFETIME,
+    Lifetime,
+    Lifetime::new(&format!("'{PLACEHOLDER_LIFETIME_NAME}"), Span::call_site())
+);
+define!(
+    PLACEHOLDER_LIFETIME_PARAM,
+    LifetimeParam,
+    LifetimeParam {
+        attrs: Vec::new(),
+        lifetime: PLACEHOLDER_LIFETIME.clone(),
+        colon_token: None,
+        bounds: Punctuated::new()
     }
 );
 

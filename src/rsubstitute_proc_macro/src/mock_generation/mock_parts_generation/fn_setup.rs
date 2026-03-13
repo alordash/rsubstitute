@@ -14,6 +14,8 @@ pub(crate) fn generate(
     mock_type: &MockType,
 ) -> ItemFn {
     let output_type = setup_output::generate_for_static(mock_type, fn_info, mock_setup_struct);
+    let mut generics = mock_type.generics.impl_generics.clone();
+    generics = generics.with_head_lifetime_param(constants::PLACEHOLDER_LIFETIME_PARAM.clone());
     let sig = Signature {
         constness: None,
         asyncness: None,
@@ -21,7 +23,7 @@ pub(crate) fn generate(
         abi: None,
         fn_token: Default::default(),
         ident: constants::MOCK_SETUP_FIELD_IDENT.clone(),
-        generics: mock_type.generics.impl_generics.clone(),
+        generics,
         paren_token: Default::default(),
         inputs: input_args::generate_input_args_with_static_lifetimes(
             fn_info,

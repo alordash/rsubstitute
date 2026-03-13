@@ -1,7 +1,7 @@
 use rsubstitute_proc_macro::mock;
 use std::marker::PhantomData;
 
-#[derive(Default)]
+#[derive(Default, Debug)]
 struct Data<'a, 'b, T1, T2> {
     _phantoms: (
         PhantomData<&'a ()>,
@@ -25,6 +25,19 @@ trait Trait<'a, 'b: 'a> {
         cdxdcx: &'c &'d &&'d &'c &i32,
         abcd: &'a &'b &'c &'d i32,
         xaxbxcxdx: &&'a &&'b &&'c &&'d &i32,
-        data: Data<'a, 'b, &&i32, &&'a &&'b &[&'c &&'b &Data<'c, 'a, &&&'c &i32, Vec<&'d &'b& ()>>]>,
+        data: Data<
+            'a,
+            'b,
+            &&i32,
+            &&'a &&'b &[&'c &&'b &Data<'c, 'a, &&&'c &i32, Vec<&'d &'b &()>>],
+        >,
     );
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn compiles() {}
 }

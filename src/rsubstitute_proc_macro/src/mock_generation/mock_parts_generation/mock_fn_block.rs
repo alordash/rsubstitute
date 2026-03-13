@@ -77,10 +77,11 @@ fn generate_call_stmt(fn_info: &FnInfo) -> Stmt {
         panic!("Call struct should have default lifetime as first generics parameter");
     };
     first_lifetime_param.lifetime = constants::ANONYMOUS_LIFETIME.clone();
-    let call_struct_type = r#type::create_with_generics(
+    let mut call_struct_type = r#type::create_with_generics(
         fn_info.call_struct.item_struct.ident.clone(),
         call_struct_type_generics,
     );
+    reference::set_all_lifetimes(&mut call_struct_type, &constants::ANONYMOUS_LIFETIME.clone());
     let call_stmt = Stmt::Local(local::create_with_type(
         CALL_VARIABLE_IDENT.clone(),
         call_struct_type,

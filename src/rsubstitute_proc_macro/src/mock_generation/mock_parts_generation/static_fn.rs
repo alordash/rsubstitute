@@ -6,16 +6,7 @@ use syn::punctuated::Punctuated;
 use syn::*;
 
 pub(crate) fn generate(fn_info: &FnInfo, mock_type: &MockType) -> StaticFn {
-    let mut generics = mock_type.generics.impl_generics.clone();
-    generics.params.insert(
-        0,
-        GenericParam::Lifetime(LifetimeParam {
-            attrs: Vec::new(),
-            lifetime: constants::ANONYMOUS_LIFETIME.clone(),
-            colon_token: Default::default(),
-            bounds: Punctuated::new(),
-        }),
-    );
+    let generics = mock_type.generics.impl_generics.clone();
     let sig = Signature {
         constness: None,
         asyncness: None,

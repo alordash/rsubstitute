@@ -62,8 +62,7 @@ fn generate_fn_setup(
         Target::Trait => fn_info.parent.own_generics.clone(),
         Target::Static => Default::default(),
     };
-    generics = generics.with_head_param(constants::ANONYMOUS_LIFETIME_GENERIC_ARGUMENT.clone());
-    let anonymize_normal_lifetimes = true;
+    generics = generics.with_head_lifetime_param(constants::PLACEHOLDER_LIFETIME_PARAM.clone());
     let sig = Signature {
         constness: None,
         asyncness: None,
@@ -83,7 +82,6 @@ fn generate_fn_setup(
                     .parent
                     .get_internal_phantom_types_count_without_return_type()
                     + mock_type.generics.get_phantom_fields_count(),
-                anonymize_normal_lifetimes,
             ))
             .collect(),
         variadic: None,

@@ -73,16 +73,14 @@ mod tests {
 
         // Act
         let temporary_value = 5;
+        mock.setup
+            .work(&temporary_value)
+            .does(|_| println!("amogus"));
         mock.work(&temporary_value);
 
         // Assert
         mock.received
-            .work(
-                Arg::is(|reference: &&i32| {
-                    return **reference == temporary_value;
-                }),
-                Times::Once,
-            )
+            .work(&temporary_value, Times::Once)
             .no_other_calls();
     }
 }

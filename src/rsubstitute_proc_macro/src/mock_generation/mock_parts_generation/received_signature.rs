@@ -71,14 +71,12 @@ fn generate(
         colon_token: Default::default(),
         ty: Box::new(r#type::create(TIMES_TYPE_IDENT.clone())),
     });
-    let anonymize_normal_lifetimes = true;
     let mut inputs: Vec<_> = input_args::generate_input_args(
         fn_info,
         fn_info
             .parent
             .get_internal_phantom_types_count_without_return_type()
             + mock_type.generics.get_phantom_fields_count(),
-        anonymize_normal_lifetimes,
     )
     .into_iter()
     .chain(iter::once(times_arg))
@@ -93,7 +91,7 @@ fn generate(
         OutputTypeGenerics::UseMock => mock_type.generics.impl_generics.clone(),
         OutputTypeGenerics::DoNotUse => Default::default(),
     };
-    generics = generics.with_head_param(constants::ANONYMOUS_LIFETIME_GENERIC_ARGUMENT.clone());
+    generics = generics.with_head_lifetime_param(constants::PLACEHOLDER_LIFETIME_PARAM.clone());
     let signature = Signature {
         constness: None,
         asyncness: None,

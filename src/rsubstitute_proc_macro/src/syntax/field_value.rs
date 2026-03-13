@@ -3,17 +3,19 @@ use crate::syntax::extensions::IFieldExtensions;
 use crate::syntax::*;
 use syn::*;
 
-pub(crate) fn create_with_into_conversion(field: &Field) -> FieldValue {
+pub(crate) fn create_with_lifetime_and_into_conversion(field: &Field) -> FieldValue {
     let field_ident = field.get_required_ident();
+    let into_call = Expr::MethodCall(expr_method_call::create(
+        vec![field_ident.clone()],
+        constants::INTO_FN_IDENT.clone(),
+        Vec::new(),
+    ));
+    let transmute_lifetime_macro = transmute_lifetime_expr::create_for_expr(into_call);
     let field_value = FieldValue {
         attrs: Vec::new(),
-        member: Member::Named(field_ident.clone()),
+        member: Member::Named(field_ident),
         colon_token: Some(Default::default()),
-        expr: Expr::MethodCall(expr_method_call::create(
-            vec![field_ident],
-            constants::INTO_FN_IDENT.clone(),
-            Vec::new(),
-        )),
+        expr: transmute_lifetime_macro,
     };
 
     return field_value;
