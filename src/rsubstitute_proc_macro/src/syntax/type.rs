@@ -9,15 +9,22 @@ pub(crate) fn create(ident: Ident) -> Type {
     return result;
 }
 
-pub(crate) fn create_with_generics(ident: Ident, generics: Generics) -> Type {
+pub(crate) fn create_with_generics_path(ident: Ident, generics: Generics) -> TypePath {
     let path = path::create_with_generics(ident, generics);
-    let result = Type::Path(TypePath { qself: None, path });
+    let result = TypePath { qself: None, path };
     return result;
 }
 
+pub(crate) fn create_with_generics(ident: Ident, generics: Generics) -> Type {
+    Type::Path(create_with_generics_path(ident, generics))
+}
+
+pub(crate) fn create_from_struct_path(item_struct: &ItemStruct) -> TypePath {
+    create_with_generics_path(item_struct.ident.clone(), item_struct.generics.clone())
+}
+
 pub(crate) fn create_from_struct(item_struct: &ItemStruct) -> Type {
-    let result = create_with_generics(item_struct.ident.clone(), item_struct.generics.clone());
-    return result;
+    Type::Path(create_from_struct_path(item_struct))
 }
 
 pub(crate) fn wrap_in(ty: Type, wrapper: Ident) -> Type {

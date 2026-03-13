@@ -7,78 +7,86 @@ use std::iter::{IntoIterator, Iterator};
 use syn::punctuated::Punctuated;
 use syn::*;
 
-macro_rules! define {
-    // For idents
+macro_rules! ident {
     ($symbol:ident, $value:literal) => {
         pub(crate) const $symbol: LazyCell<Ident> = LazyCell::new(|| format_ident!($value));
     };
-
-    // For everything else
-    ($symbol:ident, $ty:ty, $block:block) => {
-        pub(crate) const $symbol: LazyCell<$ty> = LazyCell::new(|| $block);
+    ($symbol:ident, $value_ident:ident) => {
+        pub(crate) const $symbol: LazyCell<Ident> =
+            LazyCell::new(|| format_ident!("{}", $value_ident));
     };
 }
 
-define!(DATA_IDENT, "data");
-pub(crate) const MOCK_STRUCT_IDENT_PREFIX: &'static str = "Mock";
-define!(MOCK_SETUP_FIELD_IDENT, "setup");
-define!(MOCK_RECEIVED_FIELD_IDENT, "received");
+macro_rules! define {
+    ($symbol:ident, $ty:ty, $expr:expr) => {
+        pub(crate) const $symbol: LazyCell<$ty> = LazyCell::new(|| $expr);
+    };
+}
 
-define!(SELF_IDENT, "self");
-define!(SELF_EXPR, Expr, {
-    let result = Expr::Path(ExprPath {
+ident!(DATA_IDENT, "data");
+pub(crate) const MOCK_STRUCT_IDENT_PREFIX: &'static str = "Mock";
+ident!(MOCK_SETUP_FIELD_IDENT, "setup");
+ident!(MOCK_RECEIVED_FIELD_IDENT, "received");
+
+ident!(SELF_IDENT, "self");
+define!(
+    SELF_EXPR,
+    Expr,
+    Expr::Path(ExprPath {
         attrs: Vec::new(),
         qself: None,
         path: path::create(SELF_IDENT.clone()),
-    });
-    return result;
-});
+    })
+);
 
-define!(MACRO_VEC_PATH, Path, {
-    let result = path::create(format_ident!("vec"));
-    return result;
-});
+define!(MACRO_VEC_PATH, Path, path::create(format_ident!("vec")));
 
-define!(SUPER_IDENT, "super");
-define!(FOR_GENERATED_IDENT, "for_generated");
-define!(CRATE_IDENT, "rsubstitute");
-define!(ARG_TYPE_IDENT, "Arg");
+ident!(SUPER_IDENT, "super");
+ident!(FOR_GENERATED_IDENT, "for_generated");
+ident!(CRATE_IDENT, "rsubstitute");
+ident!(ARG_TYPE_IDENT, "Arg");
 
 pub(crate) const I_ARGS_FORMATTER_TRAIT_NAME: &'static str = "IArgsFormatter";
-define!(I_ARGS_FORMATTER_TRAIT_PATH, Path, {
-    let result = path::create(format_ident!("{I_ARGS_FORMATTER_TRAIT_NAME}"));
-    return result;
-});
+define!(
+    I_ARGS_FORMATTER_TRAIT_PATH,
+    Path,
+    path::create(format_ident!("{I_ARGS_FORMATTER_TRAIT_NAME}"))
+);
 
 pub(crate) const I_GENERICS_HASH_KEY_PROVIDER_TRAIT_NAME: &'static str = "IGenericsHashKeyProvider";
-define!(I_GENERICS_HASH_KEY_PROVIDER_TRAIT_PATH, Path, {
-    let result = path::create(format_ident!("{I_GENERICS_HASH_KEY_PROVIDER_TRAIT_NAME}"));
-    return result;
-});
+define!(
+    I_GENERICS_HASH_KEY_PROVIDER_TRAIT_PATH,
+    Path,
+    path::create(format_ident!("{I_GENERICS_HASH_KEY_PROVIDER_TRAIT_NAME}"))
+);
 
 pub(crate) const CLONE_FOR_RSUBSTITUTE_TRAIT_NAME: &'static str = "CloneForRSubstitute";
-define!(DERIVE_CLONE_FOR_RSUBSTITUTE_ATTRIBUTE, Attribute, {
-    let result = attribute::create(DERIVE_IDENT.clone(), CLONE_FOR_RSUBSTITUTE_TRAIT_NAME);
-    return result;
-});
+define!(
+    DERIVE_CLONE_FOR_RSUBSTITUTE_ATTRIBUTE,
+    Attribute,
+    attribute::create(DERIVE_IDENT.clone(), CLONE_FOR_RSUBSTITUTE_TRAIT_NAME)
+);
 
-define!(I_ARGS_FORMATTER_FN_IDENT, "fmt_args");
-define!(I_ARGS_CHECKER_TRAIT_IDENT, "IArgsChecker");
+ident!(I_ARGS_FORMATTER_FN_IDENT, "fmt_args");
+ident!(I_ARGS_CHECKER_TRAIT_IDENT, "IArgsChecker");
 
 pub(crate) const I_ARGS_INFOS_PROVIDER_TRAIT_NAME: &'static str = "IArgsInfosProvider";
-pub(crate) const I_ARGS_INFOS_PROVIDER_TRAIT_IDENT: LazyCell<Ident> =
-    LazyCell::new(|| format_ident!("{I_ARGS_INFOS_PROVIDER_TRAIT_NAME}"));
+ident!(
+    I_ARGS_INFOS_PROVIDER_TRAIT_IDENT,
+    I_ARGS_INFOS_PROVIDER_TRAIT_NAME
+);
 
 pub(crate) const I_ARGS_TUPLE_PROVIDER_TRAIT_NAME: &'static str = "IArgsTupleProvider";
-pub(crate) const I_ARGS_TUPLE_PROVIDER_TRAIT_IDENT: LazyCell<Ident> =
-    LazyCell::new(|| format_ident!("{I_ARGS_TUPLE_PROVIDER_TRAIT_NAME}"));
+ident!(
+    I_ARGS_TUPLE_PROVIDER_TRAIT_IDENT,
+    I_ARGS_TUPLE_PROVIDER_TRAIT_NAME
+);
 
-define!(I_MOCK_DATA_TRAIT_IDENT, "IMockData");
-
-pub(crate) const I_MOCK_DATA_GET_RECEIVED_NOTHING_ELSE_ERROR_MSGS_FN_SIGNATURE: LazyCell<
+ident!(I_MOCK_DATA_TRAIT_IDENT, "IMockData");
+define!(
+    I_MOCK_DATA_GET_RECEIVED_NOTHING_ELSE_ERROR_MSGS_FN_SIGNATURE,
     Signature,
-> = LazyCell::new(|| {
-    let signature = Signature {
+    Signature {
         constness: None,
         asyncness: None,
         unsafety: None,
@@ -93,18 +101,19 @@ pub(crate) const I_MOCK_DATA_GET_RECEIVED_NOTHING_ELSE_ERROR_MSGS_FN_SIGNATURE: 
             Default::default(),
             Box::new(VEC_OF_VEC_OF_STRINGS_TYPE.clone()),
         ),
-    };
-    return signature;
-});
+    }
+);
 
-define!(FN_DATA_TYPE_IDENT, "FnData");
+ident!(FN_DATA_TYPE_IDENT, "FnData");
 
-define!(NEW_IDENT, "new");
+ident!(NEW_IDENT, "new");
 
-pub(crate) const SETUP_MEMBER: LazyCell<Member> =
-    LazyCell::new(|| Member::Named(format_ident!("setup")));
-pub(crate) const RECEIVED_MEMBER: LazyCell<Member> =
-    LazyCell::new(|| Member::Named(format_ident!("received")));
+define!(SETUP_MEMBER, Member, Member::Named(format_ident!("setup")));
+define!(
+    RECEIVED_MEMBER,
+    Member,
+    Member::Named(format_ident!("received"))
+);
 
 define!(EMPTY_PATH_EXPR, Expr, {
     Expr::Path(ExprPath {
@@ -117,14 +126,21 @@ define!(EMPTY_PATH_EXPR, Expr, {
     })
 });
 
-pub(crate) const DATA_SHORT_FIELD_VALUE: LazyCell<FieldValue> = LazyCell::new(|| FieldValue {
-    attrs: Vec::new(),
-    member: Member::Named(DATA_IDENT.clone()),
-    colon_token: None,
-    expr: EMPTY_PATH_EXPR.clone(),
-});
-define!(DATA_FIELD_VALUE, FieldValue, {
-    let result = FieldValue {
+define!(
+    DATA_SHORT_FIELD_VALUE,
+    FieldValue,
+    FieldValue {
+        attrs: Vec::new(),
+        member: Member::Named(DATA_IDENT.clone()),
+        colon_token: None,
+        expr: EMPTY_PATH_EXPR.clone(),
+    }
+);
+
+define!(
+    DATA_FIELD_VALUE,
+    FieldValue,
+    FieldValue {
         attrs: Vec::new(),
         member: Member::Named(DATA_IDENT.clone()),
         colon_token: Some(Default::default()),
@@ -133,57 +149,62 @@ define!(DATA_FIELD_VALUE, FieldValue, {
             format_ident!("clone"),
             Vec::new(),
         )),
-    };
-    return result;
-});
+    }
+);
 
-define!(FN_DATA_ADD_CONFIG_FN_IDENT, "add_config");
+ident!(FN_DATA_ADD_CONFIG_FN_IDENT, "add_config");
 
-define!(FN_DATA_VERIFY_RECEIVED_FN_IDENT, "verify_received");
+ident!(FN_DATA_VERIFY_RECEIVED_FN_IDENT, "verify_received");
 
-define!(FN_TUNER_TYPE_IDENT, "FnTuner");
+ident!(FN_TUNER_TYPE_IDENT, "FnTuner");
 
-define!(FN_VERIFIER_TYPE_IDENT, "FnVerifier");
-define!(FN_VERIFIER_NEW_FN_EXPR, Expr, {
-    let result =
-        path::create_expr_from_parts(vec![FN_VERIFIER_TYPE_IDENT.clone(), NEW_IDENT.clone()]);
-    return result;
-});
+ident!(FN_VERIFIER_TYPE_IDENT, "FnVerifier");
+define!(
+    FN_VERIFIER_NEW_FN_EXPR,
+    Expr,
+    path::create_expr_from_parts(vec![FN_VERIFIER_TYPE_IDENT.clone(), NEW_IDENT.clone()])
+);
 
-define!(ALLOW_IDENT, "allow");
+ident!(ALLOW_IDENT, "allow");
 
-define!(ALLOW_UNUSED_ATTRIBUTE, Attribute, {
-    let result = attribute::create(ALLOW_IDENT.clone(), "unused");
-    return result;
-});
+define!(
+    ALLOW_UNUSED_ATTRIBUTE,
+    Attribute,
+    attribute::create(ALLOW_IDENT.clone(), "unused")
+);
 
-define!(ALLOW_UNUSED_PARENS_ATTRIBUTE, Attribute, {
-    let result = attribute::create(ALLOW_IDENT.clone(), "unused_parens");
-    return result;
-});
+define!(
+    ALLOW_UNUSED_PARENS_ATTRIBUTE,
+    Attribute,
+    attribute::create(ALLOW_IDENT.clone(), "unused_parens")
+);
 
-define!(ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE, Attribute, {
-    let result = attribute::create(ALLOW_IDENT.clone(), "mismatched_lifetime_syntaxes");
-    return result;
-});
+define!(
+    ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE,
+    Attribute,
+    attribute::create(ALLOW_IDENT.clone(), "mismatched_lifetime_syntaxes")
+);
 
-define!(ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE, Attribute, {
-    let result = attribute::create(ALLOW_IDENT.clone(), "non_camel_case_types");
-    return result;
-});
+define!(
+    ALLOW_NON_CAMEL_CASE_TYPES_ATTRIBUTE,
+    Attribute,
+    attribute::create(ALLOW_IDENT.clone(), "non_camel_case_types")
+);
 
-define!(ALLOW_NON_SNAKE_CASE_ATTRIBUTE, Attribute, {
-    let result = attribute::create(ALLOW_IDENT.clone(), "non_snake_case");
-    return result;
-});
+define!(
+    ALLOW_NON_SNAKE_CASE_ATTRIBUTE,
+    Attribute,
+    attribute::create(ALLOW_IDENT.clone(), "non_snake_case")
+);
 
 pub(crate) const DEBUG_TRAIT_NAME: &'static str = "Debug";
 
 pub(crate) const CLONE_TRAIT_STR: &'static str = "Clone";
-pub(crate) const CLONE_TRAIT_IDENT: LazyCell<Ident> =
-    LazyCell::new(|| format_ident!("{CLONE_TRAIT_STR}"));
-define!(CLONE_FN_SIGNATURE, Signature, {
-    let signature = Signature {
+ident!(CLONE_TRAIT_IDENT, CLONE_TRAIT_STR);
+define!(
+    CLONE_FN_SIGNATURE,
+    Signature,
+    Signature {
         constness: None,
         asyncness: None,
         unsafety: None,
@@ -195,112 +216,116 @@ define!(CLONE_FN_SIGNATURE, Signature, {
         inputs: [REF_SELF_ARG.clone()].into_iter().collect(),
         variadic: None,
         output: ReturnType::Type(Default::default(), Box::new(SELF_TYPE.clone())),
-    };
-    return signature;
-});
+    }
+);
 
-define!(DERIVE_IDENT, "derive");
+ident!(DERIVE_IDENT, "derive");
 
-define!(DERIVE_MOCK_DATA_ATTRIBUTE, Attribute, {
-    let result = attribute::create(DERIVE_IDENT.clone(), &I_MOCK_DATA_TRAIT_IDENT.to_string());
-    return result;
-});
+define!(
+    DERIVE_MOCK_DATA_ATTRIBUTE,
+    Attribute,
+    attribute::create(DERIVE_IDENT.clone(), &I_MOCK_DATA_TRAIT_IDENT.to_string())
+);
 
-define!(DOC_HIDDEN_ATTRIBUTE, Attribute, {
-    let ident = format_ident!("doc");
-    let result = attribute::create(ident, "hidden");
-    return result;
-});
+define!(
+    DOC_HIDDEN_ATTRIBUTE,
+    Attribute,
+    attribute::create(format_ident!("doc"), "hidden")
+);
 
-define!(CFG_TEST_ATTRIBUTE, Attribute, {
-    let ident = format_ident!("cfg");
-    let result = attribute::create(ident, "test");
-    return result;
-});
+define!(
+    CFG_TEST_ATTRIBUTE,
+    Attribute,
+    attribute::create(format_ident!("cfg"), "test")
+);
 
-define!(CFG_NOT_TEST_ATTRIBUTE, Attribute, {
-    let ident = format_ident!("cfg");
-    let result = attribute::create(ident, "not(test)");
-    return result;
-});
+define!(
+    CFG_NOT_TEST_ATTRIBUTE,
+    Attribute,
+    attribute::create(format_ident!("cfg"), "not(test)")
+);
 
-define!(VOID_TYPE, Type, {
-    let result = Type::Tuple(TypeTuple {
+define!(
+    VOID_TYPE,
+    Type,
+    Type::Tuple(TypeTuple {
         paren_token: Default::default(),
         elems: Punctuated::new(),
-    });
-    return result;
-});
+    })
+);
 
-define!(MACRO_FORMAT_PATH, Path, {
-    let result = path::create(format_ident!("format"));
-    return result;
-});
+define!(
+    MACRO_FORMAT_PATH,
+    Path,
+    path::create(format_ident!("format"))
+);
 
-define!(SELF_TYPE_IDENT, "Self");
+ident!(SELF_TYPE_IDENT, "Self");
 
-define!(SELF_TYPE_PATH, Path, {
-    let result = path::create(SELF_TYPE_IDENT.clone());
-    return result;
-});
+define!(SELF_TYPE_PATH, Path, path::create(SELF_TYPE_IDENT.clone()));
 
-define!(SELF_TYPE, Type, {
-    let result = r#type::create(SELF_TYPE_IDENT.clone());
-    return result;
-});
+define!(SELF_TYPE, Type, r#type::create(SELF_TYPE_IDENT.clone()));
 
-define!(REF_SELF_TYPE, Type, {
-    let result = r#type::reference(
+define!(
+    REF_SELF_TYPE,
+    Type,
+    r#type::reference(
         Type::Path(TypePath {
             qself: None,
             path: SELF_TYPE_PATH.clone(),
         }),
         Some(DEFAULT_ARG_LIFETIME.clone()),
-    );
-    return result;
-});
+    )
+);
 
-define!(STRING_TYPE, Type, {
-    let result = r#type::create(format_ident!("String"));
-    return result;
-});
+define!(STRING_TYPE, Type, r#type::create(format_ident!("String")));
 
-define!(VEC_OF_ARG_CHECK_RESULT_TYPE, Type, {
-    let arg_check_result_type = r#type::create(format_ident!("ArgCheckResult"));
-    let result = r#type::wrap_in(arg_check_result_type, format_ident!("Vec"));
-    return result;
-});
+define!(
+    VEC_OF_ARG_CHECK_RESULT_TYPE,
+    Type,
+    r#type::wrap_in(
+        r#type::create(format_ident!("ArgCheckResult")),
+        format_ident!("Vec")
+    )
+);
 
-define!(VEC_OF_ARG_INFO_RESULT_TYPE, Type, {
-    let arg_check_result_type = r#type::create(format_ident!("ArgInfo"));
-    let result = r#type::wrap_in(arg_check_result_type, format_ident!("Vec"));
-    return result;
-});
+define!(
+    VEC_OF_ARG_INFO_RESULT_TYPE,
+    Type,
+    r#type::wrap_in(
+        r#type::create(format_ident!("ArgInfo")),
+        format_ident!("Vec")
+    )
+);
 
-define!(VEC_OF_VEC_OF_STRINGS_TYPE, Type, {
-    let result = r#type::wrap_in(
+define!(
+    VEC_OF_VEC_OF_STRINGS_TYPE,
+    Type,
+    r#type::wrap_in(
         r#type::wrap_in(STRING_TYPE.clone(), format_ident!("Vec")),
         format_ident!("Vec"),
-    );
-    return result;
-});
+    )
+);
 
-define!(ARC_IDENT, "Arc");
+ident!(ARC_IDENT, "Arc");
 
-define!(REF_SELF_ARG, FnArg, {
-    let result = FnArg::Receiver(Receiver {
+define!(
+    REF_SELF_ARG,
+    FnArg,
+    FnArg::Receiver(Receiver {
         attrs: Vec::new(),
         reference: Some((Default::default(), None)),
         mutability: None,
         self_token: Default::default(),
         colon_token: None,
         ty: Box::new(REF_SELF_TYPE.clone()),
-    });
-    return result;
-});
+    })
+);
 
-define!(USE_SUPER, ItemUse, {
-    let result = ItemUse {
+define!(
+    USE_SUPER,
+    ItemUse,
+    ItemUse {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
         use_token: Default::default(),
@@ -313,12 +338,13 @@ define!(USE_SUPER, ItemUse, {
             })),
         }),
         semi_token: Default::default(),
-    };
-    return result;
-});
+    }
+);
 
-define!(USE_FOR_GENERATED, ItemUse, {
-    let result = ItemUse {
+define!(
+    USE_FOR_GENERATED,
+    ItemUse,
+    ItemUse {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
         use_token: Default::default(),
@@ -335,86 +361,118 @@ define!(USE_FOR_GENERATED, ItemUse, {
             })),
         }),
         semi_token: Default::default(),
-    };
-    return result;
-});
+    }
+);
 
-define!(PHANTOM_DATA_IDENT, "PhantomData");
-define!(PHANTOM_DATA_EXPR_PATH, Expr, {
-    let result = path::create_expr(PHANTOM_DATA_IDENT.clone());
-    return result;
-});
+ident!(PHANTOM_DATA_IDENT, "PhantomData");
+define!(
+    PHANTOM_DATA_EXPR_PATH,
+    Expr,
+    path::create_expr(PHANTOM_DATA_IDENT.clone())
+);
 
-define!(DEFAULT_ARG_LIFETIME_FIELD_IDENT, "_phantom_lifetime");
+ident!(DEFAULT_ARG_LIFETIME_FIELD_IDENT, "_phantom_lifetime");
 
-define!(DEFAULT_ARG_LIFETIME_FIELD, Field, {
-    let ty = r#type::phantom_data_lifetime(DEFAULT_ARG_LIFETIME.clone());
-    let result = Field {
+define!(
+    DEFAULT_ARG_LIFETIME_FIELD,
+    Field,
+    Field {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
         mutability: FieldMutability::None,
         ident: Some(DEFAULT_ARG_LIFETIME_FIELD_IDENT.clone()),
         colon_token: Some(Default::default()),
-        ty,
-    };
-    return result;
-});
+        ty: r#type::phantom_data_lifetime(DEFAULT_ARG_LIFETIME.clone()),
+    }
+);
 
-define!(RETURN_TYPE_PHANTOM_FIELD_IDENT, "_return_type");
+ident!(RETURN_TYPE_PHANTOM_FIELD_IDENT, "_return_type");
 
-pub(crate) const DERIVED_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
-    apostrophe: Span::call_site(),
-    ident: format_ident!("_"),
-});
+define!(
+    DERIVED_LIFETIME,
+    Lifetime,
+    Lifetime {
+        apostrophe: Span::call_site(),
+        ident: format_ident!("_"),
+    }
+);
 
-pub(crate) const ANONYMOUS_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
-    apostrophe: Span::call_site(),
-    ident: format_ident!("__rsa"),
-});
+ident!(ANONYMOUS_LIFETIME_IDENT, "__rsa");
+define!(
+    ANONYMOUS_LIFETIME,
+    Lifetime,
+    Lifetime {
+        apostrophe: Span::call_site(),
+        ident: ANONYMOUS_LIFETIME_IDENT.clone(),
+    }
+);
+define!(
+    ANONYMOUS_LIFETIME_GENERIC_PARAM,
+    GenericParam,
+    GenericParam::Lifetime(LifetimeParam {
+        attrs: Vec::new(),
+        lifetime: ANONYMOUS_LIFETIME.clone(),
+        colon_token: None,
+        bounds: Punctuated::new()
+    })
+);
+define!(
+    ANONYMOUS_LIFETIME_GENERIC_ARGUMENT,
+    GenericArgument,
+    GenericArgument::Lifetime(ANONYMOUS_LIFETIME.clone())
+);
 
 pub(crate) const DEFAULT_ARG_LIFETIME_NAME: &'static str = "__rs";
-pub(crate) const DEFAULT_ARG_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
-    apostrophe: Span::call_site(),
-    ident: format_ident!("{DEFAULT_ARG_LIFETIME_NAME}"),
-});
+define!(
+    DEFAULT_ARG_LIFETIME,
+    Lifetime,
+    Lifetime {
+        apostrophe: Span::call_site(),
+        ident: format_ident!("{DEFAULT_ARG_LIFETIME_NAME}"),
+    }
+);
 
-pub(crate) const STATIC_LIFETIME: LazyCell<Lifetime> = LazyCell::new(|| Lifetime {
-    apostrophe: Span::call_site(),
-    ident: format_ident!("static"),
-});
+define!(
+    STATIC_LIFETIME,
+    Lifetime,
+    Lifetime {
+        apostrophe: Span::call_site(),
+        ident: format_ident!("static"),
+    }
+);
 
-define!(CLONE_FN_IDENT, "clone");
+ident!(CLONE_FN_IDENT, "clone");
 
-define!(RESET_IDENT, "reset");
+ident!(RESET_IDENT, "reset");
 
-define!(INTO_TRAIT_IDENT, "Into");
-define!(INTO_FN_IDENT, "into");
+ident!(INTO_TRAIT_IDENT, "Into");
+ident!(INTO_FN_IDENT, "into");
 
-define!(GET_GLOBAL_MOCK_FN_IDENT, "get_global_mock");
+ident!(GET_GLOBAL_MOCK_FN_IDENT, "get_global_mock");
 
-define!(DEFAULT_TRAIT_PATH, Path, {
-    let result = path::create(format_ident!("Default"));
-    return result;
-});
+define!(
+    DEFAULT_TRAIT_PATH,
+    Path,
+    path::create(format_ident!("Default"))
+);
 
-define!(DEFAULT_FN_IDENT, "default");
-define!(INNER_DATA_FIELD_IDENT, "inner_data");
+ident!(DEFAULT_FN_IDENT, "default");
+ident!(INNER_DATA_FIELD_IDENT, "inner_data");
 
-define!(DEREF_TRAIT_PATH, Path, {
-    let result = path::create(format_ident!("Deref"));
-    return result;
-});
-define!(DEREF_TARGET_TYPE_IDENT, "Target");
-define!(DEREF_FN_IDENT, "deref");
+define!(DEREF_TRAIT_PATH, Path, path::create(format_ident!("Deref")));
+ident!(DEREF_TARGET_TYPE_IDENT, "Target");
+ident!(DEREF_FN_IDENT, "deref");
 
-define!(IGNORE_IMPL_ATTRIBUTE_IDENT, "unmock");
+ident!(IGNORE_IMPL_ATTRIBUTE_IDENT, "unmock");
 
-define!(HASH_FN_IDENT, "hash");
+ident!(HASH_FN_IDENT, "hash");
 
-define!(ARG_PRINTER_STRUCT_IDENT, "ArgPrinter");
-define!(DEBUG_STRING_FN_IDENT, "debug_string");
+ident!(ARG_PRINTER_STRUCT_IDENT, "ArgPrinter");
+ident!(DEBUG_STRING_FN_IDENT, "debug_string");
 
-define!(MUT_INFER_PTR_TYPE, Type, {
+define!(
+    MUT_INFER_PTR_TYPE,
+    Type,
     Type::Ptr(TypePtr {
         star_token: Default::default(),
         const_token: Some(Default::default()),
@@ -423,22 +481,25 @@ define!(MUT_INFER_PTR_TYPE, Type, {
             underscore_token: Default::default(),
         })),
     })
-});
+);
 
-define!(MUT_VOID_PTR_TYPE, Type, {
+define!(
+    MUT_VOID_PTR_TYPE,
+    Type,
     Type::Ptr(TypePtr {
         star_token: Default::default(),
         const_token: Some(Default::default()),
         mutability: Some(Default::default()),
         elem: Box::new(VOID_TYPE.clone()),
     })
-});
+);
 
-define!(DYN_CALL_REF_TYPE, Type, {
-    let result = r#type::reference(r#type::create(format_ident!("DynCall")), None);
-    return result;
-});
-define!(DYN_CALL_DOWNCAST_REF_FN_IDENT, "downcast_ref");
+define!(
+    DYN_CALL_REF_TYPE,
+    Type,
+    r#type::reference(r#type::create(format_ident!("DynCall")), None)
+);
+ident!(DYN_CALL_DOWNCAST_REF_FN_IDENT, "downcast_ref");
 
 #[cfg(not(feature = "mock_base_by_default"))]
 pub(crate) const SUPPORT_BASE_PARAMETER: &'static str = "base";
@@ -448,17 +509,20 @@ pub(crate) const DO_NOT_SUPPORT_BASE_PARAMETER: &'static str = "no_base";
 
 pub(crate) const BASE_FN_IDENT_PREFIX: &'static str = "base";
 
-define!(BOX_IDENT, "Box");
-define!(BOX_NEW_EXPR, Expr, {
-    let result = path::create_expr_from_parts(vec![BOX_IDENT.clone(), NEW_IDENT.clone()]);
-    return result;
-});
-define!(BOX_LEAK_EXPR, Expr, {
-    let result = path::create_expr_from_parts(vec![BOX_IDENT.clone(), format_ident!("leak")]);
-    return result;
-});
+ident!(BOX_IDENT, "Box");
+define!(
+    BOX_NEW_EXPR,
+    Expr,
+    path::create_expr_from_parts(vec![BOX_IDENT.clone(), NEW_IDENT.clone()])
+);
+define!(
+    BOX_LEAK_EXPR,
+    Expr,
+    path::create_expr_from_parts(vec![BOX_IDENT.clone(), format_ident!("leak")])
+);
 
-define!(TRANSMUTE_LIFETIME_MACRO_PATH, Path, {
-    let result = path::create(format_ident!("transmute_lifetime"));
-    return result;
-});
+define!(
+    TRANSMUTE_LIFETIME_MACRO_PATH,
+    Path,
+    path::create(format_ident!("transmute_lifetime"))
+);

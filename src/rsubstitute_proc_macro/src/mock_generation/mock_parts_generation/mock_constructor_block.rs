@@ -1,6 +1,7 @@
 use crate::constants;
 use crate::mock_generation::mock_parts_generation::models::*;
 use crate::mock_generation::mock_parts_generation::*;
+use crate::syntax::extensions::*;
 use crate::syntax::*;
 use proc_macro2::Span;
 use quote::format_ident;

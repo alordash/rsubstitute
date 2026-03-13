@@ -2,6 +2,7 @@ use crate::constants;
 use crate::mock_generation::fn_info_generation::models::*;
 use crate::mock_generation::mock_parts_generation::models::*;
 use crate::mock_generation::mock_parts_generation::*;
+use crate::syntax::extensions::*;
 use crate::syntax::*;
 use quote::format_ident;
 use std::cell::LazyCell;
@@ -84,7 +85,7 @@ fn generate_fn_setup_block(fn_info: &FnInfo, mock_type: &MockType) -> Block {
                             fn_info.parent.get_internal_phantom_types_count()
                                 + mock_type.generics.get_phantom_fields_count(),
                         )
-                        .map(IFieldRequiredIdentExtension::get_required_ident)
+                        .map(IFieldExtensions::get_required_ident)
                         .collect(),
                 ),
             ))),

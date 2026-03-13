@@ -1,5 +1,5 @@
 use crate::constants;
-use crate::syntax::field_required_ident_extension::IFieldRequiredIdentExtension;
+use crate::syntax::extensions::IFieldExtensions;
 use crate::syntax::*;
 use syn::*;
 

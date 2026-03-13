@@ -2,6 +2,8 @@ use crate::constants;
 use crate::mock_generation::fn_info_generation::models::*;
 use crate::mock_generation::mock_parts_generation::models::*;
 use crate::mock_generation::mock_parts_generation::*;
+use crate::mock_generation::parameters::*;
+use crate::syntax::extensions::*;
 use crate::syntax::*;
 use proc_macro2::Ident;
 use quote::format_ident;
@@ -18,11 +20,10 @@ pub(crate) fn generate_for_trait(
     mock_type: &MockType,
     output_type_generics: OutputTypeGenerics,
 ) -> Signature {
-    let prepend_ref_self_arg = true;
     let result = generate(
         fn_info,
         fn_info.parent.fn_ident.clone(),
-        prepend_ref_self_arg,
+        Target::Trait,
         constants::SELF_TYPE.clone(),
         mock_type,
         output_type_generics,
@@ -37,11 +38,10 @@ pub(crate) fn generate_for_static(
 ) -> Signature {
     let mut owner_type = mock_received_struct.ty.clone();
     reference::staticify_anonymous_lifetimes(&mut owner_type);
-    let prepend_ref_self_arg = false;
     let result = generate(
         fn_info,
         constants::MOCK_RECEIVED_FIELD_IDENT.clone(),
-        prepend_ref_self_arg,
+        Target::Static,
         owner_type,
         mock_type,
         OutputTypeGenerics::UseMock,
@@ -54,7 +54,7 @@ const TIMES_TYPE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("Times"
 fn generate(
     fn_info: &FnInfo,
     fn_ident: Ident,
-    prepend_ref_self_arg: bool,
+    target: Target,
     owner_type: Type,
     mock_type: &MockType,
     output_type_generics: OutputTypeGenerics,
@@ -71,25 +71,29 @@ fn generate(
         colon_token: Default::default(),
         ty: Box::new(r#type::create(TIMES_TYPE_IDENT.clone())),
     });
+    let anonymize_normal_lifetimes = true;
     let mut inputs: Vec<_> = input_args::generate_input_args(
         fn_info,
         fn_info
             .parent
             .get_internal_phantom_types_count_without_return_type()
             + mock_type.generics.get_phantom_fields_count(),
+        anonymize_normal_lifetimes,
     )
     .into_iter()
     .chain(iter::once(times_arg))
     .collect();
-    if prepend_ref_self_arg {
-        inputs.insert(0, constants::REF_SELF_ARG.clone());
+    match target {
+        Target::Trait => inputs.insert(0, constants::REF_SELF_ARG.clone()),
+        _ => (),
     }
     let output_type = generate_output_type(fn_info.parent.arg_refs_tuple.clone(), owner_type);
-    let generics = match output_type_generics {
+    let mut generics = match output_type_generics {
         OutputTypeGenerics::UseFnOwn => fn_info.parent.own_generics.clone(),
         OutputTypeGenerics::UseMock => mock_type.generics.impl_generics.clone(),
         OutputTypeGenerics::DoNotUse => Default::default(),
     };
+    generics = generics.with_head_param(constants::ANONYMOUS_LIFETIME_GENERIC_PARAM.clone());
     let signature = Signature {
         constness: None,
         asyncness: None,

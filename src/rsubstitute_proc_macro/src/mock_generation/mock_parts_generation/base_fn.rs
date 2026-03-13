@@ -3,6 +3,8 @@ use crate::mock_generation::fn_info_generation::models::*;
 use crate::mock_generation::mock_parts_generation::models::*;
 use crate::mock_generation::mock_parts_generation::*;
 use crate::mock_generation::models::FnDecl;
+use crate::mock_generation::parameters::*;
+use crate::syntax::extensions::*;
 use crate::syntax::*;
 use quote::format_ident;
 use std::cell::LazyCell;
@@ -19,7 +21,7 @@ pub(crate) fn generate(
         call_struct,
         base_fn_block,
         mock_type,
-        Target::Other,
+        Target::Trait,
         None,
     );
     let impl_item_fn = ImplItemFn {
@@ -46,7 +48,7 @@ pub(crate) fn generate_struct_trait_fn(
         call_struct,
         base_fn_block,
         mock_type,
-        Target::Other,
+        Target::Trait,
         Some(trait_ident),
     );
     let impl_item_fn = ImplItemFn {
@@ -72,7 +74,7 @@ pub(crate) fn generate_static(
         call_struct,
         base_fn_block,
         mock_type,
-        Target::StaticFn,
+        Target::Static,
         None,
     );
     let item_fn = ItemFn {
@@ -97,11 +99,11 @@ fn generate_call_base_fn_parts(
     maybe_containing_trait_ident: Option<&Ident>,
 ) -> (Signature, Block) {
     let generics = match target {
-        Target::StaticFn => fn_decl.merged_generics.clone(),
-        Target::Other => fn_decl.own_generics.clone(),
+        Target::Static => fn_decl.merged_generics.clone(),
+        Target::Trait => fn_decl.own_generics.clone(),
     };
     let first_arg = match target {
-        Target::StaticFn => FnArg::Typed(PatType {
+        Target::Static => FnArg::Typed(PatType {
             attrs: Vec::new(),
             pat: Box::new(Pat::Wild(PatWild {
                 attrs: Vec::new(),
@@ -110,7 +112,7 @@ fn generate_call_base_fn_parts(
             colon_token: Default::default(),
             ty: Box::new(r#type::reference(mock_type.ty.clone(), None)),
         }),
-        Target::Other => constants::REF_SELF_ARG.clone(),
+        Target::Trait => constants::REF_SELF_ARG.clone(),
     };
     let call_arg = FnArg::Typed(PatType {
         attrs: Vec::new(),
@@ -210,9 +212,4 @@ fn generate_call_base_fn_block(
         stmts,
     };
     return block;
-}
-
-enum Target {
-    StaticFn,
-    Other,
 }

@@ -2,6 +2,7 @@ use crate::constants;
 use crate::mock_generation::fn_info_generation::models::*;
 use crate::mock_generation::mock_parts_generation::models::*;
 use crate::mock_generation::mock_parts_generation::*;
+use crate::syntax::extensions::*;
 use crate::syntax::*;
 use quote::format_ident;
 use std::cell::LazyCell;

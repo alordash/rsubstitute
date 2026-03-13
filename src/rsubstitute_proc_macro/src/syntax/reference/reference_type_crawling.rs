@@ -1,7 +1,8 @@
+use super::*;
 use syn::*;
 
 pub(crate) fn recursive_get_all_type_references<'a>(
-    result: &mut Vec<&'a mut Option<Lifetime>>,
+    result: &mut Vec<ReferenceLifetime<'a>>,
     ty: &'a mut Type,
 ) {
     match ty {
@@ -17,7 +18,7 @@ pub(crate) fn recursive_get_all_type_references<'a>(
         Type::Reference(type_reference) => {
             let mut_lifetime_ref = &mut type_reference.lifetime;
             recursive_get_all_type_references_from_box(result, &mut type_reference.elem);
-            result.push(mut_lifetime_ref);
+            result.push(ReferenceLifetime::Optional(mut_lifetime_ref));
         }
         Type::Slice(type_slice) => {
             recursive_get_all_type_references(result, type_slice.elem.as_mut())
@@ -32,7 +33,7 @@ pub(crate) fn recursive_get_all_type_references<'a>(
 }
 
 pub(crate) fn recursive_get_all_type_references_from_box<'a>(
-    result: &mut Vec<&'a mut Option<Lifetime>>,
+    result: &mut Vec<ReferenceLifetime<'a>>,
     boxed_ty: &'a mut Box<Type>,
 ) {
     let ty = boxed_ty.as_mut();
@@ -40,7 +41,7 @@ pub(crate) fn recursive_get_all_type_references_from_box<'a>(
 }
 
 pub(crate) fn recursive_get_all_type_references_from_path<'a>(
-    result: &mut Vec<&'a mut Option<Lifetime>>,
+    result: &mut Vec<ReferenceLifetime<'a>>,
     path: &'a mut Path,
 ) {
     for path_segment in path.segments.iter_mut() {
@@ -52,6 +53,9 @@ pub(crate) fn recursive_get_all_type_references_from_path<'a>(
                         GenericArgument::AssocType(assoc_type) => {
                             recursive_get_all_type_references(result, &mut assoc_type.ty)
                         }
+                        GenericArgument::Lifetime(lifetime) => {
+                            result.push(ReferenceLifetime::Required(lifetime))
+                        }
                         _ => (),
                     }
                 }
@@ -62,7 +66,7 @@ pub(crate) fn recursive_get_all_type_references_from_path<'a>(
 }
 
 pub(crate) fn recursive_get_all_type_references_from_tuple<'a>(
-    result: &mut Vec<&'a mut Option<Lifetime>>,
+    result: &mut Vec<ReferenceLifetime<'a>>,
     type_tuple: &'a mut TypeTuple,
 ) {
     for elem_type in type_tuple.elems.iter_mut() {
@@ -71,7 +75,7 @@ pub(crate) fn recursive_get_all_type_references_from_tuple<'a>(
 }
 
 pub(crate) fn recursive_get_all_type_references_from_type_impl_trait<'a>(
-    result: &mut Vec<&'a mut Option<Lifetime>>,
+    result: &mut Vec<ReferenceLifetime<'a>>,
     type_impl_trait: &'a mut TypeImplTrait,
 ) {
     for type_param_bound in type_impl_trait.bounds.iter_mut() {

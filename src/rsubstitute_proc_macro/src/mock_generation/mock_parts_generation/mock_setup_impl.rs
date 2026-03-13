@@ -2,6 +2,8 @@ use crate::constants;
 use crate::mock_generation::fn_info_generation::models::*;
 use crate::mock_generation::mock_parts_generation::models::*;
 use crate::mock_generation::mock_parts_generation::*;
+use crate::mock_generation::parameters::*;
+use crate::syntax::extensions::*;
 use crate::syntax::*;
 use proc_macro2::{Ident, Span};
 use quote::format_ident;
@@ -15,18 +17,11 @@ pub(crate) fn generate_for_trait(
     fn_infos: &[FnInfo],
 ) -> MockSetupImpl {
     let self_ty = mock_setup_struct.ty.clone();
-    let use_fn_info_ident_as_method_ident = true;
     let fn_setups = fn_infos
         .iter()
         .map(|x| {
             let output_type = setup_output::generate_for_trait(mock_type, x);
-            return ImplItem::Fn(generate_fn_setup(
-                x,
-                mock_type,
-                use_fn_info_ident_as_method_ident,
-                output_type,
-                GenericsStrategy::UseFnOwn,
-            ));
+            return ImplItem::Fn(generate_fn_setup(x, mock_type, output_type, Target::Trait));
         })
         .collect();
 
@@ -41,14 +36,12 @@ pub(crate) fn generate_for_static(
     fn_info: &FnInfo,
 ) -> MockSetupImpl {
     let self_ty = mock_setup_struct.ty.clone();
-    let use_fn_info_ident_as_method_ident = false;
     let output_type = setup_output::generate_for_trait(mock_type, fn_info);
     let fn_setup = ImplItem::Fn(generate_fn_setup(
         fn_info,
         mock_type,
-        use_fn_info_ident_as_method_ident,
         output_type,
-        GenericsStrategy::DoNotUse,
+        Target::Static,
     ));
 
     let item_impl = r#impl::create_with_default_lifetime(mock_type, self_ty, vec![fn_setup]);
@@ -61,25 +54,25 @@ const FN_TUNER_VAR_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("fn_t
 fn generate_fn_setup(
     fn_info: &FnInfo,
     mock_type: &MockType,
-    use_fn_info_ident_as_method_ident: bool,
     output_type: TypePath,
-    generics_strategy: GenericsStrategy,
+    target: Target,
 ) -> ImplItemFn {
     let block = generate_fn_setup_block(fn_info, &output_type);
-    let generics = match generics_strategy {
-        GenericsStrategy::UseFnOwn => fn_info.parent.own_generics.clone(),
-        GenericsStrategy::DoNotUse => Default::default(),
+    let mut generics = match target {
+        Target::Trait => fn_info.parent.own_generics.clone(),
+        Target::Static => Default::default(),
     };
+    generics = generics.with_head_param(constants::ANONYMOUS_LIFETIME_GENERIC_PARAM.clone());
+    let anonymize_normal_lifetimes = true;
     let sig = Signature {
         constness: None,
         asyncness: None,
         unsafety: None,
         abi: None,
         fn_token: Default::default(),
-        ident: if use_fn_info_ident_as_method_ident {
-            fn_info.parent.fn_ident.clone()
-        } else {
-            constants::MOCK_SETUP_FIELD_IDENT.clone()
+        ident: match target {
+            Target::Trait => fn_info.parent.fn_ident.clone(),
+            Target::Static => constants::MOCK_SETUP_FIELD_IDENT.clone(),
         },
         generics,
         paren_token: Default::default(),
@@ -90,6 +83,7 @@ fn generate_fn_setup(
                     .parent
                     .get_internal_phantom_types_count_without_return_type()
                     + mock_type.generics.get_phantom_fields_count(),
+                anonymize_normal_lifetimes,
             ))
             .collect(),
         variadic: None,
@@ -152,9 +146,4 @@ fn generate_fn_setup_block(fn_info: &FnInfo, output_type: &TypePath) -> Block {
         stmts,
     };
     return block;
-}
-
-enum GenericsStrategy {
-    UseFnOwn,
-    DoNotUse,
 }

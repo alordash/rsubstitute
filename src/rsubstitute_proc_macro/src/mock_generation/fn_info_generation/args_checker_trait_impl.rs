@@ -1,6 +1,7 @@
 use crate::constants;
 use crate::mock_generation::fn_info_generation::models::*;
 use crate::mock_generation::mock_parts_generation::*;
+use crate::syntax::extensions::*;
 use crate::syntax::*;
 use proc_macro2::{Ident, Span};
 use quote::{format_ident, ToTokens};
@@ -24,7 +25,7 @@ pub(crate) fn generate(
         .into_iter()
         .collect(),
     };
-    let self_ty = Box::new(args_checker_struct.ty.clone());
+    let self_ty = Box::new(Type::Path(args_checker_struct.ty_path.clone()));
     let items = generate_check_fn(call_struct, skipped_fields_count);
     let item_impl = ItemImpl {
         attrs: Vec::new(),

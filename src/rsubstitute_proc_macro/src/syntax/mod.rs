@@ -5,6 +5,7 @@ pub(crate) mod bool_lit;
 pub(crate) mod expr_call;
 pub(crate) mod expr_method_call;
 pub(crate) mod expr_reference;
+pub(crate) mod extensions;
 pub(crate) mod field;
 pub(crate) mod field_access_expr;
 pub(crate) mod field_value;
@@ -17,7 +18,3 @@ pub(crate) mod reference;
 pub(crate) mod r#struct;
 pub(crate) mod transmute_lifetime_expr;
 pub(crate) mod r#type;
-
-mod field_required_ident_extension;
-
-pub(crate) use field_required_ident_extension::*;

@@ -1,4 +1,5 @@
 use crate::constants;
+use crate::syntax::extensions::*;
 use crate::syntax::*;
 use proc_macro::TokenStream;
 use quote::{format_ident, ToTokens};

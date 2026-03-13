@@ -1,11 +1,16 @@
 use crate::constants;
 use crate::mock_generation::fn_info_generation::models::FnInfo;
+use crate::syntax::extensions::*;
 use crate::syntax::*;
 use proc_macro2::Ident;
 use quote::format_ident;
 use syn::*;
 
-pub(crate) fn generate_input_args(fn_info: &FnInfo, skipped_fields_count: usize) -> Vec<FnArg> {
+pub(crate) fn generate_input_args(
+    fn_info: &FnInfo,
+    skipped_fields_count: usize,
+    anonymize_normal_lifetimes: bool,
+) -> Vec<FnArg> {
     let result = fn_info
         .args_checker_struct
         .item_struct
@@ -13,6 +18,10 @@ pub(crate) fn generate_input_args(fn_info: &FnInfo, skipped_fields_count: usize)
         .iter()
         .skip(skipped_fields_count)
         .map(|field| {
+            let mut ty = field.ty.clone();
+            if anonymize_normal_lifetimes {
+                reference::anonymize_normal_lifetimes(&mut ty);
+            }
             FnArg::Typed(PatType {
                 attrs: Vec::new(),
                 pat: Box::new(Pat::Ident(PatIdent {
@@ -37,9 +46,7 @@ pub(crate) fn generate_input_args(fn_info: &FnInfo, skipped_fields_count: usize)
                                     AngleBracketedGenericArguments {
                                         colon2_token: None,
                                         lt_token: Default::default(),
-                                        args: [GenericArgument::Type(field.ty.clone())]
-                                            .into_iter()
-                                            .collect(),
+                                        args: [GenericArgument::Type(ty)].into_iter().collect(),
                                         gt_token: Default::default(),
                                     },
                                 ),
@@ -61,7 +68,9 @@ pub(crate) fn generate_input_args_with_static_lifetimes(
     fn_info: &FnInfo,
     skipped_fields_count: usize,
 ) -> Vec<FnArg> {
-    let mut fn_args = generate_input_args(fn_info, skipped_fields_count);
+    let anonymize_normal_lifetimes = false;
+    let mut fn_args =
+        generate_input_args(fn_info, skipped_fields_count, anonymize_normal_lifetimes);
     for fn_arg in fn_args.iter_mut() {
         if let FnArg::Typed(pat_type) = fn_arg {
             reference::staticify_anonymous_lifetimes(&mut pat_type.ty);
@@ -89,10 +98,17 @@ pub(crate) fn generate_args_checker_var_ident_and_decl_stmt(fn_info: &FnInfo) ->
             return field_value::create_with_into_conversion(field);
         })
         .collect();
-    let args_checker_struct_type = fn_info.args_checker_struct.ty.clone();
+    let mut args_checker_struct_type = fn_info.args_checker_struct.ty_path.clone();
+    let PathArguments::AngleBracketed(ref mut args_checker_struct_type_path_arguments) =
+        args_checker_struct_type.path.segments[0].arguments
+    else {
+        panic!("ArgsCheckerStruct type path arguments must be AngleBracketed.")
+    };
+    args_checker_struct_type_path_arguments.args[0] =
+        constants::ANONYMOUS_LIFETIME_GENERIC_ARGUMENT.clone();
     let args_checker_decl_stmt = Stmt::Local(local::create_with_type(
         args_checker_var_ident.clone(),
-        args_checker_struct_type,
+        Type::Path(args_checker_struct_type),
         LocalInit {
             eq_token: Default::default(),
             expr: Box::new(Expr::Struct(ExprStruct {
