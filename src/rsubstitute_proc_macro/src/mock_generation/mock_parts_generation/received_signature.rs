@@ -93,7 +93,7 @@ fn generate(
         OutputTypeGenerics::UseMock => mock_type.generics.impl_generics.clone(),
         OutputTypeGenerics::DoNotUse => Default::default(),
     };
-    generics = generics.with_head_param(constants::ANONYMOUS_LIFETIME_GENERIC_PARAM.clone());
+    generics = generics.with_head_param(constants::ANONYMOUS_LIFETIME_GENERIC_ARGUMENT.clone());
     let signature = Signature {
         constness: None,
         asyncness: None,

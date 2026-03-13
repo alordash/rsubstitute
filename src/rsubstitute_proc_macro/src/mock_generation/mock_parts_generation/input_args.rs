@@ -1,82 +1,49 @@
 use crate::constants;
 use crate::mock_generation::fn_info_generation::models::FnInfo;
+use crate::mock_generation::mock_parts_generation::models::*;
 use crate::syntax::extensions::*;
 use crate::syntax::*;
-use proc_macro2::Ident;
+use proc_macro2::{Ident, Span};
 use quote::format_ident;
+use std::collections::HashSet;
 use syn::*;
 
-pub(crate) fn generate_input_args(
-    fn_info: &FnInfo,
-    skipped_fields_count: usize,
-    anonymize_normal_lifetimes: bool,
-) -> Vec<FnArg> {
-    let result = fn_info
+pub(crate) fn generate_input_args(fn_info: &FnInfo, skipped_fields_count: usize) -> InputArgs {
+    let fields = fn_info
         .args_checker_struct
         .item_struct
         .fields
         .iter()
-        .skip(skipped_fields_count)
-        .map(|field| {
-            let mut ty = field.ty.clone();
-            if anonymize_normal_lifetimes {
-                reference::anonymize_normal_lifetimes(&mut ty);
-            }
-            FnArg::Typed(PatType {
-                attrs: Vec::new(),
-                pat: Box::new(Pat::Ident(PatIdent {
-                    attrs: Vec::new(),
-                    by_ref: None,
-                    mutability: None,
-                    ident: field.get_required_ident(),
-                    subpat: None,
-                })),
-                colon_token: Default::default(),
-                ty: Box::new(Type::ImplTrait(TypeImplTrait {
-                    impl_token: Default::default(),
-                    bounds: [TypeParamBound::Trait(TraitBound {
-                        paren_token: None,
-                        modifier: TraitBoundModifier::None,
-                        lifetimes: None,
-                        path: Path {
-                            leading_colon: None,
-                            segments: [PathSegment {
-                                ident: constants::INTO_TRAIT_IDENT.clone(),
-                                arguments: PathArguments::AngleBracketed(
-                                    AngleBracketedGenericArguments {
-                                        colon2_token: None,
-                                        lt_token: Default::default(),
-                                        args: [GenericArgument::Type(ty)].into_iter().collect(),
-                                        gt_token: Default::default(),
-                                    },
-                                ),
-                            }]
-                            .into_iter()
-                            .collect(),
-                        },
-                    })]
-                    .into_iter()
-                    .collect(),
-                })),
-            })
-        })
-        .collect();
+        .skip(skipped_fields_count);
+    let fn_arg_datas: Vec<_> = fields.map(transform_field_into_fn_arg).collect();
+    let mut fn_args = Vec::with_capacity(fn_arg_datas.len());
+    let mut placeholder_fn_arg_lifetime_params = Vec::with_capacity(fn_arg_datas.len());
+    for fn_arg_data in fn_arg_datas.into_iter() {
+        fn_args.push(fn_arg_data.fn_arg);
+        if let Some(placeholder_fn_arg_lifetime_param) =
+            fn_arg_data.maybe_placeholder_lifetime_param
+        {
+            placeholder_fn_arg_lifetime_params.push(placeholder_fn_arg_lifetime_param);
+        }
+    }
+    let result = InputArgs {
+        fn_args,
+        placeholder_fn_arg_lifetime_params,
+    };
     return result;
 }
 
 pub(crate) fn generate_input_args_with_static_lifetimes(
     fn_info: &FnInfo,
     skipped_fields_count: usize,
-) -> Vec<FnArg> {
-    let anonymize_normal_lifetimes = false;
-    let mut fn_args =
-        generate_input_args(fn_info, skipped_fields_count, anonymize_normal_lifetimes);
-    for fn_arg in fn_args.iter_mut() {
+) -> InputArgs {
+    let mut input_args = generate_input_args(fn_info, skipped_fields_count);
+    for fn_arg in input_args.fn_args.iter_mut() {
         if let FnArg::Typed(pat_type) = fn_arg {
             reference::staticify_anonymous_lifetimes(&mut pat_type.ty);
         }
     }
-    return fn_args;
+    return input_args;
 }
 
 pub(crate) fn generate_args_checker_var_ident_and_decl_stmt(fn_info: &FnInfo) -> (Ident, Stmt) {
@@ -127,3 +94,102 @@ pub(crate) fn generate_args_checker_var_ident_and_decl_stmt(fn_info: &FnInfo) ->
 }
 
 const ARGS_CHECKER_VARIABLE_SUFFIX: &'static str = "args_checker";
+
+fn transform_field_into_fn_arg(field: &Field) -> FnArgData {
+    let field_ident = field.get_required_ident();
+    let mut ty = field.ty.clone();
+    let Type::Path(ref mut ty_path) = ty else {
+        panic!("Input arg field should be Type::Path (Arg<'__rs, T>).")
+    };
+    let PathArguments::AngleBracketed(ref mut ty_path_arguments) =
+        ty_path.path.segments[0].arguments
+    else {
+        panic!("Input arg field should have generic arguments (Arg<'__rs, T>).")
+    };
+    let GenericArgument::Type(ref mut actual_ty) = ty_path_arguments.args[1] else {
+        panic!("Input arg field should have type as second generic argument (Arg<'__rs, T>).");
+    };
+    let anonymous_lifetime_parent_lifetimes =
+        get_all_anonymous_lifetime_parent_lifetimes(actual_ty);
+    let maybe_placeholder_lifetime_param = if anonymous_lifetime_parent_lifetimes.is_empty() {
+        None
+    } else {
+        Some(LifetimeParam {
+            attrs: Vec::new(),
+            lifetime: Lifetime::new(
+                &format!("__r_{}", field_ident.to_string()),
+                Span::call_site(),
+            ),
+            colon_token: Some(Default::default()),
+            bounds: anonymous_lifetime_parent_lifetimes
+                .into_iter()
+                .map(|parent_lifetime_ref| parent_lifetime_ref.clone())
+                .collect(),
+        })
+    };
+
+    let fn_arg = FnArg::Typed(PatType {
+        attrs: Vec::new(),
+        pat: Box::new(Pat::Ident(PatIdent {
+            attrs: Vec::new(),
+            by_ref: None,
+            mutability: None,
+            ident: field.get_required_ident(),
+            subpat: None,
+        })),
+        colon_token: Default::default(),
+        ty: Box::new(Type::ImplTrait(TypeImplTrait {
+            impl_token: Default::default(),
+            bounds: [TypeParamBound::Trait(TraitBound {
+                paren_token: None,
+                modifier: TraitBoundModifier::None,
+                lifetimes: None,
+                path: Path {
+                    leading_colon: None,
+                    segments: [PathSegment {
+                        ident: constants::INTO_TRAIT_IDENT.clone(),
+                        arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
+                            colon2_token: None,
+                            lt_token: Default::default(),
+                            args: [GenericArgument::Type(ty)].into_iter().collect(),
+                            gt_token: Default::default(),
+                        }),
+                    }]
+                    .into_iter()
+                    .collect(),
+                },
+            })]
+            .into_iter()
+            .collect(),
+        })),
+    });
+    let fn_arg_data = FnArgData {
+        fn_arg,
+        maybe_placeholder_lifetime_param,
+    };
+    return fn_arg_data;
+}
+
+fn get_all_anonymous_lifetime_parent_lifetimes<'a>(ty: &'a mut Type) -> HashSet<&'a mut Lifetime> {
+    let mut result = HashSet::new();
+    let mut last_lifetimes_chain = Vec::new();
+    let mut visitor = |type_reference: &'a mut TypeReference| {
+        let Some(ref mut this_lifetime) = type_reference.lifetime else {
+            if !last_lifetimes_chain.is_empty() {
+                result.extend(last_lifetimes_chain.drain(..));
+            }
+            return;
+        };
+        match *type_reference.elem {
+            Type::Reference(_) => last_lifetimes_chain.push(this_lifetime),
+            _ => last_lifetimes_chain.clear(),
+        };
+    };
+    reference::visit_all_optional_lifetimes(ty, &mut visitor);
+    return result;
+}
+
+struct FnArgData {
+    pub fn_arg: FnArg,
+    pub maybe_placeholder_lifetime_param: Option<LifetimeParam>,
+}

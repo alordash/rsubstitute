@@ -1,3 +1,17 @@
+use rsubstitute_proc_macro::mock;
+use std::marker::PhantomData;
+
+#[derive(Default)]
+struct Data<'a, 'b, T1, T2> {
+    _phantoms: (
+        PhantomData<&'a ()>,
+        PhantomData<&'b ()>,
+        PhantomData<T1>,
+        PhantomData<T2>,
+    ),
+}
+
+#[mock]
 trait Trait<'a, 'b: 'a> {
     fn work<'c, 'd: 'a>(
         &self,
@@ -11,5 +25,6 @@ trait Trait<'a, 'b: 'a> {
         cdxdcx: &'c &'d &&'d &'c &i32,
         abcd: &'a &'b &'c &'d i32,
         xaxbxcxdx: &&'a &&'b &&'c &&'d &i32,
+        data: Data<'a, 'b, &&i32, &&'a &&'b &[&'c &&'b &Data<'c, 'a, &&&'c &i32, Vec<&'d &'b& ()>>]>,
     );
 }

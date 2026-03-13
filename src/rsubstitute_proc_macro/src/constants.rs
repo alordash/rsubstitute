@@ -389,32 +389,12 @@ define!(
 ident!(RETURN_TYPE_PHANTOM_FIELD_IDENT, "_return_type");
 
 define!(
-    DERIVED_LIFETIME,
+    ANONYMOUS_LIFETIME,
     Lifetime,
     Lifetime {
         apostrophe: Span::call_site(),
         ident: format_ident!("_"),
     }
-);
-
-ident!(ANONYMOUS_LIFETIME_IDENT, "__rsa");
-define!(
-    ANONYMOUS_LIFETIME,
-    Lifetime,
-    Lifetime {
-        apostrophe: Span::call_site(),
-        ident: ANONYMOUS_LIFETIME_IDENT.clone(),
-    }
-);
-define!(
-    ANONYMOUS_LIFETIME_GENERIC_PARAM,
-    GenericParam,
-    GenericParam::Lifetime(LifetimeParam {
-        attrs: Vec::new(),
-        lifetime: ANONYMOUS_LIFETIME.clone(),
-        colon_token: None,
-        bounds: Punctuated::new()
-    })
 );
 define!(
     ANONYMOUS_LIFETIME_GENERIC_ARGUMENT,

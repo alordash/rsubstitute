@@ -1,6 +1,4 @@
-mod reference_lifetime;
 mod reference_type_crawling;
-pub(crate) use reference_lifetime::*;
 
 use crate::constants;
 use syn::*;
@@ -8,18 +6,18 @@ use syn::*;
 pub(crate) fn staticify_anonymous_lifetimes(ty: &mut Type) {
     let optional_lifetimes = get_all_optional_lifetimes(ty);
 
-    for mut optional_lifetime in optional_lifetimes {
+    for optional_lifetime in optional_lifetimes {
         if optional_lifetime.is_none() {
-            optional_lifetime.set(constants::STATIC_LIFETIME.clone());
+            *optional_lifetime = Some(constants::STATIC_LIFETIME.clone());
         }
     }
 }
 
 pub(crate) fn normalize_anonymous_lifetimes(ty: &mut Type) {
     let optional_lifetimes = get_all_optional_lifetimes(ty);
-    for mut optional_lifetime in optional_lifetimes {
+    for optional_lifetime in optional_lifetimes {
         if optional_lifetime.is_none() {
-            optional_lifetime.set(constants::DEFAULT_ARG_LIFETIME.clone());
+            *optional_lifetime = Some(constants::DEFAULT_ARG_LIFETIME.clone());
         }
     }
 }
@@ -32,17 +30,26 @@ pub(crate) fn normalize_anonymous_lifetimes_in_struct(item_struct: &mut ItemStru
 
 pub(crate) fn anonymize_normal_lifetimes(ty: &mut Type) {
     let optional_lifetimes = get_all_optional_lifetimes(ty);
-    for mut optional_lifetime in optional_lifetimes {
-        if let Some(lifetime) = optional_lifetime.get_mut()
+    for optional_lifetime in optional_lifetimes {
+        if let Some(lifetime) = optional_lifetime
             && lifetime.ident.to_string() == constants::DEFAULT_ARG_LIFETIME_NAME
         {
-            lifetime.ident = constants::ANONYMOUS_LIFETIME_IDENT.clone();
+            // lifetime.ident = constants::ANONYMOUS_LIFETIME_IDENT.clone();
         }
     }
 }
 
-pub(crate) fn get_all_optional_lifetimes(ty: &mut Type) -> Vec<ReferenceLifetime> {
+pub(crate) fn get_all_optional_lifetimes<'a>(ty: &'a mut Type) -> Vec<&'a mut Option<Lifetime>> {
     let mut result = Vec::new();
-    reference_type_crawling::recursive_get_all_type_references(&mut result, ty);
+    let mut visitor =
+        |type_reference: &'a mut TypeReference| result.push(&mut type_reference.lifetime);
+    reference_type_crawling::recursive_visit_all_type_references(&mut visitor, ty);
     return result;
+}
+
+pub(crate) fn visit_all_optional_lifetimes<'a>(
+    ty: &'a mut Type,
+    visitor: &mut dyn FnMut(&'a mut TypeReference),
+) {
+    reference_type_crawling::recursive_visit_all_type_references(visitor, ty);
 }

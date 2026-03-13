@@ -174,7 +174,7 @@ mod accept_many_ref {
             false,
             false,
         > {
-            let accept_many_ref_args_checker: accept_many_ref_ArgsChecker<'__rsa, 'a, 'b> =
+            let accept_many_ref_args_checker: accept_many_ref_ArgsChecker<'_, 'a, 'b> =
                 accept_many_ref_ArgsChecker {
                     _phantom_lifetime: PhantomData,
                     _phantom_a: PhantomData,
@@ -204,7 +204,7 @@ mod accept_many_ref {
             _em: impl Into<Arg<'__rsa, &'__rsa ()>>,
             times: Times,
         ) -> FnVerifier<Self, (&'__rs &'a &'b &'a &'__rs i32, &'__rs &'__rs ())> {
-            let accept_many_ref_args_checker: accept_many_ref_ArgsChecker<'__rsa, 'a, 'b> =
+            let accept_many_ref_args_checker: accept_many_ref_ArgsChecker<'_, 'a, 'b> =
                 accept_many_ref_ArgsChecker {
                     _phantom_lifetime: PhantomData,
                     _phantom_a: PhantomData,

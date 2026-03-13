@@ -10,7 +10,7 @@ pub enum OutputTypeLifetime {
 impl OutputTypeLifetime {
     pub(crate) fn get(&self) -> Lifetime {
         match self {
-            OutputTypeLifetime::Derived => constants::DERIVED_LIFETIME.clone(),
+            OutputTypeLifetime::Derived => constants::ANONYMOUS_LIFETIME.clone(),
             OutputTypeLifetime::Default => constants::DEFAULT_ARG_LIFETIME.clone(),
         }
     }

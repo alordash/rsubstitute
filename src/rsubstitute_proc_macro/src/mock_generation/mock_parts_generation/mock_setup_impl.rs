@@ -62,7 +62,7 @@ fn generate_fn_setup(
         Target::Trait => fn_info.parent.own_generics.clone(),
         Target::Static => Default::default(),
     };
-    generics = generics.with_head_param(constants::ANONYMOUS_LIFETIME_GENERIC_PARAM.clone());
+    generics = generics.with_head_param(constants::ANONYMOUS_LIFETIME_GENERIC_ARGUMENT.clone());
     let anonymize_normal_lifetimes = true;
     let sig = Signature {
         constness: None,
