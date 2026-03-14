@@ -113,7 +113,7 @@ impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, false, STORES_
         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
             fn_config.borrow_mut().register_call(call.clone());
             if let Some(callback) = fn_config.borrow().get_callback() {
-                callback.borrow_mut()(mock, call.as_ref());
+                callback.borrow_mut()(mock as *const TMock as *const (), call.as_ref());
             }
         }
     }
@@ -130,7 +130,7 @@ impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, false, STORES_
         fn_config.borrow_mut().register_call(call.clone());
         let fn_config_ref = fn_config.borrow();
         if let Some(callback) = fn_config_ref.get_callback() {
-            callback.borrow_mut()(mock, call.as_ref());
+            callback.borrow_mut()(mock as *const TMock as *const (), call.as_ref());
         }
         drop(fn_config_ref);
         let Some(return_value) = fn_config.borrow_mut().select_next_return_value(&call) else {
@@ -162,7 +162,7 @@ impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, true, STORES_M
                 base_call(mock, call_for_base_call);
             }
             if let Some(callback) = fn_config_ref.get_callback() {
-                callback.borrow_mut()(mock, call.as_ref());
+                callback.borrow_mut()(mock as *const TMock as *const (), call.as_ref());
             }
         }
     }
@@ -190,7 +190,7 @@ impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, true, STORES_M
             return base_return_value;
         }
         if let Some(callback) = fn_config_ref.get_callback() {
-            callback.borrow_mut()(mock, call.as_ref());
+            callback.borrow_mut()(mock as *const TMock as *const (), call.as_ref());
         }
         drop(fn_config_ref);
         let Some(return_value) = fn_config.borrow_mut().select_next_return_value(&call) else {

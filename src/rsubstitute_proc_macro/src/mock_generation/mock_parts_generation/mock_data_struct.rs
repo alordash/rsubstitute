@@ -118,7 +118,7 @@ fn generate_field(fn_info: &FnInfo, mock_type: &MockType) -> Field {
                     colon2_token: None,
                     lt_token: Default::default(),
                     args: [
-                        GenericArgument::Lifetime(constants::DEFAULT_ARG_LIFETIME.clone()),
+                        GenericArgument::Lifetime(constants::STATIC_LIFETIME.clone()),
                         GenericArgument::Type(mock_type.ty.clone()),
                         GenericArgument::Const(bool_lit::create(
                             fn_info.parent.maybe_base_fn_block.is_some(),

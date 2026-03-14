@@ -32,12 +32,12 @@ trait Trait<'a, 'b: 'a> {
             &&i32,
             &&'a &&'b &[&'c &&'b &Data<'c, 'a, &&&'c &i32, Vec<&'d &'b &()>>],
         >,
-    ) -> &'a &'a &'b &'b &'c &'c &'d &'d i32;
+    ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32;
 }
 
 #[mock]
 #[allow(unused)]
-fn work<'a, 'b: 'a, 'c, 'd: 'a>(
+fn work<'x, 'a, 'b: 'a, 'c, 'd: 'a>(
     a: &'a i32,
     b: &'b i32,
     c: &'c i32,
@@ -49,7 +49,7 @@ fn work<'a, 'b: 'a, 'c, 'd: 'a>(
     abcd: &'a &'b &'c &'d i32,
     xaxbxcxdx: &&'a &&'b &&'c &&'d &i32,
     data: Data<'a, 'b, &&i32, &&'a &&'b &[&'c &&'b &Data<'c, 'a, &&&'c &i32, Vec<&'d &'b &()>>]>,
-) -> &'a &'a &'b &'b &'c &'c &'d &'d i32 {
+) -> &'x &'a &'x &'a &'x &'b &'x &'b &'x &'c &'x &'c &'x &'d &'x &'d &'x i32 {
     unreachable!()
 }
 
@@ -88,7 +88,7 @@ mocked_base! {
                 &&i32,
                 &&'a &&'b &[&'c &&'b &Data<'c, 'a, &&&'c &i32, Vec<&'d &'b &()>>],
             >,
-        ) -> &'a&'a&'b&'b&'c&'c&'d&'d i32 {
+        ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 {
             unreachable!()
         }
     }
@@ -113,7 +113,7 @@ mocked_base! {
                 &&i32,
                 &&'a &&'b &[&'c &&'b &Data<'c, 'a, &&&'c &i32, Vec<&'d &'b &()>>],
             >,
-        )  -> &'a&'a&'b&'b&'c&'c&'d&'d i32{
+        )  -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32{
             Self::work(self, a, b, c, d, axb, cxd, abxbax, cdxdcx, abcd, xaxbxcxdx, data)
         }
     }
@@ -130,7 +130,7 @@ mod tests {
     fn trait_work_Ok() {
         // Arrange
         let mock = TraitMock::new();
-        let return_value = &&&&&&&&55;
+        let return_value = &&&&&&&&&&&&&&&&&55;
         let a = &1;
         {
             let b = &2;
@@ -218,7 +218,7 @@ mod tests {
 
     #[test]
     fn fn_work_Ok() {
-        let return_value = &&&&&&&&55;
+        let return_value = &&&&&&&&&&&&&&&&&55;
         let a = &1;
         {
             let b = &2;
@@ -306,7 +306,7 @@ mod tests {
     fn struct_work_Ok() {
         // Arrange
         let mock = StructMock::new();
-        let return_value = &&&&&&&&55;
+        let return_value = &&&&&&&&&&&&&&&&&55;
         let a = &1;
         {
             let b = &2;

@@ -10,7 +10,7 @@ pub(crate) struct FnConfig<'rs, TMock> {
     args_checker: DynArgsChecker<'rs>,
     return_value_sources: VecDeque<ReturnValueSource<'rs>>,
     calls: Vec<Arc<DynCall<'rs>>>,
-    callback: Option<Arc<RefCell<dyn FnMut(&TMock, &DynCall<'rs>)>>>,
+    callback: Option<Arc<RefCell<dyn FnMut(*const (), &DynCall<'rs>)>>>,
     call_base: bool,
 }
 
@@ -41,15 +41,25 @@ impl<'rs, TMock> FnConfig<'rs, TMock> {
         &mut self,
         mut callback: impl FnMut(&TMock, TArgRefsTuple) + 'static,
     ) {
-        let dyn_callback = move |mock: &TMock, dyn_call: &DynCall<'rs>| {
+        let dyn_callback = move |raw_mock_ptr: *const (), dyn_call: &DynCall<'rs>| {
             let raw_arg_refs_tuple_ptr = dyn_call.get_ptr_to_boxed_tuple_of_refs();
             let arg_refs_tuple_ptr = raw_arg_refs_tuple_ptr as *mut TArgRefsTuple;
+
             // SAFETY: both `get_ptr_to_boxed_tuple_of_refs` implementation and `TArgRefsTuple` type
             // are controlled by procedure macro. This guarantees that downcasting from `Box` is safe
             // and won't lead to transmutation between different types.
             let boxed_arg_refs_tuple = unsafe { Box::from_raw(arg_refs_tuple_ptr) };
             let arg_refs_tuple = *boxed_arg_refs_tuple;
-            callback(mock, arg_refs_tuple)
+
+            // SAFETY: using pointer instead of reference to untie `TMock` lifetime from `callback`
+            // in `FnConfig`. Pointer is passed from `FnData` which casts valid reference to pointer.
+            let mock_ref = unsafe {
+                let mock_ptr = raw_mock_ptr as *const TMock;
+                mock_ptr
+                    .as_ref()
+                    .expect("Pointer to mock in user callback must be null.")
+            };
+            callback(mock_ref, arg_refs_tuple)
         };
         self.callback = Some(Arc::new(RefCell::new(dyn_callback)));
     }
@@ -92,7 +102,7 @@ impl<'rs, TMock> FnConfig<'rs, TMock> {
         };
     }
 
-    pub(crate) fn get_callback(&self) -> Option<Arc<RefCell<dyn FnMut(&TMock, &DynCall<'rs>)>>> {
+    pub(crate) fn get_callback(&self) -> Option<Arc<RefCell<dyn FnMut(*const (), &DynCall<'rs>)>>> {
         self.callback.clone()
     }
 
