@@ -43,8 +43,8 @@ edition = "2024"
 [[bin]]
 name = "dyn_data_base_and_generics"
 path = "bin/bin_dyn_data_base_and_generics.rs"
-#test = false
-#doctest = false
+test = false
+doctest = false
 bench = false
 
 #[[bin]]
