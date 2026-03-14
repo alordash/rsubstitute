@@ -57,7 +57,7 @@ impl<'rs, TMock> FnConfig<'rs, TMock> {
                 let mock_ptr = raw_mock_ptr as *const TMock;
                 mock_ptr
                     .as_ref()
-                    .expect("Pointer to mock in user callback must be null.")
+                    .expect("Pointer to mock in user callback must be not null.")
             };
             callback(mock_ref, arg_refs_tuple)
         };

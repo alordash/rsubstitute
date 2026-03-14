@@ -71,27 +71,30 @@ fn generate(
         colon_token: Default::default(),
         ty: Box::new(r#type::create(TIMES_TYPE_IDENT.clone())),
     });
-    let mut inputs: Vec<_> = input_args::generate_input_args(
+    let own_inputs = input_args::generate_input_args(
         fn_info,
-        fn_info
-            .parent
-            .get_internal_phantom_types_count()
+        fn_info.parent.get_internal_phantom_types_count()
             + mock_type.generics.get_phantom_fields_count(),
-    )
-    .into_iter()
-    .chain(iter::once(times_arg))
-    .collect();
-    match target {
-        Target::Trait => inputs.insert(0, constants::REF_SELF_ARG.clone()),
-        _ => (),
-    }
+    );
     let output_type = generate_output_type(fn_info.parent.arg_refs_tuple.clone(), owner_type);
+
     let mut generics = match output_type_generics {
         OutputTypeGenerics::UseFnOwn => fn_info.parent.own_generics.clone(),
         OutputTypeGenerics::UseMock => mock_type.generics.impl_generics.clone(),
         OutputTypeGenerics::DoNotUse => Default::default(),
     };
     generics = generics.with_head_lifetime_param(constants::PLACEHOLDER_LIFETIME_PARAM.clone());
+    generics = referenced_generic_types_lifetimes_filler::fill(generics, mock_type, &own_inputs);
+
+    let mut inputs: Vec<_> = own_inputs
+        .into_iter()
+        .chain(iter::once(times_arg))
+        .collect();
+    match target {
+        Target::Trait => inputs.insert(0, constants::REF_SELF_ARG.clone()),
+        _ => (),
+    }
+
     let signature = Signature {
         constness: None,
         asyncness: None,

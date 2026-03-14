@@ -58,11 +58,19 @@ fn generate_fn_setup(
     target: Target,
 ) -> ImplItemFn {
     let block = generate_fn_setup_block(fn_info, &output_type);
+    let own_inputs = input_args::generate_input_args(
+        fn_info,
+        fn_info.parent.get_internal_phantom_types_count()
+            + mock_type.generics.get_phantom_fields_count(),
+    );
+
     let mut generics = match target {
         Target::Trait => fn_info.parent.own_generics.clone(),
         Target::Static => Default::default(),
     };
     generics = generics.with_head_lifetime_param(constants::PLACEHOLDER_LIFETIME_PARAM.clone());
+    generics = referenced_generic_types_lifetimes_filler::fill(generics, mock_type, &own_inputs);
+
     let sig = Signature {
         constness: None,
         asyncness: None,
@@ -76,13 +84,7 @@ fn generate_fn_setup(
         generics,
         paren_token: Default::default(),
         inputs: iter::once(constants::REF_SELF_ARG.clone())
-            .chain(input_args::generate_input_args(
-                fn_info,
-                fn_info
-                    .parent
-                    .get_internal_phantom_types_count()
-                    + mock_type.generics.get_phantom_fields_count(),
-            ))
+            .chain(own_inputs)
             .collect(),
         variadic: None,
         output: ReturnType::Type(Default::default(), Box::new(Type::Path(output_type))),

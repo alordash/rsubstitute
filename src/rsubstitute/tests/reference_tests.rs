@@ -13,8 +13,8 @@ struct Data<'a, 'b, T1, T2> {
 
 #[mock]
 #[allow(unused)]
-trait Trait<'a, 'b: 'a> {
-    fn work<'c, 'd: 'a>(
+trait Trait<'a, 'b: 'a, T1> {
+    fn work<'c, 'd: 'a, T2: Clone>(
         &self,
         a: &'a i32,
         b: &'b i32,
@@ -32,12 +32,18 @@ trait Trait<'a, 'b: 'a> {
             &&i32,
             &&'a &&'b &[&'c &&'b &Data<'c, 'a, &&&'c &i32, Vec<&'d &'b &()>>],
         >,
+        t1: T1,
+        t1_ref: &T1,
+        xaxbxcxdx_t1_ref: &&'a &&'b &&'c &&'d &T1,
+        t2: T2,
+        t2_ref: &T2,
+        xaxbxcxdx_t2_ref: &&'a &&'b &&'c &&'d &T2,
     ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32;
 }
 
 #[mock]
 #[allow(unused)]
-fn work<'x, 'a, 'b: 'a, 'c, 'd: 'a>(
+fn work<'x, 'a, 'b: 'a, 'c, 'd: 'a, T1, T2>(
     a: &'a i32,
     b: &'b i32,
     c: &'c i32,
@@ -49,28 +55,36 @@ fn work<'x, 'a, 'b: 'a, 'c, 'd: 'a>(
     abcd: &'a &'b &'c &'d i32,
     xaxbxcxdx: &&'a &&'b &&'c &&'d &i32,
     data: Data<'a, 'b, &&i32, &&'a &&'b &[&'c &&'b &Data<'c, 'a, &&&'c &i32, Vec<&'d &'b &()>>]>,
+    t1: T1,
+    t1_ref: &T1,
+    xaxbxcxdx_t1_ref: &&'a &&'b &&'c &&'d &T1,
+    t2: T2,
+    t2_ref: &T2,
+    xaxbxcxdx_t2_ref: &&'a &&'b &&'c &&'d &T2,
 ) -> &'x &'a &'x &'a &'x &'b &'x &'b &'x &'c &'x &'c &'x &'d &'x &'d &'x i32 {
     unreachable!()
 }
 
 mocked_base! {
     #[allow(unused)]
-    struct Struct<'a, 'b: 'a> {
+    struct Struct<'a, 'b: 'a, T1: Clone> {
         _phantom_a: PhantomData<&'a ()>,
         _phantom_b: PhantomData<&'b ()>,
+        _phantom_t1: PhantomData<T1>,
     }
 
     #[allow(unused)]
-    impl<'a, 'b: 'a> Struct<'a, 'b> {
+    impl<'a, 'b: 'a, T1: Clone> Struct<'a, 'b, T1> {
         pub fn new() -> Self {
             Self {
                 _phantom_a: PhantomData,
                 _phantom_b: PhantomData,
+                _phantom_t1: PhantomData,
             }
         }
 
         #[allow(unused)]
-        fn work<'c, 'd: 'a>(
+        fn work<'c, 'd: 'a, T2: Clone>(
             &self,
             a: &'a i32,
             b: &'b i32,
@@ -88,14 +102,20 @@ mocked_base! {
                 &&i32,
                 &&'a &&'b &[&'c &&'b &Data<'c, 'a, &&&'c &i32, Vec<&'d &'b &()>>],
             >,
+            t1: T1,
+            t1_ref: &T1,
+            xaxbxcxdx_t1_ref: &&'a &&'b &&'c &&'d &T1,
+            t2: T2,
+            t2_ref: &T2,
+            xaxbxcxdx_t2_ref: &&'a &&'b &&'c &&'d &T2,
         ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 {
             unreachable!()
         }
     }
 
     #[allow(unused)]
-    impl<'a, 'b: 'a> Trait<'a, 'b> for Struct<'a, 'b> {
-        fn work<'c, 'd: 'a>(
+    impl<'a, 'b: 'a, T1: Clone> Trait<'a, 'b, T1> for Struct<'a, 'b, T1> {
+        fn work<'c, 'd: 'a, T2: Clone>(
             &self,
             a: &'a i32,
             b: &'b i32,
@@ -113,8 +133,33 @@ mocked_base! {
                 &&i32,
                 &&'a &&'b &[&'c &&'b &Data<'c, 'a, &&&'c &i32, Vec<&'d &'b &()>>],
             >,
-        )  -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32{
-            Self::work(self, a, b, c, d, axb, cxd, abxbax, cdxdcx, abcd, xaxbxcxdx, data)
+            t1: T1,
+            t1_ref: &T1,
+            xaxbxcxdx_t1_ref: &&'a &&'b &&'c &&'d &T1,
+            t2: T2,
+            t2_ref: &T2,
+            xaxbxcxdx_t2_ref: &&'a &&'b &&'c &&'d &T2,
+        ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 {
+            Self::work(
+                self,
+                a,
+                b,
+                c,
+                d,
+                axb,
+                cxd,
+                abxbax,
+                cdxdcx,
+                abcd,
+                xaxbxcxdx,
+                data,
+                t1,
+                t1_ref,
+                xaxbxcxdx_t1_ref,
+                t2,
+                t2_ref,
+                xaxbxcxdx_t2_ref,
+            )
         }
     }
 }
@@ -154,6 +199,12 @@ mod tests {
                                                 let data = Data::<'_, '_, _, _> {
                                                     _phantoms: Default::default(),
                                                 };
+                                                let t1 = [7, 77];
+                                                let t1_ref = &[8, 88];
+                                                let xaxbxcxdx_t1_ref = &&&&&&&&&[9, 99];
+                                                let t2 = true;
+                                                let t2_ref = &true;
+                                                let xaxbxcxdx_t2_ref = &&&&&&&&&true;
                                                 mock.setup
                                                     .work(
                                                         a,
@@ -167,6 +218,12 @@ mod tests {
                                                         abcd,
                                                         xaxbxcxdx,
                                                         data.clone(),
+                                                        t1,
+                                                        t1_ref,
+                                                        xaxbxcxdx_t1_ref,
+                                                        t2,
+                                                        t2_ref,
+                                                        xaxbxcxdx_t2_ref,
                                                     )
                                                     .returns(return_value);
 
@@ -183,6 +240,12 @@ mod tests {
                                                     abcd,
                                                     xaxbxcxdx,
                                                     data.clone(),
+                                                    t1,
+                                                    t1_ref,
+                                                    xaxbxcxdx_t1_ref,
+                                                    t2,
+                                                    t2_ref,
+                                                    xaxbxcxdx_t2_ref,
                                                 );
 
                                                 // Assert
@@ -201,6 +264,12 @@ mod tests {
                                                         abcd,
                                                         xaxbxcxdx,
                                                         data,
+                                                        t1,
+                                                        t1_ref,
+                                                        xaxbxcxdx_t1_ref,
+                                                        t2,
+                                                        t2_ref,
+                                                        xaxbxcxdx_t2_ref,
                                                         Times::Once,
                                                     )
                                                     .no_other_calls()
@@ -242,6 +311,12 @@ mod tests {
                                                 let data = Data::<'_, '_, _, _> {
                                                     _phantoms: Default::default(),
                                                 };
+                                                let t1 = [7, 77];
+                                                let t1_ref = &[8, 88];
+                                                let xaxbxcxdx_t1_ref = &&&&&&&&&[9, 99];
+                                                let t2 = true;
+                                                let t2_ref = &true;
+                                                let xaxbxcxdx_t2_ref = &&&&&&&&&true;
                                                 work::setup(
                                                     a,
                                                     b,
@@ -254,6 +329,12 @@ mod tests {
                                                     abcd,
                                                     xaxbxcxdx,
                                                     data.clone(),
+                                                    t1,
+                                                    t1_ref,
+                                                    xaxbxcxdx_t1_ref,
+                                                    t2,
+                                                    t2_ref,
+                                                    xaxbxcxdx_t2_ref,
                                                 )
                                                 .returns(return_value);
 
@@ -270,6 +351,12 @@ mod tests {
                                                     abcd,
                                                     xaxbxcxdx,
                                                     data.clone(),
+                                                    t1,
+                                                    t1_ref,
+                                                    xaxbxcxdx_t1_ref,
+                                                    t2,
+                                                    t2_ref,
+                                                    xaxbxcxdx_t2_ref,
                                                 );
 
                                                 // Assert
@@ -287,6 +374,12 @@ mod tests {
                                                     abcd,
                                                     xaxbxcxdx,
                                                     data,
+                                                    t1,
+                                                    t1_ref,
+                                                    xaxbxcxdx_t1_ref,
+                                                    t2,
+                                                    t2_ref,
+                                                    xaxbxcxdx_t2_ref,
                                                     Times::Once,
                                                 )
                                                 .no_other_calls()
@@ -330,6 +423,12 @@ mod tests {
                                                 let data = Data::<'_, '_, _, _> {
                                                     _phantoms: Default::default(),
                                                 };
+                                                let t1 = [7, 77];
+                                                let t1_ref = &[8, 88];
+                                                let xaxbxcxdx_t1_ref = &&&&&&&&&[9, 99];
+                                                let t2 = true;
+                                                let t2_ref = &true;
+                                                let xaxbxcxdx_t2_ref = &&&&&&&&&true;
                                                 mock.setup
                                                     .work(
                                                         a,
@@ -343,6 +442,12 @@ mod tests {
                                                         abcd,
                                                         xaxbxcxdx,
                                                         data.clone(),
+                                                        t1,
+                                                        t1_ref,
+                                                        xaxbxcxdx_t1_ref,
+                                                        t2,
+                                                        t2_ref,
+                                                        xaxbxcxdx_t2_ref,
                                                     )
                                                     .returns(return_value);
                                                 mock.setup
@@ -359,6 +464,12 @@ mod tests {
                                                         abcd,
                                                         xaxbxcxdx,
                                                         data.clone(),
+                                                        t1,
+                                                        t1_ref,
+                                                        xaxbxcxdx_t1_ref,
+                                                        t2,
+                                                        t2_ref,
+                                                        xaxbxcxdx_t2_ref,
                                                     )
                                                     .call_base();
 
@@ -375,6 +486,12 @@ mod tests {
                                                     abcd,
                                                     xaxbxcxdx,
                                                     data.clone(),
+                                                    t1,
+                                                    t1_ref,
+                                                    xaxbxcxdx_t1_ref,
+                                                    t2,
+                                                    t2_ref,
+                                                    xaxbxcxdx_t2_ref,
                                                 );
 
                                                 // Assert
@@ -392,6 +509,12 @@ mod tests {
                                                     abcd,
                                                     xaxbxcxdx,
                                                     data.clone(),
+                                                    t1,
+                                                    t1_ref,
+                                                    xaxbxcxdx_t1_ref,
+                                                    t2,
+                                                    t2_ref,
+                                                    xaxbxcxdx_t2_ref,
                                                     Times::Once,
                                                 );
                                                 mock.received
@@ -407,6 +530,12 @@ mod tests {
                                                         abcd,
                                                         xaxbxcxdx,
                                                         data,
+                                                        t1,
+                                                        t1_ref,
+                                                        xaxbxcxdx_t1_ref,
+                                                        t2,
+                                                        t2_ref,
+                                                        xaxbxcxdx_t2_ref,
                                                         Times::Once,
                                                     )
                                                     .no_other_calls()

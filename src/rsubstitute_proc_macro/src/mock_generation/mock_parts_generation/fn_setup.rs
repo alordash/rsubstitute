@@ -13,9 +13,19 @@ pub(crate) fn generate(
     mock_setup_struct: &MockSetupStruct,
     mock_type: &MockType,
 ) -> ItemFn {
+    let own_inputs: Vec<_> = input_args::generate_input_args_with_static_lifetimes(
+        fn_info,
+        fn_info.parent.get_internal_phantom_types_count()
+            + mock_type.generics.get_phantom_fields_count(),
+    )
+    .into_iter()
+    .collect();
+
     let output_type = setup_output::generate_for_static(mock_type, fn_info, mock_setup_struct);
     let mut generics = mock_type.generics.impl_generics.clone();
     generics = generics.with_head_lifetime_param(constants::PLACEHOLDER_LIFETIME_PARAM.clone());
+    generics = referenced_generic_types_lifetimes_filler::fill(generics, mock_type, &own_inputs);
+
     let sig = Signature {
         constness: None,
         asyncness: None,
@@ -25,13 +35,7 @@ pub(crate) fn generate(
         ident: constants::MOCK_SETUP_FIELD_IDENT.clone(),
         generics,
         paren_token: Default::default(),
-        inputs: input_args::generate_input_args_with_static_lifetimes(
-            fn_info,
-            fn_info.parent.get_internal_phantom_types_count()
-                + mock_type.generics.get_phantom_fields_count(),
-        )
-        .into_iter()
-        .collect(),
+        inputs: own_inputs.into_iter().collect(),
         variadic: None,
         output: ReturnType::Type(Default::default(), Box::new(Type::Path(output_type))),
     };

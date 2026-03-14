@@ -14,7 +14,7 @@ pub enum Arg<'rs, T> {
     #[doc(hidden)]
     PrivateNotEq(ArgCmp<T>, Private),
     #[doc(hidden)]
-    PrivateIs(Box<dyn Fn(&T) -> bool + 'rs>, Private),
+    PrivateIs(Box<dyn Fn(*const ()) -> bool + 'rs>, Private),
 }
 
 impl<'rs, T: PartialEq> From<T> for Arg<'rs, T> {
@@ -43,7 +43,15 @@ impl<'rs, T: Debug> Debug for Arg<'rs, T> {
 
 impl<'rs, T> Arg<'rs, T> {
     pub fn is<'a, TFn: Fn(&T) -> bool + 'a>(predicate: TFn) -> Self {
-        let reference: Box<dyn Fn(&T) -> bool + 'rs> =
+        let anonymous_predicate = move |ptr: *const()| {
+            // SAFETY: 
+            let t_ref = unsafe {
+                let t_ptr = ptr as *const T;
+                t_ptr.as_ref().expect("Pointer to argument in Arg::is must not be null.")
+            };
+        };
+        
+        let reference: Box<dyn Fn(*const ()) -> bool + 'rs> =
             transmute_lifetime!(Box::new(predicate) as Box<dyn Fn(&T) -> bool + 'a>);
         return Self::PrivateIs(reference, Private);
     }
@@ -104,7 +112,7 @@ impl<'rs, T> Arg<'rs, T> {
                 }
             }
             Arg::PrivateIs(predicate, _) => {
-                if !predicate(actual_value) {
+                if !predicate(actual_value as *const _ as *const ()) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
@@ -154,7 +162,7 @@ impl<'rs, 'a, T: ?Sized> Arg<'rs, &'a T> {
                 }
             }
             Arg::PrivateIs(predicate, _) => {
-                if !predicate(actual_value) {
+                if !predicate(actual_value as *const _ as *const ()) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
@@ -231,7 +239,7 @@ impl<'rs, 'a, T: ?Sized> Arg<'rs, &'a mut T> {
                 }
             }
             Arg::PrivateIs(predicate, _) => {
-                if !predicate(mut_actual_value) {
+                if !predicate(actual_value as *const _ as *const ()) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
@@ -284,7 +292,7 @@ impl<'rs, T: ?Sized> Arg<'rs, Rc<T>> {
                 }
             }
             Arg::PrivateIs(predicate, _) => {
-                if !predicate(actual_value) {
+                if !predicate(actual_value as *const _ as *const ()) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
@@ -337,7 +345,7 @@ impl<'rs, T: ?Sized> Arg<'rs, Arc<T>> {
                 }
             }
             Arg::PrivateIs(predicate, _) => {
-                if !predicate(actual_value) {
+                if !predicate(actual_value as *const _ as *const ()) {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
