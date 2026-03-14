@@ -186,7 +186,10 @@ fn generate_call_base_fn_block(
         })
         .collect();
     let deconstruct_call_stmt = Stmt::Local(Local {
-        attrs: Vec::new(),
+        attrs: vec![
+            constants::ALLOW_NON_SHORTHAND_FIELD_PATTERNS_ATTRIBUTE.clone(),
+            constants::ALLOW_UNUSED_VARIABLES_ATTRIBUTE.clone(),
+        ],
         let_token: Default::default(),
         pat: Pat::Struct(PatStruct {
             attrs: Vec::new(),

@@ -180,6 +180,18 @@ define!(
 );
 
 define!(
+    ALLOW_UNUSED_VARIABLES_ATTRIBUTE,
+    Attribute,
+    attribute::create(ALLOW_IDENT.clone(), "unused_variables")
+);
+
+define!(
+    ALLOW_NON_SHORTHAND_FIELD_PATTERNS_ATTRIBUTE,
+    Attribute,
+    attribute::create(ALLOW_IDENT.clone(), "non_shorthand_field_patterns")
+);
+
+define!(
     ALLOW_MISMATCHED_LIFETIME_SYNTAXES_ATTRIBUTE,
     Attribute,
     attribute::create(ALLOW_IDENT.clone(), "mismatched_lifetime_syntaxes")

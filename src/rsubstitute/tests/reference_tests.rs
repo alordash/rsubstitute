@@ -12,9 +12,10 @@ struct Data<'a, 'b, T1, T2> {
 }
 
 #[mock]
+#[allow(unused)]
 trait Trait<'a, 'b: 'a> {
-    fn work<'s, 'c, 'd: 'a>(
-        &'s self,
+    fn work<'c, 'd: 'a>(
+        &self,
         a: &'a i32,
         b: &'b i32,
         c: &'c i32,
@@ -35,6 +36,7 @@ trait Trait<'a, 'b: 'a> {
 }
 
 #[mock]
+#[allow(unused)]
 fn work<'a, 'b: 'a, 'c, 'd: 'a>(
     a: &'a i32,
     b: &'b i32,
@@ -52,11 +54,13 @@ fn work<'a, 'b: 'a, 'c, 'd: 'a>(
 }
 
 mocked_base! {
+    #[allow(unused)]
     struct Struct<'a, 'b: 'a> {
         _phantom_a: PhantomData<&'a ()>,
         _phantom_b: PhantomData<&'b ()>,
     }
 
+    #[allow(unused)]
     impl<'a, 'b: 'a> Struct<'a, 'b> {
         pub fn new() -> Self {
             Self {
@@ -65,6 +69,7 @@ mocked_base! {
             }
         }
 
+        #[allow(unused)]
         fn work<'c, 'd: 'a>(
             &self,
             a: &'a i32,
@@ -88,6 +93,7 @@ mocked_base! {
         }
     }
 
+    #[allow(unused)]
     impl<'a, 'b: 'a> Trait<'a, 'b> for Struct<'a, 'b> {
         fn work<'c, 'd: 'a>(
             &self,
@@ -115,6 +121,8 @@ mocked_base! {
 
 #[cfg(test)]
 mod tests {
+    #![allow(non_snake_case)]
+
     use super::*;
     use rsubstitute_core::Times;
 

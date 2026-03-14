@@ -2,7 +2,6 @@ mod lifetime_visitor;
 
 use crate::constants;
 use crate::syntax::lifetime::lifetime_visitor::*;
-use quote::ToTokens;
 use syn::visit_mut::VisitMut;
 use syn::*;
 
