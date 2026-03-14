@@ -22,19 +22,9 @@ pub(crate) fn generate(fn_decl: &FnDecl, mock_generics: &MockGenerics) -> ArgsCh
         .enumerate()
         .flat_map(|(i, x)| try_convert_fn_arg_to_field(i, x))
         .collect();
-    let internal_phantom_fields =
-        if let Some(ref phantom_return_type) = fn_decl.maybe_phantom_return_field {
-            vec![
-                constants::DEFAULT_ARG_LIFETIME_FIELD.clone(),
-                phantom_return_type.clone(),
-            ]
-        } else {
-            vec![constants::DEFAULT_ARG_LIFETIME_FIELD.clone()]
-        };
-    let struct_fields = internal_phantom_fields
-        .into_iter()
-        .clone()
+    let struct_fields = core::iter::once(constants::DEFAULT_ARG_LIFETIME_FIELD.clone())
         .chain(mock_generics.phantom_fields.iter().cloned())
+        .chain(fn_decl.internal_phantom_fields.iter().cloned())
         .chain(fn_fields)
         .collect();
     let fields_named = FieldsNamed {
@@ -46,7 +36,10 @@ pub(crate) fn generate(fn_decl: &FnDecl, mock_generics: &MockGenerics) -> ArgsCh
         r#struct::create(attrs, ident, fn_decl.merged_generics.clone(), fields_named);
     reference::normalize_anonymous_lifetimes_in_struct(&mut item_struct);
     let ty = r#type::create_from_struct_path(&item_struct);
-    let args_checker_struct = ArgsCheckerStruct { item_struct, ty_path: ty };
+    let args_checker_struct = ArgsCheckerStruct {
+        item_struct,
+        ty_path: ty,
+    };
 
     return args_checker_struct;
 }

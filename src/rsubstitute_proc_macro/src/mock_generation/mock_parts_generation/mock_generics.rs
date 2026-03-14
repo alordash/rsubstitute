@@ -1,7 +1,6 @@
 use crate::constants;
 use crate::mock_generation::mock_parts_generation::models::*;
-use crate::syntax::*;
-use quote::format_ident;
+use crate::mock_generation::*;
 use syn::punctuated::Punctuated;
 use syn::*;
 
@@ -19,7 +18,7 @@ pub(crate) fn generate(source_generics: &Generics) -> MockGenerics {
     let phantom_fields = source_generics
         .params
         .iter()
-        .filter_map(|x| try_map_generic_param_to_field(x))
+        .filter_map(phantom_field::try_map_generic_param)
         .collect();
     let mock_generics = MockGenerics {
         source_generics: source_generics.clone(),
@@ -27,22 +26,4 @@ pub(crate) fn generate(source_generics: &Generics) -> MockGenerics {
         phantom_fields,
     };
     return mock_generics;
-}
-
-fn try_map_generic_param_to_field(generic_param: &GenericParam) -> Option<Field> {
-    match generic_param {
-        GenericParam::Lifetime(generic_lifetime) => Some(field::create(
-            format_phantom_field_name(&generic_lifetime.lifetime.ident),
-            r#type::phantom_data_lifetime(generic_lifetime.lifetime.clone()),
-        )),
-        GenericParam::Type(generic_type) => Some(field::create(
-            format_phantom_field_name(&generic_type.ident),
-            r#type::phantom_data(generic_type.ident.clone()),
-        )),
-        _ => None,
-    }
-}
-
-fn format_phantom_field_name(ident: &Ident) -> Ident {
-    format_ident!("_phantom_{ident}")
 }

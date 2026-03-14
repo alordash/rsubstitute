@@ -8,3 +8,4 @@ pub(crate) mod mock_parts_generation;
 pub(crate) mod parameters;
 pub(crate) mod struct_mock_syntax;
 pub(crate) mod targets;
+pub(crate) mod phantom_field;

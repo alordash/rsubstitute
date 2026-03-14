@@ -80,7 +80,7 @@ fn generate_fn_setup(
                 fn_info,
                 fn_info
                     .parent
-                    .get_internal_phantom_types_count_without_return_type()
+                    .get_internal_phantom_types_count()
                     + mock_type.generics.get_phantom_fields_count(),
             ))
             .collect(),

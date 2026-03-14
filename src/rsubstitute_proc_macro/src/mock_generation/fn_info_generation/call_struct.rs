@@ -17,18 +17,9 @@ pub(crate) fn generate(ctx: &Ctx, fn_decl: &FnDecl, mock_generics: &MockGenerics
         .iter()
         .enumerate()
         .flat_map(|(i, x)| try_convert_fn_arg_to_field(i, x));
-    let internal_phantom_fields =
-        if let Some(ref phantom_return_type) = fn_decl.maybe_phantom_return_field {
-            vec![
-                constants::DEFAULT_ARG_LIFETIME_FIELD.clone(),
-                phantom_return_type.clone(),
-            ]
-        } else {
-            vec![constants::DEFAULT_ARG_LIFETIME_FIELD.clone()]
-        };
-    let struct_fields = internal_phantom_fields
-        .into_iter()
+    let struct_fields = core::iter::once(constants::DEFAULT_ARG_LIFETIME_FIELD.clone())
         .chain(mock_generics.phantom_fields.iter().cloned())
+        .chain(fn_decl.internal_phantom_fields.iter().cloned())
         .chain(fn_fields)
         .collect();
     let fields_named = FieldsNamed {

@@ -13,8 +13,8 @@ pub(crate) struct FnDecl {
     pub merged_generics: Generics,
     pub visibility: Visibility,
     pub maybe_base_fn_block: Option<Block>,
-    pub maybe_phantom_return_field: Option<Field>,
-    pub arg_refs_tuple: Type
+    pub internal_phantom_fields: Vec<Field>,
+    pub arg_refs_tuple: Type,
 }
 
 impl FnDecl {
@@ -47,17 +47,6 @@ impl FnDecl {
     }
 
     pub(crate) fn get_internal_phantom_types_count(&self) -> usize {
-        if self.maybe_phantom_return_field.is_some() {
-            2
-        } else {
-            1
-        }
-    }
-
-    // pub(crate) fn get_internal_phantom_types_count_without_return_type(&self) -> usize {
-    //     1
-    // }
-    pub(crate) fn get_internal_phantom_types_count_without_return_type(&self) -> usize {
-        self.get_internal_phantom_types_count()
+        self.internal_phantom_fields.len() + 1
     }
 }

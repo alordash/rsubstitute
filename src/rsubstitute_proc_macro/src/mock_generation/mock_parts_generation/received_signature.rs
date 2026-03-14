@@ -75,7 +75,7 @@ fn generate(
         fn_info,
         fn_info
             .parent
-            .get_internal_phantom_types_count_without_return_type()
+            .get_internal_phantom_types_count()
             + mock_type.generics.get_phantom_fields_count(),
     )
     .into_iter()

@@ -41,6 +41,9 @@ fn generate(
 ) -> TypePath {
     let mut arg_refs_tuple = fn_info.parent.arg_refs_tuple.clone();
     reference::normalize_anonymous_lifetimes(&mut arg_refs_tuple);
+    let mut return_type = fn_info.parent.get_return_value_type();
+    let placeholder_lifetime = constants::PLACEHOLDER_LIFETIME.clone();
+    reference::set_all_lifetimes(&mut return_type, &placeholder_lifetime);
     let result = TypePath {
         qself: None,
         path: Path {
@@ -55,7 +58,7 @@ fn generate(
                         GenericArgument::Type(mock_type.ty.clone()),
                         GenericArgument::Type(owner_type),
                         GenericArgument::Type(arg_refs_tuple),
-                        GenericArgument::Type(fn_info.parent.get_return_value_type()),
+                        GenericArgument::Type(return_type),
                         GenericArgument::Const(bool_lit::create(
                             fn_info.parent.maybe_base_fn_block.is_some(),
                         )),

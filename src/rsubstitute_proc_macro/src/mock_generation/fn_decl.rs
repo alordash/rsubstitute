@@ -1,6 +1,8 @@
 use crate::constants;
 use crate::mock_generation::mock_parts_generation::models::*;
 use crate::mock_generation::models::*;
+use crate::mock_generation::parameters::Target;
+use crate::mock_generation::*;
 use crate::syntax::*;
 use syn::*;
 
@@ -41,6 +43,7 @@ pub(crate) fn extract_struct_trait_impl_fns(
         .map(move |trait_impl_fn| {
             create_fn_decl(
                 ctx,
+                Target::Trait,
                 GenericsStrategy::MergeWithMockGenerics(mock_generics),
                 trait_impl_fn.attrs.clone(),
                 &trait_impl_fn.sig,
@@ -56,6 +59,7 @@ pub(crate) fn extract_struct_trait_impl_fns(
 pub(crate) fn extract_fn(ctx: &Ctx, mock_generics: &MockGenerics, item_fn: &ItemFn) -> FnDecl {
     let fn_decl = create_fn_decl(
         ctx,
+        Target::Static,
         GenericsStrategy::UseMockGenerics(mock_generics),
         item_fn.attrs.clone(),
         &item_fn.sig,
@@ -87,6 +91,7 @@ fn map_trait_item_fn(
     let sig = &trait_item_fn.sig;
     let fn_decl = create_fn_decl(
         ctx,
+        Target::Trait,
         GenericsStrategy::MergeWithMockGenerics(mock_generics),
         trait_item_fn.attrs.clone(),
         sig,
@@ -101,6 +106,7 @@ fn map_impl_item_fn(ctx: &Ctx, mock_generics: &MockGenerics, impl_item_fn: &Impl
     let sig = &impl_item_fn.sig;
     let fn_decl = create_fn_decl(
         ctx,
+        Target::Trait,
         GenericsStrategy::MergeWithMockGenerics(mock_generics),
         impl_item_fn.attrs.clone(),
         sig,
@@ -113,6 +119,7 @@ fn map_impl_item_fn(ctx: &Ctx, mock_generics: &MockGenerics, impl_item_fn: &Impl
 
 fn create_fn_decl(
     ctx: &Ctx,
+    target: Target,
     generics_strategy: GenericsStrategy,
     attrs: Vec<Attribute>,
     sig: &Signature,
@@ -129,6 +136,16 @@ fn create_fn_decl(
     };
     let arguments: Vec<_> = sig.inputs.iter().cloned().collect();
     let arg_refs_tuple = generate_arg_refs_tuple(&arguments);
+    let internal_phantom_fields: Vec<_> = match target {
+        Target::Trait => sig
+            .generics
+            .params
+            .iter()
+            .filter_map(phantom_field::try_map_generic_param)
+            .chain(maybe_phantom_return_field)
+            .collect(),
+        Target::Static => Vec::new(),
+    };
     let fn_decl = FnDecl {
         attrs,
         maybe_parent_trait_ident,
@@ -139,7 +156,7 @@ fn create_fn_decl(
         merged_generics,
         visibility,
         maybe_base_fn_block: maybe_base_fn_block.filter(|_| ctx.support_base_calling),
-        maybe_phantom_return_field,
+        internal_phantom_fields,
         arg_refs_tuple,
     };
     return fn_decl;
