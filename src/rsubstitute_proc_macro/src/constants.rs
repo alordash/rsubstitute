@@ -396,11 +396,6 @@ define!(
         ident: format_ident!("_"),
     }
 );
-define!(
-    ANONYMOUS_LIFETIME_GENERIC_ARGUMENT,
-    GenericArgument,
-    GenericArgument::Lifetime(ANONYMOUS_LIFETIME.clone())
-);
 
 pub(crate) const DEFAULT_ARG_LIFETIME_NAME: &'static str = "__rs";
 define!(

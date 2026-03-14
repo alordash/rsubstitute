@@ -40,10 +40,10 @@ fn generate(
     stores_mock_data: bool,
 ) -> TypePath {
     let mut arg_refs_tuple = fn_info.parent.arg_refs_tuple.clone();
-    reference::normalize_anonymous_lifetimes(&mut arg_refs_tuple);
+    lifetime::normalize_anonymous_lifetimes(&mut arg_refs_tuple);
     let mut return_type = fn_info.parent.get_return_value_type();
     let placeholder_lifetime = constants::PLACEHOLDER_LIFETIME.clone();
-    reference::set_all_lifetimes(&mut return_type, &placeholder_lifetime);
+    lifetime::set_all_lifetimes(&mut return_type, &placeholder_lifetime);
     let result = TypePath {
         qself: None,
         path: Path {

@@ -81,7 +81,7 @@ fn generate_call_stmt(fn_info: &FnInfo) -> Stmt {
         fn_info.call_struct.item_struct.ident.clone(),
         call_struct_type_generics,
     );
-    reference::set_all_lifetimes(&mut call_struct_type, &constants::ANONYMOUS_LIFETIME.clone());
+    lifetime::set_all_lifetimes(&mut call_struct_type, &constants::ANONYMOUS_LIFETIME.clone());
     let call_stmt = Stmt::Local(local::create_with_type(
         CALL_VARIABLE_IDENT.clone(),
         call_struct_type,

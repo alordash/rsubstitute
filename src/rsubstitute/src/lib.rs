@@ -8,6 +8,11 @@ pub mod macros {
     pub use rsubstitute_proc_macro::*;
 }
 
+pub mod prelude {
+    pub use super::*;
+    pub use macros::*;
+}
+
 #[allow(unused_imports)]
 pub mod for_generated {
     pub use crate::*;

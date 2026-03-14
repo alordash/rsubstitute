@@ -29,9 +29,9 @@ pub(crate) fn generate(ctx: &Ctx, fn_decl: &FnDecl, mock_generics: &MockGenerics
 
     let mut item_struct =
         r#struct::create(attrs, ident, fn_decl.merged_generics.clone(), fields_named);
-    reference::normalize_anonymous_lifetimes_in_struct(&mut item_struct);
-    let ty = r#type::create_from_struct(&item_struct);
-    let call_struct = CallStruct { item_struct, ty };
+    lifetime::normalize_anonymous_lifetimes_in_struct(&mut item_struct);
+    let ty_path = r#type::create_from_struct_path(&item_struct);
+    let call_struct = CallStruct { item_struct, ty_path };
 
     return call_struct;
 }

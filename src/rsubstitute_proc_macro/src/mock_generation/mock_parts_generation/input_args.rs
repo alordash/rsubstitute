@@ -24,7 +24,7 @@ pub(crate) fn generate_input_args_with_static_lifetimes(
     let mut fn_args = generate_input_args(fn_info, skipped_fields_count);
     for fn_arg in fn_args.iter_mut() {
         if let FnArg::Typed(pat_type) = fn_arg {
-            reference::staticify_anonymous_lifetimes(&mut pat_type.ty);
+            lifetime::staticify_anonymous_lifetimes(&mut pat_type.ty);
         }
     }
     return fn_args;
@@ -50,13 +50,8 @@ pub(crate) fn generate_args_checker_var_ident_and_decl_stmt(fn_info: &FnInfo) ->
         })
         .collect();
     let mut args_checker_struct_type = fn_info.args_checker_struct.ty_path.clone();
-    let PathArguments::AngleBracketed(ref mut args_checker_struct_type_path_arguments) =
-        args_checker_struct_type.path.segments[0].arguments
-    else {
-        panic!("ArgsCheckerStruct type path arguments must be AngleBracketed.")
-    };
-    args_checker_struct_type_path_arguments.args[0] =
-        constants::ANONYMOUS_LIFETIME_GENERIC_ARGUMENT.clone();
+    args_checker_struct_type
+        .set_first_generic_lifetime_argument(constants::ANONYMOUS_LIFETIME.clone());
     let args_checker_decl_stmt = Stmt::Local(local::create_with_type(
         args_checker_var_ident.clone(),
         Type::Path(args_checker_struct_type),
@@ -94,7 +89,7 @@ fn transform_field_into_fn_arg(field: &Field) -> FnArg {
     };
     let placeholder_lifetime_ident = constants::PLACEHOLDER_LIFETIME_IDENT.clone();
     ty_arg_lifetime_param.ident = placeholder_lifetime_ident.clone();
-    reference::set_all_lifetimes(&mut ty, &constants::PLACEHOLDER_LIFETIME.clone());
+    lifetime::set_all_lifetimes(&mut ty, &constants::PLACEHOLDER_LIFETIME.clone());
 
     let fn_arg = FnArg::Typed(PatType {
         attrs: Vec::new(),

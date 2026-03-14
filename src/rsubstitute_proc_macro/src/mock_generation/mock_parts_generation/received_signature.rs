@@ -37,7 +37,7 @@ pub(crate) fn generate_for_static(
     mock_type: &MockType,
 ) -> Signature {
     let mut owner_type = mock_received_struct.ty.clone();
-    reference::staticify_anonymous_lifetimes(&mut owner_type);
+    lifetime::staticify_anonymous_lifetimes(&mut owner_type);
     let result = generate(
         fn_info,
         constants::MOCK_RECEIVED_FIELD_IDENT.clone(),
@@ -109,7 +109,7 @@ fn generate(
 }
 
 fn generate_output_type(mut arg_refs_tuple: Type, owner_type: Type) -> Type {
-    reference::normalize_anonymous_lifetimes(&mut arg_refs_tuple);
+    lifetime::normalize_anonymous_lifetimes(&mut arg_refs_tuple);
     let result = Type::Path(TypePath {
         qself: None,
         path: Path {

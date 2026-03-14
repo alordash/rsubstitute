@@ -34,7 +34,7 @@ pub(crate) fn generate(fn_decl: &FnDecl, mock_generics: &MockGenerics) -> ArgsCh
 
     let mut item_struct =
         r#struct::create(attrs, ident, fn_decl.merged_generics.clone(), fields_named);
-    reference::normalize_anonymous_lifetimes_in_struct(&mut item_struct);
+    lifetime::normalize_anonymous_lifetimes_in_struct(&mut item_struct);
     let ty = r#type::create_from_struct_path(&item_struct);
     let args_checker_struct = ArgsCheckerStruct {
         item_struct,

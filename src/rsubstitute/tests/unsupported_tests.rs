@@ -8,7 +8,7 @@ trait Trait<'a> {
     // TODO - make test. Can not return anonymous reference behind typed reference
     fn return_ref(&self) -> &'a &i32;
     
-    // TODO - make test. Can not use Trait's generic lifetimes for &self reference.
+    // TODO - support. Can not use Trait's generic lifetimes for &self reference.
     fn self_ref(&'a self);
 }
 

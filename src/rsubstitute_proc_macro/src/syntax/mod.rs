@@ -14,7 +14,7 @@ pub(crate) mod generics;
 pub(crate) mod r#impl;
 pub(crate) mod local;
 pub(crate) mod path;
-pub(crate) mod reference;
+pub(crate) mod lifetime;
 pub(crate) mod r#struct;
 pub(crate) mod transmute_lifetime_expr;
 pub(crate) mod r#type;

@@ -102,7 +102,7 @@ fn generate_check_fn(call_struct: &CallStruct, skipped_fields_count: usize) -> I
 }
 
 fn generate_call_var_stmt(call_struct: &CallStruct) -> Stmt {
-    let call_var_type = r#type::reference(call_struct.ty.clone(), None);
+    let call_var_type = r#type::reference(Type::Path(call_struct.ty_path.clone()), None);
     let stmt = Stmt::Local(local::create_with_type(
         CALL_VAR_IDENT.clone(),
         call_var_type,

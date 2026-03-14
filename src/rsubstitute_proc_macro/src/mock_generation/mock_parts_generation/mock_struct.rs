@@ -71,7 +71,7 @@ pub(crate) fn generate_for_static(
         .attrs
         .insert(0, constants::DOC_HIDDEN_ATTRIBUTE.clone());
     for field in mock_struct.item_struct.fields.iter_mut() {
-        reference::staticify_anonymous_lifetimes(&mut field.ty);
+        lifetime::staticify_anonymous_lifetimes(&mut field.ty);
     }
 
     return mock_struct;

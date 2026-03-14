@@ -1,8 +1,6 @@
-use crate::constants;
 use crate::mock_generation::fn_info_generation::models::*;
 use crate::mock_generation::mock_parts_generation::models::*;
 use crate::mock_generation::mock_parts_generation::*;
-use syn::punctuated::Punctuated;
 use syn::*;
 
 pub(crate) fn generate(fn_info: &FnInfo, mock_type: &MockType) -> StaticFn {

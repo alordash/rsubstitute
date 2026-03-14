@@ -114,6 +114,8 @@ fn generate_call_base_fn_parts(
         }),
         Target::Trait => constants::REF_SELF_ARG.clone(),
     };
+    let mut call_struct_ty = call_struct.ty_path.clone();
+    call_struct_ty.set_first_generic_lifetime_argument(constants::ANONYMOUS_LIFETIME.clone());
     let call_arg = FnArg::Typed(PatType {
         attrs: Vec::new(),
         pat: Box::new(Pat::Ident(PatIdent {
@@ -124,7 +126,7 @@ fn generate_call_base_fn_parts(
             subpat: None,
         })),
         colon_token: Default::default(),
-        ty: Box::new(call_struct.ty.clone()),
+        ty: Box::new(Type::Path(call_struct_ty)),
     });
     let ident = match maybe_containing_trait_ident {
         Some(containing_trait_ident) => base_fn_ident::format(&format_ident!(
