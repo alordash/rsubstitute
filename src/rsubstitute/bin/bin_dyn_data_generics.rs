@@ -16,7 +16,7 @@ mod __rsubstitute_generated_Trait {
     use super::*;
     use rsubstitute::for_generated::*;
 
-    #[derive(IGenericsHashKeyProvider, IArgsInfosProvider, IArgsTupleProvider)]
+    #[derive(IGenericsInfoProvider, IArgsInfosProvider, IArgsTupleProvider)]
     pub struct work_Call<'rs, T1, T2, T3, const B: bool, const N: usize> {
         _phantom_lifetime: PhantomData<&'rs ()>,
         _return_type: PhantomData<T3>,
@@ -24,7 +24,7 @@ mod __rsubstitute_generated_Trait {
         t2: &'rs T2,
     }
 
-    #[derive(Debug, IGenericsHashKeyProvider, IArgsFormatter)]
+    #[derive(Debug, IGenericsInfoProvider, IArgsFormatter)]
     pub struct work_ArgsChecker<'rs, T1, T2, T3, const B: bool, const N: usize> {
         _phantom_lifetime: PhantomData<&'rs ()>,
         _return_type: PhantomData<T3>,

@@ -42,7 +42,7 @@ fn generate_call_derive_traits_attribute(ctx: &Ctx) -> Attribute {
     let mut arguments = vec![
         constants::I_ARGS_INFOS_PROVIDER_TRAIT_NAME,
         constants::I_ARGS_TUPLE_PROVIDER_TRAIT_NAME,
-        constants::I_GENERICS_HASH_KEY_PROVIDER_TRAIT_NAME,
+        constants::I_GENERICS_INFO_PROVIDER_TRAIT_NAME,
     ];
     if ctx.support_base_calling {
         arguments.push(constants::CLONE_FOR_RSUBSTITUTE_TRAIT_NAME);

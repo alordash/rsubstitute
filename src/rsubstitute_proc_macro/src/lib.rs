@@ -7,7 +7,7 @@ mod derive_args_formatter_macro;
 mod derive_args_infos_provider_macro;
 mod derive_args_tuple_provider_macro;
 mod derive_clone_for_rsubstitute_macro;
-mod derive_generics_hash_key_provider_macro;
+mod derive_generics_info_provider_macro;
 mod derive_mock_data_macro;
 mod mock_generation;
 mod syntax;
@@ -65,9 +65,9 @@ pub fn derive_mock_data(item: proc_macro::TokenStream) -> proc_macro::TokenStrea
     derive_mock_data_macro::handle(item)
 }
 
-#[proc_macro_derive(IGenericsHashKeyProvider)]
-pub fn derive_generics_hash_key_provider(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    derive_generics_hash_key_provider_macro::handle(item)
+#[proc_macro_derive(IGenericsInfoProvider)]
+pub fn derive_generics_info_provider(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    derive_generics_info_provider_macro::handle(item)
 }
 
 #[proc_macro_derive(CloneForRSubstitute)]

@@ -3,6 +3,7 @@ use crate::syntax::*;
 use proc_macro::TokenStream;
 use quote::{format_ident, ToTokens};
 use std::cell::LazyCell;
+use syn::punctuated::Punctuated;
 use syn::*;
 
 pub(crate) fn handle(item: TokenStream) -> TokenStream {
@@ -23,6 +24,7 @@ pub(crate) fn handle(item: TokenStream) -> TokenStream {
         self_ty: Box::new(r#type::create_from_struct(&item_struct)),
         brace_token: Default::default(),
         items: vec![
+            impl_items.get_generic_parameter_infos,
             impl_items.hash_generics_type_ids_item,
             impl_items.hash_const_values_item,
         ],
@@ -42,8 +44,9 @@ const HASH_CONST_VALUES_FN_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("hash_const_values"));
 
 fn generate_impl_items(item_struct: &ItemStruct) -> ImplItems {
-    let mut type_params = Vec::new();
-    let mut const_params = Vec::new();
+    let vecs_capacity = item_struct.generics.params.len();
+    let mut type_params = Vec::with_capacity(vecs_capacity);
+    let mut const_params = Vec::with_capacity(vecs_capacity);
     for generic_param in item_struct.generics.params.iter() {
         match generic_param {
             GenericParam::Type(type_param) => type_params.push(type_param),
@@ -51,14 +54,101 @@ fn generate_impl_items(item_struct: &ItemStruct) -> ImplItems {
             _ => (),
         }
     }
+    let get_generic_parameter_infos =
+        generate_get_generic_parameter_infos(&item_struct.generics.params);
     let hash_generics_type_ids_item = generate_hash_generics_type_ids_item(type_params);
     let hash_const_values_item = generate_hash_const_values_item(const_params);
 
     let impl_items = ImplItems {
+        get_generic_parameter_infos,
         hash_generics_type_ids_item,
         hash_const_values_item,
     };
     return impl_items;
+}
+
+fn generate_get_generic_parameter_infos(
+    generic_params: &Punctuated<GenericParam, Token![,]>,
+) -> ImplItem {
+    let sig = Signature {
+        constness: None,
+        asyncness: None,
+        unsafety: None,
+        abi: None,
+        fn_token: Default::default(),
+        ident: format_ident!("get_generic_parameter_infos"),
+        generics: Default::default(),
+        paren_token: Default::default(),
+        inputs: [constants::REF_SELF_ARG.clone()].into_iter().collect(),
+        variadic: None,
+        output: ReturnType::Type(
+            Default::default(),
+            Box::new(r#type::wrap_in(
+                r#type::create(format_ident!("GenericParameterInfo")),
+                constants::VEC_TYPE_IDENT.clone(),
+            )),
+        ),
+    };
+
+    let generic_parameter_infos: Punctuated<Expr, Token![,]> = generic_params
+        .iter()
+        .filter_map(|generic_param| match generic_param {
+            GenericParam::Type(type_param) => Some(expr_call::create(
+                path::create_expr_with_generics(
+                    constants::GENERIC_TYPE_INFO_FN_IDENT.clone(),
+                    Generics {
+                        lt_token: Some(Default::default()),
+                        params: [GenericParam::Type(TypeParam {
+                            attrs: Vec::new(),
+                            ident: type_param.ident.clone(),
+                            colon_token: None,
+                            bounds: Punctuated::new(),
+                            eq_token: None,
+                            default: None,
+                        })]
+                        .into_iter()
+                        .collect(),
+                        gt_token: Some(Default::default()),
+                        where_clause: None,
+                    },
+                ),
+                str_lit::create_from_ident(&type_param.ident),
+            )),
+            GenericParam::Const(const_param) => Some(expr_call::create_from_ident(
+                constants::GENERIC_CONST_INFO_FN_IDENT.clone(),
+                vec![
+                    str_lit::create_from_ident(&const_param.ident),
+                    path::create_expr(const_param.ident.clone()),
+                ],
+            )),
+            _ => None,
+        })
+        .collect();
+
+    let stmt = Stmt::Expr(
+        Expr::Macro(ExprMacro {
+            attrs: Vec::new(),
+            mac: Macro {
+                path: constants::MACRO_VEC_PATH.clone(),
+                bang_token: Default::default(),
+                delimiter: MacroDelimiter::Bracket(Default::default()),
+                tokens: generic_parameter_infos.into_token_stream(),
+            },
+        }),
+        None,
+    );
+
+    let impl_item_fn = ImplItemFn {
+        attrs: Vec::new(),
+        vis: Visibility::Inherited,
+        defaultness: None,
+        sig,
+        block: Block {
+            brace_token: Default::default(),
+            stmts: vec![stmt],
+        },
+    };
+    return ImplItem::Fn(impl_item_fn);
 }
 
 fn generate_hash_generics_type_ids_item(type_params: Vec<&TypeParam>) -> ImplItem {
@@ -193,6 +283,7 @@ fn generate_const_hash_stmt(const_param: &ConstParam) -> Stmt {
 }
 
 struct ImplItems {
+    pub get_generic_parameter_infos: ImplItem,
     pub hash_generics_type_ids_item: ImplItem,
     pub hash_const_values_item: ImplItem,
 }

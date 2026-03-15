@@ -13,7 +13,11 @@ impl<'rs> IArgsFormatter for DynArgsChecker<'rs> {
     }
 }
 
-impl<'rs> IGenericsHashKeyProvider for DynArgsChecker<'rs> {
+impl<'rs> IGenericsInfoProvider for DynArgsChecker<'rs> {
+    fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
+        self.inner.get_generic_parameter_infos()
+    }
+
     fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {
         self.inner.hash_generics_type_ids(hasher)
     }

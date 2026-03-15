@@ -13,7 +13,12 @@ impl<'rs> IArgsInfosProvider for DynCall<'rs> {
     }
 }
 
-impl<'rs> IGenericsHashKeyProvider for DynCall<'rs> {
+impl<'rs> IGenericsInfoProvider for DynCall<'rs> {
+    fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
+        self.inner.get_generic_parameter_infos()
+    }
+
+
     fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {
         self.inner.hash_generics_type_ids(hasher)
     }

@@ -53,7 +53,7 @@ fn generate_arg_checker_derive_traits_attribute() -> Attribute {
             "{}, {}, {}",
             constants::DEBUG_TRAIT_NAME,
             constants::I_ARGS_FORMATTER_TRAIT_NAME,
-            constants::I_GENERICS_HASH_KEY_PROVIDER_TRAIT_NAME,
+            constants::I_GENERICS_INFO_PROVIDER_TRAIT_NAME,
         ),
     );
     return derive_attribute;

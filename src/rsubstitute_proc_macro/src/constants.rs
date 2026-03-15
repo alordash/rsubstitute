@@ -23,6 +23,8 @@ macro_rules! define {
     };
 }
 
+ident!(VEC_TYPE_IDENT, "Vec");
+
 ident!(DATA_IDENT, "data");
 pub(crate) const MOCK_STRUCT_IDENT_PREFIX: &'static str = "Mock";
 ident!(MOCK_SETUP_FIELD_IDENT, "setup");
@@ -53,11 +55,11 @@ define!(
     path::create(format_ident!("{I_ARGS_FORMATTER_TRAIT_NAME}"))
 );
 
-pub(crate) const I_GENERICS_HASH_KEY_PROVIDER_TRAIT_NAME: &'static str = "IGenericsHashKeyProvider";
+pub(crate) const I_GENERICS_INFO_PROVIDER_TRAIT_NAME: &'static str = "IGenericsInfoProvider";
 define!(
     I_GENERICS_HASH_KEY_PROVIDER_TRAIT_PATH,
     Path,
-    path::create(format_ident!("{I_GENERICS_HASH_KEY_PROVIDER_TRAIT_NAME}"))
+    path::create(format_ident!("{I_GENERICS_INFO_PROVIDER_TRAIT_NAME}"))
 );
 
 pub(crate) const CLONE_FOR_RSUBSTITUTE_TRAIT_NAME: &'static str = "CloneForRSubstitute";
@@ -297,7 +299,7 @@ define!(
     Type,
     r#type::wrap_in(
         r#type::create(format_ident!("ArgCheckResult")),
-        format_ident!("Vec")
+        VEC_TYPE_IDENT.clone()
     )
 );
 
@@ -306,7 +308,7 @@ define!(
     Type,
     r#type::wrap_in(
         r#type::create(format_ident!("ArgInfo")),
-        format_ident!("Vec")
+        VEC_TYPE_IDENT.clone()
     )
 );
 
@@ -314,8 +316,8 @@ define!(
     VEC_OF_VEC_OF_STRINGS_TYPE,
     Type,
     r#type::wrap_in(
-        r#type::wrap_in(STRING_TYPE.clone(), format_ident!("Vec")),
-        format_ident!("Vec"),
+        r#type::wrap_in(STRING_TYPE.clone(), VEC_TYPE_IDENT.clone()),
+        VEC_TYPE_IDENT.clone(),
     )
 );
 
@@ -528,3 +530,7 @@ define!(
     Path,
     path::create(format_ident!("transmute_lifetime"))
 );
+
+ident!(GENERIC_TYPE_INFO_FN_IDENT, "generic_type_info");
+
+ident!(GENERIC_CONST_INFO_FN_IDENT, "generic_const_info");

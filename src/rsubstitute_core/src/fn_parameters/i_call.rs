@@ -1,6 +1,6 @@
 use crate::args::*;
 use crate::*;
 
-pub trait ICall: IArgsInfosProvider + IGenericsHashKeyProvider + IArgsTupleProvider {}
+pub trait ICall: IArgsInfosProvider + IGenericsInfoProvider + IArgsTupleProvider {}
 
-impl<T: IArgsInfosProvider + IGenericsHashKeyProvider + IArgsTupleProvider> ICall for T {}
+impl<T: IArgsInfosProvider + IGenericsInfoProvider + IArgsTupleProvider> ICall for T {}

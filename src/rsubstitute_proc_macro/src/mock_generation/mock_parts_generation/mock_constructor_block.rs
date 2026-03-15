@@ -24,10 +24,7 @@ pub(crate) fn generate(
                 constants::FN_DATA_TYPE_IDENT.clone(),
                 constants::NEW_IDENT.clone(),
             ]);
-            let args = vec![Expr::Lit(ExprLit {
-                attrs: Vec::new(),
-                lit: Lit::Str(LitStr::new(&fn_ident.to_string(), Span::call_site())),
-            })];
+            let args = vec![str_lit::create(&fn_ident),];
             FieldValue {
                 attrs: Vec::new(),
                 member: Member::Named(field_ident.clone()),

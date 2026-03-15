@@ -1,12 +1,12 @@
+use crate::args::{GenericParameterInfo, GenericsHashKey};
 use std::any::TypeId;
 use std::hash::{DefaultHasher, Hash, Hasher};
 
 pub type GenericsHasher = DefaultHasher;
 
-#[derive(Eq, PartialEq, Hash)]
-pub struct GenericsHashKey(u64);
+pub trait IGenericsInfoProvider {
+    fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo>;
 
-pub trait IGenericsHashKeyProvider {
     fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher);
 
     fn hash_const_values(&self, hasher: &mut GenericsHasher);
@@ -20,12 +20,12 @@ pub trait IGenericsHashKeyProvider {
     }
 }
 
-// Helper method for clearer `IGenericsHashKeyProvider::hash_generics_type_ids` auto-generated implementation.
+// Helper method for clearer `IGenericsInfoProvider::hash_generics_type_ids` auto-generated implementation.
 pub fn tid<T>() -> TypeId {
     typeid::of::<T>()
 }
 
-// Helper method for calculating hash in `IGenericsHashKeyProvider::hash_consts_values` of any sized
+// Helper method for calculating hash in `IGenericsInfoProvider::hash_consts_values` of any sized
 // const value (passed as const parameter) by using types raw bytes. Not calling `t.hash` because
 // `T` is not guaranteed to implement `Hash`.
 // This approach anticipates adt_const_params feature:

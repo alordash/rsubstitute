@@ -37,6 +37,10 @@ pub(crate) fn create_with_generics(ident: Ident, generics: Generics) -> Path {
     return result;
 }
 
+pub(crate) fn create_expr_with_generics(ident: Ident, generics: Generics) -> Expr {
+    to_expr(create_with_generics(ident, generics))
+}
+
 pub(crate) fn create_from_parts(idents: Vec<Ident>) -> Path {
     let result = Path {
         leading_colon: None,

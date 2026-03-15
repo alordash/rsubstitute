@@ -16,13 +16,13 @@ mod __rsubstitute_generated_Trait {
     use super::*;
     use rsubstitute::for_generated::*;
 
-    #[derive(Clone, IGenericsHashKeyProvider, IArgsInfosProvider, IArgsTupleProvider)]
+    #[derive(Clone, IGenericsInfoProvider, IArgsInfosProvider, IArgsTupleProvider)]
     pub struct work_Call<'rs, 'a> {
         _phantom_lifetime: PhantomData<&'rs ()>,
         v: &'a i32,
     }
 
-    #[derive(Debug, IArgsFormatter, IGenericsHashKeyProvider)]
+    #[derive(Debug, IArgsFormatter, IGenericsInfoProvider)]
     pub struct work_ArgsChecker<'rs, 'a> {
         _phantom_lifetime: PhantomData<&'rs ()>,
         v: Arg<'rs, &'a i32>,

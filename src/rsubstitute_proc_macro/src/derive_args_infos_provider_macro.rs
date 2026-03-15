@@ -92,10 +92,7 @@ fn generate_arg_info_new_expr(field: &Field) -> Expr {
         .ident
         .clone()
         .expect("Call struct fields should have ident.");
-    let field_name_arg = Expr::Lit(ExprLit {
-        attrs: Vec::new(),
-        lit: Lit::Str(LitStr::new(&field_ident.to_string(), Span::call_site())),
-    });
+    let field_name_arg = str_lit::create_from_ident(&field_ident);
     let field_value_arg = expr_reference::create(field_access_expr::create(vec![
         constants::SELF_IDENT.clone(),
         field_ident.clone(),
