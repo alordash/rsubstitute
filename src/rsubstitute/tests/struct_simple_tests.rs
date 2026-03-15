@@ -44,7 +44,7 @@ mod tests {
         fn f_Ok() {
             // Arrange
             let value = 22;
-            let mock = StructMock::new(value);
+            let mock = Struct::new(value);
             let callback_flag = Arc::new(RefCell::new(false));
             let callback_flag_clone = callback_flag.clone();
             let return_value = ();
@@ -54,7 +54,7 @@ mod tests {
                 .and_does(move |_, _| *callback_flag_clone.borrow_mut() = true);
 
             // Act
-            StructMock::non_associative();
+            Struct::non_associative();
             let result = mock.f();
 
             // Assert
@@ -67,7 +67,7 @@ mod tests {
         #[test]
         fn f_NoConfig_Ok() {
             // Arrange
-            let mock = StructMock::new(1);
+            let mock = Struct::new(1);
 
             // Act
             let result = mock.f();
@@ -80,7 +80,7 @@ mod tests {
         #[test]
         fn f_MultipleTimes_Ok() {
             // Arrange
-            let mock = StructMock::new(1);
+            let mock = Struct::new(1);
 
             // Act
             let result1 = mock.f();
@@ -98,7 +98,7 @@ mod tests {
         #[test]
         fn f_MultipleTimes_Panics() {
             // Arrange
-            let mock = StructMock::new(1);
+            let mock = Struct::new(1);
 
             // Act
             mock.f();
@@ -159,7 +159,7 @@ Received no non-matching calls"#,
         fn Trait_f_Ok() {
             // Arrange
             let value = 22;
-            let mock = StructMock::new(value);
+            let mock = Struct::new(value);
             let callback_flag = Arc::new(RefCell::new(false));
             let callback_flag_clone = callback_flag.clone();
             let return_value = ();
@@ -170,7 +170,7 @@ Received no non-matching calls"#,
                 .and_does(move |_, _| *callback_flag_clone.borrow_mut() = true);
 
             // Act
-            StructMock::non_associative();
+            Struct::non_associative();
             let result = Trait::f(&mock);
 
             // Assert
@@ -184,7 +184,7 @@ Received no non-matching calls"#,
         #[test]
         fn Trait_f_NoConfig_Ok() {
             // Arrange
-            let mock = StructMock::new(1);
+            let mock = Struct::new(1);
 
             // Act
             let result = Trait::f(&mock);
@@ -198,7 +198,7 @@ Received no non-matching calls"#,
         #[test]
         fn Trait_f_MultipleTimes_Ok() {
             // Arrange
-            let mock = StructMock::new(1);
+            let mock = Struct::new(1);
 
             // Act
             let result1 = Trait::f(&mock);
@@ -217,7 +217,7 @@ Received no non-matching calls"#,
         #[test]
         fn Trait_f_MultipleTimes_Panics() {
             // Arrange
-            let mock = StructMock::new(1);
+            let mock = Struct::new(1);
 
             // Act
             Trait::f(&mock);

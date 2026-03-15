@@ -33,7 +33,7 @@ mod tests {
         #[test]
         fn accept_value_Ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let first_value = 10;
             let second_value = 22;
 
@@ -61,7 +61,7 @@ mod tests {
         #[test]
         fn accept_value_Callback_ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let callback_flag = Arc::new(RefCell::new(false));
             let callback_flag_clone = callback_flag.clone();
             mock.setup
@@ -78,7 +78,7 @@ mod tests {
         #[test]
         fn accept_value_ArgAny_Panics() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let first_value = 10;
             let second_value = 22;
 
@@ -125,7 +125,7 @@ Received no non-matching calls"#
         #[test]
         fn accept_value_ArgEq_Panics() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let first_value = 10;
             let second_value = 22;
 
@@ -207,7 +207,7 @@ accept_value(*{first_value}*)
         #[test]
         fn accept_value_ArgIs_Panics() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let first_value = 10;
             let second_value = 22;
 
@@ -293,7 +293,7 @@ accept_value(*{first_value}*)
         #[test]
         fn accept_value_NoOtherCallsWithoutOtherCalls_Ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let value = 10;
 
             // Act
@@ -308,7 +308,7 @@ accept_value(*{first_value}*)
         #[test]
         fn accept_value_NoOtherCallsWithOneOtherCall_Panics() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let first_value = 10;
             let second_value = 22;
 
@@ -333,7 +333,7 @@ accept_value(*{first_value}*)
         #[test]
         fn accept_value_NoOtherCallsWithManyOtherCalls_Panics() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let first_value = 10;
             let second_value = 22;
             let third_value = 333;
@@ -365,7 +365,7 @@ accept_value(*{first_value}*)
         #[test]
         fn return_value_Single_Ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let value = 10;
             mock.setup.return_value().returns(value);
 
@@ -386,7 +386,7 @@ accept_value(*{first_value}*)
                 ThirdConfigChanged,
             }
 
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let first_value = 10;
             let second_value = 22;
             let third_value = 333;
@@ -420,7 +420,7 @@ accept_value(*{first_value}*)
         #[test]
         fn return_value_Many_Ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let first_value = 10;
             let second_value = 22;
             let third_value = 333;
@@ -442,7 +442,7 @@ accept_value(*{first_value}*)
         #[test]
         fn return_value_ManyWithCallback_Ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let callback_counter = Arc::new(RefCell::new(0));
             let callback_counter_clone = callback_counter.clone();
             let first_value = 10;
@@ -466,7 +466,7 @@ accept_value(*{first_value}*)
         #[test]
         fn return_value_NoMatchingConfiguration_Panics() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
 
             // Act
             let actual_error_msg = record_panic(|| mock.return_value());
@@ -484,7 +484,7 @@ accept_value(*{first_value}*)
         #[test]
         fn accept_value_return_value_Ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let first_accepted_value = 10;
             let first_returned_value = 11.1;
             let second_accepted_value = 20;
@@ -520,7 +520,7 @@ accept_value(*{first_value}*)
         #[test]
         fn accept_value_return_value_Many1_Ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let single_accepted_value = 10;
             let double_accepted_value = 20;
             let first_returned_value = 11.1;
@@ -555,7 +555,7 @@ accept_value(*{first_value}*)
         #[test]
         fn accept_value_return_value_Many2_Ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let first_accepted_value = 10;
             let first_first_returned_value = 11.1;
             let first_second_returned_value = 22.2;
@@ -620,7 +620,7 @@ accept_value(*{first_value}*)
         #[test]
         fn accept_value_return_value_Callback_Ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let first_accepted_value = 10;
             let first_callback_number = Arc::new(RefCell::new(0));
             let first_callback_number_clone = first_callback_number.clone();
@@ -666,7 +666,7 @@ accept_value(*{first_value}*)
         #[test]
         fn accept_two_values_Ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let v1 = 10;
             let v2 = 20.2;
 
@@ -686,7 +686,7 @@ accept_value(*{first_value}*)
         #[test]
         fn accept_two_values_return_value_Ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let v1 = 10;
             let v2 = 20.2;
             let returned_value = String::from("quo vadis");
@@ -708,7 +708,7 @@ accept_value(*{first_value}*)
         #[test]
         fn accept_two_values_return_value_Panics() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let v1 = 10;
             let v2 = 20.2;
             let returned_value = String::from("veridis quo");
@@ -779,7 +779,7 @@ accept_two_values_return_value(*10*, *20.2*)
         #[test]
         fn accept_two_values_return_value_NoReturnValue_Panics() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let unexpected_v1 = 10;
             let unexpected_v2 = 22.2;
             let expected_v1 = 30;

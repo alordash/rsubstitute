@@ -32,7 +32,7 @@ mod tests {
         #[test]
         fn accept_rc_Ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let r = Rc::new(1);
 
             // Act
@@ -45,7 +45,7 @@ mod tests {
         #[test]
         fn accept_rc_Panics() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let r = Rc::new(11);
             let r_ptr = Rc::as_ptr(&r);
 
@@ -99,7 +99,7 @@ accept_rc(*{r}*)
         #[test]
         fn return_rc_Ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let r = Rc::new(10);
             mock.setup.return_rc().returns(r.clone());
 
@@ -117,7 +117,7 @@ accept_rc(*{r}*)
         #[test]
         fn accept_rc_return_rc_Ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let accepted_r = Rc::new(10);
             let returned_r = Rc::new(20);
             mock.setup
@@ -143,7 +143,7 @@ accept_rc(*{r}*)
         #[test]
         fn accept_two_rcs_Ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let r1 = Rc::new(10);
             let r2 = Rc::new(20.2);
 
@@ -164,7 +164,7 @@ accept_rc(*{r}*)
         #[test]
         fn accept_two_rcs_return_rc_Ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let r1 = Rc::new(10);
             let r2 = Rc::new(20.2);
             let returned_r = Rc::new(String::from("veridis quo"));

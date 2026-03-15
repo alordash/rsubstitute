@@ -49,7 +49,7 @@ mod tests {
         #[test]
         fn accept_arc_Ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let r = Arc::new(1);
 
             // Act
@@ -62,7 +62,7 @@ mod tests {
         #[test]
         fn accept_arc_Panics() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let r = Arc::new(11);
             let r_ptr = Arc::as_ptr(&r);
 
@@ -116,7 +116,7 @@ accept_arc(*{r}*)
         #[test]
         fn return_arc_Ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let r = Arc::new(10);
             mock.setup.return_arc().returns(r.clone());
 
@@ -134,7 +134,7 @@ accept_arc(*{r}*)
         #[test]
         fn accept_arc_return_arc_Ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let accepted_r = Arc::new(10);
             let returned_r = Arc::new(20);
             mock.setup
@@ -160,7 +160,7 @@ accept_arc(*{r}*)
         #[test]
         fn accept_two_arcs_Ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let r1 = Arc::new(10);
             let r2 = Arc::new(20.2);
 
@@ -181,7 +181,7 @@ accept_arc(*{r}*)
         #[test]
         fn accept_two_arcs_return_arc_Ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let r1 = Arc::new(10);
             let r2 = Arc::new(20.2);
             let returned_r = Arc::new(String::from("veridis quo"));

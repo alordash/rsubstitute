@@ -36,7 +36,7 @@ mod tests {
 
     #[test]
     fn flex() {
-        let mut mock = StructMock::new();
+        let mut mock = Struct::new();
 
         mock.setup.sbox().call_base();
         mock.setup.src().call_base();

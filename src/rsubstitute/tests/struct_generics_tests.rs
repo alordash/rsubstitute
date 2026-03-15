@@ -36,7 +36,7 @@ mod tests {
         let t1 = "amogus";
         let t2 = vec![3, 4, 5];
         let number = 4534;
-        let mock = StructMock::new(t1, &t2, number);
+        let mock = Struct::new(t1, &t2, number);
 
         let another_t2 = vec![11, 2];
         mock.setup.get_t2().returns(&another_t2);

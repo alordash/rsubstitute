@@ -31,7 +31,7 @@ mod tests {
         #[test]
         fn accept_ref_Ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let r = &1;
 
             // Act
@@ -44,7 +44,7 @@ mod tests {
         #[test]
         fn accept_rc_Panics() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let r = &11;
             let r_ptr = core::ptr::from_ref(r);
 
@@ -98,7 +98,7 @@ accept_ref(*{r}*)
         #[test]
         fn return_ref_Ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let r = Box::leak(Box::new(11));
             mock.setup.return_ref().returns(r);
 
@@ -116,7 +116,7 @@ accept_ref(*{r}*)
         #[test]
         fn accept_ref_return_ref_Ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let accepted_r = &10;
             let returned_r = &20;
             mock.setup
@@ -142,7 +142,7 @@ accept_ref(*{r}*)
         #[test]
         fn accept_two_refs_Ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let r1 = &10;
             let r2 = &20.2;
 
@@ -163,7 +163,7 @@ accept_ref(*{r}*)
         #[test]
         fn accept_two_refs_return_ref_Ok() {
             // Arrange
-            let mock = StructMock::new();
+            let mock = Struct::new();
             let r1 = &10;
             let r2 = &20.2;
             let returned_r = "veridis quo";

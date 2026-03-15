@@ -398,7 +398,7 @@ mod tests {
     #[test]
     fn struct_work_Ok() {
         // Arrange
-        let mock = StructMock::new();
+        let mock = Struct::new();
         let return_value = &&&&&&&&&&&&&&&&&55;
         let a = &1;
         {

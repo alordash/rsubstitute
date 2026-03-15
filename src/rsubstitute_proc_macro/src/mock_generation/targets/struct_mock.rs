@@ -5,17 +5,13 @@ use crate::mock_generation::mock_parts_generation::*;
 use crate::mock_generation::models::*;
 use crate::mock_generation::*;
 use proc_macro::TokenStream;
-use quote::{format_ident, quote};
+use quote::quote;
 use syn::ImplItem;
 
 pub(crate) fn handle(ctx: &Ctx, mut struct_mock_syntax: StructMockSyntax) -> TokenStream {
     let source_struct_impls_syntax = generate_source_struct_impls_syntax(&struct_mock_syntax);
 
-    let mock_ident = format_ident!(
-        "{}{}",
-        struct_mock_syntax.r#struct.ident,
-        constants::MOCK_STRUCT_IDENT_PREFIX
-    );
+    let mock_ident = struct_mock_syntax.r#struct.ident.clone();
 
     let mock_generics = mock_generics::generate(&struct_mock_syntax.r#struct.generics);
     let mock_type = mock_type::generate_for_struct(mock_ident.clone(), mock_generics);

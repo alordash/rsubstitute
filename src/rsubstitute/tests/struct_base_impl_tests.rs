@@ -12,7 +12,6 @@ pub const DEFAULT_STRUCT_GET_VALUE: i32 = 200;
 pub const DEFAULT_FIRST_TRAIT_GET_VALUE: i32 = 500;
 pub const DEFAULT_SECOND_TRAIT_GET_VALUE: &'static str = "quo vadis";
 
-// TODO - dont add "Mock" suffix to generated struct mock
 mocked_base! {
     struct Struct;
 
@@ -51,7 +50,7 @@ mod tests {
     #[test]
     fn get_plus_one_Ok() {
         // Arrange
-        let mock = StructMock::new();
+        let mock = Struct::new();
 
         let value = 302;
         mock.setup.get_plus_one().returns(value);
@@ -68,7 +67,7 @@ mod tests {
     #[test]
     fn get_plus_one_CallBase_Ok() {
         // Arrange
-        let mock = StructMock::new();
+        let mock = Struct::new();
 
         let struct_value = 302;
         let trait_value = 33;
@@ -105,7 +104,7 @@ mod tests {
     #[test]
     fn get_plus_one_StructCallBase_Ok() {
         // Arrange
-        let mock = StructMock::new();
+        let mock = Struct::new();
 
         let trait_value = 33;
         mock.setup
@@ -135,7 +134,7 @@ mod tests {
     #[test]
     fn get_plus_one_StructAndTraitCallBase_Ok() {
         // Arrange
-        let mock = StructMock::new();
+        let mock = Struct::new();
 
         mock.setup
             .get()
@@ -164,7 +163,7 @@ mod tests {
     #[test]
     fn get_SelfAndBothTraits_Ok() {
         // Arrange
-        let mock = StructMock::new();
+        let mock = Struct::new();
 
         let self_value = 5;
         let first_trait_value = 15;
