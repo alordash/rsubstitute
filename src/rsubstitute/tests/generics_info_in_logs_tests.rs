@@ -25,7 +25,7 @@ mod __rsubstitute_generated_Trait {
     {
         fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
             vec![
-                generic_type_info("T1", core::any::TypeId::of::<T1>()),
+                generic_type_info("T1", core::any::type_name::<T1>()),
                 generic_const_info("B", B),
                 generic_type_info("T2", core::any::type_name::<T2>()),
                 generic_const_info("N", N),

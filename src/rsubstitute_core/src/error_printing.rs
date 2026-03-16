@@ -1,17 +1,22 @@
 use crate::args::*;
+use crate::fn_parameters::DynArgsChecker;
 use crate::matching_config_search_result::MatchingConfigSearchErr;
 use crate::*;
 
 pub(crate) fn panic_received_verification_error(
     fn_name: &'static str,
-    args_formatter: &dyn IArgsFormatter,
+    args_formatter: &DynArgsChecker,
     matching_calls_check_result: CallsCheckResult,
     non_matching_calls_check_result: CallsCheckResult,
     times: Times,
 ) -> ! {
     let matching_calls_count = matching_calls_check_result.calls_args_check_results.len();
 
-    let expected_call_msg = format!("\t{fn_name}({})", args_formatter.fmt_args());
+    let expected_call_msg = format!(
+        "\t{fn_name}{}({})",
+        fmt_generic_parameter_infos(&args_formatter.get_generic_parameter_infos()),
+        args_formatter.fmt_args()
+    );
     let matching_calls_report = if matching_calls_count == 0 {
         "Actually received no matching calls".to_string()
     } else {
@@ -22,7 +27,7 @@ pub(crate) fn panic_received_verification_error(
                 fmt_call(
                     fn_name,
                     x,
-                    &matching_calls_check_result.generic_parameter_infos,
+                    &[],    // TODO - add enum
                 )
             })
             .collect();
@@ -49,7 +54,7 @@ pub(crate) fn panic_received_verification_error(
                 fmt_call(
                     fn_name,
                     x,
-                    &non_matching_calls_check_result.generic_parameter_infos,
+                    &[],    // TODO - add enum
                 )
             })
             .collect();
