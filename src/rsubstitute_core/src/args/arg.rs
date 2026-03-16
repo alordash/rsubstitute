@@ -207,12 +207,6 @@ impl<'rs, 'a, T: ?Sized> Arg<'rs, &'a mut T> {
                 .as_ref()
                 .expect("Mutable reference to call argument should not be null.")
         };
-        // SAFETY: see notes above.
-        let mut_actual_value = unsafe {
-            &(*actual_value_ptr)
-                .as_mut()
-                .expect("Mutable reference to call argument should not be null.")
-        };
         let arg_info = ArgInfo::new(arg_name, actual_value, actual_value_str.clone());
         let actual_ptr = core::ptr::from_ref(*actual_value);
         match self {
