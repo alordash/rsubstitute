@@ -19,6 +19,7 @@ trait Trait<'rs, T1> {
 }
 
 #[derive(Clone, Debug)]
+#[allow(unused)]
 struct Foo {
     amogus: f32,
 }

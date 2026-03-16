@@ -532,5 +532,4 @@ define!(
 );
 
 ident!(GENERIC_TYPE_INFO_FN_IDENT, "generic_type_info");
-
 ident!(GENERIC_CONST_INFO_FN_IDENT, "generic_const_info");

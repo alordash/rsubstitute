@@ -36,10 +36,10 @@ impl Display for GenericParameterInfo {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         match self {
             GenericParameterInfo::Type(type_info) => {
-                write!(f, "{}: {}", type_info.name, type_info.name)
+                write!(f, "{}", type_info.type_name)
             }
             GenericParameterInfo::Const(const_info) => {
-                write!(f, "{} = {}", const_info.name, const_info.debug_value_str)
+                write!(f, "{}", const_info.debug_value_str)
             }
         }
     }

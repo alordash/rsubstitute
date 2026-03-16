@@ -242,15 +242,10 @@ mod internal {
                     non_matching_calls_args_check_results.push(call_args_check_results);
                 }
             }
-            let generic_parameters_info = dyn_args_checker.get_generic_parameter_infos();
-            let matching_calls_check_result = CallsCheckResult::new(
-                matching_calls_args_check_results,
-                generic_parameters_info.clone(),
-            );
-            let non_matching_calls_check_result = CallsCheckResult::new(
-                non_matching_calls_args_check_results,
-                generic_parameters_info,
-            );
+            let matching_calls_check_result =
+                CallsCheckResult::new(matching_calls_args_check_results);
+            let non_matching_calls_check_result =
+                CallsCheckResult::new(non_matching_calls_args_check_results);
             return (matching_calls_check_result, non_matching_calls_check_result);
         }
 
@@ -276,9 +271,7 @@ mod internal {
                 let b_matched_args_count = b.iter().filter(|x| x.is_ok()).count();
                 return b_matched_args_count.cmp(&a_matched_args_count);
             });
-            let generic_parameter_infos = dyn_call.get_generic_parameter_infos();
-            let calls_check_result =
-                CallsCheckResult::new(calls_args_check_results, generic_parameter_infos);
+            let calls_check_result = CallsCheckResult::new(calls_args_check_results);
             return MatchingConfigSearchResult::Err(MatchingConfigSearchErr {
                 args_check_results_sorted_by_number_of_correctly_matched_args_descending:
                     calls_check_result,
