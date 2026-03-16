@@ -43,17 +43,19 @@ impl<'rs, T: Debug> Debug for Arg<'rs, T> {
 
 impl<'rs, T> Arg<'rs, T> {
     pub fn is<'a, TFn: Fn(&T) -> bool + 'a>(predicate: TFn) -> Self {
-        let anonymous_predicate = move |ptr: *const()| {
-            // SAFETY: 
+        let anonymous_predicate = move |ptr: *const ()| {
+            // SAFETY: anonymous predicate is called only internally and passed pointer is always
+            // created by casting &T.
             let t_ref = unsafe {
                 let t_ptr = ptr as *const T;
-                t_ptr.as_ref().expect("Pointer to argument in Arg::is must not be null.")
+                t_ptr
+                    .as_ref()
+                    .expect("Pointer to argument in Arg::is must not be null.")
             };
+            return predicate(t_ref);
         };
-        
-        let reference: Box<dyn Fn(*const ()) -> bool + 'rs> =
-            transmute_lifetime!(Box::new(predicate) as Box<dyn Fn(&T) -> bool + 'a>);
-        return Self::PrivateIs(reference, Private);
+        let boxed_anonymous_predicate = Box::new(anonymous_predicate) as Box<dyn Fn(*const ()) -> bool + 'a>;
+        return Self::PrivateIs(transmute_lifetime!(boxed_anonymous_predicate), Private);
     }
 
     pub fn eq(value: T) -> Self
