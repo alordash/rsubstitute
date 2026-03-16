@@ -1,5 +1,4 @@
 use crate::args::*;
-use crate::*;
 
 pub trait ICall: IArgsInfosProvider + IGenericsInfoProvider + IArgsTupleProvider {}
 

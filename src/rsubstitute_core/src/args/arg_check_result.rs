@@ -15,17 +15,6 @@ pub struct ArgCheckResultErr {
 }
 
 impl ArgCheckResult {
-    pub fn ok(arg_info: ArgInfo) -> Self {
-        Self::Ok(ArgCheckResultOk { arg_info })
-    }
-
-    pub fn err(arg_info: ArgInfo, error_msg: String) -> Self {
-        Self::Err(ArgCheckResultErr {
-            arg_info,
-            error_msg,
-        })
-    }
-
     pub fn is_ok(&self) -> bool {
         match self {
             ArgCheckResult::Ok(_) => true,

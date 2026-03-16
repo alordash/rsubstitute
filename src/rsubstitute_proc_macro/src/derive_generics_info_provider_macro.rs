@@ -93,26 +93,36 @@ fn generate_get_generic_parameter_infos(
     let generic_parameter_infos: Punctuated<Expr, Token![,]> = generic_params
         .iter()
         .filter_map(|generic_param| match generic_param {
-            GenericParam::Type(type_param) => Some(expr_call::create(
+            GenericParam::Type(type_param) => Some(expr_call::create_with_args(
                 path::create_expr_with_generics(
                     constants::GENERIC_TYPE_INFO_FN_IDENT.clone(),
-                    Generics {
-                        lt_token: Some(Default::default()),
-                        params: [GenericParam::Type(TypeParam {
-                            attrs: Vec::new(),
-                            ident: type_param.ident.clone(),
-                            colon_token: None,
-                            bounds: Punctuated::new(),
-                            eq_token: None,
-                            default: None,
-                        })]
-                        .into_iter()
-                        .collect(),
-                        gt_token: Some(Default::default()),
-                        where_clause: None,
-                    },
+                    Generics::default(),
                 ),
-                str_lit::create_from_ident(&type_param.ident),
+                vec![
+                    str_lit::create_from_ident(&type_param.ident),
+                    expr_call::create_without_args(path::create_expr_from_parts_with_generics(
+                        vec![
+                            format_ident!("core"),
+                            format_ident!("any"),
+                            format_ident!("type_name"),
+                        ],
+                        Generics {
+                            lt_token: Some(Default::default()),
+                            params: [GenericParam::Type(TypeParam {
+                                attrs: Vec::new(),
+                                ident: type_param.ident.clone(),
+                                colon_token: None,
+                                bounds: Punctuated::new(),
+                                eq_token: None,
+                                default: None,
+                            })]
+                            .into_iter()
+                            .collect(),
+                            gt_token: Some(Default::default()),
+                            where_clause: None,
+                        },
+                    )),
+                ],
             )),
             GenericParam::Const(const_param) => Some(expr_call::create_from_ident(
                 constants::GENERIC_CONST_INFO_FN_IDENT.clone(),

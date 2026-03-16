@@ -3,7 +3,7 @@ use crate::mock_generation::fn_info_generation::models::*;
 use crate::mock_generation::mock_parts_generation::*;
 use crate::syntax::extensions::*;
 use crate::syntax::*;
-use proc_macro2::{Ident, Span};
+use proc_macro2::Ident;
 use quote::{format_ident, ToTokens};
 use std::cell::LazyCell;
 use syn::punctuated::Punctuated;

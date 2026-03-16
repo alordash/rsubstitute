@@ -2,7 +2,7 @@ use crate::constants;
 use crate::mock_generation::mock_parts_generation::*;
 use crate::syntax::*;
 use proc_macro::TokenStream;
-use proc_macro2::{Ident, Span};
+use proc_macro2::Ident;
 use quote::{format_ident, ToTokens};
 use std::cell::LazyCell;
 use syn::punctuated::Punctuated;

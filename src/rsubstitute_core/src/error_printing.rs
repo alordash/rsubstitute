@@ -5,19 +5,26 @@ use crate::*;
 pub(crate) fn panic_received_verification_error(
     fn_name: &'static str,
     args_formatter: &dyn IArgsFormatter,
-    matching_calls: Vec<Vec<ArgCheckResult>>,
-    non_matching_calls: Vec<Vec<ArgCheckResult>>,
+    matching_calls_check_result: CallsCheckResult,
+    non_matching_calls_check_result: CallsCheckResult,
     times: Times,
 ) -> ! {
-    let matching_calls_count = matching_calls.len();
+    let matching_calls_count = matching_calls_check_result.calls_args_check_results.len();
 
     let expected_call_msg = format!("\t{fn_name}({})", args_formatter.fmt_args());
     let matching_calls_report = if matching_calls_count == 0 {
         "Actually received no matching calls".to_string()
     } else {
-        let matching_calls_args_msgs: Vec<_> = matching_calls
+        let matching_calls_args_msgs: Vec<_> = matching_calls_check_result
+            .calls_args_check_results
             .into_iter()
-            .map(|x| fmt_call(fn_name, x))
+            .map(|x| {
+                fmt_call(
+                    fn_name,
+                    x,
+                    &matching_calls_check_result.generic_parameter_infos,
+                )
+            })
             .collect();
         let matching_calls_args_msg = matching_calls_args_msgs.join("\n\t");
         let call_fmt = fmt_calls(matching_calls_count);
@@ -26,16 +33,25 @@ pub(crate) fn panic_received_verification_error(
 \t{matching_calls_args_msg}"
         )
     };
-    let non_matching_calls_count = non_matching_calls.len();
+    let non_matching_calls_count = non_matching_calls_check_result
+        .calls_args_check_results
+        .len();
     let non_matching_calls_report = if non_matching_calls_count == 0 {
         "Received no non-matching calls".to_string()
     } else {
         let max_invalid_calls_listed_count = read_config().max_invalid_calls_listed_count;
         let call_fmt = fmt_calls(non_matching_calls_count);
-        let non_matching_calls_args_msgs: Vec<_> = non_matching_calls
+        let non_matching_calls_args_msgs: Vec<_> = non_matching_calls_check_result
+            .calls_args_check_results
             .into_iter()
             .take(max_invalid_calls_listed_count)
-            .map(|x| fmt_call(fn_name, x))
+            .map(|x| {
+                fmt_call(
+                    fn_name,
+                    x,
+                    &non_matching_calls_check_result.generic_parameter_infos,
+                )
+            })
             .collect();
         let trimmed_output_disclaimer = if non_matching_calls_count > max_invalid_calls_listed_count
         {
@@ -61,23 +77,23 @@ pub(crate) fn panic_received_verification_error(
 pub(crate) fn panic_no_suitable_fn_configuration_found(
     fn_name: &'static str,
     unexpected_call: Vec<ArgInfo>,
+    generic_parameter_infos: Vec<GenericParameterInfo>,
     matching_config_search_err: MatchingConfigSearchErr,
 ) -> ! {
-    let call_msg = format_received_unexpected_call_error(fn_name, unexpected_call);
-    let configs_report = if matching_config_search_err
-        .args_check_results_sorted_by_number_of_correctly_matched_args_descending
-        .len()
-        > 0
-    {
-        let args_check_results_msgs: Vec<_> = matching_config_search_err
-                .args_check_results_sorted_by_number_of_correctly_matched_args_descending
+    let call_msg =
+        format_received_unexpected_call_error(fn_name, unexpected_call, generic_parameter_infos);
+    let calls = matching_config_search_err
+        .args_check_results_sorted_by_number_of_correctly_matched_args_descending;
+    let configs_report = if calls.calls_args_check_results.len() > 0 {
+        let args_check_results_msgs: Vec<_> = calls
+            .calls_args_check_results
                 .into_iter()
                 .enumerate()
                 .map(|(i, args_check_result)| {
                     let number = i + 1;
                     let matched_arguments_count = args_check_result.iter().filter(|x| x.is_ok()).count();
                     let total_arguments_count = args_check_result.len();
-                    let args_msg = fmt_args_msg(fn_name, args_check_result);
+                    let args_msg = fmt_fn_parameters_msg(fn_name, args_check_result, &calls.generic_parameter_infos);
                     return format!("{number}. Matched {matched_arguments_count}/{total_arguments_count} arguments: {args_msg}");
                 })
                 .collect();
@@ -100,13 +116,15 @@ List of existing configuration ordered by number of correctly matched arguments 
 pub(crate) fn format_received_unexpected_call_error(
     fn_name: &'static str,
     call_args: Vec<ArgInfo>,
+    generic_parameter_infos: Vec<GenericParameterInfo>,
 ) -> String {
     let call_args_msgs: Vec<_> = call_args
         .into_iter()
         .map(|call_arg| call_arg.clone_arg_debug_string())
         .collect();
     let call_args_msg = call_args_msgs.join(", ");
-    let error_msg = format!("{fn_name}({call_args_msg})");
+    let generic_parameters_msg = fmt_generic_parameter_infos(&generic_parameter_infos);
+    let error_msg = format!("{fn_name}{generic_parameters_msg}({call_args_msg})");
     return error_msg;
 }
 
@@ -132,14 +150,20 @@ pub(crate) fn panic_received_unexpected_calls_error(error_msgs: Vec<String>) -> 
 pub(crate) fn panic_no_return_value_was_configured(
     fn_name: &'static str,
     call_args: Vec<ArgInfo>,
+    generic_parameter_infos: Vec<GenericParameterInfo>,
 ) -> ! {
-    let call_msg = format_received_unexpected_call_error(fn_name, call_args);
+    let call_msg =
+        format_received_unexpected_call_error(fn_name, call_args, generic_parameter_infos);
     let error_msg = format!("No return value found for following call: {call_msg}");
     panic!("{error_msg}");
 }
 
-fn fmt_call(fn_name: &'static str, call: Vec<ArgCheckResult>) -> String {
-    let error_msgs: Vec<_> = call
+fn fmt_call(
+    fn_name: &'static str,
+    args_check_results: Vec<ArgCheckResult>,
+    generic_parameter_info: &[GenericParameterInfo],
+) -> String {
+    let error_msgs: Vec<_> = args_check_results
         .iter()
         .filter_map(ArgCheckResult::as_err)
         .enumerate()
@@ -165,12 +189,16 @@ fn fmt_call(fn_name: &'static str, call: Vec<ArgCheckResult>) -> String {
 \t{error_msgs_joined}"
         )
     };
-    let args_msg = fmt_args_msg(fn_name, call);
+    let args_msg = fmt_fn_parameters_msg(fn_name, args_check_results, generic_parameter_info);
     format!("{args_msg}{errors_report}")
 }
 
-fn fmt_args_msg(fn_name: &'static str, call: Vec<ArgCheckResult>) -> String {
-    let args_msgs: Vec<_> = call
+fn fmt_fn_parameters_msg(
+    fn_name: &'static str,
+    args_check_results: Vec<ArgCheckResult>,
+    generic_parameter_infos: &[GenericParameterInfo],
+) -> String {
+    let args_msgs: Vec<_> = args_check_results
         .into_iter()
         .map(|x| match x {
             ArgCheckResult::Ok(x) => x.arg_info.clone_arg_debug_string(),
@@ -178,8 +206,23 @@ fn fmt_args_msg(fn_name: &'static str, call: Vec<ArgCheckResult>) -> String {
         })
         .collect();
     let args_msgs_joined = args_msgs.join(", ");
-    let args_msg = format!("{fn_name}({args_msgs_joined})");
+    let generic_parameters_msg = fmt_generic_parameter_infos(generic_parameter_infos);
+    let args_msg = format!("{fn_name}{generic_parameters_msg}({args_msgs_joined})");
     return args_msg;
+}
+
+fn fmt_generic_parameter_infos(generic_parameter_infos: &[GenericParameterInfo]) -> String {
+    let result = if generic_parameter_infos.is_empty() {
+        String::new()
+    } else {
+        let generic_parameters_msgs: Vec<_> = generic_parameter_infos
+            .into_iter()
+            .map(|x| x.to_string())
+            .collect();
+        let generic_parameters_msgs_joined = generic_parameters_msgs.join(", ");
+        format!("<{generic_parameters_msgs_joined}>")
+    };
+    return result;
 }
 
 fn fmt_calls(calls_count: usize) -> &'static str {
