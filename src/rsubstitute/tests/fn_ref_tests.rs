@@ -64,7 +64,6 @@ mod tests {
             // Arrange
             let r = &12;
 
-            // TODO - add API for calls inspection
             {
                 let v2 = 24;
                 let r2 = &v2;
@@ -72,21 +71,6 @@ mod tests {
                     .does(|(ref received_r2,)| println!("received_r2 = {received_r2}"));
                 accept_ref(r2);
             }
-
-            let q: &i32 = accept_ref::get_mock()
-                .data
-                .accept_ref
-                .configs
-                .borrow()
-                .iter()
-                .next()
-                .unwrap()
-                .1[0]
-                .borrow()
-                .calls
-                .last()
-                .unwrap()
-                .downcast_ref();
 
             let some_data = [15, 22, 32, 42, 52, 62, 72, 82, 92, 102];
             println!("some_data = {some_data:?}");
