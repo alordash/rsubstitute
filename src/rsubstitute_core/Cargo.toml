@@ -2,6 +2,11 @@
 name = "rsubstitute_core"
 version = "0.1.0"
 edition = "2024"
+description = "Core of rsubstitute that handles mocking logic."
+license = "MIT"
+homepage = "https://github.com/alordash/rsubstitute"
+repository = "https://github.com/alordash/rsubstitute"
+readme = "../../README.md"
 
 [dependencies]
 typeid = { workspace = true }

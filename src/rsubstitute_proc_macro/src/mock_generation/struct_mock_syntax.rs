@@ -13,18 +13,17 @@ pub(crate) fn parse(input: ParseStream) -> Result<StructMockSyntax> {
     while !input.is_empty() {
         let item_impl = input.call(ItemImpl::parse)?;
         let Type::Path(type_path) = item_impl.self_ty.as_ref() else {
-            panic!("{}", STRUCT_MOCK_INVALID_IDENT_ERROR_MESSAGE);
+            panic!("{STRUCT_MOCK_INVALID_IDENT_ERROR_MESSAGE}");
         };
         assert_eq!(
             type_path.path.segments.len(),
             1,
-            "{}",
-            STRUCT_MOCK_INVALID_IMPL_TARGET_PATH_ERROR_MSG
+            "{STRUCT_MOCK_INVALID_IMPL_TARGET_PATH_ERROR_MSG}"
         );
         let type_path_segment = type_path.path.segments.first().unwrap();
         let type_ident = &type_path_segment.ident;
         if *type_ident != r#struct.ident {
-            panic!("{}", STRUCT_MOCK_INVALID_IDENT_ERROR_MESSAGE);
+            panic!("{STRUCT_MOCK_INVALID_IDENT_ERROR_MESSAGE}");
         }
         if should_ignore_impl(&item_impl) {
             ignored_impls.push(item_impl);

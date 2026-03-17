@@ -2,6 +2,11 @@
 name = "rsubstitute"
 version = "0.1.0"
 edition = "2024"
+description = "Library for mocking."
+license = "MIT"
+homepage = "https://github.com/alordash/rsubstitute"
+repository = "https://github.com/alordash/rsubstitute"
+readme = "../../README.md"
 
 #[[bin]]
 #name = "trait"

@@ -2,6 +2,11 @@
 name = "rsubstitute_proc_macro"
 version = "0.1.0"
 edition = "2024"
+description = "rsubstitute procedural macros."
+license = "MIT"
+homepage = "https://github.com/alordash/rsubstitute"
+repository = "https://github.com/alordash/rsubstitute"
+readme = "../../README.md"
 
 [lib]
 name = "rsubstitute_proc_macro"
