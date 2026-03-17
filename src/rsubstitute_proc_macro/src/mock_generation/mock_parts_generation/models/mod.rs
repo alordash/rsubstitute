@@ -22,6 +22,7 @@ mod output_type_generics_model;
 mod output_type_lifetime_model;
 mod static_base_fn_model;
 mod static_fn_model;
+mod associated_generics_model;
 
 pub(crate) use base_fn_model::*;
 pub(crate) use generated_mod_model::*;
@@ -47,3 +48,4 @@ pub(crate) use output_type_generics_model::*;
 pub(crate) use output_type_lifetime_model::*;
 pub(crate) use static_base_fn_model::*;
 pub(crate) use static_fn_model::*;
+pub(crate) use associated_generics_model::*;

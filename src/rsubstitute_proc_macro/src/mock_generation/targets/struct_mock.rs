@@ -15,7 +15,7 @@ pub(crate) fn handle(ctx: &Ctx, mut struct_mock_syntax: StructMockSyntax) -> Tok
 
     let mock_generics = mock_generics::generate(&struct_mock_syntax.r#struct.generics, None);
     let mock_type = mock_type::generate_for_struct(mock_ident.clone(), mock_generics);
-    let mock_struct_trait_infos: Vec<_> = std::mem::take(&mut struct_mock_syntax.trait_impls)
+    let mock_struct_trait_infos: Vec<_> = core::mem::take(&mut struct_mock_syntax.trait_impls)
         .into_iter()
         .map(|x| mock_struct_trait_info::generate(ctx, &mock_type, x))
         .collect();
@@ -34,7 +34,7 @@ pub(crate) fn handle(ctx: &Ctx, mut struct_mock_syntax: StructMockSyntax) -> Tok
         .chain(mock_struct_trait_infos.iter().flat_map(|x| &x.fn_infos))
         .collect();
     let mock_data_struct = mock_data_struct::generate_for_trait(&mock_type, &all_fn_infos);
-    let mock_struct_traits: Vec<_> = mock_struct_trait_infos
+    let mut mock_struct_traits: Vec<_> = mock_struct_trait_infos
         .into_iter()
         .map(|mock_struct_trait_info| {
             mock_struct_trait::generate(&mock_data_struct, mock_struct_trait_info)
@@ -77,13 +77,14 @@ pub(crate) fn handle(ctx: &Ctx, mut struct_mock_syntax: StructMockSyntax) -> Tok
     );
     let inner_data_deref_impl = inner_data_deref_impl::generate(&mock_struct, &inner_data_struct);
     let mock_trait_impls = mock_struct_traits
-        .iter()
-        .map(|mock_struct_trait| {
+        .iter_mut()
+        .map(|mut mock_struct_trait| {
             mock_payload_impl::generate_for_struct_trait(
                 mock_struct_trait.info.trait_ident_from_path.clone(),
                 &mock_type,
                 &mock_struct_trait.info.fn_infos,
                 &mock_struct_trait.info.trait_ident_from_path,
+                core::mem::take(&mut mock_struct_trait.info.rest_impl_items)
             )
         })
         .collect();

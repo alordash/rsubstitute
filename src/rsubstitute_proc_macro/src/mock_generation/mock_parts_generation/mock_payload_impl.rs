@@ -3,15 +3,18 @@ use crate::mock_generation::mock_parts_generation::models::*;
 use crate::mock_generation::mock_parts_generation::*;
 use crate::syntax::*;
 use proc_macro2::Ident;
+use quote::ToTokens;
 use syn::*;
 
 pub(crate) fn generate(
     trait_ident: Ident,
     mock_type: &MockType,
     fn_infos: &[FnInfo],
+    associated_generics: AssociatedGenerics,
 ) -> MockPayloadImpl {
     let trait_path =
         path::create_with_generics(trait_ident, mock_type.generics.source_generics.clone());
+    let rest_impl_items = convert_associated_generics_to_impl_items(associated_generics);
 
     let mock_impl = generate_core(
         Vec::new(),
@@ -20,6 +23,7 @@ pub(crate) fn generate(
         fn_infos,
         Some(trait_path),
         None,
+        rest_impl_items,
     );
     return mock_impl;
 }
@@ -29,6 +33,7 @@ pub(crate) fn generate_for_struct_trait(
     mock_type: &MockType,
     fn_infos: &[FnInfo],
     containing_trait_ident: &Ident,
+    rest_impl_items: Vec<ImplItem>,
 ) -> MockPayloadImpl {
     let trait_path =
         path::create_with_generics(trait_ident, mock_type.generics.source_generics.clone());
@@ -40,6 +45,7 @@ pub(crate) fn generate_for_struct_trait(
         fn_infos,
         Some(trait_path),
         Some(containing_trait_ident),
+        rest_impl_items,
     );
     return mock_impl;
 }
@@ -56,6 +62,7 @@ pub(crate) fn generate_for_struct(
         fn_infos,
         None,
         None,
+        Vec::new(),
     );
     return mock_impl;
 }
@@ -67,11 +74,16 @@ fn generate_core(
     fn_infos: &[FnInfo],
     maybe_trait_path: Option<Path>,
     maybe_containing_trait_ident: Option<&Ident>,
+    rest_impl_items: Vec<ImplItem>,
 ) -> MockPayloadImpl {
-    let items = fn_infos
-        .iter()
-        .map(|x| generate_impl_item_fn(x, maybe_containing_trait_ident))
-        .map(ImplItem::Fn)
+    let items = rest_impl_items
+        .into_iter()
+        .chain(
+            fn_infos
+                .iter()
+                .map(|x| generate_impl_item_fn(x, maybe_containing_trait_ident))
+                .map(ImplItem::Fn),
+        )
         .collect();
     let trait_ = maybe_trait_path.map(|trait_path| (None, trait_path, Default::default()));
 
@@ -121,4 +133,39 @@ fn generate_impl_item_fn(
         block,
     };
     return impl_item_fn;
+}
+
+fn convert_associated_generics_to_impl_items(
+    associated_generics: AssociatedGenerics,
+) -> Vec<ImplItem> {
+    let const_impl_items = associated_generics.trait_item_consts.into_iter().map(|x| {
+        ImplItem::Const(ImplItemConst {
+            attrs: x.attrs,
+            vis: Visibility::Inherited,
+            defaultness: None,
+            colon_token: x.colon_token,
+            ident: x.ident.clone(),
+            generics: x.generics,
+            const_token: Default::default(),
+            ty: x.ty,
+            eq_token: Default::default(),
+            expr: path::create_expr(x.ident),
+            semi_token: Default::default(),
+        })
+    });
+    let type_impl_items = associated_generics.trait_item_types.into_iter().map(|x| {
+        ImplItem::Type(ImplItemType {
+            attrs: x.attrs,
+            vis: Visibility::Inherited,
+            defaultness: None,
+            type_token: x.type_token,
+            ident: x.ident.clone(),
+            generics: x.generics,
+            eq_token: Default::default(),
+            ty: r#type::create(x.ident),
+            semi_token: Default::default(),
+        })
+    });
+    let impl_items = const_impl_items.chain(type_impl_items).collect();
+    return impl_items;
 }

@@ -11,9 +11,9 @@ pub(crate) fn handle_attribute_macro(
 ) -> TokenStream {
     let ctx = ctx::create(proc_macro_attribute);
     if let Ok(item_trait) = syn::parse::<ItemTrait>(proc_macro_item.clone()) {
-        return item_trait::handle(&ctx, item_trait);
+        return trait_mock::handle(&ctx, item_trait);
     } else if let Ok(item_fn) = syn::parse::<ItemFn>(proc_macro_item) {
-        return item_fn::handle(&ctx, item_fn);
+        return fn_mock::handle(&ctx, item_fn);
     }
 
     panic!("Expected `trait`, `impl` or `fn`.");

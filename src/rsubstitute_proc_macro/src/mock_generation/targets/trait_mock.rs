@@ -14,15 +14,8 @@ pub(crate) fn handle(ctx: &Ctx, item_trait: ItemTrait) -> TokenStream {
         item_trait.ident,
         constants::MOCK_STRUCT_IDENT_PREFIX
     );
-    let trait_item_types: Vec<_> = item_trait
-        .items
-        .iter()
-        .filter_map(|trait_item| match trait_item {
-            TraitItem::Type(trait_item_type) => Some(trait_item_type),
-            _ => None,
-        })
-        .collect();
-    let mock_generics = mock_generics::generate(&item_trait.generics, Some(&trait_item_types));
+    let associated_generics = associated_generics::extract(&item_trait.items);
+    let mock_generics = mock_generics::generate(&item_trait.generics, Some(&associated_generics));
     let fn_decls = fn_decl::extract(ctx, &mock_generics, &item_trait.items);
     let target_ident = item_trait.ident.clone();
     let mock_type = mock_type::generate(mock_ident.clone(), mock_generics);
@@ -44,7 +37,12 @@ pub(crate) fn handle(ctx: &Ctx, item_trait: ItemTrait) -> TokenStream {
         &mock_data_struct,
         None,
     );
-    let mock_trait_impl = mock_payload_impl::generate(target_ident.clone(), &mock_type, &fn_infos);
+    let mock_trait_impl = mock_payload_impl::generate(
+        target_ident.clone(),
+        &mock_type,
+        &fn_infos,
+        associated_generics,
+    );
     let base_fns: Vec<_> = fn_infos
         .iter()
         .filter_map(|fn_info| {

@@ -36,3 +36,4 @@ pub(crate) mod received_signature;
 pub(crate) mod referenced_generic_types_lifetimes_filler;
 pub(crate) mod setup_output;
 pub(crate) mod static_fn;
+pub(crate) mod associated_generics;
