@@ -1,11 +1,11 @@
 use crate::fn_parameters::{IArgRefsTuple, IReturnValue};
 
-pub(crate) struct DynArgRefsTuple<'rs> {
+pub struct DynArgRefsTuple<'rs> {
     inner: Box<dyn IArgRefsTuple<'rs> + 'rs>,
 }
 
 impl<'rs> DynArgRefsTuple<'rs> {
-    pub fn from_raw(raw_ptr: *mut (dyn IArgRefsTuple<'rs> + 'rs)) -> Self {
+    pub(crate) fn from_raw(raw_ptr: *mut (dyn IArgRefsTuple<'rs> + 'rs)) -> Self {
         Self {
             // SAFETY: for justification refer to module level documentation.
             inner: unsafe { Box::from_raw(raw_ptr) },

@@ -410,6 +410,16 @@ define!(
         ident: format_ident!("_"),
     }
 );
+define!(
+    ANONYMOUS_LIFETIME_PARAM,
+    LifetimeParam,
+    LifetimeParam {
+        attrs: Vec::new(),
+        lifetime: ANONYMOUS_LIFETIME.clone(),
+        colon_token: None,
+        bounds: Punctuated::new()
+    }
+);
 
 pub(crate) const DEFAULT_ARG_LIFETIME_NAME: &'static str = "__rs";
 define!(
@@ -533,3 +543,10 @@ define!(
 
 ident!(GENERIC_TYPE_INFO_FN_IDENT, "generic_type_info");
 ident!(GENERIC_CONST_INFO_FN_IDENT, "generic_const_info");
+
+ident!(GET_MOCK_FN_IDENT, "get_mock");
+define!(
+    GET_MOCK_FN_CALL_EXPR,
+    Expr,
+    expr_call::create_from_ident(GET_MOCK_FN_IDENT.clone(), Vec::new())
+);

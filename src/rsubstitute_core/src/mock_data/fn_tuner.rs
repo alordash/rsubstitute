@@ -102,7 +102,7 @@ impl<
     ) -> &FnReturnCallbackTuner<'rs, TMock, TOwner, TArgRefsTuple, STORES_MOCK_DATA> {
         let return_value_source = ReturnValueSource::Factory(Box::new(
             move |dyn_arg_refs_tuple: DynArgRefsTuple<'rs>| {
-                let arg_refs_tuple: TArgRefsTuple = dyn_arg_refs_tuple.downcast_into();
+                let arg_refs_tuple: TArgRefsTuple = dyn_arg_refs_tuple.downcast_into::<TArgRefsTuple>();
                 let result = f(arg_refs_tuple);
                 return transmute_lifetime!(DynReturnValue::new(result));
             },

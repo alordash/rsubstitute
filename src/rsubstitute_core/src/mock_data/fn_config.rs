@@ -5,13 +5,13 @@ use std::collections::VecDeque;
 use std::marker::PhantomData;
 use std::sync::Arc;
 
-pub(crate) struct FnConfig<'rs, TMock> {
+pub struct FnConfig<'rs, TMock> {
     _phantom_mock: PhantomData<TMock>,
-    args_checker: DynArgsChecker<'rs>,
-    return_value_sources: VecDeque<ReturnValueSource<'rs>>,
-    calls: Vec<Arc<DynCall<'rs>>>,
-    callback: Option<Arc<RefCell<dyn FnMut(*const (), &DynCall<'rs>)>>>,
-    call_base: bool,
+    pub args_checker: DynArgsChecker<'rs>,
+    pub return_value_sources: VecDeque<ReturnValueSource<'rs>>,
+    pub calls: Vec<Arc<DynCall<'rs>>>,
+    pub callback: Option<Arc<RefCell<dyn FnMut(*const (), &DynCall<'rs>)>>>,
+    pub call_base: bool,
 }
 
 impl<'rs, TMock> FnConfig<'rs, TMock> {

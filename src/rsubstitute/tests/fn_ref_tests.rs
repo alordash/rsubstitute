@@ -4,6 +4,7 @@ use rsubstitute::macros::mock;
 #[mock(base)]
 fn accept_ref(r: &i32) {}
 
+// TODO - do not forget to specify in docs that calling `setup` on static fn clears all existing configurations (this is done because otherwise configs would interrupt each other in tests)
 const BASE_RETURN_REF: &'static i32 = &1000;
 #[mock(base)]
 fn return_ref() -> &'static i32 {
@@ -71,6 +72,21 @@ mod tests {
                     .does(|(ref received_r2,)| println!("received_r2 = {received_r2}"));
                 accept_ref(r2);
             }
+
+            let q: &i32 = accept_ref::get_mock()
+                .data
+                .accept_ref
+                .configs
+                .borrow()
+                .iter()
+                .next()
+                .unwrap()
+                .1[0]
+                .borrow()
+                .calls
+                .last()
+                .unwrap()
+                .downcast_ref();
 
             let some_data = [15, 22, 32, 42, 52, 62, 72, 82, 92, 102];
             println!("some_data = {some_data:?}");

@@ -13,7 +13,7 @@ unsafe impl Send for GlobalMocksMap {}
 unsafe impl Sync for GlobalMocksMap {}
 
 impl GlobalMocksMap {
-    pub fn get_mock<'a, T: Default>(&'_ self) -> &'a T {
+    pub fn get_specific_mock<'a, T: Default>(&'_ self) -> &'a T {
         let mut map = self.map.borrow_mut();
         let type_id = typeid::of::<T>();
         let raw_ptr = map
@@ -41,6 +41,6 @@ thread_local! {
 }
 
 pub fn get_global_mock<'a, T: Default>() -> &'a T {
-    let result = GLOBAL_MOCKS_MAP.with(|this| this.get_mock());
+    let result = GLOBAL_MOCKS_MAP.with(|this| this.get_specific_mock());
     return result;
 }

@@ -56,7 +56,7 @@ fn generate_fn_setup_block(fn_info: &FnInfo, mock_type: &MockType) -> Block {
         MOCK_VAR_IDENT.clone(),
         LocalInit {
             eq_token: Default::default(),
-            expr: Box::new(get_global_mock_expr::generate(mock_type.ty.clone())),
+            expr: Box::new(constants::GET_MOCK_FN_CALL_EXPR.clone()),
             diverge: None,
         },
     ));

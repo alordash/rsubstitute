@@ -1,8 +1,7 @@
 use crate::args::*;
 use crate::fn_parameters::DynCall;
-use std::ops::Deref;
 
-pub(crate) struct DynArgsChecker<'rs> {
+pub struct DynArgsChecker<'rs> {
     inner: Box<dyn IArgsChecker + 'rs>,
 }
 
@@ -33,17 +32,9 @@ impl<'rs> IArgsChecker for DynArgsChecker<'rs> {
 }
 
 impl<'rs> DynArgsChecker<'rs> {
-    pub fn new<T: IArgsChecker + 'rs>(value: T) -> Self {
+    pub(crate) fn new<T: IArgsChecker + 'rs>(value: T) -> Self {
         Self {
             inner: Box::new(value),
         }
-    }
-}
-
-impl<'rs> Deref for DynArgsChecker<'rs> {
-    type Target = dyn IArgsChecker + 'rs;
-
-    fn deref(&self) -> &Self::Target {
-        self.inner.as_ref()
     }
 }

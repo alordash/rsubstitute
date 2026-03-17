@@ -70,18 +70,14 @@ fn generate_call_stmt(fn_info: &FnInfo) -> Stmt {
             return field_value;
         })
         .collect();
-    let mut call_struct_type_generics = fn_info.call_struct.item_struct.generics.clone();
-    let Some(GenericParam::Lifetime(first_lifetime_param)) =
-        call_struct_type_generics.params.first_mut()
-    else {
-        panic!("Call struct should have default lifetime as first generics parameter");
-    };
-    first_lifetime_param.lifetime = constants::ANONYMOUS_LIFETIME.clone();
     let mut call_struct_type = r#type::create_with_generics(
         fn_info.call_struct.item_struct.ident.clone(),
-        call_struct_type_generics,
+        fn_info.call_struct.item_struct.generics.clone(),
     );
-    lifetime::set_all_lifetimes(&mut call_struct_type, &constants::ANONYMOUS_LIFETIME.clone());
+    lifetime::set_all_lifetimes(
+        &mut call_struct_type,
+        &constants::ANONYMOUS_LIFETIME.clone(),
+    );
     let call_stmt = Stmt::Local(local::create_with_type(
         CALL_VARIABLE_IDENT.clone(),
         call_struct_type,
@@ -124,11 +120,16 @@ fn generate_last_stmts(
     let last_stmts = match target {
         Target::Other => vec![handle_stmt],
         Target::StaticFn(mock_type) => {
+            let mut generics = mock_type.generics.impl_generics.clone();
+            generics.params.insert(
+                0,
+                GenericParam::Lifetime(constants::ANONYMOUS_LIFETIME_PARAM.clone()),
+            );
             let mock_var_stmt = Stmt::Local(local::create(
                 MOCK_VARIABLE_IDENT.clone(),
                 LocalInit {
                     eq_token: Default::default(),
-                    expr: Box::new(get_global_mock_expr::generate(mock_type.ty.clone())),
+                    expr: Box::new(get_mock_expr::generate(generics)),
                     diverge: None,
                 },
             ));

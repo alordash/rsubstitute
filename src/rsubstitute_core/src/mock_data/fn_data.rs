@@ -9,8 +9,8 @@ use std::sync::Arc;
 
 pub struct FnData<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool> {
     fn_name: &'static str,
-    call_infos: RefCell<HashMap<GenericsHashKey, Vec<CallCheck<'rs>>>>,
-    configs: RefCell<HashMap<GenericsHashKey, Vec<Arc<RefCell<FnConfig<'rs, TMock>>>>>>,
+    pub call_infos: RefCell<HashMap<GenericsHashKey, Vec<CallCheck<'rs>>>>,
+    pub configs: RefCell<HashMap<GenericsHashKey, Vec<Arc<RefCell<FnConfig<'rs, TMock>>>>>>,
 }
 
 impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool>

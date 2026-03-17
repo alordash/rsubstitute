@@ -2,7 +2,7 @@ use std::cell::Cell;
 use std::sync::Arc;
 use crate::fn_parameters::DynCall;
 
-pub(crate) struct CallCheck<'rs> {
+pub struct CallCheck<'rs> {
     verified: Cell<bool>,
     call: Arc<DynCall<'rs>>,
 }

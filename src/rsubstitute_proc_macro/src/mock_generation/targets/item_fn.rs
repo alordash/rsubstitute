@@ -44,6 +44,7 @@ pub(crate) fn handle(ctx: &Ctx, item_fn: ItemFn) -> TokenStream {
         mock_setup_impl::generate_for_static(&mock_type, &mock_setup_struct, &fn_info);
     let mock_received_impl =
         mock_received_impl::generate_for_static(&mock_type, &mock_received_struct, &fn_info);
+    let fn_get_mock = fn_get_mock::generate(&mock_type);
     let fn_setup = fn_setup::generate(&fn_info, &mock_setup_struct, &mock_type);
     let fn_received = fn_received::generate(&fn_info, &mock_received_struct, &mock_type);
     let static_fn = static_fn::generate(&fn_info, &mock_type);
@@ -70,6 +71,7 @@ pub(crate) fn handle(ctx: &Ctx, item_fn: ItemFn) -> TokenStream {
         mock_struct_default_impl,
         mock_setup_impl,
         mock_received_impl,
+        fn_get_mock,
         fn_setup,
         fn_received,
         static_fn,

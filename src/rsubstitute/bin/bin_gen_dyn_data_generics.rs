@@ -72,7 +72,6 @@ mod tests {
                 Times::Once,
             )
             .no_other_calls();
-        // TODO - write const generic parameters in error logs
     }
 }
 
