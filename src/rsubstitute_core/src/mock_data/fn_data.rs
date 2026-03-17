@@ -5,12 +5,14 @@ use crate::mock_data::*;
 use crate::*;
 use std::cell::RefCell;
 use std::collections::HashMap;
+use std::sync::atomic::AtomicUsize;
 use std::sync::Arc;
 
 pub struct FnData<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool> {
     fn_name: &'static str,
     pub call_infos: RefCell<HashMap<GenericsHashKey, Vec<CallCheck<'rs>>>>,
     pub configs: RefCell<HashMap<GenericsHashKey, Vec<Arc<RefCell<FnConfig<'rs, TMock>>>>>>,
+    next_call_number: AtomicUsize,
 }
 
 impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool>
@@ -21,6 +23,7 @@ impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool
             fn_name,
             call_infos: RefCell::new(HashMap::new()),
             configs: RefCell::new(HashMap::new()),
+            next_call_number: AtomicUsize::new(1),
         }
     }
 
@@ -84,7 +87,7 @@ impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool
 
     pub fn get_unexpected_calls_error_msgs(&self) -> Vec<String> {
         let all_call_infos = self.call_infos.borrow();
-        let unexpected_call_infos: Vec<_> = all_call_infos
+        let mut unexpected_call_infos: Vec<_> = all_call_infos
             .values()
             .flatten()
             .filter(|x| x.is_not_verified())
@@ -92,6 +95,7 @@ impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool
         if unexpected_call_infos.is_empty() {
             return Vec::new();
         }
+        unexpected_call_infos.sort_by(|a, b| a.number.cmp(&b.number));
         let unexpected_call_arg_infos = unexpected_call_infos
             .into_iter()
             .map(|x| {
@@ -209,6 +213,7 @@ impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, true, STORES_M
 
 mod internal {
     use super::*;
+    use std::sync::atomic::Ordering;
 
     impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool>
         FnData<'rs, TMock, SUPPORTS_BASE_CALLING, STORES_MOCK_DATA>
@@ -219,7 +224,10 @@ mod internal {
                 .borrow_mut()
                 .entry(generics_hash_key)
                 .or_default()
-                .push(CallCheck::new(call));
+                .push(CallCheck::new(
+                    self.next_call_number.fetch_add(1, Ordering::Relaxed),
+                    call,
+                ));
             self
         }
 

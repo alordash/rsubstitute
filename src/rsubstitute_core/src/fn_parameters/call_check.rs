@@ -3,13 +3,15 @@ use std::sync::Arc;
 use crate::fn_parameters::DynCall;
 
 pub struct CallCheck<'rs> {
+    pub number: usize,
     verified: Cell<bool>,
     call: Arc<DynCall<'rs>>,
 }
 
 impl<'rs> CallCheck<'rs> {
-    pub fn new(call: Arc<DynCall<'rs>>) -> Self {
+    pub fn new(number: usize, call: Arc<DynCall<'rs>>) -> Self {
         Self {
+            number,
             verified: Cell::new(false),
             call,
         }

@@ -11,11 +11,11 @@ pub const DEFAULT_CONFIG: Config = Config {
 pub static CONFIG: LazyLock<RwLock<Config>> = LazyLock::new(|| RwLock::new(DEFAULT_CONFIG));
 
 pub fn read_config<'a>() -> RwLockReadGuard<'a, Config> {
-    println!("Trying to read config");
-    CONFIG.read().expect("Unable to lock rsubstitute config")
+    CONFIG.read().expect(LOCK_ERROR_MSG)
 }
 
 pub fn write_config<'a>() -> RwLockWriteGuard<'a, Config> {
-    println!("Trying to write config");
-    CONFIG.write().expect("Unable to lock rsubstitute config")
+    CONFIG.write().expect(LOCK_ERROR_MSG)
 }
+
+const LOCK_ERROR_MSG: &'static str = "Unable to lock rsubstitute config";

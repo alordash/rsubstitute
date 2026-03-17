@@ -94,7 +94,7 @@ mod tests {
 
             let expected_error_msg = format!(
                 "Mock wasn't configured to handle following call:
-	get_return({accepted_str:?})"
+	get_return<&str>({accepted_str:?})"
             );
             assert_eq!(expected_error_msg, actual_error_msg);
         }
