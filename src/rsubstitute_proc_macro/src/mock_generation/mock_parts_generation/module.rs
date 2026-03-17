@@ -107,7 +107,7 @@ pub(crate) fn generate_struct(
     mock_struct: MockStruct,
     inner_data_deref_impl: InnerDataDerefImpl,
     mock_trait_impls: Vec<MockPayloadImpl>,
-    mock_trait_impl: MockPayloadImpl,
+    mock_struct_impl: MockPayloadImpl,
     mock_impl: MockImpl,
     mock_setup_impl: MockSetupImpl,
     mock_received_impl: MockReceivedImpl,
@@ -145,7 +145,7 @@ pub(crate) fn generate_struct(
                 .map(|mock_trait_impl| Item::Impl(mock_trait_impl.item_impl)),
         )
         .chain([
-            Item::Impl(mock_trait_impl.item_impl),
+            Item::Impl(mock_struct_impl.item_impl),
             Item::Impl(mock_impl.item_impl),
             Item::Impl(mock_setup_impl.item_impl),
             Item::Impl(mock_received_impl.item_impl),

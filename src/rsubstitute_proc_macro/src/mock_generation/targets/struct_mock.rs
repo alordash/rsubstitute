@@ -13,7 +13,7 @@ pub(crate) fn handle(ctx: &Ctx, mut struct_mock_syntax: StructMockSyntax) -> Tok
 
     let mock_ident = struct_mock_syntax.r#struct.ident.clone();
 
-    let mock_generics = mock_generics::generate(&struct_mock_syntax.r#struct.generics);
+    let mock_generics = mock_generics::generate(&struct_mock_syntax.r#struct.generics, None);
     let mock_type = mock_type::generate_for_struct(mock_ident.clone(), mock_generics);
     let mock_struct_trait_infos: Vec<_> = std::mem::take(&mut struct_mock_syntax.trait_impls)
         .into_iter()
@@ -87,7 +87,7 @@ pub(crate) fn handle(ctx: &Ctx, mut struct_mock_syntax: StructMockSyntax) -> Tok
             )
         })
         .collect();
-    let mock_trait_impl =
+    let mock_struct_impl =
         mock_payload_impl::generate_for_struct(struct_impls_attrs, &mock_type, &struct_fn_infos);
     let inner_data_param =
         inner_data_param::generate(&inner_data_struct, &struct_mock_syntax.new_fn);
@@ -166,7 +166,7 @@ pub(crate) fn handle(ctx: &Ctx, mut struct_mock_syntax: StructMockSyntax) -> Tok
         mock_struct,
         inner_data_deref_impl,
         mock_trait_impls,
-        mock_trait_impl,
+        mock_struct_impl,
         mock_impl,
         mock_setup_impl,
         mock_received_impl,
