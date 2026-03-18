@@ -31,13 +31,13 @@ trait Trait {
 mocked_base! {
     #[derive(Clone)]
     struct Struct;
-    
+
     impl Struct {
         pub fn new() -> Self {
             Self
         }
     }
-    
+
     impl Trait for Struct {
         fn get_my_type<TT: Clone>(&self, input: Self::InputType<i32>) -> Self::OutputType<TT>
         where

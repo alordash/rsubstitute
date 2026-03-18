@@ -115,7 +115,7 @@ fn generate_call_base_fn_parts(
         Target::Trait => constants::REF_SELF_ARG.clone(),
     };
     let mut call_struct_ty = call_struct.ty_path.clone();
-    call_struct_ty.set_first_generic_lifetime_argument(constants::ANONYMOUS_LIFETIME.clone());
+    // call_struct_ty.set_first_generic_lifetime_argument(constants::ANONYMOUS_LIFETIME.clone());
     let call_arg = FnArg::Typed(PatType {
         attrs: Vec::new(),
         pat: Box::new(Pat::Ident(PatIdent {

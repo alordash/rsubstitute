@@ -875,8 +875,8 @@ mod __rsubstitute_generated_Struct {
                                                                                                                                                                                                                                                                                                                                                                                                                                                                       &'__rs &'__rs T2,
                                                                                                                                                                                                                                                                                                                                                                                                                                                                       &'__rs &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T2),
             &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa i32, true, true> where
-            T1: '__rsa,
-            T2: '__rsa
+            T2: '__rsa,
+            T1: '__rsa
         {
             let Trait_work_args_checker: Trait_work_ArgsChecker<'_, 'a, 'b, 'c, 'd, T1, T2> =
                 Trait_work_ArgsChecker {
@@ -1330,7 +1330,10 @@ mod __rsubstitute_generated_Struct {
             return self
                 .data
                 .Trait_work
-                .handle_base_returning(self, call, Self::base_Trait_work);
+                .handle_base_returning(self, call, |s: &Self, c| {
+                    let q = self.base_Trait_work::<T2>(c);
+                    todo!()
+                });
         }
     }
     #[allow(unused)]
@@ -1421,7 +1424,7 @@ mod __rsubstitute_generated_Struct {
         }
         fn base_work<'c, 'd: 'a, T2: Clone>(
             &self,
-            call: work_Call<'_, 'a, 'b, 'c, 'd, T1, T2>,
+            call: work_Call<'__rs, 'a, 'b, 'c, 'd, T1, T2>,
         ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 {
             #[allow(non_shorthand_field_patterns)]
             #[allow(unused_variables)]
@@ -1447,9 +1450,9 @@ mod __rsubstitute_generated_Struct {
             } = call;
             unreachable!()
         }
-        fn base_Trait_work<'q, 'c, 'd: 'a, T2: Clone>(
+        fn base_Trait_work<'c, 'd: 'a, T2: Clone>(
             &self,
-            call: Trait_work_Call<'q, 'a, 'b, 'c, 'd, T1, T2>,
+            call: Trait_work_Call<'__rs, 'a, 'b, 'c, 'd, T1, T2>,
         ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 {
             #[allow(non_shorthand_field_patterns)]
             #[allow(unused_variables)]
@@ -1525,8 +1528,8 @@ mod __rsubstitute_generated_Struct {
                                                                                                                                                                                                                                                                                                                                                                                                                                                                       &'__rs &'__rs T2,
                                                                                                                                                                                                                                                                                                                                                                                                                                                                       &'__rs &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T2),
             &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa i32, true, true> where
-            T1: '__rsa,
-            T2: '__rsa
+            T2: '__rsa,
+            T1: '__rsa
         {
             let work_args_checker: work_ArgsChecker<'_, 'a, 'b, 'c, 'd, T1, T2> =
                 work_ArgsChecker {
@@ -1656,8 +1659,8 @@ mod __rsubstitute_generated_Struct {
             ),
         >
         where
-            T1: '__rsa,
             T2: '__rsa,
+            T1: '__rsa,
         {
             let work_args_checker: work_ArgsChecker<'_, 'a, 'b, 'c, 'd, T1, T2> =
                 work_ArgsChecker {
