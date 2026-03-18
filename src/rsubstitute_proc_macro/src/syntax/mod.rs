@@ -19,3 +19,4 @@ pub(crate) mod r#struct;
 pub(crate) mod transmute_lifetime_expr;
 pub(crate) mod r#type;
 pub(crate) mod str_lit;
+pub(crate) mod ident;

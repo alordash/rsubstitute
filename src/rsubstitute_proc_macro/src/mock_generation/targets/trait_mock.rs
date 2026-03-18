@@ -21,9 +21,9 @@ pub(crate) fn handle(ctx: &Ctx, item_trait: ItemTrait) -> TokenStream {
         Target::Trait,
         Some(&associated_generics),
     );
-    let fn_decls = fn_decl::extract(ctx, &mock_generics, &item_trait.items);
-    let target_ident = item_trait.ident.clone();
     let mock_type = mock_type::generate(mock_ident.clone(), mock_generics);
+    let fn_decls = fn_decl::extract(ctx, &mock_type, &item_trait);
+    let target_ident = item_trait.ident.clone();
     let fn_infos: Vec<_> = fn_decls
         .into_iter()
         .map(|x| fn_info::generate(ctx, x, &mock_type))

@@ -143,42 +143,42 @@ fn generate_impl_item_fn(
 fn convert_associated_generics_to_impl_items(
     associated_generics: AssociatedGenerics,
 ) -> Vec<ImplItem> {
-    let const_impl_items = associated_generics
-        .trait_item_consts
+    let impl_items = associated_generics
+        .trait_items
         .into_iter()
-        .zip(associated_generics.trait_item_consts_source_idents)
-        .map(|(x, source_ident)| {
-            ImplItem::Const(ImplItemConst {
+        .filter_map(|trait_item| match trait_item {
+            TraitItem::Const(x) => Some(ImplItem::Const(ImplItemConst {
                 attrs: x.attrs,
                 vis: Visibility::Inherited,
                 defaultness: None,
                 colon_token: x.colon_token,
-                ident: source_ident,
+                ident: x.ident.clone(),
                 generics: x.generics,
                 const_token: Default::default(),
                 ty: x.ty,
                 eq_token: Default::default(),
-                expr: path::create_expr(x.ident),
+                expr: path::create_expr(associated_generics::format_associated_param_ident(
+                    &associated_generics.parent_ident,
+                    &x.ident,
+                )),
                 semi_token: Default::default(),
-            })
-        });
-    let type_impl_items = associated_generics
-        .trait_item_types
-        .into_iter()
-        .zip(associated_generics.trait_item_types_source_idents)
-        .map(|(x, source_ident)| {
-            ImplItem::Type(ImplItemType {
+            })),
+            TraitItem::Type(x) => Some(ImplItem::Type(ImplItemType {
                 attrs: x.attrs,
                 vis: Visibility::Inherited,
                 defaultness: None,
                 type_token: x.type_token,
-                ident: source_ident,
+                ident: x.ident.clone(),
                 generics: x.generics,
                 eq_token: Default::default(),
-                ty: r#type::create(x.ident),
+                ty: r#type::create(associated_generics::format_associated_param_ident(
+                    &associated_generics.parent_ident,
+                    &x.ident,
+                )),
                 semi_token: Default::default(),
-            })
-        });
-    let impl_items = const_impl_items.chain(type_impl_items).collect();
+            })),
+            _ => None,
+        })
+        .collect();
     return impl_items;
 }

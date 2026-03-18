@@ -1,13 +1,13 @@
 use crate::constants;
+use crate::mock_generation::fn_decl;
 use crate::mock_generation::fn_info_generation::*;
 use crate::mock_generation::mock_parts_generation::models::*;
 use crate::mock_generation::mock_parts_generation::*;
 use crate::mock_generation::models::Ctx;
+use crate::mock_generation::parameters::Target;
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
 use syn::*;
-use crate::mock_generation::fn_decl;
-use crate::mock_generation::parameters::Target;
 
 pub(crate) fn handle(ctx: &Ctx, item_fn: ItemFn) -> TokenStream {
     let mock_ident = format_ident!(
@@ -16,8 +16,8 @@ pub(crate) fn handle(ctx: &Ctx, item_fn: ItemFn) -> TokenStream {
         constants::MOCK_STRUCT_IDENT_PREFIX
     );
     let mock_generics = mock_generics::generate(&item_fn.sig.generics, Target::Static, None);
-    let fn_decl = fn_decl::extract_fn(ctx, &mock_generics, &item_fn);
     let mock_type = mock_type::generate(mock_ident.clone(), mock_generics);
+    let fn_decl = fn_decl::extract_fn(ctx, &mock_type, &item_fn);
     let fn_ident = item_fn.sig.ident.clone();
     let fn_info = fn_info::generate(ctx, fn_decl, &mock_type);
     let fn_infos = [fn_info];
