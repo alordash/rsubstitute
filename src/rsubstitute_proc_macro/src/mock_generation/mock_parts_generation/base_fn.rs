@@ -185,6 +185,11 @@ fn generate_call_base_fn_block(
             pat: typed_fn_arg.pat.clone(),
         })
         .collect();
+    let mut call_struct_generics = call_struct.item_struct.generics.clone();
+    lifetime::set_all_lifetimes_in_generics(
+        &mut call_struct_generics,
+        &constants::ANONYMOUS_LIFETIME.clone(),
+    );
     let deconstruct_call_stmt = Stmt::Local(Local {
         attrs: vec![
             constants::ALLOW_NON_SHORTHAND_FIELD_PATTERNS_ATTRIBUTE.clone(),
@@ -194,7 +199,10 @@ fn generate_call_base_fn_block(
         pat: Pat::Struct(PatStruct {
             attrs: Vec::new(),
             qself: None,
-            path: path::create(call_struct.item_struct.ident.clone()),
+            path: path::create_with_generics(
+                call_struct.item_struct.ident.clone(),
+                call_struct_generics,
+            ),
             brace_token: Default::default(),
             fields,
             rest: Some(PatRest {

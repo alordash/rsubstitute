@@ -174,13 +174,13 @@ fn generate_handle_expr(
             ]),
         };
         vec![
-            expr_reference::create(base_receiver.clone()),
+            base_receiver.clone(),
             path::create_expr(CALL_VARIABLE_IDENT.clone()),
             base_fn_path,
         ]
     } else {
         vec![
-            expr_reference::create(base_receiver.clone()),
+            base_receiver.clone(),
             path::create_expr(CALL_VARIABLE_IDENT.clone()),
         ]
     };

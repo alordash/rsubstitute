@@ -32,3 +32,9 @@ pub(crate) fn set_all_lifetimes(ty: &mut Type, new_lifetime: &Lifetime) {
         LifetimeReplacer::new(new_lifetime, ReplacementStrategy::ReplaceAll);
     lifetime_replacer.visit_type_mut(ty);
 }
+
+pub(crate) fn set_all_lifetimes_in_generics(generics: &mut Generics, new_lifetime: &Lifetime) {
+    let mut lifetime_replacer =
+        LifetimeReplacer::new(new_lifetime, ReplacementStrategy::ReplaceAll);
+    lifetime_replacer.visit_generics_mut(generics);
+}

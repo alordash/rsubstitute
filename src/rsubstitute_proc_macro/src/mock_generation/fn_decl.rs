@@ -5,7 +5,6 @@ use crate::mock_generation::models::*;
 use crate::mock_generation::parameters::Target;
 use crate::mock_generation::*;
 use crate::syntax::*;
-use quote::ToTokens;
 use syn::visit_mut::VisitMut;
 use syn::*;
 

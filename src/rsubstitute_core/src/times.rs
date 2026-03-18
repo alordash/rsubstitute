@@ -6,7 +6,7 @@ pub enum Times {
     Exactly(usize),
     #[cfg_attr(
         not(debug_assertions),
-        deprecated = "Expecting varying number of calls is not recommended, as it may lead to flaky tests. Determine concrete number of expected calls."
+        deprecated = "Expecting varying number of calls is not recommended, as it may lead to inconsistent test run results. Determine concrete number of expected calls."
     )]
     Any,
 }
@@ -34,3 +34,5 @@ impl Display for Times {
         }
     }
 }
+
+// TODO - impl From<usize> for Times? (Exactly)
