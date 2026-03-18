@@ -17,6 +17,23 @@ pub(crate) fn merge(first: &Generics, second: &Generics) -> Generics {
     return result;
 }
 
+pub(crate) fn remove_default_values(mut generics: Generics) -> Generics {
+    for param in generics.params.iter_mut() {
+        match param {
+            GenericParam::Type(type_param) => {
+                type_param.eq_token = None;
+                type_param.default = None;
+            }
+            GenericParam::Const(const_param) => {
+                const_param.eq_token = None;
+                const_param.default = None;
+            }
+            _ => (),
+        }
+    }
+    return generics;
+}
+
 fn merge_where_clause(
     maybe_first: Option<WhereClause>,
     maybe_second: Option<WhereClause>,

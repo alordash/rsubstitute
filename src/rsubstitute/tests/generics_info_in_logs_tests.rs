@@ -22,7 +22,7 @@ mod tests {
 
         // Assert
         let expected_panic_msg = "Mock wasn't configured to handle following call:
-	work<i32, true, f32, 5>(14)";
+	work<f32, 5>(14)";
         assert_eq!(expected_panic_msg, panic_msg);
     }
 
@@ -42,7 +42,7 @@ mod tests {
 
         // Assert
         let expected_panic_msg = "Mock wasn't configured to handle following call:
-	work<i32, true, f32, 1>(5)
+	work<f32, 1>(5)
 List of existing configuration ordered by number of correctly matched arguments (non-matching arguments indicated with '*' characters):
 	1. Matched 0/1 arguments: work(*5*)";
         assert_eq!(expected_panic_msg, panic_msg);
@@ -62,7 +62,7 @@ List of existing configuration ordered by number of correctly matched arguments 
 
         // Assert
         let expected_panic_msg =
-            "No return value found for following call: work<i32, true, f32, 1>(5)";
+            "No return value found for following call: work<f32, 1>(5)";
         assert_eq!(expected_panic_msg, panic_msg);
     }
 
@@ -86,7 +86,7 @@ List of existing configuration ordered by number of correctly matched arguments 
         let actual_value_ptr = core::ptr::from_ref(&actual_value);
         let expected_value_ptr = core::ptr::from_ref(&expected_value);
         let expected_panic_msg = format!("Expected to receive a call exactly once matching:
-	work<i32, true, f32, 1>((&i32): equal to 6)
+	work<f32, 1>((&i32): equal to 6)
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
 work(*5*)
@@ -114,7 +114,7 @@ work(*5*)
         assert_eq!(returned_value, actual_returned_value);
 
         let expected_panic_msg = "Expected to receive a call exactly once matching:
-	work<i32, true, alloc::string::String, 124>((&i32): equal to 5)
+	work<alloc::string::String, 124>((&i32): equal to 5)
 Actually received no matching calls
 Received no non-matching calls";
         assert_eq!(expected_panic_msg, panic_msg);
@@ -148,8 +148,8 @@ Received no non-matching calls";
         assert_eq!(second_returned_value, actual_second_returned_value);
 
         let expected_panic_msg = "Did not expect to receive any other calls. Received 2 unexpected calls:
-1. work<i32, true, f32, 1>(5)
-2. work<i32, true, [i32; 3], 200>(100)";
+1. work<f32, 1>(5)
+2. work<[i32; 3], 200>(100)";
         assert_eq!(expected_panic_msg, panic_msg);
     }
 }

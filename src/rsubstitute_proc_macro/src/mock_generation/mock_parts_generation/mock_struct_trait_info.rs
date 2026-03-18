@@ -22,6 +22,7 @@ pub(crate) fn generate(
         .filter(is_rest_impl_item)
         .collect();
     let mock_struct_trait_info = MockStructTraitInfo {
+        trait_path: trait_impl.trait_path,
         trait_ident_from_path,
         mock_type: mock_type.clone(),
         fn_infos,

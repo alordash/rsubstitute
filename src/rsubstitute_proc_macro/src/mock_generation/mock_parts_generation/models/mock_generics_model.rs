@@ -4,7 +4,9 @@ use syn::*;
 pub(crate) struct MockGenerics {
     pub source_generics: Generics,
     pub impl_generics: Generics,
+    pub impl_generics_without_default_values: Generics,
     pub phantom_fields: Vec<Field>,
+    pub associated_params_count: usize,
 }
 
 impl MockGenerics {

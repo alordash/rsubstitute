@@ -1,4 +1,5 @@
 use crate::mock_generation::fn_info_generation::models::*;
+use crate::mock_generation::fn_info_generation::*;
 use crate::mock_generation::mock_parts_generation::models::*;
 use crate::mock_generation::models::*;
 use crate::syntax::*;
@@ -35,8 +36,11 @@ pub(crate) fn generate(fn_decl: &FnDecl, mock_generics: &MockGenerics) -> ArgsCh
     let mut item_struct =
         r#struct::create(attrs, ident, fn_decl.merged_generics.clone(), fields_named);
     lifetime::normalize_anonymous_lifetimes_in_struct(&mut item_struct);
+    let generics_info_provider_impl =
+        generics_info_provider_impl::generate(&item_struct, mock_generics.associated_params_count);
     let ty = r#type::create_from_struct_path(&item_struct);
     let args_checker_struct = ArgsCheckerStruct {
+        generics_info_provider_impl,
         item_struct,
         ty_path: ty,
     };
@@ -50,10 +54,9 @@ fn generate_arg_checker_derive_traits_attribute() -> Attribute {
     let derive_attribute = attribute::create(
         constants::DERIVE_IDENT.clone(),
         &format!(
-            "{}, {}, {}",
+            "{}, {}",
             constants::DEBUG_TRAIT_NAME,
             constants::I_ARGS_FORMATTER_TRAIT_NAME,
-            constants::I_GENERICS_INFO_PROVIDER_TRAIT_NAME,
         ),
     );
     return derive_attribute;

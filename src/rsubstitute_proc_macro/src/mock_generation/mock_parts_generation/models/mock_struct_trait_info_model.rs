@@ -4,6 +4,7 @@ use proc_macro2::Ident;
 use syn::*;
 
 pub(crate) struct MockStructTraitInfo {
+    pub trait_path: Path,
     pub trait_ident_from_path: Ident,
     pub mock_type: MockType,
     pub fn_infos: Vec<FnInfo>,

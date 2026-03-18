@@ -17,7 +17,7 @@ pub(crate) fn generate(
         defaultness: None,
         unsafety: None,
         impl_token: Default::default(),
-        generics: mock_struct.item_struct.generics.clone(),
+        generics: generics::remove_default_values(mock_struct.item_struct.generics.clone()),
         trait_: Some((
             None,
             constants::DEREF_TRAIT_PATH.clone(),

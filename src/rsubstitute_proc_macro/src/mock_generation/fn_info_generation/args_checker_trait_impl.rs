@@ -32,7 +32,7 @@ pub(crate) fn generate(
         defaultness: None,
         unsafety: None,
         impl_token: Default::default(),
-        generics: args_checker_struct.item_struct.generics.clone(),
+        generics: generics::remove_default_values(args_checker_struct.item_struct.generics.clone()),
         trait_: Some((None, trait_path, Default::default())),
         self_ty,
         brace_token: Default::default(),

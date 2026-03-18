@@ -55,11 +55,10 @@ define!(
     path::create(format_ident!("{I_ARGS_FORMATTER_TRAIT_NAME}"))
 );
 
-pub(crate) const I_GENERICS_INFO_PROVIDER_TRAIT_NAME: &'static str = "IGenericsInfoProvider";
 define!(
     I_GENERICS_HASH_KEY_PROVIDER_TRAIT_PATH,
     Path,
-    path::create(format_ident!("{I_GENERICS_INFO_PROVIDER_TRAIT_NAME}"))
+    path::create(format_ident!("IGenericsInfoProvider"))
 );
 
 pub(crate) const CLONE_FOR_RSUBSTITUTE_TRAIT_NAME: &'static str = "CloneForRSubstitute";
@@ -477,7 +476,11 @@ define!(DEREF_TRAIT_PATH, Path, path::create(format_ident!("Deref")));
 ident!(DEREF_TARGET_TYPE_IDENT, "Target");
 ident!(DEREF_FN_IDENT, "deref");
 
-ident!(IGNORE_IMPL_ATTRIBUTE_IDENT, "unmock");
+pub const IGNORE_IMPL_ATTRIBUTE_IDENT_NAME: &'static str = "unmock";
+ident!(
+    IGNORE_IMPL_ATTRIBUTE_IDENT,
+    IGNORE_IMPL_ATTRIBUTE_IDENT_NAME
+);
 
 ident!(HASH_FN_IDENT, "hash");
 

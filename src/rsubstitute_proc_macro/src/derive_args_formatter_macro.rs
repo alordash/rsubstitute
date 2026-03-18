@@ -17,7 +17,7 @@ pub(crate) fn handle(item: TokenStream) -> TokenStream {
         defaultness: None,
         unsafety: None,
         impl_token: Default::default(),
-        generics: item_struct.generics.clone(),
+        generics: generics::remove_default_values(item_struct.generics.clone()),
         trait_: Some((
             None,
             constants::I_ARGS_FORMATTER_TRAIT_PATH.clone(),

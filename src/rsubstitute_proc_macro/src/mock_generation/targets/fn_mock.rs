@@ -7,6 +7,7 @@ use proc_macro::TokenStream;
 use quote::{format_ident, quote};
 use syn::*;
 use crate::mock_generation::fn_decl;
+use crate::mock_generation::parameters::Target;
 
 pub(crate) fn handle(ctx: &Ctx, item_fn: ItemFn) -> TokenStream {
     let mock_ident = format_ident!(
@@ -14,7 +15,7 @@ pub(crate) fn handle(ctx: &Ctx, item_fn: ItemFn) -> TokenStream {
         item_fn.sig.ident,
         constants::MOCK_STRUCT_IDENT_PREFIX
     );
-    let mock_generics = mock_generics::generate(&item_fn.sig.generics, None);
+    let mock_generics = mock_generics::generate(&item_fn.sig.generics, Target::Static, None);
     let fn_decl = fn_decl::extract_fn(ctx, &mock_generics, &item_fn);
     let mock_type = mock_type::generate(mock_ident.clone(), mock_generics);
     let fn_ident = item_fn.sig.ident.clone();

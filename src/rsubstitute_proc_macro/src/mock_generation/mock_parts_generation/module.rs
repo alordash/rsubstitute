@@ -163,19 +163,22 @@ pub(crate) fn generate_struct(
 
 const GENERATED_MOD_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("__rsubstitute_generated"));
-fn convert_fn_info(fn_info: FnInfo) -> [Item; 3] {
-    [
-        Item::Struct(fn_info.call_struct.item_struct),
-        Item::Struct(fn_info.args_checker_struct.item_struct),
-        Item::Impl(fn_info.args_checker_impl.item_impl),
-    ]
-}
 
 fn convert_fn_infos(fn_infos: Vec<FnInfo>) -> Vec<Item> {
     return fn_infos
         .into_iter()
         .flat_map(|x| convert_fn_info(x))
         .collect();
+}
+
+fn convert_fn_info(fn_info: FnInfo) -> [Item; 5] {
+    [
+        Item::Struct(fn_info.call_struct.item_struct),
+        Item::Impl(fn_info.call_struct.generics_info_provider_impl),
+        Item::Struct(fn_info.args_checker_struct.item_struct),
+        Item::Impl(fn_info.args_checker_impl.item_impl),
+        Item::Impl(fn_info.args_checker_struct.generics_info_provider_impl),
+    ]
 }
 
 fn create_item_mod(ident: Ident, items: Vec<Item>) -> ItemMod {

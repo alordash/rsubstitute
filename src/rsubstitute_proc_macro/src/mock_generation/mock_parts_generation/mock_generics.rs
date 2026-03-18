@@ -1,11 +1,14 @@
 use crate::constants;
 use crate::mock_generation::mock_parts_generation::models::*;
+use crate::mock_generation::parameters::*;
 use crate::mock_generation::*;
+use crate::syntax::generics;
 use syn::punctuated::Punctuated;
 use syn::*;
 
 pub(crate) fn generate(
     source_generics: &Generics,
+    target: Target,
     maybe_associated_generics: Option<&AssociatedGenerics>,
 ) -> MockGenerics {
     let mut modified_source_generics = source_generics.clone();
@@ -18,22 +21,32 @@ pub(crate) fn generate(
             bounds: Punctuated::new(),
         }),
     );
+    let mut associated_params_count = 0;
     if let Some(associated_generics) = maybe_associated_generics {
+        associated_params_count = associated_generics.generics_params.len();
         for generics_param in associated_generics.generics_params.iter().rev() {
             modified_source_generics
                 .params
                 .insert(1, generics_param.clone());
         }
     }
+    match target {
+        Target::Static => (),
+        _ => associated_params_count += source_generics.params.len(),
+    };
     let phantom_fields = modified_source_generics
         .params
         .iter()
         .filter_map(phantom_field::try_map_generic_param)
         .collect();
+    let impl_generics_without_default_values =
+        generics::remove_default_values(modified_source_generics.clone());
     let mock_generics = MockGenerics {
         source_generics: source_generics.clone(),
         impl_generics: modified_source_generics,
+        impl_generics_without_default_values,
         phantom_fields,
+        associated_params_count,
     };
     return mock_generics;
 }

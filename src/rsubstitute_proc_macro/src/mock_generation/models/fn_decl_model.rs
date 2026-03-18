@@ -6,7 +6,7 @@ use syn::*;
 pub(crate) struct FnDecl {
     pub attrs: Vec<Attribute>,
     pub maybe_parent_trait_ident: Option<Ident>,
-    pub(crate) fn_ident: Ident,
+    pub fn_ident: Ident,
     pub arguments: Vec<FnArg>,
     pub return_value: ReturnType,
     pub own_generics: Generics,

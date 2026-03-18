@@ -1,4 +1,5 @@
 use crate::mock_generation::fn_info_generation::models::*;
+use crate::mock_generation::fn_info_generation::*;
 use crate::mock_generation::mock_parts_generation::models::*;
 use crate::mock_generation::models::*;
 use crate::syntax::*;
@@ -31,7 +32,13 @@ pub(crate) fn generate(ctx: &Ctx, fn_decl: &FnDecl, mock_generics: &MockGenerics
         r#struct::create(attrs, ident, fn_decl.merged_generics.clone(), fields_named);
     lifetime::normalize_anonymous_lifetimes_in_struct(&mut item_struct);
     let ty_path = r#type::create_from_struct_path(&item_struct);
-    let call_struct = CallStruct { item_struct, ty_path };
+    let generics_info_provider_impl =
+        generics_info_provider_impl::generate(&item_struct, mock_generics.associated_params_count);
+    let call_struct = CallStruct {
+        item_struct,
+        ty_path,
+        generics_info_provider_impl,
+    };
 
     return call_struct;
 }
@@ -42,7 +49,6 @@ fn generate_call_derive_traits_attribute(ctx: &Ctx) -> Attribute {
     let mut arguments = vec![
         constants::I_ARGS_INFOS_PROVIDER_TRAIT_NAME,
         constants::I_ARGS_TUPLE_PROVIDER_TRAIT_NAME,
-        constants::I_GENERICS_INFO_PROVIDER_TRAIT_NAME,
     ];
     if ctx.support_base_calling {
         arguments.push(constants::CLONE_FOR_RSUBSTITUTE_TRAIT_NAME);

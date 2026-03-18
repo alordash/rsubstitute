@@ -1,5 +1,6 @@
 use crate::mock_generation::mock_parts_generation::models::*;
 use syn::*;
+use crate::syntax::generics;
 
 pub(crate) fn generate(inner_data_struct: &InnerDataStruct, new_fn: ImplItemFn) -> InnerDataImpl {
     let self_ty = inner_data_struct.ty.clone();
@@ -9,7 +10,7 @@ pub(crate) fn generate(inner_data_struct: &InnerDataStruct, new_fn: ImplItemFn) 
         defaultness: None,
         unsafety: None,
         impl_token: Default::default(),
-        generics: inner_data_struct.item_struct.generics.clone(),
+        generics: generics::remove_default_values(inner_data_struct.item_struct.generics.clone()),
         trait_: None,
         self_ty: Box::new(self_ty),
         brace_token: Default::default(),

@@ -7,8 +7,8 @@ use syn::*;
 pub(crate) struct StructMockSyntax {
     pub r#struct: ItemStruct,
     pub new_fn: ImplItemFn,
-    pub(crate) trait_impls: Vec<TraitImpl>,
-    pub(crate) struct_impls: Vec<ItemImpl>,
+    pub trait_impls: Vec<TraitImpl>,
+    pub struct_impls: Vec<ItemImpl>,
     pub ignored_impls: Vec<ItemImpl>,
 }
 
