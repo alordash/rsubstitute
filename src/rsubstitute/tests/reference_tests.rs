@@ -1327,13 +1327,17 @@ mod __rsubstitute_generated_Struct {
                 t2_ref: transmute_lifetime!(t2_ref),
                 xaxbxcxdx_t2_ref: transmute_lifetime!(xaxbxcxdx_t2_ref),
             };
-            return self
-                .data
-                .Trait_work
-                .handle_base_returning(self, call, |s: &Self, c| {
-                    let q = self.base_Trait_work::<T2>(c);
-                    todo!()
-                });
+            let w= Struct::<'__rs, 'a, 'b, T1>::base_Trait_work::<T2>;
+            let d = w as *const ();
+            // let b: *const () = unsafe { core::mem::transmute(Self::base_Trait_work::<T2> as * const fn()) };
+            // return self
+            //     .data
+            //     .Trait_work
+            //     .handle_base_returning(self, call, |s: &Self, c| {
+            //         let q = self.base_Trait_work::<T2>(c);
+            //         todo!()
+            //     });
+            todo!();
         }
     }
     #[allow(unused)]
@@ -1391,10 +1395,11 @@ mod __rsubstitute_generated_Struct {
                 t2_ref: transmute_lifetime!(t2_ref),
                 xaxbxcxdx_t2_ref: transmute_lifetime!(xaxbxcxdx_t2_ref),
             };
-            return self
-                .data
-                .work
-                .handle_base_returning(self, call, Self::base_work);
+            // return self
+            //     .data
+            //     .work
+            //     .handle_base_returning(self, call, Self::base_work);
+            todo!()
         }
     }
     impl<'__rs, 'a, 'b: 'a, T1: Clone> Struct<'__rs, 'a, 'b, T1> {
@@ -1450,9 +1455,9 @@ mod __rsubstitute_generated_Struct {
             } = call;
             unreachable!()
         }
-        fn base_Trait_work<'c, 'd: 'a, T2: Clone>(
+        fn base_Trait_work<'q, 'c, 'd: 'a, T2: Clone>(
             &self,
-            call: Trait_work_Call<'__rs, 'a, 'b, 'c, 'd, T1, T2>,
+            call: Trait_work_Call<'q, 'a, 'b, 'c, 'd, T1, T2>,
         ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 {
             #[allow(non_shorthand_field_patterns)]
             #[allow(unused_variables)]
