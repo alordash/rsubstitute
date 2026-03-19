@@ -14,11 +14,18 @@ pub(crate) fn generate(ctx: &Ctx, fn_decl: &FnDecl, mock_generics: &MockGenerics
         generate_call_derive_traits_attribute(ctx),
     ];
     let ident = format_ident!("{}_{}", fn_decl.get_full_ident(), CALL_STRUCT_SUFFIX);
-    let fn_fields = fn_decl
+    let fn_field_infos: Vec<_> = fn_decl
         .arguments
         .iter()
         .enumerate()
-        .flat_map(|(i, x)| try_convert_fn_arg_to_field(i, x));
+        .flat_map(|(i, x)| try_convert_fn_arg_to_field(i, x))
+        .collect();
+    let mut fn_fields = Vec::with_capacity(fn_field_infos.len());
+    let mut fields_maybe_actual_source_types = Vec::with_capacity(fn_fields.len());
+    for fn_field_info in fn_field_infos.into_iter() {
+        fn_fields.push(fn_field_info.field);
+        fields_maybe_actual_source_types.push(fn_field_info.maybe_actual_source_type);
+    }
     let struct_fields = core::iter::once(constants::DEFAULT_ARG_LIFETIME_FIELD.clone())
         .chain(mock_generics.phantom_fields.iter().cloned())
         .chain(fn_decl.internal_phantom_fields.iter().cloned())
@@ -39,6 +46,7 @@ pub(crate) fn generate(ctx: &Ctx, fn_decl: &FnDecl, mock_generics: &MockGenerics
         item_struct,
         ty_path,
         generics_info_provider_impl,
+        fields_maybe_actual_source_types,
     };
 
     return call_struct;
@@ -59,7 +67,7 @@ fn generate_call_derive_traits_attribute(ctx: &Ctx) -> Attribute {
     return derive_attribute;
 }
 
-fn try_convert_fn_arg_to_field(arg_number: usize, fn_arg: &FnArg) -> Option<Field> {
+fn try_convert_fn_arg_to_field(arg_number: usize, fn_arg: &FnArg) -> Option<FieldInfo> {
     let pat_type = match fn_arg {
         FnArg::Receiver(_) => return None,
         FnArg::Typed(pat_type) => pat_type,
@@ -73,9 +81,19 @@ fn try_convert_fn_arg_to_field(arg_number: usize, fn_arg: &FnArg) -> Option<Fiel
         }),
         rest => rest.clone(),
     };
-    ty = reference_to_pointer::convert_in_type(ty);
+    let conversion_result = reference_to_pointer::convert_in_type(ty);
+    ty = conversion_result.new_type;
     let ident = arg_ident::extract(arg_number, pat_type);
 
-    let result = field::create(ident, ty);
+    let field = field::create(ident, ty);
+    let result = FieldInfo {
+        field,
+        maybe_actual_source_type: conversion_result.maybe_actual_source_type,
+    };
     return Some(result);
+}
+
+struct FieldInfo {
+    pub field: Field,
+    pub maybe_actual_source_type: Option<Type>,
 }

@@ -100,7 +100,7 @@ fn generate_arg_info_new_expr(field: &Field) -> Expr {
     let field_debug_string_arg = debug_string_expr::generate(field_access_expr::create(vec![
         constants::SELF_IDENT.clone(),
         field_ident,
-    ]));
+    ]), None); // TODO - pass something instead of None (after turning derive macro into part of main code generation)
 
     let expr = expr_call::create_with_args(
         path::create_expr_from_parts(vec![

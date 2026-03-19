@@ -587,7 +587,7 @@ mod tests {
                                                 let t2 = true;
                                                 let t2_ref = &true;
                                                 let xaxbxcxdx_t2_ref = &&&&&&&&&true;
-                                                let xapx = &&(&(&2) as *const _);
+                                                let xapx = &&(&(&188) as *const _);
                                                 mock.setup
                                                     .work(
                                                         a,
@@ -876,6 +876,11 @@ mod __rsubstitute_generated_Struct {
                     &self.xaxbxcxdx_t2_ref,
                     (&ArgPrinter(&self.xaxbxcxdx_t2_ref)).debug_string(),
                 ),
+                ArgInfo::new(
+                    "xapx",
+                    &self.xapx,
+                    (&ArgPrinter::<&&*const &i32>(transmute_lifetime!(&self.xapx))).debug_string(),
+                ),
             ]
         }
     }
@@ -984,7 +989,7 @@ mod __rsubstitute_generated_Struct {
             let call: &Trait_work_Call<'__rs, 'a, 'b, 'c, 'd, T1, T2> = dyn_call.downcast_ref();
             vec![
                 self.a
-                    .check_ref("a", &call.a, (&ArgPrinter(&&call.a)).debug_string()),
+                    .check_ref("a", &call.a, (&ArgPrinter(&call.a)).debug_string()),
                 self.b
                     .check_ref("b", &call.b, (&ArgPrinter(&&call.b)).debug_string()),
                 self.c
@@ -1043,6 +1048,11 @@ mod __rsubstitute_generated_Struct {
                     "xaxbxcxdx_t2_ref",
                     &call.xaxbxcxdx_t2_ref,
                     (&ArgPrinter(&&call.xaxbxcxdx_t2_ref)).debug_string(),
+                ),
+                self.xapx.check_ref(
+                    "xapx",
+                    &call.xapx,
+                    (&ArgPrinter::<&&& &i32>(&transmute_lifetime!(&call.xapx))).debug_string(),
                 ),
             ]
         }

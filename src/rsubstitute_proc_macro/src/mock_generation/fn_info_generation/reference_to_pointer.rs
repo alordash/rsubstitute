@@ -1,13 +1,31 @@
+use crate::mock_generation::fn_info_generation::models::*;
 use syn::visit_mut::VisitMut;
 use syn::*;
 
-pub(crate) fn convert_in_type(mut ty: Type) -> Type {
-    let mut reference_to_pointer_convertor = ReferenceToPointerConvertor;
+pub(crate) fn convert_in_type(mut ty: Type) -> ReferenceToPointerConversionResult {
+    let mut reference_to_pointer_convertor = ReferenceToPointerConvertor::new();
+    let actual_source_type = ty.clone();
     reference_to_pointer_convertor.visit_type_mut(&mut ty);
-    return ty;
+    let maybe_actual_source_type = if reference_to_pointer_convertor.changed {
+        Some(actual_source_type)
+    } else {
+        None
+    };
+    return ReferenceToPointerConversionResult {
+        new_type: ty,
+        maybe_actual_source_type,
+    };
 }
 
-struct ReferenceToPointerConvertor;
+struct ReferenceToPointerConvertor {
+    changed: bool,
+}
+
+impl ReferenceToPointerConvertor {
+    pub fn new() -> Self {
+        Self { changed: false }
+    }
+}
 
 impl VisitMut for ReferenceToPointerConvertor {
     fn visit_type_mut(&mut self, i: &mut Type) {

@@ -71,10 +71,13 @@ fn create_fmt_args_block(item_struct: &ItemStruct) -> Block {
         .iter()
         .skip_while(|field| field::is_phantom_data(field))
         .map(|field| {
-            debug_string_expr::generate(field_access_expr::create(vec![
-                constants::SELF_IDENT.clone(),
-                field.get_required_ident(),
-            ]))
+            debug_string_expr::generate(
+                field_access_expr::create(vec![
+                    constants::SELF_IDENT.clone(),
+                    field.get_required_ident(),
+                ]),
+                None,
+            ) // TODO - pass something instead of None (after turning derive macro into part of main code generation)
         })
         .collect();
     let tokens = quote! { #literal, #(#args),* };

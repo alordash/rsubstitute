@@ -2,7 +2,7 @@ use crate::constants;
 use crate::syntax::*;
 use syn::*;
 
-pub(crate) fn generate(expr: Expr) -> Expr {
+pub(crate) fn generate(expr: Expr, maybe_actual_source_type: Option<&Type>) -> Expr {
     let method_call_expr = Expr::MethodCall(expr_method_call::create_with_base_receiver(
         Expr::Paren(ExprParen {
             attrs: Vec::new(),
