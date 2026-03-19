@@ -1738,10 +1738,10 @@ mod __rsubstitute_generated_Struct {
             } = call;
             unreachable!()
         }
-        fn base_Trait_work<'c, 'd: 'a, T2: Clone + 'a + 'b + 'c + 'd>(
-            &self,
+        fn base_Trait_work<'q, 'c, 'd: 'a, T2: Clone>(
+            &'q self,
             call: Trait_work_Call<'__rs, 'a, 'b, 'c, 'd, T1, T2>,
-        ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 {
+        ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 where T1: 'q, T2: 'q {
             #[allow(non_shorthand_field_patterns)]
             #[allow(unused_variables)]
             let Trait_work_Call::<'_, '_, '_, '_, '_, T1, T2> {
