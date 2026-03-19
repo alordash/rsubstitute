@@ -28,6 +28,9 @@ trait Trait {
         TT: ToString;
 }
 
+// TODO - write in docs about limitation: `Self` should not be used ambigiously, e.g.
+// correct: <Self as Trait>::OutputType
+//   wrong: Self::OutputType
 // mocked_base! {
 //     #[derive(Clone)]
 //     struct Struct;
@@ -44,7 +47,7 @@ trait Trait {
 //             Self: Clone + Sized,
 //             TT: ToString,
 //         {
-//             Self::OutputType::<TT>::default()
+//             <Self as Trait>::OutputType::<TT>::default()
 //         }
 //     }
 // }
@@ -206,7 +209,7 @@ impl Trait for Struct {
         Self: Clone + Sized,
         TT: ToString,
     {
-        Self::OutputType::<TT>::default()
+        <Self as Trait>::OutputType::<TT>::default()
     }
 }
 #[cfg(not(test))]
@@ -443,19 +446,18 @@ mod __rsubstitute_generated_Struct {
                 inner_data,
             };
         }
-        fn base_Trait_get_my_type<'q, TT: Clone>(
+        fn base_Trait_get_my_type<TT: Clone>(
             &self,
-            call: Trait_get_my_type_Call<'q, TT>,
-        ) -> <Struct<'q> as Trait>::OutputType<TT>
+            call: Trait_get_my_type_Call<'__rs, TT>,
+        ) -> <Struct<'__rs> as Trait>::OutputType<TT>
         where
             Self: Clone + Sized,
             TT: ToString,
         {
             #[allow(non_shorthand_field_patterns)]
             #[allow(unused_variables)]
-            let Trait_get_my_type_Call::<'__rs, TT> { input: input, .. } = transmute_lifetime!(call);
-            // <Struct<'__rs> as Trait>::OutputType::<TT>::default()
-            todo!()
+            let Trait_get_my_type_Call::<'_, TT> { input: input, .. } = call;
+            <Self as Trait>::OutputType::<TT>::default()
         }
     }
     impl<'__rs> StructSetup<'__rs> {}

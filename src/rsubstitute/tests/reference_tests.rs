@@ -11,7 +11,7 @@ struct Data<'a, 'b, T1, T2> {
     ),
 }
 
-#[mock]
+// #[mock]
 #[allow(unused)]
 trait Trait<'a, 'b: 'a, T1> {
     fn work<'c, 'd: 'a, T2: Clone>(
@@ -38,10 +38,11 @@ trait Trait<'a, 'b: 'a, T1> {
         t2: T2,
         t2_ref: &T2,
         xaxbxcxdx_t2_ref: &&'a &&'b &&'c &&'d &T2,
+        xapx: &&'a *const &i32,
     ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32;
 }
 
-#[mock]
+// #[mock]
 #[allow(unused)]
 fn work<'x, 'a, 'b: 'a, 'c, 'd: 'a, T1, T2>(
     a: &'a i32,
@@ -167,233 +168,390 @@ fn work<'x, 'a, 'b: 'a, 'c, 'd: 'a, T1, T2>(
 #[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
-
     use super::*;
-    use rsubstitute_core::Times;
+
+    // #[test]
+    // fn trait_work_Ok() {
+    //     // Arrange
+    //     let mock = TraitMock::new();
+    //     let return_value = &&&&&&&&&&&&&&&&&55;
+    //     let a = &1;
+    //     {
+    //         let b = &2;
+    //         {
+    //             let c = &3;
+    //             {
+    //                 let d = &4;
+    //                 {
+    //                     let axb = &&&5;
+    //                     {
+    //                         let cxd = &&&6;
+    //                         {
+    //                             let abxbax = &&&&&&7;
+    //                             {
+    //                                 let cdxdcx = &&&&&&8;
+    //                                 {
+    //                                     let abcd = &&&&9;
+    //                                     {
+    //                                         let xaxbxcxdx = &&&&&&&&&10;
+    //                                         {
+    //                                             let data = Data::<'_, '_, _, _> {
+    //                                                 _phantoms: Default::default(),
+    //                                             };
+    //                                             let t1 = [7, 77];
+    //                                             let t1_ref = &[8, 88];
+    //                                             let xaxbxcxdx_t1_ref = &&&&&&&&&[9, 99];
+    //                                             let t2 = true;
+    //                                             let t2_ref = &true;
+    //                                             let xaxbxcxdx_t2_ref = &&&&&&&&&true;
+    //                                             mock.setup
+    //                                                 .work(
+    //                                                     a,
+    //                                                     b,
+    //                                                     c,
+    //                                                     d,
+    //                                                     axb,
+    //                                                     cxd,
+    //                                                     abxbax,
+    //                                                     cdxdcx,
+    //                                                     abcd,
+    //                                                     xaxbxcxdx,
+    //                                                     data.clone(),
+    //                                                     t1,
+    //                                                     t1_ref,
+    //                                                     xaxbxcxdx_t1_ref,
+    //                                                     t2,
+    //                                                     t2_ref,
+    //                                                     xaxbxcxdx_t2_ref,
+    //                                                 )
+    //                                                 .returns(return_value);
+    //
+    //                                             // Act
+    //                                             let actual_return_value = mock.work(
+    //                                                 a,
+    //                                                 b,
+    //                                                 c,
+    //                                                 d,
+    //                                                 axb,
+    //                                                 cxd,
+    //                                                 abxbax,
+    //                                                 cdxdcx,
+    //                                                 abcd,
+    //                                                 xaxbxcxdx,
+    //                                                 data.clone(),
+    //                                                 t1,
+    //                                                 t1_ref,
+    //                                                 xaxbxcxdx_t1_ref,
+    //                                                 t2,
+    //                                                 t2_ref,
+    //                                                 xaxbxcxdx_t2_ref,
+    //                                             );
+    //
+    //                                             // Assert
+    //                                             assert_eq!(return_value, actual_return_value);
+    //
+    //                                             mock.received
+    //                                                 .work(
+    //                                                     a,
+    //                                                     b,
+    //                                                     c,
+    //                                                     d,
+    //                                                     axb,
+    //                                                     cxd,
+    //                                                     abxbax,
+    //                                                     cdxdcx,
+    //                                                     abcd,
+    //                                                     xaxbxcxdx,
+    //                                                     data,
+    //                                                     t1,
+    //                                                     t1_ref,
+    //                                                     xaxbxcxdx_t1_ref,
+    //                                                     t2,
+    //                                                     t2_ref,
+    //                                                     xaxbxcxdx_t2_ref,
+    //                                                     Times::Once,
+    //                                                 )
+    //                                                 .no_other_calls()
+    //                                         }
+    //                                     }
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
+    //
+    // #[test]
+    // fn fn_work_Ok() {
+    //     let return_value = &&&&&&&&&&&&&&&&&55;
+    //     let a = &1;
+    //     {
+    //         let b = &2;
+    //         {
+    //             let c = &3;
+    //             {
+    //                 let d = &4;
+    //                 {
+    //                     let axb = &&&5;
+    //                     {
+    //                         let cxd = &&&6;
+    //                         {
+    //                             let abxbax = &&&&&&7;
+    //                             {
+    //                                 let cdxdcx = &&&&&&8;
+    //                                 {
+    //                                     let abcd = &&&&9;
+    //                                     {
+    //                                         let xaxbxcxdx = &&&&&&&&&10;
+    //                                         {
+    //                                             let data = Data::<'_, '_, _, _> {
+    //                                                 _phantoms: Default::default(),
+    //                                             };
+    //                                             let t1 = [7, 77];
+    //                                             let t1_ref = &[8, 88];
+    //                                             let xaxbxcxdx_t1_ref = &&&&&&&&&[9, 99];
+    //                                             let t2 = true;
+    //                                             let t2_ref = &true;
+    //                                             let xaxbxcxdx_t2_ref = &&&&&&&&&true;
+    //                                             work::setup(
+    //                                                 a,
+    //                                                 b,
+    //                                                 c,
+    //                                                 d,
+    //                                                 axb,
+    //                                                 cxd,
+    //                                                 abxbax,
+    //                                                 cdxdcx,
+    //                                                 abcd,
+    //                                                 xaxbxcxdx,
+    //                                                 data.clone(),
+    //                                                 t1,
+    //                                                 t1_ref,
+    //                                                 xaxbxcxdx_t1_ref,
+    //                                                 t2,
+    //                                                 t2_ref,
+    //                                                 xaxbxcxdx_t2_ref,
+    //                                             )
+    //                                             .returns(return_value);
+    //
+    //                                             // Act
+    //                                             let actual_return_value = work(
+    //                                                 a,
+    //                                                 b,
+    //                                                 c,
+    //                                                 d,
+    //                                                 axb,
+    //                                                 cxd,
+    //                                                 abxbax,
+    //                                                 cdxdcx,
+    //                                                 abcd,
+    //                                                 xaxbxcxdx,
+    //                                                 data.clone(),
+    //                                                 t1,
+    //                                                 t1_ref,
+    //                                                 xaxbxcxdx_t1_ref,
+    //                                                 t2,
+    //                                                 t2_ref,
+    //                                                 xaxbxcxdx_t2_ref,
+    //                                             );
+    //
+    //                                             // Assert
+    //                                             assert_eq!(return_value, actual_return_value);
+    //
+    //                                             work::received(
+    //                                                 a,
+    //                                                 b,
+    //                                                 c,
+    //                                                 d,
+    //                                                 axb,
+    //                                                 cxd,
+    //                                                 abxbax,
+    //                                                 cdxdcx,
+    //                                                 abcd,
+    //                                                 xaxbxcxdx,
+    //                                                 data,
+    //                                                 t1,
+    //                                                 t1_ref,
+    //                                                 xaxbxcxdx_t1_ref,
+    //                                                 t2,
+    //                                                 t2_ref,
+    //                                                 xaxbxcxdx_t2_ref,
+    //                                                 Times::Once,
+    //                                             )
+    //                                             .no_other_calls()
+    //                                         }
+    //                                     }
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
+    //
+    // #[test]
+    // fn struct_work_Ok() {
+    //     // Arrange
+    //     let mock = Struct::new();
+    //     let return_value = &&&&&&&&&&&&&&&&&55;
+    //     let a = &1;
+    //     {
+    //         let b = &2;
+    //         {
+    //             let c = &3;
+    //             {
+    //                 let d = &4;
+    //                 {
+    //                     let axb = &&&5;
+    //                     {
+    //                         let cxd = &&&6;
+    //                         {
+    //                             let abxbax = &&&&&&7;
+    //                             {
+    //                                 let cdxdcx = &&&&&&8;
+    //                                 {
+    //                                     let abcd = &&&&9;
+    //                                     {
+    //                                         let xaxbxcxdx = &&&&&&&&&10;
+    //                                         {
+    //                                             let data = Data::<'_, '_, _, _> {
+    //                                                 _phantoms: Default::default(),
+    //                                             };
+    //                                             let t1 = [7, 77];
+    //                                             let t1_ref = &[8, 88];
+    //                                             let xaxbxcxdx_t1_ref = &&&&&&&&&[9, 99];
+    //                                             let t2 = true;
+    //                                             let t2_ref = &true;
+    //                                             let xaxbxcxdx_t2_ref = &&&&&&&&&true;
+    //                                             mock.setup
+    //                                                 .work(
+    //                                                     a,
+    //                                                     b,
+    //                                                     c,
+    //                                                     d,
+    //                                                     axb,
+    //                                                     cxd,
+    //                                                     abxbax,
+    //                                                     cdxdcx,
+    //                                                     abcd,
+    //                                                     xaxbxcxdx,
+    //                                                     data.clone(),
+    //                                                     t1,
+    //                                                     t1_ref,
+    //                                                     xaxbxcxdx_t1_ref,
+    //                                                     t2,
+    //                                                     t2_ref,
+    //                                                     xaxbxcxdx_t2_ref,
+    //                                                 )
+    //                                                 .returns(return_value);
+    //                                             mock.setup
+    //                                                 .as_Trait
+    //                                                 .work(
+    //                                                     a,
+    //                                                     b,
+    //                                                     c,
+    //                                                     d,
+    //                                                     axb,
+    //                                                     cxd,
+    //                                                     abxbax,
+    //                                                     cdxdcx,
+    //                                                     abcd,
+    //                                                     xaxbxcxdx,
+    //                                                     data.clone(),
+    //                                                     t1,
+    //                                                     t1_ref,
+    //                                                     xaxbxcxdx_t1_ref,
+    //                                                     t2,
+    //                                                     t2_ref,
+    //                                                     xaxbxcxdx_t2_ref,
+    //                                                 )
+    //                                                 .call_base();
+    //
+    //                                             // Act
+    //                                             let actual_return_value = mock.work(
+    //                                                 a,
+    //                                                 b,
+    //                                                 c,
+    //                                                 d,
+    //                                                 axb,
+    //                                                 cxd,
+    //                                                 abxbax,
+    //                                                 cdxdcx,
+    //                                                 abcd,
+    //                                                 xaxbxcxdx,
+    //                                                 data.clone(),
+    //                                                 t1,
+    //                                                 t1_ref,
+    //                                                 xaxbxcxdx_t1_ref,
+    //                                                 t2,
+    //                                                 t2_ref,
+    //                                                 xaxbxcxdx_t2_ref,
+    //                                             );
+    //
+    //                                             // Assert
+    //                                             assert_eq!(return_value, actual_return_value);
+    //
+    //                                             mock.received.as_Trait.work(
+    //                                                 a,
+    //                                                 b,
+    //                                                 c,
+    //                                                 d,
+    //                                                 axb,
+    //                                                 cxd,
+    //                                                 abxbax,
+    //                                                 cdxdcx,
+    //                                                 abcd,
+    //                                                 xaxbxcxdx,
+    //                                                 data.clone(),
+    //                                                 t1,
+    //                                                 t1_ref,
+    //                                                 xaxbxcxdx_t1_ref,
+    //                                                 t2,
+    //                                                 t2_ref,
+    //                                                 xaxbxcxdx_t2_ref,
+    //                                                 Times::Once,
+    //                                             );
+    //                                             mock.received
+    //                                                 .work(
+    //                                                     a,
+    //                                                     b,
+    //                                                     c,
+    //                                                     d,
+    //                                                     axb,
+    //                                                     cxd,
+    //                                                     abxbax,
+    //                                                     cdxdcx,
+    //                                                     abcd,
+    //                                                     xaxbxcxdx,
+    //                                                     data,
+    //                                                     t1,
+    //                                                     t1_ref,
+    //                                                     xaxbxcxdx_t1_ref,
+    //                                                     t2,
+    //                                                     t2_ref,
+    //                                                     xaxbxcxdx_t2_ref,
+    //                                                     Times::Once,
+    //                                                 )
+    //                                                 .no_other_calls()
+    //                                         }
+    //                                     }
+    //                                 }
+    //                             }
+    //                         }
+    //                     }
+    //                 }
+    //             }
+    //         }
+    //     }
+    // }
 
     #[test]
-    fn trait_work_Ok() {
-        // Arrange
-        let mock = TraitMock::new();
-        let return_value = &&&&&&&&&&&&&&&&&55;
-        let a = &1;
-        {
-            let b = &2;
-            {
-                let c = &3;
-                {
-                    let d = &4;
-                    {
-                        let axb = &&&5;
-                        {
-                            let cxd = &&&6;
-                            {
-                                let abxbax = &&&&&&7;
-                                {
-                                    let cdxdcx = &&&&&&8;
-                                    {
-                                        let abcd = &&&&9;
-                                        {
-                                            let xaxbxcxdx = &&&&&&&&&10;
-                                            {
-                                                let data = Data::<'_, '_, _, _> {
-                                                    _phantoms: Default::default(),
-                                                };
-                                                let t1 = [7, 77];
-                                                let t1_ref = &[8, 88];
-                                                let xaxbxcxdx_t1_ref = &&&&&&&&&[9, 99];
-                                                let t2 = true;
-                                                let t2_ref = &true;
-                                                let xaxbxcxdx_t2_ref = &&&&&&&&&true;
-                                                mock.setup
-                                                    .work(
-                                                        a,
-                                                        b,
-                                                        c,
-                                                        d,
-                                                        axb,
-                                                        cxd,
-                                                        abxbax,
-                                                        cdxdcx,
-                                                        abcd,
-                                                        xaxbxcxdx,
-                                                        data.clone(),
-                                                        t1,
-                                                        t1_ref,
-                                                        xaxbxcxdx_t1_ref,
-                                                        t2,
-                                                        t2_ref,
-                                                        xaxbxcxdx_t2_ref,
-                                                    )
-                                                    .returns(return_value);
-
-                                                // Act
-                                                let actual_return_value = mock.work(
-                                                    a,
-                                                    b,
-                                                    c,
-                                                    d,
-                                                    axb,
-                                                    cxd,
-                                                    abxbax,
-                                                    cdxdcx,
-                                                    abcd,
-                                                    xaxbxcxdx,
-                                                    data.clone(),
-                                                    t1,
-                                                    t1_ref,
-                                                    xaxbxcxdx_t1_ref,
-                                                    t2,
-                                                    t2_ref,
-                                                    xaxbxcxdx_t2_ref,
-                                                );
-
-                                                // Assert
-                                                assert_eq!(return_value, actual_return_value);
-
-                                                mock.received
-                                                    .work(
-                                                        a,
-                                                        b,
-                                                        c,
-                                                        d,
-                                                        axb,
-                                                        cxd,
-                                                        abxbax,
-                                                        cdxdcx,
-                                                        abcd,
-                                                        xaxbxcxdx,
-                                                        data,
-                                                        t1,
-                                                        t1_ref,
-                                                        xaxbxcxdx_t1_ref,
-                                                        t2,
-                                                        t2_ref,
-                                                        xaxbxcxdx_t2_ref,
-                                                        Times::Once,
-                                                    )
-                                                    .no_other_calls()
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    #[test]
-    fn fn_work_Ok() {
-        let return_value = &&&&&&&&&&&&&&&&&55;
-        let a = &1;
-        {
-            let b = &2;
-            {
-                let c = &3;
-                {
-                    let d = &4;
-                    {
-                        let axb = &&&5;
-                        {
-                            let cxd = &&&6;
-                            {
-                                let abxbax = &&&&&&7;
-                                {
-                                    let cdxdcx = &&&&&&8;
-                                    {
-                                        let abcd = &&&&9;
-                                        {
-                                            let xaxbxcxdx = &&&&&&&&&10;
-                                            {
-                                                let data = Data::<'_, '_, _, _> {
-                                                    _phantoms: Default::default(),
-                                                };
-                                                let t1 = [7, 77];
-                                                let t1_ref = &[8, 88];
-                                                let xaxbxcxdx_t1_ref = &&&&&&&&&[9, 99];
-                                                let t2 = true;
-                                                let t2_ref = &true;
-                                                let xaxbxcxdx_t2_ref = &&&&&&&&&true;
-                                                work::setup(
-                                                    a,
-                                                    b,
-                                                    c,
-                                                    d,
-                                                    axb,
-                                                    cxd,
-                                                    abxbax,
-                                                    cdxdcx,
-                                                    abcd,
-                                                    xaxbxcxdx,
-                                                    data.clone(),
-                                                    t1,
-                                                    t1_ref,
-                                                    xaxbxcxdx_t1_ref,
-                                                    t2,
-                                                    t2_ref,
-                                                    xaxbxcxdx_t2_ref,
-                                                )
-                                                .returns(return_value);
-
-                                                // Act
-                                                let actual_return_value = work(
-                                                    a,
-                                                    b,
-                                                    c,
-                                                    d,
-                                                    axb,
-                                                    cxd,
-                                                    abxbax,
-                                                    cdxdcx,
-                                                    abcd,
-                                                    xaxbxcxdx,
-                                                    data.clone(),
-                                                    t1,
-                                                    t1_ref,
-                                                    xaxbxcxdx_t1_ref,
-                                                    t2,
-                                                    t2_ref,
-                                                    xaxbxcxdx_t2_ref,
-                                                );
-
-                                                // Assert
-                                                assert_eq!(return_value, actual_return_value);
-
-                                                work::received(
-                                                    a,
-                                                    b,
-                                                    c,
-                                                    d,
-                                                    axb,
-                                                    cxd,
-                                                    abxbax,
-                                                    cdxdcx,
-                                                    abcd,
-                                                    xaxbxcxdx,
-                                                    data,
-                                                    t1,
-                                                    t1_ref,
-                                                    xaxbxcxdx_t1_ref,
-                                                    t2,
-                                                    t2_ref,
-                                                    xaxbxcxdx_t2_ref,
-                                                    Times::Once,
-                                                )
-                                                .no_other_calls()
-                                            }
-                                        }
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+    fn compile() {}
 
     #[test]
     fn struct_work_Ok() {
@@ -429,27 +587,29 @@ mod tests {
                                                 let t2 = true;
                                                 let t2_ref = &true;
                                                 let xaxbxcxdx_t2_ref = &&&&&&&&&true;
-                                                mock.setup
-                                                    .work(
-                                                        a,
-                                                        b,
-                                                        c,
-                                                        d,
-                                                        axb,
-                                                        cxd,
-                                                        abxbax,
-                                                        cdxdcx,
-                                                        abcd,
-                                                        xaxbxcxdx,
-                                                        data.clone(),
-                                                        t1,
-                                                        t1_ref,
-                                                        xaxbxcxdx_t1_ref,
-                                                        t2,
-                                                        t2_ref,
-                                                        xaxbxcxdx_t2_ref,
-                                                    )
-                                                    .returns(return_value);
+                                                let xapx = &&(&(&2) as *const _);
+                                                // mock.setup
+                                                //     .work(
+                                                //         a,
+                                                //         b,
+                                                //         c,
+                                                //         d,
+                                                //         axb,
+                                                //         cxd,
+                                                //         abxbax,
+                                                //         cdxdcx,
+                                                //         abcd,
+                                                //         xaxbxcxdx,
+                                                //         data.clone(),
+                                                //         t1,
+                                                //         t1_ref,
+                                                //         xaxbxcxdx_t1_ref,
+                                                //         t2,
+                                                //         t2_ref,
+                                                //         xaxbxcxdx_t2_ref,
+                                                //         xapx,
+                                                //     )
+                                                //     .returns(return_value);
                                                 mock.setup
                                                     .as_Trait
                                                     .work(
@@ -470,6 +630,7 @@ mod tests {
                                                         t2,
                                                         t2_ref,
                                                         xaxbxcxdx_t2_ref,
+                                                        xapx,
                                                     )
                                                     .call_base();
 
@@ -492,6 +653,7 @@ mod tests {
                                                     t2,
                                                     t2_ref,
                                                     xaxbxcxdx_t2_ref,
+                                                    xapx,
                                                 );
 
                                                 // Assert
@@ -515,6 +677,7 @@ mod tests {
                                                     t2,
                                                     t2_ref,
                                                     xaxbxcxdx_t2_ref,
+                                                    xapx,
                                                     Times::Once,
                                                 );
                                                 mock.received
@@ -536,6 +699,7 @@ mod tests {
                                                         t2,
                                                         t2_ref,
                                                         xaxbxcxdx_t2_ref,
+                                                        xapx,
                                                         Times::Once,
                                                     )
                                                     .no_other_calls()
@@ -586,6 +750,7 @@ impl<'a, 'b: 'a, T1: Clone> Trait<'a, 'b, T1> for Struct<'a, 'b, T1> {
         t2: T2,
         t2_ref: &T2,
         xaxbxcxdx_t2_ref: &&'a &&'b &&'c &&'d &T2,
+        xapx: &&'a *const &i32,
     ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 {
         Self::work(
             self,
@@ -606,6 +771,7 @@ impl<'a, 'b: 'a, T1: Clone> Trait<'a, 'b, T1> for Struct<'a, 'b, T1> {
             t2,
             t2_ref,
             xaxbxcxdx_t2_ref,
+            xapx,
         )
     }
 }
@@ -645,6 +811,7 @@ impl<'a, 'b: 'a, T1: Clone> Struct<'a, 'b, T1> {
         t2: T2,
         t2_ref: &T2,
         xaxbxcxdx_t2_ref: &&'a &&'b &&'c &&'d &T2,
+        xapx: &&'a *const &i32,
     ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 {
         unreachable!()
     }
@@ -659,8 +826,62 @@ pub use __rsubstitute_generated_Struct::*;
 mod __rsubstitute_generated_Struct {
     use super::*;
     use rsubstitute::for_generated::*;
+    impl<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> IArgsInfosProvider
+        for Trait_work_Call<'__rs, 'a, 'b, 'c, 'd, T1, T2>
+    {
+        fn get_arg_infos(&self) -> Vec<ArgInfo> {
+            vec![
+                ArgInfo::new("a", &self.a, (&ArgPrinter(&"amogus")).debug_string()),
+                ArgInfo::new("b", &self.b, (&ArgPrinter(&self.b)).debug_string()),
+                ArgInfo::new("c", &self.c, (&ArgPrinter(&self.c)).debug_string()),
+                ArgInfo::new("d", &self.d, (&ArgPrinter(&self.d)).debug_string()),
+                ArgInfo::new("axb", &self.axb, (&ArgPrinter(&self.axb)).debug_string()),
+                ArgInfo::new("cxd", &self.cxd, (&ArgPrinter(&self.cxd)).debug_string()),
+                ArgInfo::new(
+                    "abxbax",
+                    &self.abxbax,
+                    (&ArgPrinter(&self.abxbax)).debug_string(),
+                ),
+                ArgInfo::new(
+                    "cdxdcx",
+                    &self.cdxdcx,
+                    (&ArgPrinter(&self.cdxdcx)).debug_string(),
+                ),
+                ArgInfo::new("abcd", &self.abcd, (&ArgPrinter(&self.abcd)).debug_string()),
+                ArgInfo::new(
+                    "xaxbxcxdx",
+                    &self.xaxbxcxdx,
+                    (&ArgPrinter(&self.xaxbxcxdx)).debug_string(),
+                ),
+                ArgInfo::new("data", &self.data, (&ArgPrinter(&self.data)).debug_string()),
+                ArgInfo::new("t1", &self.t1, (&ArgPrinter(&self.t1)).debug_string()),
+                ArgInfo::new(
+                    "t1_ref",
+                    &self.t1_ref,
+                    (&ArgPrinter(&self.t1_ref)).debug_string(),
+                ),
+                ArgInfo::new(
+                    "xaxbxcxdx_t1_ref",
+                    &self.xaxbxcxdx_t1_ref,
+                    (&ArgPrinter(&self.xaxbxcxdx_t1_ref)).debug_string(),
+                ),
+                ArgInfo::new("t2", &self.t2, (&ArgPrinter(&self.t2)).debug_string()),
+                ArgInfo::new(
+                    "t2_ref",
+                    &self.t2_ref,
+                    (&ArgPrinter(&self.t2_ref)).debug_string(),
+                ),
+                ArgInfo::new(
+                    "xaxbxcxdx_t2_ref",
+                    &self.xaxbxcxdx_t2_ref,
+                    (&ArgPrinter(&self.xaxbxcxdx_t2_ref)).debug_string(),
+                ),
+            ]
+        }
+    }
     #[doc(hidden)]
-    #[derive(IArgsInfosProvider, IArgsTupleProvider, CloneForRSubstitute)]
+    #[derive(IArgsTupleProvider, CloneForRSubstitute)]
+    #[repr(C)]
     pub struct Trait_work_Call<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> {
         _phantom_lifetime: PhantomData<&'__rs ()>,
         _phantom___rs: PhantomData<&'__rs ()>,
@@ -670,33 +891,34 @@ mod __rsubstitute_generated_Struct {
         _phantom_c: PhantomData<&'c ()>,
         _phantom_d: PhantomData<&'d ()>,
         _phantom_T2: PhantomData<T2>,
-        a: &'a i32,
-        b: &'b i32,
-        c: &'c i32,
-        d: &'d i32,
-        axb: &'a &'__rs &'b i32,
-        cxd: &'c &'__rs &'d i32,
-        abxbax: &'a &'b &'__rs &'b &'a &'__rs i32,
-        cdxdcx: &'c &'d &'__rs &'d &'c &'__rs i32,
-        abcd: &'a &'b &'c &'d i32,
-        xaxbxcxdx: &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs i32,
+        a: *const i32,
+        b: *const i32,
+        c: *const i32,
+        d: *const i32,
+        axb: *const *const *const i32,
+        cxd: *const *const *const i32,
+        abxbax: *const *const *const *const *const *const i32,
+        cdxdcx: *const *const *const *const *const *const i32,
+        abcd: *const *const *const *const i32,
+        xaxbxcxdx: *const *const *const *const *const *const *const *const *const i32,
         data: Data<
             'a,
             'b,
-            &'__rs &'__rs i32,
-            &'__rs &'a &'__rs &'b &'__rs [&'c &'__rs &'b &'__rs Data<
+            *const *const i32,
+            *const *const *const *const *const [*const *const *const *const Data<
                 'c,
                 'a,
-                &'__rs &'__rs &'c &'__rs i32,
-                Vec<&'d &'b &'__rs ()>,
+                *const *const *const *const i32,
+                Vec<*const *const *const ()>,
             >],
         >,
         t1: T1,
-        t1_ref: &'__rs T1,
-        xaxbxcxdx_t1_ref: &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T1,
+        t1_ref: *const T1,
+        xaxbxcxdx_t1_ref: *const *const *const *const *const *const *const *const *const T1,
         t2: T2,
-        t2_ref: &'__rs T2,
-        xaxbxcxdx_t2_ref: &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T2,
+        t2_ref: *const T2,
+        xaxbxcxdx_t2_ref: *const *const *const *const *const *const *const *const *const T2,
+        xapx: *const *const *const *const i32,
     }
     impl<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> IGenericsInfoProvider
         for Trait_work_Call<'__rs, 'a, 'b, 'c, 'd, T1, T2>
@@ -720,36 +942,39 @@ mod __rsubstitute_generated_Struct {
         _phantom_c: PhantomData<&'c ()>,
         _phantom_d: PhantomData<&'d ()>,
         _phantom_T2: PhantomData<T2>,
-        a: Arg<'__rs, &'a i32>,
-        b: Arg<'__rs, &'b i32>,
-        c: Arg<'__rs, &'c i32>,
-        d: Arg<'__rs, &'d i32>,
-        axb: Arg<'__rs, &'a &'__rs &'b i32>,
-        cxd: Arg<'__rs, &'c &'__rs &'d i32>,
-        abxbax: Arg<'__rs, &'a &'b &'__rs &'b &'a &'__rs i32>,
-        cdxdcx: Arg<'__rs, &'c &'d &'__rs &'d &'c &'__rs i32>,
-        abcd: Arg<'__rs, &'a &'b &'c &'d i32>,
-        xaxbxcxdx: Arg<'__rs, &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs i32>,
+        a: Arg<'__rs, *const i32>,
+        b: Arg<'__rs, *const i32>,
+        c: Arg<'__rs, *const i32>,
+        d: Arg<'__rs, *const i32>,
+        axb: Arg<'__rs, *const *const *const i32>,
+        cxd: Arg<'__rs, *const *const *const i32>,
+        abxbax: Arg<'__rs, *const *const *const *const *const *const i32>,
+        cdxdcx: Arg<'__rs, *const *const *const *const *const *const i32>,
+        abcd: Arg<'__rs, *const *const *const *const i32>,
+        xaxbxcxdx: Arg<'__rs, *const *const *const *const *const *const *const *const *const i32>,
         data: Arg<
             '__rs,
             Data<
                 'a,
                 'b,
-                &'__rs &'__rs i32,
-                &'__rs &'a &'__rs &'b &'__rs [&'c &'__rs &'b &'__rs Data<
+                *const *const i32,
+                *const *const *const *const *const [*const *const *const *const Data<
                     'c,
                     'a,
-                    &'__rs &'__rs &'c &'__rs i32,
-                    Vec<&'d &'b &'__rs ()>,
+                    *const *const *const *const i32,
+                    Vec<*const *const *const ()>,
                 >],
             >,
         >,
         t1: Arg<'__rs, T1>,
-        t1_ref: Arg<'__rs, &'__rs T1>,
-        xaxbxcxdx_t1_ref: Arg<'__rs, &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T1>,
+        t1_ref: Arg<'__rs, *const T1>,
+        xaxbxcxdx_t1_ref:
+            Arg<'__rs, *const *const *const *const *const *const *const *const *const T1>,
         t2: Arg<'__rs, T2>,
-        t2_ref: Arg<'__rs, &'__rs T2>,
-        xaxbxcxdx_t2_ref: Arg<'__rs, &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T2>,
+        t2_ref: Arg<'__rs, *const T2>,
+        xaxbxcxdx_t2_ref:
+            Arg<'__rs, *const *const *const *const *const *const *const *const *const T2>,
+        xapx: Arg<'__rs, *const *const *const *const i32>,
     }
     impl<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> IArgsChecker
         for Trait_work_ArgsChecker<'__rs, 'a, 'b, 'c, 'd, T1, T2>
@@ -852,7 +1077,7 @@ mod __rsubstitute_generated_Struct {
                 '__rsa,
                 &'__rsa &'__rsa i32,
                 &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa [&'__rsa &'__rsa &'__rsa &'__rsa Data<'__rsa, '__rsa, &'__rsa &'__rsa &'__rsa &'__rsa i32, Vec<&'__rsa &'__rsa &'__rsa ()>>],
-            >>>, t1: impl Into<Arg<'__rsa, T1>>, t1_ref: impl Into<Arg<'__rsa, &'__rsa T1>>, xaxbxcxdx_t1_ref: impl Into<Arg<'__rsa, &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa T1>>, t2: impl Into<Arg<'__rsa, T2>>, t2_ref: impl Into<Arg<'__rsa, &'__rsa T2>>, xaxbxcxdx_t2_ref: impl Into<Arg<'__rsa, &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa T2>>) -> FnTuner<'_, Struct<'__rs, 'a, 'b, T1>, Self, (&'__rs &'a i32,
+            >>>, t1: impl Into<Arg<'__rsa, T1>>, t1_ref: impl Into<Arg<'__rsa, &'__rsa T1>>, xaxbxcxdx_t1_ref: impl Into<Arg<'__rsa, &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa T1>>, t2: impl Into<Arg<'__rsa, T2>>, t2_ref: impl Into<Arg<'__rsa, &'__rsa T2>>, xaxbxcxdx_t2_ref: impl Into<Arg<'__rsa, &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa T2>>, xapx: impl Into<Arg<'__rs, &'__rsa &'__rsa *const &'__rsa i32>>) -> FnTuner<'_, Struct<'__rs, 'a, 'b, T1>, Self, (&'__rs &'a i32,
                                                                                                                                                                                                                                                                                                                                                                                                                                                                       &'__rs &'b i32,
                                                                                                                                                                                                                                                                                                                                                                                                                                                                       &'__rs &'c i32,
                                                                                                                                                                                                                                                                                                                                                                                                                                                                       &'__rs &'d i32,
@@ -905,6 +1130,7 @@ mod __rsubstitute_generated_Struct {
                     t2: transmute_lifetime!(t2.into()),
                     t2_ref: transmute_lifetime!(t2_ref.into()),
                     xaxbxcxdx_t2_ref: transmute_lifetime!(xaxbxcxdx_t2_ref.into()),
+                    xapx: transmute_lifetime!(xapx.into())
                 };
             let fn_tuner: FnTuner<'_, Struct<'__rs, 'a, 'b, T1>, Self, (&'__rs &'a i32,
                                                                         &'__rs &'b i32,
@@ -971,7 +1197,7 @@ mod __rsubstitute_generated_Struct {
                     '__rsa,
                     &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa T2,
                 >,
-            >,
+            >,xapx: impl Into<Arg<'__rs, &'__rsa &'__rsa *const &'__rsa i32>>,
             times: Times,
         ) -> FnVerifier<
             Self,
@@ -1036,6 +1262,7 @@ mod __rsubstitute_generated_Struct {
                     t2: transmute_lifetime!(t2.into()),
                     t2_ref: transmute_lifetime!(t2_ref.into()),
                     xaxbxcxdx_t2_ref: transmute_lifetime!(xaxbxcxdx_t2_ref.into()),
+                    xapx: transmute_lifetime!(xapx.into())
                 };
             self.data
                 .Trait_work
@@ -1043,8 +1270,66 @@ mod __rsubstitute_generated_Struct {
             return FnVerifier::new(self.clone());
         }
     }
+    impl<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> IArgsInfosProvider
+        for work_Call<'__rs, 'a, 'b, 'c, 'd, T1, T2>
+    {
+        fn get_arg_infos(&self) -> Vec<ArgInfo> {
+            vec![
+                ArgInfo::new(
+                    "a",
+                    &self.a,
+                    (&ArgPrinter::<&i32>(&transmute_lifetime!(self.a))).debug_string(),
+                ),
+                ArgInfo::new("b", &self.b, (&ArgPrinter(&self.b)).debug_string()),
+                ArgInfo::new("c", &self.c, (&ArgPrinter(&self.c)).debug_string()),
+                ArgInfo::new("d", &self.d, (&ArgPrinter(&self.d)).debug_string()),
+                ArgInfo::new("axb", &self.axb, (&ArgPrinter(&self.axb)).debug_string()),
+                ArgInfo::new("cxd", &self.cxd, (&ArgPrinter(&self.cxd)).debug_string()),
+                ArgInfo::new(
+                    "abxbax",
+                    &self.abxbax,
+                    (&ArgPrinter(&self.abxbax)).debug_string(),
+                ),
+                ArgInfo::new(
+                    "cdxdcx",
+                    &self.cdxdcx,
+                    (&ArgPrinter(&self.cdxdcx)).debug_string(),
+                ),
+                ArgInfo::new("abcd", &self.abcd, (&ArgPrinter(&self.abcd)).debug_string()),
+                ArgInfo::new(
+                    "xaxbxcxdx",
+                    &self.xaxbxcxdx,
+                    (&ArgPrinter(&self.xaxbxcxdx)).debug_string(),
+                ),
+                ArgInfo::new("data", &self.data, (&ArgPrinter(&self.data)).debug_string()),
+                ArgInfo::new("t1", &self.t1, (&ArgPrinter(&self.t1)).debug_string()),
+                ArgInfo::new(
+                    "t1_ref",
+                    &self.t1_ref,
+                    (&ArgPrinter(&self.t1_ref)).debug_string(),
+                ),
+                ArgInfo::new(
+                    "xaxbxcxdx_t1_ref",
+                    &self.xaxbxcxdx_t1_ref,
+                    (&ArgPrinter(&self.xaxbxcxdx_t1_ref)).debug_string(),
+                ),
+                ArgInfo::new("t2", &self.t2, (&ArgPrinter(&self.t2)).debug_string()),
+                ArgInfo::new(
+                    "t2_ref",
+                    &self.t2_ref,
+                    (&ArgPrinter(&self.t2_ref)).debug_string(),
+                ),
+                ArgInfo::new(
+                    "xaxbxcxdx_t2_ref",
+                    &self.xaxbxcxdx_t2_ref,
+                    (&ArgPrinter(&self.xaxbxcxdx_t2_ref)).debug_string(),
+                ),
+            ]
+        }
+    }
     #[doc(hidden)]
-    #[derive(IArgsInfosProvider, IArgsTupleProvider, CloneForRSubstitute)]
+    #[derive(IArgsTupleProvider, CloneForRSubstitute)]
+    #[repr(C)]
     pub struct work_Call<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> {
         _phantom_lifetime: PhantomData<&'__rs ()>,
         _phantom___rs: PhantomData<&'__rs ()>,
@@ -1054,33 +1339,33 @@ mod __rsubstitute_generated_Struct {
         _phantom_c: PhantomData<&'c ()>,
         _phantom_d: PhantomData<&'d ()>,
         _phantom_T2: PhantomData<T2>,
-        a: &'a i32,
-        b: &'b i32,
-        c: &'c i32,
-        d: &'d i32,
-        axb: &'a &'__rs &'b i32,
-        cxd: &'c &'__rs &'d i32,
-        abxbax: &'a &'b &'__rs &'b &'a &'__rs i32,
-        cdxdcx: &'c &'d &'__rs &'d &'c &'__rs i32,
-        abcd: &'a &'b &'c &'d i32,
-        xaxbxcxdx: &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs i32,
+        a: *const i32,
+        b: *const i32,
+        c: *const i32,
+        d: *const i32,
+        axb: *const *const *const i32,
+        cxd: *const *const *const i32,
+        abxbax: *const *const *const *const *const *const i32,
+        cdxdcx: *const *const *const *const *const *const i32,
+        abcd: *const *const *const *const i32,
+        xaxbxcxdx: *const *const *const *const *const *const *const *const *const i32,
         data: Data<
             'a,
             'b,
-            &'__rs &'__rs i32,
-            &'__rs &'a &'__rs &'b &'__rs [&'c &'__rs &'b &'__rs Data<
+            *const *const i32,
+            *const *const *const *const *const [*const *const *const *const Data<
                 'c,
                 'a,
-                &'__rs &'__rs &'c &'__rs i32,
-                Vec<&'d &'b &'__rs ()>,
+                *const *const *const *const i32,
+                Vec<*const *const *const ()>,
             >],
         >,
         t1: T1,
-        t1_ref: &'__rs T1,
-        xaxbxcxdx_t1_ref: &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T1,
+        t1_ref: *const T1,
+        xaxbxcxdx_t1_ref: *const *const *const *const *const *const *const *const *const T1,
         t2: T2,
-        t2_ref: &'__rs T2,
-        xaxbxcxdx_t2_ref: &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T2,
+        t2_ref: *const T2,
+        xaxbxcxdx_t2_ref: *const *const *const *const *const *const *const *const *const T2,
     }
     impl<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> IGenericsInfoProvider
         for work_Call<'__rs, 'a, 'b, 'c, 'd, T1, T2>
@@ -1104,36 +1389,39 @@ mod __rsubstitute_generated_Struct {
         _phantom_c: PhantomData<&'c ()>,
         _phantom_d: PhantomData<&'d ()>,
         _phantom_T2: PhantomData<T2>,
-        a: Arg<'__rs, &'a i32>,
-        b: Arg<'__rs, &'b i32>,
-        c: Arg<'__rs, &'c i32>,
-        d: Arg<'__rs, &'d i32>,
-        axb: Arg<'__rs, &'a &'__rs &'b i32>,
-        cxd: Arg<'__rs, &'c &'__rs &'d i32>,
-        abxbax: Arg<'__rs, &'a &'b &'__rs &'b &'a &'__rs i32>,
-        cdxdcx: Arg<'__rs, &'c &'d &'__rs &'d &'c &'__rs i32>,
-        abcd: Arg<'__rs, &'a &'b &'c &'d i32>,
-        xaxbxcxdx: Arg<'__rs, &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs i32>,
+        a: Arg<'__rs, *const i32>,
+        b: Arg<'__rs, *const i32>,
+        c: Arg<'__rs, *const i32>,
+        d: Arg<'__rs, *const i32>,
+        axb: Arg<'__rs, *const *const *const i32>,
+        cxd: Arg<'__rs, *const *const *const i32>,
+        abxbax: Arg<'__rs, *const *const *const *const *const *const i32>,
+        cdxdcx: Arg<'__rs, *const *const *const *const *const *const i32>,
+        abcd: Arg<'__rs, *const *const *const *const i32>,
+        xaxbxcxdx: Arg<'__rs, *const *const *const *const *const *const *const *const *const i32>,
         data: Arg<
             '__rs,
             Data<
                 'a,
                 'b,
-                &'__rs &'__rs i32,
-                &'__rs &'a &'__rs &'b &'__rs [&'c &'__rs &'b &'__rs Data<
+                *const *const i32,
+                *const *const *const *const *const [*const *const *const *const Data<
                     'c,
                     'a,
-                    &'__rs &'__rs &'c &'__rs i32,
-                    Vec<&'d &'b &'__rs ()>,
+                    *const *const *const *const i32,
+                    Vec<*const *const *const ()>,
                 >],
             >,
         >,
         t1: Arg<'__rs, T1>,
-        t1_ref: Arg<'__rs, &'__rs T1>,
-        xaxbxcxdx_t1_ref: Arg<'__rs, &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T1>,
+        t1_ref: Arg<'__rs, *const T1>,
+        xaxbxcxdx_t1_ref:
+            Arg<'__rs, *const *const *const *const *const *const *const *const *const T1>,
         t2: Arg<'__rs, T2>,
-        t2_ref: Arg<'__rs, &'__rs T2>,
-        xaxbxcxdx_t2_ref: Arg<'__rs, &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T2>,
+        t2_ref: Arg<'__rs, *const T2>,
+        xaxbxcxdx_t2_ref:
+            Arg<'__rs, *const *const *const *const *const *const *const *const *const T2>,
+        xapx: Arg<'__rs, *const *const *const *const i32>,
     }
     impl<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> IArgsChecker
         for work_ArgsChecker<'__rs, 'a, 'b, 'c, 'd, T1, T2>
@@ -1299,6 +1587,7 @@ mod __rsubstitute_generated_Struct {
             t2: T2,
             t2_ref: &T2,
             xaxbxcxdx_t2_ref: &&'a &&'b &&'c &&'d &T2,
+            xapx: &&'a *const &i32,
         ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 {
             let call: Trait_work_Call<'_, '_, '_, '_, '_, T1, T2> = Trait_work_Call {
                 _phantom_lifetime: PhantomData,
@@ -1326,18 +1615,12 @@ mod __rsubstitute_generated_Struct {
                 t2: transmute_lifetime!(t2),
                 t2_ref: transmute_lifetime!(t2_ref),
                 xaxbxcxdx_t2_ref: transmute_lifetime!(xaxbxcxdx_t2_ref),
+                xapx: transmute_lifetime!(xapx)
             };
-            let w= Struct::<'__rs, 'a, 'b, T1>::base_Trait_work::<T2>;
-            let d = w as *const ();
-            // let b: *const () = unsafe { core::mem::transmute(Self::base_Trait_work::<T2> as * const fn()) };
-            // return self
-            //     .data
-            //     .Trait_work
-            //     .handle_base_returning(self, call, |s: &Self, c| {
-            //         let q = self.base_Trait_work::<T2>(c);
-            //         todo!()
-            //     });
-            todo!();
+            return self
+                .data
+                .Trait_work
+                .handle_base_returning(self, call, Self::base_Trait_work);
         }
     }
     #[allow(unused)]
@@ -1367,6 +1650,7 @@ mod __rsubstitute_generated_Struct {
             t2: T2,
             t2_ref: &T2,
             xaxbxcxdx_t2_ref: &&'a &&'b &&'c &&'d &T2,
+            xapx: &&'a *const &i32,
         ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 {
             let call: work_Call<'_, '_, '_, '_, '_, T1, T2> = work_Call {
                 _phantom_lifetime: PhantomData,
@@ -1395,11 +1679,10 @@ mod __rsubstitute_generated_Struct {
                 t2_ref: transmute_lifetime!(t2_ref),
                 xaxbxcxdx_t2_ref: transmute_lifetime!(xaxbxcxdx_t2_ref),
             };
-            // return self
-            //     .data
-            //     .work
-            //     .handle_base_returning(self, call, Self::base_work);
-            todo!()
+            return self
+                .data
+                .work
+                .handle_base_returning(self, call, Self::base_work);
         }
     }
     impl<'__rs, 'a, 'b: 'a, T1: Clone> Struct<'__rs, 'a, 'b, T1> {
@@ -1455,9 +1738,9 @@ mod __rsubstitute_generated_Struct {
             } = call;
             unreachable!()
         }
-        fn base_Trait_work<'q, 'c, 'd: 'a, T2: Clone>(
+        fn base_Trait_work<'c, 'd: 'a, T2: Clone + 'a + 'b + 'c + 'd>(
             &self,
-            call: Trait_work_Call<'q, 'a, 'b, 'c, 'd, T1, T2>,
+            call: Trait_work_Call<'__rs, 'a, 'b, 'c, 'd, T1, T2>,
         ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 {
             #[allow(non_shorthand_field_patterns)]
             #[allow(unused_variables)]
@@ -1479,27 +1762,29 @@ mod __rsubstitute_generated_Struct {
                 t2: t2,
                 t2_ref: t2_ref,
                 xaxbxcxdx_t2_ref: xaxbxcxdx_t2_ref,
+                xapx: xapx,
                 ..
             } = call;
-            <Struct<'__rs, 'a, 'b, T1> as Trait<'a, 'b, T1>>::work(
+            Self::work::<T2>(
                 self,
-                a,
-                b,
-                c,
-                d,
-                axb,
-                cxd,
-                abxbax,
-                cdxdcx,
-                abcd,
-                xaxbxcxdx,
-                data,
-                t1,
-                t1_ref,
-                xaxbxcxdx_t1_ref,
-                t2,
-                t2_ref,
-                xaxbxcxdx_t2_ref,
+                transmute_lifetime!(a),
+                transmute_lifetime!(b),
+                transmute_lifetime!(c),
+                transmute_lifetime!(d),
+                transmute_lifetime!(axb),
+                transmute_lifetime!(cxd),
+                transmute_lifetime!(abxbax),
+                transmute_lifetime!(cdxdcx),
+                transmute_lifetime!(abcd),
+                transmute_lifetime!(xaxbxcxdx),
+                transmute_lifetime!(data),
+                transmute_lifetime!(t1),
+                transmute_lifetime!(t1_ref),
+                transmute_lifetime!(xaxbxcxdx_t1_ref),
+                transmute_lifetime!(t2),
+                transmute_lifetime!(t2_ref),
+                transmute_lifetime!(xaxbxcxdx_t2_ref),
+                transmute_lifetime!(xapx)
             )
         }
     }
@@ -1510,7 +1795,7 @@ mod __rsubstitute_generated_Struct {
                 '__rsa,
                 &'__rsa &'__rsa i32,
                 &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa [&'__rsa &'__rsa &'__rsa &'__rsa Data<'__rsa, '__rsa, &'__rsa &'__rsa &'__rsa &'__rsa i32, Vec<&'__rsa &'__rsa &'__rsa ()>>],
-            >>>, t1: impl Into<Arg<'__rsa, T1>>, t1_ref: impl Into<Arg<'__rsa, &'__rsa T1>>, xaxbxcxdx_t1_ref: impl Into<Arg<'__rsa, &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa T1>>, t2: impl Into<Arg<'__rsa, T2>>, t2_ref: impl Into<Arg<'__rsa, &'__rsa T2>>, xaxbxcxdx_t2_ref: impl Into<Arg<'__rsa, &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa T2>>) -> FnTuner<'_, Struct<'__rs, 'a, 'b, T1>, Self, (&'__rs &'a i32,
+            >>>, t1: impl Into<Arg<'__rsa, T1>>, t1_ref: impl Into<Arg<'__rsa, &'__rsa T1>>, xaxbxcxdx_t1_ref: impl Into<Arg<'__rsa, &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa T1>>, t2: impl Into<Arg<'__rsa, T2>>, t2_ref: impl Into<Arg<'__rsa, &'__rsa T2>>, xaxbxcxdx_t2_ref: impl Into<Arg<'__rsa, &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa T2>>, xapx: impl Into<Arg<'__rs, &'__rsa &'__rsa *const &'__rsa i32>>) -> FnTuner<'_, Struct<'__rs, 'a, 'b, T1>, Self, (&'__rs &'a i32,
                                                                                                                                                                                                                                                                                                                                                                                                                                                                       &'__rs &'b i32,
                                                                                                                                                                                                                                                                                                                                                                                                                                                                       &'__rs &'c i32,
                                                                                                                                                                                                                                                                                                                                                                                                                                                                       &'__rs &'d i32,
@@ -1533,8 +1818,8 @@ mod __rsubstitute_generated_Struct {
                                                                                                                                                                                                                                                                                                                                                                                                                                                                       &'__rs &'__rs T2,
                                                                                                                                                                                                                                                                                                                                                                                                                                                                       &'__rs &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T2),
             &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa i32, true, true> where
-            T2: '__rsa,
-            T1: '__rsa
+            T1: '__rsa,
+            T2: '__rsa
         {
             let work_args_checker: work_ArgsChecker<'_, 'a, 'b, 'c, 'd, T1, T2> =
                 work_ArgsChecker {
@@ -1563,6 +1848,7 @@ mod __rsubstitute_generated_Struct {
                     t2: transmute_lifetime!(t2.into()),
                     t2_ref: transmute_lifetime!(t2_ref.into()),
                     xaxbxcxdx_t2_ref: transmute_lifetime!(xaxbxcxdx_t2_ref.into()),
+                    xapx: transmute_lifetime!(xapx.into())
                 };
             let fn_tuner: FnTuner<'_, Struct<'__rs, 'a, 'b, T1>, Self, (&'__rs &'a i32,
                                                                         &'__rs &'b i32,
@@ -1630,6 +1916,7 @@ mod __rsubstitute_generated_Struct {
                     &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa T2,
                 >,
             >,
+            xapx: impl Into<Arg<'__rs, &'__rsa &'__rsa *const &'__rsa i32>>,
             times: Times,
         ) -> FnVerifier<
             Self,
@@ -1694,6 +1981,7 @@ mod __rsubstitute_generated_Struct {
                     t2: transmute_lifetime!(t2.into()),
                     t2_ref: transmute_lifetime!(t2_ref.into()),
                     xaxbxcxdx_t2_ref: transmute_lifetime!(xaxbxcxdx_t2_ref.into()),
+                    xapx: transmute_lifetime!(xapx.into())
                 };
             self.data.work.verify_received(work_args_checker, times);
             return FnVerifier::new(self.clone());

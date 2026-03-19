@@ -51,6 +51,7 @@ pub(crate) fn extract_struct_trait_impl_fns(
                 trait_impl_fn.attrs.clone(),
                 &trait_impl_fn.sig,
                 trait_impl_fn.vis.clone(),
+                false,
                 Some(trait_impl_fn.block.clone()),
                 Some(&trait_impl.trait_path),
             )
@@ -68,6 +69,7 @@ pub(crate) fn extract_fn(ctx: &Ctx, mock_type: &MockType, item_fn: &ItemFn) -> F
         item_fn.attrs.clone(),
         &item_fn.sig,
         item_fn.vis.clone(),
+        false,
         Some(*item_fn.block.clone()),
         None,
     );
@@ -103,6 +105,7 @@ fn map_trait_item_fn(
         trait_item_fn.attrs.clone(),
         sig,
         Visibility::Inherited,
+        true,
         trait_item_fn.default.clone(),
         Some(trait_path),
     );
@@ -119,6 +122,7 @@ fn map_impl_item_fn(ctx: &Ctx, mock_type: &MockType, impl_item_fn: &ImplItemFn) 
         impl_item_fn.attrs.clone(),
         sig,
         impl_item_fn.vis.clone(),
+        false,
         Some(impl_item_fn.block.clone()),
         None,
     );
@@ -133,6 +137,7 @@ fn create_fn_decl(
     attrs: Vec<Attribute>,
     sig: &Signature,
     visibility: Visibility,
+    base_fn_block_is_in_trait: bool,
     mut maybe_base_fn_block: Option<Block>,
     maybe_parent_trait_path: Option<&Path>,
 ) -> FnDecl {
@@ -146,10 +151,12 @@ fn create_fn_decl(
             AssociatedTypesIdentsReplacer::new(mock_path, parent_trait_path);
 
         associated_types_idents_replacer.visit_signature_mut(&mut actual_sig);
-        maybe_base_fn_block = maybe_base_fn_block.map(|mut block| {
-            associated_types_idents_replacer.visit_block_mut(&mut block);
-            return block;
-        });
+        if base_fn_block_is_in_trait {
+            maybe_base_fn_block = maybe_base_fn_block.map(|mut block| {
+                associated_types_idents_replacer.visit_block_mut(&mut block);
+                return block;
+            });
+        }
     }
 
     let maybe_phantom_return_field =

@@ -8,6 +8,7 @@ use quote::{quote, ToTokens};
 use syn::token::Paren;
 use syn::*;
 
+// TODO - replace all derive attributes with manual generation (because why parse code twice?)
 pub(crate) fn handle(item: TokenStream) -> TokenStream {
     let item_struct = parse_macro_input!(item as ItemStruct);
 

@@ -176,9 +176,9 @@ impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, true, STORES_M
 
     pub fn handle_base_returning<
         'a,
-        TCall: ICall + Clone + 'a,
+        TCall: ICall + Clone,
         TReturnValue: IReturnValue<'a>,
-        TBaseCall: FnMut(&'a TMock, TCall) -> TReturnValue + 'a,
+        TBaseCall: FnMut(&'a TMock, TCall) -> TReturnValue,
     >(
         &self,
         mock: &'a TMock,

@@ -7,6 +7,7 @@ use crate::*;
 use quote::format_ident;
 use syn::*;
 
+// TODO - add #[repr(C)] to generated CallStruct and ArgsCheckerStruct
 pub(crate) fn generate(ctx: &Ctx, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> CallStruct {
     let attrs = vec![
         constants::DOC_HIDDEN_ATTRIBUTE.clone(),

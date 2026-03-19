@@ -11,6 +11,8 @@ mod derive_mock_data_macro;
 mod mock_generation;
 mod syntax;
 
+// TODO - make it work only in test mode.
+// basically use `#[cfg(test, mock)]` everywhere (same with `mocked!` ?)
 #[proc_macro_attribute]
 pub fn mock(
     proc_macro_attribute: proc_macro::TokenStream,
