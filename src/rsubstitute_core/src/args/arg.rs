@@ -25,6 +25,12 @@ impl<'rs, T: PartialEq> From<T> for Arg<'rs, T> {
     }
 }
 
+impl<'rs, 'a, T> From<&'a T> for Arg<'rs, *const T> {
+    fn from(value: &'a T) -> Self {
+        Arg::eq(value as *const T)
+    }
+}
+
 impl<'rs, T: Debug> Debug for Arg<'rs, T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         // TODO - extract to const field when std::any::type_name becomes stabilized as const fn

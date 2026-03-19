@@ -142,91 +142,91 @@ accept_ref(*{r}*)
 
     mod return_ref_tests {
         use super::*;
-
+    
         #[test]
         fn return_ref_Ok() {
             // Arrange
             let r = Box::leak(Box::new(11));
             return_ref::setup().returns(r);
-
+    
             // Act
             let actual_r = return_ref();
-
+    
             // Assert
             assert_eq!(r, actual_r);
         }
-
+    
         #[test]
         fn return_ref_CallBase_Ok() {
             // Arrange
             return_ref::setup().call_base();
-
+    
             // Act
             let actual_r = return_ref();
-
+    
             // Assert
             assert_eq!(BASE_RETURN_REF, actual_r);
         }
     }
-
+    
     mod accept_ref_return_ref_tests {
         use super::*;
-
+    
         #[test]
         fn accept_ref_return_ref_Ok() {
             // Arrange
             let accepted_r = &10;
             let returned_r = &20;
             accept_ref_return_ref::setup(accepted_r).returns(returned_r);
-
+    
             // Act
             let actual_returned_r = accept_ref_return_ref(accepted_r);
-
+    
             // Assert
             assert_eq!(returned_r, actual_returned_r);
-
+    
             accept_ref_return_ref::received(accepted_r, Times::Once)
                 .received(Arg::not_eq(accepted_r), Times::Never)
                 .no_other_calls();
         }
-
+    
         #[test]
         fn accept_ref_return_ref_CallBase_Ok() {
             // Arrange
             let accepted_r = &10;
             accept_ref_return_ref::setup(accepted_r).call_base();
-
+    
             // Act
             let actual_returned_r = accept_ref_return_ref(accepted_r);
-
+    
             // Assert
             assert_eq!(BASE_ACCEPT_REF_RETURN_REF, actual_returned_r);
             accept_ref_return_ref::received(accepted_r, Times::Once).no_other_calls();
         }
     }
-
+    
     mod accept_two_refs_tests {
         use super::*;
-
+    
         #[test]
         fn accept_two_refs_Ok() {
             // Arrange
             let r1 = &10;
             let r2 = &20.2;
-
+    
             // Act
             accept_two_refs(r1, r2);
-
+    
             // Assert
             accept_two_refs::received(r1, r2, Times::Once)
                 .received(Arg::not_eq(r1), Arg::not_eq(r2), Times::Never)
                 .no_other_calls();
         }
     }
-
+    
     mod accept_two_refs_return_ref_tests {
         use super::*;
-
+    
         #[test]
         fn accept_two_refs_return_ref_Ok() {
             // Arrange
@@ -234,29 +234,29 @@ accept_ref(*{r}*)
             let r2 = &20.2;
             let returned_r = "veridis quo";
             accept_two_refs_return_ref::setup(r1, r2).returns(returned_r);
-
+    
             // Act
             let actual_returned_r = accept_two_refs_return_ref(r1, r2);
-
+    
             // Assert
             assert_eq!(returned_r, actual_returned_r);
-
+    
             accept_two_refs_return_ref::received(r1, r2, Times::Once).no_other_calls();
         }
-
+    
         #[test]
         fn accept_two_refs_return_ref_CallBase_Ok() {
             // Arrange
             let r1 = &10;
             let r2 = &20.2;
             accept_two_refs_return_ref::setup(r1, r2).call_base();
-
+    
             // Act
             let actual_returned_r = accept_two_refs_return_ref(r1, r2);
-
+    
             // Assert
             assert_eq!(ACCEPT_TWO_REFS_RETURN_REF, actual_returned_r);
-
+    
             accept_two_refs_return_ref::received(r1, r2, Times::Once).no_other_calls();
         }
     }

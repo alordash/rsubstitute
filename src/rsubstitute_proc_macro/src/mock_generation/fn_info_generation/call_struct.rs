@@ -64,7 +64,7 @@ fn try_convert_fn_arg_to_field(arg_number: usize, fn_arg: &FnArg) -> Option<Fiel
         FnArg::Receiver(_) => return None,
         FnArg::Typed(pat_type) => pat_type,
     };
-    let ty = match &*pat_type.ty {
+    let mut ty = match &*pat_type.ty {
         Type::Reference(reference) if reference.mutability.is_some() => Type::Ptr(TypePtr {
             star_token: Default::default(),
             const_token: None,
@@ -73,6 +73,7 @@ fn try_convert_fn_arg_to_field(arg_number: usize, fn_arg: &FnArg) -> Option<Fiel
         }),
         rest => rest.clone(),
     };
+    ty = reference_to_pointer::convert_in_type(ty);
     let ident = arg_ident::extract(arg_number, pat_type);
 
     let result = field::create(ident, ty);

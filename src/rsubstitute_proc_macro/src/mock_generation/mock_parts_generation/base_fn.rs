@@ -10,9 +10,6 @@ use quote::format_ident;
 use std::cell::LazyCell;
 use syn::*;
 
-// TODO - add trait name to method name in error logs, e.g.
-//        work(1);
-// Trait::work(1);
 pub(crate) fn generate(
     mock_type: &MockType,
     fn_decl: &FnDecl,

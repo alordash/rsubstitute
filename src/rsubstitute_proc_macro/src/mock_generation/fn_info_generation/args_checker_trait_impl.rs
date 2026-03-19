@@ -145,11 +145,11 @@ fn generate_check_exprs(field: &Field) -> Expr {
     let receiver =
         field_access_expr::create(vec![constants::SELF_IDENT.clone(), field_ident.clone()]);
     let field_name_arg = str_lit::create_from_ident(&field_ident);
-    let field_access_arg = expr_reference::create(field_access_expr::create(vec![
-        CALL_VAR_IDENT.clone(),
-        field_ident,
-    ]));
-    let field_string_value_arg = debug_string_expr::generate(field_access_arg.clone());
+    let field_access_expr = field_access_expr::create(vec![CALL_VAR_IDENT.clone(), field_ident]);
+    let field_reference_expr = expr_reference::create(field_access_expr.clone());
+    let field_string_value_arg = debug_string_expr::generate(field_reference_expr);
+    let field_transmute_expr =
+        transmute_lifetime_expr::create_for_expr(expr_reference::create(field_access_expr));
     let method = get_check_fn_ident(&field.ty);
     let expr = Expr::MethodCall(ExprMethodCall {
         attrs: Vec::new(),
@@ -158,7 +158,7 @@ fn generate_check_exprs(field: &Field) -> Expr {
         method,
         turbofish: None,
         paren_token: Default::default(),
-        args: [field_name_arg, field_access_arg, field_string_value_arg]
+        args: [field_name_arg, field_transmute_expr, field_string_value_arg]
             .into_iter()
             .collect(),
     });

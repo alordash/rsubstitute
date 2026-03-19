@@ -588,30 +588,7 @@ mod tests {
                                                 let t2_ref = &true;
                                                 let xaxbxcxdx_t2_ref = &&&&&&&&&true;
                                                 let xapx = &&(&(&2) as *const _);
-                                                // mock.setup
-                                                //     .work(
-                                                //         a,
-                                                //         b,
-                                                //         c,
-                                                //         d,
-                                                //         axb,
-                                                //         cxd,
-                                                //         abxbax,
-                                                //         cdxdcx,
-                                                //         abcd,
-                                                //         xaxbxcxdx,
-                                                //         data.clone(),
-                                                //         t1,
-                                                //         t1_ref,
-                                                //         xaxbxcxdx_t1_ref,
-                                                //         t2,
-                                                //         t2_ref,
-                                                //         xaxbxcxdx_t2_ref,
-                                                //         xapx,
-                                                //     )
-                                                //     .returns(return_value);
                                                 mock.setup
-                                                    .as_Trait
                                                     .work(
                                                         a,
                                                         b,
@@ -632,7 +609,30 @@ mod tests {
                                                         xaxbxcxdx_t2_ref,
                                                         xapx,
                                                     )
-                                                    .call_base();
+                                                    .returns(return_value);
+                                                // mock.setup
+                                                //     .as_Trait
+                                                //     .work(
+                                                //         a,
+                                                //         b,
+                                                //         c,
+                                                //         d,
+                                                //         axb,
+                                                //         cxd,
+                                                //         abxbax,
+                                                //         cdxdcx,
+                                                //         abcd,
+                                                //         xaxbxcxdx,
+                                                //         data.clone(),
+                                                //         t1,
+                                                //         t1_ref,
+                                                //         xaxbxcxdx_t1_ref,
+                                                //         t2,
+                                                //         t2_ref,
+                                                //         xaxbxcxdx_t2_ref,
+                                                //         xapx,
+                                                //     )
+                                                //     .call_base();
 
                                                 // Act
                                                 let actual_return_value = mock.work(
@@ -1130,7 +1130,7 @@ mod __rsubstitute_generated_Struct {
                     t2: transmute_lifetime!(t2.into()),
                     t2_ref: transmute_lifetime!(t2_ref.into()),
                     xaxbxcxdx_t2_ref: transmute_lifetime!(xaxbxcxdx_t2_ref.into()),
-                    xapx: transmute_lifetime!(xapx.into())
+                    xapx: transmute_lifetime!(xapx.into()),
                 };
             let fn_tuner: FnTuner<'_, Struct<'__rs, 'a, 'b, T1>, Self, (&'__rs &'a i32,
                                                                         &'__rs &'b i32,
@@ -1197,7 +1197,8 @@ mod __rsubstitute_generated_Struct {
                     '__rsa,
                     &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa T2,
                 >,
-            >,xapx: impl Into<Arg<'__rs, &'__rsa &'__rsa *const &'__rsa i32>>,
+            >,
+            xapx: impl Into<Arg<'__rs, &'__rsa &'__rsa *const &'__rsa i32>>,
             times: Times,
         ) -> FnVerifier<
             Self,
@@ -1262,7 +1263,7 @@ mod __rsubstitute_generated_Struct {
                     t2: transmute_lifetime!(t2.into()),
                     t2_ref: transmute_lifetime!(t2_ref.into()),
                     xaxbxcxdx_t2_ref: transmute_lifetime!(xaxbxcxdx_t2_ref.into()),
-                    xapx: transmute_lifetime!(xapx.into())
+                    xapx: transmute_lifetime!(xapx.into()),
                 };
             self.data
                 .Trait_work
@@ -1615,7 +1616,7 @@ mod __rsubstitute_generated_Struct {
                 t2: transmute_lifetime!(t2),
                 t2_ref: transmute_lifetime!(t2_ref),
                 xaxbxcxdx_t2_ref: transmute_lifetime!(xaxbxcxdx_t2_ref),
-                xapx: transmute_lifetime!(xapx)
+                xapx: transmute_lifetime!(xapx),
             };
             return self
                 .data
@@ -1710,10 +1711,13 @@ mod __rsubstitute_generated_Struct {
                 inner_data,
             };
         }
-        fn base_work<'c, 'd: 'a, T2: Clone>(
+        fn base_work<'q, 'c, 'd: 'a, T2: Clone>(
             &self,
             call: work_Call<'__rs, 'a, 'b, 'c, 'd, T1, T2>,
-        ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 {
+        ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32
+        where
+            T1: 'q,
+            T2: 'q, {
             #[allow(non_shorthand_field_patterns)]
             #[allow(unused_variables)]
             let work_Call::<'_, '_, '_, '_, '_, T1, T2> {
@@ -1741,7 +1745,11 @@ mod __rsubstitute_generated_Struct {
         fn base_Trait_work<'q, 'c, 'd: 'a, T2: Clone>(
             &'q self,
             call: Trait_work_Call<'__rs, 'a, 'b, 'c, 'd, T1, T2>,
-        ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 where T1: 'q, T2: 'q {
+        ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32
+        where
+            T1: 'q,
+            T2: 'q,
+        {
             #[allow(non_shorthand_field_patterns)]
             #[allow(unused_variables)]
             let Trait_work_Call::<'_, '_, '_, '_, '_, T1, T2> {
@@ -1784,7 +1792,7 @@ mod __rsubstitute_generated_Struct {
                 transmute_lifetime!(t2),
                 transmute_lifetime!(t2_ref),
                 transmute_lifetime!(xaxbxcxdx_t2_ref),
-                transmute_lifetime!(xapx)
+                transmute_lifetime!(xapx),
             )
         }
     }
@@ -1848,7 +1856,7 @@ mod __rsubstitute_generated_Struct {
                     t2: transmute_lifetime!(t2.into()),
                     t2_ref: transmute_lifetime!(t2_ref.into()),
                     xaxbxcxdx_t2_ref: transmute_lifetime!(xaxbxcxdx_t2_ref.into()),
-                    xapx: transmute_lifetime!(xapx.into())
+                    xapx: transmute_lifetime!(xapx.into()),
                 };
             let fn_tuner: FnTuner<'_, Struct<'__rs, 'a, 'b, T1>, Self, (&'__rs &'a i32,
                                                                         &'__rs &'b i32,
@@ -1981,7 +1989,7 @@ mod __rsubstitute_generated_Struct {
                     t2: transmute_lifetime!(t2.into()),
                     t2_ref: transmute_lifetime!(t2_ref.into()),
                     xaxbxcxdx_t2_ref: transmute_lifetime!(xaxbxcxdx_t2_ref.into()),
-                    xapx: transmute_lifetime!(xapx.into())
+                    xapx: transmute_lifetime!(xapx.into()),
                 };
             self.data.work.verify_received(work_args_checker, times);
             return FnVerifier::new(self.clone());
