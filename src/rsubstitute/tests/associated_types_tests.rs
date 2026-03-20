@@ -252,7 +252,7 @@ mod __rsubstitute_generated_Struct {
         fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
     }
     #[doc(hidden)]
-    #[derive(Debug, IArgsFormatter)]
+    #[derive(Debug)]
     pub struct Trait_get_my_type_ArgsChecker<'__rs, TT: Clone>
     where
         TT: ToString,

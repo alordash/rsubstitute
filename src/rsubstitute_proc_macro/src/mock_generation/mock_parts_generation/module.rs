@@ -176,8 +176,17 @@ fn convert_fn_info(fn_info: FnInfo) -> [Item; 6] {
         Item::Struct(fn_info.call_struct.item_struct),
         Item::Impl(fn_info.call_struct.generics_info_provider_impl),
         Item::Struct(fn_info.args_checker_struct.item_struct),
-        Item::Impl(fn_info.args_checker_trait_impl.item_impl),
-        Item::Impl(fn_info.args_checker_args_formatter_trait_impl),
+        Item::Impl(
+            fn_info
+                .args_checker_struct
+                .args_checker_trait_impl
+                .item_impl,
+        ),
+        Item::Impl(
+            fn_info
+                .args_checker_struct
+                .args_checker_args_formatter_trait_impl,
+        ),
         Item::Impl(fn_info.args_checker_struct.generics_info_provider_impl),
     ]
 }

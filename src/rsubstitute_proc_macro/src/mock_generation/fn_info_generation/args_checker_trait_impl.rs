@@ -12,7 +12,8 @@ use syn::*;
 
 pub(crate) fn generate(
     call_struct: &CallStruct,
-    args_checker_struct: &ArgsCheckerStruct,
+    ty_path: TypePath,
+    generics: Generics,
     skipped_fields_count: usize,
 ) -> ArgsCheckerTraitImpl {
     let trait_ident = constants::I_ARGS_CHECKER_TRAIT_IDENT.clone();
@@ -25,14 +26,14 @@ pub(crate) fn generate(
         .into_iter()
         .collect(),
     };
-    let self_ty = Box::new(Type::Path(args_checker_struct.ty_path.clone()));
+    let self_ty = Box::new(Type::Path(ty_path));
     let items = generate_check_fn(call_struct, skipped_fields_count);
     let item_impl = ItemImpl {
         attrs: Vec::new(),
         defaultness: None,
         unsafety: None,
         impl_token: Default::default(),
-        generics: generics::remove_default_values(args_checker_struct.item_struct.generics.clone()),
+        generics: generics::remove_default_values(generics),
         trait_: Some((None, trait_path, Default::default())),
         self_ty,
         brace_token: Default::default(),

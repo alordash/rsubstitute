@@ -9,20 +9,20 @@ use syn::token::Paren;
 use syn::*;
 
 // TODO - replace all derive attributes with manual generation (because why parse code twice?)
-pub(crate) fn generate(args_checker_struct: &ArgsCheckerStruct) -> ItemImpl {
-    let fmt_args_impl = create_fmt_args_impl_item(&args_checker_struct.item_struct);
+pub(crate) fn generate(args_checker_struct: &ItemStruct) -> ItemImpl {
+    let fmt_args_impl = create_fmt_args_impl_item(&args_checker_struct);
     let item_impl = ItemImpl {
         attrs: Vec::new(),
         defaultness: None,
         unsafety: None,
         impl_token: Default::default(),
-        generics: generics::remove_default_values(args_checker_struct.item_struct.generics.clone()),
+        generics: generics::remove_default_values(args_checker_struct.generics.clone()),
         trait_: Some((
             None,
             constants::I_ARGS_FORMATTER_TRAIT_PATH.clone(),
             Default::default(),
         )),
-        self_ty: Box::new(r#type::create_from_struct(&args_checker_struct.item_struct)),
+        self_ty: Box::new(r#type::create_from_struct(&args_checker_struct)),
         brace_token: Default::default(),
         items: vec![fmt_args_impl],
     };
