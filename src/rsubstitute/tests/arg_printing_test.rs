@@ -9,7 +9,7 @@ trait Trait<'a> {
 
 #[cfg(test)]
 mod tests {
-    #[allow(non_snake_case)]
+    #![allow(non_snake_case)]
     use super::*;
     use not_enough_asserts::panics::record_panic;
 

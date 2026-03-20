@@ -10,7 +10,10 @@ use syn::*;
 pub(crate) fn generate(fn_decl: &FnDecl, mock_generics: &MockGenerics) -> ArgsCheckerStruct {
     let attrs = vec![
         constants::DOC_HIDDEN_ATTRIBUTE.clone(),
-        generate_arg_checker_derive_traits_attribute(),
+        attribute::create(
+            constants::DERIVE_IDENT.clone(),
+            constants::DEBUG_TRAIT_NAME,
+        ),
     ];
     let ident = format_ident!(
         "{}_{}",
@@ -49,18 +52,6 @@ pub(crate) fn generate(fn_decl: &FnDecl, mock_generics: &MockGenerics) -> ArgsCh
 }
 
 const ARGS_CHECKER_STRUCT_SUFFIX: &'static str = "ArgsChecker";
-
-fn generate_arg_checker_derive_traits_attribute() -> Attribute {
-    let derive_attribute = attribute::create(
-        constants::DERIVE_IDENT.clone(),
-        &format!(
-            "{}, {}",
-            constants::DEBUG_TRAIT_NAME,
-            constants::I_ARGS_FORMATTER_TRAIT_NAME,
-        ),
-    );
-    return derive_attribute;
-}
 
 fn try_convert_fn_arg_to_field(arg_number: usize, fn_arg: &FnArg) -> Option<Field> {
     let pat_type = match fn_arg {
