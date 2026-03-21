@@ -61,13 +61,6 @@ define!(
     path::create(format_ident!("IGenericsInfoProvider"))
 );
 
-pub(crate) const CLONE_FOR_RSUBSTITUTE_TRAIT_NAME: &'static str = "CloneForRSubstitute";
-define!(
-    DERIVE_CLONE_FOR_RSUBSTITUTE_ATTRIBUTE,
-    Attribute,
-    attribute::create(DERIVE_IDENT.clone(), CLONE_FOR_RSUBSTITUTE_TRAIT_NAME)
-);
-
 ident!(I_ARGS_FORMATTER_FN_IDENT, "fmt_args");
 ident!(I_ARGS_CHECKER_TRAIT_IDENT, "IArgsChecker");
 

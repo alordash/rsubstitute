@@ -9,10 +9,7 @@ use syn::*;
 
 // TODO - add #[repr(C)] to generated CallStruct and ArgsCheckerStruct
 pub(crate) fn generate(ctx: &Ctx, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> CallStruct {
-    let attrs = vec![
-        constants::DOC_HIDDEN_ATTRIBUTE.clone(),
-        generate_call_derive_traits_attribute(ctx),
-    ];
+    let attrs = vec![constants::DOC_HIDDEN_ATTRIBUTE.clone()];
     let ident = format_ident!("{}_{}", fn_decl.get_full_ident(), CALL_STRUCT_SUFFIX);
     let fn_field_infos: Vec<_> = fn_decl
         .arguments
@@ -40,12 +37,19 @@ pub(crate) fn generate(ctx: &Ctx, fn_decl: &FnDecl, mock_generics: &MockGenerics
         r#struct::create(attrs, ident, fn_decl.merged_generics.clone(), fields_named);
     lifetime::normalize_anonymous_lifetimes_in_struct(&mut item_struct);
     let ty_path = r#type::create_from_struct_path(&item_struct);
-    let generics_info_provider_impl =
-        generics_info_provider_impl::generate(&item_struct, mock_generics.associated_params_count);
     let args_infos_provider_trait_impl =
         call_args_infos_provider_trait_impl::generate(&item_struct);
     let args_tuple_provider_trait_impl =
         call_args_tuple_provider_trait_impl::generate(&item_struct);
+    let generics_info_provider_impl =
+        generics_info_provider_impl::generate(&item_struct, mock_generics.associated_params_count);
+    let maybe_clone_for_rsubstitute_trait_impl = if ctx.support_base_calling {
+        Some(clone_for_rsubstitute_trait_impl::generate(
+            &item_struct,
+        ))
+    } else {
+        None
+    };
     let call_struct = CallStruct {
         item_struct,
         ty_path,
@@ -53,22 +57,13 @@ pub(crate) fn generate(ctx: &Ctx, fn_decl: &FnDecl, mock_generics: &MockGenerics
         fields_maybe_actual_source_types,
         args_infos_provider_trait_impl,
         args_tuple_provider_trait_impl,
+        maybe_clone_for_rsubstitute_trait_impl,
     };
 
     return call_struct;
 }
 
 const CALL_STRUCT_SUFFIX: &'static str = "Call";
-
-fn generate_call_derive_traits_attribute(ctx: &Ctx) -> Attribute {
-    let mut arguments = vec![];
-    if ctx.support_base_calling {
-        arguments.push(constants::CLONE_FOR_RSUBSTITUTE_TRAIT_NAME);
-    }
-    let arguments_str = arguments.join(", ");
-    let derive_attribute = attribute::create(constants::DERIVE_IDENT.clone(), &arguments_str);
-    return derive_attribute;
-}
 
 fn try_convert_fn_arg_to_field(arg_number: usize, fn_arg: &FnArg) -> Option<FieldInfo> {
     let pat_type = match fn_arg {

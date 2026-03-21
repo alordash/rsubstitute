@@ -1,16 +1,12 @@
 use crate::constants;
 use crate::syntax::*;
-use proc_macro::TokenStream;
-use quote::ToTokens;
 use syn::punctuated::Punctuated;
 use syn::*;
 
-pub(crate) fn handle(item: TokenStream) -> TokenStream {
-    let item_struct = parse_macro_input!(item as ItemStruct);
-
+pub(crate) fn generate(item_struct: &ItemStruct) -> ItemImpl {
     let trait_path = path::create(constants::CLONE_TRAIT_IDENT.clone());
-    let self_ty = Box::new(r#type::create_from_struct(&item_struct));
-    let get_arg_infos_fn = generate_clone_fn(&item_struct);
+    let self_ty = Box::new(r#type::create_from_struct(item_struct));
+    let get_arg_infos_fn = generate_clone_fn(item_struct);
     let item_impl = ItemImpl {
         attrs: Vec::new(),
         defaultness: None,
@@ -22,7 +18,7 @@ pub(crate) fn handle(item: TokenStream) -> TokenStream {
         brace_token: Default::default(),
         items: vec![get_arg_infos_fn],
     };
-    return item_impl.into_token_stream().into();
+    return item_impl;
 }
 
 fn generate_clone_fn(item_struct: &ItemStruct) -> ImplItem {

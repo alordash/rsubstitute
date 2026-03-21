@@ -1,4 +1,5 @@
 use crate::constants;
+use crate::mock_generation::clone_for_rsubstitute_trait_impl;
 use crate::mock_generation::mock_parts_generation::models::*;
 use crate::syntax::*;
 use syn::*;
@@ -48,7 +49,12 @@ pub(crate) fn generate(
         fields,
     );
     let ty = r#type::create_from_struct(&item_struct);
-    let result = MockStruct { item_struct, ty };
+    let clone_for_rsubstitute_trait_impl = clone_for_rsubstitute_trait_impl::generate(&item_struct);
+    let result = MockStruct {
+        item_struct,
+        ty,
+        clone_for_rsubstitute_trait_impl,
+    };
     return result;
 }
 

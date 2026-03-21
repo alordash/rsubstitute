@@ -35,7 +35,7 @@ pub(crate) fn handle(ctx: &Ctx, item_trait: ItemTrait) -> TokenStream {
     let mock_received_struct =
         mock_received_struct::generate(&mock_ident, &mock_type, &mock_data_struct, Vec::new());
     let mock_struct = mock_struct::generate(
-        vec![constants::DERIVE_CLONE_FOR_RSUBSTITUTE_ATTRIBUTE.clone()],
+        Vec::new(),
         &mock_type,
         &mock_setup_struct,
         &mock_received_struct,

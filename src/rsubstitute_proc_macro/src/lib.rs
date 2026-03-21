@@ -3,7 +3,6 @@ use crate::mock_generation::parameters::*;
 use crate::mock_generation::*;
 
 mod constants;
-mod derive_clone_for_rsubstitute_macro;
 mod derive_mock_data_macro;
 mod mock_generation;
 mod syntax;
@@ -46,9 +45,4 @@ pub fn mocked_no_base(proc_macro_item: proc_macro::TokenStream) -> proc_macro::T
 #[proc_macro_derive(IMockData)]
 pub fn derive_mock_data(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
     derive_mock_data_macro::handle(item)
-}
-
-#[proc_macro_derive(CloneForRSubstitute)]
-pub fn derive_clone_for_r_substitute(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    derive_clone_for_rsubstitute_macro::handle(item)
 }

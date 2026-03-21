@@ -27,11 +27,11 @@ pub(crate) fn generate_trait(
         .into_iter()
         .map(|x| Item::Use(x))
         .chain(convert_fn_infos(fn_infos))
+        .chain([Item::Struct(mock_data_struct.item_struct)])
+        .chain(convert_mock_setup_struct(mock_setup_struct))
+        .chain(convert_mock_received_struct(mock_received_struct))
+        .chain(convert_mock_struct(mock_struct))
         .chain([
-            Item::Struct(mock_data_struct.item_struct),
-            Item::Struct(mock_setup_struct.item_struct),
-            Item::Struct(mock_received_struct.item_struct),
-            Item::Struct(mock_struct.item_struct),
             Item::Impl(mock_trait_impl.item_impl),
             Item::Impl(mock_impl.item_impl),
             Item::Impl(mock_setup_impl.item_impl),
@@ -71,11 +71,11 @@ pub(crate) fn generate_fn(
         .into_iter()
         .map(|x| Item::Use(x))
         .chain(convert_fn_info(fn_info))
+        .chain([Item::Struct(mock_data_struct.item_struct)])
+        .chain(convert_mock_setup_struct(mock_setup_struct))
+        .chain(convert_mock_received_struct(mock_received_struct))
+        .chain(convert_mock_struct(mock_struct))
         .chain([
-            Item::Struct(mock_data_struct.item_struct),
-            Item::Struct(mock_setup_struct.item_struct),
-            Item::Struct(mock_received_struct.item_struct),
-            Item::Struct(mock_struct.item_struct),
             Item::Impl(mock_struct_default_impl.item_impl),
             Item::Impl(mock_setup_impl.item_impl),
             Item::Impl(mock_received_impl.item_impl),
@@ -130,15 +130,16 @@ pub(crate) fn generate_struct(
             ])
         }))
         .chain(struct_fn_infos.into_iter().flat_map(|x| convert_fn_info(x)))
+        .chain([Item::Struct(mock_data_struct.item_struct)])
+        .chain(convert_mock_setup_struct(mock_setup_struct))
+        .chain(convert_mock_received_struct(mock_received_struct))
         .chain([
-            Item::Struct(mock_data_struct.item_struct),
-            Item::Struct(mock_setup_struct.item_struct),
-            Item::Struct(mock_received_struct.item_struct),
             Item::Struct(inner_data_struct.item_struct),
+            Item::Impl(inner_data_struct.clone_for_rsubstitute_trait_impl),
             Item::Impl(inner_data_impl.item_impl),
-            Item::Struct(mock_struct.item_struct),
-            Item::Impl(inner_data_deref_impl.item_impl),
         ])
+        .chain(convert_mock_struct(mock_struct))
+        .chain([Item::Impl(inner_data_deref_impl.item_impl)])
         .chain(
             mock_trait_impls
                 .into_iter()
@@ -171,12 +172,22 @@ fn convert_fn_infos(fn_infos: Vec<FnInfo>) -> Vec<Item> {
         .collect();
 }
 
-fn convert_fn_info(fn_info: FnInfo) -> [Item; 8] {
+fn convert_fn_info(fn_info: FnInfo) -> Vec<Item> {
     [
         Item::Struct(fn_info.call_struct.item_struct),
         Item::Impl(fn_info.call_struct.args_infos_provider_trait_impl),
         Item::Impl(fn_info.call_struct.args_tuple_provider_trait_impl),
         Item::Impl(fn_info.call_struct.generics_info_provider_impl),
+    ]
+    .into_iter()
+    .chain(
+        fn_info
+            .call_struct
+            .maybe_clone_for_rsubstitute_trait_impl
+            .map(Item::Impl)
+            .into_iter(),
+    )
+    .chain([
         Item::Struct(fn_info.args_checker_struct.item_struct),
         Item::Impl(fn_info.args_checker_struct.args_checker_trait_impl),
         Item::Impl(
@@ -185,6 +196,28 @@ fn convert_fn_info(fn_info: FnInfo) -> [Item; 8] {
                 .args_checker_args_formatter_trait_impl,
         ),
         Item::Impl(fn_info.args_checker_struct.generics_info_provider_impl),
+    ])
+    .collect()
+}
+
+fn convert_mock_setup_struct(mock_setup_struct: MockSetupStruct) -> [Item; 2] {
+    [
+        Item::Struct(mock_setup_struct.item_struct),
+        Item::Impl(mock_setup_struct.clone_for_rsubstitute_trait_impl),
+    ]
+}
+
+fn convert_mock_received_struct(mock_received_struct: MockReceivedStruct) -> [Item; 2] {
+    [
+        Item::Struct(mock_received_struct.item_struct),
+        Item::Impl(mock_received_struct.clone_for_rsubstitute_trait_impl),
+    ]
+}
+
+fn convert_mock_struct(mock_struct: MockStruct) -> [Item; 2] {
+    [
+        Item::Struct(mock_struct.item_struct),
+        Item::Impl(mock_struct.clone_for_rsubstitute_trait_impl),
     ]
 }
 
