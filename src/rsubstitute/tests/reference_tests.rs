@@ -109,6 +109,7 @@ fn work<'x, 'a, 'b: 'a, 'c, 'd: 'a, T1, T2>(
 //             t2: T2,
 //             t2_ref: &T2,
 //             xaxbxcxdx_t2_ref: &&'a &&'b &&'c &&'d &T2,
+//             xapx: &&'a *const &i32,
 //         ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 {
 //             unreachable!()
 //         }
@@ -140,6 +141,7 @@ fn work<'x, 'a, 'b: 'a, 'c, 'd: 'a, T1, T2>(
 //             t2: T2,
 //             t2_ref: &T2,
 //             xaxbxcxdx_t2_ref: &&'a &&'b &&'c &&'d &T2,
+//             xapx: &&'a *const &i32,
 //         ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 {
 //             Self::work(
 //                 self,
@@ -160,6 +162,7 @@ fn work<'x, 'a, 'b: 'a, 'c, 'd: 'a, T1, T2>(
 //                 t2,
 //                 t2_ref,
 //                 xaxbxcxdx_t2_ref,
+//                 xapx,
 //             )
 //         }
 //     }
@@ -826,12 +829,51 @@ pub use __rsubstitute_generated_Struct::*;
 mod __rsubstitute_generated_Struct {
     use super::*;
     use rsubstitute::for_generated::*;
+    #[doc(hidden)]
+    pub struct Trait_work_Call<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> {
+        _phantom_lifetime: PhantomData<&'__rs ()>,
+        _phantom___rs: PhantomData<&'__rs ()>,
+        _phantom_a: PhantomData<&'a ()>,
+        _phantom_b: PhantomData<&'b ()>,
+        _phantom_T1: PhantomData<T1>,
+        _phantom_c: PhantomData<&'c ()>,
+        _phantom_d: PhantomData<&'d ()>,
+        _phantom_T2: PhantomData<T2>,
+        a: *const i32,
+        b: *const i32,
+        c: *const i32,
+        d: *const i32,
+        axb: *const *const *const i32,
+        cxd: *const *const *const i32,
+        abxbax: *const *const *const *const *const *const i32,
+        cdxdcx: *const *const *const *const *const *const i32,
+        abcd: *const *const *const *const i32,
+        xaxbxcxdx: *const *const *const *const *const *const *const *const *const i32,
+        data: Data<
+            'a,
+            'b,
+            *const *const i32,
+            *const *const *const *const *const [*const *const *const *const Data<
+                'c,
+                'a,
+                *const *const *const *const i32,
+                Vec<*const *const *const ()>,
+            >],
+        >,
+        t1: T1,
+        t1_ref: *const T1,
+        xaxbxcxdx_t1_ref: *const *const *const *const *const *const *const *const *const T1,
+        t2: T2,
+        t2_ref: *const T2,
+        xaxbxcxdx_t2_ref: *const *const *const *const *const *const *const *const *const T2,
+        xapx: *const *const *const *const i32,
+    }
     impl<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> IArgsInfosProvider
         for Trait_work_Call<'__rs, 'a, 'b, 'c, 'd, T1, T2>
     {
         fn get_arg_infos(&self) -> Vec<ArgInfo> {
             vec![
-                ArgInfo::new("a", &self.a, (&ArgPrinter(&"amogus")).debug_string()),
+                ArgInfo::new("a", &self.a, (&ArgPrinter(&self.a)).debug_string()),
                 ArgInfo::new("b", &self.b, (&ArgPrinter(&self.b)).debug_string()),
                 ArgInfo::new("c", &self.c, (&ArgPrinter(&self.c)).debug_string()),
                 ArgInfo::new("d", &self.d, (&ArgPrinter(&self.d)).debug_string()),
@@ -876,54 +918,35 @@ mod __rsubstitute_generated_Struct {
                     &self.xaxbxcxdx_t2_ref,
                     (&ArgPrinter(&self.xaxbxcxdx_t2_ref)).debug_string(),
                 ),
-                ArgInfo::new(
-                    "xapx",
-                    &self.xapx,
-                    (&ArgPrinter::<&&*const &i32>(transmute_lifetime!(&self.xapx))).debug_string(),
-                ),
+                ArgInfo::new("xapx", &self.xapx, (&ArgPrinter(&self.xapx)).debug_string()),
             ]
         }
     }
-    #[doc(hidden)]
-    #[derive(IArgsTupleProvider, CloneForRSubstitute)]
-    #[repr(C)]
-    pub struct Trait_work_Call<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> {
-        _phantom_lifetime: PhantomData<&'__rs ()>,
-        _phantom___rs: PhantomData<&'__rs ()>,
-        _phantom_a: PhantomData<&'a ()>,
-        _phantom_b: PhantomData<&'b ()>,
-        _phantom_T1: PhantomData<T1>,
-        _phantom_c: PhantomData<&'c ()>,
-        _phantom_d: PhantomData<&'d ()>,
-        _phantom_T2: PhantomData<T2>,
-        a: *const i32,
-        b: *const i32,
-        c: *const i32,
-        d: *const i32,
-        axb: *const *const *const i32,
-        cxd: *const *const *const i32,
-        abxbax: *const *const *const *const *const *const i32,
-        cdxdcx: *const *const *const *const *const *const i32,
-        abcd: *const *const *const *const i32,
-        xaxbxcxdx: *const *const *const *const *const *const *const *const *const i32,
-        data: Data<
-            'a,
-            'b,
-            *const *const i32,
-            *const *const *const *const *const [*const *const *const *const Data<
-                'c,
-                'a,
-                *const *const *const *const i32,
-                Vec<*const *const *const ()>,
-            >],
-        >,
-        t1: T1,
-        t1_ref: *const T1,
-        xaxbxcxdx_t1_ref: *const *const *const *const *const *const *const *const *const T1,
-        t2: T2,
-        t2_ref: *const T2,
-        xaxbxcxdx_t2_ref: *const *const *const *const *const *const *const *const *const T2,
-        xapx: *const *const *const *const i32,
+    impl<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> IArgsTupleProvider
+        for Trait_work_Call<'__rs, 'a, 'b, 'c, 'd, T1, T2>
+    {
+        fn get_ptr_to_boxed_tuple_of_refs(&self) -> *mut () {
+            Box::leak(Box::new((
+                &self.a,
+                &self.b,
+                &self.c,
+                &self.d,
+                &self.axb,
+                &self.cxd,
+                &self.abxbax,
+                &self.cdxdcx,
+                &self.abcd,
+                &self.xaxbxcxdx,
+                &self.data,
+                &self.t1,
+                &self.t1_ref,
+                &self.xaxbxcxdx_t1_ref,
+                &self.t2,
+                &self.t2_ref,
+                &self.xaxbxcxdx_t2_ref,
+                &self.xapx,
+            ))) as *mut _ as *mut ()
+        }
     }
     impl<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> IGenericsInfoProvider
         for Trait_work_Call<'__rs, 'a, 'b, 'c, 'd, T1, T2>
@@ -936,8 +959,42 @@ mod __rsubstitute_generated_Struct {
         }
         fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
     }
+    impl<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> Clone
+        for Trait_work_Call<'__rs, 'a, 'b, 'c, 'd, T1, T2>
+    {
+        fn clone(&self) -> Self {
+            Self {
+                _phantom_lifetime: (&self._phantom_lifetime).clone(),
+                _phantom___rs: (&self._phantom___rs).clone(),
+                _phantom_a: (&self._phantom_a).clone(),
+                _phantom_b: (&self._phantom_b).clone(),
+                _phantom_T1: (&self._phantom_T1).clone(),
+                _phantom_c: (&self._phantom_c).clone(),
+                _phantom_d: (&self._phantom_d).clone(),
+                _phantom_T2: (&self._phantom_T2).clone(),
+                a: (&self.a).clone(),
+                b: (&self.b).clone(),
+                c: (&self.c).clone(),
+                d: (&self.d).clone(),
+                axb: (&self.axb).clone(),
+                cxd: (&self.cxd).clone(),
+                abxbax: (&self.abxbax).clone(),
+                cdxdcx: (&self.cdxdcx).clone(),
+                abcd: (&self.abcd).clone(),
+                xaxbxcxdx: (&self.xaxbxcxdx).clone(),
+                data: (&self.data).clone(),
+                t1: (&self.t1).clone(),
+                t1_ref: (&self.t1_ref).clone(),
+                xaxbxcxdx_t1_ref: (&self.xaxbxcxdx_t1_ref).clone(),
+                t2: (&self.t2).clone(),
+                t2_ref: (&self.t2_ref).clone(),
+                xaxbxcxdx_t2_ref: (&self.xaxbxcxdx_t2_ref).clone(),
+                xapx: (&self.xapx).clone(),
+            }
+        }
+    }
     #[doc(hidden)]
-    #[derive(Debug, IArgsFormatter)]
+    #[derive(Debug)]
     pub struct Trait_work_ArgsChecker<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> {
         _phantom_lifetime: PhantomData<&'__rs ()>,
         _phantom___rs: PhantomData<&'__rs ()>,
@@ -947,39 +1004,37 @@ mod __rsubstitute_generated_Struct {
         _phantom_c: PhantomData<&'c ()>,
         _phantom_d: PhantomData<&'d ()>,
         _phantom_T2: PhantomData<T2>,
-        a: Arg<'__rs, *const i32>,
-        b: Arg<'__rs, *const i32>,
-        c: Arg<'__rs, *const i32>,
-        d: Arg<'__rs, *const i32>,
-        axb: Arg<'__rs, *const *const *const i32>,
-        cxd: Arg<'__rs, *const *const *const i32>,
-        abxbax: Arg<'__rs, *const *const *const *const *const *const i32>,
-        cdxdcx: Arg<'__rs, *const *const *const *const *const *const i32>,
-        abcd: Arg<'__rs, *const *const *const *const i32>,
-        xaxbxcxdx: Arg<'__rs, *const *const *const *const *const *const *const *const *const i32>,
+        a: Arg<'__rs, &'a i32>,
+        b: Arg<'__rs, &'b i32>,
+        c: Arg<'__rs, &'c i32>,
+        d: Arg<'__rs, &'d i32>,
+        axb: Arg<'__rs, &'a &'__rs &'b i32>,
+        cxd: Arg<'__rs, &'c &'__rs &'d i32>,
+        abxbax: Arg<'__rs, &'a &'b &'__rs &'b &'a &'__rs i32>,
+        cdxdcx: Arg<'__rs, &'c &'d &'__rs &'d &'c &'__rs i32>,
+        abcd: Arg<'__rs, &'a &'b &'c &'d i32>,
+        xaxbxcxdx: Arg<'__rs, &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs i32>,
         data: Arg<
             '__rs,
             Data<
                 'a,
                 'b,
-                *const *const i32,
-                *const *const *const *const *const [*const *const *const *const Data<
+                &'__rs &'__rs i32,
+                &'__rs &'a &'__rs &'b &'__rs [&'c &'__rs &'b &'__rs Data<
                     'c,
                     'a,
-                    *const *const *const *const i32,
-                    Vec<*const *const *const ()>,
+                    &'__rs &'__rs &'c &'__rs i32,
+                    Vec<&'d &'b &'__rs ()>,
                 >],
             >,
         >,
         t1: Arg<'__rs, T1>,
-        t1_ref: Arg<'__rs, *const T1>,
-        xaxbxcxdx_t1_ref:
-            Arg<'__rs, *const *const *const *const *const *const *const *const *const T1>,
+        t1_ref: Arg<'__rs, &'__rs T1>,
+        xaxbxcxdx_t1_ref: Arg<'__rs, &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T1>,
         t2: Arg<'__rs, T2>,
-        t2_ref: Arg<'__rs, *const T2>,
-        xaxbxcxdx_t2_ref:
-            Arg<'__rs, *const *const *const *const *const *const *const *const *const T2>,
-        xapx: Arg<'__rs, *const *const *const *const i32>,
+        t2_ref: Arg<'__rs, &'__rs T2>,
+        xaxbxcxdx_t2_ref: Arg<'__rs, &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T2>,
+        xapx: Arg<'__rs, &'__rs &'a *const &'__rs i32>,
     }
     impl<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> IArgsChecker
         for Trait_work_ArgsChecker<'__rs, 'a, 'b, 'c, 'd, T1, T2>
@@ -988,73 +1043,124 @@ mod __rsubstitute_generated_Struct {
         fn check(&self, dyn_call: &DynCall) -> Vec<ArgCheckResult> {
             let call: &Trait_work_Call<'__rs, 'a, 'b, 'c, 'd, T1, T2> = dyn_call.downcast_ref();
             vec![
-                self.a
-                    .check_ref("a", &call.a, (&ArgPrinter(&call.a)).debug_string()),
-                self.b
-                    .check_ref("b", &call.b, (&ArgPrinter(&&call.b)).debug_string()),
-                self.c
-                    .check_ref("c", &call.c, (&ArgPrinter(&&call.c)).debug_string()),
-                self.d
-                    .check_ref("d", &call.d, (&ArgPrinter(&&call.d)).debug_string()),
-                self.axb
-                    .check_ref("axb", &call.axb, (&ArgPrinter(&&call.axb)).debug_string()),
-                self.cxd
-                    .check_ref("cxd", &call.cxd, (&ArgPrinter(&&call.cxd)).debug_string()),
-                self.abxbax.check_ref(
+                self.a.check(
+                    "a",
+                    transmute_lifetime!(&call.a),
+                    (&ArgPrinter(&call.a)).debug_string(),
+                ),
+                self.b.check(
+                    "b",
+                    transmute_lifetime!(&call.b),
+                    (&ArgPrinter(&call.b)).debug_string(),
+                ),
+                self.c.check(
+                    "c",
+                    transmute_lifetime!(&call.c),
+                    (&ArgPrinter(&call.c)).debug_string(),
+                ),
+                self.d.check(
+                    "d",
+                    transmute_lifetime!(&call.d),
+                    (&ArgPrinter(&call.d)).debug_string(),
+                ),
+                self.axb.check(
+                    "axb",
+                    transmute_lifetime!(&call.axb),
+                    (&ArgPrinter(&call.axb)).debug_string(),
+                ),
+                self.cxd.check(
+                    "cxd",
+                    transmute_lifetime!(&call.cxd),
+                    (&ArgPrinter(&call.cxd)).debug_string(),
+                ),
+                self.abxbax.check(
                     "abxbax",
-                    &call.abxbax,
-                    (&ArgPrinter(&&call.abxbax)).debug_string(),
+                    transmute_lifetime!(&call.abxbax),
+                    (&ArgPrinter(&call.abxbax)).debug_string(),
                 ),
-                self.cdxdcx.check_ref(
+                self.cdxdcx.check(
                     "cdxdcx",
-                    &call.cdxdcx,
-                    (&ArgPrinter(&&call.cdxdcx)).debug_string(),
+                    transmute_lifetime!(&call.cdxdcx),
+                    (&ArgPrinter(&call.cdxdcx)).debug_string(),
                 ),
-                self.abcd.check_ref(
+                self.abcd.check(
                     "abcd",
-                    &call.abcd,
-                    (&ArgPrinter(&&call.abcd)).debug_string(),
+                    transmute_lifetime!(&call.abcd),
+                    (&ArgPrinter(&call.abcd)).debug_string(),
                 ),
-                self.xaxbxcxdx.check_ref(
+                self.xaxbxcxdx.check(
                     "xaxbxcxdx",
-                    &call.xaxbxcxdx,
-                    (&ArgPrinter(&&call.xaxbxcxdx)).debug_string(),
+                    transmute_lifetime!(&call.xaxbxcxdx),
+                    (&ArgPrinter(&call.xaxbxcxdx)).debug_string(),
                 ),
                 self.data.check(
                     "data",
-                    &call.data,
-                    (&ArgPrinter(&&call.data)).debug_string(),
+                    transmute_lifetime!(&call.data),
+                    (&ArgPrinter(&call.data)).debug_string(),
                 ),
-                self.t1
-                    .check("t1", &call.t1, (&ArgPrinter(&&call.t1)).debug_string()),
-                self.t1_ref.check_ref(
+                self.t1.check(
+                    "t1",
+                    transmute_lifetime!(&call.t1),
+                    (&ArgPrinter(&call.t1)).debug_string(),
+                ),
+                self.t1_ref.check(
                     "t1_ref",
-                    &call.t1_ref,
-                    (&ArgPrinter(&&call.t1_ref)).debug_string(),
+                    transmute_lifetime!(&call.t1_ref),
+                    (&ArgPrinter(&call.t1_ref)).debug_string(),
                 ),
-                self.xaxbxcxdx_t1_ref.check_ref(
+                self.xaxbxcxdx_t1_ref.check(
                     "xaxbxcxdx_t1_ref",
-                    &call.xaxbxcxdx_t1_ref,
-                    (&ArgPrinter(&&call.xaxbxcxdx_t1_ref)).debug_string(),
+                    transmute_lifetime!(&call.xaxbxcxdx_t1_ref),
+                    (&ArgPrinter(&call.xaxbxcxdx_t1_ref)).debug_string(),
                 ),
-                self.t2
-                    .check("t2", &call.t2, (&ArgPrinter(&&call.t2)).debug_string()),
-                self.t2_ref.check_ref(
+                self.t2.check(
+                    "t2",
+                    transmute_lifetime!(&call.t2),
+                    (&ArgPrinter(&call.t2)).debug_string(),
+                ),
+                self.t2_ref.check(
                     "t2_ref",
-                    &call.t2_ref,
-                    (&ArgPrinter(&&call.t2_ref)).debug_string(),
+                    transmute_lifetime!(&call.t2_ref),
+                    (&ArgPrinter(&call.t2_ref)).debug_string(),
                 ),
-                self.xaxbxcxdx_t2_ref.check_ref(
+                self.xaxbxcxdx_t2_ref.check(
                     "xaxbxcxdx_t2_ref",
-                    &call.xaxbxcxdx_t2_ref,
-                    (&ArgPrinter(&&call.xaxbxcxdx_t2_ref)).debug_string(),
+                    transmute_lifetime!(&call.xaxbxcxdx_t2_ref),
+                    (&ArgPrinter(&call.xaxbxcxdx_t2_ref)).debug_string(),
                 ),
-                self.xapx.check_ref(
+                self.xapx.check(
                     "xapx",
-                    &call.xapx,
-                    (&ArgPrinter::<&&& &i32>(&transmute_lifetime!(&call.xapx))).debug_string(),
+                    transmute_lifetime!(&call.xapx),
+                    (&ArgPrinter(&call.xapx)).debug_string(),
                 ),
             ]
+        }
+    }
+    impl<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> IArgsFormatter
+        for Trait_work_ArgsChecker<'__rs, 'a, 'b, 'c, 'd, T1, T2>
+    {
+        fn fmt_args(&self) -> String {
+            format!(
+                "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
+                (&ArgPrinter(&self.a)).debug_string(),
+                (&ArgPrinter(&self.b)).debug_string(),
+                (&ArgPrinter(&self.c)).debug_string(),
+                (&ArgPrinter(&self.d)).debug_string(),
+                (&ArgPrinter(&self.axb)).debug_string(),
+                (&ArgPrinter(&self.cxd)).debug_string(),
+                (&ArgPrinter(&self.abxbax)).debug_string(),
+                (&ArgPrinter(&self.cdxdcx)).debug_string(),
+                (&ArgPrinter(&self.abcd)).debug_string(),
+                (&ArgPrinter(&self.xaxbxcxdx)).debug_string(),
+                (&ArgPrinter(&self.data)).debug_string(),
+                (&ArgPrinter(&self.t1)).debug_string(),
+                (&ArgPrinter(&self.t1_ref)).debug_string(),
+                (&ArgPrinter(&self.xaxbxcxdx_t1_ref)).debug_string(),
+                (&ArgPrinter(&self.t2)).debug_string(),
+                (&ArgPrinter(&self.t2_ref)).debug_string(),
+                (&ArgPrinter(&self.xaxbxcxdx_t2_ref)).debug_string(),
+                (&ArgPrinter(&self.xapx)).debug_string()
+            )
         }
     }
     impl<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> IGenericsInfoProvider
@@ -1069,17 +1175,29 @@ mod __rsubstitute_generated_Struct {
         fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
     }
     #[doc(hidden)]
-    #[derive(CloneForRSubstitute)]
     pub struct TraitSetup<'__rs, 'a, 'b: 'a, T1: Clone> {
         data: Arc<StructData<'__rs, 'a, 'b, T1>>,
     }
 
+    impl<'__rs, 'a, 'b: 'a, T1: Clone> Clone for TraitSetup<'__rs, 'a, 'b, T1> {
+        fn clone(&self) -> Self {
+            Self {
+                data: (&self.data).clone(),
+            }
+        }
+    }
     #[doc(hidden)]
-    #[derive(CloneForRSubstitute)]
     pub struct TraitReceived<'__rs, 'a, 'b: 'a, T1: Clone> {
         data: Arc<StructData<'__rs, 'a, 'b, T1>>,
     }
 
+    impl<'__rs, 'a, 'b: 'a, T1: Clone> Clone for TraitReceived<'__rs, 'a, 'b, T1> {
+        fn clone(&self) -> Self {
+            Self {
+                data: (&self.data).clone(),
+            }
+        }
+    }
     impl<'__rs, 'a, 'b: 'a, T1: Clone> TraitSetup<'__rs, 'a, 'b, T1> {
         pub fn work<'__rsa, 'c, 'd : 'a, T2: Clone>(
             &self, a: impl Into<Arg<'__rsa, &'__rsa i32>>, b: impl Into<Arg<'__rsa, &'__rsa i32>>, c: impl Into<Arg<'__rsa, &'__rsa i32>>, d: impl Into<Arg<'__rsa, &'__rsa i32>>, axb: impl Into<Arg<'__rsa, &'__rsa &'__rsa &'__rsa i32>>, cxd: impl Into<Arg<'__rsa, &'__rsa &'__rsa &'__rsa i32>>, abxbax: impl Into<Arg<'__rsa, &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa i32>>, cdxdcx: impl Into<Arg<'__rsa, &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa i32>>, abcd: impl Into<Arg<'__rsa, &'__rsa &'__rsa &'__rsa &'__rsa i32>>, xaxbxcxdx: impl Into<Arg<'__rsa, &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa i32>>, data: impl Into<Arg<'__rsa, Data<
@@ -1087,31 +1205,32 @@ mod __rsubstitute_generated_Struct {
                 '__rsa,
                 &'__rsa &'__rsa i32,
                 &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa [&'__rsa &'__rsa &'__rsa &'__rsa Data<'__rsa, '__rsa, &'__rsa &'__rsa &'__rsa &'__rsa i32, Vec<&'__rsa &'__rsa &'__rsa ()>>],
-            >>>, t1: impl Into<Arg<'__rsa, T1>>, t1_ref: impl Into<Arg<'__rsa, &'__rsa T1>>, xaxbxcxdx_t1_ref: impl Into<Arg<'__rsa, &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa T1>>, t2: impl Into<Arg<'__rsa, T2>>, t2_ref: impl Into<Arg<'__rsa, &'__rsa T2>>, xaxbxcxdx_t2_ref: impl Into<Arg<'__rsa, &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa T2>>, xapx: impl Into<Arg<'__rs, &'__rsa &'__rsa *const &'__rsa i32>>) -> FnTuner<'_, Struct<'__rs, 'a, 'b, T1>, Self, (&'__rs &'a i32,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs &'b i32,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs &'c i32,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs &'d i32,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs &'a &'__rs &'b i32,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs &'c &'__rs &'d i32,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs &'a &'b &'__rs &'b &'a &'__rs i32,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs &'c &'d &'__rs &'d &'c &'__rs i32,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs &'a &'b &'c &'d i32,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs i32,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs Data<
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                          'a,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                          'b,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                          &'__rs &'__rs i32,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                          &'__rs &'a &'__rs &'b &'__rs [&'c &'__rs &'b &'__rs Data<'c, 'a, &'__rs &'__rs &'c &'__rs i32, Vec<&'d &'b &'__rs ()>>],
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      >,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs T1,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs &'__rs T1,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T1,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs T2,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs &'__rs T2,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T2),
+            >>>, t1: impl Into<Arg<'__rsa, T1>>, t1_ref: impl Into<Arg<'__rsa, &'__rsa T1>>, xaxbxcxdx_t1_ref: impl Into<Arg<'__rsa, &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa T1>>, t2: impl Into<Arg<'__rsa, T2>>, t2_ref: impl Into<Arg<'__rsa, &'__rsa T2>>, xaxbxcxdx_t2_ref: impl Into<Arg<'__rsa, &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa T2>>, xapx: impl Into<Arg<'__rsa, &'__rsa &'__rsa *const &'__rsa i32>>) -> FnTuner<'_, Struct<'__rs, 'a, 'b, T1>, Self, (&'__rs &'a i32,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'b i32,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'c i32,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'d i32,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'a &'__rs &'b i32,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'c &'__rs &'d i32,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'a &'b &'__rs &'b &'a &'__rs i32,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'c &'d &'__rs &'d &'c &'__rs i32,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'a &'b &'c &'d i32,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs i32,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs Data<
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            'a,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            'b,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            &'__rs &'__rs i32,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            &'__rs &'a &'__rs &'b &'__rs [&'c &'__rs &'b &'__rs Data<'c, 'a, &'__rs &'__rs &'c &'__rs i32, Vec<&'d &'b &'__rs ()>>],
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        >,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs T1,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'__rs T1,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T1,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs T2,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'__rs T2,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T2,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'__rs &'a *const &'__rs i32),
             &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa i32, true, true> where
-            T2: '__rsa,
-            T1: '__rsa
+            T1: '__rsa,
+            T2: '__rsa
         {
             let Trait_work_args_checker: Trait_work_ArgsChecker<'_, 'a, 'b, 'c, 'd, T1, T2> =
                 Trait_work_ArgsChecker {
@@ -1163,7 +1282,8 @@ mod __rsubstitute_generated_Struct {
                                                                         &'__rs &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T1,
                                                                         &'__rs T2,
                                                                         &'__rs &'__rs T2,
-                                                                        &'__rs &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T2),
+                                                                        &'__rs &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T2,
+                                                                        &'__rs &'__rs &'a *const &'__rs i32),
                 &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa i32, true, true> = self.data.Trait_work.add_config(Trait_work_args_checker, self);
             return transmute_lifetime!(fn_tuner);
         }
@@ -1208,7 +1328,7 @@ mod __rsubstitute_generated_Struct {
                     &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa T2,
                 >,
             >,
-            xapx: impl Into<Arg<'__rs, &'__rsa &'__rsa *const &'__rsa i32>>,
+            xapx: impl Into<Arg<'__rsa, &'__rsa &'__rsa *const &'__rsa i32>>,
             times: Times,
         ) -> FnVerifier<
             Self,
@@ -1240,11 +1360,12 @@ mod __rsubstitute_generated_Struct {
                 &'__rs T2,
                 &'__rs &'__rs T2,
                 &'__rs &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T2,
+                &'__rs &'__rs &'a *const &'__rs i32,
             ),
         >
         where
-            T2: '__rsa,
             T1: '__rsa,
+            T2: '__rsa,
         {
             let Trait_work_args_checker: Trait_work_ArgsChecker<'_, 'a, 'b, 'c, 'd, T1, T2> =
                 Trait_work_ArgsChecker {
@@ -1281,16 +1402,51 @@ mod __rsubstitute_generated_Struct {
             return FnVerifier::new(self.clone());
         }
     }
+    #[doc(hidden)]
+    pub struct work_Call<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> {
+        _phantom_lifetime: PhantomData<&'__rs ()>,
+        _phantom___rs: PhantomData<&'__rs ()>,
+        _phantom_a: PhantomData<&'a ()>,
+        _phantom_b: PhantomData<&'b ()>,
+        _phantom_T1: PhantomData<T1>,
+        _phantom_c: PhantomData<&'c ()>,
+        _phantom_d: PhantomData<&'d ()>,
+        _phantom_T2: PhantomData<T2>,
+        a: *const i32,
+        b: *const i32,
+        c: *const i32,
+        d: *const i32,
+        axb: *const *const *const i32,
+        cxd: *const *const *const i32,
+        abxbax: *const *const *const *const *const *const i32,
+        cdxdcx: *const *const *const *const *const *const i32,
+        abcd: *const *const *const *const i32,
+        xaxbxcxdx: *const *const *const *const *const *const *const *const *const i32,
+        data: Data<
+            'a,
+            'b,
+            *const *const i32,
+            *const *const *const *const *const [*const *const *const *const Data<
+                'c,
+                'a,
+                *const *const *const *const i32,
+                Vec<*const *const *const ()>,
+            >],
+        >,
+        t1: T1,
+        t1_ref: *const T1,
+        xaxbxcxdx_t1_ref: *const *const *const *const *const *const *const *const *const T1,
+        t2: T2,
+        t2_ref: *const T2,
+        xaxbxcxdx_t2_ref: *const *const *const *const *const *const *const *const *const T2,
+        xapx: *const *const *const *const i32,
+    }
     impl<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> IArgsInfosProvider
         for work_Call<'__rs, 'a, 'b, 'c, 'd, T1, T2>
     {
         fn get_arg_infos(&self) -> Vec<ArgInfo> {
             vec![
-                ArgInfo::new(
-                    "a",
-                    &self.a,
-                    (&ArgPrinter::<&i32>(&transmute_lifetime!(self.a))).debug_string(),
-                ),
+                ArgInfo::new("a", &self.a, (&ArgPrinter(&self.a)).debug_string()),
                 ArgInfo::new("b", &self.b, (&ArgPrinter(&self.b)).debug_string()),
                 ArgInfo::new("c", &self.c, (&ArgPrinter(&self.c)).debug_string()),
                 ArgInfo::new("d", &self.d, (&ArgPrinter(&self.d)).debug_string()),
@@ -1335,48 +1491,35 @@ mod __rsubstitute_generated_Struct {
                     &self.xaxbxcxdx_t2_ref,
                     (&ArgPrinter(&self.xaxbxcxdx_t2_ref)).debug_string(),
                 ),
+                ArgInfo::new("xapx", &self.xapx, (&ArgPrinter(&self.xapx)).debug_string()),
             ]
         }
     }
-    #[doc(hidden)]
-    #[derive(IArgsTupleProvider, CloneForRSubstitute)]
-    #[repr(C)]
-    pub struct work_Call<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> {
-        _phantom_lifetime: PhantomData<&'__rs ()>,
-        _phantom___rs: PhantomData<&'__rs ()>,
-        _phantom_a: PhantomData<&'a ()>,
-        _phantom_b: PhantomData<&'b ()>,
-        _phantom_T1: PhantomData<T1>,
-        _phantom_c: PhantomData<&'c ()>,
-        _phantom_d: PhantomData<&'d ()>,
-        _phantom_T2: PhantomData<T2>,
-        a: *const i32,
-        b: *const i32,
-        c: *const i32,
-        d: *const i32,
-        axb: *const *const *const i32,
-        cxd: *const *const *const i32,
-        abxbax: *const *const *const *const *const *const i32,
-        cdxdcx: *const *const *const *const *const *const i32,
-        abcd: *const *const *const *const i32,
-        xaxbxcxdx: *const *const *const *const *const *const *const *const *const i32,
-        data: Data<
-            'a,
-            'b,
-            *const *const i32,
-            *const *const *const *const *const [*const *const *const *const Data<
-                'c,
-                'a,
-                *const *const *const *const i32,
-                Vec<*const *const *const ()>,
-            >],
-        >,
-        t1: T1,
-        t1_ref: *const T1,
-        xaxbxcxdx_t1_ref: *const *const *const *const *const *const *const *const *const T1,
-        t2: T2,
-        t2_ref: *const T2,
-        xaxbxcxdx_t2_ref: *const *const *const *const *const *const *const *const *const T2,
+    impl<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> IArgsTupleProvider
+        for work_Call<'__rs, 'a, 'b, 'c, 'd, T1, T2>
+    {
+        fn get_ptr_to_boxed_tuple_of_refs(&self) -> *mut () {
+            Box::leak(Box::new((
+                &self.a,
+                &self.b,
+                &self.c,
+                &self.d,
+                &self.axb,
+                &self.cxd,
+                &self.abxbax,
+                &self.cdxdcx,
+                &self.abcd,
+                &self.xaxbxcxdx,
+                &self.data,
+                &self.t1,
+                &self.t1_ref,
+                &self.xaxbxcxdx_t1_ref,
+                &self.t2,
+                &self.t2_ref,
+                &self.xaxbxcxdx_t2_ref,
+                &self.xapx,
+            ))) as *mut _ as *mut ()
+        }
     }
     impl<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> IGenericsInfoProvider
         for work_Call<'__rs, 'a, 'b, 'c, 'd, T1, T2>
@@ -1389,8 +1532,42 @@ mod __rsubstitute_generated_Struct {
         }
         fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
     }
+    impl<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> Clone
+        for work_Call<'__rs, 'a, 'b, 'c, 'd, T1, T2>
+    {
+        fn clone(&self) -> Self {
+            Self {
+                _phantom_lifetime: (&self._phantom_lifetime).clone(),
+                _phantom___rs: (&self._phantom___rs).clone(),
+                _phantom_a: (&self._phantom_a).clone(),
+                _phantom_b: (&self._phantom_b).clone(),
+                _phantom_T1: (&self._phantom_T1).clone(),
+                _phantom_c: (&self._phantom_c).clone(),
+                _phantom_d: (&self._phantom_d).clone(),
+                _phantom_T2: (&self._phantom_T2).clone(),
+                a: (&self.a).clone(),
+                b: (&self.b).clone(),
+                c: (&self.c).clone(),
+                d: (&self.d).clone(),
+                axb: (&self.axb).clone(),
+                cxd: (&self.cxd).clone(),
+                abxbax: (&self.abxbax).clone(),
+                cdxdcx: (&self.cdxdcx).clone(),
+                abcd: (&self.abcd).clone(),
+                xaxbxcxdx: (&self.xaxbxcxdx).clone(),
+                data: (&self.data).clone(),
+                t1: (&self.t1).clone(),
+                t1_ref: (&self.t1_ref).clone(),
+                xaxbxcxdx_t1_ref: (&self.xaxbxcxdx_t1_ref).clone(),
+                t2: (&self.t2).clone(),
+                t2_ref: (&self.t2_ref).clone(),
+                xaxbxcxdx_t2_ref: (&self.xaxbxcxdx_t2_ref).clone(),
+                xapx: (&self.xapx).clone(),
+            }
+        }
+    }
     #[doc(hidden)]
-    #[derive(Debug, IArgsFormatter)]
+    #[derive(Debug)]
     pub struct work_ArgsChecker<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> {
         _phantom_lifetime: PhantomData<&'__rs ()>,
         _phantom___rs: PhantomData<&'__rs ()>,
@@ -1400,39 +1577,37 @@ mod __rsubstitute_generated_Struct {
         _phantom_c: PhantomData<&'c ()>,
         _phantom_d: PhantomData<&'d ()>,
         _phantom_T2: PhantomData<T2>,
-        a: Arg<'__rs, *const i32>,
-        b: Arg<'__rs, *const i32>,
-        c: Arg<'__rs, *const i32>,
-        d: Arg<'__rs, *const i32>,
-        axb: Arg<'__rs, *const *const *const i32>,
-        cxd: Arg<'__rs, *const *const *const i32>,
-        abxbax: Arg<'__rs, *const *const *const *const *const *const i32>,
-        cdxdcx: Arg<'__rs, *const *const *const *const *const *const i32>,
-        abcd: Arg<'__rs, *const *const *const *const i32>,
-        xaxbxcxdx: Arg<'__rs, *const *const *const *const *const *const *const *const *const i32>,
+        a: Arg<'__rs, &'a i32>,
+        b: Arg<'__rs, &'b i32>,
+        c: Arg<'__rs, &'c i32>,
+        d: Arg<'__rs, &'d i32>,
+        axb: Arg<'__rs, &'a &'__rs &'b i32>,
+        cxd: Arg<'__rs, &'c &'__rs &'d i32>,
+        abxbax: Arg<'__rs, &'a &'b &'__rs &'b &'a &'__rs i32>,
+        cdxdcx: Arg<'__rs, &'c &'d &'__rs &'d &'c &'__rs i32>,
+        abcd: Arg<'__rs, &'a &'b &'c &'d i32>,
+        xaxbxcxdx: Arg<'__rs, &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs i32>,
         data: Arg<
             '__rs,
             Data<
                 'a,
                 'b,
-                *const *const i32,
-                *const *const *const *const *const [*const *const *const *const Data<
+                &'__rs &'__rs i32,
+                &'__rs &'a &'__rs &'b &'__rs [&'c &'__rs &'b &'__rs Data<
                     'c,
                     'a,
-                    *const *const *const *const i32,
-                    Vec<*const *const *const ()>,
+                    &'__rs &'__rs &'c &'__rs i32,
+                    Vec<&'d &'b &'__rs ()>,
                 >],
             >,
         >,
         t1: Arg<'__rs, T1>,
-        t1_ref: Arg<'__rs, *const T1>,
-        xaxbxcxdx_t1_ref:
-            Arg<'__rs, *const *const *const *const *const *const *const *const *const T1>,
+        t1_ref: Arg<'__rs, &'__rs T1>,
+        xaxbxcxdx_t1_ref: Arg<'__rs, &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T1>,
         t2: Arg<'__rs, T2>,
-        t2_ref: Arg<'__rs, *const T2>,
-        xaxbxcxdx_t2_ref:
-            Arg<'__rs, *const *const *const *const *const *const *const *const *const T2>,
-        xapx: Arg<'__rs, *const *const *const *const i32>,
+        t2_ref: Arg<'__rs, &'__rs T2>,
+        xaxbxcxdx_t2_ref: Arg<'__rs, &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T2>,
+        xapx: Arg<'__rs, &'__rs &'a *const &'__rs i32>,
     }
     impl<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> IArgsChecker
         for work_ArgsChecker<'__rs, 'a, 'b, 'c, 'd, T1, T2>
@@ -1441,68 +1616,124 @@ mod __rsubstitute_generated_Struct {
         fn check(&self, dyn_call: &DynCall) -> Vec<ArgCheckResult> {
             let call: &work_Call<'__rs, 'a, 'b, 'c, 'd, T1, T2> = dyn_call.downcast_ref();
             vec![
-                self.a
-                    .check_ref("a", &call.a, (&ArgPrinter(&&call.a)).debug_string()),
-                self.b
-                    .check_ref("b", &call.b, (&ArgPrinter(&&call.b)).debug_string()),
-                self.c
-                    .check_ref("c", &call.c, (&ArgPrinter(&&call.c)).debug_string()),
-                self.d
-                    .check_ref("d", &call.d, (&ArgPrinter(&&call.d)).debug_string()),
-                self.axb
-                    .check_ref("axb", &call.axb, (&ArgPrinter(&&call.axb)).debug_string()),
-                self.cxd
-                    .check_ref("cxd", &call.cxd, (&ArgPrinter(&&call.cxd)).debug_string()),
-                self.abxbax.check_ref(
+                self.a.check(
+                    "a",
+                    transmute_lifetime!(&call.a),
+                    (&ArgPrinter(&call.a)).debug_string(),
+                ),
+                self.b.check(
+                    "b",
+                    transmute_lifetime!(&call.b),
+                    (&ArgPrinter(&call.b)).debug_string(),
+                ),
+                self.c.check(
+                    "c",
+                    transmute_lifetime!(&call.c),
+                    (&ArgPrinter(&call.c)).debug_string(),
+                ),
+                self.d.check(
+                    "d",
+                    transmute_lifetime!(&call.d),
+                    (&ArgPrinter(&call.d)).debug_string(),
+                ),
+                self.axb.check(
+                    "axb",
+                    transmute_lifetime!(&call.axb),
+                    (&ArgPrinter(&call.axb)).debug_string(),
+                ),
+                self.cxd.check(
+                    "cxd",
+                    transmute_lifetime!(&call.cxd),
+                    (&ArgPrinter(&call.cxd)).debug_string(),
+                ),
+                self.abxbax.check(
                     "abxbax",
-                    &call.abxbax,
-                    (&ArgPrinter(&&call.abxbax)).debug_string(),
+                    transmute_lifetime!(&call.abxbax),
+                    (&ArgPrinter(&call.abxbax)).debug_string(),
                 ),
-                self.cdxdcx.check_ref(
+                self.cdxdcx.check(
                     "cdxdcx",
-                    &call.cdxdcx,
-                    (&ArgPrinter(&&call.cdxdcx)).debug_string(),
+                    transmute_lifetime!(&call.cdxdcx),
+                    (&ArgPrinter(&call.cdxdcx)).debug_string(),
                 ),
-                self.abcd.check_ref(
+                self.abcd.check(
                     "abcd",
-                    &call.abcd,
-                    (&ArgPrinter(&&call.abcd)).debug_string(),
+                    transmute_lifetime!(&call.abcd),
+                    (&ArgPrinter(&call.abcd)).debug_string(),
                 ),
-                self.xaxbxcxdx.check_ref(
+                self.xaxbxcxdx.check(
                     "xaxbxcxdx",
-                    &call.xaxbxcxdx,
-                    (&ArgPrinter(&&call.xaxbxcxdx)).debug_string(),
+                    transmute_lifetime!(&call.xaxbxcxdx),
+                    (&ArgPrinter(&call.xaxbxcxdx)).debug_string(),
                 ),
                 self.data.check(
                     "data",
-                    &call.data,
-                    (&ArgPrinter(&&call.data)).debug_string(),
+                    transmute_lifetime!(&call.data),
+                    (&ArgPrinter(&call.data)).debug_string(),
                 ),
-                self.t1
-                    .check("t1", &call.t1, (&ArgPrinter(&&call.t1)).debug_string()),
-                self.t1_ref.check_ref(
+                self.t1.check(
+                    "t1",
+                    transmute_lifetime!(&call.t1),
+                    (&ArgPrinter(&call.t1)).debug_string(),
+                ),
+                self.t1_ref.check(
                     "t1_ref",
-                    &call.t1_ref,
-                    (&ArgPrinter(&&call.t1_ref)).debug_string(),
+                    transmute_lifetime!(&call.t1_ref),
+                    (&ArgPrinter(&call.t1_ref)).debug_string(),
                 ),
-                self.xaxbxcxdx_t1_ref.check_ref(
+                self.xaxbxcxdx_t1_ref.check(
                     "xaxbxcxdx_t1_ref",
-                    &call.xaxbxcxdx_t1_ref,
-                    (&ArgPrinter(&&call.xaxbxcxdx_t1_ref)).debug_string(),
+                    transmute_lifetime!(&call.xaxbxcxdx_t1_ref),
+                    (&ArgPrinter(&call.xaxbxcxdx_t1_ref)).debug_string(),
                 ),
-                self.t2
-                    .check("t2", &call.t2, (&ArgPrinter(&&call.t2)).debug_string()),
-                self.t2_ref.check_ref(
+                self.t2.check(
+                    "t2",
+                    transmute_lifetime!(&call.t2),
+                    (&ArgPrinter(&call.t2)).debug_string(),
+                ),
+                self.t2_ref.check(
                     "t2_ref",
-                    &call.t2_ref,
-                    (&ArgPrinter(&&call.t2_ref)).debug_string(),
+                    transmute_lifetime!(&call.t2_ref),
+                    (&ArgPrinter(&call.t2_ref)).debug_string(),
                 ),
-                self.xaxbxcxdx_t2_ref.check_ref(
+                self.xaxbxcxdx_t2_ref.check(
                     "xaxbxcxdx_t2_ref",
-                    &call.xaxbxcxdx_t2_ref,
-                    (&ArgPrinter(&&call.xaxbxcxdx_t2_ref)).debug_string(),
+                    transmute_lifetime!(&call.xaxbxcxdx_t2_ref),
+                    (&ArgPrinter(&call.xaxbxcxdx_t2_ref)).debug_string(),
+                ),
+                self.xapx.check(
+                    "xapx",
+                    transmute_lifetime!(&call.xapx),
+                    (&ArgPrinter(&call.xapx)).debug_string(),
                 ),
             ]
+        }
+    }
+    impl<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> IArgsFormatter
+        for work_ArgsChecker<'__rs, 'a, 'b, 'c, 'd, T1, T2>
+    {
+        fn fmt_args(&self) -> String {
+            format!(
+                "{}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}, {}",
+                (&ArgPrinter(&self.a)).debug_string(),
+                (&ArgPrinter(&self.b)).debug_string(),
+                (&ArgPrinter(&self.c)).debug_string(),
+                (&ArgPrinter(&self.d)).debug_string(),
+                (&ArgPrinter(&self.axb)).debug_string(),
+                (&ArgPrinter(&self.cxd)).debug_string(),
+                (&ArgPrinter(&self.abxbax)).debug_string(),
+                (&ArgPrinter(&self.cdxdcx)).debug_string(),
+                (&ArgPrinter(&self.abcd)).debug_string(),
+                (&ArgPrinter(&self.xaxbxcxdx)).debug_string(),
+                (&ArgPrinter(&self.data)).debug_string(),
+                (&ArgPrinter(&self.t1)).debug_string(),
+                (&ArgPrinter(&self.t1_ref)).debug_string(),
+                (&ArgPrinter(&self.xaxbxcxdx_t1_ref)).debug_string(),
+                (&ArgPrinter(&self.t2)).debug_string(),
+                (&ArgPrinter(&self.t2_ref)).debug_string(),
+                (&ArgPrinter(&self.xaxbxcxdx_t2_ref)).debug_string(),
+                (&ArgPrinter(&self.xapx)).debug_string()
+            )
         }
     }
     impl<'__rs, 'a, 'b: 'a, 'c, 'd: 'a, T1: Clone, T2: Clone> IGenericsInfoProvider
@@ -1529,19 +1760,33 @@ mod __rsubstitute_generated_Struct {
     }
 
     #[doc(hidden)]
-    #[derive(CloneForRSubstitute)]
     pub struct StructSetup<'__rs, 'a, 'b: 'a, T1: Clone> {
         data: Arc<StructData<'__rs, 'a, 'b, T1>>,
         pub as_Trait: TraitSetup<'__rs, 'a, 'b, T1>,
     }
 
+    impl<'__rs, 'a, 'b: 'a, T1: Clone> Clone for StructSetup<'__rs, 'a, 'b, T1> {
+        fn clone(&self) -> Self {
+            Self {
+                data: (&self.data).clone(),
+                as_Trait: (&self.as_Trait).clone(),
+            }
+        }
+    }
     #[doc(hidden)]
-    #[derive(CloneForRSubstitute)]
     pub struct StructReceived<'__rs, 'a, 'b: 'a, T1: Clone> {
         data: Arc<StructData<'__rs, 'a, 'b, T1>>,
         pub as_Trait: TraitReceived<'__rs, 'a, 'b, T1>,
     }
 
+    impl<'__rs, 'a, 'b: 'a, T1: Clone> Clone for StructReceived<'__rs, 'a, 'b, T1> {
+        fn clone(&self) -> Self {
+            Self {
+                data: (&self.data).clone(),
+                as_Trait: (&self.as_Trait).clone(),
+            }
+        }
+    }
     #[allow(unused)]
     #[doc(hidden)]
     pub struct Struct_InnerData<'a, 'b: 'a, T1: Clone> {
@@ -1631,7 +1876,7 @@ mod __rsubstitute_generated_Struct {
             return self
                 .data
                 .Trait_work
-                .handle_base_returning(self, call, Self::base_Trait_work);
+                .handle_base_returning(&self, call, Self::base_Trait_work);
         }
     }
     #[allow(unused)]
@@ -1689,11 +1934,12 @@ mod __rsubstitute_generated_Struct {
                 t2: transmute_lifetime!(t2),
                 t2_ref: transmute_lifetime!(t2_ref),
                 xaxbxcxdx_t2_ref: transmute_lifetime!(xaxbxcxdx_t2_ref),
+                xapx: transmute_lifetime!(xapx),
             };
             return self
                 .data
                 .work
-                .handle_base_returning(self, call, Self::base_work);
+                .handle_base_returning(&self, call, Self::base_work);
         }
     }
     impl<'__rs, 'a, 'b: 'a, T1: Clone> Struct<'__rs, 'a, 'b, T1> {
@@ -1721,13 +1967,10 @@ mod __rsubstitute_generated_Struct {
                 inner_data,
             };
         }
-        fn base_work<'q, 'c, 'd: 'a, T2: Clone>(
+        fn base_work<'c, 'd: 'a, T2: Clone>(
             &self,
             call: work_Call<'__rs, 'a, 'b, 'c, 'd, T1, T2>,
-        ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32
-        where
-            T1: 'q,
-            T2: 'q, {
+        ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 {
             #[allow(non_shorthand_field_patterns)]
             #[allow(unused_variables)]
             let work_Call::<'_, '_, '_, '_, '_, T1, T2> {
@@ -1748,17 +1991,17 @@ mod __rsubstitute_generated_Struct {
                 t2: t2,
                 t2_ref: t2_ref,
                 xaxbxcxdx_t2_ref: xaxbxcxdx_t2_ref,
+                xapx: xapx,
                 ..
             } = call;
             unreachable!()
         }
-        fn base_Trait_work<'q, 'c, 'd: 'a, T2: Clone>(
-            &'q self,
+        fn base_Trait_work<'c, 'd: 'a, T2: Clone>(
+            &self,
             call: Trait_work_Call<'__rs, 'a, 'b, 'c, 'd, T1, T2>,
         ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32
         where
-            T1: 'q,
-            T2: 'q,
+            T2: 'a + 'b + 'c + 'd,
         {
             #[allow(non_shorthand_field_patterns)]
             #[allow(unused_variables)]
@@ -1783,26 +2026,49 @@ mod __rsubstitute_generated_Struct {
                 xapx: xapx,
                 ..
             } = call;
-            Self::work::<T2>(
+            let a: &'a i32 = transmute_lifetime!(a);
+            let b: &'b i32 = transmute_lifetime!(b);
+            let c: &'c i32 = transmute_lifetime!(c);
+            let d: &'d i32 = transmute_lifetime!(d);
+            let axb: &'a &&'b i32 = transmute_lifetime!(axb);
+            let cxd: &'c &&'d i32 = transmute_lifetime!(cxd);
+            let abxbax: &'a &'b &&'b &'a &i32 = transmute_lifetime!(abxbax);
+            let cdxdcx: &'c &'d &&'d &'c &i32 = transmute_lifetime!(cdxdcx);
+            let abcd: &'a &'b &'c &'d i32 = transmute_lifetime!(abcd);
+            let xaxbxcxdx: &&'a &&'b &&'c &&'d &i32 = transmute_lifetime!(xaxbxcxdx);
+            let data: Data<
+                'a,
+                'b,
+                &&i32,
+                &&'a &&'b &[&'c &&'b &Data<'c, 'a, &&&'c &i32, Vec<&'d &'b &()>>],
+            > = transmute_lifetime!(data);
+            let t1: T1 = transmute_lifetime!(t1);
+            let t1_ref: &T1 = transmute_lifetime!(t1_ref);
+            let xaxbxcxdx_t1_ref: &&'a &&'b &&'c &&'d &T1 = transmute_lifetime!(xaxbxcxdx_t1_ref);
+            let t2: T2 = transmute_lifetime!(t2);
+            let t2_ref: &T2 = transmute_lifetime!(t2_ref);
+            let xaxbxcxdx_t2_ref: &&'a &&'b &&'c &&'d &T2 = transmute_lifetime!(xaxbxcxdx_t2_ref);
+            let xapx: &&'a *const &i32 = transmute_lifetime!(xapx);
+            Self::work(
                 self,
-                transmute_lifetime!(a),
-                transmute_lifetime!(b),
-                transmute_lifetime!(c),
-                transmute_lifetime!(d),
-                transmute_lifetime!(axb),
-                transmute_lifetime!(cxd),
-                transmute_lifetime!(abxbax),
-                transmute_lifetime!(cdxdcx),
-                transmute_lifetime!(abcd),
-                transmute_lifetime!(xaxbxcxdx),
-                transmute_lifetime!(data),
-                transmute_lifetime!(t1),
-                transmute_lifetime!(t1_ref),
-                transmute_lifetime!(xaxbxcxdx_t1_ref),
-                transmute_lifetime!(t2),
-                transmute_lifetime!(t2_ref),
-                transmute_lifetime!(xaxbxcxdx_t2_ref),
-                transmute_lifetime!(xapx),
+                a,
+                b,
+                c,
+                d,
+                axb,
+                cxd,
+                abxbax,
+                cdxdcx,
+                abcd,
+                xaxbxcxdx,
+                data,
+                t1,
+                t1_ref,
+                xaxbxcxdx_t1_ref,
+                t2,
+                t2_ref,
+                xaxbxcxdx_t2_ref,
+                xapx,
             )
         }
     }
@@ -1813,31 +2079,32 @@ mod __rsubstitute_generated_Struct {
                 '__rsa,
                 &'__rsa &'__rsa i32,
                 &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa [&'__rsa &'__rsa &'__rsa &'__rsa Data<'__rsa, '__rsa, &'__rsa &'__rsa &'__rsa &'__rsa i32, Vec<&'__rsa &'__rsa &'__rsa ()>>],
-            >>>, t1: impl Into<Arg<'__rsa, T1>>, t1_ref: impl Into<Arg<'__rsa, &'__rsa T1>>, xaxbxcxdx_t1_ref: impl Into<Arg<'__rsa, &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa T1>>, t2: impl Into<Arg<'__rsa, T2>>, t2_ref: impl Into<Arg<'__rsa, &'__rsa T2>>, xaxbxcxdx_t2_ref: impl Into<Arg<'__rsa, &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa T2>>, xapx: impl Into<Arg<'__rs, &'__rsa &'__rsa *const &'__rsa i32>>) -> FnTuner<'_, Struct<'__rs, 'a, 'b, T1>, Self, (&'__rs &'a i32,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs &'b i32,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs &'c i32,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs &'d i32,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs &'a &'__rs &'b i32,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs &'c &'__rs &'d i32,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs &'a &'b &'__rs &'b &'a &'__rs i32,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs &'c &'d &'__rs &'d &'c &'__rs i32,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs &'a &'b &'c &'d i32,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs i32,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs Data<
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                          'a,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                          'b,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                          &'__rs &'__rs i32,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                          &'__rs &'a &'__rs &'b &'__rs [&'c &'__rs &'b &'__rs Data<'c, 'a, &'__rs &'__rs &'c &'__rs i32, Vec<&'d &'b &'__rs ()>>],
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      >,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs T1,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs &'__rs T1,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T1,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs T2,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs &'__rs T2,
-                                                                                                                                                                                                                                                                                                                                                                                                                                                                      &'__rs &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T2),
+            >>>, t1: impl Into<Arg<'__rsa, T1>>, t1_ref: impl Into<Arg<'__rsa, &'__rsa T1>>, xaxbxcxdx_t1_ref: impl Into<Arg<'__rsa, &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa T1>>, t2: impl Into<Arg<'__rsa, T2>>, t2_ref: impl Into<Arg<'__rsa, &'__rsa T2>>, xaxbxcxdx_t2_ref: impl Into<Arg<'__rsa, &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa T2>>, xapx: impl Into<Arg<'__rsa, &'__rsa &'__rsa *const &'__rsa i32>>) -> FnTuner<'_, Struct<'__rs, 'a, 'b, T1>, Self, (&'__rs &'a i32,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'b i32,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'c i32,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'d i32,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'a &'__rs &'b i32,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'c &'__rs &'d i32,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'a &'b &'__rs &'b &'a &'__rs i32,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'c &'d &'__rs &'d &'c &'__rs i32,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'a &'b &'c &'d i32,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs i32,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs Data<
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            'a,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            'b,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            &'__rs &'__rs i32,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                            &'__rs &'a &'__rs &'b &'__rs [&'c &'__rs &'b &'__rs Data<'c, 'a, &'__rs &'__rs &'c &'__rs i32, Vec<&'d &'b &'__rs ()>>],
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        >,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs T1,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'__rs T1,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T1,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs T2,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'__rs T2,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T2,
+                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                                        &'__rs &'__rs &'a *const &'__rs i32),
             &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa i32, true, true> where
-            T1: '__rsa,
-            T2: '__rsa
+            T2: '__rsa,
+            T1: '__rsa
         {
             let work_args_checker: work_ArgsChecker<'_, 'a, 'b, 'c, 'd, T1, T2> =
                 work_ArgsChecker {
@@ -1889,7 +2156,8 @@ mod __rsubstitute_generated_Struct {
                                                                         &'__rs &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T1,
                                                                         &'__rs T2,
                                                                         &'__rs &'__rs T2,
-                                                                        &'__rs &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T2),
+                                                                        &'__rs &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T2,
+                                                                        &'__rs &'__rs &'a *const &'__rs i32),
                 &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa i32, true, true> = self.data.work.add_config(work_args_checker, self);
             return transmute_lifetime!(fn_tuner);
         }
@@ -1934,7 +2202,7 @@ mod __rsubstitute_generated_Struct {
                     &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa &'__rsa T2,
                 >,
             >,
-            xapx: impl Into<Arg<'__rs, &'__rsa &'__rsa *const &'__rsa i32>>,
+            xapx: impl Into<Arg<'__rsa, &'__rsa &'__rsa *const &'__rsa i32>>,
             times: Times,
         ) -> FnVerifier<
             Self,
@@ -1966,11 +2234,12 @@ mod __rsubstitute_generated_Struct {
                 &'__rs T2,
                 &'__rs &'__rs T2,
                 &'__rs &'__rs &'a &'__rs &'b &'__rs &'c &'__rs &'d &'__rs T2,
+                &'__rs &'__rs &'a *const &'__rs i32,
             ),
         >
         where
-            T2: '__rsa,
             T1: '__rsa,
+            T2: '__rsa,
         {
             let work_args_checker: work_ArgsChecker<'_, 'a, 'b, 'c, 'd, T1, T2> =
                 work_ArgsChecker {
