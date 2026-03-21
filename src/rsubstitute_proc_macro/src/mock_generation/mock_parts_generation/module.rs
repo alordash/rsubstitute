@@ -122,12 +122,18 @@ pub(crate) fn generate_struct(
         .into_iter()
         .map(|x| Item::Use(x))
         .chain(mock_struct_traits.into_iter().flat_map(|x| {
-            convert_fn_infos(x.info.fn_infos).into_iter().chain([
-                Item::Struct(x.setup_struct.item_struct),
-                Item::Struct(x.received_struct.item_struct),
-                Item::Impl(x.setup_impl.item_impl),
-                Item::Impl(x.received_impl.item_impl),
-            ])
+            convert_fn_infos(x.info.fn_infos).into_iter().chain(
+                [
+                    convert_mock_setup_struct(x.setup_struct),
+                    convert_mock_received_struct(x.received_struct),
+                ]
+                .into_iter()
+                .flatten()
+                .chain([
+                    Item::Impl(x.setup_impl.item_impl),
+                    Item::Impl(x.received_impl.item_impl),
+                ]),
+            )
         }))
         .chain(struct_fn_infos.into_iter().flat_map(|x| convert_fn_info(x)))
         .chain([Item::Struct(mock_data_struct.item_struct)])
