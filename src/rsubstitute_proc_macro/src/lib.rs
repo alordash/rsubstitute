@@ -3,7 +3,6 @@ use crate::mock_generation::parameters::*;
 use crate::mock_generation::*;
 
 mod constants;
-mod derive_args_tuple_provider_macro;
 mod derive_clone_for_rsubstitute_macro;
 mod derive_mock_data_macro;
 mod mock_generation;
@@ -42,11 +41,6 @@ pub fn mocked_base(proc_macro_item: proc_macro::TokenStream) -> proc_macro::Toke
 #[proc_macro]
 pub fn mocked_no_base(proc_macro_item: proc_macro::TokenStream) -> proc_macro::TokenStream {
     mock_macro_handler.handle_macro_mocked(proc_macro_item, MockedMacroMode::WithoutBase)
-}
-
-#[proc_macro_derive(IArgsTupleProvider)]
-pub fn derive_args_tuple_provider(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    derive_args_tuple_provider_macro::handle(item)
 }
 
 #[proc_macro_derive(IMockData)]

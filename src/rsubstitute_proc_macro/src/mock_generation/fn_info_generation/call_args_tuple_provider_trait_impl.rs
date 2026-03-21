@@ -1,17 +1,14 @@
 use crate::constants;
 use crate::syntax::*;
-use proc_macro::TokenStream;
-use quote::{format_ident, ToTokens};
+use quote::format_ident;
 use std::cell::LazyCell;
 use syn::punctuated::Punctuated;
 use syn::*;
 
-pub(crate) fn handle(item: TokenStream) -> TokenStream {
-    let item_struct = parse_macro_input!(item as ItemStruct);
-
+pub(crate) fn generate(item_struct: &ItemStruct) -> ItemImpl {
     let trait_path = path::create(constants::I_ARGS_TUPLE_PROVIDER_TRAIT_IDENT.clone());
-    let self_ty = Box::new(r#type::create_from_struct(&item_struct));
-    let get_arg_infos_fn = generate_get_ptr_to_boxed_tuple_of_refs_fn(&item_struct);
+    let self_ty = Box::new(r#type::create_from_struct(item_struct));
+    let get_arg_infos_fn = generate_get_ptr_to_boxed_tuple_of_refs_fn(item_struct);
     let item_impl = ItemImpl {
         attrs: Vec::new(),
         defaultness: None,
@@ -23,7 +20,7 @@ pub(crate) fn handle(item: TokenStream) -> TokenStream {
         brace_token: Default::default(),
         items: vec![get_arg_infos_fn],
     };
-    return item_impl.into_token_stream().into();
+    return item_impl;
 }
 
 const GET_PTR_TO_BOXED_TUPLE_OF_REFS_FN_SIGNATURE: LazyCell<Signature> = LazyCell::new(|| {
