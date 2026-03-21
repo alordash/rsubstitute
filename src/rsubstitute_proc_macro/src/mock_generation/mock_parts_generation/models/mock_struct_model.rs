@@ -3,5 +3,5 @@ use syn::*;
 pub(crate) struct MockStruct {
     pub item_struct: ItemStruct,
     pub ty: Type,
-    pub clone_for_rsubstitute_trait_impl: ItemImpl
+    pub maybe_clone_for_rsubstitute_trait_impl: Option<ItemImpl>,
 }

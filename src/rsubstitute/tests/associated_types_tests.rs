@@ -3,6 +3,11 @@
 use rsubstitute::prelude::*;
 use std::fmt::Debug;
 
+// TODO - test how TraitA : TraitB behaves
+// TODO - write that mock(base) has no effect on static fns
+#[mock]
+fn f() {}
+
 #[mock(base)]
 trait Trait {
     const CONST: usize = 43;
@@ -229,7 +234,6 @@ mod __rsubstitute_generated_Struct {
     use super::*;
     use rsubstitute::for_generated::*;
     #[doc(hidden)]
-    #[derive(IArgsInfosProvider, IArgsTupleProvider, CloneForRSubstitute)]
     pub struct Trait_get_my_type_Call<'__rs, TT: Clone>
     where
         TT: ToString,
@@ -238,6 +242,26 @@ mod __rsubstitute_generated_Struct {
         _phantom___rs: PhantomData<&'__rs ()>,
         _phantom_TT: PhantomData<TT>,
         input: <Struct<'__rs> as Trait>::InputType<i32>,
+    }
+    impl<'__rs, TT: Clone> IArgsInfosProvider for Trait_get_my_type_Call<'__rs, TT>
+    where
+        TT: ToString,
+    {
+        fn get_arg_infos(&self) -> Vec<ArgInfo> {
+            vec![ArgInfo::new(
+                "input",
+                &self.input,
+                (&ArgPrinter(&self.input)).debug_string(),
+            )]
+        }
+    }
+    impl<'__rs, TT: Clone> IArgsTupleProvider for Trait_get_my_type_Call<'__rs, TT>
+    where
+        TT: ToString,
+    {
+        fn get_ptr_to_boxed_tuple_of_refs(&self) -> *mut () {
+            Box::leak(Box::new((&self.input,))) as *mut _ as *mut ()
+        }
     }
     impl<'__rs, TT: Clone> IGenericsInfoProvider for Trait_get_my_type_Call<'__rs, TT>
     where
@@ -250,6 +274,19 @@ mod __rsubstitute_generated_Struct {
             [tid::<TT>()].hash(hasher)
         }
         fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
+    }
+    impl<'__rs, TT: Clone> Clone for Trait_get_my_type_Call<'__rs, TT>
+    where
+        TT: ToString,
+    {
+        fn clone(&self) -> Self {
+            Self {
+                _phantom_lifetime: (&self._phantom_lifetime).clone(),
+                _phantom___rs: (&self._phantom___rs).clone(),
+                _phantom_TT: (&self._phantom_TT).clone(),
+                input: (&self.input).clone(),
+            }
+        }
     }
     #[doc(hidden)]
     #[derive(Debug)]
@@ -271,9 +308,17 @@ mod __rsubstitute_generated_Struct {
             let call: &Trait_get_my_type_Call<'__rs, TT> = dyn_call.downcast_ref();
             vec![self.input.check(
                 "input",
-                &call.input,
-                (&ArgPrinter(&&call.input)).debug_string(),
+                transmute_lifetime!(&call.input),
+                (&ArgPrinter(&call.input)).debug_string(),
             )]
+        }
+    }
+    impl<'__rs, TT: Clone> IArgsFormatter for Trait_get_my_type_ArgsChecker<'__rs, TT>
+    where
+        TT: ToString,
+    {
+        fn fmt_args(&self) -> String {
+            format!("{}", (&ArgPrinter(&self.input)).debug_string())
         }
     }
     impl<'__rs, TT: Clone> IGenericsInfoProvider for Trait_get_my_type_ArgsChecker<'__rs, TT>
@@ -289,14 +334,26 @@ mod __rsubstitute_generated_Struct {
         fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
     }
     #[doc(hidden)]
-    #[derive(CloneForRSubstitute)]
     pub struct TraitSetup<'__rs> {
         data: Arc<StructData<'__rs>>,
     }
+    impl<'__rs> Clone for TraitSetup<'__rs> {
+        fn clone(&self) -> Self {
+            Self {
+                data: (&self.data).clone(),
+            }
+        }
+    }
     #[doc(hidden)]
-    #[derive(CloneForRSubstitute)]
     pub struct TraitReceived<'__rs> {
         data: Arc<StructData<'__rs>>,
+    }
+    impl<'__rs> Clone for TraitReceived<'__rs> {
+        fn clone(&self) -> Self {
+            Self {
+                data: (&self.data).clone(),
+            }
+        }
     }
     impl<'__rs> TraitSetup<'__rs> {
         pub fn get_my_type<'__rsa, TT: Clone>(
@@ -368,16 +425,30 @@ mod __rsubstitute_generated_Struct {
         pub Trait_get_my_type: FnData<'static, Struct<'__rs>, true, true>,
     }
     #[doc(hidden)]
-    #[derive(CloneForRSubstitute)]
     pub struct StructSetup<'__rs> {
         data: Arc<StructData<'__rs>>,
         pub as_Trait: TraitSetup<'__rs>,
     }
+    impl<'__rs> Clone for StructSetup<'__rs> {
+        fn clone(&self) -> Self {
+            Self {
+                data: (&self.data).clone(),
+                as_Trait: (&self.as_Trait).clone(),
+            }
+        }
+    }
     #[doc(hidden)]
-    #[derive(CloneForRSubstitute)]
     pub struct StructReceived<'__rs> {
         data: Arc<StructData<'__rs>>,
         pub as_Trait: TraitReceived<'__rs>,
+    }
+    impl<'__rs> Clone for StructReceived<'__rs> {
+        fn clone(&self) -> Self {
+            Self {
+                data: (&self.data).clone(),
+                as_Trait: (&self.as_Trait).clone(),
+            }
+        }
     }
     #[derive(Clone)]
     #[doc(hidden)]
@@ -418,7 +489,7 @@ mod __rsubstitute_generated_Struct {
                 input: transmute_lifetime!(input),
             };
             return self.data.Trait_get_my_type.handle_base_returning(
-                self,
+                &self,
                 call,
                 Self::base_Trait_get_my_type,
             );

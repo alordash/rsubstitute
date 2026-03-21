@@ -8,3 +8,5 @@ pub(crate) struct FnInfo {
     pub args_checker_struct: ArgsCheckerStruct,
     pub data_field_ident: Ident,
 }
+
+// TODO - (idk where to write) remote _phantom_Lifetime

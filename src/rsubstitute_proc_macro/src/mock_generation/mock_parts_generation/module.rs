@@ -141,7 +141,6 @@ pub(crate) fn generate_struct(
         .chain(convert_mock_received_struct(mock_received_struct))
         .chain([
             Item::Struct(inner_data_struct.item_struct),
-            Item::Impl(inner_data_struct.clone_for_rsubstitute_trait_impl),
             Item::Impl(inner_data_impl.item_impl),
         ])
         .chain(convert_mock_struct(mock_struct))
@@ -220,11 +219,15 @@ fn convert_mock_received_struct(mock_received_struct: MockReceivedStruct) -> [It
     ]
 }
 
-fn convert_mock_struct(mock_struct: MockStruct) -> [Item; 2] {
-    [
-        Item::Struct(mock_struct.item_struct),
-        Item::Impl(mock_struct.clone_for_rsubstitute_trait_impl),
-    ]
+fn convert_mock_struct(mock_struct: MockStruct) -> Vec<Item> {
+    core::iter::once(Item::Struct(mock_struct.item_struct))
+        .chain(
+            mock_struct
+                .maybe_clone_for_rsubstitute_trait_impl
+                .map(Item::Impl)
+                .into_iter(),
+        )
+        .collect()
 }
 
 fn create_item_mod(ident: Ident, items: Vec<Item>) -> ItemMod {

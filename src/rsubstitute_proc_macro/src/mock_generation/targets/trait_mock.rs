@@ -41,6 +41,7 @@ pub(crate) fn handle(ctx: &Ctx, item_trait: ItemTrait) -> TokenStream {
         &mock_received_struct,
         &mock_data_struct,
         None,
+        true,
     );
     let mock_trait_impl = mock_payload_impl::generate(
         target_ident.clone(),

@@ -73,6 +73,7 @@ pub(crate) fn handle(ctx: &Ctx, mut struct_mock_syntax: StructMockSyntax) -> Tok
         &mock_received_struct,
         &mock_data_struct,
         Some(&inner_data_struct),
+        false,
     );
     let inner_data_deref_impl = inner_data_deref_impl::generate(&mock_struct, &inner_data_struct);
     let mock_trait_impls = mock_struct_traits
