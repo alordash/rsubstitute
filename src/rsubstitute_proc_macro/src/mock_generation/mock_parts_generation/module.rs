@@ -171,17 +171,13 @@ fn convert_fn_infos(fn_infos: Vec<FnInfo>) -> Vec<Item> {
         .collect();
 }
 
-fn convert_fn_info(fn_info: FnInfo) -> [Item; 6] {
+fn convert_fn_info(fn_info: FnInfo) -> [Item; 7] {
     [
         Item::Struct(fn_info.call_struct.item_struct),
+        Item::Impl(fn_info.call_struct.args_infos_provider_trait_impl),
         Item::Impl(fn_info.call_struct.generics_info_provider_impl),
         Item::Struct(fn_info.args_checker_struct.item_struct),
-        Item::Impl(
-            fn_info
-                .args_checker_struct
-                .args_checker_trait_impl
-                .item_impl,
-        ),
+        Item::Impl(fn_info.args_checker_struct.args_checker_trait_impl),
         Item::Impl(
             fn_info
                 .args_checker_struct

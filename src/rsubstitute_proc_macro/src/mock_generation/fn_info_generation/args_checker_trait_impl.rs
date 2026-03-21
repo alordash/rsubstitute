@@ -15,7 +15,7 @@ pub(crate) fn generate(
     ty_path: TypePath,
     generics: Generics,
     skipped_fields_count: usize,
-) -> ArgsCheckerTraitImpl {
+) -> ItemImpl {
     let trait_ident = constants::I_ARGS_CHECKER_TRAIT_IDENT.clone();
     let trait_path = Path {
         leading_colon: None,
@@ -39,8 +39,7 @@ pub(crate) fn generate(
         brace_token: Default::default(),
         items: vec![items],
     };
-    let args_checker_impl = ArgsCheckerTraitImpl { item_impl };
-    return args_checker_impl;
+    return item_impl;
 }
 
 const CHECK_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("check"));

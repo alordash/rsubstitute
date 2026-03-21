@@ -275,7 +275,7 @@ mod accept_ref {
     use super::*;
     use rsubstitute::for_generated::*;
     #[doc(hidden)]
-    #[derive(IArgsInfosProvider, IArgsTupleProvider, CloneForRSubstitute)]
+    #[derive(IArgsTupleProvider, CloneForRSubstitute)]
     pub struct accept_ref_Call<'__rs> {
         _phantom_lifetime: PhantomData<&'__rs ()>,
         _phantom___rs: PhantomData<&'__rs ()>,
@@ -289,7 +289,7 @@ mod accept_ref {
         fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
     }
     #[doc(hidden)]
-    #[derive(Debug, IArgsFormatter)]
+    #[derive(Debug)]
     pub struct accept_ref_ArgsChecker<'__rs> {
         _phantom_lifetime: PhantomData<&'__rs ()>,
         _phantom___rs: PhantomData<&'__rs ()>,

@@ -1,7 +1,6 @@
 use crate::constants;
 use crate::mock_generation::mock_parts_generation::*;
 use crate::syntax::*;
-use proc_macro::TokenStream;
 use proc_macro2::Ident;
 use quote::{format_ident, ToTokens};
 use std::cell::LazyCell;
@@ -9,12 +8,10 @@ use syn::punctuated::Punctuated;
 use syn::token::Bracket;
 use syn::*;
 
-pub(crate) fn handle(item: TokenStream) -> TokenStream {
-    let item_struct = parse_macro_input!(item as ItemStruct);
-
+pub(crate) fn generate(item_struct: &ItemStruct) -> ItemImpl {
     let trait_path = path::create(constants::I_ARGS_INFOS_PROVIDER_TRAIT_IDENT.clone());
-    let self_ty = Box::new(r#type::create_from_struct(&item_struct));
-    let get_arg_infos_fn = generate_get_arg_infos_fn(&item_struct);
+    let self_ty = Box::new(r#type::create_from_struct(item_struct));
+    let get_arg_infos_fn = generate_get_arg_infos_fn(item_struct);
     let item_impl = ItemImpl {
         attrs: Vec::new(),
         defaultness: None,
@@ -26,7 +23,7 @@ pub(crate) fn handle(item: TokenStream) -> TokenStream {
         brace_token: Default::default(),
         items: vec![get_arg_infos_fn],
     };
-    return item_impl.into_token_stream().into();
+    return item_impl;
 }
 
 const GET_ARG_INFOS_FN_SIGNATURE: LazyCell<Signature> = LazyCell::new(|| {
@@ -97,10 +94,10 @@ fn generate_arg_info_new_expr(field: &Field) -> Expr {
         constants::SELF_IDENT.clone(),
         field_ident.clone(),
     ]));
-    let field_debug_string_arg = debug_string_expr::generate(field_access_expr::create(vec![
-        constants::SELF_IDENT.clone(),
-        field_ident,
-    ]), None); // TODO - pass something instead of None (after turning derive macro into part of main code generation)
+    let field_debug_string_arg = debug_string_expr::generate(
+        field_access_expr::create(vec![constants::SELF_IDENT.clone(), field_ident]),
+        None,
+    ); // TODO - pass something instead of None (after turning derive macro into part of main code generation)
 
     let expr = expr_call::create_with_args(
         path::create_expr_from_parts(vec![

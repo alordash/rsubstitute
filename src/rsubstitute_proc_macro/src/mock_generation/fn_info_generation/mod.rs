@@ -7,3 +7,4 @@ pub(crate) mod call_struct;
 pub(crate) mod fn_info;
 pub(crate) mod generics_info_provider_impl;
 pub(crate) mod reference_to_pointer;
+pub(crate) mod call_args_infos_provider_trait_impl;
