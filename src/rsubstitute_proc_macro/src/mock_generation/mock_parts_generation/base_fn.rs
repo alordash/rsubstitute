@@ -98,10 +98,11 @@ fn generate_call_base_fn_parts(
     target: Target,
     maybe_containing_trait_ident: Option<&Ident>,
 ) -> (Signature, Block) {
-    let generics = match target {
+    let mut generics = match target {
         Target::Static => fn_decl.merged_generics.clone(),
         Target::Trait => fn_decl.own_generics.clone(),
     };
+    generics = add_lifetime_constraints_to_generic_types(generics);
     let first_arg = match target {
         Target::Static => FnArg::Typed(PatType {
             attrs: Vec::new(),
@@ -170,6 +171,7 @@ fn generate_call_base_fn_block(
         .fields
         .iter()
         .skip(fn_decl.get_internal_phantom_types_count() + phantom_fields_count);
+    let mut fields_actual_types_assignment_statements = Vec::new();
     let fields = fn_decl
         .arguments
         .iter()
@@ -178,12 +180,33 @@ fn generate_call_base_fn_block(
             FnArg::Typed(typed) => Some(typed),
         })
         .zip(call_struct_fields)
-        .map(|(typed_fn_arg, call_struct_field)| FieldPat {
-            attrs: Vec::new(),
-            member: Member::Named(call_struct_field.get_required_ident()),
-            colon_token: Some(Default::default()),
-            pat: typed_fn_arg.pat.clone(),
-        })
+        .zip(&call_struct.fields_maybe_actual_source_types)
+        .map(
+            |((typed_fn_arg, call_struct_field), maybe_actual_source_type)| {
+                let field_ident = call_struct_field.get_required_ident();
+                if let Some(actual_source_type) = maybe_actual_source_type {
+                    fields_actual_types_assignment_statements.push(Stmt::Local(
+                        local::create_with_type(
+                            field_ident.clone(),
+                            actual_source_type.clone(),
+                            LocalInit {
+                                eq_token: Default::default(),
+                                expr: Box::new(transmute_lifetime_expr::create(
+                                    field_ident.clone(),
+                                )),
+                                diverge: None,
+                            },
+                        ),
+                    ))
+                }
+                FieldPat {
+                    attrs: Vec::new(),
+                    member: Member::Named(field_ident),
+                    colon_token: Some(Default::default()),
+                    pat: typed_fn_arg.pat.clone(),
+                }
+            },
+        )
         .collect();
     let mut call_struct_generics = call_struct.item_struct.generics.clone();
     lifetime::set_all_lifetimes_in_generics(
@@ -218,6 +241,7 @@ fn generate_call_base_fn_block(
         semi_token: Default::default(),
     });
     let stmts = std::iter::once(deconstruct_call_stmt)
+        .chain(fields_actual_types_assignment_statements)
         .chain(base_fn_block.stmts)
         .collect();
     let block = Block {
@@ -225,4 +249,15 @@ fn generate_call_base_fn_block(
         stmts,
     };
     return block;
+}
+
+fn add_lifetime_constraints_to_generic_types(mut generics: Generics) -> Generics {
+    let lifetime_param_bounds: Vec<_> = generics
+        .lifetimes()
+        .map(|lifetime_param| TypeParamBound::Lifetime(lifetime_param.lifetime.clone()))
+        .collect();
+    for type_param in generics.type_params_mut() {
+        type_param.bounds.extend(lifetime_param_bounds.clone());
+    }
+    return generics;
 }
