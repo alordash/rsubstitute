@@ -1,4 +1,5 @@
 use crate::constants;
+use crate::mock_generation::clone_for_rsubstitute_trait_impl;
 use crate::mock_generation::mock_parts_generation::models::*;
 use crate::syntax::*;
 use syn::*;
@@ -10,6 +11,7 @@ pub(crate) fn generate(
     mock_received_struct: &MockReceivedStruct,
     mock_data_struct: &MockDataStruct,
     maybe_inner_data_struct: Option<&InnerDataStruct>,
+    impl_clone: bool,
 ) -> MockStruct {
     let data_field = field::create_pub(
         constants::DATA_IDENT.clone(),
@@ -48,7 +50,16 @@ pub(crate) fn generate(
         fields,
     );
     let ty = r#type::create_from_struct(&item_struct);
-    let result = MockStruct { item_struct, ty };
+    let maybe_clone_for_rsubstitute_trait_impl = if impl_clone {
+        Some(clone_for_rsubstitute_trait_impl::generate(&item_struct))
+    } else {
+        None
+    };
+    let result = MockStruct {
+        item_struct,
+        ty,
+        maybe_clone_for_rsubstitute_trait_impl,
+    };
     return result;
 }
 
@@ -65,6 +76,7 @@ pub(crate) fn generate_for_static(
         mock_received_struct,
         mock_data_struct,
         None,
+        true,
     );
     mock_struct
         .item_struct

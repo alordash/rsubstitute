@@ -38,6 +38,7 @@ trait Trait<'a, 'b: 'a, T1> {
         t2: T2,
         t2_ref: &T2,
         xaxbxcxdx_t2_ref: &&'a &&'b &&'c &&'d &T2,
+        xapx: &&'a *const &i32,
     ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32;
 }
 
@@ -61,6 +62,7 @@ fn work<'x, 'a, 'b: 'a, 'c, 'd: 'a, T1, T2>(
     t2: T2,
     t2_ref: &T2,
     xaxbxcxdx_t2_ref: &&'a &&'b &&'c &&'d &T2,
+    xapx: &&'a *const &i32,
 ) -> &'x &'a &'x &'a &'x &'b &'x &'b &'x &'c &'x &'c &'x &'d &'x &'d &'x i32 {
     unreachable!()
 }
@@ -108,6 +110,7 @@ mocked_base! {
             t2: T2,
             t2_ref: &T2,
             xaxbxcxdx_t2_ref: &&'a &&'b &&'c &&'d &T2,
+            xapx: &&'a *const &i32,
         ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 {
             unreachable!()
         }
@@ -139,6 +142,7 @@ mocked_base! {
             t2: T2,
             t2_ref: &T2,
             xaxbxcxdx_t2_ref: &&'a &&'b &&'c &&'d &T2,
+            xapx: &&'a *const &i32,
         ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 {
             Self::work(
                 self,
@@ -159,6 +163,7 @@ mocked_base! {
                 t2,
                 t2_ref,
                 xaxbxcxdx_t2_ref,
+                xapx,
             )
         }
     }
@@ -167,9 +172,7 @@ mocked_base! {
 #[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
-
     use super::*;
-    use rsubstitute_core::Times;
 
     #[test]
     fn trait_work_Ok() {
@@ -205,6 +208,7 @@ mod tests {
                                                 let t2 = true;
                                                 let t2_ref = &true;
                                                 let xaxbxcxdx_t2_ref = &&&&&&&&&true;
+                                                let xapx = &&(&(&188) as *const _);
                                                 mock.setup
                                                     .work(
                                                         a,
@@ -224,6 +228,7 @@ mod tests {
                                                         t2,
                                                         t2_ref,
                                                         xaxbxcxdx_t2_ref,
+                                                        xapx,
                                                     )
                                                     .returns(return_value);
 
@@ -246,6 +251,7 @@ mod tests {
                                                     t2,
                                                     t2_ref,
                                                     xaxbxcxdx_t2_ref,
+                                                    xapx,
                                                 );
 
                                                 // Assert
@@ -270,6 +276,7 @@ mod tests {
                                                         t2,
                                                         t2_ref,
                                                         xaxbxcxdx_t2_ref,
+                                                        xapx,
                                                         Times::Once,
                                                     )
                                                     .no_other_calls()
@@ -317,6 +324,7 @@ mod tests {
                                                 let t2 = true;
                                                 let t2_ref = &true;
                                                 let xaxbxcxdx_t2_ref = &&&&&&&&&true;
+                                                let xapx = &&(&(&188) as *const _);
                                                 work::setup(
                                                     a,
                                                     b,
@@ -335,6 +343,7 @@ mod tests {
                                                     t2,
                                                     t2_ref,
                                                     xaxbxcxdx_t2_ref,
+                                                    xapx,
                                                 )
                                                 .returns(return_value);
 
@@ -357,6 +366,7 @@ mod tests {
                                                     t2,
                                                     t2_ref,
                                                     xaxbxcxdx_t2_ref,
+                                                    xapx,
                                                 );
 
                                                 // Assert
@@ -380,6 +390,7 @@ mod tests {
                                                     t2,
                                                     t2_ref,
                                                     xaxbxcxdx_t2_ref,
+                                                    xapx,
                                                     Times::Once,
                                                 )
                                                 .no_other_calls()
@@ -429,6 +440,7 @@ mod tests {
                                                 let t2 = true;
                                                 let t2_ref = &true;
                                                 let xaxbxcxdx_t2_ref = &&&&&&&&&true;
+                                                let xapx = &&(&(&188) as *const _);
                                                 mock.setup
                                                     .work(
                                                         a,
@@ -448,6 +460,7 @@ mod tests {
                                                         t2,
                                                         t2_ref,
                                                         xaxbxcxdx_t2_ref,
+                                                        xapx,
                                                     )
                                                     .returns(return_value);
                                                 mock.setup
@@ -470,6 +483,7 @@ mod tests {
                                                         t2,
                                                         t2_ref,
                                                         xaxbxcxdx_t2_ref,
+                                                        xapx,
                                                     )
                                                     .call_base();
 
@@ -492,6 +506,7 @@ mod tests {
                                                     t2,
                                                     t2_ref,
                                                     xaxbxcxdx_t2_ref,
+                                                    xapx,
                                                 );
 
                                                 // Assert
@@ -515,6 +530,7 @@ mod tests {
                                                     t2,
                                                     t2_ref,
                                                     xaxbxcxdx_t2_ref,
+                                                    xapx,
                                                     Times::Once,
                                                 );
                                                 mock.received
@@ -536,6 +552,7 @@ mod tests {
                                                         t2,
                                                         t2_ref,
                                                         xaxbxcxdx_t2_ref,
+                                                        xapx,
                                                         Times::Once,
                                                     )
                                                     .no_other_calls()

@@ -1,6 +1,7 @@
 use crate::constants;
 use crate::mock_generation::models::*;
 use quote::ToTokens;
+use std::cell::LazyCell;
 use syn::parse::*;
 use syn::*;
 
@@ -30,7 +31,16 @@ pub(crate) fn parse(input: ParseStream) -> Result<StructMockSyntax> {
             continue;
         }
         if item_impl.trait_.is_some() {
-            let trait_impl = TraitImpl { item_impl };
+            let trait_path = item_impl
+                .trait_
+                .as_ref()
+                .expect("trait_impls should contain only trait implementations.")
+                .1
+                .clone();
+            let trait_impl = TraitImpl {
+                trait_path,
+                item_impl,
+            };
             trait_impls.push(trait_impl);
         } else {
             validate_item_impl(&item_impl);
@@ -56,8 +66,13 @@ pub(crate) fn parse(input: ParseStream) -> Result<StructMockSyntax> {
 const STRUCT_MOCK_INVALID_IMPL_TARGET_PATH_ERROR_MSG: &'static str = "(`impl` target's path length) Struct type ident in `impl` block can not be long path, it should be just a single ident.";
 const STRUCT_MOCK_INVALID_IDENT_ERROR_MESSAGE: &'static str =
     "Struct mock should contain only `impl` blocks for it's own type.";
-const STRUCT_MOCK_INVALID_FN_SIG_ERROR_MESSAGE: &'static str = "Struct mock `impl` functions should all be associated.\
-(!) Note: You can ignore `impl` block with `#[unmock]` attribute.";
+const STRUCT_MOCK_INVALID_FN_SIG_ERROR_MESSAGE: LazyCell<String> = LazyCell::new(|| {
+    format!(
+        "Struct mock `impl` functions should all be associated.
+(!) Note: You can ignore `impl` block with `#[{}]` attribute.",
+        constants::IGNORE_IMPL_ATTRIBUTE_IDENT_NAME
+    )
+});
 const NO_NEW_FN_ERROR_MESSAGE: &'static str = "In order to be mockable structure must have function `pub(crate) fn new(args) -> Self`, where `args` is arbitrary collection of user-defined arguments.";
 const NEW_FN_MUST_BE_PUBLIC_ERROR_MESSAGE: &'static str = "Function `new` must be public.";
 const NEW_FN_MUST_HAVE_RETURN_TYPE_ERROR_MESSAGE_PART: &'static str =
@@ -91,7 +106,7 @@ fn validate_item_impl(item_impl: &ItemImpl) {
         {
             continue;
         }
-        panic!("{}", STRUCT_MOCK_INVALID_FN_SIG_ERROR_MESSAGE);
+        panic!("{}", *STRUCT_MOCK_INVALID_FN_SIG_ERROR_MESSAGE);
     }
 }
 

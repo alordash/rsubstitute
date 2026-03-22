@@ -2,32 +2,30 @@ use crate::constants;
 use crate::mock_generation::mock_parts_generation::*;
 use crate::syntax::extensions::*;
 use crate::syntax::*;
-use proc_macro::TokenStream;
 use proc_macro2::Literal;
-use quote::{quote, ToTokens};
+use quote::quote;
 use syn::token::Paren;
 use syn::*;
 
-pub(crate) fn handle(item: TokenStream) -> TokenStream {
-    let item_struct = parse_macro_input!(item as ItemStruct);
-
-    let fmt_args_impl = create_fmt_args_impl_item(&item_struct);
+// TODO - replace all derive attributes with manual generation (because why parse code twice?)
+pub(crate) fn generate(args_checker_struct: &ItemStruct) -> ItemImpl {
+    let fmt_args_impl = create_fmt_args_impl_item(&args_checker_struct);
     let item_impl = ItemImpl {
         attrs: Vec::new(),
         defaultness: None,
         unsafety: None,
         impl_token: Default::default(),
-        generics: item_struct.generics.clone(),
+        generics: generics::remove_default_values(args_checker_struct.generics.clone()),
         trait_: Some((
             None,
             constants::I_ARGS_FORMATTER_TRAIT_PATH.clone(),
             Default::default(),
         )),
-        self_ty: Box::new(r#type::create_from_struct(&item_struct)),
+        self_ty: Box::new(r#type::create_from_struct(&args_checker_struct)),
         brace_token: Default::default(),
         items: vec![fmt_args_impl],
     };
-    return item_impl.into_token_stream().into();
+    return item_impl;
 }
 
 fn create_fmt_args_impl_item(item_struct: &ItemStruct) -> ImplItem {
@@ -70,10 +68,13 @@ fn create_fmt_args_block(item_struct: &ItemStruct) -> Block {
         .iter()
         .skip_while(|field| field::is_phantom_data(field))
         .map(|field| {
-            debug_string_expr::generate(field_access_expr::create(vec![
-                constants::SELF_IDENT.clone(),
-                field.get_required_ident(),
-            ]))
+            debug_string_expr::generate(
+                field_access_expr::create(vec![
+                    constants::SELF_IDENT.clone(),
+                    field.get_required_ident(),
+                ]),
+                None,
+            )
         })
         .collect();
     let tokens = quote! { #literal, #(#args),* };

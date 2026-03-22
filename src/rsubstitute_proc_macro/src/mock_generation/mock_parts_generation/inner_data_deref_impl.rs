@@ -17,7 +17,7 @@ pub(crate) fn generate(
         defaultness: None,
         unsafety: None,
         impl_token: Default::default(),
-        generics: mock_struct.item_struct.generics.clone(),
+        generics: generics::remove_default_values(mock_struct.item_struct.generics.clone()),
         trait_: Some((
             None,
             constants::DEREF_TRAIT_PATH.clone(),
@@ -75,7 +75,7 @@ fn generate_deref_fn_item() -> ImplItem {
     let block = Block {
         brace_token: Default::default(),
         stmts: vec![Stmt::Expr(
-            expr_reference::create(field_access_expr::create(vec![
+            reference::create_expr(field_access_expr::create(vec![
                 constants::SELF_IDENT.clone(),
                 constants::INNER_DATA_FIELD_IDENT.clone(),
             ])),

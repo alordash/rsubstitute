@@ -1,21 +1,24 @@
 use crate::constants;
 use crate::syntax::*;
-use proc_macro::TokenStream;
 use quote::{format_ident, ToTokens};
 use std::cell::LazyCell;
 use syn::punctuated::Punctuated;
 use syn::*;
 
-pub(crate) fn handle(item: TokenStream) -> TokenStream {
-    let item_struct = parse_macro_input!(item as ItemStruct);
-
-    let impl_items = generate_impl_items(&item_struct);
+pub(crate) fn generate(item_struct: &ItemStruct, associated_params_count: usize) -> ItemImpl {
+    let generic_params: Vec<_> = item_struct
+        .generics
+        .params
+        .iter()
+        .skip(1 + associated_params_count)
+        .collect();
+    let impl_items = generate_impl_items(generic_params);
     let item_impl = ItemImpl {
         attrs: Vec::new(),
         defaultness: None,
         unsafety: None,
         impl_token: Default::default(),
-        generics: item_struct.generics.clone(),
+        generics: generics::remove_default_values(item_struct.generics.clone()),
         trait_: Some((
             None,
             constants::I_GENERICS_HASH_KEY_PROVIDER_TRAIT_PATH.clone(),
@@ -30,7 +33,7 @@ pub(crate) fn handle(item: TokenStream) -> TokenStream {
         ],
     };
 
-    return item_impl.into_token_stream().into();
+    return item_impl;
 }
 
 const GENERICS_HASHER_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("GenericsHasher"));
@@ -43,19 +46,18 @@ const HASH_GENERICS_TYPE_IDS_FN_IDENT: LazyCell<Ident> =
 const HASH_CONST_VALUES_FN_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("hash_const_values"));
 
-fn generate_impl_items(item_struct: &ItemStruct) -> ImplItems {
-    let vecs_capacity = item_struct.generics.params.len();
+fn generate_impl_items(generic_params: Vec<&GenericParam>) -> ImplItems {
+    let vecs_capacity = generic_params.len();
     let mut type_params = Vec::with_capacity(vecs_capacity);
     let mut const_params = Vec::with_capacity(vecs_capacity);
-    for generic_param in item_struct.generics.params.iter() {
+    for generic_param in generic_params.iter() {
         match generic_param {
             GenericParam::Type(type_param) => type_params.push(type_param),
             GenericParam::Const(const_param) => const_params.push(const_param),
             _ => (),
         }
     }
-    let get_generic_parameter_infos =
-        generate_get_generic_parameter_infos(&item_struct.generics.params);
+    let get_generic_parameter_infos = generate_get_generic_parameter_infos(&generic_params);
     let hash_generics_type_ids_item = generate_hash_generics_type_ids_item(type_params);
     let hash_const_values_item = generate_hash_const_values_item(const_params);
 
@@ -67,9 +69,7 @@ fn generate_impl_items(item_struct: &ItemStruct) -> ImplItems {
     return impl_items;
 }
 
-fn generate_get_generic_parameter_infos(
-    generic_params: &Punctuated<GenericParam, Token![,]>,
-) -> ImplItem {
+fn generate_get_generic_parameter_infos(generic_params: &[&GenericParam]) -> ImplItem {
     let sig = Signature {
         constness: None,
         asyncness: None,
@@ -93,14 +93,14 @@ fn generate_get_generic_parameter_infos(
     let generic_parameter_infos: Punctuated<Expr, Token![,]> = generic_params
         .iter()
         .filter_map(|generic_param| match generic_param {
-            GenericParam::Type(type_param) => Some(expr_call::create_with_args(
+            GenericParam::Type(type_param) => Some(call::create_with_args(
                 path::create_expr_with_generics(
                     constants::GENERIC_TYPE_INFO_FN_IDENT.clone(),
                     Generics::default(),
                 ),
                 vec![
                     str_lit::create_from_ident(&type_param.ident),
-                    expr_call::create_without_args(path::create_expr_from_parts_with_generics(
+                    call::create_without_args(path::create_expr_from_parts_with_generics(
                         vec![
                             format_ident!("core"),
                             format_ident!("any"),
@@ -124,7 +124,7 @@ fn generate_get_generic_parameter_infos(
                     )),
                 ],
             )),
-            GenericParam::Const(const_param) => Some(expr_call::create_from_ident(
+            GenericParam::Const(const_param) => Some(call::create_from_ident(
                 constants::GENERIC_CONST_INFO_FN_IDENT.clone(),
                 vec![
                     str_lit::create_from_ident(&const_param.ident),
@@ -170,7 +170,7 @@ fn generate_hash_generics_type_ids_item(type_params: Vec<&TypeParam>) -> ImplIte
             bracket_token: Default::default(),
             elems: tid_exprs.collect(),
         };
-        let hash_method_call = expr_method_call::create_with_base_receiver(
+        let hash_method_call = method_call::create_with_base_receiver(
             Expr::Array(tid_array_expr),
             Vec::new(),
             constants::HASH_FN_IDENT.clone(),
@@ -273,7 +273,7 @@ fn generate_tid_expr(type_param: &TypeParam) -> Expr {
             .collect(),
         },
     });
-    let expr = expr_call::create_without_args(func);
+    let expr = call::create_without_args(func);
     return expr;
 }
 
@@ -287,7 +287,7 @@ fn generate_const_hash_stmt(const_param: &ConstParam) -> Stmt {
         }),
         path::create_expr(HASHER_ARG_IDENT.clone()),
     ];
-    let expr = expr_call::create_with_args(path::create_expr(CONST_HASH_FN_IDENT.clone()), args);
+    let expr = call::create_with_args(path::create_expr(CONST_HASH_FN_IDENT.clone()), args);
     let stmt = Stmt::Expr(expr, Some(Default::default()));
     return stmt;
 }

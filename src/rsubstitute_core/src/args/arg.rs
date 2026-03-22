@@ -7,6 +7,8 @@ use std::sync::Arc;
 struct Private;
 
 #[allow(private_interfaces)]
+// TODO - remove 'rs lifetime, it is no longer needed since accepting raw ptr in PrivateIs
+#[repr(C)]
 pub enum Arg<'rs, T> {
     Any,
     #[doc(hidden)]
@@ -20,6 +22,12 @@ pub enum Arg<'rs, T> {
 impl<'rs, T: PartialEq> From<T> for Arg<'rs, T> {
     fn from(value: T) -> Self {
         Arg::eq(value)
+    }
+}
+
+impl<'rs, 'a, T> From<&'a T> for Arg<'rs, *const T> {
+    fn from(value: &'a T) -> Self {
+        Arg::eq(value as *const T)
     }
 }
 
@@ -54,7 +62,8 @@ impl<'rs, T> Arg<'rs, T> {
             };
             return predicate(t_ref);
         };
-        let boxed_anonymous_predicate = Box::new(anonymous_predicate) as Box<dyn Fn(*const ()) -> bool + 'a>;
+        let boxed_anonymous_predicate =
+            Box::new(anonymous_predicate) as Box<dyn Fn(*const ()) -> bool + 'a>;
         return Self::PrivateIs(transmute_lifetime!(boxed_anonymous_predicate), Private);
     }
 

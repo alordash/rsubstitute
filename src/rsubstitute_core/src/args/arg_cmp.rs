@@ -1,3 +1,4 @@
+#[repr(C)]
 pub(crate) struct ArgCmp<T> {
     pub value: T,
     pub comparator: fn(&T, &T) -> bool,

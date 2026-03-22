@@ -4,7 +4,10 @@ use proc_macro2::Ident;
 use syn::*;
 
 pub(crate) fn create(ident: Ident) -> Type {
-    let path = path::create(ident);
+    create_from_path(path::create(ident))
+}
+
+pub(crate) fn create_from_path(path: Path) -> Type {
     let result = Type::Path(TypePath { qself: None, path });
     return result;
 }

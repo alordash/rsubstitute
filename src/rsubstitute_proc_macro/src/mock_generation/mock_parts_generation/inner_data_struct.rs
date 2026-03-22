@@ -12,7 +12,10 @@ pub(crate) fn generate(source_struct: ItemStruct) -> InnerDataStruct {
     item_struct.ident = format_ident!("{}_{}", item_struct.ident, INNER_DATA_STRUCT_IDENT_SUFFIX);
     item_struct.vis = Visibility::Public(Default::default());
     let ty = r#type::create_from_struct(&item_struct);
-    let inner_data_struct = InnerDataStruct { item_struct, ty };
+    let inner_data_struct = InnerDataStruct {
+        item_struct,
+        ty,
+    };
     return inner_data_struct;
 }
 

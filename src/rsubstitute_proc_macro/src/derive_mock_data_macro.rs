@@ -16,7 +16,7 @@ pub(crate) fn handle(item: TokenStream) -> TokenStream {
         defaultness: None,
         unsafety: None,
         impl_token: Default::default(),
-        generics: item_struct.generics.clone(),
+        generics: generics::remove_default_values(item_struct.generics.clone()),
         trait_: Some((
             None,
             path::create(constants::I_MOCK_DATA_TRAIT_IDENT.clone()),
@@ -60,7 +60,7 @@ fn create_get_received_nothing_else_error_msgs_block(item_struct: &ItemStruct) -
             _ => false,
         })
         .map(|field| {
-            expr_method_call::create(
+            method_call::create(
                 vec![constants::SELF_IDENT.clone(), field.get_required_ident()],
                 GET_UNEXPECTED_CALLS_ERROR_MSGS_FN_IDENT.clone(),
                 Vec::new(),

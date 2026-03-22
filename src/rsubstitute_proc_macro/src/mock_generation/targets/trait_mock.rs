@@ -3,6 +3,7 @@ use crate::mock_generation::fn_info_generation::*;
 use crate::mock_generation::mock_parts_generation::models::*;
 use crate::mock_generation::mock_parts_generation::*;
 use crate::mock_generation::models::*;
+use crate::mock_generation::parameters::Target;
 use crate::mock_generation::*;
 use proc_macro::TokenStream;
 use quote::{format_ident, quote};
@@ -14,10 +15,15 @@ pub(crate) fn handle(ctx: &Ctx, item_trait: ItemTrait) -> TokenStream {
         item_trait.ident,
         constants::MOCK_STRUCT_IDENT_PREFIX
     );
-    let mock_generics = mock_generics::generate(&item_trait.generics);
-    let fn_decls = fn_decl::extract(ctx, &mock_generics, &item_trait.items);
-    let target_ident = item_trait.ident.clone();
+    let associated_generics = associated_generics::extract(&item_trait.ident, &item_trait.items);
+    let mock_generics = mock_generics::generate(
+        &item_trait.generics,
+        Target::Trait,
+        Some(&associated_generics),
+    );
     let mock_type = mock_type::generate(mock_ident.clone(), mock_generics);
+    let fn_decls = fn_decl::extract(ctx, &mock_type, &item_trait);
+    let target_ident = item_trait.ident.clone();
     let fn_infos: Vec<_> = fn_decls
         .into_iter()
         .map(|x| fn_info::generate(ctx, x, &mock_type))
@@ -29,14 +35,20 @@ pub(crate) fn handle(ctx: &Ctx, item_trait: ItemTrait) -> TokenStream {
     let mock_received_struct =
         mock_received_struct::generate(&mock_ident, &mock_type, &mock_data_struct, Vec::new());
     let mock_struct = mock_struct::generate(
-        vec![constants::DERIVE_CLONE_FOR_RSUBSTITUTE_ATTRIBUTE.clone()],
+        Vec::new(),
         &mock_type,
         &mock_setup_struct,
         &mock_received_struct,
         &mock_data_struct,
         None,
+        true,
     );
-    let mock_trait_impl = mock_payload_impl::generate(target_ident.clone(), &mock_type, &fn_infos);
+    let mock_trait_impl = mock_payload_impl::generate(
+        target_ident.clone(),
+        &mock_type,
+        &fn_infos,
+        associated_generics,
+    );
     let base_fns: Vec<_> = fn_infos
         .iter()
         .filter_map(|fn_info| {

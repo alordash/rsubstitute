@@ -118,7 +118,7 @@ fn generate_fn_setup_block(fn_info: &FnInfo, output_type: &TypePath) -> Block {
         Type::Path(fn_tuner_type),
         LocalInit {
             eq_token: Default::default(),
-            expr: Box::new(Expr::MethodCall(expr_method_call::create(
+            expr: Box::new(Expr::MethodCall(method_call::create(
                 vec![
                     constants::SELF_IDENT.clone(),
                     constants::DATA_IDENT.clone(),

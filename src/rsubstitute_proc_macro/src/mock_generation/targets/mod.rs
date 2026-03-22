@@ -1,3 +1,3 @@
-pub(crate) mod item_fn;
-pub(crate) mod item_trait;
+pub(crate) mod fn_mock;
+pub(crate) mod trait_mock;
 pub(crate) mod struct_mock;

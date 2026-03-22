@@ -1,3 +1,4 @@
+mod associated_generics_model;
 mod base_fn_model;
 mod generated_mod_model;
 mod implemented_trait_configurator_model;
@@ -23,6 +24,7 @@ mod output_type_lifetime_model;
 mod static_base_fn_model;
 mod static_fn_model;
 
+pub(crate) use associated_generics_model::*;
 pub(crate) use base_fn_model::*;
 pub(crate) use generated_mod_model::*;
 pub(crate) use implemented_trait_configurator_model::*;

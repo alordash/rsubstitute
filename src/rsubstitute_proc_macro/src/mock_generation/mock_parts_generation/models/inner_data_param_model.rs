@@ -4,5 +4,5 @@ use syn::*;
 
 pub(crate) struct InnerDataParam<'a> {
     pub inner_data_struct: &'a InnerDataStruct,
-    pub(crate) constructor_arguments: Vec<(Ident, Type)>,
+    pub constructor_arguments: Vec<(Ident, Type)>,
 }

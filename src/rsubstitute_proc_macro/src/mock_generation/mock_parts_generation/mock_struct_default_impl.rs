@@ -44,7 +44,7 @@ pub(crate) fn generate(
         defaultness: None,
         unsafety: None,
         impl_token: Default::default(),
-        generics: mock_type.generics.impl_generics.clone(),
+        generics: mock_type.generics.impl_generics_without_default_values.clone(),
         trait_: Some((
             None,
             constants::DEFAULT_TRAIT_PATH.clone(),

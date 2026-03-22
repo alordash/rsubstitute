@@ -1,28 +1,24 @@
 use crate::constants;
 use crate::syntax::*;
-use proc_macro::TokenStream;
-use quote::ToTokens;
 use syn::punctuated::Punctuated;
 use syn::*;
 
-pub(crate) fn handle(item: TokenStream) -> TokenStream {
-    let item_struct = parse_macro_input!(item as ItemStruct);
-
+pub(crate) fn generate(item_struct: &ItemStruct) -> ItemImpl {
     let trait_path = path::create(constants::CLONE_TRAIT_IDENT.clone());
-    let self_ty = Box::new(r#type::create_from_struct(&item_struct));
-    let get_arg_infos_fn = generate_clone_fn(&item_struct);
+    let self_ty = Box::new(r#type::create_from_struct(item_struct));
+    let get_arg_infos_fn = generate_clone_fn(item_struct);
     let item_impl = ItemImpl {
         attrs: Vec::new(),
         defaultness: None,
         unsafety: None,
         impl_token: Default::default(),
-        generics: item_struct.generics.clone(),
+        generics: generics::remove_default_values(item_struct.generics.clone()),
         trait_: Some((None, trait_path, Default::default())),
         self_ty,
         brace_token: Default::default(),
         items: vec![get_arg_infos_fn],
     };
-    return item_impl.into_token_stream().into();
+    return item_impl;
 }
 
 fn generate_clone_fn(item_struct: &ItemStruct) -> ImplItem {
@@ -66,11 +62,11 @@ fn generate_field_value(field: &Field) -> FieldValue {
         .ident
         .clone()
         .expect("Call struct fields should have ident.");
-    let field_clone_expr = expr_method_call::create_with_base_receiver(
+    let field_clone_expr = method_call::create_with_base_receiver(
         Expr::Paren(ExprParen {
             attrs: Vec::new(),
             paren_token: Default::default(),
-            expr: Box::new(expr_reference::create(field_access_expr::create(vec![
+            expr: Box::new(reference::create_expr(field_access_expr::create(vec![
                 constants::SELF_IDENT.clone(),
                 field_ident.clone(),
             ]))),

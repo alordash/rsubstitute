@@ -5,7 +5,7 @@ use syn::*;
 
 pub(crate) fn create_with_lifetime_and_into_conversion(field: &Field) -> FieldValue {
     let field_ident = field.get_required_ident();
-    let into_call = Expr::MethodCall(expr_method_call::create(
+    let into_call = Expr::MethodCall(method_call::create(
         vec![field_ident.clone()],
         constants::INTO_FN_IDENT.clone(),
         Vec::new(),

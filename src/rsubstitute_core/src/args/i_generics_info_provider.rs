@@ -4,6 +4,7 @@ use std::hash::{DefaultHasher, Hash, Hasher};
 
 pub type GenericsHasher = DefaultHasher;
 
+// TODO - add #[allow(unused_var)] (warning triggers on hasher arg)
 pub trait IGenericsInfoProvider {
     fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo>;
 

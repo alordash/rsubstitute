@@ -4,7 +4,7 @@ use crate::mock_generation::mock_parts_generation::*;
 use crate::syntax::extensions::*;
 use crate::syntax::*;
 use proc_macro2::Ident;
-use quote::{format_ident, ToTokens};
+use quote::{ToTokens, format_ident};
 use std::cell::LazyCell;
 use syn::punctuated::Punctuated;
 use syn::token::Bracket;
@@ -12,9 +12,10 @@ use syn::*;
 
 pub(crate) fn generate(
     call_struct: &CallStruct,
-    args_checker_struct: &ArgsCheckerStruct,
+    ty_path: TypePath,
+    generics: Generics,
     skipped_fields_count: usize,
-) -> ArgsCheckerTraitImpl {
+) -> ItemImpl {
     let trait_ident = constants::I_ARGS_CHECKER_TRAIT_IDENT.clone();
     let trait_path = Path {
         leading_colon: None,
@@ -25,21 +26,20 @@ pub(crate) fn generate(
         .into_iter()
         .collect(),
     };
-    let self_ty = Box::new(Type::Path(args_checker_struct.ty_path.clone()));
+    let self_ty = Box::new(Type::Path(ty_path));
     let items = generate_check_fn(call_struct, skipped_fields_count);
     let item_impl = ItemImpl {
         attrs: Vec::new(),
         defaultness: None,
         unsafety: None,
         impl_token: Default::default(),
-        generics: args_checker_struct.item_struct.generics.clone(),
+        generics: generics::remove_default_values(generics),
         trait_: Some((None, trait_path, Default::default())),
         self_ty,
         brace_token: Default::default(),
         items: vec![items],
     };
-    let args_checker_impl = ArgsCheckerTraitImpl { item_impl };
-    return args_checker_impl;
+    return item_impl;
 }
 
 const CHECK_FN_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("check"));
@@ -108,7 +108,7 @@ fn generate_call_var_stmt(call_struct: &CallStruct) -> Stmt {
         call_var_type,
         LocalInit {
             eq_token: Default::default(),
-            expr: Box::new(Expr::MethodCall(expr_method_call::create(
+            expr: Box::new(Expr::MethodCall(method_call::create(
                 vec![DYN_CALL_ARG_IDENT.clone()],
                 constants::DYN_CALL_DOWNCAST_REF_FN_IDENT.clone(),
                 Vec::new(),
@@ -125,7 +125,10 @@ fn generate_check_stmt(call_struct: &CallStruct, skipped_fields_count: usize) ->
         .fields
         .iter()
         .skip(skipped_fields_count)
-        .map(|field| generate_check_exprs(field))
+        .zip(call_struct.fields_maybe_actual_source_types.iter())
+        .map(|(field, maybe_actual_source_type)| {
+            generate_check_exprs(field, maybe_actual_source_type)
+        })
         .collect();
     let vec_expr = Expr::Macro(ExprMacro {
         attrs: Vec::new(),
@@ -140,17 +143,17 @@ fn generate_check_stmt(call_struct: &CallStruct, skipped_fields_count: usize) ->
     return stmt;
 }
 
-fn generate_check_exprs(field: &Field) -> Expr {
+fn generate_check_exprs(field: &Field, maybe_actual_source_type: &Option<Type>) -> Expr {
     let field_ident = field.get_required_ident();
     let receiver =
         field_access_expr::create(vec![constants::SELF_IDENT.clone(), field_ident.clone()]);
     let field_name_arg = str_lit::create_from_ident(&field_ident);
-    let field_access_arg = expr_reference::create(field_access_expr::create(vec![
-        CALL_VAR_IDENT.clone(),
-        field_ident,
-    ]));
-    let field_string_value_arg = debug_string_expr::generate(field_access_arg.clone());
-    let method = get_check_fn_ident(&field.ty);
+    let field_access_expr = field_access_expr::create(vec![CALL_VAR_IDENT.clone(), field_ident]);
+    let field_string_value_arg =
+        debug_string_expr::generate(field_access_expr.clone(), maybe_actual_source_type.as_ref());
+    let field_transmute_expr =
+        transmute_lifetime_expr::create_for_expr(reference::create_expr(field_access_expr));
+    let method = get_check_fn_ident(&field.ty, maybe_actual_source_type);
     let expr = Expr::MethodCall(ExprMethodCall {
         attrs: Vec::new(),
         receiver: Box::new(receiver),
@@ -158,23 +161,24 @@ fn generate_check_exprs(field: &Field) -> Expr {
         method,
         turbofish: None,
         paren_token: Default::default(),
-        args: [field_name_arg, field_access_arg, field_string_value_arg]
+        args: [field_name_arg, field_transmute_expr, field_string_value_arg]
             .into_iter()
             .collect(),
     });
     return expr;
 }
 
-fn get_check_fn_ident(ty: &Type) -> Ident {
-    if let Type::Reference(_) = ty {
+fn get_check_fn_ident(ty: &Type, maybe_actual_source_type: &Option<Type>) -> Ident {
+    let checked_ty = maybe_actual_source_type.as_ref().unwrap_or(ty);
+    if let Type::Reference(_) = checked_ty {
         return ARG_CHECK_REF_FN_IDENT.clone();
     }
-    if let Type::Ptr(ptr) = ty
+    if let Type::Ptr(ptr) = checked_ty
         && ptr.mutability.is_some()
     {
         return ARG_CHECK_MUT_REF_FN_IDENT.clone();
     }
-    if let Type::Path(type_path) = ty {
+    if let Type::Path(type_path) = checked_ty {
         if let Some(ident) = type_path.path.segments.last().map(|x| &x.ident) {
             if ident == "Rc" {
                 return ARG_CHECK_RC_FN_IDENT.clone();

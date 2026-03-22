@@ -5,21 +5,21 @@ use crate::*;
 
 pub(crate) fn panic_received_verification_error(
     fn_name: &'static str,
-    args_formatter: &DynArgsChecker,
+    args_checker: &DynArgsChecker,
     matching_calls_check_result: CallsCheckResult,
     non_matching_calls_check_result: CallsCheckResult,
     times: Times,
 ) -> ! {
     let matching_calls_count = matching_calls_check_result.calls_args_check_results.len();
 
-    let generic_parameter_infos = args_formatter.get_generic_parameter_infos();
+    let generic_parameter_infos = args_checker.get_generic_parameter_infos();
     let generic_parameters_msg = fmt_generic_parameter_infos(GenericParameterInfosFormatting::Do(
         &generic_parameter_infos,
     ));
     let expected_call_msg = format!(
         "\t{fn_name}{}({})",
         generic_parameters_msg,
-        args_formatter.fmt_args(),
+        args_checker.fmt_args(),
     );
     let matching_calls_report = if matching_calls_count == 0 {
         "Actually received no matching calls".to_string()

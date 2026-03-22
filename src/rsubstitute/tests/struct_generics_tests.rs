@@ -1,6 +1,8 @@
 use rsubstitute::macros::*;
 use std::fmt::Debug;
 
+trait Trait {}
+
 mocked! {
     struct Struct<'a, T1: ToString, T2>
     where
@@ -10,6 +12,8 @@ mocked! {
         t2_ref: &'a T2,
         number: i32,
     }
+    
+    impl<'a, T1, T2> Trait for Struct<'a, T1, T2> {}
 
     impl<'a, T1: Debug, T2: ToString> Struct<'a, T1, T2> {
         pub fn new(t1: T1, t2_ref: &'a T2, number: i32) -> Self {

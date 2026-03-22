@@ -24,7 +24,7 @@ pub(crate) fn generate(
 
 fn generate_fn_received_block(fn_info: &FnInfo, mock_type: &MockType) -> Block {
     let static_mock_expr = constants::GET_MOCK_FN_CALL_EXPR.clone();
-    let received_clone_expr = Expr::MethodCall(expr_method_call::create_with_base_receiver(
+    let received_clone_expr = Expr::MethodCall(method_call::create_with_base_receiver(
         static_mock_expr,
         vec![constants::MOCK_RECEIVED_FIELD_IDENT.clone()],
         constants::CLONE_FN_IDENT.clone(),
@@ -35,7 +35,7 @@ fn generate_fn_received_block(fn_info: &FnInfo, mock_type: &MockType) -> Block {
             attrs: Vec::new(),
             return_token: Default::default(),
             expr: Some(Box::new(Expr::MethodCall(
-                expr_method_call::create_with_base_receiver(
+                method_call::create_with_base_receiver(
                     received_clone_expr,
                     Vec::new(),
                     constants::MOCK_RECEIVED_FIELD_IDENT.clone(),

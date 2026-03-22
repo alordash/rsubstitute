@@ -22,7 +22,7 @@ mod tests {
 
         // Assert
         let expected_panic_msg = "Mock wasn't configured to handle following call:
-	work<i32, true, f32, 5>(14)";
+	Trait::work<f32, 5>(14)";
         assert_eq!(expected_panic_msg, panic_msg);
     }
 
@@ -42,9 +42,9 @@ mod tests {
 
         // Assert
         let expected_panic_msg = "Mock wasn't configured to handle following call:
-	work<i32, true, f32, 1>(5)
+	Trait::work<f32, 1>(5)
 List of existing configuration ordered by number of correctly matched arguments (non-matching arguments indicated with '*' characters):
-	1. Matched 0/1 arguments: work(*5*)";
+	1. Matched 0/1 arguments: Trait::work(*5*)";
         assert_eq!(expected_panic_msg, panic_msg);
     }
 
@@ -62,7 +62,7 @@ List of existing configuration ordered by number of correctly matched arguments 
 
         // Assert
         let expected_panic_msg =
-            "No return value found for following call: work<i32, true, f32, 1>(5)";
+            "No return value found for following call: Trait::work<f32, 1>(5)";
         assert_eq!(expected_panic_msg, panic_msg);
     }
 
@@ -74,7 +74,8 @@ List of existing configuration ordered by number of correctly matched arguments 
         let actual_value = 5;
         let expected_value = actual_value + 1;
         let returned_value = 3.0f32;
-        mock.setup.work::<f32, 1>(&actual_value).returns(returned_value);
+        const N: usize = 1;
+        mock.setup.work::<f32, N>(&actual_value).returns(returned_value);
 
         // Act
         let actual_returned_value = mock.work::<f32, 1>(&actual_value);
@@ -86,10 +87,10 @@ List of existing configuration ordered by number of correctly matched arguments 
         let actual_value_ptr = core::ptr::from_ref(&actual_value);
         let expected_value_ptr = core::ptr::from_ref(&expected_value);
         let expected_panic_msg = format!("Expected to receive a call exactly once matching:
-	work<i32, true, f32, 1>((&i32): equal to 6)
+	Trait::work<f32, {N}>((&i32): equal to {expected_value})
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-work(*5*)
+Trait::work(*5*)
 	1. v (&i32):
 		Expected reference (ptr: {expected_value_ptr:?}): 6
 		Actual reference   (ptr: {actual_value_ptr:?}): 5");
@@ -114,7 +115,7 @@ work(*5*)
         assert_eq!(returned_value, actual_returned_value);
 
         let expected_panic_msg = "Expected to receive a call exactly once matching:
-	work<i32, true, alloc::string::String, 124>((&i32): equal to 5)
+	Trait::work<alloc::string::String, 124>((&i32): equal to 5)
 Actually received no matching calls
 Received no non-matching calls";
         assert_eq!(expected_panic_msg, panic_msg);
@@ -148,8 +149,8 @@ Received no non-matching calls";
         assert_eq!(second_returned_value, actual_second_returned_value);
 
         let expected_panic_msg = "Did not expect to receive any other calls. Received 2 unexpected calls:
-1. work<i32, true, f32, 1>(5)
-2. work<i32, true, [i32; 3], 200>(100)";
+1. Trait::work<f32, 1>(5)
+2. Trait::work<[i32; 3], 200>(100)";
         assert_eq!(expected_panic_msg, panic_msg);
     }
 }

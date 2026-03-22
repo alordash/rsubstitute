@@ -4,27 +4,27 @@ use std::rc::Rc;
 use std::sync::Arc;
 
 // TODO - right now self type is always `&self` in base methods
-// mocked_base! {
-//     #[derive(Clone)]
-//     struct Struct;
-// 
-//     impl Struct {
-//         pub fn new() -> Self { Self }
-// 
-//         pub fn mutate(&mut self) {}
-// 
-//         pub fn consume(self) -> i32 { 10 }
-// 
-// 
-//         pub fn sbox(self: Box<Self>) -> i32 { 212 }
-//         pub fn src(self: Rc<Self>) -> i32 { 212 }
-//         pub fn sarc(self: Arc<Self>) -> i32 { 212 }
-// 
-//         pub fn spbox(self: Pin<Box<Self>>) -> i32 { 212 }
-//         pub fn sprc(self: Pin<Rc<Self>>) -> i32 { 212 }
-//         pub fn sparc(self: Pin<Arc<Self>>) -> i32 { 212 }
-//     }
-// }
+mocked_base! {
+    #[derive(Clone)]
+    struct Struct;
+
+    impl Struct {
+        pub fn new() -> Self { Self }
+
+        pub fn mutate(&mut self) {}
+
+        pub fn consume(self) -> i32 { 10 }
+
+
+        pub fn sbox(self: Box<Self>) -> i32 { 212 }
+        pub fn src(self: Rc<Self>) -> i32 { 212 }
+        pub fn sarc(self: Arc<Self>) -> i32 { 212 }
+
+        pub fn spbox(self: Pin<Box<Self>>) -> i32 { 212 }
+        pub fn sprc(self: Pin<Rc<Self>>) -> i32 { 212 }
+        pub fn sparc(self: Pin<Arc<Self>>) -> i32 { 212 }
+    }
+}
 
 #[cfg(test)]
 mod tests {
