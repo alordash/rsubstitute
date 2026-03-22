@@ -4,7 +4,7 @@ use crate::mock_generation::mock_parts_generation::*;
 use crate::syntax::extensions::*;
 use crate::syntax::*;
 use proc_macro2::Ident;
-use quote::{format_ident, ToTokens};
+use quote::{ToTokens, format_ident};
 use std::cell::LazyCell;
 use syn::punctuated::Punctuated;
 use syn::token::Bracket;
@@ -153,7 +153,7 @@ fn generate_check_exprs(field: &Field, maybe_actual_source_type: &Option<Type>) 
         debug_string_expr::generate(field_access_expr.clone(), maybe_actual_source_type.as_ref());
     let field_transmute_expr =
         transmute_lifetime_expr::create_for_expr(reference::create_expr(field_access_expr));
-    let method = get_check_fn_ident(&field.ty);
+    let method = get_check_fn_ident(&field.ty, maybe_actual_source_type);
     let expr = Expr::MethodCall(ExprMethodCall {
         attrs: Vec::new(),
         receiver: Box::new(receiver),
@@ -168,16 +168,17 @@ fn generate_check_exprs(field: &Field, maybe_actual_source_type: &Option<Type>) 
     return expr;
 }
 
-fn get_check_fn_ident(ty: &Type) -> Ident {
-    if let Type::Reference(_) = ty {
+fn get_check_fn_ident(ty: &Type, maybe_actual_source_type: &Option<Type>) -> Ident {
+    let checked_ty = maybe_actual_source_type.as_ref().unwrap_or(ty);
+    if let Type::Reference(_) = checked_ty {
         return ARG_CHECK_REF_FN_IDENT.clone();
     }
-    if let Type::Ptr(ptr) = ty
+    if let Type::Ptr(ptr) = checked_ty
         && ptr.mutability.is_some()
     {
         return ARG_CHECK_MUT_REF_FN_IDENT.clone();
     }
-    if let Type::Path(type_path) = ty {
+    if let Type::Path(type_path) = checked_ty {
         if let Some(ident) = type_path.path.segments.last().map(|x| &x.ident) {
             if ident == "Rc" {
                 return ARG_CHECK_RC_FN_IDENT.clone();

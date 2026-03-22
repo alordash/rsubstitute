@@ -25,7 +25,7 @@ pub(crate) fn generate(
         None,
     );
     let impl_item_fn = ImplItemFn {
-        attrs: Vec::new(),
+        attrs: fn_decl.attrs.clone(),
         vis: Visibility::Inherited,
         defaultness: None,
         sig,
@@ -52,7 +52,7 @@ pub(crate) fn generate_struct_trait_fn(
         Some(trait_ident),
     );
     let impl_item_fn = ImplItemFn {
-        attrs: Vec::new(),
+        attrs: fn_decl.attrs.clone(),
         vis: Visibility::Inherited,
         defaultness: None,
         sig,
@@ -78,7 +78,7 @@ pub(crate) fn generate_static(
         None,
     );
     let item_fn = ItemFn {
-        attrs: Vec::new(),
+        attrs: fn_decl.attrs.clone(),
         vis: Visibility::Inherited,
         sig,
         block: Box::new(block),
@@ -115,8 +115,7 @@ fn generate_call_base_fn_parts(
         }),
         Target::Trait => constants::REF_SELF_ARG.clone(),
     };
-    let mut call_struct_ty = call_struct.ty_path.clone();
-    // call_struct_ty.set_first_generic_lifetime_argument(constants::ANONYMOUS_LIFETIME.clone());
+    let call_struct_ty = call_struct.ty_path.clone();
     let call_arg = FnArg::Typed(PatType {
         attrs: Vec::new(),
         pat: Box::new(Pat::Ident(PatIdent {
@@ -252,8 +251,10 @@ fn generate_call_base_fn_block(
 }
 
 fn add_lifetime_constraints_to_generic_types(mut generics: Generics) -> Generics {
+    let default_arg_lifetime = constants::DEFAULT_ARG_LIFETIME.clone();
     let lifetime_param_bounds: Vec<_> = generics
         .lifetimes()
+        .filter(|lifetime_param| lifetime_param.lifetime.ident != default_arg_lifetime.ident)
         .map(|lifetime_param| TypeParamBound::Lifetime(lifetime_param.lifetime.clone()))
         .collect();
     for type_param in generics.type_params_mut() {

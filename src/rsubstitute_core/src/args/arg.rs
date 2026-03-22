@@ -138,18 +138,18 @@ impl<'rs, T> Arg<'rs, T> {
     }
 }
 
-impl<'rs, T: ?Sized> Arg<'rs, *const T> {
+impl<'rs, 'a, T: ?Sized> Arg<'rs, &'a T> {
     pub fn check_ref(
         &self,
         arg_name: &'static str,
-        actual_value: &*const T,
+        actual_value: &&'a T,
         actual_value_str: String,
     ) -> ArgCheckResult {
         let arg_info = ArgInfo::new(arg_name, actual_value, actual_value_str.clone());
-        let actual_ptr = *actual_value;
+        let actual_ptr = core::ptr::from_ref(*actual_value);
         match self {
             Arg::PrivateEq(arg_cmp, _) => {
-                let expected_ptr = arg_cmp.value;
+                let expected_ptr = core::ptr::from_ref(arg_cmp.value);
                 if !core::ptr::eq(actual_ptr, expected_ptr) {
                     let expected_value_str = print_arg(&arg_cmp.value);
                     return ArgCheckResult::Err(ArgCheckResultErr {
@@ -161,7 +161,7 @@ impl<'rs, T: ?Sized> Arg<'rs, *const T> {
                 }
             }
             Arg::PrivateNotEq(arg_cmp, _) => {
-                let not_expected_ptr = arg_cmp.value;
+                let not_expected_ptr = core::ptr::from_ref(arg_cmp.value);
                 if core::ptr::eq(actual_ptr, not_expected_ptr) {
                     let not_expected_value_str = print_arg(&arg_cmp.value);
                     return ArgCheckResult::Err(ArgCheckResultErr {

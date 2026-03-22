@@ -86,10 +86,10 @@ mod tests {
                 || mock.received.accept_value(Arg::Any, Times::Never),
                 format!(
                     r#"Expected to never receive a call matching:
-	accept_value((i32): any)
+	Trait::accept_value((i32): any)
 Actually received 2 matching calls:
-	accept_value({first_value})
-	accept_value({second_value})
+	Trait::accept_value({first_value})
+	Trait::accept_value({second_value})
 Received no non-matching calls"#
                 ),
             );
@@ -97,10 +97,10 @@ Received no non-matching calls"#
                 || mock.received.accept_value(Arg::Any, Times::Once),
                 format!(
                     r#"Expected to receive a call exactly once matching:
-	accept_value((i32): any)
+	Trait::accept_value((i32): any)
 Actually received 2 matching calls:
-	accept_value({first_value})
-	accept_value({second_value})
+	Trait::accept_value({first_value})
+	Trait::accept_value({second_value})
 Received no non-matching calls"#
                 ),
             );
@@ -108,10 +108,10 @@ Received no non-matching calls"#
                 || mock.received.accept_value(Arg::Any, Times::Exactly(3)),
                 format!(
                     r#"Expected to receive a call 3 times matching:
-	accept_value((i32): any)
+	Trait::accept_value((i32): any)
 Actually received 2 matching calls:
-	accept_value({first_value})
-	accept_value({second_value})
+	Trait::accept_value({first_value})
+	Trait::accept_value({second_value})
 Received no non-matching calls"#
                 ),
             );
@@ -136,11 +136,11 @@ Received no non-matching calls"#
                 },
                 format!(
                     r#"Expected to never receive a call matching:
-	accept_value((i32): equal to {first_value})
+	Trait::accept_value((i32): equal to {first_value})
 Actually received 1 matching call:
-	accept_value({first_value})
+	Trait::accept_value({first_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-accept_value(*{second_value}*)
+Trait::accept_value(*{second_value}*)
 	1. v (i32):
 		Expected: {first_value}
 		Actual:   {second_value}"#
@@ -153,11 +153,11 @@ accept_value(*{second_value}*)
                 },
                 format!(
                     r#"Expected to receive a call 3 times matching:
-	accept_value((i32): equal to {first_value})
+	Trait::accept_value((i32): equal to {first_value})
 Actually received 1 matching call:
-	accept_value({first_value})
+	Trait::accept_value({first_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-accept_value(*{second_value}*)
+Trait::accept_value(*{second_value}*)
 	1. v (i32):
 		Expected: {first_value}
 		Actual:   {second_value}"#
@@ -170,11 +170,11 @@ accept_value(*{second_value}*)
                 },
                 format!(
                     r#"Expected to never receive a call matching:
-	accept_value((i32): equal to {second_value})
+	Trait::accept_value((i32): equal to {second_value})
 Actually received 1 matching call:
-	accept_value({second_value})
+	Trait::accept_value({second_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-accept_value(*{first_value}*)
+Trait::accept_value(*{first_value}*)
 	1. v (i32):
 		Expected: {second_value}
 		Actual:   {first_value}"#
@@ -187,11 +187,11 @@ accept_value(*{first_value}*)
                 },
                 format!(
                     r#"Expected to receive a call 3 times matching:
-	accept_value((i32): equal to {second_value})
+	Trait::accept_value((i32): equal to {second_value})
 Actually received 1 matching call:
-	accept_value({second_value})
+	Trait::accept_value({second_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-accept_value(*{first_value}*)
+Trait::accept_value(*{first_value}*)
 	1. v (i32):
 		Expected: {second_value}
 		Actual:   {first_value}"#
@@ -220,11 +220,11 @@ accept_value(*{first_value}*)
                 },
                 format!(
                     r#"Expected to never receive a call matching:
-	accept_value((i32): custom predicate)
+	Trait::accept_value((i32): custom predicate)
 Actually received 1 matching call:
-	accept_value({first_value})
+	Trait::accept_value({first_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-accept_value(*{second_value}*)
+Trait::accept_value(*{second_value}*)
 	1. v (i32):
 		Custom predicate didn't match passed value. Received value: {second_value}"#
                 ),
@@ -238,11 +238,11 @@ accept_value(*{second_value}*)
                 },
                 format!(
                     r#"Expected to receive a call 3 times matching:
-	accept_value((i32): custom predicate)
+	Trait::accept_value((i32): custom predicate)
 Actually received 1 matching call:
-	accept_value({first_value})
+	Trait::accept_value({first_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-accept_value(*{second_value}*)
+Trait::accept_value(*{second_value}*)
 	1. v (i32):
 		Custom predicate didn't match passed value. Received value: {second_value}"#
                 ),
@@ -256,11 +256,11 @@ accept_value(*{second_value}*)
                 },
                 format!(
                     r#"Expected to never receive a call matching:
-	accept_value((i32): custom predicate)
+	Trait::accept_value((i32): custom predicate)
 Actually received 1 matching call:
-	accept_value({second_value})
+	Trait::accept_value({second_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-accept_value(*{first_value}*)
+Trait::accept_value(*{first_value}*)
 	1. v (i32):
 		Custom predicate didn't match passed value. Received value: {first_value}"#
                 ),
@@ -274,11 +274,11 @@ accept_value(*{first_value}*)
                 },
                 format!(
                     r#"Expected to receive a call 3 times matching:
-	accept_value((i32): custom predicate)
+	Trait::accept_value((i32): custom predicate)
 Actually received 1 matching call:
-	accept_value({second_value})
+	Trait::accept_value({second_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-accept_value(*{first_value}*)
+Trait::accept_value(*{first_value}*)
 	1. v (i32):
 		Custom predicate didn't match passed value. Received value: {first_value}"#
                 ),
@@ -320,7 +320,7 @@ accept_value(*{first_value}*)
                 },
                 format!(
                     "Did not expect to receive any other calls. Received 1 unexpected call:
-1. accept_value({second_value})"
+1. Trait::accept_value({second_value})"
                 ),
             );
         }
@@ -347,8 +347,8 @@ accept_value(*{first_value}*)
                 },
                 format!(
                     "Did not expect to receive any other calls. Received 2 unexpected calls:
-1. accept_value({second_value})
-2. accept_value({third_value})"
+1. Trait::accept_value({second_value})
+2. Trait::accept_value({third_value})"
                 ),
             );
         }
@@ -408,7 +408,7 @@ accept_value(*{first_value}*)
 
             // Assert
             assert_eq!(first_value, actual_first_value);
-            assert_eq!("No return value found for following call: return_value()", error_second_value);
+            assert_eq!("No return value found for following call: Trait::return_value()", error_second_value);
             assert_eq!(Result::DidNotChange, *callback_result.borrow());
         }
 
@@ -473,7 +473,7 @@ accept_value(*{first_value}*)
 
             // Assert
             let expected_error_msg = "Mock wasn't configured to handle following call:
-	return_value()";
+	Trait::return_value()";
             assert_eq!(expected_error_msg, actual_error_msg);
         }
     }
@@ -729,9 +729,9 @@ accept_value(*{first_value}*)
                 },
                 format!(
                     r#"Expected to never receive a call matching:
-	accept_two_values_return_value((i32): equal to {v1}, (f32): equal to {v2})
+	Trait::accept_two_values_return_value((i32): equal to {v1}, (f32): equal to {v2})
 Actually received 1 matching call:
-	accept_two_values_return_value({v1}, {v2})
+	Trait::accept_two_values_return_value({v1}, {v2})
 Received no non-matching calls"#
                 ),
             );
@@ -743,9 +743,9 @@ Received no non-matching calls"#
                 },
                 format!(
                     r#"Expected to receive a call 3 times matching:
-	accept_two_values_return_value((i32): equal to {v1}, (f32): equal to {v2})
+	Trait::accept_two_values_return_value((i32): equal to {v1}, (f32): equal to {v2})
 Actually received 1 matching call:
-	accept_two_values_return_value({v1}, {v2})
+	Trait::accept_two_values_return_value({v1}, {v2})
 Received no non-matching calls"#
                 ),
             );
@@ -762,10 +762,10 @@ Received no non-matching calls"#
                 },
                 format!(
                     r#"Expected to receive a call exactly once matching:
-	accept_two_values_return_value((i32): equal to {invalid_expected_v1}, (f32): equal to {invalid_expected_v2})
+	Trait::accept_two_values_return_value((i32): equal to {invalid_expected_v1}, (f32): equal to {invalid_expected_v2})
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-accept_two_values_return_value(*10*, *20.2*)
+Trait::accept_two_values_return_value(*10*, *20.2*)
 	1. v1 (i32):
 		Expected: 11
 		Actual:   10
@@ -796,7 +796,7 @@ accept_two_values_return_value(*10*, *20.2*)
 
             // Assert
             let expected_error_msg = format!(
-                "No return value found for following call: accept_two_values_return_value({unexpected_v1}, {unexpected_v2})"
+                "No return value found for following call: Trait::accept_two_values_return_value({unexpected_v1}, {unexpected_v2})"
             );
             assert_eq!(expected_error_msg, actual_error_msg);
         }

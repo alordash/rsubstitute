@@ -37,8 +37,10 @@ mod tests {
         let mock = TraitMock::new();
 
         let r = &&&5;
+        let r_ptr = core::ptr::from_ref(r);
         let return_value = 175;
         let unexpected_r = &&&14;
+        let unexpected_r_ptr = core::ptr::from_ref(unexpected_r);
 
         mock.setup.accept_ref(r).returns(return_value);
 
@@ -56,8 +58,8 @@ Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
 Trait::accept_ref(*{r}*)
 	1. r (&&&i32):
-		Expected: {unexpected_r}
-		Actual:   {r}"
+		Expected reference (ptr: {unexpected_r_ptr:?}): {unexpected_r}
+		Actual reference   (ptr: {r_ptr:?}): {r}"
         );
         assert_eq!(expected_panic_msg, panic_msg);
     }
@@ -110,8 +112,10 @@ Trait::accept_ref(*{r}*)
         let mock = TraitMock::new();
 
         let r = &&(&&&5 as *const &&i32);
+        let r_ptr = core::ptr::from_ref(r);
         let return_value = 175;
         let unexpected_r = &&(&&&14 as *const &&i32);
+        let unexpected_r_ptr = core::ptr::from_ref(unexpected_r);
 
         mock.setup.accept_ref_ptr(r).returns(return_value);
 
@@ -129,8 +133,8 @@ Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
 Trait::accept_ref_ptr(*{r:?}*)
 	1. r (&&*const &&i32):
-		Expected: {unexpected_r:?}
-		Actual:   {r:?}"
+		Expected reference (ptr: {unexpected_r_ptr:?}): {unexpected_r:?}
+		Actual reference   (ptr: {r_ptr:?}): {r:?}"
         );
         assert_eq!(expected_panic_msg, panic_msg);
     }

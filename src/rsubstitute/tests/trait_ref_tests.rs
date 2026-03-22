@@ -51,9 +51,9 @@ mod tests {
                 || mock.received.accept_ref(Arg::Any, Times::Never),
                 format!(
                     "Expected to never receive a call matching:
-	accept_ref((&i32): any)
+	Trait::accept_ref((&i32): any)
 Actually received 1 matching call:
-	accept_ref({r})
+	Trait::accept_ref({r})
 Received no non-matching calls"
                 ),
             );
@@ -62,9 +62,9 @@ Received no non-matching calls"
                 || mock.received.accept_ref(Arg::Any, Times::Exactly(3)),
                 format!(
                     "Expected to receive a call 3 times matching:
-	accept_ref((&i32): any)
+	Trait::accept_ref((&i32): any)
 Actually received 1 matching call:
-	accept_ref({r})
+	Trait::accept_ref({r})
 Received no non-matching calls"
                 ),
             );
@@ -75,10 +75,10 @@ Received no non-matching calls"
                 || mock.received.accept_ref(invalid_r, Times::Once),
                 format!(
                     "Expected to receive a call exactly once matching:
-	accept_ref((&i32): equal to {invalid_r})
+	Trait::accept_ref((&i32): equal to {invalid_r})
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-accept_ref(*{r}*)
+Trait::accept_ref(*{r}*)
 	1. r (&i32):
 		Expected reference (ptr: {invalid_r_ptr:?}): {invalid_r}
 		Actual reference   (ptr: {r_ptr:?}): {r}"

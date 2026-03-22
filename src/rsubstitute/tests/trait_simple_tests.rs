@@ -108,44 +108,44 @@ mod tests {
         assert_panics(
             || mock.received.f(Times::Once),
             r#"Expected to receive a call exactly once matching:
-	f()
+	Trait::f()
 Actually received 3 matching calls:
-	f()
-	f()
-	f()
+	Trait::f()
+	Trait::f()
+	Trait::f()
 Received no non-matching calls"#,
         );
 
         assert_panics(
             || mock.received.f(Times::Exactly(1)),
             r#"Expected to receive a call exactly once matching:
-	f()
+	Trait::f()
 Actually received 3 matching calls:
-	f()
-	f()
-	f()
+	Trait::f()
+	Trait::f()
+	Trait::f()
 Received no non-matching calls"#,
         );
 
         assert_panics(
             || mock.received.f(Times::Exactly(2)),
             r#"Expected to receive a call 2 times matching:
-	f()
+	Trait::f()
 Actually received 3 matching calls:
-	f()
-	f()
-	f()
+	Trait::f()
+	Trait::f()
+	Trait::f()
 Received no non-matching calls"#,
         );
 
         assert_panics(
             || mock.received.f(Times::Exactly(4)),
             r#"Expected to receive a call 4 times matching:
-	f()
+	Trait::f()
 Actually received 3 matching calls:
-	f()
-	f()
-	f()
+	Trait::f()
+	Trait::f()
+	Trait::f()
 Received no non-matching calls"#,
         );
     }
