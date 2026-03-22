@@ -21,6 +21,6 @@ pub(crate) fn generate(ty: Type) -> Expr {
             .collect(),
         },
     });
-    let global_mock_expr = expr_call::create_without_args(func);
+    let global_mock_expr = call::create_without_args(func);
     return global_mock_expr;
 }

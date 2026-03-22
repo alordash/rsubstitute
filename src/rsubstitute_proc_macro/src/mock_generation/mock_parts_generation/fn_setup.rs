@@ -62,7 +62,7 @@ fn generate_fn_setup_block(fn_info: &FnInfo, mock_type: &MockType) -> Block {
     ));
     let mock_var_expr = path::create_expr(MOCK_VAR_IDENT.clone());
     let reset_stmt = Stmt::Expr(
-        Expr::MethodCall(expr_method_call::create_with_base_receiver(
+        Expr::MethodCall(method_call::create_with_base_receiver(
             mock_var_expr.clone(),
             vec![
                 constants::DATA_IDENT.clone(),
@@ -78,7 +78,7 @@ fn generate_fn_setup_block(fn_info: &FnInfo, mock_type: &MockType) -> Block {
             attrs: Vec::new(),
             return_token: Default::default(),
             expr: Some(Box::new(Expr::MethodCall(
-                expr_method_call::create_with_base_receiver(
+                method_call::create_with_base_receiver(
                     mock_var_expr.clone(),
                     vec![constants::MOCK_SETUP_FIELD_IDENT.clone()],
                     constants::MOCK_SETUP_FIELD_IDENT.clone(),

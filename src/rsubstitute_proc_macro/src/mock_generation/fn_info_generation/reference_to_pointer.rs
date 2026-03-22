@@ -45,6 +45,7 @@ impl VisitMut for ReferenceToPointerConvertor {
             // TODO - is there a better way to do it?
             core::mem::swap(&mut type_ptr.elem, &mut type_reference.elem);
             *i = Type::Ptr(type_ptr);
+            self.changed = true;
         }
 
         visit_mut::visit_type_mut(self, i);

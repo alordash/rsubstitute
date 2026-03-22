@@ -74,7 +74,7 @@ fn create_fmt_args_block(item_struct: &ItemStruct) -> Block {
                     field.get_required_ident(),
                 ]),
                 None,
-            ) // TODO - pass something instead of None (after turning derive macro into part of main code generation)
+            )
         })
         .collect();
     let tokens = quote! { #literal, #(#args),* };

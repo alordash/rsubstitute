@@ -93,14 +93,14 @@ fn generate_get_generic_parameter_infos(generic_params: &[&GenericParam]) -> Imp
     let generic_parameter_infos: Punctuated<Expr, Token![,]> = generic_params
         .iter()
         .filter_map(|generic_param| match generic_param {
-            GenericParam::Type(type_param) => Some(expr_call::create_with_args(
+            GenericParam::Type(type_param) => Some(call::create_with_args(
                 path::create_expr_with_generics(
                     constants::GENERIC_TYPE_INFO_FN_IDENT.clone(),
                     Generics::default(),
                 ),
                 vec![
                     str_lit::create_from_ident(&type_param.ident),
-                    expr_call::create_without_args(path::create_expr_from_parts_with_generics(
+                    call::create_without_args(path::create_expr_from_parts_with_generics(
                         vec![
                             format_ident!("core"),
                             format_ident!("any"),
@@ -124,7 +124,7 @@ fn generate_get_generic_parameter_infos(generic_params: &[&GenericParam]) -> Imp
                     )),
                 ],
             )),
-            GenericParam::Const(const_param) => Some(expr_call::create_from_ident(
+            GenericParam::Const(const_param) => Some(call::create_from_ident(
                 constants::GENERIC_CONST_INFO_FN_IDENT.clone(),
                 vec![
                     str_lit::create_from_ident(&const_param.ident),
@@ -170,7 +170,7 @@ fn generate_hash_generics_type_ids_item(type_params: Vec<&TypeParam>) -> ImplIte
             bracket_token: Default::default(),
             elems: tid_exprs.collect(),
         };
-        let hash_method_call = expr_method_call::create_with_base_receiver(
+        let hash_method_call = method_call::create_with_base_receiver(
             Expr::Array(tid_array_expr),
             Vec::new(),
             constants::HASH_FN_IDENT.clone(),
@@ -273,7 +273,7 @@ fn generate_tid_expr(type_param: &TypeParam) -> Expr {
             .collect(),
         },
     });
-    let expr = expr_call::create_without_args(func);
+    let expr = call::create_without_args(func);
     return expr;
 }
 
@@ -287,7 +287,7 @@ fn generate_const_hash_stmt(const_param: &ConstParam) -> Stmt {
         }),
         path::create_expr(HASHER_ARG_IDENT.clone()),
     ];
-    let expr = expr_call::create_with_args(path::create_expr(CONST_HASH_FN_IDENT.clone()), args);
+    let expr = call::create_with_args(path::create_expr(CONST_HASH_FN_IDENT.clone()), args);
     let stmt = Stmt::Expr(expr, Some(Default::default()));
     return stmt;
 }

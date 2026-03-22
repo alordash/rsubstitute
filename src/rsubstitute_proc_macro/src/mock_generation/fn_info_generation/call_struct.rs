@@ -37,16 +37,16 @@ pub(crate) fn generate(ctx: &Ctx, fn_decl: &FnDecl, mock_generics: &MockGenerics
         r#struct::create(attrs, ident, fn_decl.merged_generics.clone(), fields_named);
     lifetime::normalize_anonymous_lifetimes_in_struct(&mut item_struct);
     let ty_path = r#type::create_from_struct_path(&item_struct);
-    let args_infos_provider_trait_impl =
-        call_args_infos_provider_trait_impl::generate(&item_struct);
+    let args_infos_provider_trait_impl = call_args_infos_provider_trait_impl::generate(
+        &item_struct,
+        &fields_maybe_actual_source_types,
+    );
     let args_tuple_provider_trait_impl =
         call_args_tuple_provider_trait_impl::generate(&item_struct);
     let generics_info_provider_impl =
         generics_info_provider_impl::generate(&item_struct, mock_generics.associated_params_count);
     let maybe_clone_for_rsubstitute_trait_impl = if ctx.support_base_calling {
-        Some(clone_for_rsubstitute_trait_impl::generate(
-            &item_struct,
-        ))
+        Some(clone_for_rsubstitute_trait_impl::generate(&item_struct))
     } else {
         None
     };

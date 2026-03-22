@@ -1,6 +1,6 @@
 use syn::*;
 
-pub(crate) fn create(base_expr: Expr) -> Expr {
+pub(crate) fn create_expr(base_expr: Expr) -> Expr {
     let expr_ref = Expr::Reference(ExprReference {
         attrs: Vec::new(),
         and_token: Default::default(),

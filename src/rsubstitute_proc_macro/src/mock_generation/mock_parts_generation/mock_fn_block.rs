@@ -174,17 +174,17 @@ fn generate_handle_expr(
             ]),
         };
         vec![
-            expr_reference::create(base_receiver.clone()),
+            reference::create_expr(base_receiver.clone()),
             path::create_expr(CALL_VARIABLE_IDENT.clone()),
             base_fn_path,
         ]
     } else {
         vec![
-            expr_reference::create(base_receiver.clone()),
+            reference::create_expr(base_receiver.clone()),
             path::create_expr(CALL_VARIABLE_IDENT.clone()),
         ]
     };
-    let expr_method_call = expr_method_call::create_with_base_receiver_and_expr_args(
+    let expr_method_call = method_call::create_with_base_receiver_and_expr_args(
         base_receiver,
         idents,
         method_name,

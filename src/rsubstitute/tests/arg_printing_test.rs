@@ -124,11 +124,11 @@ Trait::accept_ref(*{r}*)
         let panic_msg = record_panic(|| mock.received.accept_ref_ptr(unexpected_r, Times::Once));
         let expected_panic_msg = format!(
             "Expected to receive a call exactly once matching:
-	Trait::accept_ref_ptr((&&*const &&): equal to {unexpected_r:?})
+	Trait::accept_ref_ptr((&&*const &&i32): equal to {unexpected_r:?})
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
 Trait::accept_ref_ptr(*{r:?}*)
-	1. r (&&*const &&):
+	1. r (&&*const &&i32):
 		Expected: {unexpected_r:?}
 		Actual:   {r:?}"
         );

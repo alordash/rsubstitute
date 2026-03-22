@@ -75,7 +75,7 @@ fn generate_deref_fn_item() -> ImplItem {
     let block = Block {
         brace_token: Default::default(),
         stmts: vec![Stmt::Expr(
-            expr_reference::create(field_access_expr::create(vec![
+            reference::create_expr(field_access_expr::create(vec![
                 constants::SELF_IDENT.clone(),
                 constants::INNER_DATA_FIELD_IDENT.clone(),
             ])),

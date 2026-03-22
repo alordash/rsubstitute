@@ -60,7 +60,7 @@ fn create_get_received_nothing_else_error_msgs_block(item_struct: &ItemStruct) -
             _ => false,
         })
         .map(|field| {
-            expr_method_call::create(
+            method_call::create(
                 vec![constants::SELF_IDENT.clone(), field.get_required_ident()],
                 GET_UNEXPECTED_CALLS_ERROR_MSGS_FN_IDENT.clone(),
                 Vec::new(),

@@ -62,11 +62,11 @@ fn generate_field_value(field: &Field) -> FieldValue {
         .ident
         .clone()
         .expect("Call struct fields should have ident.");
-    let field_clone_expr = expr_method_call::create_with_base_receiver(
+    let field_clone_expr = method_call::create_with_base_receiver(
         Expr::Paren(ExprParen {
             attrs: Vec::new(),
             paren_token: Default::default(),
-            expr: Box::new(expr_reference::create(field_access_expr::create(vec![
+            expr: Box::new(reference::create_expr(field_access_expr::create(vec![
                 constants::SELF_IDENT.clone(),
                 field_ident.clone(),
             ]))),

@@ -138,7 +138,7 @@ define!(
         attrs: Vec::new(),
         member: Member::Named(DATA_IDENT.clone()),
         colon_token: Some(Default::default()),
-        expr: Expr::MethodCall(expr_method_call::create(
+        expr: Expr::MethodCall(method_call::create(
             vec![DATA_IDENT.clone()],
             format_ident!("clone"),
             Vec::new(),
@@ -544,5 +544,5 @@ ident!(GET_MOCK_FN_IDENT, "get_mock");
 define!(
     GET_MOCK_FN_CALL_EXPR,
     Expr,
-    expr_call::create_from_ident(GET_MOCK_FN_IDENT.clone(), Vec::new())
+    call::create_from_ident(GET_MOCK_FN_IDENT.clone(), Vec::new())
 );

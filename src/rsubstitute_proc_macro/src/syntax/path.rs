@@ -60,6 +60,21 @@ pub(crate) fn create_expr_from_parts_with_generics(idents: Vec<Ident>, generics:
     return to_expr(result);
 }
 
+pub(crate) fn create_expr_with_generic_type(ident: Ident, generic_type: Type) -> Expr {
+    let mut result = create(ident);
+    result
+        .segments
+        .last_mut()
+        .expect("Last segment of expr shouldn't be empty.")
+        .arguments = PathArguments::AngleBracketed(AngleBracketedGenericArguments {
+        colon2_token: Some(Default::default()),
+        lt_token: Default::default(),
+        args: [GenericArgument::Type(generic_type)].into_iter().collect(),
+        gt_token: Default::default(),
+    });
+    return to_expr(result);
+}
+
 pub(crate) fn create_expr(ident: Ident) -> Expr {
     to_expr(create(ident))
 }

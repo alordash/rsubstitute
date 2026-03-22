@@ -91,7 +91,7 @@ fn generate_fn_received_block(fn_info: &FnInfo) -> Block {
     let (args_checker_var_ident, args_checker_decl_stmt) =
         input_args::generate_args_checker_var_ident_and_decl_stmt(fn_info);
     let verify_received_stmt = Stmt::Expr(
-        Expr::MethodCall(expr_method_call::create(
+        Expr::MethodCall(method_call::create(
             vec![
                 constants::SELF_IDENT.clone(),
                 constants::DATA_IDENT.clone(),
@@ -109,9 +109,9 @@ fn generate_fn_received_block(fn_info: &FnInfo) -> Block {
         Expr::Return(ExprReturn {
             attrs: Vec::new(),
             return_token: Default::default(),
-            expr: Some(Box::new(expr_call::create(
+            expr: Some(Box::new(call::create(
                 constants::FN_VERIFIER_NEW_FN_EXPR.clone(),
-                Expr::MethodCall(expr_method_call::create_with_base_receiver(
+                Expr::MethodCall(method_call::create_with_base_receiver(
                     constants::SELF_EXPR.clone(),
                     Vec::new(),
                     constants::CLONE_FN_IDENT.clone(),
@@ -131,7 +131,7 @@ fn generate_fn_received_block(fn_info: &FnInfo) -> Block {
 
 fn generate_only_fn() -> ImplItem {
     let verify_received_nothing_else_stmt = Stmt::Expr(
-        Expr::MethodCall(expr_method_call::create(
+        Expr::MethodCall(method_call::create(
             vec![constants::SELF_IDENT.clone(), constants::DATA_IDENT.clone()],
             format_ident!("verify_received_nothing_else"),
             Vec::new(),

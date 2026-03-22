@@ -108,7 +108,7 @@ fn generate_call_var_stmt(call_struct: &CallStruct) -> Stmt {
         call_var_type,
         LocalInit {
             eq_token: Default::default(),
-            expr: Box::new(Expr::MethodCall(expr_method_call::create(
+            expr: Box::new(Expr::MethodCall(method_call::create(
                 vec![DYN_CALL_ARG_IDENT.clone()],
                 constants::DYN_CALL_DOWNCAST_REF_FN_IDENT.clone(),
                 Vec::new(),
@@ -152,7 +152,7 @@ fn generate_check_exprs(field: &Field, maybe_actual_source_type: &Option<Type>) 
     let field_string_value_arg =
         debug_string_expr::generate(field_access_expr.clone(), maybe_actual_source_type.as_ref());
     let field_transmute_expr =
-        transmute_lifetime_expr::create_for_expr(expr_reference::create(field_access_expr));
+        transmute_lifetime_expr::create_for_expr(reference::create_expr(field_access_expr));
     let method = get_check_fn_ident(&field.ty);
     let expr = Expr::MethodCall(ExprMethodCall {
         attrs: Vec::new(),

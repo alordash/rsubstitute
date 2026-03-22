@@ -71,8 +71,8 @@ fn generate_return_stmt(item_struct: &ItemStruct) -> Stmt {
         paren_token: Default::default(),
         elems: fields_exprs,
     });
-    let box_new_expr = expr_call::create(constants::BOX_NEW_EXPR.clone(), tuple_expr);
-    let box_leak_expr = expr_call::create(constants::BOX_LEAK_EXPR.clone(), box_new_expr);
+    let box_new_expr = call::create(constants::BOX_NEW_EXPR.clone(), tuple_expr);
+    let box_leak_expr = call::create(constants::BOX_LEAK_EXPR.clone(), box_new_expr);
     let as_mut_anonymous_expr = Expr::Cast(ExprCast {
         attrs: Vec::new(),
         expr: Box::new(box_leak_expr),
@@ -97,6 +97,6 @@ fn generate_field_expr_ref_expr(field: &Field) -> Expr {
         .expect("Call struct fields should have ident.");
     let field_access =
         field_access_expr::create(vec![constants::SELF_IDENT.clone(), field_ident.clone()]);
-    let field_reference = expr_reference::create(field_access);
+    let field_reference = reference::create_expr(field_access);
     return field_reference;
 }

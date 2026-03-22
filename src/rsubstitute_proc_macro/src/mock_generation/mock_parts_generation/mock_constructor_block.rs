@@ -28,7 +28,7 @@ pub(crate) fn generate(
                 attrs: Vec::new(),
                 member: Member::Named(field_ident.clone()),
                 colon_token: Some(Default::default()),
-                expr: expr_call::create_with_args(func, args),
+                expr: call::create_with_args(func, args),
             }
         })
         .collect();
@@ -70,7 +70,7 @@ pub(crate) fn generate(
         }),
         init: Some(LocalInit {
             eq_token: Default::default(),
-            expr: Box::new(expr_call::create(func, arg)),
+            expr: Box::new(call::create(func, arg)),
             diverge: None,
         }),
         semi_token: Default::default(),
@@ -196,7 +196,7 @@ fn generate_inner_data_stmt(inner_data_param: InnerDataParam) -> Stmt {
         .collect();
     let local_init = LocalInit {
         eq_token: Default::default(),
-        expr: Box::new(expr_call::create_with_args(func, args)),
+        expr: Box::new(call::create_with_args(func, args)),
         diverge: None,
     };
     let local = local::create(constants::INNER_DATA_FIELD_IDENT.clone(), local_init);
