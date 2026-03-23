@@ -4,7 +4,7 @@ use crate::mock_generation::mock_parts_generation::*;
 use crate::syntax::extensions::*;
 use crate::syntax::*;
 use proc_macro2::Ident;
-use quote::{ToTokens, format_ident};
+use quote::{format_ident, ToTokens};
 use std::cell::LazyCell;
 use syn::punctuated::Punctuated;
 use syn::token::Bracket;
@@ -145,8 +145,26 @@ fn generate_check_stmt(call_struct: &CallStruct, skipped_fields_count: usize) ->
 
 fn generate_check_exprs(field: &Field, maybe_actual_source_type: &Option<Type>) -> Expr {
     let field_ident = field.get_required_ident();
-    let receiver =
-        field_access_expr::create(vec![constants::SELF_IDENT.clone(), field_ident.clone()]);
+    let receiver = if let Some(actual_source_type) = maybe_actual_source_type {
+        transmute_lifetime_expr::create_for_expr(Expr::Verbatim(
+            [
+                reference::create_expr(field_access_expr::create(vec![
+                    constants::SELF_IDENT.clone(),
+                    field_ident.clone(),
+                ])),
+                reference::create_expr(Expr::Path(ExprPath {
+                    attrs: Vec::new(),
+                    qself: None,
+                    path: arg_type::create(actual_source_type.clone()).path,
+                })),
+            ]
+            .into_iter()
+            .collect::<Punctuated<_, Token![,]>>()
+            .to_token_stream(),
+        ))
+    } else {
+        field_access_expr::create(vec![constants::SELF_IDENT.clone(), field_ident.clone()])
+    };
     let field_name_arg = str_lit::create_from_ident(&field_ident);
     let field_access_expr = field_access_expr::create(vec![CALL_VAR_IDENT.clone(), field_ident]);
     let field_string_value_arg =

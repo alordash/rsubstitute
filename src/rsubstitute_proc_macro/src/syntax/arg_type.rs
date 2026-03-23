@@ -1,8 +1,8 @@
 use crate::constants;
 use syn::*;
 
-pub(crate) fn create(ty: Type) -> Type {
-    let result = Type::Path(TypePath {
+pub(crate) fn create(ty: Type) -> TypePath {
+    let result = TypePath {
         qself: None,
         path: Path {
             leading_colon: Default::default(),
@@ -12,7 +12,6 @@ pub(crate) fn create(ty: Type) -> Type {
                     colon2_token: None,
                     lt_token: Default::default(),
                     args: [
-                        GenericArgument::Lifetime(constants::DEFAULT_ARG_LIFETIME.clone()),
                         GenericArgument::Type(ty),
                     ]
                     .into_iter()
@@ -23,6 +22,6 @@ pub(crate) fn create(ty: Type) -> Type {
             .into_iter()
             .collect(),
         },
-    });
+    };
     return result;
 }

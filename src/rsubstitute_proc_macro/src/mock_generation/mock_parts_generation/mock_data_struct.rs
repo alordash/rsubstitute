@@ -30,9 +30,11 @@ pub(crate) fn generate_for_trait(mock_type: &MockType, fn_infos: &[&FnInfo]) -> 
             )
         })
         .collect();
-    let fields = [constants::DEFAULT_ARG_LIFETIME_FIELD.clone()]
+    let fields = mock_type
+        .generics
+        .phantom_fields
+        .clone()
         .into_iter()
-        .chain(mock_type.generics.phantom_fields.clone())
         .chain(fn_fields)
         .into_iter()
         .collect();
@@ -80,9 +82,11 @@ pub(crate) fn generate_for_static(mock_type: &MockType, fn_infos: &[&FnInfo]) ->
             )
         })
         .collect();
-    let fields = [constants::DEFAULT_ARG_LIFETIME_FIELD.clone()]
+    let fields = mock_type
+        .generics
+        .phantom_fields
+        .clone()
         .into_iter()
-        .chain(mock_type.generics.phantom_fields.clone())
         .chain(fn_fields)
         .collect();
     let fields_named = FieldsNamed {

@@ -8,8 +8,12 @@ use syn::token::Paren;
 use syn::*;
 
 // TODO - replace all derive attributes with manual generation (because why parse code twice?)
-pub(crate) fn generate(args_checker_struct: &ItemStruct) -> ItemImpl {
-    let fmt_args_impl = create_fmt_args_impl_item(&args_checker_struct);
+pub(crate) fn generate(
+    args_checker_struct: &ItemStruct,
+    fields_maybe_actual_source_types: &[Option<Type>],
+) -> ItemImpl {
+    let fmt_args_impl =
+        create_fmt_args_impl_item(&args_checker_struct, fields_maybe_actual_source_types);
     let item_impl = ItemImpl {
         attrs: Vec::new(),
         defaultness: None,
@@ -28,7 +32,10 @@ pub(crate) fn generate(args_checker_struct: &ItemStruct) -> ItemImpl {
     return item_impl;
 }
 
-fn create_fmt_args_impl_item(item_struct: &ItemStruct) -> ImplItem {
+fn create_fmt_args_impl_item(
+    item_struct: &ItemStruct,
+    fields_maybe_actual_source_types: &[Option<Type>],
+) -> ImplItem {
     let sig = Signature {
         constness: None,
         asyncness: None,
@@ -42,7 +49,7 @@ fn create_fmt_args_impl_item(item_struct: &ItemStruct) -> ImplItem {
         variadic: None,
         output: ReturnType::Type(Default::default(), Box::new(constants::STRING_TYPE.clone())),
     };
-    let block = create_fmt_args_block(item_struct);
+    let block = create_fmt_args_block(item_struct, fields_maybe_actual_source_types);
     let impl_item_fn = ImplItemFn {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
@@ -54,7 +61,10 @@ fn create_fmt_args_impl_item(item_struct: &ItemStruct) -> ImplItem {
     return impl_item;
 }
 
-fn create_fmt_args_block(item_struct: &ItemStruct) -> Block {
+fn create_fmt_args_block(
+    item_struct: &ItemStruct,
+    fields_maybe_actual_source_types: &[Option<Type>],
+) -> Block {
     let literal_str = item_struct
         .fields
         .iter()
@@ -67,13 +77,14 @@ fn create_fmt_args_block(item_struct: &ItemStruct) -> Block {
         .fields
         .iter()
         .skip_while(|field| field::is_phantom_data(field))
-        .map(|field| {
+        .zip(fields_maybe_actual_source_types)
+        .map(|(field, maybe_actual_source_type)| {
             debug_string_expr::generate(
                 field_access_expr::create(vec![
                     constants::SELF_IDENT.clone(),
                     field.get_required_ident(),
                 ]),
-                None,
+                maybe_actual_source_type.as_ref(),
             )
         })
         .collect();

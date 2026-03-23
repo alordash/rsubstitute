@@ -54,4 +54,7 @@ macro_rules! transmute_lifetime {
     ($expr:expr) => {
         unsafe { core::mem::transmute($expr) }
     };
+    ($expr:expr, $ty:ty) => {
+        unsafe { core::mem::transmute::<_, $ty>($expr) }
+    };
 }

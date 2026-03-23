@@ -1,9 +1,7 @@
-use crate::constants;
 use crate::mock_generation::mock_parts_generation::models::*;
 use crate::mock_generation::parameters::*;
 use crate::mock_generation::*;
 use crate::syntax::generics;
-use syn::punctuated::Punctuated;
 use syn::*;
 
 pub(crate) fn generate(
@@ -12,23 +10,12 @@ pub(crate) fn generate(
     maybe_associated_generics: Option<&AssociatedGenerics>,
 ) -> MockGenerics {
     let mut modified_source_generics = source_generics.clone();
-    modified_source_generics.params.insert(
-        0,
-        GenericParam::Lifetime(LifetimeParam {
-            attrs: Vec::new(),
-            lifetime: constants::DEFAULT_ARG_LIFETIME.clone(),
-            colon_token: None,
-            bounds: Punctuated::new(),
-        }),
-    );
     let mut associated_params_count = 0;
     if let Some(associated_generics) = maybe_associated_generics {
         associated_params_count = associated_generics.generics_params.len();
-        for generics_param in associated_generics.generics_params.iter().rev() {
-            modified_source_generics
-                .params
-                .insert(1, generics_param.clone());
-        }
+        modified_source_generics
+            .params
+            .extend(associated_generics.generics_params.clone());
     }
     match target {
         Target::Static => (),

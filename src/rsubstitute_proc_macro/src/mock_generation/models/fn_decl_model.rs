@@ -48,6 +48,6 @@ impl FnDecl {
     }
 
     pub(crate) fn get_internal_phantom_types_count(&self) -> usize {
-        self.internal_phantom_fields.len() + 1
+        self.internal_phantom_fields.len()
     }
 }

@@ -84,7 +84,10 @@ fn generate(
         OutputTypeGenerics::DoNotUse => Default::default(),
     };
     generics = generics.with_head_lifetime_param(constants::PLACEHOLDER_LIFETIME_PARAM.clone());
-    generics = referenced_generic_types_lifetimes_filler::fill(generics, mock_type, &own_inputs);
+    generics =
+        placeholder_lifetime_constrainer::add_mutual_lifetime_bounds(generics, &mock_type.generics);
+    // TODO - remove?
+    // generics = referenced_generic_types_lifetimes_filler::fill(generics, mock_type, &own_inputs);
 
     let mut inputs: Vec<_> = own_inputs
         .into_iter()
@@ -111,8 +114,7 @@ fn generate(
     return signature;
 }
 
-fn generate_output_type(mut arg_refs_tuple: Type, owner_type: Type) -> Type {
-    lifetime::normalize_anonymous_lifetimes(&mut arg_refs_tuple);
+fn generate_output_type(arg_refs_tuple: Type, owner_type: Type) -> Type {
     let result = Type::Path(TypePath {
         qself: None,
         path: Path {

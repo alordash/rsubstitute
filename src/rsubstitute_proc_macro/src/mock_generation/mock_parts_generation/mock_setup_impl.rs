@@ -69,7 +69,10 @@ fn generate_fn_setup(
         Target::Static => Default::default(),
     };
     generics = generics.with_head_lifetime_param(constants::PLACEHOLDER_LIFETIME_PARAM.clone());
-    generics = referenced_generic_types_lifetimes_filler::fill(generics, mock_type, &own_inputs);
+    generics =
+        placeholder_lifetime_constrainer::add_mutual_lifetime_bounds(generics, &mock_type.generics);
+    // TODO - remove? (i odnt even remember what this is for lol)
+    // generics = referenced_generic_types_lifetimes_filler::fill(generics, mock_type, &own_inputs);
 
     let sig = Signature {
         constness: None,

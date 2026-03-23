@@ -278,8 +278,7 @@ define!(
         Type::Path(TypePath {
             qself: None,
             path: SELF_TYPE_PATH.clone(),
-        }),
-        Some(DEFAULT_ARG_LIFETIME.clone()),
+        }),None,
     )
 );
 
@@ -376,21 +375,6 @@ define!(
     path::create_expr(PHANTOM_DATA_IDENT.clone())
 );
 
-ident!(DEFAULT_ARG_LIFETIME_FIELD_IDENT, "_phantom_lifetime");
-
-define!(
-    DEFAULT_ARG_LIFETIME_FIELD,
-    Field,
-    Field {
-        attrs: Vec::new(),
-        vis: Visibility::Inherited,
-        mutability: FieldMutability::None,
-        ident: Some(DEFAULT_ARG_LIFETIME_FIELD_IDENT.clone()),
-        colon_token: Some(Default::default()),
-        ty: r#type::phantom_data_lifetime(DEFAULT_ARG_LIFETIME.clone()),
-    }
-);
-
 ident!(RETURN_TYPE_PHANTOM_FIELD_IDENT, "_return_type");
 
 define!(
@@ -412,15 +396,7 @@ define!(
     }
 );
 
-pub(crate) const DEFAULT_ARG_LIFETIME_NAME: &'static str = "__rs";
-define!(
-    DEFAULT_ARG_LIFETIME,
-    Lifetime,
-    Lifetime::new(&format!("'{DEFAULT_ARG_LIFETIME_NAME}"), Span::call_site())
-);
-
 pub(crate) const PLACEHOLDER_LIFETIME_NAME: &'static str = "__rsa";
-ident!(PLACEHOLDER_LIFETIME_IDENT, PLACEHOLDER_LIFETIME_NAME);
 define!(
     PLACEHOLDER_LIFETIME,
     Lifetime,

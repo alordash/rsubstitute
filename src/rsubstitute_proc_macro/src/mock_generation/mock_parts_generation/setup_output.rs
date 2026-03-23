@@ -1,6 +1,7 @@
 use crate::constants;
 use crate::mock_generation::fn_info_generation::models::*;
 use crate::mock_generation::mock_parts_generation::models::*;
+use crate::syntax::extensions::ITypePathExtensions;
 use crate::syntax::*;
 use syn::*;
 
@@ -22,13 +23,14 @@ pub(crate) fn generate_for_static(
 ) -> TypePath {
     let owner_type = mock_setup_struct.ty.clone();
     let stores_mock_data = false;
-    let ty = generate(
+    let mut ty = generate(
         mock_type,
         fn_info,
         owner_type,
         OutputTypeLifetime::Default,
         stores_mock_data,
     );
+    ty = ty.set_first_generic_lifetime_argument(constants::PLACEHOLDER_LIFETIME.clone());
     return ty;
 }
 
@@ -39,8 +41,7 @@ fn generate(
     output_type_lifetime: OutputTypeLifetime,
     stores_mock_data: bool,
 ) -> TypePath {
-    let mut arg_refs_tuple = fn_info.parent.arg_refs_tuple.clone();
-    lifetime::normalize_anonymous_lifetimes(&mut arg_refs_tuple);
+    let arg_refs_tuple = fn_info.parent.arg_refs_tuple.clone();
     let mut return_type = fn_info.parent.get_return_value_type();
     let placeholder_lifetime = constants::PLACEHOLDER_LIFETIME.clone();
     lifetime::set_all_lifetimes(&mut return_type, &placeholder_lifetime);

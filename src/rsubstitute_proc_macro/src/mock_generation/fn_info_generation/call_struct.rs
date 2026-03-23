@@ -1,4 +1,5 @@
 use crate::mock_generation::fn_info_generation::models::*;
+use crate::mock_generation::fn_info_generation::reference_to_pointer::ConversionStrategy;
 use crate::mock_generation::fn_info_generation::*;
 use crate::mock_generation::mock_parts_generation::models::*;
 use crate::mock_generation::models::*;
@@ -6,7 +7,6 @@ use crate::syntax::*;
 use crate::*;
 use quote::format_ident;
 use syn::*;
-use crate::mock_generation::fn_info_generation::reference_to_pointer::ConversionStrategy;
 
 // TODO - add #[repr(C)] to generated CallStruct and ArgsCheckerStruct
 pub(crate) fn generate(ctx: &Ctx, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> CallStruct {
@@ -24,8 +24,10 @@ pub(crate) fn generate(ctx: &Ctx, fn_decl: &FnDecl, mock_generics: &MockGenerics
         fn_fields.push(fn_field_info.field);
         fields_maybe_actual_source_types.push(fn_field_info.maybe_actual_source_type);
     }
-    let struct_fields = core::iter::once(constants::DEFAULT_ARG_LIFETIME_FIELD.clone())
-        .chain(mock_generics.phantom_fields.iter().cloned())
+    let struct_fields = mock_generics
+        .phantom_fields
+        .iter()
+        .cloned()
         .chain(fn_decl.internal_phantom_fields.iter().cloned())
         .chain(fn_fields)
         .collect();
@@ -34,9 +36,7 @@ pub(crate) fn generate(ctx: &Ctx, fn_decl: &FnDecl, mock_generics: &MockGenerics
         named: struct_fields,
     };
 
-    let mut item_struct =
-        r#struct::create(attrs, ident, fn_decl.merged_generics.clone(), fields_named);
-    lifetime::normalize_anonymous_lifetimes_in_struct(&mut item_struct);
+    let item_struct = r#struct::create(attrs, ident, fn_decl.merged_generics.clone(), fields_named);
     let ty_path = r#type::create_from_struct_path(&item_struct);
     let args_infos_provider_trait_impl = call_args_infos_provider_trait_impl::generate(
         &item_struct,
@@ -80,7 +80,8 @@ fn try_convert_fn_arg_to_field(arg_number: usize, fn_arg: &FnArg) -> Option<Fiel
         }),
         rest => rest.clone(),
     };
-    let conversion_result = reference_to_pointer::convert_in_type(ty, ConversionStrategy::AllReferences);
+    let conversion_result =
+        reference_to_pointer::convert_in_type(ty, ConversionStrategy::AllReferences);
     ty = conversion_result.new_type;
     let ident = arg_ident::extract(arg_number, pat_type);
 
