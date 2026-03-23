@@ -44,6 +44,10 @@ fn generate(
     let mut return_type = fn_info.parent.get_return_value_type();
     let placeholder_lifetime = constants::PLACEHOLDER_LIFETIME.clone();
     lifetime::set_all_lifetimes(&mut return_type, &placeholder_lifetime);
+    let mock_arg_type = match fn_info.parent.maybe_actual_self_type.as_ref() {
+        None => Type::Path(mock_type.ty_path.clone()),
+        Some(actual_self_type) => *actual_self_type.ty.clone(),
+    };
     let result = TypePath {
         qself: None,
         path: Path {
@@ -55,10 +59,11 @@ fn generate(
                     lt_token: Default::default(),
                     args: [
                         GenericArgument::Lifetime(output_type_lifetime.get()),
-                        GenericArgument::Type(mock_type.ty.clone()),
+                        GenericArgument::Type(Type::Path(mock_type.ty_path.clone())),
                         GenericArgument::Type(owner_type),
                         GenericArgument::Type(arg_refs_tuple),
                         GenericArgument::Type(return_type),
+                        GenericArgument::Type(mock_arg_type),
                         GenericArgument::Const(bool_lit::create(
                             fn_info.parent.maybe_base_fn_block.is_some(),
                         )),

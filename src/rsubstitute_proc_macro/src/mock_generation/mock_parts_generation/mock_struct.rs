@@ -55,10 +55,12 @@ pub(crate) fn generate(
     } else {
         None
     };
+    let as_ref_trait_impl = as_ref::create_trait_impl_for_struct_as_self(&item_struct, &ty);
     let result = MockStruct {
         item_struct,
         ty,
         maybe_clone_for_rsubstitute_trait_impl,
+        as_ref_trait_impl
     };
     return result;
 }

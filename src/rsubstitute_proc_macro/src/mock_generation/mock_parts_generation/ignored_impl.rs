@@ -14,5 +14,5 @@ fn fix_single(mock_type: &MockType, ignored_impl: &mut ItemImpl) {
         &ignored_impl.generics,
     );
     ignored_impl.generics = merged_generics;
-    *ignored_impl.self_ty = mock_type.ty.clone();
+    *ignored_impl.self_ty = Type::Path(mock_type.ty_path.clone());
 }

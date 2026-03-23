@@ -19,10 +19,10 @@ fn generate_core(
     mock_generics: MockGenerics,
     stores_mock_data: bool,
 ) -> MockType {
-    let ty = r#type::create_with_generics(mock_ident.clone(), mock_generics.impl_generics.clone());
+    let ty_path = r#type::create_with_generics_path(mock_ident.clone(), mock_generics.impl_generics.clone());
     let mock_type = MockType {
         ident: mock_ident,
-        ty,
+        ty_path,
         generics: mock_generics,
         stores_mock_data,
     };

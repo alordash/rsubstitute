@@ -5,8 +5,8 @@ use crate::mock_data::*;
 use crate::*;
 use std::cell::RefCell;
 use std::collections::HashMap;
-use std::sync::Arc;
 use std::sync::atomic::AtomicUsize;
+use std::sync::Arc;
 
 pub struct FnData<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool> {
     fn_name: &'static str,
@@ -38,6 +38,7 @@ impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool
         TOwner,
         TArgRefsTuple: Copy,
         TReturnValue,
+        TMockArg,
     >(
         &self,
         args_checker: TArgsChecker,
@@ -48,6 +49,7 @@ impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool
         TOwner,
         TArgRefsTuple,
         TReturnValue,
+        TMockArg,
         SUPPORTS_BASE_CALLING,
         STORES_MOCK_DATA,
     > {
@@ -112,21 +114,21 @@ impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool
 }
 
 impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, false, STORES_MOCK_DATA> {
-    pub fn handle<'a, TCall: ICall + 'a>(&self, mock: &TMock, the_call: TCall) {
+    pub fn handle<'a, TMockArg, TCall: ICall + 'a>(&self, mock_arg: TMockArg, the_call: TCall) {
         let call = Arc::new(DynCall::new(the_call));
         let maybe_fn_config = self.try_get_matching_config(&call);
         self.register_call(call.clone());
         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
             fn_config.borrow_mut().register_call(call.clone());
             if let Some(callback) = fn_config.borrow().get_callback() {
-                callback.borrow_mut()(mock as *const TMock as *const (), call.as_ref());
+                callback.borrow_mut()(&mock_arg as *const TMockArg as *const (), call.as_ref());
             }
         }
     }
 
-    pub fn handle_returning<'a, 'b, TCall: ICall + 'a, TReturnValue: IReturnValue<'b>>(
+    pub fn handle_returning<'a, 'b, TMockArg, TCall: ICall + 'a, TReturnValue: IReturnValue<'b>>(
         &self,
-        mock: &TMock,
+        mock_arg: TMockArg,
         the_call: TCall,
     ) -> TReturnValue {
         let dyn_call = DynCall::new(the_call);
@@ -136,7 +138,7 @@ impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, false, STORES_
         fn_config.borrow_mut().register_call(call.clone());
         let fn_config_ref = fn_config.borrow();
         if let Some(callback) = fn_config_ref.get_callback() {
-            callback.borrow_mut()(mock as *const TMock as *const (), call.as_ref());
+            callback.borrow_mut()(&mock_arg as *const TMockArg as *const (), call.as_ref());
         }
         drop(fn_config_ref);
         let Some(return_value) = fn_config.borrow_mut().select_next_return_value(&call) else {
@@ -151,11 +153,11 @@ impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, false, STORES_
 }
 
 impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, true, STORES_MOCK_DATA> {
-    pub fn handle_base<'a, TCall: ICall + Clone + 'a>(
+    pub fn handle_base<'a, TMockArg, TCall: ICall + Clone + 'a>(
         &self,
-        mock: &TMock,
+        mock_arg: TMockArg,
         the_call: TCall,
-        mut base_call: impl FnMut(&TMock, TCall),
+        mut base_call: impl FnMut(TMockArg, TCall),
     ) {
         let call_for_base_call = the_call.clone();
         let dyn_call = DynCall::new(the_call);
@@ -165,23 +167,25 @@ impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, true, STORES_M
         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
             fn_config.borrow_mut().register_call(call.clone());
             let fn_config_ref = fn_config.borrow();
-            if fn_config_ref.should_call_base() {
-                base_call(mock, call_for_base_call);
-            }
+            // TODO - verify through tests that callbacks are called before base_fn
             if let Some(callback) = fn_config_ref.get_callback() {
-                callback.borrow_mut()(mock as *const TMock as *const (), call.as_ref());
+                callback.borrow_mut()(&mock_arg as *const TMockArg as *const (), call.as_ref());
+            }
+            if fn_config_ref.should_call_base() {
+                base_call(mock_arg, call_for_base_call);
             }
         }
     }
 
     pub fn handle_base_returning<
         'a,
+        TMockArg,
         TCall: ICall + Clone,
         TReturnValue: IReturnValue<'a>,
-        TBaseCall: FnMut(&'a TMock, TCall) -> TReturnValue,
+        TBaseCall: FnMut(TMockArg, TCall) -> TReturnValue,
     >(
         &self,
-        mock: &'a TMock,
+        mock_arg: TMockArg,
         the_call: TCall,
         mut base_call: TBaseCall,
     ) -> TReturnValue {
@@ -192,12 +196,12 @@ impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, true, STORES_M
         self.register_call(call.clone());
         fn_config.borrow_mut().register_call(call.clone());
         let fn_config_ref = fn_config.borrow();
-        if fn_config_ref.should_call_base() {
-            let base_return_value = base_call(mock, call_for_base_call);
-            return base_return_value;
-        }
         if let Some(callback) = fn_config_ref.get_callback() {
-            callback.borrow_mut()(mock as *const TMock as *const (), call.as_ref());
+            callback.borrow_mut()(&mock_arg as *const TMockArg as *const (), call.as_ref());
+        }
+        if fn_config_ref.should_call_base() {
+            let base_return_value = base_call(mock_arg, call_for_base_call);
+            return base_return_value;
         }
         drop(fn_config_ref);
         let Some(return_value) = fn_config.borrow_mut().select_next_return_value(&call) else {

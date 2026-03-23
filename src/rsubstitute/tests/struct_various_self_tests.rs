@@ -30,7 +30,7 @@ mocked_base! {
         pub fn sparc(self: Pin<Arc<Self>>) -> i32 { 212 }
         
         // TODO - support
-        // pub fn nested<'a>(self: &mut &'a Arc<Rc<Box<Box<Struct>>>>) -> i32 { 212 }
+        pub fn nested<'a>(self: &mut &'a Arc<Rc<Box<Box<Struct>>>>) -> i32 { 212 }
     }
 }
 

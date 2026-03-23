@@ -220,14 +220,18 @@ fn convert_mock_received_struct(mock_received_struct: MockReceivedStruct) -> [It
 }
 
 fn convert_mock_struct(mock_struct: MockStruct) -> Vec<Item> {
-    core::iter::once(Item::Struct(mock_struct.item_struct))
-        .chain(
-            mock_struct
-                .maybe_clone_for_rsubstitute_trait_impl
-                .map(Item::Impl)
-                .into_iter(),
-        )
-        .collect()
+    [
+        Item::Struct(mock_struct.item_struct),
+        Item::Impl(mock_struct.as_ref_trait_impl),
+    ]
+    .into_iter()
+    .chain(
+        mock_struct
+            .maybe_clone_for_rsubstitute_trait_impl
+            .map(Item::Impl)
+            .into_iter(),
+    )
+    .collect()
 }
 
 fn create_item_mod(ident: Ident, items: Vec<Item>) -> ItemMod {

@@ -25,7 +25,7 @@ pub fn generate(mock_type: &MockType) -> ItemFn {
         output: ReturnType::Type(
             Default::default(),
             Box::new(r#type::reference(
-                mock_type.ty.clone(),
+                Type::Path(mock_type.ty_path.clone()),
                 Some(constants::PLACEHOLDER_LIFETIME.clone()),
             )),
         ),
@@ -34,7 +34,7 @@ pub fn generate(mock_type: &MockType) -> ItemFn {
     let block = Block {
         brace_token: Default::default(),
         stmts: vec![Stmt::Expr(
-            get_global_mock_expr::generate(mock_type.ty.clone()),
+            get_global_mock_expr::generate(Type::Path(mock_type.ty_path.clone())),
             None,
         )],
     };

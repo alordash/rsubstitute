@@ -60,7 +60,7 @@ pub(crate) fn create_expr_from_parts_with_generics(idents: Vec<Ident>, generics:
     return to_expr(result);
 }
 
-pub(crate) fn create_expr_with_generic_type(ident: Ident, generic_type: Type) -> Expr {
+pub(crate) fn create_with_generic_type(ident: Ident, generic_type: Type) -> Path {
     let mut result = create(ident);
     result
         .segments
@@ -72,7 +72,11 @@ pub(crate) fn create_expr_with_generic_type(ident: Ident, generic_type: Type) ->
         args: [GenericArgument::Type(generic_type)].into_iter().collect(),
         gt_token: Default::default(),
     });
-    return to_expr(result);
+    return result;
+}
+
+pub(crate) fn create_expr_with_generic_type(ident: Ident, generic_type: Type) -> Expr {
+    to_expr(create_with_generic_type(ident, generic_type))
 }
 
 pub(crate) fn create_expr(ident: Ident) -> Expr {

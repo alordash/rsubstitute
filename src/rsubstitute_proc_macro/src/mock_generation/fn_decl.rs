@@ -2,9 +2,9 @@ use crate::constants;
 use crate::mock_generation::fn_decl::associated_types_idents_replacer::AssociatedTypesIdentsReplacer;
 use crate::mock_generation::mock_parts_generation::models::*;
 use crate::mock_generation::models::*;
-use crate::mock_generation::parameters::Target;
 use crate::mock_generation::*;
 use crate::syntax::*;
+use std::ops::Deref;
 use syn::visit_mut::VisitMut;
 use syn::*;
 
@@ -46,7 +46,6 @@ pub(crate) fn extract_struct_trait_impl_fns(
             create_fn_decl(
                 ctx,
                 mock_type,
-                Target::Trait,
                 GenericsStrategy::MergeWithMockGenerics,
                 trait_impl_fn.attrs.clone(),
                 &trait_impl_fn.sig,
@@ -64,7 +63,6 @@ pub(crate) fn extract_fn(ctx: &Ctx, mock_type: &MockType, item_fn: &ItemFn) -> F
     let fn_decl = create_fn_decl(
         ctx,
         mock_type,
-        Target::Static,
         GenericsStrategy::UseMockGenerics,
         item_fn.attrs.clone(),
         &item_fn.sig,
@@ -100,7 +98,6 @@ fn map_trait_item_fn(
     let fn_decl = create_fn_decl(
         ctx,
         mock_type,
-        Target::Trait,
         GenericsStrategy::MergeWithMockGenerics,
         trait_item_fn.attrs.clone(),
         sig,
@@ -117,7 +114,6 @@ fn map_impl_item_fn(ctx: &Ctx, mock_type: &MockType, impl_item_fn: &ImplItemFn) 
     let fn_decl = create_fn_decl(
         ctx,
         mock_type,
-        Target::Trait,
         GenericsStrategy::MergeWithMockGenerics,
         impl_item_fn.attrs.clone(),
         sig,
@@ -132,7 +128,6 @@ fn map_impl_item_fn(ctx: &Ctx, mock_type: &MockType, impl_item_fn: &ImplItemFn) 
 fn create_fn_decl(
     ctx: &Ctx,
     mock_type: &MockType,
-    target: Target,
     generics_strategy: GenericsStrategy,
     attrs: Vec<Attribute>,
     sig: &Signature,
@@ -169,16 +164,21 @@ fn create_fn_decl(
     };
     let arguments: Vec<_> = actual_sig.inputs.iter().cloned().collect();
     let arg_refs_tuple = generate_arg_refs_tuple(&arguments);
-    let internal_phantom_fields: Vec<_> = match target {
-        Target::Trait => actual_sig
-            .generics
-            .params
-            .iter()
-            .filter_map(phantom_field::try_map_generic_param)
-            .chain(maybe_phantom_return_field)
-            .collect(),
-        Target::Static => Vec::new(),
-    };
+    let internal_phantom_fields: Vec<_> = actual_sig
+        .inputs
+        .iter()
+        .enumerate()
+        .flat_map(|(arg_number, fn_arg)| phantom_field::try_create_for_fn_arg(arg_number, fn_arg))
+        .chain(
+            actual_sig
+                .generics
+                .params
+                .iter()
+                .filter_map(phantom_field::try_map_generic_param),
+        )
+        .chain(maybe_phantom_return_field)
+        .collect();
+    let maybe_actual_self_type = try_get_actual_self_type(&actual_sig, &mock_type.ty_path);
 
     let fn_decl = FnDecl {
         attrs,
@@ -192,6 +192,7 @@ fn create_fn_decl(
         maybe_base_fn_block: maybe_base_fn_block.filter(|_| ctx.support_base_calling),
         internal_phantom_fields,
         arg_refs_tuple,
+        maybe_actual_self_type,
     };
     return fn_decl;
 }
@@ -234,7 +235,56 @@ fn generate_arg_refs_tuple(fn_args: &[FnArg]) -> Type {
     return result;
 }
 
+fn try_get_actual_self_type(sig: &Signature, inferred_type_path: &TypePath) -> Option<Receiver> {
+    let Some(FnArg::Receiver(mut receiver)) = sig.inputs.get(0).cloned() else {
+        return None;
+    };
+    if is_type_receiver_self(&receiver.ty) {
+        receiver.colon_token = None;
+    } else {
+        let mut self_type_inferrer = SelfTypeInferrer { inferred_type_path };
+        self_type_inferrer.visit_receiver_mut(&mut receiver);
+    }
+    return Some(receiver.clone());
+}
+
+fn is_type_receiver_self(ty: &Type) -> bool {
+    match ty {
+        Type::Path(type_path) => is_type_path_receiver_self(type_path),
+        Type::Reference(TypeReference { elem, .. }) => {
+            if let Type::Path(type_path) = elem.deref() {
+                is_type_path_receiver_self(type_path)
+            } else {
+                false
+            }
+        }
+        _ => false,
+    }
+}
+
+fn is_type_path_receiver_self(ty_path: &TypePath) -> bool {
+    ty_path
+        .path
+        .get_ident()
+        .is_some_and(|ident| ident == constants::SELF_TYPE_NAME)
+}
+
 enum GenericsStrategy {
     MergeWithMockGenerics,
     UseMockGenerics,
+}
+
+struct SelfTypeInferrer<'a> {
+    pub inferred_type_path: &'a TypePath,
+}
+
+impl<'a> VisitMut for SelfTypeInferrer<'a> {
+    fn visit_type_path_mut(&mut self, i: &mut TypePath) {
+        if is_type_path_receiver_self(i) {
+            *i = self.inferred_type_path.clone();
+            return;
+        }
+
+        visit_mut::visit_type_path_mut(self, i);
+    }
 }

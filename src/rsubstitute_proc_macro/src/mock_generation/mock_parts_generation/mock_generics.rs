@@ -34,11 +34,14 @@ pub(crate) fn generate(
         Target::Static => (),
         _ => associated_params_count += source_generics.params.len(),
     };
-    let phantom_fields = modified_source_generics
-        .params
-        .iter()
-        .filter_map(phantom_field::try_map_generic_param)
-        .collect();
+    let phantom_fields = match target {
+        Target::Trait => modified_source_generics
+            .params
+            .iter()
+            .filter_map(phantom_field::try_map_generic_param)
+            .collect(),
+        Target::Static => Vec::new(),
+    };
     let impl_generics_without_default_values =
         generics::remove_default_values(modified_source_generics.clone());
     let mock_generics = MockGenerics {

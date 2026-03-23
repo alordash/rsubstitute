@@ -6,6 +6,7 @@ use crate::syntax::*;
 use crate::*;
 use quote::format_ident;
 use syn::*;
+use crate::mock_generation::fn_info_generation::reference_to_pointer::ConversionStrategy;
 
 // TODO - add #[repr(C)] to generated CallStruct and ArgsCheckerStruct
 pub(crate) fn generate(ctx: &Ctx, fn_decl: &FnDecl, mock_generics: &MockGenerics) -> CallStruct {
@@ -79,7 +80,7 @@ fn try_convert_fn_arg_to_field(arg_number: usize, fn_arg: &FnArg) -> Option<Fiel
         }),
         rest => rest.clone(),
     };
-    let conversion_result = reference_to_pointer::convert_in_type(ty);
+    let conversion_result = reference_to_pointer::convert_in_type(ty, ConversionStrategy::AllReferences);
     ty = conversion_result.new_type;
     let ident = arg_ident::extract(arg_number, pat_type);
 

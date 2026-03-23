@@ -266,10 +266,9 @@ define!(
     path::create(format_ident!("format"))
 );
 
-ident!(SELF_TYPE_IDENT, "Self");
-
+pub const SELF_TYPE_NAME: &'static str = "Self";
+ident!(SELF_TYPE_IDENT, SELF_TYPE_NAME);
 define!(SELF_TYPE_PATH, Path, path::create(SELF_TYPE_IDENT.clone()));
-
 define!(SELF_TYPE, Type, r#type::create(SELF_TYPE_IDENT.clone()));
 
 define!(
@@ -546,3 +545,6 @@ define!(
     Expr,
     call::create_from_ident(GET_MOCK_FN_IDENT.clone(), Vec::new())
 );
+
+ident!(AS_REF_TRAIT_IDENT, "AsRef");
+ident!(AS_REF_FN_IDENT, "as_ref");

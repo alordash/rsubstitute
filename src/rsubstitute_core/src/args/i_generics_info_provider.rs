@@ -8,9 +8,11 @@ pub type GenericsHasher = DefaultHasher;
 pub trait IGenericsInfoProvider {
     fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo>;
 
-    fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher);
+    // TODO - add #[allow(unused)] on hasher in generated impl
+    fn hash_generics_type_ids(&self, #[allow(unused)] hasher: &mut GenericsHasher);
 
-    fn hash_const_values(&self, hasher: &mut GenericsHasher);
+    // TODO - add #[allow(unused_args)] on hasher in generated impl
+    fn hash_const_values(&self, #[allow(unused)] hasher: &mut GenericsHasher);
 
     fn get_generics_hash_key(&self) -> GenericsHashKey {
         let mut hasher = GenericsHasher::new();

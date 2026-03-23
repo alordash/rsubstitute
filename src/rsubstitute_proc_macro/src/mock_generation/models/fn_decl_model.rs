@@ -15,6 +15,7 @@ pub(crate) struct FnDecl {
     pub maybe_base_fn_block: Option<Block>,
     pub internal_phantom_fields: Vec<Field>,
     pub arg_refs_tuple: Type,
+    pub maybe_actual_self_type: Option<Receiver>,
 }
 
 impl FnDecl {

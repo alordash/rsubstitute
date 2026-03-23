@@ -9,4 +9,4 @@ pub(crate) struct FnInfo {
     pub data_field_ident: Ident,
 }
 
-// TODO - (idk where to write) remote _phantom_Lifetime
+// TODO - (idk where to write) remove _phantom_Lifetime from Call/ArgChecker/etc structs
