@@ -215,10 +215,7 @@ fn generate_call_base_fn_block(
         )
         .collect();
     let mut call_struct_generics = call_struct.item_struct.generics.clone();
-    lifetime::set_all_lifetimes_in_generics(
-        &mut call_struct_generics,
-        &constants::ANONYMOUS_LIFETIME.clone(),
-    );
+    lifetime::anonymize_lifetimes_in_generics(&mut call_struct_generics);
     let deconstruct_call_stmt = Stmt::Local(Local {
         attrs: vec![
             constants::ALLOW_NON_SHORTHAND_FIELD_PATTERNS_ATTRIBUTE.clone(),

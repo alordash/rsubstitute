@@ -26,10 +26,18 @@ pub(crate) fn set_all_lifetimes(ty: &mut Type, new_lifetime: &Lifetime) {
     lifetime_replacer.visit_type_mut(ty);
 }
 
-pub(crate) fn set_all_lifetimes_in_generics(generics: &mut Generics, new_lifetime: &Lifetime) {
+pub(crate) fn anonymize_lifetimes_in_generics(generics: &mut Generics) {
+    let anonymous_lifetime = constants::ANONYMOUS_LIFETIME.clone();
     let mut lifetime_replacer =
-        LifetimeReplacer::new(ReplacementStrategy::ReplaceAll(new_lifetime));
+        LifetimeReplacer::new(ReplacementStrategy::ReplaceAll(&anonymous_lifetime));
     lifetime_replacer.visit_generics_mut(generics);
+}
+
+pub(crate) fn anonymize_lifetimes_in_type_path(type_path: &mut TypePath) {
+    let anonymous_lifetime = constants::ANONYMOUS_LIFETIME.clone();
+    let mut lifetime_replacer =
+        LifetimeReplacer::new(ReplacementStrategy::ReplaceAll(&anonymous_lifetime));
+    lifetime_replacer.visit_type_path_mut(type_path);
 }
 
 pub(crate) fn remove_all_lifetimes(ty: &mut Type) {

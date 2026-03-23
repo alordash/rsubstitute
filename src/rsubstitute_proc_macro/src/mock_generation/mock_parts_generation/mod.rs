@@ -6,7 +6,6 @@ pub(crate) mod debug_string_expr;
 pub(crate) mod fn_get_mock;
 pub(crate) mod fn_received;
 pub(crate) mod fn_setup;
-pub(crate) mod get_global_mock_expr;
 pub(crate) mod ignored_impl;
 pub(crate) mod implemented_trait_ident;
 pub(crate) mod inner_data_deref_impl;
