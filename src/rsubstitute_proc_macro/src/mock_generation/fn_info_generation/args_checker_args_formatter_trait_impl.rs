@@ -79,13 +79,13 @@ fn create_fmt_args_block(
         .skip_while(|field| field::is_phantom_data(field))
         .zip(fields_maybe_actual_source_types)
         .map(|(field, maybe_actual_source_type)| {
-            debug_string_expr::generate(
-                field_access_expr::create(vec![
-                    constants::SELF_IDENT.clone(),
-                    field.get_required_ident(),
-                ]),
-                maybe_actual_source_type.as_ref(),
-            )
+            let field_ident = field.get_required_ident();
+            let receiver = if let Some(actual_source_type) = maybe_actual_source_type {
+                transmute_lifetime_expr::create_for_arg(field_ident, actual_source_type.clone())
+            } else {
+                field_access_expr::create(vec![constants::SELF_IDENT.clone(), field_ident])
+            };
+            debug_string_expr::generate(receiver, None)
         })
         .collect();
     let tokens = quote! { #literal, #(#args),* };

@@ -146,22 +146,7 @@ fn generate_check_stmt(call_struct: &CallStruct, skipped_fields_count: usize) ->
 fn generate_check_exprs(field: &Field, maybe_actual_source_type: &Option<Type>) -> Expr {
     let field_ident = field.get_required_ident();
     let receiver = if let Some(actual_source_type) = maybe_actual_source_type {
-        transmute_lifetime_expr::create_for_expr(Expr::Verbatim(
-            [
-                reference::create_expr(field_access_expr::create(vec![
-                    constants::SELF_IDENT.clone(),
-                    field_ident.clone(),
-                ])),
-                reference::create_expr(Expr::Path(ExprPath {
-                    attrs: Vec::new(),
-                    qself: None,
-                    path: arg_type::create(actual_source_type.clone()).path,
-                })),
-            ]
-            .into_iter()
-            .collect::<Punctuated<_, Token![,]>>()
-            .to_token_stream(),
-        ))
+        transmute_lifetime_expr::create_for_arg(field_ident.clone(), actual_source_type.clone())
     } else {
         field_access_expr::create(vec![constants::SELF_IDENT.clone(), field_ident.clone()])
     };
