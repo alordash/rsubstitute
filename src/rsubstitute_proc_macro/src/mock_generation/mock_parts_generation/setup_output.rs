@@ -41,7 +41,8 @@ fn generate(
     output_type_lifetime: OutputTypeLifetime,
     stores_mock_data: bool,
 ) -> TypePath {
-    let arg_refs_tuple = fn_info.parent.arg_refs_tuple.clone();
+    let mut arg_refs_tuple = fn_info.parent.arg_refs_tuple.clone();
+    lifetime::placehold_anonymouys_lifetimes(&mut arg_refs_tuple);
     let mut return_type = fn_info.parent.get_return_value_type();
     let placeholder_lifetime = constants::PLACEHOLDER_LIFETIME.clone();
     lifetime::set_all_lifetimes(&mut return_type, &placeholder_lifetime);

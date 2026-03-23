@@ -114,7 +114,8 @@ fn generate(
     return signature;
 }
 
-fn generate_output_type(arg_refs_tuple: Type, owner_type: Type) -> Type {
+fn generate_output_type(mut arg_refs_tuple: Type, owner_type: Type) -> Type {
+    lifetime::placehold_anonymouys_lifetimes(&mut arg_refs_tuple);
     let result = Type::Path(TypePath {
         qself: None,
         path: Path {

@@ -54,7 +54,9 @@ macro_rules! transmute_lifetime {
     ($expr:expr) => {
         unsafe { core::mem::transmute($expr) }
     };
+    // `transmute` alias just so that IDE doesn't highlight `$ty` as unsafe.
     ($expr:expr, $ty:ty) => {
-        unsafe { core::mem::transmute::<_, $ty>($expr) }
+        use core::mem::transmute as transmute;
+        unsafe { transmute::<_, $ty>($expr) }
     };
 }
