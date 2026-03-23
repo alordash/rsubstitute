@@ -10,17 +10,11 @@ pub(crate) fn generate(
     maybe_associated_generics: Option<&AssociatedGenerics>,
 ) -> MockGenerics {
     let mut modified_source_generics = source_generics.clone();
-    let mut associated_params_count = 0;
     if let Some(associated_generics) = maybe_associated_generics {
-        associated_params_count = associated_generics.generics_params.len();
         modified_source_generics
             .params
             .extend(associated_generics.generics_params.clone());
     }
-    match target {
-        Target::Static => (),
-        _ => associated_params_count += source_generics.params.len(),
-    };
     let phantom_fields = match target {
         Target::Trait => modified_source_generics
             .params
@@ -36,7 +30,6 @@ pub(crate) fn generate(
         impl_generics: modified_source_generics,
         impl_generics_without_default_values,
         phantom_fields,
-        associated_params_count,
     };
     return mock_generics;
 }

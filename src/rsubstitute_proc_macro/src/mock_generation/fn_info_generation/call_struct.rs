@@ -45,7 +45,7 @@ pub(crate) fn generate(ctx: &Ctx, fn_decl: &FnDecl, mock_generics: &MockGenerics
     let args_tuple_provider_trait_impl =
         call_args_tuple_provider_trait_impl::generate(&item_struct);
     let generics_info_provider_impl =
-        generics_info_provider_impl::generate(&item_struct, mock_generics.associated_params_count);
+        generics_info_provider_impl::generate(&item_struct);
     let maybe_clone_for_rsubstitute_trait_impl = if ctx.support_base_calling {
         Some(clone_for_rsubstitute_trait_impl::generate(&item_struct))
     } else {

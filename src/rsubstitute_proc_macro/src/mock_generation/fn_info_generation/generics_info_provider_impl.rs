@@ -5,12 +5,11 @@ use std::cell::LazyCell;
 use syn::punctuated::Punctuated;
 use syn::*;
 
-pub(crate) fn generate(item_struct: &ItemStruct, associated_params_count: usize) -> ItemImpl {
+pub(crate) fn generate(item_struct: &ItemStruct) -> ItemImpl {
     let generic_params: Vec<_> = item_struct
         .generics
         .params
         .iter()
-        .skip(1 + associated_params_count)
         .collect();
     let impl_items = generate_impl_items(generic_params);
     let item_impl = ItemImpl {

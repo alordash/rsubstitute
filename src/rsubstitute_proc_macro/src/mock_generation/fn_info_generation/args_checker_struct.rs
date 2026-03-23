@@ -42,7 +42,7 @@ pub(crate) fn generate(
 
     let item_struct = r#struct::create(attrs, ident, fn_decl.merged_generics.clone(), fields_named);
     let generics_info_provider_impl =
-        generics_info_provider_impl::generate(&item_struct, mock_generics.associated_params_count);
+        generics_info_provider_impl::generate(&item_struct);
     let ty_path = r#type::create_from_struct_path(&item_struct);
 
     let args_checker_trait_impl = args_checker_trait_impl::generate(
