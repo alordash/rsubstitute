@@ -4,17 +4,22 @@ use std::rc::Rc;
 use std::sync::Arc;
 
 // TODO - right now self type is always `&self` in base methods
+// TODO - add also methods that accept mut self and that do not return anything
+// TODO - also test callbacks - they must receive reference to same `self` type that was used in fn
+// definition and VERIFY that data passed to them is correct
+// type Alias = Struct;
 mocked_base! {
     #[derive(Clone)]
-    struct Struct;
+    struct Struct {
+        pub number: i32
+    }
 
     impl Struct {
-        pub fn new() -> Self { Self }
+        pub fn new(number: i32) -> Self { Self { number } }
 
         pub fn mutate(&mut self) {}
 
         pub fn consume(self) -> i32 { 10 }
-
 
         pub fn sbox(self: Box<Self>) -> i32 { 212 }
         pub fn src(self: Rc<Self>) -> i32 { 212 }
@@ -23,6 +28,9 @@ mocked_base! {
         pub fn spbox(self: Pin<Box<Self>>) -> i32 { 212 }
         pub fn sprc(self: Pin<Rc<Self>>) -> i32 { 212 }
         pub fn sparc(self: Pin<Arc<Self>>) -> i32 { 212 }
+        
+        // TODO - support
+        // pub fn nested<'a>(self: &mut &'a Arc<Rc<Box<Box<Struct>>>>) -> i32 { 212 }
     }
 }
 
@@ -37,9 +45,13 @@ mod tests {
 
     #[test]
     fn flex() {
-        let mut mock = Struct::new();
+        let number = 45;
+        let mut mock = Struct::new(number);
 
-        mock.setup.sbox().call_base();
+        mock.setup
+            .sbox()
+            .call_base()
+            .and_does(move |s, _| assert_eq!(number, s.number));
         mock.setup.src().call_base();
         mock.setup.sarc().call_base();
 
