@@ -73,31 +73,29 @@ fn generate_fn_setup_block(fn_info: &FnInfo, mock_type: &MockType) -> Block {
         )),
         Some(Default::default()),
     );
-    let return_stmt = Stmt::Expr(
-        Expr::Return(ExprReturn {
-            attrs: Vec::new(),
-            return_token: Default::default(),
-            expr: Some(Box::new(Expr::MethodCall(
-                method_call::create_with_base_receiver(
-                    mock_var_expr.clone(),
-                    vec![constants::MOCK_SETUP_FIELD_IDENT.clone()],
-                    constants::MOCK_SETUP_FIELD_IDENT.clone(),
-                    fn_info
-                        .args_checker_struct
-                        .item_struct
-                        .fields
-                        .iter()
-                        .skip(
-                            fn_info.parent.get_internal_phantom_types_count()
-                                + mock_type.generics.get_phantom_fields_count(),
-                        )
-                        .map(IFieldExtensions::get_required_ident)
-                        .collect(),
-                ),
-            ))),
-        }),
-        Some(Default::default()),
-    );
+    let return_epxr = Expr::Return(ExprReturn {
+        attrs: Vec::new(),
+        return_token: Default::default(),
+        expr: Some(Box::new(transmute_lifetime_expr::create_for_expr(
+            Expr::MethodCall(method_call::create_with_base_receiver(
+                mock_var_expr.clone(),
+                vec![constants::MOCK_SETUP_FIELD_IDENT.clone()],
+                constants::MOCK_SETUP_FIELD_IDENT.clone(),
+                fn_info
+                    .args_checker_struct
+                    .item_struct
+                    .fields
+                    .iter()
+                    .skip(
+                        fn_info.parent.get_internal_phantom_types_count()
+                            + mock_type.generics.get_phantom_fields_count(),
+                    )
+                    .map(IFieldExtensions::get_required_ident)
+                    .collect(),
+            )),
+        ))),
+    });
+    let return_stmt = Stmt::Expr(return_epxr, Some(Default::default()));
     let stmts = vec![mock_var_stmt, reset_stmt, return_stmt];
     let block = Block {
         brace_token: Default::default(),
