@@ -2,8 +2,6 @@
 pub use rsubstitute_core::args::*;
 pub use rsubstitute_core::*;
 
-mod global_mocks_map;
-
 pub mod macros {
     pub use rsubstitute_proc_macro::*;
 }
@@ -13,10 +11,10 @@ pub mod prelude {
     pub use macros::*;
 }
 
+// TODO - review it, maybe something is no longer needed
 #[allow(unused_imports)]
 pub mod for_generated {
     pub use crate::*;
-    pub use global_mocks_map::*;
     pub use macros::*;
     pub use rsubstitute_core::fn_parameters::*;
     pub use rsubstitute_core::mock_data::*;

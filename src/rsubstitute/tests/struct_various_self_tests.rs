@@ -1,927 +1,2167 @@
-use rsubstitute::macros::*;
+mod test_utils;
+
+use rsubstitute::prelude::*;
 use std::pin::Pin;
 use std::rc::Rc;
 use std::sync::Arc;
 
-// TODO - right now self type is always `&self` in base methods
-// TODO - add also methods that accept mut self and that do not return anything
 // TODO - also test callbacks - they must receive reference to same `self` type that was used in fn
-// definition and VERIFY that data passed to them is correct
-// type Alias = Struct;
-// mocked_base! {
-//     #[derive(Clone)]
-//     struct Struct {
-//         pub number: i32
-//     }
-//
-//     impl Struct {
-//         pub fn new(number: i32) -> Self { Self { number } }
-//
-//         pub fn mutate(&mut self) {}
-//
-//         pub fn consume(self) -> i32 { 10 }
-//
-//         pub fn sbox(self: Box<Self>) -> i32 { 212 }
-//         pub fn src(self: Rc<Self>) -> i32 { 212 }
-//         pub fn sarc(self: Arc<Self>) -> i32 { 212 }
-//
-//         pub fn spbox(self: Pin<Box<Self>>) -> i32 { 212 }
-//         pub fn sprc(self: Pin<Rc<Self>>) -> i32 { 212 }
-//         pub fn sparc(self: Pin<Arc<Self>>) -> i32 { 212 }
-//
-//         // TODO - support
-//         pub fn nested<'a>(self: &mut &'a Arc<Rc<Box<Box<Struct>>>>) -> i32 { 212 }
-//     }
-// }
+#[rustfmt::skip]
+#[allow(unused)]
+mod consts {
+    pub const BY_VALUE:                                       i32 = 1 ;
+    pub const BY_VALUE_COLON:                                 i32 = 2 ;
+    pub const BY_MUT_VALUE:                                   i32 = 3 ;
+    pub const BY_MUT_VALUE_COLON:                             i32 = 4 ;
+    pub const BY_REF:                                         i32 = 5 ;
+    pub const BY_REF_COLON:                                   i32 = 6 ;
+    pub const BY_REF_WITH_LIFETIME:                           i32 = 7 ;
+    pub const BY_REF_COLON_WITH_LIFETIME:                     i32 = 8 ;
+    pub const BY_REF_MUT:                                     i32 = 9 ;
+    pub const BY_REF_MUT_COLON:                               i32 = 10;
+    pub const BY_REF_MUT_WITH_LIFETIME:                       i32 = 11;
+    pub const BY_REF_MUT_COLON_WITH_LIFETIME:                 i32 = 12;
+    pub const BY_BOX:                                         i32 = 13;
+    pub const BY_BOX_REF:                                     i32 = 14;
+    pub const BY_BOX_REF_MUT:                                 i32 = 15;
+    pub const BY_MUT_BOX:                                     i32 = 16;
+    pub const BY_MUT_BOX_REF:                                 i32 = 17;
+    pub const BY_MUT_BOX_REF_MUT:                             i32 = 18;
+    pub const BY_RC:                                          i32 = 19;
+    pub const BY_RC_REF:                                      i32 = 20;
+    pub const BY_RC_REF_MUT:                                  i32 = 21;
+    pub const BY_MUT_RC:                                      i32 = 22;
+    pub const BY_MUT_RC_REF:                                  i32 = 23;
+    pub const BY_MUT_RC_REF_MUT:                              i32 = 24;
+    pub const BY_ARC:                                         i32 = 25;
+    pub const BY_ARC_REF:                                     i32 = 26;
+    pub const BY_ARC_REF_MUT:                                 i32 = 27;
+    pub const BY_MUT_ARC:                                     i32 = 28;
+    pub const BY_MUT_ARC_REF:                                 i32 = 29;
+    pub const BY_MUT_ARC_REF_MUT:                             i32 = 30;
+    pub const BY_PIN_REF:                                     i32 = 31;
+    pub const BY_PIN_REF_MUT:                                 i32 = 32;
+    pub const BY_MUT_PIN_REF:                                 i32 = 33;
+    pub const BY_MUT_PIN_REF_MUT:                             i32 = 34;
+    pub const BY_MUT_REF_MUT_BOX_MUT_REF_MUT_WITH_LIFETIMES:  i32 = 35;
+    pub const BY_MUT_REF_MUT_RC_MUT_REF_MUT_WITH_LIFETIMES:   i32 = 36;
+    pub const BY_MUT_REF_MUT_ARC_MUT_REF_MUT_WITH_LIFETIMES:  i32 = 37;
+    pub const BY_MUT_REF_MUT_PIN_MUT_REF_MUT_WITH_LIFETIMES:  i32 = 38;
+    pub const NESTED:                                         i32 = 39;
+}
+use consts::*;
 
+mocked_base! {
+    #[derive(Clone)]
+    struct Struct;
+
+    #[rustfmt::skip]
+    #[allow(unused_mut)] // TODO - this should disable warnings
+    impl Struct {
+        pub fn new() -> Self { Self }
+
+        pub fn by_value          (    self      ) {}
+        pub fn by_value_colon    (    self: Self) {}
+        pub fn by_mut_value      (mut self      ) {}
+        pub fn by_mut_value_colon(mut self: Self) {}
+
+        pub fn by_ref                            (&       self              ) {}
+        pub fn by_ref_colon                      (        self: &       Self) {}
+        pub fn by_ref_with_lifetime          <'a>(&'a     self              ) {}
+        pub fn by_ref_colon_with_lifetime    <'a>(        self: &'a     Self) {}
+        pub fn by_ref_mut                        (&   mut self              ) {}
+        pub fn by_ref_mut_colon                  (        self: &   mut Self) {}
+        pub fn by_ref_mut_with_lifetime      <'a>(&'a mut self              ) {}
+        pub fn by_ref_mut_colon_with_lifetime<'a>(        self: &'a mut Self) {}
+
+        pub fn by_box            (    self: Box<        Self>) {}
+        pub fn by_box_ref        (    self: Box<&       Self>) {}
+        pub fn by_box_ref_mut    (    self: Box<&   mut Self>) {}
+        pub fn by_mut_box        (mut self: Box<        Self>) {}
+        pub fn by_mut_box_ref    (mut self: Box<&       Self>) {}
+        pub fn by_mut_box_ref_mut(mut self: Box<&   mut Self>) {}
+
+        pub fn by_rc             (    self: Rc <        Self>) {}
+        pub fn by_rc_ref         (    self: Rc <&       Self>) {}
+        pub fn by_rc_ref_mut     (    self: Rc <&   mut Self>) {}
+        pub fn by_mut_rc         (mut self: Rc <        Self>) {}
+        pub fn by_mut_rc_ref     (mut self: Rc <&       Self>) {}
+        pub fn by_mut_rc_ref_mut (mut self: Rc <&   mut Self>) {}
+
+        pub fn by_arc            (    self: Arc<        Self>) {}
+        pub fn by_arc_ref        (    self: Arc<&       Self>) {}
+        pub fn by_arc_ref_mut    (    self: Arc<&   mut Self>) {}
+        pub fn by_mut_arc        (mut self: Arc<        Self>) {}
+        pub fn by_mut_arc_ref    (mut self: Arc<&       Self>) {}
+        pub fn by_mut_arc_ref_mut(mut self: Arc<&   mut Self>) {}
+
+        pub fn by_pin_ref                  (    self: Pin<&       Self>) {}
+        pub fn by_pin_ref_mut              (    self: Pin<&   mut Self>) {}
+        pub fn by_mut_pin_ref              (mut self: Pin<&       Self>) {}
+        pub fn by_mut_pin_ref_mut          (mut self: Pin<&   mut Self>) {}
+
+        pub fn by_mut_ref_mut_box_mut_ref_mut_with_lifetimes<'a, 'b>(mut self: &'a mut Box<&'b mut Self>) {}
+        pub fn by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes <'a, 'b>(mut self: &'a mut Rc <&'b mut Self>) {}
+        pub fn by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes<'a, 'b>(mut self: &'a mut Arc<&'b mut Self>) {}
+        pub fn by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes<'a, 'b>(mut self: &'a mut Pin<&'b mut Self>) {}
+
+        pub fn nested<'a, 'b, 'c>(self: &'a Box<&mut Pin<&'c mut Rc<&'b mut Box<&'a& Arc<&mut &'c Pin<Rc<&'b mut&&mut Self>>>>>>>) {}
+
+        pub fn return_by_value          (    self      ) -> i32 { BY_VALUE }
+        pub fn return_by_value_colon    (    self: Self) -> i32 { BY_VALUE_COLON }
+        pub fn return_by_mut_value      (mut self      ) -> i32 { BY_MUT_VALUE }
+        pub fn return_by_mut_value_colon(mut self: Self) -> i32 { BY_MUT_VALUE_COLON }
+
+        pub fn return_by_ref                            (&       self              ) -> i32 { BY_REF }
+        pub fn return_by_ref_colon                      (        self: &       Self) -> i32 { BY_REF_COLON }
+        pub fn return_by_ref_with_lifetime          <'a>(&'a     self              ) -> i32 { BY_REF_WITH_LIFETIME }
+        pub fn return_by_ref_colon_with_lifetime    <'a>(        self: &'a     Self) -> i32 { BY_REF_COLON_WITH_LIFETIME }
+        pub fn return_by_ref_mut                        (&   mut self              ) -> i32 { BY_REF_MUT }
+        pub fn return_by_ref_mut_colon                  (        self: &   mut Self) -> i32 { BY_REF_MUT_COLON }
+        pub fn return_by_ref_mut_with_lifetime      <'a>(&'a mut self              ) -> i32 { BY_REF_MUT_WITH_LIFETIME }
+        pub fn return_by_ref_mut_colon_with_lifetime<'a>(        self: &'a mut Self) -> i32 { BY_REF_MUT_COLON_WITH_LIFETIME }
+
+        pub fn return_by_box            (    self: Box<        Self>) -> i32 { BY_BOX }
+        pub fn return_by_box_ref        (    self: Box<&       Self>) -> i32 { BY_BOX_REF }
+        pub fn return_by_box_ref_mut    (    self: Box<&   mut Self>) -> i32 { BY_BOX_REF_MUT }
+        pub fn return_by_mut_box        (mut self: Box<        Self>) -> i32 { BY_MUT_BOX }
+        pub fn return_by_mut_box_ref    (mut self: Box<&       Self>) -> i32 { BY_MUT_BOX_REF }
+        pub fn return_by_mut_box_ref_mut(mut self: Box<&   mut Self>) -> i32 { BY_MUT_BOX_REF_MUT }
+
+        pub fn return_by_rc             (    self: Rc <        Self>) -> i32 { BY_RC }
+        pub fn return_by_rc_ref         (    self: Rc <&       Self>) -> i32 { BY_RC_REF }
+        pub fn return_by_rc_ref_mut     (    self: Rc <&   mut Self>) -> i32 { BY_RC_REF_MUT }
+        pub fn return_by_mut_rc         (mut self: Rc <        Self>) -> i32 { BY_MUT_RC }
+        pub fn return_by_mut_rc_ref     (mut self: Rc <&       Self>) -> i32 { BY_MUT_RC_REF }
+        pub fn return_by_mut_rc_ref_mut (mut self: Rc <&   mut Self>) -> i32 { BY_MUT_RC_REF_MUT }
+
+        pub fn return_by_arc            (    self: Arc<        Self>) -> i32 { BY_ARC }
+        pub fn return_by_arc_ref        (    self: Arc<&       Self>) -> i32 { BY_ARC_REF }
+        pub fn return_by_arc_ref_mut    (    self: Arc<&   mut Self>) -> i32 { BY_ARC_REF_MUT }
+        pub fn return_by_mut_arc        (mut self: Arc<        Self>) -> i32 { BY_MUT_ARC }
+        pub fn return_by_mut_arc_ref    (mut self: Arc<&       Self>) -> i32 { BY_MUT_ARC_REF }
+        pub fn return_by_mut_arc_ref_mut(mut self: Arc<&   mut Self>) -> i32 { BY_MUT_ARC_REF_MUT }
+
+        pub fn return_by_pin_ref                  (    self: Pin<&       Self>) -> i32 { BY_PIN_REF }
+        pub fn return_by_pin_ref_mut              (    self: Pin<&   mut Self>) -> i32 { BY_PIN_REF_MUT }
+        pub fn return_by_mut_pin_ref              (mut self: Pin<&       Self>) -> i32 { BY_MUT_PIN_REF }
+        pub fn return_by_mut_pin_ref_mut          (mut self: Pin<&   mut Self>) -> i32 { BY_MUT_PIN_REF_MUT }
+
+        pub fn return_by_mut_ref_mut_box_mut_ref_mut_with_lifetimes<'a, 'b>(mut self: &'a mut Box<&'b mut Self>) -> i32 { BY_MUT_REF_MUT_BOX_MUT_REF_MUT_WITH_LIFETIMES }
+        pub fn return_by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes <'a, 'b>(mut self: &'a mut Rc <&'b mut Self>) -> i32 { BY_MUT_REF_MUT_RC_MUT_REF_MUT_WITH_LIFETIMES }
+        pub fn return_by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes<'a, 'b>(mut self: &'a mut Arc<&'b mut Self>) -> i32 { BY_MUT_REF_MUT_ARC_MUT_REF_MUT_WITH_LIFETIMES }
+        pub fn return_by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes<'a, 'b>(mut self: &'a mut Pin<&'b mut Self>) -> i32 { BY_MUT_REF_MUT_PIN_MUT_REF_MUT_WITH_LIFETIMES }
+
+        pub fn return_nested<'a, 'b, 'c>(self: &'a Box<&mut Pin<&'c mut Rc<&'b mut Box<&'a& Arc<&mut &'c Pin<Rc<&'b mut&&mut Self>>>>>>>) -> i32 { NESTED }
+    }
+}
+
+// TODO - remove #[cfg(test)] from every integration test, it makes no sense
 #[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
+    #![allow(unused_imports)]
 
     use super::*;
     use rsubstitute::*;
-    use std::cell::Cell;
-    use std::rc::Rc;
+    use test_utils::*;
 
-    #[test]
-    fn flex() {
-        let number = 45;
-        let mut mock = Struct::new(number);
+    mod basic_tests {
+        use super::*;
 
-        mock.setup
-            .sbox()
-            .call_base()
-            .and_does(move |s, _| assert_eq!(number, s.number));
-        mock.setup.src().call_base();
-        mock.setup.sarc().call_base();
+        #[test]
+        fn by_value_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup.by_value().does(move |_, _| counter.inc());
+            mock.setup
+                .by_value()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
 
-        mock.setup.spbox().call_base();
-        mock.setup.sprc().call_base();
-        mock.setup.sparc().call_base();
+            // Act
+            mock.clone().by_value();
+            mock.clone().by_value();
 
-        assert_eq!(212, Box::new(mock.clone()).sbox());
-        assert_eq!(212, Box::new(mock.clone()).sbox());
-        assert_eq!(212, Box::new(mock.clone()).sbox());
-        mock.received.sbox(Times::Exactly(3));
-
-        assert_eq!(212, Box::new(mock.clone()).sbox());
-        assert_eq!(212, Rc::new(mock.clone()).src());
-        assert_eq!(212, Arc::new(mock.clone()).sarc());
-        mock.received.sbox(Times::Exactly(4));
-        mock.received.src(Times::Once);
-        mock.received.sarc(Times::Once);
-
-        assert_eq!(212, Pin::new(Box::new(mock.clone())).spbox());
-        assert_eq!(212, Pin::new(Rc::new(mock.clone())).sprc());
-        assert_eq!(212, Pin::new(Arc::new(mock.clone())).sparc());
-        mock.received.spbox(Times::Once);
-        mock.received.sprc(Times::Once);
-        mock.received.sparc(Times::Once);
-
-        let flag = Rc::new(Cell::new(false));
-        let flag_clone = flag.clone();
-
-        mock.setup.mutate().does(move |_, _| flag_clone.set(true));
-        mock.setup.consume().call_base();
-
-        mock.mutate();
-        assert!(flag.get());
-        let value = mock.clone().consume();
-        assert_eq!(10, value);
-
-        mock.received
-            .mutate(Times::Once)
-            .consume(Times::Once)
-            .no_other_calls();
-    }
-
-    #[test]
-    fn compile() {}
-}
-
-#[cfg(not(test))]
-#[derive(Clone)]
-struct Struct {
-    pub number: i32,
-}
-#[cfg(not(test))]
-impl Struct {
-    pub fn new(number: i32) -> Self {
-        Self { number }
-    }
-
-    pub fn mutate(&mut self) {}
-
-    pub fn consume(self) -> i32 {
-        10
-    }
-
-    pub fn sbox(self: Box<Self>) -> i32 {
-        212
-    }
-    pub fn src(self: Rc<Self>) -> i32 {
-        212
-    }
-    pub fn sarc(self: Arc<Self>) -> i32 {
-        212
-    }
-
-    pub fn spbox(self: Pin<Box<Self>>) -> i32 {
-        212
-    }
-    pub fn sprc(self: Pin<Rc<Self>>) -> i32 {
-        212
-    }
-    pub fn sparc(self: Pin<Arc<Self>>) -> i32 {
-        212
-    }
-
-    // TODO - support
-    pub fn nested<'a>(self: &mut &'a Arc<Rc<Box<Box<Struct>>>>) -> i32 {
-        212
-    }
-}
-#[cfg(test)]
-pub use __rsubstitute_generated_Struct::*;
-#[cfg(test)]
-#[allow(unused_parens)]
-#[allow(non_snake_case)]
-#[allow(non_camel_case_types)]
-#[allow(mismatched_lifetime_syntaxes)]
-mod __rsubstitute_generated_Struct {
-    use super::*;
-    use rsubstitute::for_generated::*;
-    #[doc(hidden)]
-    pub struct mutate_Call {}
-    impl IArgsInfosProvider for mutate_Call {
-        fn get_arg_infos(&self) -> Vec<ArgInfo> {
-            vec![]
-        }
-    }
-    impl IArgsTupleProvider for mutate_Call {
-        fn get_ptr_to_boxed_tuple_of_refs(&self) -> *mut () {
-            Box::leak(Box::new(())) as *mut _ as *mut ()
-        }
-    }
-    impl IGenericsInfoProvider for mutate_Call {
-        fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
-            vec![]
-        }
-        fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {}
-        fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
-    }
-    impl Clone for mutate_Call {
-        fn clone(&self) -> Self {
-            Self {}
-        }
-    }
-    #[doc(hidden)]
-    #[derive(Debug)]
-    pub struct mutate_ArgsChecker {}
-    impl IArgsChecker for mutate_ArgsChecker {
-        #[allow(unused)]
-        fn check(&self, dyn_call: &DynCall) -> Vec<ArgCheckResult> {
-            let call: &mutate_Call = dyn_call.downcast_ref();
-            vec![]
-        }
-    }
-    impl IArgsFormatter for mutate_ArgsChecker {
-        fn fmt_args(&self) -> String {
-            format!("",)
-        }
-    }
-    impl IGenericsInfoProvider for mutate_ArgsChecker {
-        fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
-            vec![]
-        }
-        fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {}
-        fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
-    }
-    #[doc(hidden)]
-    pub struct consume_Call {}
-    impl IArgsInfosProvider for consume_Call {
-        fn get_arg_infos(&self) -> Vec<ArgInfo> {
-            vec![]
-        }
-    }
-    impl IArgsTupleProvider for consume_Call {
-        fn get_ptr_to_boxed_tuple_of_refs(&self) -> *mut () {
-            Box::leak(Box::new(())) as *mut _ as *mut ()
-        }
-    }
-    impl IGenericsInfoProvider for consume_Call {
-        fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
-            vec![]
-        }
-        fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {}
-        fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
-    }
-    impl Clone for consume_Call {
-        fn clone(&self) -> Self {
-            Self {}
-        }
-    }
-    #[doc(hidden)]
-    #[derive(Debug)]
-    pub struct consume_ArgsChecker {}
-    impl IArgsChecker for consume_ArgsChecker {
-        #[allow(unused)]
-        fn check(&self, dyn_call: &DynCall) -> Vec<ArgCheckResult> {
-            let call: &consume_Call = dyn_call.downcast_ref();
-            vec![]
-        }
-    }
-    impl IArgsFormatter for consume_ArgsChecker {
-        fn fmt_args(&self) -> String {
-            format!("",)
-        }
-    }
-    impl IGenericsInfoProvider for consume_ArgsChecker {
-        fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
-            vec![]
-        }
-        fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {}
-        fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
-    }
-    #[doc(hidden)]
-    pub struct sbox_Call {}
-    impl IArgsInfosProvider for sbox_Call {
-        fn get_arg_infos(&self) -> Vec<ArgInfo> {
-            vec![]
-        }
-    }
-    impl IArgsTupleProvider for sbox_Call {
-        fn get_ptr_to_boxed_tuple_of_refs(&self) -> *mut () {
-            Box::leak(Box::new(())) as *mut _ as *mut ()
-        }
-    }
-    impl IGenericsInfoProvider for sbox_Call {
-        fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
-            vec![]
-        }
-        fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {}
-        fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
-    }
-    impl Clone for sbox_Call {
-        fn clone(&self) -> Self {
-            Self {}
-        }
-    }
-    #[doc(hidden)]
-    #[derive(Debug)]
-    pub struct sbox_ArgsChecker {}
-    impl IArgsChecker for sbox_ArgsChecker {
-        #[allow(unused)]
-        fn check(&self, dyn_call: &DynCall) -> Vec<ArgCheckResult> {
-            let call: &sbox_Call = dyn_call.downcast_ref();
-            vec![]
-        }
-    }
-    impl IArgsFormatter for sbox_ArgsChecker {
-        fn fmt_args(&self) -> String {
-            format!("",)
-        }
-    }
-    impl IGenericsInfoProvider for sbox_ArgsChecker {
-        fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
-            vec![]
-        }
-        fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {}
-        fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
-    }
-    #[doc(hidden)]
-    pub struct src_Call {}
-    impl IArgsInfosProvider for src_Call {
-        fn get_arg_infos(&self) -> Vec<ArgInfo> {
-            vec![]
-        }
-    }
-    impl IArgsTupleProvider for src_Call {
-        fn get_ptr_to_boxed_tuple_of_refs(&self) -> *mut () {
-            Box::leak(Box::new(())) as *mut _ as *mut ()
-        }
-    }
-    impl IGenericsInfoProvider for src_Call {
-        fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
-            vec![]
-        }
-        fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {}
-        fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
-    }
-    impl Clone for src_Call {
-        fn clone(&self) -> Self {
-            Self {}
-        }
-    }
-    #[doc(hidden)]
-    #[derive(Debug)]
-    pub struct src_ArgsChecker {}
-    impl IArgsChecker for src_ArgsChecker {
-        #[allow(unused)]
-        fn check(&self, dyn_call: &DynCall) -> Vec<ArgCheckResult> {
-            let call: &src_Call = dyn_call.downcast_ref();
-            vec![]
-        }
-    }
-    impl IArgsFormatter for src_ArgsChecker {
-        fn fmt_args(&self) -> String {
-            format!("",)
-        }
-    }
-    impl IGenericsInfoProvider for src_ArgsChecker {
-        fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
-            vec![]
-        }
-        fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {}
-        fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
-    }
-    #[doc(hidden)]
-    pub struct sarc_Call {}
-    impl IArgsInfosProvider for sarc_Call {
-        fn get_arg_infos(&self) -> Vec<ArgInfo> {
-            vec![]
-        }
-    }
-    impl IArgsTupleProvider for sarc_Call {
-        fn get_ptr_to_boxed_tuple_of_refs(&self) -> *mut () {
-            Box::leak(Box::new(())) as *mut _ as *mut ()
-        }
-    }
-    impl IGenericsInfoProvider for sarc_Call {
-        fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
-            vec![]
-        }
-        fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {}
-        fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
-    }
-    impl Clone for sarc_Call {
-        fn clone(&self) -> Self {
-            Self {}
-        }
-    }
-    #[doc(hidden)]
-    #[derive(Debug)]
-    pub struct sarc_ArgsChecker {}
-    impl IArgsChecker for sarc_ArgsChecker {
-        #[allow(unused)]
-        fn check(&self, dyn_call: &DynCall) -> Vec<ArgCheckResult> {
-            let call: &sarc_Call = dyn_call.downcast_ref();
-            vec![]
-        }
-    }
-    impl IArgsFormatter for sarc_ArgsChecker {
-        fn fmt_args(&self) -> String {
-            format!("",)
-        }
-    }
-    impl IGenericsInfoProvider for sarc_ArgsChecker {
-        fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
-            vec![]
-        }
-        fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {}
-        fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
-    }
-    #[doc(hidden)]
-    pub struct spbox_Call {}
-    impl IArgsInfosProvider for spbox_Call {
-        fn get_arg_infos(&self) -> Vec<ArgInfo> {
-            vec![]
-        }
-    }
-    impl IArgsTupleProvider for spbox_Call {
-        fn get_ptr_to_boxed_tuple_of_refs(&self) -> *mut () {
-            Box::leak(Box::new(())) as *mut _ as *mut ()
-        }
-    }
-    impl IGenericsInfoProvider for spbox_Call {
-        fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
-            vec![]
-        }
-        fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {}
-        fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
-    }
-    impl Clone for spbox_Call {
-        fn clone(&self) -> Self {
-            Self {}
-        }
-    }
-    #[doc(hidden)]
-    #[derive(Debug)]
-    pub struct spbox_ArgsChecker {}
-    impl IArgsChecker for spbox_ArgsChecker {
-        #[allow(unused)]
-        fn check(&self, dyn_call: &DynCall) -> Vec<ArgCheckResult> {
-            let call: &spbox_Call = dyn_call.downcast_ref();
-            vec![]
-        }
-    }
-    impl IArgsFormatter for spbox_ArgsChecker {
-        fn fmt_args(&self) -> String {
-            format!("",)
-        }
-    }
-    impl IGenericsInfoProvider for spbox_ArgsChecker {
-        fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
-            vec![]
-        }
-        fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {}
-        fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
-    }
-    #[doc(hidden)]
-    pub struct sprc_Call {}
-    impl IArgsInfosProvider for sprc_Call {
-        fn get_arg_infos(&self) -> Vec<ArgInfo> {
-            vec![]
-        }
-    }
-    impl IArgsTupleProvider for sprc_Call {
-        fn get_ptr_to_boxed_tuple_of_refs(&self) -> *mut () {
-            Box::leak(Box::new(())) as *mut _ as *mut ()
-        }
-    }
-    impl IGenericsInfoProvider for sprc_Call {
-        fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
-            vec![]
-        }
-        fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {}
-        fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
-    }
-    impl Clone for sprc_Call {
-        fn clone(&self) -> Self {
-            Self {}
-        }
-    }
-    #[doc(hidden)]
-    #[derive(Debug)]
-    pub struct sprc_ArgsChecker {}
-    impl IArgsChecker for sprc_ArgsChecker {
-        #[allow(unused)]
-        fn check(&self, dyn_call: &DynCall) -> Vec<ArgCheckResult> {
-            let call: &sprc_Call = dyn_call.downcast_ref();
-            vec![]
-        }
-    }
-    impl IArgsFormatter for sprc_ArgsChecker {
-        fn fmt_args(&self) -> String {
-            format!("",)
-        }
-    }
-    impl IGenericsInfoProvider for sprc_ArgsChecker {
-        fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
-            vec![]
-        }
-        fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {}
-        fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
-    }
-    #[doc(hidden)]
-    pub struct sparc_Call {}
-    impl IArgsInfosProvider for sparc_Call {
-        fn get_arg_infos(&self) -> Vec<ArgInfo> {
-            vec![]
-        }
-    }
-    impl IArgsTupleProvider for sparc_Call {
-        fn get_ptr_to_boxed_tuple_of_refs(&self) -> *mut () {
-            Box::leak(Box::new(())) as *mut _ as *mut ()
-        }
-    }
-    impl IGenericsInfoProvider for sparc_Call {
-        fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
-            vec![]
-        }
-        fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {}
-        fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
-    }
-    impl Clone for sparc_Call {
-        fn clone(&self) -> Self {
-            Self {}
-        }
-    }
-    #[doc(hidden)]
-    #[derive(Debug)]
-    pub struct sparc_ArgsChecker {}
-    impl IArgsChecker for sparc_ArgsChecker {
-        #[allow(unused)]
-        fn check(&self, dyn_call: &DynCall) -> Vec<ArgCheckResult> {
-            let call: &sparc_Call = dyn_call.downcast_ref();
-            vec![]
-        }
-    }
-    impl IArgsFormatter for sparc_ArgsChecker {
-        fn fmt_args(&self) -> String {
-            format!("",)
-        }
-    }
-    impl IGenericsInfoProvider for sparc_ArgsChecker {
-        fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
-            vec![]
-        }
-        fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {}
-        fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
-    }
-    #[doc(hidden)]
-    pub struct nested_Call<'a> {
-        _phantom_GenericParam_a: PhantomData<&'a ()>,
-    }
-    impl<'a> IArgsInfosProvider for nested_Call<'a> {
-        fn get_arg_infos(&self) -> Vec<ArgInfo> {
-            vec![]
-        }
-    }
-    impl<'a> IArgsTupleProvider for nested_Call<'a> {
-        fn get_ptr_to_boxed_tuple_of_refs(&self) -> *mut () {
-            Box::leak(Box::new(())) as *mut _ as *mut ()
-        }
-    }
-    impl<'a> IGenericsInfoProvider for nested_Call<'a> {
-        fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
-            vec![]
-        }
-        fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {}
-        fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
-    }
-    impl<'a> Clone for nested_Call<'a> {
-        fn clone(&self) -> Self {
-            Self {
-                _phantom_GenericParam_a: (&self._phantom_GenericParam_a).clone(),
-            }
-        }
-    }
-    #[doc(hidden)]
-    #[derive(Debug)]
-    pub struct nested_ArgsChecker<'a> {
-        _phantom_GenericParam_a: PhantomData<&'a ()>,
-    }
-    impl<'a> IArgsChecker for nested_ArgsChecker<'a> {
-        #[allow(unused)]
-        fn check(&self, dyn_call: &DynCall) -> Vec<ArgCheckResult> {
-            let call: &nested_Call<'a> = dyn_call.downcast_ref();
-            vec![]
-        }
-    }
-    impl<'a> IArgsFormatter for nested_ArgsChecker<'a> {
-        fn fmt_args(&self) -> String {
-            format!("",)
-        }
-    }
-    impl<'a> IGenericsInfoProvider for nested_ArgsChecker<'a> {
-        fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
-            vec![]
-        }
-        fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {}
-        fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
-    }
-    #[doc(hidden)]
-    #[derive(IMockData)]
-    pub struct StructData {
-        pub mutate: FnData<'static, Struct, true, true>,
-        pub consume: FnData<'static, Struct, true, true>,
-        pub sbox: FnData<'static, Struct, true, true>,
-        pub src: FnData<'static, Struct, true, true>,
-        pub sarc: FnData<'static, Struct, true, true>,
-        pub spbox: FnData<'static, Struct, true, true>,
-        pub sprc: FnData<'static, Struct, true, true>,
-        pub sparc: FnData<'static, Struct, true, true>,
-        pub nested: FnData<'static, Struct, true, true>,
-    }
-    #[doc(hidden)]
-    pub struct StructSetup {
-        data: Arc<StructData>,
-    }
-    impl Clone for StructSetup {
-        fn clone(&self) -> Self {
-            Self {
-                data: (&self.data).clone(),
-            }
-        }
-    }
-    #[doc(hidden)]
-    pub struct StructReceived {
-        data: Arc<StructData>,
-    }
-    impl Clone for StructReceived {
-        fn clone(&self) -> Self {
-            Self {
-                data: (&self.data).clone(),
-            }
-        }
-    }
-    #[derive(Clone)]
-    #[doc(hidden)]
-    pub struct Struct_InnerData {
-        pub number: i32,
-    }
-
-    impl Struct_InnerData {
-        pub fn new(number: i32) -> Self {
-            Self { number }
-        }
-    }
-
-    #[derive(Clone)]
-    pub struct Struct {
-        pub setup: StructSetup,
-        pub received: StructReceived,
-        pub data: Arc<StructData>,
-        inner_data: Struct_InnerData,
-    }
-    impl AsRef<Struct> for Struct {
-        fn as_ref(&self) -> &Struct {
-            self
-        }
-    }
-    impl Deref for Struct {
-        type Target = Struct_InnerData;
-        fn deref(&self) -> &Self::Target {
-            &self.inner_data
-        }
-    }
-    impl Struct {
-        pub fn mutate(&mut self) {
-            let call: mutate_Call = mutate_Call {};
-            self.data
-                .clone()
-                .mutate
-                .handle_base(self, call, Self::base_mutate);
+            // Assert
+            mock.received.by_value(Times::Exactly(2)).no_other_calls();
+            assert_eq!(2, counter.get());
         }
 
-        pub fn consume(self) -> i32 {
-            let call: consume_Call = consume_Call {};
-            return self
-                .data
-                .clone()
-                .consume
-                .handle_base_returning(self, call, Self::base_consume);
+        #[test]
+        fn by_value_colon_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup.by_value_colon().does(move |_, _| counter.inc());
+            mock.setup
+                .by_value_colon()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            // TODO - test and write in doc about the ability to clone mocks and what does it mean
+            mock.clone().by_value_colon();
+            mock.clone().by_value_colon();
+
+            // Assert
+            mock.received
+                .by_value_colon(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(2, counter.get());
         }
 
-        pub fn sbox(self: Box<Self>) -> i32 {
-            let call: sbox_Call = sbox_Call {};
-            return self
-                .data
-                .clone()
-                .sbox
-                .handle_base_returning(self, call, Self::base_sbox);
-        }
-        pub fn src(self: Rc<Self>) -> i32 {
-            let call: src_Call = src_Call {};
-            return self
-                .data
-                .clone()
-                .src
-                .handle_base_returning(self, call, Self::base_src);
-        }
-        pub fn sarc(self: Arc<Self>) -> i32 {
-            let call: sarc_Call = sarc_Call {};
-            return self
-                .data
-                .clone()
-                .sarc
-                .handle_base_returning(self, call, Self::base_sarc);
+        #[test]
+        fn by_mut_value_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup.by_mut_value().does(move |_, _| counter.inc());
+            mock.setup
+                .by_mut_value()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            mock.clone().by_mut_value();
+            mock.clone().by_mut_value();
+
+            // Assert
+            mock.received
+                .by_mut_value(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(2, counter.get());
         }
 
-        pub fn spbox(self: Pin<Box<Self>>) -> i32 {
-            let call: spbox_Call = spbox_Call {};
-            return self
-                .data
-                .clone()
-                .spbox
-                .handle_base_returning(self, call, Self::base_spbox);
-        }
-        pub fn sprc(self: Pin<Rc<Self>>) -> i32 {
-            let call: sprc_Call = sprc_Call {};
-            return self
-                .data
-                .clone()
-                .sprc
-                .handle_base_returning(self, call, Self::base_sprc);
-        }
-        pub fn sparc(self: Pin<Arc<Self>>) -> i32 {
-            let call: sparc_Call = sparc_Call {};
-            return self
-                .data
-                .clone()
-                .sparc
-                .handle_base_returning(self, call, Self::base_sparc);
+        #[test]
+        fn by_mut_value_colon_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup
+                .by_mut_value_colon()
+                .does(move |_, _| counter.inc());
+            mock.setup
+                .by_mut_value_colon()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            mock.clone().by_mut_value_colon();
+            mock.clone().by_mut_value_colon();
+
+            // Assert
+            mock.received
+                .by_mut_value_colon(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(2, counter.get());
         }
 
-        // TODO - support
-        pub fn nested<'a>(self: &mut &'a Arc<Rc<Box<Box<Struct>>>>) -> i32 {
-            let call: nested_Call<'_> = nested_Call {
-                _phantom_GenericParam_a: PhantomData,
-            };
-            return self
-                .data
-                .clone()
-                .nested
-                .handle_base_returning(self, call, Self::base_nested);
+        #[test]
+        fn by_ref_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup.by_ref().does(move |_, _| counter.inc());
+            mock.setup
+                .by_ref()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            mock.by_ref();
+            mock.by_ref();
+
+            // Assert
+            mock.received.by_ref(Times::Exactly(2)).no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_ref_colon_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup.by_ref_colon().does(move |_, _| counter.inc());
+            mock.setup
+                .by_ref_colon()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            mock.by_ref_colon();
+            mock.by_ref_colon();
+
+            // Assert
+            mock.received
+                .by_ref_colon(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_ref_with_lifetime_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup
+                .by_ref_with_lifetime()
+                .does(move |_, _| counter.inc());
+            mock.setup
+                .by_ref_with_lifetime()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            mock.by_ref_with_lifetime();
+            mock.by_ref_with_lifetime();
+
+            // Assert
+            mock.received
+                .by_ref_with_lifetime(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_ref_colon_with_lifetime_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup
+                .by_ref_colon_with_lifetime()
+                .does(move |_, _| counter.inc());
+            mock.setup
+                .by_ref_colon_with_lifetime()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            mock.by_ref_colon_with_lifetime();
+            mock.by_ref_colon_with_lifetime();
+
+            // Assert
+            mock.received
+                .by_ref_colon_with_lifetime(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_ref_mut_Ok() {
+            // Arrange
+            let mut mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup.by_ref_mut().does(move |_, _| counter.inc());
+            mock.setup
+                .by_ref_mut()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            mock.by_ref_mut();
+            mock.by_ref_mut();
+
+            // Assert
+            mock.received.by_ref_mut(Times::Exactly(2)).no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_ref_mut_colon_Ok() {
+            // Arrange
+            let mut mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup
+                .by_ref_mut_colon()
+                .does(move |_, _| counter.inc());
+            mock.setup
+                .by_ref_mut_colon()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            mock.by_ref_mut_colon();
+            mock.by_ref_mut_colon();
+
+            // Assert
+            mock.received
+                .by_ref_mut_colon(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_ref_mut_with_lifetime_Ok() {
+            // Arrange
+            let mut mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup
+                .by_ref_mut_with_lifetime()
+                .does(move |_, _| counter.inc());
+            mock.setup
+                .by_ref_mut_with_lifetime()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            mock.by_ref_mut_with_lifetime();
+            mock.by_ref_mut_with_lifetime();
+
+            // Assert
+            mock.received
+                .by_ref_mut_with_lifetime(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_ref_mut_colon_with_lifetime_Ok() {
+            // Arrange
+            let mut mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup
+                .by_ref_mut_colon_with_lifetime()
+                .does(move |_, _| counter.inc());
+            mock.setup
+                .by_ref_mut_colon_with_lifetime()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            mock.by_ref_mut_colon_with_lifetime();
+            mock.by_ref_mut_colon_with_lifetime();
+
+            // Assert
+            mock.received
+                .by_ref_mut_colon_with_lifetime(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_box_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup.by_box().does(move |_, _| counter.inc());
+            mock.setup
+                .by_box()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            Box::new(mock.clone()).by_box();
+            Box::new(mock.clone()).by_box();
+
+            // Assert
+            mock.received.by_box(Times::Exactly(2)).no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_box_ref_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup.by_box_ref().does(move |_, _| counter.inc());
+            mock.setup
+                .by_box_ref()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            Box::new(&mock.clone()).by_box_ref();
+            Box::new(&mock.clone()).by_box_ref();
+
+            // Assert
+            mock.received.by_box_ref(Times::Exactly(2)).no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_box_ref_mut_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup.by_box_ref_mut().does(move |_, _| counter.inc());
+            mock.setup
+                .by_box_ref_mut()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            Box::new(&mut mock.clone()).by_box_ref_mut();
+            Box::new(&mut mock.clone()).by_box_ref_mut();
+
+            // Assert
+            mock.received
+                .by_box_ref_mut(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_mut_box_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup.by_mut_box().does(move |_, _| counter.inc());
+            mock.setup
+                .by_mut_box()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            Box::new(mock.clone()).by_mut_box();
+            Box::new(mock.clone()).by_mut_box();
+
+            // Assert
+            mock.received.by_mut_box(Times::Exactly(2)).no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_mut_box_ref_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup.by_mut_box_ref().does(move |_, _| counter.inc());
+            mock.setup
+                .by_mut_box_ref()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            Box::new(&mock.clone()).by_mut_box_ref();
+            Box::new(&mock.clone()).by_mut_box_ref();
+
+            // Assert
+            mock.received
+                .by_mut_box_ref(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_mut_box_ref_mut_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup
+                .by_mut_box_ref_mut()
+                .does(move |_, _| counter.inc());
+            mock.setup
+                .by_mut_box_ref_mut()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            Box::new(&mut mock.clone()).by_mut_box_ref_mut();
+            Box::new(&mut mock.clone()).by_mut_box_ref_mut();
+
+            // Assert
+            mock.received
+                .by_mut_box_ref_mut(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_rc_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup.by_rc().does(move |_, _| counter.inc());
+            mock.setup
+                .by_rc()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            Rc::new(mock.clone()).by_rc();
+            Rc::new(mock.clone()).by_rc();
+
+            // Assert
+            mock.received.by_rc(Times::Exactly(2)).no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_rc_ref_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup.by_rc_ref().does(move |_, _| counter.inc());
+            mock.setup
+                .by_rc_ref()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            Rc::new(&mock.clone()).by_rc_ref();
+            Rc::new(&mock.clone()).by_rc_ref();
+
+            // Assert
+            mock.received.by_rc_ref(Times::Exactly(2)).no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_rc_ref_mut_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup.by_rc_ref_mut().does(move |_, _| counter.inc());
+            mock.setup
+                .by_rc_ref_mut()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            Rc::new(&mut mock.clone()).by_rc_ref_mut();
+            Rc::new(&mut mock.clone()).by_rc_ref_mut();
+
+            // Assert
+            mock.received
+                .by_rc_ref_mut(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_mut_rc_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup.by_mut_rc().does(move |_, _| counter.inc());
+            mock.setup
+                .by_mut_rc()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            Rc::new(mock.clone()).by_mut_rc();
+            Rc::new(mock.clone()).by_mut_rc();
+
+            // Assert
+            mock.received.by_mut_rc(Times::Exactly(2)).no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_mut_rc_ref_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup.by_mut_rc_ref().does(move |_, _| counter.inc());
+            mock.setup
+                .by_mut_rc_ref()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            Rc::new(&mock.clone()).by_mut_rc_ref();
+            Rc::new(&mock.clone()).by_mut_rc_ref();
+
+            // Assert
+            mock.received
+                .by_mut_rc_ref(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_mut_rc_ref_mut_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup
+                .by_mut_rc_ref_mut()
+                .does(move |_, _| counter.inc());
+            mock.setup
+                .by_mut_rc_ref_mut()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            Rc::new(&mut mock.clone()).by_mut_rc_ref_mut();
+            Rc::new(&mut mock.clone()).by_mut_rc_ref_mut();
+
+            // Assert
+            mock.received
+                .by_mut_rc_ref_mut(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_arc_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup.by_arc().does(move |_, _| counter.inc());
+            mock.setup
+                .by_arc()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            Arc::new(mock.clone()).by_arc();
+            Arc::new(mock.clone()).by_arc();
+
+            // Assert
+            mock.received.by_arc(Times::Exactly(2)).no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_arc_ref_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup.by_arc_ref().does(move |_, _| counter.inc());
+            mock.setup
+                .by_arc_ref()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            Arc::new(&mock.clone()).by_arc_ref();
+            Arc::new(&mock.clone()).by_arc_ref();
+
+            // Assert
+            mock.received.by_arc_ref(Times::Exactly(2)).no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_arc_ref_mut_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup.by_arc_ref_mut().does(move |_, _| counter.inc());
+            mock.setup
+                .by_arc_ref_mut()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            Arc::new(&mut mock.clone()).by_arc_ref_mut();
+            Arc::new(&mut mock.clone()).by_arc_ref_mut();
+
+            // Assert
+            mock.received
+                .by_arc_ref_mut(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_mut_arc_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup.by_mut_arc().does(move |_, _| counter.inc());
+            mock.setup
+                .by_mut_arc()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            Arc::new(mock.clone()).by_mut_arc();
+            Arc::new(mock.clone()).by_mut_arc();
+
+            // Assert
+            mock.received.by_mut_arc(Times::Exactly(2)).no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_mut_arc_ref_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup.by_mut_arc_ref().does(move |_, _| counter.inc());
+            mock.setup
+                .by_mut_arc_ref()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            Arc::new(&mock.clone()).by_mut_arc_ref();
+            Arc::new(&mock.clone()).by_mut_arc_ref();
+
+            // Assert
+            mock.received
+                .by_mut_arc_ref(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_mut_arc_ref_mut_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup
+                .by_mut_arc_ref_mut()
+                .does(move |_, _| counter.inc());
+            mock.setup
+                .by_mut_arc_ref_mut()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            Arc::new(&mut mock.clone()).by_mut_arc_ref_mut();
+            Arc::new(&mut mock.clone()).by_mut_arc_ref_mut();
+
+            // Assert
+            mock.received
+                .by_mut_arc_ref_mut(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_pin_ref_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup.by_pin_ref().does(move |_, _| counter.inc());
+            mock.setup
+                .by_pin_ref()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            Pin::new(&mock.clone()).by_pin_ref();
+            Pin::new(&mock.clone()).by_pin_ref();
+
+            // Assert
+            mock.received.by_pin_ref(Times::Exactly(2)).no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_pin_ref_mut_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup.by_pin_ref_mut().does(move |_, _| counter.inc());
+            mock.setup
+                .by_pin_ref_mut()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            Pin::new(&mut mock.clone()).by_pin_ref_mut();
+            Pin::new(&mut mock.clone()).by_pin_ref_mut();
+
+            // Assert
+            mock.received
+                .by_pin_ref_mut(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_mut_pin_ref_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup.by_mut_pin_ref().does(move |_, _| counter.inc());
+            mock.setup
+                .by_mut_pin_ref()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            Pin::new(&mock.clone()).by_mut_pin_ref();
+            Pin::new(&mock.clone()).by_mut_pin_ref();
+
+            // Assert
+            mock.received
+                .by_mut_pin_ref(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_mut_pin_ref_mut_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup
+                .by_mut_pin_ref_mut()
+                .does(move |_, _| counter.inc());
+            mock.setup
+                .by_mut_pin_ref_mut()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            Pin::new(&mut mock.clone()).by_mut_pin_ref_mut();
+            Pin::new(&mut mock.clone()).by_mut_pin_ref_mut();
+
+            // Assert
+            mock.received
+                .by_mut_pin_ref_mut(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_mut_ref_mut_box_mut_ref_mut_with_lifetimes_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup
+                .by_mut_ref_mut_box_mut_ref_mut_with_lifetimes()
+                .does(move |_, _| counter.inc());
+            mock.setup
+                .by_mut_ref_mut_box_mut_ref_mut_with_lifetimes()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            Box::new(&mut mock.clone()).by_mut_ref_mut_box_mut_ref_mut_with_lifetimes();
+            Box::new(&mut mock.clone()).by_mut_ref_mut_box_mut_ref_mut_with_lifetimes();
+
+            // Assert
+            mock.received
+                .by_mut_ref_mut_box_mut_ref_mut_with_lifetimes(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup
+                .by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes()
+                .does(move |_, _| counter.inc());
+            mock.setup
+                .by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            Rc::new(&mut mock.clone()).by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes();
+            Rc::new(&mut mock.clone()).by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes();
+
+            // Assert
+            mock.received
+                .by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup
+                .by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes()
+                .does(move |_, _| counter.inc());
+            mock.setup
+                .by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            Arc::new(&mut mock.clone()).by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes();
+            Arc::new(&mut mock.clone()).by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes();
+
+            // Assert
+            mock.received
+                .by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup
+                .by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes()
+                .does(move |_, _| counter.inc());
+            mock.setup
+                .by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            Pin::new(&mut mock.clone()).by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes();
+            Pin::new(&mut mock.clone()).by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes();
+
+            // Assert
+            mock.received
+                .by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(2, counter.get());
+        }
+
+        #[test]
+        fn nested_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            mock.setup.nested().does(move |_, _| counter.inc());
+            mock.setup
+                .nested()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            let mut the_self = mock.clone();
+            let mut the_self = &&mut the_self;
+            let the_self = Rc::new(&mut the_self);
+            let the_self = &mut &Pin::new(the_self);
+            let the_self = &&Arc::new(the_self);
+            let the_self = &mut Box::new(the_self);
+            let the_self = &mut Rc::new(the_self);
+            let the_self = &mut Pin::new(the_self);
+            let the_self = &Box::new(the_self);
+
+            // Act
+            the_self.nested();
+            the_self.nested();
+
+            // Assert
+            mock.received.nested(Times::Exactly(2)).no_other_calls();
+            assert_eq!(2, counter.get());
         }
     }
-    impl Struct {
-        pub fn new(number: i32) -> Self {
-            let data = Arc::new(StructData {
-                mutate: FnData::new("mutate"),
-                consume: FnData::new("consume"),
-                sbox: FnData::new("sbox"),
-                src: FnData::new("src"),
-                sarc: FnData::new("sarc"),
-                spbox: FnData::new("spbox"),
-                sprc: FnData::new("sprc"),
-                sparc: FnData::new("sparc"),
-                nested: FnData::new("nested"),
-            });
-            let inner_data = Struct_InnerData::new(number);
-            return Struct {
-                setup: StructSetup { data: data.clone() },
-                received: StructReceived { data: data.clone() },
-                data,
-                inner_data,
-            };
-        }
-        fn base_mutate(&mut self, call: mutate_Call) {
-            #[allow(non_shorthand_field_patterns)]
-            #[allow(unused_variables)]
-            let mutate_Call { .. } = call;
-        }
-        fn base_consume(self, call: consume_Call) -> i32 {
-            #[allow(non_shorthand_field_patterns)]
-            #[allow(unused_variables)]
-            let consume_Call { .. } = call;
-            10
+
+    mod return_tests {
+        use super::*;
+
+        #[test]
+        fn return_by_value_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_value()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_value()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = mock.clone().return_by_value();
+            let actual_second_value = mock.clone().return_by_value();
+
+            // Assert
+            mock.received
+                .return_by_value(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_VALUE, actual_second_value);
         }
 
-        fn base_sbox(self: Box<Struct>, call: sbox_Call) -> i32 {
-            #[allow(non_shorthand_field_patterns)]
-            #[allow(unused_variables)]
-            let sbox_Call { .. } = call;
-            212
-        }
-        fn base_src(self: Rc<Struct>, call: src_Call) -> i32 {
-            #[allow(non_shorthand_field_patterns)]
-            #[allow(unused_variables)]
-            let src_Call { .. } = call;
-            212
-        }
-        fn base_sarc(self: Arc<Struct>, call: sarc_Call) -> i32 {
-            #[allow(non_shorthand_field_patterns)]
-            #[allow(unused_variables)]
-            let sarc_Call { .. } = call;
-            212
+        #[test]
+        fn return_by_value_colon_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_value_colon()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_value_colon()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = mock.clone().return_by_value_colon();
+            let actual_second_value = mock.clone().return_by_value_colon();
+
+            // Assert
+            mock.received
+                .return_by_value_colon(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_VALUE_COLON, actual_second_value);
         }
 
-        fn base_spbox(self: Pin<Box<Struct>>, call: spbox_Call) -> i32 {
-            #[allow(non_shorthand_field_patterns)]
-            #[allow(unused_variables)]
-            let spbox_Call { .. } = call;
-            212
-        }
-        fn base_sprc(self: Pin<Rc<Struct>>, call: sprc_Call) -> i32 {
-            #[allow(non_shorthand_field_patterns)]
-            #[allow(unused_variables)]
-            let sprc_Call { .. } = call;
-            212
-        }
-        fn base_sparc(self: Pin<Arc<Struct>>, call: sparc_Call) -> i32 {
-            #[allow(non_shorthand_field_patterns)]
-            #[allow(unused_variables)]
-            let sparc_Call { .. } = call;
-            212
+        #[test]
+        fn return_by_mut_value_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_mut_value()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_mut_value()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = mock.clone().return_by_mut_value();
+            let actual_second_value = mock.clone().return_by_mut_value();
+
+            // Assert
+            mock.received
+                .return_by_mut_value(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_MUT_VALUE, actual_second_value);
         }
 
-        // TODO - support
-        fn base_nested<'a>(self: &mut &'a Arc<Rc<Box<Box<Struct>>>>, call: nested_Call<'a>) -> i32 {
-            #[allow(non_shorthand_field_patterns)]
-            #[allow(unused_variables)]
-            let nested_Call::<'_> { .. } = call;
-            212
+        #[test]
+        fn return_by_mut_value_colon_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_mut_value_colon()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_mut_value_colon()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = mock.clone().return_by_mut_value_colon();
+            let actual_second_value = mock.clone().return_by_mut_value_colon();
+
+            // Assert
+            mock.received
+                .return_by_mut_value_colon(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_MUT_VALUE_COLON, actual_second_value);
         }
-    }
-    impl StructSetup {
-        pub fn mutate<'__rsa>(&self) -> FnTuner<'_, Struct, Self, (), (), &mut Self, true, true> {
-            let mutate_args_checker: mutate_ArgsChecker = mutate_ArgsChecker {};
-            let fn_tuner: FnTuner<'_, Struct, Self, (), (), &mut Self, true, true> =
-                self.data.mutate.add_config(mutate_args_checker, self);
-            return transmute_lifetime!(fn_tuner);
+
+        #[test]
+        fn return_by_ref_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_ref()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_ref()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = mock.clone().return_by_ref();
+            let actual_second_value = mock.clone().return_by_ref();
+
+            // Assert
+            mock.received
+                .return_by_ref(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_REF, actual_second_value);
         }
-        pub fn consume<'__rsa>(&self) -> FnTuner<'_, Struct, Self, (), i32, Self, true, true> {
-            let consume_args_checker: consume_ArgsChecker = consume_ArgsChecker {};
-            let fn_tuner: FnTuner<'_, Struct, Self, (), i32, Self, true, true> =
-                self.data.consume.add_config(consume_args_checker, self);
-            return transmute_lifetime!(fn_tuner);
+
+        #[test]
+        fn return_by_ref_colon_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_ref_colon()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_ref_colon()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = mock.clone().return_by_ref_colon();
+            let actual_second_value = mock.clone().return_by_ref_colon();
+
+            // Assert
+            mock.received
+                .return_by_ref_colon(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_REF_COLON, actual_second_value);
         }
-        pub fn sbox<'__rsa>(&self) -> FnTuner<'_, Struct, Self, (), i32, Box<Struct>, true, true> {
-            let sbox_args_checker: sbox_ArgsChecker = sbox_ArgsChecker {};
-            let fn_tuner: FnTuner<'_, Struct, Self, (), i32, Box<Struct>, true, true> =
-                self.data.sbox.add_config(sbox_args_checker, self);
-            return transmute_lifetime!(fn_tuner);
+
+        #[test]
+        fn return_by_ref_with_lifetime_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_ref_with_lifetime()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_ref_with_lifetime()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = mock.clone().return_by_ref_with_lifetime();
+            let actual_second_value = mock.clone().return_by_ref_with_lifetime();
+
+            // Assert
+            mock.received
+                .return_by_ref_with_lifetime(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_REF_WITH_LIFETIME, actual_second_value);
         }
-        pub fn src<'__rsa>(&self) -> FnTuner<'_, Struct, Self, (), i32, Rc<Struct>, true, true> {
-            let src_args_checker: src_ArgsChecker = src_ArgsChecker {};
-            let fn_tuner: FnTuner<'_, Struct, Self, (), i32, Rc<Struct>, true, true> =
-                self.data.src.add_config(src_args_checker, self);
-            return transmute_lifetime!(fn_tuner);
+
+        #[test]
+        fn return_by_ref_colon_with_lifetime_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_ref_colon_with_lifetime()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_ref_colon_with_lifetime()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = mock.clone().return_by_ref_colon_with_lifetime();
+            let actual_second_value = mock.clone().return_by_ref_colon_with_lifetime();
+
+            // Assert
+            mock.received
+                .return_by_ref_colon_with_lifetime(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_REF_COLON_WITH_LIFETIME, actual_second_value);
         }
-        pub fn sarc<'__rsa>(&self) -> FnTuner<'_, Struct, Self, (), i32, Arc<Struct>, true, true> {
-            let sarc_args_checker: sarc_ArgsChecker = sarc_ArgsChecker {};
-            let fn_tuner: FnTuner<'_, Struct, Self, (), i32, Arc<Struct>, true, true> =
-                self.data.sarc.add_config(sarc_args_checker, self);
-            return transmute_lifetime!(fn_tuner);
+
+        #[test]
+        fn return_by_ref_mut_Ok() {
+            // Arrange
+            let mut mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_ref_mut()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_ref_mut()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = mock.return_by_ref_mut();
+            let actual_second_value = mock.return_by_ref_mut();
+
+            // Assert
+            mock.received
+                .return_by_ref_mut(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_REF_MUT, actual_second_value);
         }
-        pub fn spbox<'__rsa>(
-            &self,
-        ) -> FnTuner<'_, Struct, Self, (), i32, Pin<Box<Struct>>, true, true> {
-            let spbox_args_checker: spbox_ArgsChecker = spbox_ArgsChecker {};
-            let fn_tuner: FnTuner<'_, Struct, Self, (), i32, Pin<Box<Struct>>, true, true> =
-                self.data.spbox.add_config(spbox_args_checker, self);
-            return transmute_lifetime!(fn_tuner);
+
+        #[test]
+        fn return_by_ref_mut_colon_Ok() {
+            // Arrange
+            let mut mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_ref_mut_colon()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_ref_mut_colon()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = mock.return_by_ref_mut_colon();
+            let actual_second_value = mock.return_by_ref_mut_colon();
+
+            // Assert
+            mock.received
+                .return_by_ref_mut_colon(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_REF_MUT_COLON, actual_second_value);
         }
-        pub fn sprc<'__rsa>(
-            &self,
-        ) -> FnTuner<'_, Struct, Self, (), i32, Pin<Rc<Struct>>, true, true> {
-            let sprc_args_checker: sprc_ArgsChecker = sprc_ArgsChecker {};
-            let fn_tuner: FnTuner<'_, Struct, Self, (), i32, Pin<Rc<Struct>>, true, true> =
-                self.data.sprc.add_config(sprc_args_checker, self);
-            return transmute_lifetime!(fn_tuner);
+
+        #[test]
+        fn return_by_ref_mut_with_lifetime_Ok() {
+            // Arrange
+            let mut mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_ref_mut_with_lifetime()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_ref_mut_with_lifetime()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = mock.return_by_ref_mut_with_lifetime();
+            let actual_second_value = mock.return_by_ref_mut_with_lifetime();
+
+            // Assert
+            mock.received
+                .return_by_ref_mut_with_lifetime(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_REF_MUT_WITH_LIFETIME, actual_second_value);
         }
-        pub fn sparc<'__rsa>(
-            &self,
-        ) -> FnTuner<'_, Struct, Self, (), i32, Pin<Arc<Struct>>, true, true> {
-            let sparc_args_checker: sparc_ArgsChecker = sparc_ArgsChecker {};
-            let fn_tuner: FnTuner<'_, Struct, Self, (), i32, Pin<Arc<Struct>>, true, true> =
-                self.data.sparc.add_config(sparc_args_checker, self);
-            return transmute_lifetime!(fn_tuner);
+
+        #[test]
+        fn return_by_ref_mut_colon_with_lifetime_Ok() {
+            // Arrange
+            let mut mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_ref_mut_colon_with_lifetime()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_ref_mut_colon_with_lifetime()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = mock.return_by_ref_mut_colon_with_lifetime();
+            let actual_second_value = mock.return_by_ref_mut_colon_with_lifetime();
+
+            // Assert
+            mock.received
+                .return_by_ref_mut_colon_with_lifetime(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_REF_MUT_COLON_WITH_LIFETIME, actual_second_value);
         }
-        pub fn nested<'__rsa, 'a>(
-            &self,
-        ) -> FnTuner<'_, Struct, Self, (), i32, &mut &'a Arc<Rc<Box<Box<Struct>>>>, true, true>
-        {
-            let nested_args_checker: nested_ArgsChecker<'a> = nested_ArgsChecker {
-                _phantom_GenericParam_a: PhantomData,
-            };
-            let fn_tuner: FnTuner<
-                '_,
-                Struct,
-                Self,
-                (),
-                i32,
-                &mut &'a Arc<Rc<Box<Box<Struct>>>>,
-                true,
-                true,
-            > = self.data.nested.add_config(nested_args_checker, self);
-            return transmute_lifetime!(fn_tuner);
+
+        #[test]
+        fn return_by_box_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_box()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_box()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = Box::new(mock.clone()).return_by_box();
+            let actual_second_value = Box::new(mock.clone()).return_by_box();
+
+            // Assert
+            mock.received
+                .return_by_box(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_BOX, actual_second_value);
         }
-    }
-    impl StructReceived {
-        pub fn mutate<'__rsa>(&self, times: Times) -> FnVerifier<Self, ()> {
-            let mutate_args_checker: mutate_ArgsChecker = mutate_ArgsChecker {};
-            self.data.mutate.verify_received(mutate_args_checker, times);
-            return FnVerifier::new(self.clone());
+
+        #[test]
+        fn return_by_box_ref_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_box_ref()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_box_ref()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = Box::new(&mock.clone()).return_by_box_ref();
+            let actual_second_value = Box::new(&mock.clone()).return_by_box_ref();
+
+            // Assert
+            mock.received
+                .return_by_box_ref(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_BOX_REF, actual_second_value);
         }
-        pub fn consume<'__rsa>(&self, times: Times) -> FnVerifier<Self, ()> {
-            let consume_args_checker: consume_ArgsChecker = consume_ArgsChecker {};
-            self.data
-                .consume
-                .verify_received(consume_args_checker, times);
-            return FnVerifier::new(self.clone());
+
+        #[test]
+        fn return_by_box_ref_mut_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_box_ref_mut()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_box_ref_mut()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = Box::new(&mut mock.clone()).return_by_box_ref_mut();
+            let actual_second_value = Box::new(&mut mock.clone()).return_by_box_ref_mut();
+
+            // Assert
+            mock.received
+                .return_by_box_ref_mut(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_BOX_REF_MUT, actual_second_value);
         }
-        pub fn sbox<'__rsa>(&self, times: Times) -> FnVerifier<Self, ()> {
-            let sbox_args_checker: sbox_ArgsChecker = sbox_ArgsChecker {};
-            self.data.sbox.verify_received(sbox_args_checker, times);
-            return FnVerifier::new(self.clone());
+
+        #[test]
+        fn return_by_mut_box_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_mut_box()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_mut_box()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = Box::new(mock.clone()).return_by_mut_box();
+            let actual_second_value = Box::new(mock.clone()).return_by_mut_box();
+
+            // Assert
+            mock.received
+                .return_by_mut_box(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_MUT_BOX, actual_second_value);
         }
-        pub fn src<'__rsa>(&self, times: Times) -> FnVerifier<Self, ()> {
-            let src_args_checker: src_ArgsChecker = src_ArgsChecker {};
-            self.data.src.verify_received(src_args_checker, times);
-            return FnVerifier::new(self.clone());
+
+        #[test]
+        fn return_by_mut_box_ref_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_mut_box_ref()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_mut_box_ref()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = Box::new(&mock.clone()).return_by_mut_box_ref();
+            let actual_second_value = Box::new(&mock.clone()).return_by_mut_box_ref();
+
+            // Assert
+            mock.received
+                .return_by_mut_box_ref(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_MUT_BOX_REF, actual_second_value);
         }
-        pub fn sarc<'__rsa>(&self, times: Times) -> FnVerifier<Self, ()> {
-            let sarc_args_checker: sarc_ArgsChecker = sarc_ArgsChecker {};
-            self.data.sarc.verify_received(sarc_args_checker, times);
-            return FnVerifier::new(self.clone());
+
+        #[test]
+        fn return_by_mut_box_ref_mut_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_mut_box_ref_mut()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_mut_box_ref_mut()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = Box::new(&mut mock.clone()).return_by_mut_box_ref_mut();
+            let actual_second_value = Box::new(&mut mock.clone()).return_by_mut_box_ref_mut();
+
+            // Assert
+            mock.received
+                .return_by_mut_box_ref_mut(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_MUT_BOX_REF_MUT, actual_second_value);
         }
-        pub fn spbox<'__rsa>(&self, times: Times) -> FnVerifier<Self, ()> {
-            let spbox_args_checker: spbox_ArgsChecker = spbox_ArgsChecker {};
-            self.data.spbox.verify_received(spbox_args_checker, times);
-            return FnVerifier::new(self.clone());
+
+        #[test]
+        fn return_by_rc_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_rc()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_rc()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = Rc::new(mock.clone()).return_by_rc();
+            let actual_second_value = Rc::new(mock.clone()).return_by_rc();
+
+            // Assert
+            mock.received
+                .return_by_rc(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_RC, actual_second_value);
         }
-        pub fn sprc<'__rsa>(&self, times: Times) -> FnVerifier<Self, ()> {
-            let sprc_args_checker: sprc_ArgsChecker = sprc_ArgsChecker {};
-            self.data.sprc.verify_received(sprc_args_checker, times);
-            return FnVerifier::new(self.clone());
+
+        #[test]
+        fn return_by_rc_ref_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_rc_ref()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_rc_ref()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = Rc::new(&mock.clone()).return_by_rc_ref();
+            let actual_second_value = Rc::new(&mock.clone()).return_by_rc_ref();
+
+            // Assert
+            mock.received
+                .return_by_rc_ref(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_RC_REF, actual_second_value);
         }
-        pub fn sparc<'__rsa>(&self, times: Times) -> FnVerifier<Self, ()> {
-            let sparc_args_checker: sparc_ArgsChecker = sparc_ArgsChecker {};
-            self.data.sparc.verify_received(sparc_args_checker, times);
-            return FnVerifier::new(self.clone());
+
+        #[test]
+        fn return_by_rc_ref_mut_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_rc_ref_mut()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_rc_ref_mut()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = Rc::new(&mut mock.clone()).return_by_rc_ref_mut();
+            let actual_second_value = Rc::new(&mut mock.clone()).return_by_rc_ref_mut();
+
+            // Assert
+            mock.received
+                .return_by_rc_ref_mut(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_RC_REF_MUT, actual_second_value);
         }
-        pub fn nested<'__rsa, 'a>(&self, times: Times) -> FnVerifier<Self, ()> {
-            let nested_args_checker: nested_ArgsChecker<'a> = nested_ArgsChecker {
-                _phantom_GenericParam_a: PhantomData,
-            };
-            self.data.nested.verify_received(nested_args_checker, times);
-            return FnVerifier::new(self.clone());
+
+        #[test]
+        fn return_by_mut_rc_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_mut_rc()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_mut_rc()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = Rc::new(mock.clone()).return_by_mut_rc();
+            let actual_second_value = Rc::new(mock.clone()).return_by_mut_rc();
+
+            // Assert
+            mock.received
+                .return_by_mut_rc(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_MUT_RC, actual_second_value);
         }
-        pub fn no_other_calls(&self) {
-            self.data.verify_received_nothing_else();
+
+        #[test]
+        fn return_by_mut_rc_ref_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_mut_rc_ref()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_mut_rc_ref()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = Rc::new(&mock.clone()).return_by_mut_rc_ref();
+            let actual_second_value = Rc::new(&mock.clone()).return_by_mut_rc_ref();
+
+            // Assert
+            mock.received
+                .return_by_mut_rc_ref(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_MUT_RC_REF, actual_second_value);
+        }
+
+        #[test]
+        fn return_by_mut_rc_ref_mut_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_mut_rc_ref_mut()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_mut_rc_ref_mut()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = Rc::new(&mut mock.clone()).return_by_mut_rc_ref_mut();
+            let actual_second_value = Rc::new(&mut mock.clone()).return_by_mut_rc_ref_mut();
+
+            // Assert
+            mock.received
+                .return_by_mut_rc_ref_mut(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_MUT_RC_REF_MUT, actual_second_value);
+        }
+
+        #[test]
+        fn return_by_arc_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_arc()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_arc()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = Arc::new(mock.clone()).return_by_arc();
+            let actual_second_value = Arc::new(mock.clone()).return_by_arc();
+
+            // Assert
+            mock.received
+                .return_by_arc(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_ARC, actual_second_value);
+        }
+
+        #[test]
+        fn return_by_arc_ref_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_arc_ref()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_arc_ref()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = Arc::new(&mock.clone()).return_by_arc_ref();
+            let actual_second_value = Arc::new(&mock.clone()).return_by_arc_ref();
+
+            // Assert
+            mock.received
+                .return_by_arc_ref(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_ARC_REF, actual_second_value);
+        }
+
+        #[test]
+        fn return_by_arc_ref_mut_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_arc_ref_mut()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_arc_ref_mut()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = Arc::new(&mut mock.clone()).return_by_arc_ref_mut();
+            let actual_second_value = Arc::new(&mut mock.clone()).return_by_arc_ref_mut();
+
+            // Assert
+            mock.received
+                .return_by_arc_ref_mut(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_ARC_REF_MUT, actual_second_value);
+        }
+
+        #[test]
+        fn return_by_mut_arc_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_mut_arc()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_mut_arc()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = Arc::new(mock.clone()).return_by_mut_arc();
+            let actual_second_value = Arc::new(mock.clone()).return_by_mut_arc();
+
+            // Assert
+            mock.received
+                .return_by_mut_arc(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_MUT_ARC, actual_second_value);
+        }
+
+        #[test]
+        fn return_by_mut_arc_ref_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_mut_arc_ref()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_mut_arc_ref()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = Arc::new(&mock.clone()).return_by_mut_arc_ref();
+            let actual_second_value = Arc::new(&mock.clone()).return_by_mut_arc_ref();
+
+            // Assert
+            mock.received
+                .return_by_mut_arc_ref(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_MUT_ARC_REF, actual_second_value);
+        }
+
+        #[test]
+        fn return_by_mut_arc_ref_mut_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_mut_arc_ref_mut()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_mut_arc_ref_mut()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = Arc::new(&mut mock.clone()).return_by_mut_arc_ref_mut();
+            let actual_second_value = Arc::new(&mut mock.clone()).return_by_mut_arc_ref_mut();
+
+            // Assert
+            mock.received
+                .return_by_mut_arc_ref_mut(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_MUT_ARC_REF_MUT, actual_second_value);
+        }
+
+        #[test]
+        fn return_by_pin_ref_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_pin_ref()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_pin_ref()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = Pin::new(&mock.clone()).return_by_pin_ref();
+            let actual_second_value = Pin::new(&mock.clone()).return_by_pin_ref();
+
+            // Assert
+            mock.received
+                .return_by_pin_ref(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_PIN_REF, actual_second_value);
+        }
+
+        #[test]
+        fn return_by_pin_ref_mut_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_pin_ref_mut()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_pin_ref_mut()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = Pin::new(&mut mock.clone()).return_by_pin_ref_mut();
+            let actual_second_value = Pin::new(&mut mock.clone()).return_by_pin_ref_mut();
+
+            // Assert
+            mock.received
+                .return_by_pin_ref_mut(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_PIN_REF_MUT, actual_second_value);
+        }
+
+        #[test]
+        fn return_by_mut_pin_ref_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_mut_pin_ref()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_mut_pin_ref()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = Pin::new(&mock.clone()).return_by_mut_pin_ref();
+            let actual_second_value = Pin::new(&mock.clone()).return_by_mut_pin_ref();
+
+            // Assert
+            mock.received
+                .return_by_mut_pin_ref(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_MUT_PIN_REF, actual_second_value);
+        }
+
+        #[test]
+        fn return_by_mut_pin_ref_mut_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_mut_pin_ref_mut()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_mut_pin_ref_mut()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value = Pin::new(&mut mock.clone()).return_by_mut_pin_ref_mut();
+            let actual_second_value = Pin::new(&mut mock.clone()).return_by_mut_pin_ref_mut();
+
+            // Assert
+            mock.received
+                .return_by_mut_pin_ref_mut(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(BY_MUT_PIN_REF_MUT, actual_second_value);
+        }
+
+        #[test]
+        fn return_by_mut_ref_mut_box_mut_ref_mut_with_lifetimes_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_mut_ref_mut_box_mut_ref_mut_with_lifetimes()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_mut_ref_mut_box_mut_ref_mut_with_lifetimes()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value =
+                Box::new(&mut mock.clone()).return_by_mut_ref_mut_box_mut_ref_mut_with_lifetimes();
+            let actual_second_value =
+                Box::new(&mut mock.clone()).return_by_mut_ref_mut_box_mut_ref_mut_with_lifetimes();
+
+            // Assert
+            mock.received
+                .return_by_mut_ref_mut_box_mut_ref_mut_with_lifetimes(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(
+                BY_MUT_REF_MUT_BOX_MUT_REF_MUT_WITH_LIFETIMES,
+                actual_second_value
+            );
+        }
+
+        #[test]
+        fn return_by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value =
+                Rc::new(&mut mock.clone()).return_by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes();
+            let actual_second_value =
+                Rc::new(&mut mock.clone()).return_by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes();
+
+            // Assert
+            mock.received
+                .return_by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(
+                BY_MUT_REF_MUT_RC_MUT_REF_MUT_WITH_LIFETIMES,
+                actual_second_value
+            );
+        }
+
+        #[test]
+        fn return_by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value =
+                Arc::new(&mut mock.clone()).return_by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes();
+            let actual_second_value =
+                Arc::new(&mut mock.clone()).return_by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes();
+
+            // Assert
+            mock.received
+                .return_by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(
+                BY_MUT_REF_MUT_ARC_MUT_REF_MUT_WITH_LIFETIMES,
+                actual_second_value
+            );
+        }
+
+        #[test]
+        fn return_by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            // Act
+            let actual_first_value =
+                Pin::new(&mut mock.clone()).return_by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes();
+            let actual_second_value =
+                Pin::new(&mut mock.clone()).return_by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes();
+
+            // Assert
+            mock.received
+                .return_by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(
+                BY_MUT_REF_MUT_PIN_MUT_REF_MUT_WITH_LIFETIMES,
+                actual_second_value
+            );
+        }
+
+        #[test]
+        fn return_nested_Ok() {
+            // Arrange
+            let mock = Struct::new();
+            let counter = Counter::new();
+            let first_value = -100;
+            mock.setup
+                .return_nested()
+                .returns(first_value)
+                .and_does(move |_, _| counter.inc());
+            mock.setup
+                .return_nested()
+                .call_base()
+                .and_does(move |_, _| counter.double_inc());
+
+            let mut the_self = mock.clone();
+            let mut the_self = &&mut the_self;
+            let the_self = Rc::new(&mut the_self);
+            let the_self = &mut &Pin::new(the_self);
+            let the_self = &&Arc::new(the_self);
+            let the_self = &mut Box::new(the_self);
+            let the_self = &mut Rc::new(the_self);
+            let the_self = &mut Pin::new(the_self);
+            let the_self = &Box::new(the_self);
+
+            // Act
+            let actual_first_value = the_self.return_nested();
+            let actual_second_value = the_self.return_nested();
+
+            // Assert
+            mock.received
+                .return_nested(Times::Exactly(2))
+                .no_other_calls();
+            assert_eq!(3, counter.get());
+            assert_eq!(first_value, actual_first_value);
+            assert_eq!(NESTED, actual_second_value);
         }
     }
 }

@@ -429,7 +429,7 @@ ident!(RESET_IDENT, "reset");
 ident!(INTO_TRAIT_IDENT, "Into");
 ident!(INTO_FN_IDENT, "into");
 
-ident!(GET_GLOBAL_MOCK_FN_IDENT, "get_global_mock");
+ident!(GET_STATIC_FN_GLOBAL_MOCK_FN_IDENT, "get_static_fn_global_mock");
 
 define!(
     DEFAULT_TRAIT_PATH,

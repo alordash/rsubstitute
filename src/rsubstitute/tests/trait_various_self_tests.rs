@@ -1,3 +1,5 @@
+mod test_utils;
+
 use rsubstitute::prelude::*;
 use std::pin::Pin;
 use std::rc::Rc;
@@ -154,27 +156,7 @@ mod tests {
 
     use super::*;
     use rsubstitute::*;
-    use std::sync::atomic::{AtomicUsize, Ordering};
-
-    // TODO - extract to some helpers?
-    // Helper struct for callbacks verification.
-    // Leaking for ability to `Copy` so no need to create clones for moving them in closures.
-    #[derive(Copy, Clone)]
-    struct Counter(&'static AtomicUsize);
-    impl Counter {
-        fn new() -> Self {
-            Self(Box::leak(Box::new(AtomicUsize::new(0))))
-        }
-        fn inc(&self) {
-            self.0.fetch_add(1, Ordering::Relaxed);
-        }
-        fn double_inc(&self) {
-            self.0.fetch_add(2, Ordering::Relaxed);
-        }
-        fn get(&self) -> usize {
-            self.0.load(Ordering::Relaxed)
-        }
-    }
+    use test_utils::*;
 
     mod basic_tests {
         use super::*;
