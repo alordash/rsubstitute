@@ -11,6 +11,7 @@ pub(crate) fn generate(
     fn_decl: &FnDecl,
     call_struct: &CallStruct,
     mock_generics: &MockGenerics,
+    target: Target,
 ) -> ArgsCheckerStruct {
     let attrs = vec![
         constants::DOC_HIDDEN_ATTRIBUTE.clone(),
@@ -41,9 +42,16 @@ pub(crate) fn generate(
     };
 
     let item_struct = r#struct::create(attrs, ident, fn_decl.merged_generics.clone(), fields_named);
-    let generics_info_provider_impl =
-        generics_info_provider_impl::generate(&item_struct);
     let ty_path = r#type::create_from_struct_path(&item_struct);
+    let skipped_generic_params_count = match target {
+        Target::Static => 0,
+        _ => mock_generics.impl_generics.params.len(),
+    };
+    let generics_info_provider_impl = generics_info_provider_impl::generate(
+        &item_struct.generics,
+        Type::Path(ty_path.clone()),
+        skipped_generic_params_count,
+    );
 
     let args_checker_trait_impl = args_checker_trait_impl::generate(
         &call_struct,

@@ -7,6 +7,7 @@ trait Trait {
     fn work(&self, v: i32);
 }
 
+// TODO - rename all tests mods?
 #[cfg(test)]
 mod max_invalid_calls_listed_count_tests {
     #![allow(non_snake_case)]
@@ -62,8 +63,7 @@ Trait::work(*{unexpected_v}*)
 Actually received no matching calls
 Received {calls_count} non-matching calls (non-matching arguments indicated with '*' characters):{calls_error_msgs}"
             );
-            assert_eq!(expected_error_msg, actual_error_msg);
-            println!("First read");
+            assert_eq!(Some(expected_error_msg), actual_error_msg);
         }
 
         #[test]
@@ -103,8 +103,7 @@ Trait::work(*{unexpected_v}*)
 Actually received no matching calls
 Received {calls_count} non-matching calls (listing only first {max_invalid_calls_listed_count}) (non-matching arguments indicated with '*' characters):{calls_error_msgs}"
             );
-            assert_eq!(expected_error_msg, actual_error_msg);
-            println!("Second read");
+            assert_eq!(Some(expected_error_msg), actual_error_msg);
         }
     }
 }

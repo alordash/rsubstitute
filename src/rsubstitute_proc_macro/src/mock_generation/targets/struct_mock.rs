@@ -26,7 +26,7 @@ pub(crate) fn handle(ctx: &Ctx, mut struct_mock_syntax: StructMockSyntax) -> Tok
     let target_ident = struct_mock_syntax.r#struct.ident.clone();
     let struct_fn_infos: Vec<_> = struct_fn_decls
         .into_iter()
-        .map(|x| fn_info::generate(ctx, x, &mock_type))
+        .map(|x| fn_info::generate(ctx, x, &mock_type, Target::Trait))
         .collect();
     let all_fn_infos: Vec<_> = struct_fn_infos
         .iter()

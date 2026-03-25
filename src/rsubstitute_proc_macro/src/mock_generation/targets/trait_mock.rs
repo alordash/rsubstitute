@@ -26,7 +26,7 @@ pub(crate) fn handle(ctx: &Ctx, item_trait: ItemTrait) -> TokenStream {
     let target_ident = item_trait.ident.clone();
     let fn_infos: Vec<_> = fn_decls
         .into_iter()
-        .map(|x| fn_info::generate(ctx, x, &mock_type))
+        .map(|x| fn_info::generate(ctx, x, &mock_type, Target::Trait))
         .collect();
     let all_fn_infos: Vec<_> = fn_infos.iter().collect();
     let mock_data_struct = mock_data_struct::generate_for_trait(&mock_type, &all_fn_infos);

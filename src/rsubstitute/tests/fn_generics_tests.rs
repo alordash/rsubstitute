@@ -96,7 +96,7 @@ mod tests {
                 "Mock wasn't configured to handle following call:
 	get_return<&str>({accepted_str:?})"
             );
-            assert_eq!(expected_error_msg, actual_error_msg);
+            assert_eq!(Some(expected_error_msg), actual_error_msg);
         }
 
         #[test]

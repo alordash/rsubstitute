@@ -54,7 +54,7 @@ List of existing configuration ordered by number of correctly matched arguments 
 	2. Matched 2/4 arguments: Trait::work({v1}, {v2}, *{v3}*, *{v4}*)
 	3. Matched 1/4 arguments: Trait::work({v1}, *{v2}*, *{v3}*, *{v4}*)
 	4. Matched 0/4 arguments: Trait::work(*{v1}*, *{v2}*, *{v3}*, *{v4}*)");
-        assert_eq!(expected_error_msg, actual_error_msg);
+        assert_eq!(Some(expected_error_msg), actual_error_msg);
     }
 
     #[test]
@@ -91,6 +91,6 @@ List of existing configuration ordered by number of correctly matched arguments 
 	2. Matched 2/4 arguments: work({v1}, {v2}, *{v3}*, *{v4}*)
 	3. Matched 1/4 arguments: work({v1}, *{v2}*, *{v3}*, *{v4}*)
 	4. Matched 0/4 arguments: work(*{v1}*, *{v2}*, *{v3}*, *{v4}*)");
-        assert_eq!(expected_error_msg, actual_error_msg);
+        assert_eq!(Some(expected_error_msg), actual_error_msg);
     }
 }

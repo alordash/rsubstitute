@@ -28,7 +28,7 @@ mod tests {
             "Mock wasn't configured to handle following call:
 	Trait::accept_ref({r})"
         );
-        assert_eq!(expected_panic_msg, panic_msg);
+        assert_eq!(Some(expected_panic_msg), panic_msg);
     }
 
     #[test]
@@ -61,7 +61,7 @@ Trait::accept_ref(*{r}*)
 		Expected reference (ptr: {unexpected_r_ptr:?}): {unexpected_r}
 		Actual reference   (ptr: {r_ptr:?}): {r}"
         );
-        assert_eq!(expected_panic_msg, panic_msg);
+        assert_eq!(Some(expected_panic_msg), panic_msg);
     }
 
     #[test]
@@ -85,7 +85,7 @@ Trait::accept_ref(*{r}*)
             "Did not expect to receive any other calls. Received 1 unexpected call:
 1. Trait::accept_ref({r})"
         );
-        assert_eq!(expected_panic_msg, panic_msg);
+        assert_eq!(Some(expected_panic_msg), panic_msg);
     }
 
     #[test]
@@ -103,7 +103,7 @@ Trait::accept_ref(*{r}*)
             "Mock wasn't configured to handle following call:
 	Trait::accept_ref_ptr({r:?})"
         );
-        assert_eq!(expected_panic_msg, panic_msg);
+        assert_eq!(Some(expected_panic_msg), panic_msg);
     }
 
     #[test]
@@ -136,7 +136,7 @@ Trait::accept_ref_ptr(*{r:?}*)
 		Expected reference (ptr: {unexpected_r_ptr:?}): {unexpected_r:?}
 		Actual reference   (ptr: {r_ptr:?}): {r:?}"
         );
-        assert_eq!(expected_panic_msg, panic_msg);
+        assert_eq!(Some(expected_panic_msg), panic_msg);
     }
 
     #[test]
@@ -160,6 +160,6 @@ Trait::accept_ref_ptr(*{r:?}*)
             "Did not expect to receive any other calls. Received 1 unexpected call:
 1. Trait::accept_ref_ptr({r:?})"
         );
-        assert_eq!(expected_panic_msg, panic_msg);
+        assert_eq!(Some(expected_panic_msg), panic_msg);
     }
 }

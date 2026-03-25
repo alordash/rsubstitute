@@ -19,7 +19,7 @@ pub(crate) fn handle(ctx: &Ctx, item_fn: ItemFn) -> TokenStream {
     let mock_type = mock_type::generate(mock_ident.clone(), mock_generics);
     let fn_decl = fn_decl::extract_fn(ctx, &mock_type, &item_fn);
     let fn_ident = item_fn.sig.ident.clone();
-    let fn_info = fn_info::generate(ctx, fn_decl, &mock_type);
+    let fn_info = fn_info::generate(ctx, fn_decl, &mock_type, Target::Static);
     let fn_infos = [fn_info];
     let all_fn_infos: Vec<_> = fn_infos.iter().collect();
     let mock_data_struct = mock_data_struct::generate_for_static(&mock_type, &all_fn_infos);

@@ -448,12 +448,14 @@ accept_value(*{first_value}*)
 
             // Act
             let actual_first_value = return_value();
-            let error_second_value = record_panic(|| return_value());
+            let actual_second_value = return_value();
+            let actual_third_value = return_value();
 
             // Assert
             assert_eq!(first_value, actual_first_value);
-            assert_eq!("No return value found for following call: return_value()", error_second_value);
-            assert_eq!(Result::DidNotChange, *callback_result.borrow());
+            assert_eq!(second_value, actual_second_value);
+            assert_eq!(third_value, actual_third_value);
+            assert_eq!(Result::ThirdConfigChanged, *callback_result.borrow());
         }
 
         #[test]
