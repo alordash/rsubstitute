@@ -1,6 +1,7 @@
 use crate::constants;
 use syn::visit::Visit;
 use syn::*;
+use syn::punctuated::Punctuated;
 
 pub(crate) fn merge(first: &Generics, second: &Generics) -> Generics {
     let where_clause = merge_where_clause(first.where_clause.clone(), second.where_clause.clone());
@@ -36,9 +37,15 @@ pub(crate) fn remove_default_values(mut generics: Generics) -> Generics {
     return generics;
 }
 
-fn merge_params(first_params: impl Iterator<Item = GenericParam>, second_params: impl Iterator<Item = GenericParam>) {
-    
+fn merge_params(first_params: Punctuated<GenericParam, Token![,]>, second_params: Punctuated<GenericParam, Token![,]>) {
+    let mut merged_params = Vec::with_capacity(first_params.len() + second_params.len());
+    merged_params.extend(first_params);
+    for second_param in second_params {
+        
+    }
 }
+
+
 
 fn merge_where_clause(
     maybe_first: Option<WhereClause>,
