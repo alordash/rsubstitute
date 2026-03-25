@@ -72,6 +72,10 @@ impl<'rs, TMock> FnConfig<'rs, TMock> {
         self.args_checker.check(&call)
     }
 
+    pub(crate) fn has_return_value(&self) -> bool {
+        self.call_base || self.return_value_sources.front().is_some()
+    }
+
     pub(crate) fn select_next_return_value(
         &mut self,
         call: &DynCall<'rs>,

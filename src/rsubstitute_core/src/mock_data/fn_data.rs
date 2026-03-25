@@ -116,7 +116,7 @@ impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool
 impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, false, STORES_MOCK_DATA> {
     pub fn handle<'a, TMockArg, TCall: ICall + 'a>(&self, mock_arg: TMockArg, the_call: TCall) {
         let call = Arc::new(DynCall::new(the_call));
-        let maybe_fn_config = self.try_get_matching_config(&call);
+        let maybe_fn_config = self.get_optional_matching_config(&call);
         self.register_call(call.clone());
         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
             fn_config.borrow_mut().register_call(call.clone());
@@ -162,7 +162,7 @@ impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, true, STORES_M
         let call_for_base_call = the_call.clone();
         let dyn_call = DynCall::new(the_call);
         let call = Arc::new(dyn_call);
-        let maybe_fn_config = self.try_get_matching_config(&call);
+        let maybe_fn_config = self.get_optional_matching_config(&call);
         self.register_call(call.clone());
         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
             fn_config.borrow_mut().register_call(call.clone());
@@ -261,9 +261,37 @@ mod internal {
             return (matching_calls_check_result, non_matching_calls_check_result);
         }
 
-        pub(crate) fn try_get_matching_config(
+        pub(crate) fn get_optional_matching_config(
             &self,
             dyn_call: &DynCall<'rs>,
+        ) -> MatchingConfigSearchResult<'rs, TMock> {
+            let with_return_value = false;
+            return self.try_get_matching_config(dyn_call, with_return_value);
+        }
+
+        pub(crate) fn get_required_matching_config(
+            &self,
+            dyn_call: &DynCall<'rs>,
+        ) -> Arc<RefCell<FnConfig<'rs, TMock>>> {
+            let with_return_value = true;
+            let fn_config = match self.try_get_matching_config(&dyn_call, with_return_value) {
+                MatchingConfigSearchResult::Ok(matching_config) => matching_config,
+                MatchingConfigSearchResult::Err(matching_config_search_err) => {
+                    error_printing::panic_no_suitable_fn_configuration_found(
+                        self.fn_name,
+                        dyn_call.get_arg_infos(),
+                        dyn_call.get_generic_parameter_infos(),
+                        matching_config_search_err,
+                    )
+                }
+            };
+            return fn_config;
+        }
+
+        fn try_get_matching_config(
+            &self,
+            dyn_call: &DynCall<'rs>,
+            with_return_value: bool,
         ) -> MatchingConfigSearchResult<'rs, TMock> {
             let generics_hash_key = dyn_call.get_generics_hash_key();
             let all_configs = self.configs.borrow();
@@ -272,7 +300,14 @@ mod internal {
             };
             let mut calls_args_check_results = Vec::with_capacity(matching_configs.len());
             for config in matching_configs.iter() {
-                let args_check_result = config.borrow().check_call(dyn_call);
+                let config_ref = config.borrow();
+                // TODO - (write in docs) is this logic ok? Configs without return value are reused, but if fn returns value then it's skipped if it doesn't have return value.
+                // But I guess this is ok because if fn doesn't return anything then you don't care which config is used, it can only break callbacks in tests.
+                if with_return_value && !config_ref.has_return_value() {
+                    continue;
+                }
+                let args_check_result = config_ref.check_call(dyn_call);
+                drop(config_ref);
                 if args_check_result.iter().all(|x| x.is_ok()) {
                     return MatchingConfigSearchResult::Ok(config.clone());
                 }
@@ -288,24 +323,6 @@ mod internal {
                 args_check_results_sorted_by_number_of_correctly_matched_args_descending:
                     calls_check_result,
             });
-        }
-
-        pub(crate) fn get_required_matching_config(
-            &self,
-            call: &DynCall<'rs>,
-        ) -> Arc<RefCell<FnConfig<'rs, TMock>>> {
-            let fn_config = match self.try_get_matching_config(&call) {
-                MatchingConfigSearchResult::Ok(matching_config) => matching_config,
-                MatchingConfigSearchResult::Err(matching_config_search_err) => {
-                    error_printing::panic_no_suitable_fn_configuration_found(
-                        self.fn_name,
-                        call.get_arg_infos(),
-                        call.get_generic_parameter_infos(),
-                        matching_config_search_err,
-                    )
-                }
-            };
-            return fn_config;
         }
     }
 }
