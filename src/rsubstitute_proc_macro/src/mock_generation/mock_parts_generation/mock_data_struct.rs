@@ -6,7 +6,11 @@ use crate::syntax::*;
 use quote::format_ident;
 use syn::*;
 
-pub(crate) fn generate_for_trait(mock_type: &MockType, fn_infos: &[&FnInfo]) -> MockDataStruct {
+pub(crate) fn generate_for_trait(
+    mock_type: &MockType,
+    fn_infos: &[&FnInfo],
+    specify_trait_name: bool,
+) -> MockDataStruct {
     let attrs = vec![
         constants::DOC_HIDDEN_ATTRIBUTE.clone(),
         constants::DERIVE_MOCK_DATA_ATTRIBUTE.clone(),
@@ -26,7 +30,11 @@ pub(crate) fn generate_for_trait(mock_type: &MockType, fn_infos: &[&FnInfo]) -> 
         .map(|(x, y)| {
             (
                 x.get_required_ident(),
-                y.parent.get_str_literal_full_ident().clone(),
+                if specify_trait_name {
+                    y.parent.get_str_literal_full_ident().clone()
+                } else {
+                    y.parent.fn_ident.to_string()
+                },
             )
         })
         .collect();

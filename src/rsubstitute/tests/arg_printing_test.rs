@@ -28,7 +28,7 @@ mod tests {
         // Assert
         let expected_panic_msg = format!(
             "Mock wasn't configured to handle following call:
-	Trait::accept_ref({r})"
+	accept_ref({r})"
         );
         assert_eq!(Some(expected_panic_msg), panic_msg);
     }
@@ -55,10 +55,10 @@ mod tests {
 
         let expected_panic_msg = format!(
             "Expected to receive a call exactly once matching:
-	Trait::accept_ref((&&&i32): equal to {unexpected_r})
+	accept_ref((&&&i32): equal to {unexpected_r})
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-Trait::accept_ref(*{r}*)
+accept_ref(*{r}*)
 	1. r (&&&i32):
 		Expected reference (ptr: {unexpected_r_ptr:?}): {unexpected_r}
 		Actual reference   (ptr: {r_ptr:?}): {r}"
@@ -85,7 +85,7 @@ Trait::accept_ref(*{r}*)
 
         let expected_panic_msg = format!(
             "Did not expect to receive any other calls. Received 1 unexpected call:
-1. Trait::accept_ref({r})"
+1. accept_ref({r})"
         );
         assert_eq!(Some(expected_panic_msg), panic_msg);
     }
@@ -103,7 +103,7 @@ Trait::accept_ref(*{r}*)
         // Assert
         let expected_panic_msg = format!(
             "Mock wasn't configured to handle following call:
-	Trait::accept_ref_ptr({r:?})"
+	accept_ref_ptr({r:?})"
         );
         assert_eq!(Some(expected_panic_msg), panic_msg);
     }
@@ -130,10 +130,10 @@ Trait::accept_ref(*{r}*)
 
         let expected_panic_msg = format!(
             "Expected to receive a call exactly once matching:
-	Trait::accept_ref_ptr((&&*const &&i32): equal to {unexpected_r:?})
+	accept_ref_ptr((&&*const &&i32): equal to {unexpected_r:?})
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-Trait::accept_ref_ptr(*{r:?}*)
+accept_ref_ptr(*{r:?}*)
 	1. r (&&*const &&i32):
 		Expected reference (ptr: {unexpected_r_ptr:?}): {unexpected_r:?}
 		Actual reference   (ptr: {r_ptr:?}): {r:?}"
@@ -160,7 +160,7 @@ Trait::accept_ref_ptr(*{r:?}*)
 
         let expected_panic_msg = format!(
             "Did not expect to receive any other calls. Received 1 unexpected call:
-1. Trait::accept_ref_ptr({r:?})"
+1. accept_ref_ptr({r:?})"
         );
         assert_eq!(Some(expected_panic_msg), panic_msg);
     }
@@ -181,7 +181,7 @@ Trait::accept_ref_ptr(*{r:?}*)
         // Assert
         let expected_panic_msg = format!(
             "Mock wasn't configured to handle following call:
-	Trait::generic<{t1_name}, {t2_name}>({t1})",
+	generic<{t1_name}, {t2_name}>({t1})",
         );
         assert_eq!(Some(expected_panic_msg), panic_msg);
     }
@@ -208,10 +208,10 @@ Trait::accept_ref_ptr(*{r:?}*)
         assert_eq!(return_value, actual_return_value);
         let expected_panic_msg = format!(
             "Expected to receive a call exactly once matching:
-	Trait::generic<{t1_name}, {t2_name}>(({t1_name}): equal to {unexpected_t1})
+	generic<{t1_name}, {t2_name}>(({t1_name}): equal to {unexpected_t1})
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-Trait::generic(*{t1}*)
+generic(*{t1}*)
 	1. t1 ({t1_name}):
 		Expected: {unexpected_t1}
 		Actual:   {t1}"
@@ -243,7 +243,7 @@ Trait::generic(*{t1}*)
         assert_eq!(return_value, actual_return_value);
         let expected_panic_msg = format!(
             "Expected to receive a call exactly once matching:
-	Trait::generic<{t3_name}, {t4_name}>(({t3_name}): equal to {unexpected_t3})
+	generic<{t3_name}, {t4_name}>(({t3_name}): equal to {unexpected_t3})
 Actually received no matching calls
 Received no non-matching calls"
         );
@@ -272,7 +272,7 @@ Received no non-matching calls"
 
         let expected_panic_msg = format!(
             "Did not expect to receive any other calls. Received 1 unexpected call:
-1. Trait::generic<{t1_name}, {t2_name}>({t1})"
+1. generic<{t1_name}, {t2_name}>({t1})"
         );
         assert_eq!(Some(expected_panic_msg), panic_msg);
     }

@@ -51,7 +51,7 @@ mod max_invalid_calls_listed_count_tests {
             // Assert
             let calls_error_msgs = format!(
                 "
-Trait::work(*{unexpected_v}*)
+work(*{unexpected_v}*)
 	1. v (i32):
 		Expected: {expected_v}
 		Actual:   {unexpected_v}"
@@ -59,7 +59,7 @@ Trait::work(*{unexpected_v}*)
             .repeat(calls_count);
             let expected_error_msg = format!(
                 "Expected to receive a call exactly once matching:
-	Trait::work((i32): equal to {expected_v})
+	work((i32): equal to {expected_v})
 Actually received no matching calls
 Received {calls_count} non-matching calls (non-matching arguments indicated with '*' characters):{calls_error_msgs}"
             );
@@ -91,7 +91,7 @@ Received {calls_count} non-matching calls (non-matching arguments indicated with
             // Assert
             let calls_error_msgs = format!(
                 "
-Trait::work(*{unexpected_v}*)
+work(*{unexpected_v}*)
 	1. v (i32):
 		Expected: {expected_v}
 		Actual:   {unexpected_v}"
@@ -99,7 +99,7 @@ Trait::work(*{unexpected_v}*)
             .repeat(max_invalid_calls_listed_count);
             let expected_error_msg = format!(
                 "Expected to receive a call exactly once matching:
-	Trait::work((i32): equal to {expected_v})
+	work((i32): equal to {expected_v})
 Actually received no matching calls
 Received {calls_count} non-matching calls (listing only first {max_invalid_calls_listed_count}) (non-matching arguments indicated with '*' characters):{calls_error_msgs}"
             );

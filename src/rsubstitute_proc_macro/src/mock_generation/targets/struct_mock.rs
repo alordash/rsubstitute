@@ -32,7 +32,7 @@ pub(crate) fn handle(ctx: &Ctx, mut struct_mock_syntax: StructMockSyntax) -> Tok
         .iter()
         .chain(mock_struct_trait_infos.iter().flat_map(|x| &x.fn_infos))
         .collect();
-    let mock_data_struct = mock_data_struct::generate_for_trait(&mock_type, &all_fn_infos);
+    let mock_data_struct = mock_data_struct::generate_for_trait(&mock_type, &all_fn_infos, true);
     let mut mock_struct_traits: Vec<_> = mock_struct_trait_infos
         .into_iter()
         .map(|mock_struct_trait_info| {
