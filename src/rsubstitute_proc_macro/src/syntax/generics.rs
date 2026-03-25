@@ -36,6 +36,10 @@ pub(crate) fn remove_default_values(mut generics: Generics) -> Generics {
     return generics;
 }
 
+fn merge_params(first_params: impl Iterator<Item = GenericParam>, second_params: impl Iterator<Item = GenericParam>) {
+    
+}
+
 fn merge_where_clause(
     maybe_first: Option<WhereClause>,
     maybe_second: Option<WhereClause>,

@@ -53,6 +53,7 @@ pub(crate) fn extract_struct_trait_impl_fns(
                 false,
                 Some(trait_impl_fn.block.clone()),
                 Some(&trait_impl.trait_path),
+                Some(&trait_impl.item_impl.generics)
             )
         })
         .collect();
@@ -70,6 +71,7 @@ pub(crate) fn extract_fn(ctx: &Ctx, mock_type: &MockType, item_fn: &ItemFn) -> F
         false,
         Some(*item_fn.block.clone()),
         None,
+        None
     );
     return fn_decl;
 }
@@ -105,6 +107,7 @@ fn map_trait_item_fn(
         true,
         trait_item_fn.default.clone(),
         Some(trait_path),
+        None
     );
     return fn_decl;
 }
@@ -121,6 +124,7 @@ fn map_impl_item_fn(ctx: &Ctx, mock_type: &MockType, impl_item_fn: &ImplItemFn) 
         false,
         Some(impl_item_fn.block.clone()),
         None,
+        None
     );
     return fn_decl;
 }
@@ -135,6 +139,7 @@ fn create_fn_decl(
     base_fn_block_is_in_trait: bool,
     mut maybe_base_fn_block: Option<Block>,
     maybe_parent_trait_path: Option<&Path>,
+    maybe_struct_parent_trait_generics: Option<&Generics>
 ) -> FnDecl {
     let mut actual_sig = sig.clone();
     if let Some(parent_trait_path) = maybe_parent_trait_path {
@@ -156,12 +161,15 @@ fn create_fn_decl(
 
     let maybe_phantom_return_field =
         try_get_phantom_return_field(&actual_sig.output, &actual_sig.generics);
-    let merged_generics = match generics_strategy {
+    let mut merged_generics = match generics_strategy {
         GenericsStrategy::MergeWithMockGenerics => {
             generics::merge(&mock_type.generics.impl_generics, &actual_sig.generics)
         }
         GenericsStrategy::UseMockGenerics => mock_type.generics.impl_generics.clone(),
     };
+    if let Some(struct_parent_trait_generics) = maybe_struct_parent_trait_generics {
+        merged_generics = generics::merge(&merged_generics, struct_parent_trait_generics);
+    }
     let arguments: Vec<_> = actual_sig.inputs.iter().cloned().collect();
     let arg_refs_tuple = generate_arg_refs_tuple(&arguments);
     let internal_phantom_fields: Vec<_> = actual_sig
