@@ -1,4 +1,3 @@
-use rsubstitute_proc_macro::mocked_base;
 use std::marker::PhantomData;
 
 trait Same<'a, T> {
@@ -12,13 +11,18 @@ trait Different<'a, T> {
 // mocked_base! {
 //     struct Struct<'a, T>(PhantomData<&'a T>);
 //
-//     impl<'b, S> Struct<'b, S> {
-//         pub fn new() -> Self {
-//             Self(PhantomData)
-//         }
-//
-//         pub fn work(&self, s: &'b S) {}
+//     impl<'a, T> Struct<'a, T> {
+//         pub fn new() -> Self { Self(PhantomData) }
 //     }
+//
+//     // TODO - write in doc that this is not supported, that generic params idents in impl blocks should be same as in item definition
+//     // impl<'b, S> Struct<'b, S> {
+//     //     pub fn new() -> Self {
+//     //         Self(PhantomData)
+//     //     }
+//     //
+//     //     pub fn work(&self, s: &'b S) {}
+//     // }
 //
 //     // impl<'a, T> Same<'a, T> for Struct<'a, T> {
 //     //     fn work(&self, t: &'a T) {
@@ -26,11 +30,11 @@ trait Different<'a, T> {
 //     //     }
 //     // }
 //
-//     // impl<'a, 'b, T1, T2> Different<'a, T1> for Struct<'b, T2> {
-//     //     fn work(&self, t: &'a T1) {
-//     //         unreachable!()
-//     //     }
-//     // }
+//     impl<'a, 'd, T, Td> Different<'d, Td> for Struct<'a, T> {
+//         fn work(&self, t: &'d Td) {
+//             unreachable!()
+//         }
+//     }
 // }
 
 mod tests {
@@ -41,18 +45,17 @@ mod tests {
 #[cfg(not(test))]
 struct Struct<'a, T>(PhantomData<&'a T>);
 #[cfg(not(test))]
-impl<'b, S> Struct<'b, S> {
+impl<'a, 'd, T, Td> Different<'d, Td> for Struct<'a, T> {
+    fn work(&self, t: &'d Td) {
+        unreachable!()
+    }
+}
+#[cfg(not(test))]
+impl<'a, T> Struct<'a, T> {
     pub fn new() -> Self {
         Self(PhantomData)
     }
-
-    pub fn work(&self, s: &'b S) {}
 }
-// impl<'a, 'b, T1, T2> Different<'a, T1> for Struct<'b, T2> {
-//     fn work(&self, t: &'a T1) {
-//         unreachable!()
-//     }
-// }
 #[cfg(test)]
 pub use __rsubstitute_generated_Struct::*;
 #[cfg(test)]
@@ -64,103 +67,196 @@ mod __rsubstitute_generated_Struct {
     use super::*;
     use rsubstitute::for_generated::*;
     #[doc(hidden)]
-    pub struct work_Call<'a, T> {
+    pub struct Different_work_Call<'a, 'a, 'd, T, T, Td> {
         _phantom_GenericParam_a: PhantomData<&'a ()>,
         _phantom_GenericParam_T: PhantomData<T>,
-        _phantom_s: PhantomData<&'b S>,
-        s: *const S,
+        _phantom_t: PhantomData<&'d Td>,
+        t: *const Td,
     }
-    impl<'a, T> IArgsInfosProvider for work_Call<'a, T> {
+    impl<'a, 'a, 'd, T, T, Td> IArgsInfosProvider for Different_work_Call<'a, 'a, 'd, T, T, Td> {
         fn get_arg_infos(&self) -> Vec<ArgInfo> {
             vec![ArgInfo::new(
-                "s",
-                &self.s,
-                (&ArgPrinter::<&S>(transmute_lifetime!(&self.s))).debug_string(),
+                "t",
+                &self.t,
+                (&ArgPrinter::<&Td>(transmute_lifetime!(&self.t))).debug_string(),
             )]
         }
     }
-    impl<'a, T> IArgsTupleProvider for work_Call<'a, T> {
+    impl<'a, 'a, 'd, T, T, Td> IArgsTupleProvider for Different_work_Call<'a, 'a, 'd, T, T, Td> {
         fn get_ptr_to_boxed_tuple_of_refs(&self) -> *mut () {
-            Box::leak(Box::new((&self.s,))) as *mut _ as *mut ()
+            Box::leak(Box::new((&self.t,))) as *mut _ as *mut ()
         }
     }
-    impl<'a, T> IGenericsInfoProvider for work_Call<'a, T> {
+    impl<'a, 'a, 'd, T, T, Td> IGenericsInfoProvider for Different_work_Call<'a, 'a, 'd, T, T, Td> {
         fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
-            vec![]
+            vec![
+                generic_type_info("T", core::any::type_name::<T>()),
+                generic_type_info("Td", core::any::type_name::<Td>()),
+            ]
         }
-        fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {}
+        fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {
+            [tid::<T>(), tid::<Td>()].hash(hasher)
+        }
         fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
     }
-    impl<'a, T> Clone for work_Call<'a, T> {
+    impl<'a, 'a, 'd, T, T, Td> Clone for Different_work_Call<'a, 'a, 'd, T, T, Td> {
         fn clone(&self) -> Self {
             Self {
                 _phantom_GenericParam_a: (&self._phantom_GenericParam_a).clone(),
                 _phantom_GenericParam_T: (&self._phantom_GenericParam_T).clone(),
-                _phantom_s: (&self._phantom_s).clone(),
-                s: (&self.s).clone(),
+                _phantom_t: (&self._phantom_t).clone(),
+                t: (&self.t).clone(),
             }
         }
     }
     #[doc(hidden)]
     #[derive(Debug)]
-    pub struct work_ArgsChecker<'a, T> {
+    pub struct Different_work_ArgsChecker<'a, 'a, 'd, T, T, Td> {
         _phantom_GenericParam_a: PhantomData<&'a ()>,
         _phantom_GenericParam_T: PhantomData<T>,
-        _phantom_s: PhantomData<&'b S>,
-        s: Arg<*const S>,
+        _phantom_t: PhantomData<&'d Td>,
+        t: Arg<*const Td>,
     }
-    impl<'a, T> IArgsChecker for work_ArgsChecker<'a, T> {
+    impl<'a, 'a, 'd, T, T, Td> IArgsChecker for Different_work_ArgsChecker<'a, 'a, 'd, T, T, Td> {
         #[allow(unused)]
         fn check(&self, dyn_call: &DynCall) -> Vec<ArgCheckResult> {
-            let call: &work_Call<'a, T> = dyn_call.downcast_ref();
-            vec![transmute_lifetime!(&self.s, &Arg::<&'b S>).check_ref(
-                "s",
-                transmute_lifetime!(&call.s),
-                (&ArgPrinter::<&S>(transmute_lifetime!(&call.s))).debug_string(),
+            let call: &Different_work_Call<'a, 'a, 'd, T, T, Td> = dyn_call.downcast_ref();
+            vec![transmute_lifetime!(&self.t, &Arg::<&'d Td>).check_ref(
+                "t",
+                transmute_lifetime!(&call.t),
+                (&ArgPrinter::<&Td>(transmute_lifetime!(&call.t))).debug_string(),
             )]
         }
     }
-    impl<'a, T> IArgsFormatter for work_ArgsChecker<'a, T> {
+    impl<'a, 'a, 'd, T, T, Td> IArgsFormatter for Different_work_ArgsChecker<'a, 'a, 'd, T, T, Td> {
         fn fmt_args(&self) -> String {
             format!(
                 "{}",
-                (&ArgPrinter(&transmute_lifetime!(&self.s, &Arg::<&'b S>))).debug_string()
+                (&ArgPrinter(&transmute_lifetime!(&self.t, &Arg::<&'d Td>))).debug_string()
             )
         }
     }
-    impl<'a, T> IGenericsInfoProvider for work_ArgsChecker<'a, T> {
+    impl<'a, 'a, 'd, T, T, Td> IGenericsInfoProvider
+        for Different_work_ArgsChecker<'a, 'a, 'd, T, T, Td>
+    {
         fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
-            vec![]
+            vec![
+                generic_type_info("T", core::any::type_name::<T>()),
+                generic_type_info("Td", core::any::type_name::<Td>()),
+            ]
         }
-        fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {}
+        fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {
+            [tid::<T>(), tid::<Td>()].hash(hasher)
+        }
         fn hash_const_values(&self, hasher: &mut GenericsHasher) {}
+    }
+    #[doc(hidden)]
+    pub struct DifferentSetup<'a, T> {
+        data: Arc<StructData<'a, T>>,
+    }
+    impl<'a, T> Clone for DifferentSetup<'a, T> {
+        fn clone(&self) -> Self {
+            Self {
+                data: (&self.data).clone(),
+            }
+        }
+    }
+    #[doc(hidden)]
+    pub struct DifferentReceived<'a, T> {
+        data: Arc<StructData<'a, T>>,
+    }
+    impl<'a, T> Clone for DifferentReceived<'a, T> {
+        fn clone(&self) -> Self {
+            Self {
+                data: (&self.data).clone(),
+            }
+        }
+    }
+    impl<'a, T> DifferentSetup<'a, T> {
+        pub fn work<'__rsa>(
+            &self,
+            t: impl Into<Arg<&'d Td>>,
+        ) -> FnTuner<'_, Struct<'a, T>, Self, (&'__rsa &'d Td,), (), &Self, true, true>
+        where
+            '__rsa: 'a,
+            'a: '__rsa,
+        {
+            let Different_work_args_checker: Different_work_ArgsChecker<'a, 'a, 'd, T, T, Td> =
+                Different_work_ArgsChecker {
+                    _phantom_GenericParam_a: PhantomData,
+                    _phantom_GenericParam_T: PhantomData,
+                    _phantom_t: PhantomData,
+                    t: transmute_lifetime!(t.into()),
+                };
+            let fn_tuner: FnTuner<
+                '_,
+                Struct<'a, T>,
+                Self,
+                (&'__rsa &'d Td,),
+                (),
+                &Self,
+                true,
+                true,
+            > = self
+                .data
+                .Different_work
+                .add_config(Different_work_args_checker, self);
+            return transmute_lifetime!(fn_tuner);
+        }
+    }
+    impl<'a, T> DifferentReceived<'a, T> {
+        pub fn work<'__rsa>(
+            &self,
+            t: impl Into<Arg<&'d Td>>,
+            times: Times,
+        ) -> FnVerifier<Self, (&'__rsa &'d Td,)>
+        where
+            '__rsa: 'a,
+            'a: '__rsa,
+        {
+            let Different_work_args_checker: Different_work_ArgsChecker<'a, 'a, 'd, T, T, Td> =
+                Different_work_ArgsChecker {
+                    _phantom_GenericParam_a: PhantomData,
+                    _phantom_GenericParam_T: PhantomData,
+                    _phantom_t: PhantomData,
+                    t: transmute_lifetime!(t.into()),
+                };
+            self.data
+                .Different_work
+                .verify_received(Different_work_args_checker, times);
+            return FnVerifier::new(self.clone());
+        }
     }
     #[doc(hidden)]
     #[derive(IMockData)]
     pub struct StructData<'a, T> {
         _phantom_GenericParam_a: PhantomData<&'a ()>,
         _phantom_GenericParam_T: PhantomData<T>,
-        pub work: FnData<'static, Struct<'a, T>, true, true>,
+        pub Different_work: FnData<'static, Struct<'a, T>, true, true>,
     }
     #[doc(hidden)]
     pub struct StructSetup<'a, T> {
         data: Arc<StructData<'a, T>>,
+        pub as_Different: DifferentSetup<'a, T>,
     }
     impl<'a, T> Clone for StructSetup<'a, T> {
         fn clone(&self) -> Self {
             Self {
                 data: (&self.data).clone(),
+                as_Different: (&self.as_Different).clone(),
             }
         }
     }
     #[doc(hidden)]
     pub struct StructReceived<'a, T> {
         data: Arc<StructData<'a, T>>,
+        pub as_Different: DifferentReceived<'a, T>,
     }
     impl<'a, T> Clone for StructReceived<'a, T> {
         fn clone(&self) -> Self {
             Self {
                 data: (&self.data).clone(),
+                as_Different: (&self.as_Different).clone(),
             }
         }
     }
@@ -189,89 +285,52 @@ mod __rsubstitute_generated_Struct {
             &self.inner_data
         }
     }
-    impl<'a, T> Struct<'a, T> {
-        pub fn work(&self, s: &'b S) {
-            let call: work_Call<'_, T> = work_Call {
+    impl<'a, T> Different<'d, Td> for Struct<'a, T> {
+        fn work(&self, t: &'d Td) {
+            let call: Different_work_Call<'_, '_, '_, T, T, Td> = Different_work_Call {
                 _phantom_GenericParam_a: PhantomData,
                 _phantom_GenericParam_T: PhantomData,
-                _phantom_s: PhantomData,
-                s: transmute_lifetime!(s),
+                _phantom_t: PhantomData,
+                t: transmute_lifetime!(t),
             };
             self.data
                 .clone()
-                .work
-                .handle_base(self, call, Self::base_work);
+                .Different_work
+                .handle_base(self, call, Self::base_Different_work);
         }
     }
+    impl<'a, T> Struct<'a, T> {}
     impl<'a, T> Struct<'a, T> {
         pub fn new() -> Self {
             let data = Arc::new(StructData {
                 _phantom_GenericParam_a: PhantomData,
                 _phantom_GenericParam_T: PhantomData,
-                work: FnData::new("work"),
+                Different_work: FnData::new("Different::work"),
             });
             let inner_data = Struct_InnerData::new();
             return Struct {
-                setup: StructSetup { data: data.clone() },
-                received: StructReceived { data: data.clone() },
+                setup: StructSetup {
+                    data: data.clone(),
+                    as_Different: DifferentSetup { data: data.clone() },
+                },
+                received: StructReceived {
+                    data: data.clone(),
+                    as_Different: DifferentReceived { data: data.clone() },
+                },
                 data,
                 inner_data,
             };
         }
-        fn base_work(&self, call: work_Call<'a, T>) {
+        fn base_Different_work(&self, call: Different_work_Call<'a, 'a, 'd, T, T, Td>) {
             #[allow(non_shorthand_field_patterns)]
             #[allow(unused_variables)]
-            let work_Call::<'_, T> { s: s, .. } = call;
-            let s: &'b S = transmute_lifetime!(s);
+            let Different_work_Call::<'_, '_, '_, T, T, Td> { t: t, .. } = call;
+            let t: &'d Td = transmute_lifetime!(t);
+            unreachable!()
         }
     }
-    impl<'a, T> StructSetup<'a, T> {
-        pub fn work<'__rsa>(
-            &self,
-            s: impl Into<Arg<&'b S>>,
-        ) -> FnTuner<'_, Struct<'a, T>, Self, (&'__rsa &'b S,), (), &Self, true, true>
-        where
-            '__rsa: 'a,
-            'a: '__rsa,
-        {
-            let work_args_checker: work_ArgsChecker<'a, T> = work_ArgsChecker {
-                _phantom_GenericParam_a: PhantomData,
-                _phantom_GenericParam_T: PhantomData,
-                _phantom_s: PhantomData,
-                s: transmute_lifetime!(s.into()),
-            };
-            let fn_tuner: FnTuner<
-                '_,
-                Struct<'a, T>,
-                Self,
-                (&'__rsa &'b S,),
-                (),
-                &Self,
-                true,
-                true,
-            > = self.data.work.add_config(work_args_checker, self);
-            return transmute_lifetime!(fn_tuner);
-        }
-    }
+    impl<'a, T> StructSetup<'a, T> {}
     impl<'a, T> StructReceived<'a, T> {
-        pub fn work<'__rsa>(
-            &self,
-            s: impl Into<Arg<&'b S>>,
-            times: Times,
-        ) -> FnVerifier<Self, (&'__rsa &'b S,)>
-        where
-            '__rsa: 'a,
-            'a: '__rsa,
-        {
-            let work_args_checker: work_ArgsChecker<'a, T> = work_ArgsChecker {
-                _phantom_GenericParam_a: PhantomData,
-                _phantom_GenericParam_T: PhantomData,
-                _phantom_s: PhantomData,
-                s: transmute_lifetime!(s.into()),
-            };
-            self.data.work.verify_received(work_args_checker, times);
-            return FnVerifier::new(self.clone());
-        }
         pub fn no_other_calls(&self) {
             self.data.verify_received_nothing_else();
         }
