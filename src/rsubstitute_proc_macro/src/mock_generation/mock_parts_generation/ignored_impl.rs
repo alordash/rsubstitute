@@ -10,7 +10,7 @@ pub(crate) fn fix(mock_type: &MockType, ignored_impls: &mut [ItemImpl]) {
 
 fn fix_single(mock_type: &MockType, ignored_impl: &mut ItemImpl) {
     let merged_generics = generics::merge(
-        &mock_type.generics.impl_generics_without_default_values,
+        mock_type.generics.impl_generics_without_default_values.clone(),
         &ignored_impl.generics,
     );
     ignored_impl.generics = merged_generics;

@@ -7,15 +7,17 @@ use crate::mock_generation::parameters::Target;
 use crate::mock_generation::*;
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::ImplItem;
+use syn::*;
 
 pub(crate) fn handle(ctx: &Ctx, mut struct_mock_syntax: StructMockSyntax) -> TokenStream {
     let source_struct_impls_syntax = generate_source_struct_impls_syntax(&struct_mock_syntax);
 
     let mock_ident = struct_mock_syntax.r#struct.ident.clone();
 
-    let mock_generics =
-        mock_generics::generate(&struct_mock_syntax.r#struct.generics, Target::Trait, None);
+    let mock_generics = mock_generics::generate_for_struct(
+        &struct_mock_syntax.r#struct.generics,
+        &struct_mock_syntax.trait_impls,
+    );
     let mock_type = mock_type::generate_for_struct(mock_ident.clone(), mock_generics);
     let mock_struct_trait_infos: Vec<_> = core::mem::take(&mut struct_mock_syntax.trait_impls)
         .into_iter()
@@ -26,7 +28,7 @@ pub(crate) fn handle(ctx: &Ctx, mut struct_mock_syntax: StructMockSyntax) -> Tok
     let target_ident = struct_mock_syntax.r#struct.ident.clone();
     let struct_fn_infos: Vec<_> = struct_fn_decls
         .into_iter()
-        .map(|x| fn_info::generate(ctx, x, &mock_type, Target::Trait))
+        .map(|x| fn_info::generate(ctx, x, &mock_type, Target::TraitOrStruct))
         .collect();
     let all_fn_infos: Vec<_> = struct_fn_infos
         .iter()

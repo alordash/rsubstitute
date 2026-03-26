@@ -163,12 +163,12 @@ fn create_fn_decl(
         try_get_phantom_return_field(&actual_sig.output, &actual_sig.generics);
     let mut merged_generics = match generics_strategy {
         GenericsStrategy::MergeWithMockGenerics => {
-            generics::merge(&mock_type.generics.impl_generics, &actual_sig.generics)
+            generics::merge(mock_type.generics.impl_generics.clone(), &actual_sig.generics)
         }
         GenericsStrategy::UseMockGenerics => mock_type.generics.impl_generics.clone(),
     };
     if let Some(struct_parent_trait_generics) = maybe_struct_parent_trait_generics {
-        merged_generics = generics::merge(&merged_generics, struct_parent_trait_generics);
+        merged_generics = generics::merge(merged_generics, struct_parent_trait_generics);
     }
     let arguments: Vec<_> = actual_sig.inputs.iter().cloned().collect();
     let arg_refs_tuple = generate_arg_refs_tuple(&arguments);

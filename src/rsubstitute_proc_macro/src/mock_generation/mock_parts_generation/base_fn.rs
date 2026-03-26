@@ -21,7 +21,7 @@ pub(crate) fn generate(
         call_struct,
         base_fn_block,
         mock_type,
-        Target::Trait,
+        Target::TraitOrStruct,
         None,
     );
     let impl_item_fn = ImplItemFn {
@@ -48,7 +48,7 @@ pub(crate) fn generate_struct_trait_fn(
         call_struct,
         base_fn_block,
         mock_type,
-        Target::Trait,
+        Target::TraitOrStruct,
         Some(trait_ident),
     );
     let impl_item_fn = ImplItemFn {
@@ -100,7 +100,7 @@ fn generate_call_base_fn_parts(
 ) -> (Signature, Block) {
     let generics = match target {
         Target::Static => fn_decl.merged_generics.clone(),
-        Target::Trait => fn_decl.own_generics.clone(),
+        Target::TraitOrStruct => fn_decl.own_generics.clone(),
     };
     let first_arg = match target {
         Target::Static => FnArg::Typed(PatType {
@@ -115,7 +115,7 @@ fn generate_call_base_fn_parts(
                 None,
             )),
         }),
-        Target::Trait => FnArg::Receiver(
+        Target::TraitOrStruct => FnArg::Receiver(
             fn_decl
                 .maybe_actual_self_type
                 .clone()

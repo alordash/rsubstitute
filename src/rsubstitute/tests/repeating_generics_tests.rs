@@ -31,14 +31,24 @@ mocked_base! {
         }
     }
 
-    // impl<'a, 'd, T, Td> Different<'d, Td> for Struct<'a, T> {
-    //     fn work(&self, t: &'d Td) {
-    //         unreachable!()
-    //     }
-    // }
+    // TODO - write in docs about this limitation, i.e. trait impl's generics get inserted into struct's generics
+    impl<'a, 'd, T, Td> Different<'d, Td> for Struct<'a, T> {
+        fn work(&self, t: &'d Td) {
+            unreachable!()
+        }
+    }
 }
 
+#[cfg(test)]
 mod tests {
+    use super::*;
+    
     #[test]
-    fn compile() {}
+    fn compile() {
+        let mock = Struct::<i32, String>::new();
+        
+        Same::work(&mock, &3);
+        
+        mock.received.as_Same.work(&3, Times::Once);
+    }
 }

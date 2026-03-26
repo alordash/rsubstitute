@@ -21,7 +21,7 @@ pub(crate) fn generate_for_trait(
         .iter()
         .map(|x| {
             let output_type = setup_output::generate_for_trait(mock_type, x);
-            return ImplItem::Fn(generate_fn_setup(x, mock_type, output_type, Target::Trait));
+            return ImplItem::Fn(generate_fn_setup(x, mock_type, output_type, Target::TraitOrStruct));
         })
         .collect();
 
@@ -65,7 +65,7 @@ fn generate_fn_setup(
     );
 
     let mut generics = match target {
-        Target::Trait => fn_info.parent.own_generics.clone(),
+        Target::TraitOrStruct => fn_info.parent.own_generics.clone(),
         Target::Static => Default::default(),
     };
     generics = generics.with_head_lifetime_param(constants::PLACEHOLDER_LIFETIME_PARAM.clone());
@@ -81,7 +81,7 @@ fn generate_fn_setup(
         abi: None,
         fn_token: Default::default(),
         ident: match target {
-            Target::Trait => fn_info.parent.fn_ident.clone(),
+            Target::TraitOrStruct => fn_info.parent.fn_ident.clone(),
             Target::Static => constants::MOCK_SETUP_FIELD_IDENT.clone(),
         },
         generics,

@@ -1,4 +1,5 @@
 use crate::mock_generation::mock_parts_generation::models::*;
+use crate::mock_generation::models::*;
 use crate::mock_generation::parameters::*;
 use crate::mock_generation::*;
 use crate::syntax::generics;
@@ -9,14 +10,44 @@ pub(crate) fn generate(
     target: Target,
     maybe_associated_generics: Option<&AssociatedGenerics>,
 ) -> MockGenerics {
+    return generate_core(
+        source_generics.clone(),
+        source_generics,
+        target,
+        maybe_associated_generics,
+    );
+}
+
+pub(crate) fn generate_for_struct(
+    source_generics: &Generics,
+    trait_impls: &[TraitImpl],
+) -> MockGenerics {
     let mut modified_source_generics = source_generics.clone();
+    for trait_impl in trait_impls {
+        modified_source_generics =
+            generics::merge(modified_source_generics, &trait_impl.item_impl.generics);
+    }
+    return generate_core(
+        modified_source_generics,
+        source_generics,
+        Target::TraitOrStruct,
+        None,
+    );
+}
+
+fn generate_core(
+    mut modified_source_generics: Generics,
+    source_generics: &Generics,
+    target: Target,
+    maybe_associated_generics: Option<&AssociatedGenerics>,
+) -> MockGenerics {
     if let Some(associated_generics) = maybe_associated_generics {
         modified_source_generics
             .params
             .extend(associated_generics.generics_params.clone());
     }
     let phantom_fields = match target {
-        Target::Trait => modified_source_generics
+        Target::TraitOrStruct => modified_source_generics
             .params
             .iter()
             .filter_map(phantom_field::try_map_generic_param)

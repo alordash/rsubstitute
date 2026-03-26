@@ -23,7 +23,7 @@ pub(crate) fn generate_for_trait(
     let result = generate(
         fn_info,
         fn_info.parent.fn_ident.clone(),
-        Target::Trait,
+        Target::TraitOrStruct,
         constants::SELF_TYPE.clone(),
         mock_type,
         output_type_generics,
@@ -94,7 +94,7 @@ fn generate(
         .chain(iter::once(times_arg))
         .collect();
     match target {
-        Target::Trait => inputs.insert(0, constants::REF_SELF_ARG.clone()),
+        Target::TraitOrStruct => inputs.insert(0, constants::REF_SELF_ARG.clone()),
         _ => (),
     }
 

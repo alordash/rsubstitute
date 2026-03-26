@@ -5,9 +5,9 @@ use generics_merging::*;
 use syn::visit::Visit;
 use syn::*;
 
-pub(crate) fn merge(first: &Generics, second: &Generics) -> Generics {
-    let where_clause = merge_where_clause(first.where_clause.clone(), second.where_clause.clone());
-    let params = merge_params(first.params.clone(), second.params.clone());
+pub(crate) fn merge(first: Generics, second: &Generics) -> Generics {
+    let where_clause = merge_where_clause(first.where_clause, second.where_clause.clone());
+    let params = merge_params(first.params, second.params.clone());
     let result = Generics {
         lt_token: Some(Default::default()),
         params,
