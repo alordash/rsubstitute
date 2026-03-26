@@ -157,7 +157,7 @@ mocked_base! {
 }
 
 // TODO - remove #[cfg(test)] from every integration test, it makes no sense
-#[cfg(test)]
+// #[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
     #![allow(unused_imports)]
@@ -174,7 +174,8 @@ mod tests {
             // Arrange
             let mock = Struct::new();
             let counter = Counter::new();
-            mock.setup.by_value().does(move |_, _| counter.inc());
+            // TODO - assert mock type in callback
+            mock.setup.by_value().does(move |mock, _| counter.inc());
             mock.setup
                 .by_value()
                 .call_base()
