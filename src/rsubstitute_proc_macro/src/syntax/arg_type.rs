@@ -11,11 +11,7 @@ pub(crate) fn create(ty: Type) -> TypePath {
                 arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
                     colon2_token: None,
                     lt_token: Default::default(),
-                    args: [
-                        GenericArgument::Type(ty),
-                    ]
-                    .into_iter()
-                    .collect(),
+                    args: [GenericArgument::Type(ty)].into_iter().collect(),
                     gt_token: Default::default(),
                 }),
             }]

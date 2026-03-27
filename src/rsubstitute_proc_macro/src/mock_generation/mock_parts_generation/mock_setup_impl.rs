@@ -21,7 +21,12 @@ pub(crate) fn generate_for_trait(
         .iter()
         .map(|x| {
             let output_type = setup_output::generate_for_trait(mock_type, x);
-            return ImplItem::Fn(generate_fn_setup(x, mock_type, output_type, Target::TraitOrStruct));
+            return ImplItem::Fn(generate_fn_setup(
+                x,
+                mock_type,
+                output_type,
+                Target::TraitOrStruct,
+            ));
         })
         .collect();
 

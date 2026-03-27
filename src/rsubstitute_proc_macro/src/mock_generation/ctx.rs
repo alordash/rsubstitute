@@ -1,7 +1,7 @@
 use crate::constants;
 use crate::mock_generation::models::Ctx;
-use proc_macro::TokenStream;
 use crate::mock_generation::parameters::*;
+use proc_macro::TokenStream;
 
 pub(crate) fn create(proc_macro_attribute: TokenStream) -> Ctx {
     if proc_macro_attribute.is_empty() {

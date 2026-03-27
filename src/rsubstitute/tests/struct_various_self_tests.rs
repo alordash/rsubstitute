@@ -164,9 +164,9 @@ mod tests {
     #![allow(unused_imports)]
 
     use super::*;
-    use test_utils::*;
     use not_enough_asserts::*;
     use rsubstitute::*;
+    use test_utils::*;
 
     mod no_return_tests {
         use super::*;

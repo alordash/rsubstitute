@@ -87,6 +87,19 @@ pub(crate) fn create_expr_from_parts(idents: Vec<Ident>) -> Expr {
     to_expr(create_from_parts(idents))
 }
 
+pub(crate) fn create_with_path_arguments(ident: Ident, path_arguments: PathArguments) -> Path {
+    let result = Path {
+        leading_colon: None,
+        segments: [PathSegment {
+            ident,
+            arguments: path_arguments,
+        }]
+        .into_iter()
+        .collect(),
+    };
+    return result;
+}
+
 fn to_expr(path: Path) -> Expr {
     let expr = Expr::Path(ExprPath {
         attrs: Vec::new(),

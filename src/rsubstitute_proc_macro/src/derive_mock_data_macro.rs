@@ -2,7 +2,7 @@ use crate::constants;
 use crate::syntax::extensions::*;
 use crate::syntax::*;
 use proc_macro::TokenStream;
-use quote::{format_ident, ToTokens};
+use quote::{ToTokens, format_ident};
 use std::cell::LazyCell;
 use syn::punctuated::Punctuated;
 use syn::*;

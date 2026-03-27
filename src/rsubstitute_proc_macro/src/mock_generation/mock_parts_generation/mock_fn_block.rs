@@ -6,10 +6,11 @@ use crate::syntax::extensions::*;
 use crate::syntax::*;
 use quote::format_ident;
 use std::cell::LazyCell;
+use syn::punctuated::Punctuated;
 use syn::*;
 
 pub(crate) fn generate_for_trait(fn_info: &FnInfo) -> Block {
-    let call_stmt = generate_call_stmt(fn_info);
+    let call_stmt = generate_call_stmt(fn_info, None, 0);
     let last_stmts = generate_last_stmts(fn_info, Target::Other, None);
     let stmts = [call_stmt].into_iter().chain(last_stmts).collect();
     let block = Block {
@@ -19,8 +20,17 @@ pub(crate) fn generate_for_trait(fn_info: &FnInfo) -> Block {
     return block;
 }
 
-pub(crate) fn generate_for_struct_trait_fn(fn_info: &FnInfo, trait_ident: &Ident) -> Block {
-    let call_stmt = generate_call_stmt(fn_info);
+pub(crate) fn generate_for_struct_trait_fn(
+    fn_info: &FnInfo,
+    trait_ident: &Ident,
+    self_ty_path: TypePath,
+    default_self_ty_path_generics_arguments_len: usize,
+) -> Block {
+    let call_stmt = generate_call_stmt(
+        fn_info,
+        Some(self_ty_path),
+        default_self_ty_path_generics_arguments_len,
+    );
     let last_stmts = generate_last_stmts(fn_info, Target::Other, Some(trait_ident));
     let stmts = [call_stmt].into_iter().chain(last_stmts).collect();
     let block = Block {
@@ -31,7 +41,7 @@ pub(crate) fn generate_for_struct_trait_fn(fn_info: &FnInfo, trait_ident: &Ident
 }
 
 pub(crate) fn generate_for_static(fn_info: &FnInfo, mock_type: &MockType) -> Block {
-    let call_stmt = generate_call_stmt(fn_info);
+    let call_stmt = generate_call_stmt(fn_info, None, 0);
     let last_stmts = generate_last_stmts(fn_info, Target::StaticFn(mock_type), None);
     let stmts = [call_stmt].into_iter().chain(last_stmts).collect();
     let block = Block {
@@ -50,7 +60,11 @@ const HANDLE_BASE_RETURNING_METHOD_IDENT: LazyCell<Ident> =
     LazyCell::new(|| format_ident!("handle_base_returning"));
 const MOCK_VARIABLE_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("mock"));
 
-fn generate_call_stmt(fn_info: &FnInfo) -> Stmt {
+fn generate_call_stmt(
+    fn_info: &FnInfo,
+    maybe_self_ty_path: Option<TypePath>,
+    default_self_ty_path_generics_arguments_len: usize,
+) -> Stmt {
     let field_values: Vec<_> = fn_info
         .call_struct
         .item_struct
@@ -70,10 +84,40 @@ fn generate_call_stmt(fn_info: &FnInfo) -> Stmt {
             return field_value;
         })
         .collect();
-    let mut call_struct_type = r#type::create_with_generics(
+    let mut call_struct_type_path = r#type::create_with_generics_path(
         fn_info.call_struct.item_struct.ident.clone(),
         fn_info.call_struct.item_struct.generics.clone(),
     );
+    if let Some(self_ty_path) = maybe_self_ty_path
+        && let Some(call_struct_type_path_last_segment) =
+            call_struct_type_path.path.segments.last_mut()
+        && let PathArguments::AngleBracketed(call_struct_type_path_generics_arguments) =
+            &mut call_struct_type_path_last_segment.arguments
+    {
+        let self_ty_path_generics_arguments_len = self_ty_path
+            .path
+            .segments
+            .last()
+            .and_then(|x| match &x.arguments {
+                PathArguments::AngleBracketed(angle_bracketed) => Some(angle_bracketed.args.len()),
+                _ => None,
+            })
+            .unwrap_or(0);
+        let retained_call_struct_type_path_generics_argument_count =
+            call_struct_type_path_generics_arguments.args.len()
+                - default_self_ty_path_generics_arguments_len
+                + self_ty_path_generics_arguments_len;
+        let placeholder_args = Punctuated::new();
+        let retained_args: Punctuated<_, Token![,]> = core::mem::replace(
+            &mut call_struct_type_path_generics_arguments.args,
+            placeholder_args,
+        )
+        .into_iter()
+        .take(retained_call_struct_type_path_generics_argument_count)
+        .collect();
+        call_struct_type_path_generics_arguments.args = retained_args;
+    }
+    let mut call_struct_type = Type::Path(call_struct_type_path);
     lifetime::set_all_lifetimes(
         &mut call_struct_type,
         &constants::ANONYMOUS_LIFETIME.clone(),

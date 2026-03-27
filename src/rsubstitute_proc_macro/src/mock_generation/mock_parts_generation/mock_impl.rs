@@ -32,7 +32,10 @@ pub(crate) fn generate(
         defaultness: None,
         unsafety: None,
         impl_token: Default::default(),
-        generics: mock_type.generics.impl_generics_without_default_values.clone(),
+        generics: mock_type
+            .generics
+            .impl_generics_without_default_values
+            .clone(),
         trait_: None,
         self_ty: Box::new(self_ty),
         brace_token: Default::default(),

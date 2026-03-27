@@ -88,9 +88,11 @@ pub(crate) fn handle(ctx: &Ctx, mut struct_mock_syntax: StructMockSyntax) -> Tok
         .map(|mock_struct_trait| {
             mock_payload_impl::generate_for_struct_trait(
                 mock_struct_trait.info.trait_path.clone(),
-                &mock_type,
                 &mock_struct_trait.info.fn_infos,
                 &mock_struct_trait.info.trait_ident_from_path,
+                &mock_struct_trait.info.trait_generics,
+                mock_struct_trait.info.trait_self_ty_path.clone(),
+                mock_type.generics.impl_generics.params.len(),
                 core::mem::take(&mut mock_struct_trait.info.rest_impl_items),
             )
         })

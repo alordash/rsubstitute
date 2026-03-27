@@ -30,6 +30,12 @@ pub(crate) fn create_from_struct(item_struct: &ItemStruct) -> Type {
     Type::Path(create_from_struct_path(item_struct))
 }
 
+pub(crate) fn create_with_path_arguments(ident: Ident, path_arguments: PathArguments) -> Type {
+    let path = path::create_with_path_arguments(ident, path_arguments);
+    let result = TypePath { qself: None, path };
+    return Type::Path(result);
+}
+
 pub(crate) fn wrap_in(ty: Type, wrapper: Ident) -> Type {
     let result = Type::Path(TypePath {
         qself: None,

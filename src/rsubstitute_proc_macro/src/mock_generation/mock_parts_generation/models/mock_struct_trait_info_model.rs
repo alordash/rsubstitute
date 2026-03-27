@@ -6,7 +6,9 @@ use syn::*;
 pub(crate) struct MockStructTraitInfo {
     pub trait_path: Path,
     pub trait_ident_from_path: Ident,
+    pub trait_generics: Generics,
+    pub trait_self_ty_path: TypePath,
     pub mock_type: MockType,
     pub fn_infos: Vec<FnInfo>,
-    pub rest_impl_items: Vec<ImplItem>
+    pub rest_impl_items: Vec<ImplItem>,
 }

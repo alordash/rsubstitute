@@ -11,7 +11,7 @@ impl OutputTypeLifetime {
     pub(crate) fn get(&self) -> Lifetime {
         match self {
             OutputTypeLifetime::Derived => constants::ANONYMOUS_LIFETIME.clone(),
-            OutputTypeLifetime::Default => constants::ANONYMOUS_LIFETIME.clone(),   // TODO - what should it be?
+            OutputTypeLifetime::Default => constants::ANONYMOUS_LIFETIME.clone(), // TODO - what should it be?
         }
     }
 }

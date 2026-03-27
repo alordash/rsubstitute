@@ -7,11 +7,7 @@ use std::collections::{HashMap, HashSet};
 use syn::visit::Visit;
 use syn::*;
 
-pub(crate) fn fill(
-    generics: Generics,
-    mock_type: &MockType,
-    fn_args: &[FnArg],
-) -> Generics {
+pub(crate) fn fill(generics: Generics, mock_type: &MockType, fn_args: &[FnArg]) -> Generics {
     let lifetimes_map: HashMap<Ident, HashSet<Lifetime>> = generics
         .type_params()
         .chain(mock_type.generics.source_generics.type_params())

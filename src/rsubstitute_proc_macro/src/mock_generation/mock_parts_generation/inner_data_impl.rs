@@ -1,6 +1,6 @@
 use crate::mock_generation::mock_parts_generation::models::*;
-use syn::*;
 use crate::syntax::generics;
+use syn::*;
 
 pub(crate) fn generate(inner_data_struct: &InnerDataStruct, new_fn: ImplItemFn) -> InnerDataImpl {
     let self_ty = inner_data_struct.ty.clone();

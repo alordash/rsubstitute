@@ -3,8 +3,7 @@ use std::str::FromStr;
 use syn::*;
 
 pub(crate) fn create(ident: Ident, arguments: &str) -> Attribute {
-    let tokens =
-        TokenStream::from_str(arguments).expect("Should be able to parse attribute arg.");
+    let tokens = TokenStream::from_str(arguments).expect("Should be able to parse attribute arg.");
     let result = Attribute {
         pound_token: Default::default(),
         style: AttrStyle::Outer,
@@ -16,8 +15,8 @@ pub(crate) fn create(ident: Ident, arguments: &str) -> Attribute {
                     ident,
                     arguments: PathArguments::None,
                 }]
-                    .into_iter()
-                    .collect(),
+                .into_iter()
+                .collect(),
             },
             delimiter: MacroDelimiter::Paren(Default::default()),
             tokens,

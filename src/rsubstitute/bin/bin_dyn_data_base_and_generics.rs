@@ -31,8 +31,8 @@ struct Foo {
 #[cfg(test)]
 mod tests {
     use super::*;
-    use rsubstitute_core::args::Arg;
     use rsubstitute_core::Times;
+    use rsubstitute_core::args::Arg;
 
     #[test]
     fn my_test() {

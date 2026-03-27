@@ -21,7 +21,9 @@ mod max_invalid_calls_listed_count_tests {
     static TESTS_SEQ_SYNCER: LazyLock<Mutex<()>> = LazyLock::new(|| Default::default());
 
     fn seq_sync<'a>() -> MutexGuard<'a, ()> {
-        TESTS_SEQ_SYNCER.lock().expect("Unable to lock `TESTS_SYNCER`.")
+        TESTS_SEQ_SYNCER
+            .lock()
+            .expect("Unable to lock `TESTS_SYNCER`.")
     }
 
     mod default {

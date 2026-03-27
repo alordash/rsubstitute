@@ -6,9 +6,7 @@ pub(crate) struct LifetimeReplacer<'a> {
 }
 
 impl<'a> LifetimeReplacer<'a> {
-    pub(crate) fn new(
-        replacement_strategy: ReplacementStrategy<'a>,
-    ) -> Self {
+    pub(crate) fn new(replacement_strategy: ReplacementStrategy<'a>) -> Self {
         Self {
             replacement_strategy,
         }
@@ -19,7 +17,7 @@ impl<'a> VisitMut for LifetimeReplacer<'a> {
     fn visit_lifetime_mut(&mut self, lifetime: &mut Lifetime) {
         match self.replacement_strategy {
             ReplacementStrategy::ReplaceAll(new_lifetime) => *lifetime = new_lifetime.clone(),
-            ReplacementStrategy::ReplaceOnlyOptional(_) => {},
+            ReplacementStrategy::ReplaceOnlyOptional(_) => {}
             ReplacementStrategy::RemoveAll => {}
         }
 
@@ -31,7 +29,9 @@ impl<'a> VisitMut for LifetimeReplacer<'a> {
             ReplacementStrategy::ReplaceAll(new_lifetime) => {
                 type_reference.lifetime = Some(new_lifetime.clone())
             }
-            ReplacementStrategy::ReplaceOnlyOptional(new_lifetime) if type_reference.lifetime.is_none() => {
+            ReplacementStrategy::ReplaceOnlyOptional(new_lifetime)
+                if type_reference.lifetime.is_none() =>
+            {
                 type_reference.lifetime = Some(new_lifetime.clone())
             }
             ReplacementStrategy::RemoveAll => type_reference.lifetime = None,

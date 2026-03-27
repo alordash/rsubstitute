@@ -3,8 +3,8 @@ use syn::*;
 
 pub(crate) fn create(string: &str) -> Expr {
     let result = Expr::Lit(ExprLit {
-        attrs:Vec::new(),
-        lit: Lit::Str(LitStr::new(string, Span::call_site()))
+        attrs: Vec::new(),
+        lit: Lit::Str(LitStr::new(string, Span::call_site())),
     });
     return result;
 }

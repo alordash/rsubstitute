@@ -23,9 +23,14 @@ pub(crate) fn generate(
         .into_iter()
         .filter(is_rest_impl_item)
         .collect();
+    let Type::Path(trait_self_ty_path) = *trait_impl.item_impl.self_ty else {
+        panic!("Struct's trait impl `self_ty` must be `TraitPath`.");
+    };
     let mock_struct_trait_info = MockStructTraitInfo {
         trait_path: trait_impl.trait_path,
         trait_ident_from_path,
+        trait_self_ty_path,
+        trait_generics: trait_impl.item_impl.generics,
         mock_type: mock_type.clone(),
         fn_infos,
         rest_impl_items,

@@ -6,13 +6,13 @@ trait Trait<T> {
 
 // mocked_base! {
 //     struct Struct;
-// 
+//
 //     impl Struct {
 //         pub fn new() -> Self {
 //             Self
 //         }
 //     }
-// 
+//
 //     impl<T> Trait<T> for Struct {
 //         fn work(&self, t: T) -> T {
 //             t

@@ -9,7 +9,12 @@ use quote::format_ident;
 use syn::*;
 
 // TODO - add #[repr(C)] to generated CallStruct and ArgsCheckerStruct
-pub(crate) fn generate(ctx: &Ctx, fn_decl: &FnDecl, mock_generics: &MockGenerics, target: Target) -> CallStruct {
+pub(crate) fn generate(
+    ctx: &Ctx,
+    fn_decl: &FnDecl,
+    mock_generics: &MockGenerics,
+    target: Target,
+) -> CallStruct {
     let attrs = vec![constants::DOC_HIDDEN_ATTRIBUTE.clone()];
     let ident = format_ident!("{}_{}", fn_decl.get_full_ident(), CALL_STRUCT_SUFFIX);
     let fn_field_infos: Vec<_> = fn_decl
@@ -46,7 +51,7 @@ pub(crate) fn generate(ctx: &Ctx, fn_decl: &FnDecl, mock_generics: &MockGenerics
         call_args_tuple_provider_trait_impl::generate(&item_struct);
     let skipped_generic_params_count = match target {
         Target::Static => 0,
-        _ => mock_generics.impl_generics.params.len()
+        _ => mock_generics.impl_generics.params.len(),
     };
     let generics_info_provider_impl = generics_info_provider_impl::generate(
         &item_struct.generics,

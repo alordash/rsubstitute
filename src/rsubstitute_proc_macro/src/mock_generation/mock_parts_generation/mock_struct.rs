@@ -60,7 +60,7 @@ pub(crate) fn generate(
         item_struct,
         ty,
         maybe_clone_for_rsubstitute_trait_impl,
-        as_ref_trait_impl
+        as_ref_trait_impl,
     };
     return result;
 }

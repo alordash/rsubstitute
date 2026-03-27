@@ -26,28 +26,29 @@ pub(crate) fn generate(
         Some(trait_path),
         None,
         rest_impl_items,
+        0,
     );
     return mock_impl;
 }
 
 pub(crate) fn generate_for_struct_trait(
     trait_path: Path,
-    mock_type: &MockType,
     fn_infos: &[FnInfo],
     containing_trait_ident: &Ident,
+    trait_generics: &Generics,
+    trait_self_ty_path: TypePath,
+    default_self_ty_path_generics_arguments_len: usize,
     rest_impl_items: Vec<ImplItem>,
 ) -> MockPayloadImpl {
     let mock_impl = generate_core(
         Vec::new(),
-        mock_type.ty_path.clone(),
-        mock_type
-            .generics
-            .impl_generics_without_default_values
-            .clone(),
+        trait_self_ty_path,
+        trait_generics.clone(),
         fn_infos,
         Some(trait_path),
         Some(containing_trait_ident),
         rest_impl_items,
+        default_self_ty_path_generics_arguments_len,
     );
     return mock_impl;
 }
@@ -68,6 +69,7 @@ pub(crate) fn generate_for_struct(
         None,
         None,
         Vec::new(),
+        0,
     );
     return mock_impl;
 }
@@ -80,13 +82,21 @@ fn generate_core(
     maybe_trait_path: Option<Path>,
     maybe_containing_trait_ident: Option<&Ident>,
     rest_impl_items: Vec<ImplItem>,
+    default_self_ty_path_generics_arguments_len: usize,
 ) -> MockPayloadImpl {
     let items = rest_impl_items
         .into_iter()
         .chain(
             fn_infos
                 .iter()
-                .map(|x| generate_impl_item_fn(x, maybe_containing_trait_ident))
+                .map(|x| {
+                    generate_impl_item_fn(
+                        x,
+                        &self_ty_path,
+                        maybe_containing_trait_ident,
+                        default_self_ty_path_generics_arguments_len,
+                    )
+                })
                 .map(ImplItem::Fn),
         )
         .collect();
@@ -109,7 +119,9 @@ fn generate_core(
 
 fn generate_impl_item_fn(
     fn_info: &FnInfo,
+    self_ty_path: &TypePath,
     maybe_containing_trait_ident: Option<&Ident>,
+    default_self_ty_path_generics_arguments_len: usize,
 ) -> ImplItemFn {
     let sig = Signature {
         constness: None,
@@ -126,9 +138,12 @@ fn generate_impl_item_fn(
     };
     let block = match maybe_containing_trait_ident {
         None => mock_fn_block::generate_for_trait(fn_info),
-        Some(containing_trait_ident) => {
-            mock_fn_block::generate_for_struct_trait_fn(fn_info, containing_trait_ident)
-        }
+        Some(containing_trait_ident) => mock_fn_block::generate_for_struct_trait_fn(
+            fn_info,
+            containing_trait_ident,
+            self_ty_path.clone(),
+            default_self_ty_path_generics_arguments_len,
+        ),
     };
     let impl_item_fn = ImplItemFn {
         attrs: fn_info.parent.attrs.clone(),

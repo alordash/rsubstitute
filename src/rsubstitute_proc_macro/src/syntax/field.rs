@@ -1,7 +1,7 @@
+use crate::constants;
 use crate::syntax::*;
 use proc_macro2::Ident;
 use syn::*;
-use crate::constants;
 
 pub(crate) fn create(ident: Ident, ty: Type) -> Field {
     let result = Field {

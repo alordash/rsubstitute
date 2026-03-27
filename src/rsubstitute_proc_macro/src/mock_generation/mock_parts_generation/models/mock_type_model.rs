@@ -7,5 +7,5 @@ pub(crate) struct MockType {
     pub ty_path: TypePath,
     // TODO - remove it, it's not ubiquitous, it depends on impl block
     pub generics: MockGenerics,
-    pub stores_mock_data: bool
+    pub stores_mock_data: bool,
 }
