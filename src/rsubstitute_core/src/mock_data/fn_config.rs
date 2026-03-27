@@ -37,9 +37,9 @@ impl<'rs, TMock> FnConfig<'rs, TMock> {
         self.return_value_sources.extend(return_values.into_iter());
     }
 
-    pub(crate) fn set_callback<TArgRefsTuple>(
+    pub(crate) fn set_callback<TArgRefsTuple, TMockArg>(
         &mut self,
-        mut callback: impl FnMut(&TMock, TArgRefsTuple) + 'static,
+        mut callback: impl FnMut(&TMockArg, TArgRefsTuple) + 'static,
     ) {
         let dyn_callback = move |raw_mock_ptr: *const (), dyn_call: &DynCall<'rs>| {
             let raw_arg_refs_tuple_ptr = dyn_call.get_ptr_to_boxed_tuple_of_refs();
@@ -54,7 +54,7 @@ impl<'rs, TMock> FnConfig<'rs, TMock> {
             // SAFETY: using pointer instead of reference to untie `TMock` lifetime from `callback`
             // in `FnConfig`. Pointer is passed from `FnData` which casts valid reference to pointer.
             let mock_ref = unsafe {
-                let mock_ptr = raw_mock_ptr as *const TMock;
+                let mock_ptr = raw_mock_ptr as *const TMockArg;
                 mock_ptr
                     .as_ref()
                     .expect("Pointer to mock in user callback must be not null.")
@@ -70,6 +70,10 @@ impl<'rs, TMock> FnConfig<'rs, TMock> {
 
     pub(crate) fn check_call(&self, call: &DynCall<'rs>) -> Vec<ArgCheckResult> {
         self.args_checker.check(&call)
+    }
+
+    pub(crate) fn has_return_value(&self) -> bool {
+        self.call_base || self.return_value_sources.front().is_some()
     }
 
     pub(crate) fn select_next_return_value(

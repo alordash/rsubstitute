@@ -17,7 +17,7 @@ pub(crate) fn generate(
 
     let mock_impl = generate_core(
         Vec::new(),
-        mock_type.ty.clone(),
+        mock_type.ty_path.clone(),
         mock_type
             .generics
             .impl_generics_without_default_values
@@ -39,7 +39,7 @@ pub(crate) fn generate_for_struct_trait(
 ) -> MockPayloadImpl {
     let mock_impl = generate_core(
         Vec::new(),
-        mock_type.ty.clone(),
+        mock_type.ty_path.clone(),
         mock_type
             .generics
             .impl_generics_without_default_values
@@ -59,7 +59,7 @@ pub(crate) fn generate_for_struct(
 ) -> MockPayloadImpl {
     let mock_impl = generate_core(
         attrs,
-        mock_type.ty.clone(),
+        mock_type.ty_path.clone(),
         mock_type
             .generics
             .impl_generics_without_default_values
@@ -74,7 +74,7 @@ pub(crate) fn generate_for_struct(
 
 fn generate_core(
     attrs: Vec<Attribute>,
-    self_ty: Type,
+    self_ty_path: TypePath,
     generics: Generics,
     fn_infos: &[FnInfo],
     maybe_trait_path: Option<Path>,
@@ -99,7 +99,7 @@ fn generate_core(
         impl_token: Default::default(),
         generics,
         trait_,
-        self_ty: Box::new(self_ty),
+        self_ty: Box::new(Type::Path(self_ty_path)),
         brace_token: Default::default(),
         items,
     };

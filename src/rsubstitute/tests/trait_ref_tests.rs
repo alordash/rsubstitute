@@ -17,7 +17,7 @@ trait Trait {
 mod tests {
     #![allow(non_snake_case)]
     use super::*;
-    use not_enough_asserts::panics::*;
+    use not_enough_asserts::*;
     use rsubstitute::*;
 
     mod accept_ref_tests {
@@ -51,9 +51,9 @@ mod tests {
                 || mock.received.accept_ref(Arg::Any, Times::Never),
                 format!(
                     "Expected to never receive a call matching:
-	Trait::accept_ref((&i32): any)
+	accept_ref((&i32): any)
 Actually received 1 matching call:
-	Trait::accept_ref({r})
+	accept_ref({r})
 Received no non-matching calls"
                 ),
             );
@@ -62,9 +62,9 @@ Received no non-matching calls"
                 || mock.received.accept_ref(Arg::Any, Times::Exactly(3)),
                 format!(
                     "Expected to receive a call 3 times matching:
-	Trait::accept_ref((&i32): any)
+	accept_ref((&i32): any)
 Actually received 1 matching call:
-	Trait::accept_ref({r})
+	accept_ref({r})
 Received no non-matching calls"
                 ),
             );
@@ -75,10 +75,10 @@ Received no non-matching calls"
                 || mock.received.accept_ref(invalid_r, Times::Once),
                 format!(
                     "Expected to receive a call exactly once matching:
-	Trait::accept_ref((&i32): equal to {invalid_r})
+	accept_ref((&i32): equal to {invalid_r})
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-Trait::accept_ref(*{r}*)
+accept_ref(*{r}*)
 	1. r (&i32):
 		Expected reference (ptr: {invalid_r_ptr:?}): {invalid_r}
 		Actual reference   (ptr: {r_ptr:?}): {r}"

@@ -22,7 +22,7 @@ mocked! {
 mod tests {
     #![allow(non_snake_case)]
     use super::*;
-    use not_enough_asserts::panics::*;
+    use not_enough_asserts::*;
     use rsubstitute::*;
     use std::cell::RefCell;
     use std::sync::Arc;
@@ -409,12 +409,14 @@ accept_value(*{first_value}*)
 
             // Act
             let actual_first_value = mock.return_value();
-            let error_second_value = record_panic(|| mock.return_value());
+            let actual_second_value = mock.return_value();
+            let actual_third_value = mock.return_value();
 
             // Assert
             assert_eq!(first_value, actual_first_value);
-            assert_eq!("No return value found for following call: return_value()", error_second_value);
-            assert_eq!(Result::DidNotChange, *callback_result.borrow());
+            assert_eq!(second_value, actual_second_value);
+            assert_eq!(third_value, actual_third_value);
+            assert_eq!(Result::ThirdConfigChanged, *callback_result.borrow());
         }
 
         #[test]
@@ -474,7 +476,7 @@ accept_value(*{first_value}*)
             // Assert
             let expected_error_msg = "Mock wasn't configured to handle following call:
 	return_value()";
-            assert_eq!(expected_error_msg, actual_error_msg);
+            assert_eq!(Some(expected_error_msg.to_owned()), actual_error_msg);
         }
     }
 
@@ -796,9 +798,12 @@ accept_two_values_return_value(*10*, *20.2*)
 
             // Assert
             let expected_error_msg = format!(
-                "No return value found for following call: accept_two_values_return_value({unexpected_v1}, {unexpected_v2})"
+                "Mock wasn't configured to handle following call:
+	accept_two_values_return_value({unexpected_v1}, {unexpected_v2})
+List of existing configuration ordered by number of correctly matched arguments (non-matching arguments indicated with '*' characters):
+	1. Matched 0/2 arguments: accept_two_values_return_value(*{unexpected_v1}*, *{unexpected_v2}*)"
             );
-            assert_eq!(expected_error_msg, actual_error_msg);
+            assert_eq!(Some(expected_error_msg), actual_error_msg);
         }
     }
 }

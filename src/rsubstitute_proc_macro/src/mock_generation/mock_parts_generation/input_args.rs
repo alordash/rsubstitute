@@ -13,7 +13,12 @@ pub(crate) fn generate_input_args(fn_info: &FnInfo, skipped_fields_count: usize)
         .fields
         .iter()
         .skip(skipped_fields_count);
-    let fn_args: Vec<_> = fields.map(transform_field_into_fn_arg).collect();
+    let fn_args: Vec<_> = fields
+        .zip(fn_info.call_struct.fields_maybe_actual_source_types.iter())
+        .map(|(field, maybe_actual_source_type)| {
+            transform_field_into_fn_arg(field, maybe_actual_source_type)
+        })
+        .collect();
     return fn_args;
 }
 
@@ -49,9 +54,7 @@ pub(crate) fn generate_args_checker_var_ident_and_decl_stmt(fn_info: &FnInfo) ->
             return field_value::create_with_lifetime_and_into_conversion(field);
         })
         .collect();
-    let mut args_checker_struct_type = fn_info.args_checker_struct.ty_path.clone();
-    args_checker_struct_type
-        .set_first_generic_lifetime_argument(constants::ANONYMOUS_LIFETIME.clone());
+    let args_checker_struct_type = fn_info.args_checker_struct.ty_path.clone();
     let args_checker_decl_stmt = Stmt::Local(local::create_with_type(
         args_checker_var_ident.clone(),
         Type::Path(args_checker_struct_type),
@@ -74,23 +77,13 @@ pub(crate) fn generate_args_checker_var_ident_and_decl_stmt(fn_info: &FnInfo) ->
 
 const ARGS_CHECKER_VARIABLE_SUFFIX: &'static str = "args_checker";
 
-fn transform_field_into_fn_arg(field: &Field) -> FnArg {
-    let mut ty = field.ty.clone();
-    let Type::Path(ref mut ty_path) = ty else {
-        panic!("Input arg field should be Type::Path (Arg<'__rs, T>).")
-    };
-    let PathArguments::AngleBracketed(ref mut ty_path_arguments) =
-        ty_path.path.segments[0].arguments
-    else {
-        panic!("Input arg field should have generic arguments (Arg<'__rs, T>).")
-    };
-    let GenericArgument::Lifetime(ref mut ty_arg_lifetime_param) = ty_path_arguments.args[0] else {
-        panic!("Input arg field should have lifetime as first generic argument (Arg<'__rs, T>).");
-    };
-    let placeholder_lifetime_ident = constants::PLACEHOLDER_LIFETIME_IDENT.clone();
-    ty_arg_lifetime_param.ident = placeholder_lifetime_ident.clone();
-    lifetime::set_all_lifetimes(&mut ty, &constants::PLACEHOLDER_LIFETIME.clone());
-
+fn transform_field_into_fn_arg(field: &Field, maybe_actual_source_type: &Option<Type>) -> FnArg {
+    let mut ty = maybe_actual_source_type
+        .clone()
+        .map(arg_type::create)
+        .map(Type::Path)
+        .unwrap_or_else(|| field.ty.clone());
+    lifetime::placehold_anonymouys_lifetimes(&mut ty);
     let fn_arg = FnArg::Typed(PatType {
         attrs: Vec::new(),
         pat: Box::new(Pat::Ident(PatIdent {

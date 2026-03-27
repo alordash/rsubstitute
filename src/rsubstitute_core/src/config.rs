@@ -18,4 +18,4 @@ pub fn write_config<'a>() -> RwLockWriteGuard<'a, Config> {
     CONFIG.write().expect(LOCK_ERROR_MSG)
 }
 
-const LOCK_ERROR_MSG: &'static str = "Unable to lock rsubstitute config";
+const LOCK_ERROR_MSG: &'static str = "Unable to lock `rsubstitute` config.";

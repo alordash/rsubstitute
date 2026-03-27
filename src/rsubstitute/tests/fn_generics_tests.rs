@@ -32,7 +32,7 @@ where
 mod tests {
     #![allow(non_snake_case)]
     use super::*;
-    use not_enough_asserts::panics::*;
+    use not_enough_asserts::*;
     use rsubstitute::*;
 
     mod get_return_tests {
@@ -96,7 +96,7 @@ mod tests {
                 "Mock wasn't configured to handle following call:
 	get_return<&str>({accepted_str:?})"
             );
-            assert_eq!(expected_error_msg, actual_error_msg);
+            assert_eq!(Some(expected_error_msg), actual_error_msg);
         }
 
         #[test]

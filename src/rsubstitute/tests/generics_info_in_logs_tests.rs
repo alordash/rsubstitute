@@ -9,7 +9,7 @@ trait Trait<'a, T1, const B: bool> {
 mod tests {
     #![allow(non_snake_case)]
     use super::*;
-    use not_enough_asserts::panics::*;
+    use not_enough_asserts::*;
     use rsubstitute_core::Times;
 
     #[test]
@@ -22,8 +22,8 @@ mod tests {
 
         // Assert
         let expected_panic_msg = "Mock wasn't configured to handle following call:
-	Trait::work<f32, 5>(14)";
-        assert_eq!(expected_panic_msg, panic_msg);
+	work<f32, 5>(14)";
+        assert_eq!(Some(expected_panic_msg.to_owned()), panic_msg);
     }
 
     #[test]
@@ -42,10 +42,10 @@ mod tests {
 
         // Assert
         let expected_panic_msg = "Mock wasn't configured to handle following call:
-	Trait::work<f32, 1>(5)
+	work<f32, 1>(5)
 List of existing configuration ordered by number of correctly matched arguments (non-matching arguments indicated with '*' characters):
-	1. Matched 0/1 arguments: Trait::work(*5*)";
-        assert_eq!(expected_panic_msg, panic_msg);
+	1. Matched 0/1 arguments: work(*5*)";
+        assert_eq!(Some(expected_panic_msg.to_owned()), panic_msg);
     }
 
     #[test]
@@ -54,16 +54,18 @@ List of existing configuration ordered by number of correctly matched arguments 
         let mock = TraitMock::<i32, true>::new();
 
         let value = 5;
+        let returned_value = 3.0f32;
         mock.setup.work::<f32, 1>(&value);
-        mock.setup.work::<f32, 1>(&value).returns(3.0f32);
+        mock.setup.work::<f32, 1>(&value).returns(returned_value);
 
         // Act
-        let panic_msg = record_panic(|| mock.work::<f32, 1>(&value));
+        let actual_returned_value = mock.work::<f32, 1>(&value);
 
         // Assert
-        let expected_panic_msg =
-            "No return value found for following call: Trait::work<f32, 1>(5)";
-        assert_eq!(expected_panic_msg, panic_msg);
+        assert_eq!(returned_value, actual_returned_value);
+        mock.received
+            .work::<f32, 1>(&value, Times::Once)
+            .no_other_calls();
     }
 
     #[test]
@@ -75,7 +77,9 @@ List of existing configuration ordered by number of correctly matched arguments 
         let expected_value = actual_value + 1;
         let returned_value = 3.0f32;
         const N: usize = 1;
-        mock.setup.work::<f32, N>(&actual_value).returns(returned_value);
+        mock.setup
+            .work::<f32, N>(&actual_value)
+            .returns(returned_value);
 
         // Act
         let actual_returned_value = mock.work::<f32, 1>(&actual_value);
@@ -86,16 +90,18 @@ List of existing configuration ordered by number of correctly matched arguments 
 
         let actual_value_ptr = core::ptr::from_ref(&actual_value);
         let expected_value_ptr = core::ptr::from_ref(&expected_value);
-        let expected_panic_msg = format!("Expected to receive a call exactly once matching:
-	Trait::work<f32, {N}>((&i32): equal to {expected_value})
+        let expected_panic_msg = format!(
+            "Expected to receive a call exactly once matching:
+	work<f32, {N}>((&i32): equal to {expected_value})
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-Trait::work(*5*)
+work(*5*)
 	1. v (&i32):
 		Expected reference (ptr: {expected_value_ptr:?}): 6
-		Actual reference   (ptr: {actual_value_ptr:?}): 5");
+		Actual reference   (ptr: {actual_value_ptr:?}): 5"
+        );
 
-        assert_eq!(expected_panic_msg, panic_msg);
+        assert_eq!(Some(expected_panic_msg), panic_msg);
     }
 
     #[test]
@@ -115,10 +121,10 @@ Trait::work(*5*)
         assert_eq!(returned_value, actual_returned_value);
 
         let expected_panic_msg = "Expected to receive a call exactly once matching:
-	Trait::work<alloc::string::String, 124>((&i32): equal to 5)
+	work<alloc::string::String, 124>((&i32): equal to 5)
 Actually received no matching calls
 Received no non-matching calls";
-        assert_eq!(expected_panic_msg, panic_msg);
+        assert_eq!(Some(expected_panic_msg.to_owned()), panic_msg);
     }
 
     #[test]
@@ -148,9 +154,10 @@ Received no non-matching calls";
         assert_eq!(first_returned_value, actual_first_returned_value);
         assert_eq!(second_returned_value, actual_second_returned_value);
 
-        let expected_panic_msg = "Did not expect to receive any other calls. Received 2 unexpected calls:
-1. Trait::work<f32, 1>(5)
-2. Trait::work<[i32; 3], 200>(100)";
-        assert_eq!(expected_panic_msg, panic_msg);
+        let expected_panic_msg =
+            "Did not expect to receive any other calls. Received 2 unexpected calls:
+1. work<f32, 1>(5)
+2. work<[i32; 3], 200>(100)";
+        assert_eq!(Some(expected_panic_msg.to_owned()), panic_msg);
     }
 }

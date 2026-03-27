@@ -56,6 +56,11 @@ pub(crate) fn wrap_in_arc(ty: Type) -> Type {
     return result;
 }
 
+pub(crate) fn wrap_in_phantom_data(ty: Type) -> Type {
+    let result = wrap_in(ty, constants::PHANTOM_DATA_IDENT.clone());
+    return result;
+}
+
 pub(crate) fn reference(ty: Type, lifetime: Option<Lifetime>) -> Type {
     let result = Type::Reference(TypeReference {
         and_token: Default::default(),

@@ -54,4 +54,9 @@ macro_rules! transmute_lifetime {
     ($expr:expr) => {
         unsafe { core::mem::transmute($expr) }
     };
+    // If `$ty` is used as generic param in `core::mem::transmute` then source type is highlighted
+    // as being part of unsafe block. Using `let` binding to circumvent that.
+    ($expr:expr, $ty:ty) => {{
+        unsafe { let result: $ty = core::mem::transmute($expr); result }
+    }};
 }

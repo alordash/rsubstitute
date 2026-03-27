@@ -11,6 +11,7 @@ pub(crate) fn generate(
     fn_decl: &FnDecl,
     call_struct: &CallStruct,
     mock_generics: &MockGenerics,
+    target: Target,
 ) -> ArgsCheckerStruct {
     let attrs = vec![
         constants::DOC_HIDDEN_ATTRIBUTE.clone(),
@@ -21,14 +22,17 @@ pub(crate) fn generate(
         fn_decl.get_full_ident(),
         ARGS_CHECKER_STRUCT_SUFFIX
     );
-    let fn_fields: Vec<_> = fn_decl
-        .arguments
+    let fn_fields: Vec<_> = call_struct
+        .item_struct
+        .fields
         .iter()
-        .enumerate()
-        .flat_map(|(i, x)| try_convert_fn_arg_to_field(i, x))
+        .skip_while(|x| field::is_phantom_data(x))
+        .map(convert_call_struct_field_to_arg_field)
         .collect();
-    let struct_fields = core::iter::once(constants::DEFAULT_ARG_LIFETIME_FIELD.clone())
-        .chain(mock_generics.phantom_fields.iter().cloned())
+    let struct_fields = mock_generics
+        .phantom_fields
+        .iter()
+        .cloned()
         .chain(fn_decl.internal_phantom_fields.iter().cloned())
         .chain(fn_fields)
         .collect();
@@ -37,12 +41,17 @@ pub(crate) fn generate(
         named: struct_fields,
     };
 
-    let mut item_struct =
-        r#struct::create(attrs, ident, fn_decl.merged_generics.clone(), fields_named);
-    lifetime::normalize_anonymous_lifetimes_in_struct(&mut item_struct);
-    let generics_info_provider_impl =
-        generics_info_provider_impl::generate(&item_struct, mock_generics.associated_params_count);
+    let item_struct = r#struct::create(attrs, ident, fn_decl.merged_generics.clone(), fields_named);
     let ty_path = r#type::create_from_struct_path(&item_struct);
+    let skipped_generic_params_count = match target {
+        Target::Static => 0,
+        _ => mock_generics.impl_generics.params.len(),
+    };
+    let generics_info_provider_impl = generics_info_provider_impl::generate(
+        &item_struct.generics,
+        Type::Path(ty_path.clone()),
+        skipped_generic_params_count,
+    );
 
     let args_checker_trait_impl = args_checker_trait_impl::generate(
         &call_struct,
@@ -50,8 +59,10 @@ pub(crate) fn generate(
         item_struct.generics.clone(),
         fn_decl.get_internal_phantom_types_count() + mock_generics.get_phantom_fields_count(),
     );
-    let args_checker_args_formatter_trait_impl =
-        args_checker_args_formatter_trait_impl::generate(&item_struct);
+    let args_checker_args_formatter_trait_impl = args_checker_args_formatter_trait_impl::generate(
+        &item_struct,
+        &call_struct.fields_maybe_actual_source_types,
+    );
 
     let args_checker_struct = ArgsCheckerStruct {
         generics_info_provider_impl,
@@ -66,14 +77,9 @@ pub(crate) fn generate(
 
 const ARGS_CHECKER_STRUCT_SUFFIX: &'static str = "ArgsChecker";
 
-fn try_convert_fn_arg_to_field(arg_number: usize, fn_arg: &FnArg) -> Option<Field> {
-    let pat_type = match fn_arg {
-        FnArg::Receiver(_) => return None,
-        FnArg::Typed(pat_type) => pat_type,
-    };
-    let ty = arg_type::create(*pat_type.ty.clone());
-    let ident = arg_ident::extract(arg_number, pat_type);
+fn convert_call_struct_field_to_arg_field(field: &Field) -> Field {
+    let mut arg_field = field.clone();
+    arg_field.ty = Type::Path(arg_type::create(arg_field.ty));
 
-    let result = field::create(ident, ty);
-    return Some(result);
+    return arg_field;
 }

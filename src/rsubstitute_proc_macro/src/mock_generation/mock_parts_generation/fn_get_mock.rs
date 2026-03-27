@@ -1,8 +1,7 @@
 use crate::constants;
-use crate::mock_generation::mock_parts_generation::get_global_mock_expr;
 use crate::mock_generation::mock_parts_generation::models::*;
 use crate::syntax::extensions::*;
-use crate::syntax::r#type;
+use crate::syntax::*;
 use syn::punctuated::Punctuated;
 use syn::*;
 
@@ -25,7 +24,7 @@ pub fn generate(mock_type: &MockType) -> ItemFn {
         output: ReturnType::Type(
             Default::default(),
             Box::new(r#type::reference(
-                mock_type.ty.clone(),
+                Type::Path(mock_type.ty_path.clone()),
                 Some(constants::PLACEHOLDER_LIFETIME.clone()),
             )),
         ),
@@ -34,7 +33,7 @@ pub fn generate(mock_type: &MockType) -> ItemFn {
     let block = Block {
         brace_token: Default::default(),
         stmts: vec![Stmt::Expr(
-            get_global_mock_expr::generate(mock_type.ty.clone()),
+            generate_get_static_fn_global_mock_expr(Type::Path(mock_type.ty_path.clone())),
             None,
         )],
     };
@@ -47,4 +46,27 @@ pub fn generate(mock_type: &MockType) -> ItemFn {
     };
 
     return item_fn;
+}
+
+fn generate_get_static_fn_global_mock_expr(ty: Type) -> Expr {
+    let func = Expr::Path(ExprPath {
+        attrs: Vec::new(),
+        qself: None,
+        path: Path {
+            leading_colon: None,
+            segments: [PathSegment {
+                ident: constants::GET_STATIC_FN_GLOBAL_MOCK_FN_IDENT.clone(),
+                arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
+                    colon2_token: Some(Default::default()),
+                    lt_token: Default::default(),
+                    args: [GenericArgument::Type(ty)].into_iter().collect(),
+                    gt_token: Default::default(),
+                }),
+            }]
+            .into_iter()
+            .collect(),
+        },
+    });
+    let global_mock_expr = call::create_without_args(func);
+    return global_mock_expr;
 }

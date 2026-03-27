@@ -17,14 +17,6 @@ pub fn mock(
     mock_macro::handle_attribute_macro(proc_macro_attribute, proc_macro_item)
 }
 
-#[proc_macro_attribute]
-pub fn unmock(
-    _proc_macro_attribute: proc_macro::TokenStream,
-    proc_macro_item: proc_macro::TokenStream,
-) -> proc_macro::TokenStream {
-    return proc_macro_item;
-}
-
 #[proc_macro]
 pub fn mocked(proc_macro_item: proc_macro::TokenStream) -> proc_macro::TokenStream {
     mock_macro::handle_macro_mocked(proc_macro_item, MockedMacroMode::Unspecified)

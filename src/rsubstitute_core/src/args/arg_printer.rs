@@ -7,7 +7,7 @@ const UNKNOWN_ARG_STRING: &'static str = "?";
 pub struct ArgPrinter<'a, T: ?Sized>(pub &'a T);
 
 // Works only with `debug_naming` feature, otherwise returns unknown arg string.
-pub(crate) fn print_arg<T>(value: &T) -> String {
+pub(crate) fn print_arg<T: ?Sized>(value: &T) -> String {
     (&ArgPrinter(value)).debug_string()
 }
 

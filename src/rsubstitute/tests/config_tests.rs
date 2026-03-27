@@ -7,27 +7,28 @@ trait Trait {
     fn work(&self, v: i32);
 }
 
+// TODO - rename all tests mods?
 #[cfg(test)]
 mod max_invalid_calls_listed_count_tests {
     #![allow(non_snake_case)]
     use super::*;
-    use not_enough_asserts::panics::*;
+    use not_enough_asserts::*;
     use rsubstitute::*;
     use std::sync::*;
 
     // Used to run tests sequentially, otherwise `write_config` may cause deadlock
     // since `std::sync::RwLock` does not have priority policy for read and write locks.
-    static TESTS_SYNCER: LazyLock<Mutex<()>> = LazyLock::new(|| Default::default());
+    static TESTS_SEQ_SYNCER: LazyLock<Mutex<()>> = LazyLock::new(|| Default::default());
 
-    fn sync_test<'a>() -> MutexGuard<'a, ()> {
-        TESTS_SYNCER.lock().expect("Unable to lock `TESTS_SYNCER`.")
+    fn seq_sync<'a>() -> MutexGuard<'a, ()> {
+        TESTS_SEQ_SYNCER.lock().expect("Unable to lock `TESTS_SYNCER`.")
     }
 
     mod default {
         use super::*;
         #[test]
         fn CallsCountLessThanLimit_PrintsAll() {
-            let _lock = sync_test();
+            let _lock = seq_sync();
 
             // Arrange
             let mock = TraitMock::new();
@@ -50,7 +51,7 @@ mod max_invalid_calls_listed_count_tests {
             // Assert
             let calls_error_msgs = format!(
                 "
-Trait::work(*{unexpected_v}*)
+work(*{unexpected_v}*)
 	1. v (i32):
 		Expected: {expected_v}
 		Actual:   {unexpected_v}"
@@ -58,17 +59,16 @@ Trait::work(*{unexpected_v}*)
             .repeat(calls_count);
             let expected_error_msg = format!(
                 "Expected to receive a call exactly once matching:
-	Trait::work((i32): equal to {expected_v})
+	work((i32): equal to {expected_v})
 Actually received no matching calls
 Received {calls_count} non-matching calls (non-matching arguments indicated with '*' characters):{calls_error_msgs}"
             );
-            assert_eq!(expected_error_msg, actual_error_msg);
-            println!("First read");
+            assert_eq!(Some(expected_error_msg), actual_error_msg);
         }
 
         #[test]
         fn CallsCountMoreThanLimit_PrintsTrimmed() {
-            let _lock = sync_test();
+            let _lock = seq_sync();
 
             // Arrange
             let mock = TraitMock::new();
@@ -91,7 +91,7 @@ Received {calls_count} non-matching calls (non-matching arguments indicated with
             // Assert
             let calls_error_msgs = format!(
                 "
-Trait::work(*{unexpected_v}*)
+work(*{unexpected_v}*)
 	1. v (i32):
 		Expected: {expected_v}
 		Actual:   {unexpected_v}"
@@ -99,12 +99,11 @@ Trait::work(*{unexpected_v}*)
             .repeat(max_invalid_calls_listed_count);
             let expected_error_msg = format!(
                 "Expected to receive a call exactly once matching:
-	Trait::work((i32): equal to {expected_v})
+	work((i32): equal to {expected_v})
 Actually received no matching calls
 Received {calls_count} non-matching calls (listing only first {max_invalid_calls_listed_count}) (non-matching arguments indicated with '*' characters):{calls_error_msgs}"
             );
-            assert_eq!(expected_error_msg, actual_error_msg);
-            println!("Second read");
+            assert_eq!(Some(expected_error_msg), actual_error_msg);
         }
     }
 }

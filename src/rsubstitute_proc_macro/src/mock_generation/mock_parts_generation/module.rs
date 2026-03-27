@@ -111,7 +111,6 @@ pub(crate) fn generate_struct(
     mock_impl: MockImpl,
     mock_setup_impl: MockSetupImpl,
     mock_received_impl: MockReceivedImpl,
-    ignored_impls: Vec<ItemImpl>,
 ) -> GeneratedMod {
     let usings = [
         constants::USE_SUPER.clone(),
@@ -156,7 +155,6 @@ pub(crate) fn generate_struct(
             Item::Impl(mock_setup_impl.item_impl),
             Item::Impl(mock_received_impl.item_impl),
         ])
-        .chain(ignored_impls.into_iter().map(Item::Impl))
         .collect();
     let item_mod = create_item_mod(ident, items);
     let use_generated_mod = create_use_generated_mod(item_mod.ident.clone());
@@ -220,14 +218,18 @@ fn convert_mock_received_struct(mock_received_struct: MockReceivedStruct) -> [It
 }
 
 fn convert_mock_struct(mock_struct: MockStruct) -> Vec<Item> {
-    core::iter::once(Item::Struct(mock_struct.item_struct))
-        .chain(
-            mock_struct
-                .maybe_clone_for_rsubstitute_trait_impl
-                .map(Item::Impl)
-                .into_iter(),
-        )
-        .collect()
+    [
+        Item::Struct(mock_struct.item_struct),
+        Item::Impl(mock_struct.as_ref_trait_impl),
+    ]
+    .into_iter()
+    .chain(
+        mock_struct
+            .maybe_clone_for_rsubstitute_trait_impl
+            .map(Item::Impl)
+            .into_iter(),
+    )
+    .collect()
 }
 
 fn create_item_mod(ident: Ident, items: Vec<Item>) -> ItemMod {

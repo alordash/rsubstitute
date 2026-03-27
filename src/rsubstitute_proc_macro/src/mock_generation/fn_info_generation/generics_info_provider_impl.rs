@@ -5,12 +5,15 @@ use std::cell::LazyCell;
 use syn::punctuated::Punctuated;
 use syn::*;
 
-pub(crate) fn generate(item_struct: &ItemStruct, associated_params_count: usize) -> ItemImpl {
-    let generic_params: Vec<_> = item_struct
-        .generics
+pub(crate) fn generate(
+    generics: &Generics,
+    target_type: Type,
+    skipped_generic_params_count: usize,
+) -> ItemImpl {
+    let generic_params: Vec<_> = generics
         .params
         .iter()
-        .skip(1 + associated_params_count)
+        .skip(skipped_generic_params_count)
         .collect();
     let impl_items = generate_impl_items(generic_params);
     let item_impl = ItemImpl {
@@ -18,13 +21,13 @@ pub(crate) fn generate(item_struct: &ItemStruct, associated_params_count: usize)
         defaultness: None,
         unsafety: None,
         impl_token: Default::default(),
-        generics: generics::remove_default_values(item_struct.generics.clone()),
+        generics: generics::remove_default_values(generics.clone()),
         trait_: Some((
             None,
             constants::I_GENERICS_HASH_KEY_PROVIDER_TRAIT_PATH.clone(),
             Default::default(),
         )),
-        self_ty: Box::new(r#type::create_from_struct(&item_struct)),
+        self_ty: Box::new(target_type),
         brace_token: Default::default(),
         items: vec![
             impl_items.get_generic_parameter_infos,

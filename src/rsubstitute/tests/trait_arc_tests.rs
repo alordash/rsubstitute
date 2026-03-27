@@ -18,7 +18,7 @@ trait Trait {
 mod tests {
     #![allow(non_snake_case)]
     use super::*;
-    use not_enough_asserts::panics::*;
+    use not_enough_asserts::*;
     use rsubstitute::*;
 
     mod accept_arc_tests {
@@ -52,9 +52,9 @@ mod tests {
                 || mock.received.accept_arc(Arg::Any, Times::Never),
                 format!(
                     "Expected to never receive a call matching:
-	Trait::accept_arc((alloc::sync::Arc<i32>): any)
+	accept_arc((alloc::sync::Arc<i32>): any)
 Actually received 1 matching call:
-	Trait::accept_arc({r})
+	accept_arc({r})
 Received no non-matching calls"
                 ),
             );
@@ -63,9 +63,9 @@ Received no non-matching calls"
                 || mock.received.accept_arc(Arg::Any, Times::Exactly(3)),
                 format!(
                     "Expected to receive a call 3 times matching:
-	Trait::accept_arc((alloc::sync::Arc<i32>): any)
+	accept_arc((alloc::sync::Arc<i32>): any)
 Actually received 1 matching call:
-	Trait::accept_arc({r})
+	accept_arc({r})
 Received no non-matching calls"
                 ),
             );
@@ -76,10 +76,10 @@ Received no non-matching calls"
                 || mock.received.accept_arc(invalid_r.clone(), Times::Once),
                 format!(
                     "Expected to receive a call exactly once matching:
-	Trait::accept_arc((alloc::sync::Arc<i32>): equal to {invalid_r})
+	accept_arc((alloc::sync::Arc<i32>): equal to {invalid_r})
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-Trait::accept_arc(*{r}*)
+accept_arc(*{r}*)
 	1. r (alloc::sync::Arc<i32>):
 		Expected Arc (ptr: {invalid_r_ptr:?}): {invalid_r}
 		Actual Arc   (ptr: {r_ptr:?}): {r}"

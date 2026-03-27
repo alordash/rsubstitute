@@ -43,7 +43,7 @@ trait MyTrait {
 }
 
 pub use generated::*;
-use not_enough_asserts::panics::*;
+use not_enough_asserts::*;
 use rsubstitute_proc_macro::mock;
 
 mod generated {

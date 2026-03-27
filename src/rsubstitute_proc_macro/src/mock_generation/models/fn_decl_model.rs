@@ -15,6 +15,7 @@ pub(crate) struct FnDecl {
     pub maybe_base_fn_block: Option<Block>,
     pub internal_phantom_fields: Vec<Field>,
     pub arg_refs_tuple: Type,
+    pub maybe_actual_self_type: Option<Receiver>,
 }
 
 impl FnDecl {
@@ -47,6 +48,6 @@ impl FnDecl {
     }
 
     pub(crate) fn get_internal_phantom_types_count(&self) -> usize {
-        self.internal_phantom_fields.len() + 1
+        self.internal_phantom_fields.len()
     }
 }

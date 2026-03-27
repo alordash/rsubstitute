@@ -21,7 +21,7 @@ pub(crate) fn generate(
         call_struct,
         base_fn_block,
         mock_type,
-        Target::Trait,
+        Target::TraitOrStruct,
         None,
     );
     let impl_item_fn = ImplItemFn {
@@ -48,7 +48,7 @@ pub(crate) fn generate_struct_trait_fn(
         call_struct,
         base_fn_block,
         mock_type,
-        Target::Trait,
+        Target::TraitOrStruct,
         Some(trait_ident),
     );
     let impl_item_fn = ImplItemFn {
@@ -98,11 +98,10 @@ fn generate_call_base_fn_parts(
     target: Target,
     maybe_containing_trait_ident: Option<&Ident>,
 ) -> (Signature, Block) {
-    let mut generics = match target {
+    let generics = match target {
         Target::Static => fn_decl.merged_generics.clone(),
-        Target::Trait => fn_decl.own_generics.clone(),
+        Target::TraitOrStruct => fn_decl.own_generics.clone(),
     };
-    generics = add_lifetime_constraints_to_generic_types(generics);
     let first_arg = match target {
         Target::Static => FnArg::Typed(PatType {
             attrs: Vec::new(),
@@ -111,9 +110,17 @@ fn generate_call_base_fn_parts(
                 underscore_token: Default::default(),
             })),
             colon_token: Default::default(),
-            ty: Box::new(r#type::reference(mock_type.ty.clone(), None)),
+            ty: Box::new(r#type::reference(
+                Type::Path(mock_type.ty_path.clone()),
+                None,
+            )),
         }),
-        Target::Trait => constants::REF_SELF_ARG.clone(),
+        Target::TraitOrStruct => FnArg::Receiver(
+            fn_decl
+                .maybe_actual_self_type
+                .clone()
+                .expect("Base fn should have actual self type."),
+        ),
     };
     let call_struct_ty = call_struct.ty_path.clone();
     let call_arg = FnArg::Typed(PatType {
@@ -208,10 +215,7 @@ fn generate_call_base_fn_block(
         )
         .collect();
     let mut call_struct_generics = call_struct.item_struct.generics.clone();
-    lifetime::set_all_lifetimes_in_generics(
-        &mut call_struct_generics,
-        &constants::ANONYMOUS_LIFETIME.clone(),
-    );
+    lifetime::anonymize_lifetimes_in_generics(&mut call_struct_generics);
     let deconstruct_call_stmt = Stmt::Local(Local {
         attrs: vec![
             constants::ALLOW_NON_SHORTHAND_FIELD_PATTERNS_ATTRIBUTE.clone(),
@@ -248,17 +252,4 @@ fn generate_call_base_fn_block(
         stmts,
     };
     return block;
-}
-
-fn add_lifetime_constraints_to_generic_types(mut generics: Generics) -> Generics {
-    let default_arg_lifetime = constants::DEFAULT_ARG_LIFETIME.clone();
-    let lifetime_param_bounds: Vec<_> = generics
-        .lifetimes()
-        .filter(|lifetime_param| lifetime_param.lifetime.ident != default_arg_lifetime.ident)
-        .map(|lifetime_param| TypeParamBound::Lifetime(lifetime_param.lifetime.clone()))
-        .collect();
-    for type_param in generics.type_params_mut() {
-        type_param.bounds.extend(lifetime_param_bounds.clone());
-    }
-    return generics;
 }

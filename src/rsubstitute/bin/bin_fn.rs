@@ -139,11 +139,11 @@ mod global {
         String,
         globalSetup<'static>,
     > {
-        return get_global_mock::<globalMock>().setup.setup(number);
+        return get_static_fn_global_mock::<globalMock>().setup.setup(number);
     }
 
     pub fn received(number: Arg<i32>, times: Times) -> &'static globalReceived<'static> {
-        return get_global_mock::<globalMock>()
+        return get_static_fn_global_mock::<globalMock>()
             .received
             .received(number, times);
     }
@@ -153,7 +153,7 @@ mod global {
             phantom_lifetime: PhantomData,
             number,
         };
-        let mock = get_global_mock::<globalMock>();
+        let mock = get_static_fn_global_mock::<globalMock>();
         return mock.data.global_data.handle_base_returning(mock, call);
     }
 }
@@ -232,7 +232,7 @@ fn main() {
 }
 
 mod generic_fn {
-    use rsubstitute::for_generated::{IStaticLocalKey, get_global_mock};
+    use rsubstitute::for_generated::{IStaticLocalKey, get_static_fn_global_mock};
     use std::any::TypeId;
     use std::cell::{RefCell, UnsafeCell};
     use std::collections::HashMap;
@@ -265,7 +265,7 @@ mod generic_fn {
     }
 
     pub fn do_flex<T>(value: T) -> T {
-        let mock: &Mock<T> = get_global_mock();
+        let mock: &Mock<T> = get_static_fn_global_mock();
         return mock.flex(value);
     }
 }

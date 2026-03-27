@@ -1,15 +1,13 @@
+mod generics_merging;
+
 use crate::constants;
+use generics_merging::*;
 use syn::visit::Visit;
 use syn::*;
 
-pub(crate) fn merge(first: &Generics, second: &Generics) -> Generics {
-    let where_clause = merge_where_clause(first.where_clause.clone(), second.where_clause.clone());
-    let params = first
-        .params
-        .clone()
-        .into_iter()
-        .chain(second.params.clone().into_iter())
-        .collect();
+pub(crate) fn merge(first: Generics, second: &Generics) -> Generics {
+    let where_clause = merge_where_clause(first.where_clause, second.where_clause.clone());
+    let params = merge_params(first.params, second.params.clone());
     let result = Generics {
         lt_token: Some(Default::default()),
         params,
@@ -34,33 +32,6 @@ pub(crate) fn remove_default_values(mut generics: Generics) -> Generics {
         }
     }
     return generics;
-}
-
-fn merge_where_clause(
-    maybe_first: Option<WhereClause>,
-    maybe_second: Option<WhereClause>,
-) -> Option<WhereClause> {
-    match (&maybe_first, &maybe_second) {
-        (None, None) => None,
-        _ => {
-            let result = WhereClause {
-                where_token: Default::default(),
-                predicates: maybe_first
-                    .map_or(Default::default(), |x| x.predicates)
-                    .into_iter()
-                    .chain(maybe_second.map_or(Default::default(), |x| x.predicates))
-                    .filter(does_not_reference_self_type)
-                    .collect(),
-            };
-            return Some(result);
-        }
-    }
-}
-
-fn does_not_reference_self_type(where_predicate: &WherePredicate) -> bool {
-    let mut self_ident_searcher = SelfIdentSearcher::new();
-    self_ident_searcher.visit_where_predicate(where_predicate);
-    return !self_ident_searcher.references_self;
 }
 
 struct SelfIdentSearcher {

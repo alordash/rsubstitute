@@ -7,15 +7,22 @@ use crate::mock_generation::parameters::Target;
 use crate::mock_generation::*;
 use proc_macro::TokenStream;
 use quote::quote;
-use syn::ImplItem;
+use syn::*;
 
 pub(crate) fn handle(ctx: &Ctx, mut struct_mock_syntax: StructMockSyntax) -> TokenStream {
     let source_struct_impls_syntax = generate_source_struct_impls_syntax(&struct_mock_syntax);
 
     let mock_ident = struct_mock_syntax.r#struct.ident.clone();
 
-    let mock_generics =
-        mock_generics::generate(&struct_mock_syntax.r#struct.generics, Target::Trait, None);
+    // let mock_generics = mock_generics::generate_for_struct(
+    //     &struct_mock_syntax.r#struct.generics,
+    //     &struct_mock_syntax.trait_impls,
+    // );
+    let mock_generics = mock_generics::generate(
+        &struct_mock_syntax.r#struct.generics,
+        Target::TraitOrStruct,
+        None,
+    );
     let mock_type = mock_type::generate_for_struct(mock_ident.clone(), mock_generics);
     let mock_struct_trait_infos: Vec<_> = core::mem::take(&mut struct_mock_syntax.trait_impls)
         .into_iter()
@@ -26,13 +33,13 @@ pub(crate) fn handle(ctx: &Ctx, mut struct_mock_syntax: StructMockSyntax) -> Tok
     let target_ident = struct_mock_syntax.r#struct.ident.clone();
     let struct_fn_infos: Vec<_> = struct_fn_decls
         .into_iter()
-        .map(|x| fn_info::generate(ctx, x, &mock_type))
+        .map(|x| fn_info::generate(ctx, x, &mock_type, Target::TraitOrStruct))
         .collect();
     let all_fn_infos: Vec<_> = struct_fn_infos
         .iter()
         .chain(mock_struct_trait_infos.iter().flat_map(|x| &x.fn_infos))
         .collect();
-    let mock_data_struct = mock_data_struct::generate_for_trait(&mock_type, &all_fn_infos);
+    let mock_data_struct = mock_data_struct::generate_for_trait(&mock_type, &all_fn_infos, true);
     let mut mock_struct_traits: Vec<_> = mock_struct_trait_infos
         .into_iter()
         .map(|mock_struct_trait_info| {
@@ -154,7 +161,6 @@ pub(crate) fn handle(ctx: &Ctx, mut struct_mock_syntax: StructMockSyntax) -> Tok
         mock_setup_impl::generate_for_trait(&mock_type, &mock_setup_struct, &struct_fn_infos);
     let mock_received_impl =
         mock_received_impl::generate_for_trait(&mock_type, &mock_received_struct, &struct_fn_infos);
-    ignored_impl::fix(&mock_type, &mut struct_mock_syntax.ignored_impls);
     let generated_mod = module::generate_struct(
         target_ident,
         mock_struct_traits,
@@ -171,7 +177,6 @@ pub(crate) fn handle(ctx: &Ctx, mut struct_mock_syntax: StructMockSyntax) -> Tok
         mock_impl,
         mock_setup_impl,
         mock_received_impl,
-        struct_mock_syntax.ignored_impls,
     );
 
     let GeneratedMod {

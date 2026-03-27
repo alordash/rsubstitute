@@ -23,7 +23,7 @@ pub(crate) fn generate_for_trait(
     let result = generate(
         fn_info,
         fn_info.parent.fn_ident.clone(),
-        Target::Trait,
+        Target::TraitOrStruct,
         constants::SELF_TYPE.clone(),
         mock_type,
         output_type_generics,
@@ -84,14 +84,17 @@ fn generate(
         OutputTypeGenerics::DoNotUse => Default::default(),
     };
     generics = generics.with_head_lifetime_param(constants::PLACEHOLDER_LIFETIME_PARAM.clone());
-    generics = referenced_generic_types_lifetimes_filler::fill(generics, mock_type, &own_inputs);
+    generics =
+        placeholder_lifetime_constrainer::add_mutual_lifetime_bounds(generics, &mock_type.generics);
+    // TODO - remove?
+    // generics = referenced_generic_types_lifetimes_filler::fill(generics, mock_type, &own_inputs);
 
     let mut inputs: Vec<_> = own_inputs
         .into_iter()
         .chain(iter::once(times_arg))
         .collect();
     match target {
-        Target::Trait => inputs.insert(0, constants::REF_SELF_ARG.clone()),
+        Target::TraitOrStruct => inputs.insert(0, constants::REF_SELF_ARG.clone()),
         _ => (),
     }
 
@@ -112,7 +115,7 @@ fn generate(
 }
 
 fn generate_output_type(mut arg_refs_tuple: Type, owner_type: Type) -> Type {
-    lifetime::normalize_anonymous_lifetimes(&mut arg_refs_tuple);
+    lifetime::placehold_anonymouys_lifetimes(&mut arg_refs_tuple);
     let result = Type::Path(TypePath {
         qself: None,
         path: Path {

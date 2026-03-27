@@ -10,4 +10,4 @@ typeid = "1.0.3"
 proc-macro2 = "1.0.95"
 quote = "1.0.40"
 syn = { version = "2.0.104", features = ["full", "visit", "visit-mut"] }
-not_enough_asserts = "1.1.1"
+not_enough_asserts = "1.4.1"

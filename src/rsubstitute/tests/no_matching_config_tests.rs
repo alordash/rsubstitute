@@ -15,8 +15,8 @@ mod tests {
     #![allow(non_snake_case)]
 
     use super::*;
+    use not_enough_asserts::*;
     use rsubstitute::Arg;
-    use not_enough_asserts::panics::*;
 
     #[test]
     fn trait_work_Panics() {
@@ -48,13 +48,13 @@ mod tests {
 
         // Assert
         let expected_error_msg = format!("Mock wasn't configured to handle following call:
-	Trait::work({v1}, {v2}, {v3}, {v4})
+	work({v1}, {v2}, {v3}, {v4})
 List of existing configuration ordered by number of correctly matched arguments (non-matching arguments indicated with '*' characters):
-	1. Matched 3/4 arguments: Trait::work({v1}, {v2}, {v3}, *{v4}*)
-	2. Matched 2/4 arguments: Trait::work({v1}, {v2}, *{v3}*, *{v4}*)
-	3. Matched 1/4 arguments: Trait::work({v1}, *{v2}*, *{v3}*, *{v4}*)
-	4. Matched 0/4 arguments: Trait::work(*{v1}*, *{v2}*, *{v3}*, *{v4}*)");
-        assert_eq!(expected_error_msg, actual_error_msg);
+	1. Matched 3/4 arguments: work({v1}, {v2}, {v3}, *{v4}*)
+	2. Matched 2/4 arguments: work({v1}, {v2}, *{v3}*, *{v4}*)
+	3. Matched 1/4 arguments: work({v1}, *{v2}*, *{v3}*, *{v4}*)
+	4. Matched 0/4 arguments: work(*{v1}*, *{v2}*, *{v3}*, *{v4}*)");
+        assert_eq!(Some(expected_error_msg), actual_error_msg);
     }
 
     #[test]
@@ -91,6 +91,6 @@ List of existing configuration ordered by number of correctly matched arguments 
 	2. Matched 2/4 arguments: work({v1}, {v2}, *{v3}*, *{v4}*)
 	3. Matched 1/4 arguments: work({v1}, *{v2}*, *{v3}*, *{v4}*)
 	4. Matched 0/4 arguments: work(*{v1}*, *{v2}*, *{v3}*, *{v4}*)");
-        assert_eq!(expected_error_msg, actual_error_msg);
+        assert_eq!(Some(expected_error_msg), actual_error_msg);
     }
 }

@@ -4,9 +4,12 @@ version = 4
 
 [[package]]
 name = "not_enough_asserts"
-version = "1.1.1"
+version = "1.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "2c5e2218c0d7020d89c9c34204f086ab0a575be76aa72a9bfdafc881013c04df"
+checksum = "cb43d2f32fa385bd0c20b6dc1270b7e76d1a0f7611b6bf3b822e283a396ad0d4"
+dependencies = [
+ "typeid",
+]
 
 [[package]]
 name = "proc-macro2"

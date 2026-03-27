@@ -145,10 +145,6 @@ fn generate_handle_expr(
     target: Target,
     maybe_containing_trait_ident: Option<&Ident>,
 ) -> Expr {
-    let idents = vec![
-        constants::DATA_IDENT.clone(),
-        fn_info.data_field_ident.clone(),
-    ];
     let method_name = match (
         fn_info.parent.maybe_base_fn_block.is_some(),
         fn_info.parent.has_return_value(),
@@ -174,19 +170,25 @@ fn generate_handle_expr(
             ]),
         };
         vec![
-            reference::create_expr(base_receiver.clone()),
+            base_receiver.clone(),
             path::create_expr(CALL_VARIABLE_IDENT.clone()),
             base_fn_path,
         ]
     } else {
         vec![
-            reference::create_expr(base_receiver.clone()),
+            base_receiver.clone(),
             path::create_expr(CALL_VARIABLE_IDENT.clone()),
         ]
     };
-    let expr_method_call = method_call::create_with_base_receiver_and_expr_args(
+    let mock_fn_data_expr = method_call::create_with_base_receiver(
         base_receiver,
-        idents,
+        vec![constants::DATA_IDENT.clone()],
+        constants::CLONE_FN_IDENT.clone(),
+        Vec::new(),
+    );
+    let expr_method_call = method_call::create_with_base_receiver_and_expr_args(
+        Expr::MethodCall(mock_fn_data_expr),
+        vec![fn_info.data_field_ident.clone()],
         method_name,
         args,
     );

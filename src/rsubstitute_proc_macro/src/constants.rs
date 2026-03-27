@@ -266,10 +266,9 @@ define!(
     path::create(format_ident!("format"))
 );
 
-ident!(SELF_TYPE_IDENT, "Self");
-
+pub const SELF_TYPE_NAME: &'static str = "Self";
+ident!(SELF_TYPE_IDENT, SELF_TYPE_NAME);
 define!(SELF_TYPE_PATH, Path, path::create(SELF_TYPE_IDENT.clone()));
-
 define!(SELF_TYPE, Type, r#type::create(SELF_TYPE_IDENT.clone()));
 
 define!(
@@ -279,8 +278,7 @@ define!(
         Type::Path(TypePath {
             qself: None,
             path: SELF_TYPE_PATH.clone(),
-        }),
-        Some(DEFAULT_ARG_LIFETIME.clone()),
+        }),None,
     )
 );
 
@@ -377,21 +375,6 @@ define!(
     path::create_expr(PHANTOM_DATA_IDENT.clone())
 );
 
-ident!(DEFAULT_ARG_LIFETIME_FIELD_IDENT, "_phantom_lifetime");
-
-define!(
-    DEFAULT_ARG_LIFETIME_FIELD,
-    Field,
-    Field {
-        attrs: Vec::new(),
-        vis: Visibility::Inherited,
-        mutability: FieldMutability::None,
-        ident: Some(DEFAULT_ARG_LIFETIME_FIELD_IDENT.clone()),
-        colon_token: Some(Default::default()),
-        ty: r#type::phantom_data_lifetime(DEFAULT_ARG_LIFETIME.clone()),
-    }
-);
-
 ident!(RETURN_TYPE_PHANTOM_FIELD_IDENT, "_return_type");
 
 define!(
@@ -413,15 +396,7 @@ define!(
     }
 );
 
-pub(crate) const DEFAULT_ARG_LIFETIME_NAME: &'static str = "__rs";
-define!(
-    DEFAULT_ARG_LIFETIME,
-    Lifetime,
-    Lifetime::new(&format!("'{DEFAULT_ARG_LIFETIME_NAME}"), Span::call_site())
-);
-
 pub(crate) const PLACEHOLDER_LIFETIME_NAME: &'static str = "__rsa";
-ident!(PLACEHOLDER_LIFETIME_IDENT, PLACEHOLDER_LIFETIME_NAME);
 define!(
     PLACEHOLDER_LIFETIME,
     Lifetime,
@@ -454,7 +429,7 @@ ident!(RESET_IDENT, "reset");
 ident!(INTO_TRAIT_IDENT, "Into");
 ident!(INTO_FN_IDENT, "into");
 
-ident!(GET_GLOBAL_MOCK_FN_IDENT, "get_global_mock");
+ident!(GET_STATIC_FN_GLOBAL_MOCK_FN_IDENT, "get_static_fn_global_mock");
 
 define!(
     DEFAULT_TRAIT_PATH,
@@ -468,12 +443,6 @@ ident!(INNER_DATA_FIELD_IDENT, "inner_data");
 define!(DEREF_TRAIT_PATH, Path, path::create(format_ident!("Deref")));
 ident!(DEREF_TARGET_TYPE_IDENT, "Target");
 ident!(DEREF_FN_IDENT, "deref");
-
-pub const IGNORE_IMPL_ATTRIBUTE_IDENT_NAME: &'static str = "unmock";
-ident!(
-    IGNORE_IMPL_ATTRIBUTE_IDENT,
-    IGNORE_IMPL_ATTRIBUTE_IDENT_NAME
-);
 
 ident!(HASH_FN_IDENT, "hash");
 
@@ -546,3 +515,6 @@ define!(
     Expr,
     call::create_from_ident(GET_MOCK_FN_IDENT.clone(), Vec::new())
 );
+
+ident!(AS_REF_TRAIT_IDENT, "AsRef");
+ident!(AS_REF_FN_IDENT, "as_ref");

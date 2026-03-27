@@ -22,10 +22,10 @@ mocked! {
         fn f(&self) { }
     }
 
-    #[unmock]
-    impl Struct {
-        pub fn non_associative() {}
-    }
+}
+
+impl Struct {
+    pub fn non_associative() {}
 }
 
 #[cfg(test)]
@@ -33,7 +33,7 @@ mod tests {
     #![allow(non_snake_case)]
 
     use super::*;
-    use not_enough_asserts::panics::*;
+    use not_enough_asserts::*;
     use rsubstitute::*;
     use std::cell::RefCell;
     use std::sync::Arc;
@@ -55,7 +55,7 @@ mod tests {
                 .and_does(move |_, _| *callback_flag_clone.borrow_mut() = true);
 
             // Act
-            Struct::<u8>::non_associative();
+            Struct::non_associative();
             let result = mock.f();
 
             // Assert
@@ -171,7 +171,7 @@ Received no non-matching calls"#,
                 .and_does(move |_, _| *callback_flag_clone.borrow_mut() = true);
 
             // Act
-            Struct::<u8>::non_associative();
+            Struct::non_associative();
             let result = Trait::f(&mock);
 
             // Assert

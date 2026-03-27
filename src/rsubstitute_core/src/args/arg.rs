@@ -7,31 +7,31 @@ use std::sync::Arc;
 struct Private;
 
 #[allow(private_interfaces)]
-// TODO - remove 'rs lifetime, it is no longer needed since accepting raw ptr in PrivateIs
+// TODO - remove  lifetime, it is no longer needed since accepting raw ptr in PrivateIs
 #[repr(C)]
-pub enum Arg<'rs, T> {
+pub enum Arg<T> {
     Any,
     #[doc(hidden)]
     PrivateEq(ArgCmp<T>, Private),
     #[doc(hidden)]
     PrivateNotEq(ArgCmp<T>, Private),
     #[doc(hidden)]
-    PrivateIs(Box<dyn Fn(*const ()) -> bool + 'rs>, Private),
+    PrivateIs(Box<dyn Fn(*const ()) -> bool>, Private),
 }
 
-impl<'rs, T: PartialEq> From<T> for Arg<'rs, T> {
+impl<T: PartialEq> From<T> for Arg<T> {
     fn from(value: T) -> Self {
         Arg::eq(value)
     }
 }
 
-impl<'rs, 'a, T> From<&'a T> for Arg<'rs, *const T> {
+impl<'a, T> From<&'a T> for Arg<*const T> {
     fn from(value: &'a T) -> Self {
         Arg::eq(value as *const T)
     }
 }
 
-impl<'rs, T: Debug> Debug for Arg<'rs, T> {
+impl<T: Debug> Debug for Arg<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         // TODO - extract to const field when std::any::type_name becomes stabilized as const fn
         // https://github.com/rust-lang/rust/issues/63084
@@ -49,7 +49,7 @@ impl<'rs, T: Debug> Debug for Arg<'rs, T> {
     }
 }
 
-impl<'rs, T> Arg<'rs, T> {
+impl<T> Arg<T> {
     pub fn is<'a, TFn: Fn(&T) -> bool + 'a>(predicate: TFn) -> Self {
         let anonymous_predicate = move |ptr: *const ()| {
             // SAFETY: anonymous predicate is called only internally and passed pointer is always
@@ -90,7 +90,7 @@ impl<'rs, T> Arg<'rs, T> {
     }
 }
 
-impl<'rs, T> Arg<'rs, T> {
+impl<T> Arg<T> {
     pub fn check<'a>(
         &self,
         arg_name: &'static str,
@@ -138,7 +138,7 @@ impl<'rs, T> Arg<'rs, T> {
     }
 }
 
-impl<'rs, 'a, T: ?Sized> Arg<'rs, &'a T> {
+impl<'rs, 'a, T: ?Sized> Arg<&'a T> {
     pub fn check_ref(
         &self,
         arg_name: &'static str,
@@ -188,7 +188,7 @@ impl<'rs, 'a, T: ?Sized> Arg<'rs, &'a T> {
     }
 }
 
-impl<'rs, T: ?Sized> Arg<'rs, *mut T> {
+impl<T: ?Sized> Arg<*mut T> {
     pub fn check_mut(
         &self,
         arg_name: &'static str,
@@ -199,7 +199,7 @@ impl<'rs, T: ?Sized> Arg<'rs, *mut T> {
     }
 }
 
-impl<'rs, 'a, T: ?Sized> Arg<'rs, &'a mut T> {
+impl<'a, T: ?Sized> Arg<&'a mut T> {
     pub fn check_mut(
         &self,
         arg_name: &'static str,
@@ -259,7 +259,7 @@ impl<'rs, 'a, T: ?Sized> Arg<'rs, &'a mut T> {
     }
 }
 
-impl<'rs, T: ?Sized> Arg<'rs, Rc<T>> {
+impl<T: ?Sized> Arg<Rc<T>> {
     pub fn check_rc<'a>(
         &self,
         arg_name: &'static str,
@@ -312,7 +312,7 @@ impl<'rs, T: ?Sized> Arg<'rs, Rc<T>> {
     }
 }
 
-impl<'rs, T: ?Sized> Arg<'rs, Arc<T>> {
+impl<T: ?Sized> Arg<Arc<T>> {
     pub fn check_arc<'a>(
         &self,
         arg_name: &'static str,

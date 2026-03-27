@@ -6,7 +6,11 @@ use crate::syntax::*;
 use quote::format_ident;
 use syn::*;
 
-pub(crate) fn generate_for_trait(mock_type: &MockType, fn_infos: &[&FnInfo]) -> MockDataStruct {
+pub(crate) fn generate_for_trait(
+    mock_type: &MockType,
+    fn_infos: &[&FnInfo],
+    specify_trait_name: bool,
+) -> MockDataStruct {
     let attrs = vec![
         constants::DOC_HIDDEN_ATTRIBUTE.clone(),
         constants::DERIVE_MOCK_DATA_ATTRIBUTE.clone(),
@@ -26,13 +30,19 @@ pub(crate) fn generate_for_trait(mock_type: &MockType, fn_infos: &[&FnInfo]) -> 
         .map(|(x, y)| {
             (
                 x.get_required_ident(),
-                y.parent.get_str_literal_full_ident().clone(),
+                if specify_trait_name {
+                    y.parent.get_str_literal_full_ident().clone()
+                } else {
+                    y.parent.fn_ident.to_string()
+                },
             )
         })
         .collect();
-    let fields = [constants::DEFAULT_ARG_LIFETIME_FIELD.clone()]
+    let fields = mock_type
+        .generics
+        .phantom_fields
+        .clone()
         .into_iter()
-        .chain(mock_type.generics.phantom_fields.clone())
         .chain(fn_fields)
         .into_iter()
         .collect();
@@ -80,9 +90,11 @@ pub(crate) fn generate_for_static(mock_type: &MockType, fn_infos: &[&FnInfo]) ->
             )
         })
         .collect();
-    let fields = [constants::DEFAULT_ARG_LIFETIME_FIELD.clone()]
+    let fields = mock_type
+        .generics
+        .phantom_fields
+        .clone()
         .into_iter()
-        .chain(mock_type.generics.phantom_fields.clone())
         .chain(fn_fields)
         .collect();
     let fields_named = FieldsNamed {
@@ -119,7 +131,7 @@ fn generate_field(fn_info: &FnInfo, mock_type: &MockType) -> Field {
                     lt_token: Default::default(),
                     args: [
                         GenericArgument::Lifetime(constants::STATIC_LIFETIME.clone()),
-                        GenericArgument::Type(mock_type.ty.clone()),
+                        GenericArgument::Type(Type::Path(mock_type.ty_path.clone())),
                         GenericArgument::Const(bool_lit::create(
                             fn_info.parent.maybe_base_fn_block.is_some(),
                         )),
