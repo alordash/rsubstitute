@@ -53,7 +53,7 @@ pub(crate) fn extract_struct_trait_impl_fns(
                 false,
                 Some(trait_impl_fn.block.clone()),
                 Some(&trait_impl.trait_path),
-                Some(&trait_impl.item_impl.generics)
+                Some(&trait_impl.item_impl.generics),
             )
         })
         .collect();
@@ -71,7 +71,7 @@ pub(crate) fn extract_fn(ctx: &Ctx, mock_type: &MockType, item_fn: &ItemFn) -> F
         false,
         Some(*item_fn.block.clone()),
         None,
-        None
+        None,
     );
     return fn_decl;
 }
@@ -107,7 +107,7 @@ fn map_trait_item_fn(
         true,
         trait_item_fn.default.clone(),
         Some(trait_path),
-        None
+        None,
     );
     return fn_decl;
 }
@@ -124,7 +124,7 @@ fn map_impl_item_fn(ctx: &Ctx, mock_type: &MockType, impl_item_fn: &ImplItemFn) 
         false,
         Some(impl_item_fn.block.clone()),
         None,
-        None
+        None,
     );
     return fn_decl;
 }
@@ -139,7 +139,7 @@ fn create_fn_decl(
     base_fn_block_is_in_trait: bool,
     mut maybe_base_fn_block: Option<Block>,
     maybe_parent_trait_path: Option<&Path>,
-    maybe_struct_parent_trait_generics: Option<&Generics>
+    maybe_struct_parent_trait_generics: Option<&Generics>,
 ) -> FnDecl {
     let mut actual_sig = sig.clone();
     if let Some(parent_trait_path) = maybe_parent_trait_path {
@@ -162,9 +162,10 @@ fn create_fn_decl(
     let maybe_phantom_return_field =
         try_get_phantom_return_field(&actual_sig.output, &actual_sig.generics);
     let mut merged_generics = match generics_strategy {
-        GenericsStrategy::MergeWithMockGenerics => {
-            generics::merge(mock_type.generics.impl_generics.clone(), &actual_sig.generics)
-        }
+        GenericsStrategy::MergeWithMockGenerics => generics::merge(
+            mock_type.generics.impl_generics.clone(),
+            &actual_sig.generics,
+        ),
         GenericsStrategy::UseMockGenerics => mock_type.generics.impl_generics.clone(),
     };
     if let Some(struct_parent_trait_generics) = maybe_struct_parent_trait_generics {
@@ -247,27 +248,11 @@ fn try_get_actual_self_type(sig: &Signature, inferred_type_path: &TypePath) -> O
     let Some(FnArg::Receiver(mut receiver)) = sig.inputs.get(0).cloned() else {
         return None;
     };
-    if is_type_receiver_self(&receiver.ty) {
-        receiver.colon_token = None;
-    } else {
-        let mut self_type_inferrer = SelfTypeInferrer { inferred_type_path };
-        self_type_inferrer.visit_receiver_mut(&mut receiver);
-    }
+    receiver.colon_token = Some(Default::default());
+    receiver.reference = None;
+    let mut self_type_inferrer = SelfTypeInferrer { inferred_type_path };
+    self_type_inferrer.visit_receiver_mut(&mut receiver);
     return Some(receiver.clone());
-}
-
-fn is_type_receiver_self(ty: &Type) -> bool {
-    match ty {
-        Type::Path(type_path) => is_type_path_receiver_self(type_path),
-        Type::Reference(TypeReference { elem, .. }) => {
-            if let Type::Path(type_path) = elem.deref() {
-                is_type_path_receiver_self(type_path)
-            } else {
-                false
-            }
-        }
-        _ => false,
-    }
 }
 
 fn is_type_path_receiver_self(ty_path: &TypePath) -> bool {

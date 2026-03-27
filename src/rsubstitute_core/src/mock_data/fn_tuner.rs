@@ -133,7 +133,7 @@ impl<'rs, TMock, TOwner, TArgRefsTuple: Copy, TMockArg, const SUPPORTS_BASE_CALL
 impl<'rs, TMock, TOwner, TArgRefsTuple: Copy, TMockArg, const SUPPORTS_BASE_CALLING: bool>
     FnTuner<'rs, TMock, TOwner, TArgRefsTuple, (), TMockArg, SUPPORTS_BASE_CALLING, true>
 {
-    pub fn does(&self, callback: impl FnMut(&TMock, TArgRefsTuple) + 'static) -> &'rs TOwner {
+    pub fn does(&self, callback: impl FnMut(&TMockArg, TArgRefsTuple) + 'static) -> &'rs TOwner {
         self.fn_config.borrow_mut().set_callback(callback);
         return self.owner;
     }
