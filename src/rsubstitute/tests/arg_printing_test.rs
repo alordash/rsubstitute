@@ -51,7 +51,7 @@ trait Trait<'a, T0> {
 mod tests {
     #![allow(non_snake_case)]
     use super::*;
-    use not_enough_asserts::panics::record_panic;
+    use not_enough_asserts::record_panic;
 
     type T0 = [u8; 3];
 
@@ -324,7 +324,7 @@ Received no non-matching calls"
         }
     }
 
-//     mod r#struct {
+//     mod struct {
 //         use super::*;
 // 
 //         #[test]

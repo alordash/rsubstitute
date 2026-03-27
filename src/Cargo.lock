@@ -4,9 +4,9 @@ version = 4
 
 [[package]]
 name = "not_enough_asserts"
-version = "1.4.0"
+version = "1.4.1"
 source = "registry+https://github.com/rust-lang/crates.io-index"
-checksum = "e7435dcdd7942f4594ac58a66a120ad41f956ee00cb25531101581a6e4dbfefc"
+checksum = "cb43d2f32fa385bd0c20b6dc1270b7e76d1a0f7611b6bf3b822e283a396ad0d4"
 dependencies = [
  "typeid",
 ]

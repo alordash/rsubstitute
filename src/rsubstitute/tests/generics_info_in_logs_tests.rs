@@ -9,7 +9,7 @@ trait Trait<'a, T1, const B: bool> {
 mod tests {
     #![allow(non_snake_case)]
     use super::*;
-    use not_enough_asserts::panics::*;
+    use not_enough_asserts::*;
     use rsubstitute_core::Times;
 
     #[test]

@@ -1,29 +1,24 @@
-use rsubstitute::macros::*;
+use rsubstitute::macros::mock;
 use std::rc::Rc;
 
-mocked! {
-    struct Struct;
+#[mock]
+trait Trait {
+    fn accept_rc(&self, r: Rc<i32>);
 
-    impl Struct {
-        pub fn new() -> Self { Self }
+    fn return_rc(&self) -> Rc<i32>;
 
-        pub(crate) fn accept_rc(&self, r: Rc<i32>) { unreachable!() }
+    fn accept_rc_return_rc(&self, r: Rc<i32>) -> Rc<i32>;
 
-        pub(crate) fn return_rc(&self) -> Rc<i32> { unreachable!() }
+    fn accept_two_rcs(&self, r1: Rc<i32>, r2: Rc<f32>);
 
-        pub(crate) fn accept_rc_return_rc(&self, r: Rc<i32>) -> Rc<i32> { unreachable!() }
-
-        pub(crate) fn accept_two_rcs(&self, r1: Rc<i32>, r2: Rc<f32>) { unreachable!() }
-
-        pub(crate) fn accept_two_rcs_return_rc(&self, r1: Rc<i32>, r2: Rc<f32>) -> Rc<String> { unreachable!() }
-    }
+    fn accept_two_rcs_return_rc(&self, r1: Rc<i32>, r2: Rc<f32>) -> Rc<String>;
 }
 
 #[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
     use super::*;
-    use not_enough_asserts::panics::*;
+    use not_enough_asserts::*;
     use rsubstitute::*;
 
     mod accept_rc_tests {
@@ -32,7 +27,7 @@ mod tests {
         #[test]
         fn accept_rc_Ok() {
             // Arrange
-            let mock = Struct::new();
+            let mock = TraitMock::new();
             let r = Rc::new(1);
 
             // Act
@@ -45,7 +40,7 @@ mod tests {
         #[test]
         fn accept_rc_Panics() {
             // Arrange
-            let mock = Struct::new();
+            let mock = TraitMock::new();
             let r = Rc::new(11);
             let r_ptr = Rc::as_ptr(&r);
 
@@ -99,7 +94,7 @@ accept_rc(*{r}*)
         #[test]
         fn return_rc_Ok() {
             // Arrange
-            let mock = Struct::new();
+            let mock = TraitMock::new();
             let r = Rc::new(10);
             mock.setup.return_rc().returns(r.clone());
 
@@ -117,7 +112,7 @@ accept_rc(*{r}*)
         #[test]
         fn accept_rc_return_rc_Ok() {
             // Arrange
-            let mock = Struct::new();
+            let mock = TraitMock::new();
             let accepted_r = Rc::new(10);
             let returned_r = Rc::new(20);
             mock.setup
@@ -143,7 +138,7 @@ accept_rc(*{r}*)
         #[test]
         fn accept_two_rcs_Ok() {
             // Arrange
-            let mock = Struct::new();
+            let mock = TraitMock::new();
             let r1 = Rc::new(10);
             let r2 = Rc::new(20.2);
 
@@ -164,7 +159,7 @@ accept_rc(*{r}*)
         #[test]
         fn accept_two_rcs_return_rc_Ok() {
             // Arrange
-            let mock = Struct::new();
+            let mock = TraitMock::new();
             let r1 = Rc::new(10);
             let r2 = Rc::new(20.2);
             let returned_r = Rc::new(String::from("veridis quo"));

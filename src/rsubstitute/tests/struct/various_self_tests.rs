@@ -1,5 +1,3 @@
-mod test_utils;
-
 use rsubstitute::prelude::*;
 use std::pin::Pin;
 use std::rc::Rc;
@@ -164,9 +162,9 @@ mod tests {
     #![allow(unused_imports)]
 
     use super::*;
-    use not_enough_asserts::prelude::*;
+    use crate::test_utils::*;
+    use not_enough_asserts::*;
     use rsubstitute::*;
-    use test_utils::*;
 
     mod no_return_tests {
         use super::*;

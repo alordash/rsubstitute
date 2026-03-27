@@ -1,23 +1,28 @@
-use rsubstitute::macros::mock;
+use rsubstitute::macros::*;
 
-#[mock]
-trait Trait {
-    fn accept_value(&self, v: i32);
+mocked! {
+    struct Struct;
 
-    fn return_value(&self) -> i32;
+    impl Struct {
+        pub fn new() -> Self { Self }
 
-    fn accept_value_return_value(&self, v: i32) -> f32;
+        pub fn accept_value(&self, v: i32) { unreachable!() }
 
-    fn accept_two_values(&self, v1: i32, v2: f32);
+        pub fn return_value(&self) -> i32 { unreachable!() }
 
-    fn accept_two_values_return_value(&self, v1: i32, v2: f32) -> String;
+        pub fn accept_value_return_value(&self, v: i32) -> f32 { unreachable!() }
+
+        pub fn accept_two_values(&self, v1: i32, v2: f32) { unreachable!() }
+
+        pub fn accept_two_values_return_value(&self, v1: i32, v2: f32) -> String { unreachable!() }
+    }
 }
 
 #[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
     use super::*;
-    use not_enough_asserts::panics::*;
+    use not_enough_asserts::*;
     use rsubstitute::*;
     use std::cell::RefCell;
     use std::sync::Arc;
@@ -28,7 +33,7 @@ mod tests {
         #[test]
         fn accept_value_Ok() {
             // Arrange
-            let mock = TraitMock::new();
+            let mock = Struct::new();
             let first_value = 10;
             let second_value = 22;
 
@@ -56,12 +61,12 @@ mod tests {
         #[test]
         fn accept_value_Callback_ok() {
             // Arrange
-            let mock = TraitMock::new();
+            let mock = Struct::new();
             let callback_flag = Arc::new(RefCell::new(false));
             let callback_flag_clone = callback_flag.clone();
             mock.setup
                 .accept_value(Arg::Any)
-                .does(move |_| *callback_flag_clone.borrow_mut() = true);
+                .does(move |_, _| *callback_flag_clone.borrow_mut() = true);
 
             // Act
             mock.accept_value(1);
@@ -73,7 +78,7 @@ mod tests {
         #[test]
         fn accept_value_ArgAny_Panics() {
             // Arrange
-            let mock = TraitMock::new();
+            let mock = Struct::new();
             let first_value = 10;
             let second_value = 22;
 
@@ -120,7 +125,7 @@ Received no non-matching calls"#
         #[test]
         fn accept_value_ArgEq_Panics() {
             // Arrange
-            let mock = TraitMock::new();
+            let mock = Struct::new();
             let first_value = 10;
             let second_value = 22;
 
@@ -202,7 +207,7 @@ accept_value(*{first_value}*)
         #[test]
         fn accept_value_ArgIs_Panics() {
             // Arrange
-            let mock = TraitMock::new();
+            let mock = Struct::new();
             let first_value = 10;
             let second_value = 22;
 
@@ -288,7 +293,7 @@ accept_value(*{first_value}*)
         #[test]
         fn accept_value_NoOtherCallsWithoutOtherCalls_Ok() {
             // Arrange
-            let mock = TraitMock::new();
+            let mock = Struct::new();
             let value = 10;
 
             // Act
@@ -303,7 +308,7 @@ accept_value(*{first_value}*)
         #[test]
         fn accept_value_NoOtherCallsWithOneOtherCall_Panics() {
             // Arrange
-            let mock = TraitMock::new();
+            let mock = Struct::new();
             let first_value = 10;
             let second_value = 22;
 
@@ -328,7 +333,7 @@ accept_value(*{first_value}*)
         #[test]
         fn accept_value_NoOtherCallsWithManyOtherCalls_Panics() {
             // Arrange
-            let mock = TraitMock::new();
+            let mock = Struct::new();
             let first_value = 10;
             let second_value = 22;
             let third_value = 333;
@@ -360,7 +365,7 @@ accept_value(*{first_value}*)
         #[test]
         fn return_value_Single_Ok() {
             // Arrange
-            let mock = TraitMock::new();
+            let mock = Struct::new();
             let value = 10;
             mock.setup.return_value().returns(value);
 
@@ -381,25 +386,25 @@ accept_value(*{first_value}*)
                 ThirdConfigChanged,
             }
 
-            let mock = TraitMock::new();
+            let mock = Struct::new();
             let first_value = 10;
             let second_value = 22;
             let third_value = 333;
             let callback_result = Arc::new(RefCell::new(Result::DidNotChange));
-            let first_callback_result = callback_result.clone();
-            let second_callback_result = callback_result.clone();
+            let first_callback_counter_clone = callback_result.clone();
+            let second_callback_counter_clone = callback_result.clone();
             mock.setup
                 .return_value()
                 .returns(first_value)
                 .return_value()
                 .returns(second_value)
-                .and_does(move |_| {
-                    *first_callback_result.borrow_mut() = Result::SecondConfigChanged
+                .and_does(move |_, _| {
+                    *first_callback_counter_clone.borrow_mut() = Result::SecondConfigChanged
                 })
                 .return_value()
                 .returns(third_value)
-                .and_does(move |_| {
-                    *second_callback_result.borrow_mut() = Result::ThirdConfigChanged
+                .and_does(move |_, _| {
+                    *second_callback_counter_clone.borrow_mut() = Result::ThirdConfigChanged
                 });
 
             // Act
@@ -417,7 +422,7 @@ accept_value(*{first_value}*)
         #[test]
         fn return_value_Many_Ok() {
             // Arrange
-            let mock = TraitMock::new();
+            let mock = Struct::new();
             let first_value = 10;
             let second_value = 22;
             let third_value = 333;
@@ -439,7 +444,7 @@ accept_value(*{first_value}*)
         #[test]
         fn return_value_ManyWithCallback_Ok() {
             // Arrange
-            let mock = TraitMock::new();
+            let mock = Struct::new();
             let callback_counter = Arc::new(RefCell::new(0));
             let callback_counter_clone = callback_counter.clone();
             let first_value = 10;
@@ -447,7 +452,7 @@ accept_value(*{first_value}*)
             mock.setup
                 .return_value()
                 .returns_many([first_value, second_value])
-                .and_does(move |_| *callback_counter_clone.borrow_mut() += 1);
+                .and_does(move |_, _| *callback_counter_clone.borrow_mut() += 1);
 
             // Act
             let actual_first_value = mock.return_value();
@@ -458,17 +463,12 @@ accept_value(*{first_value}*)
 
             assert_eq!(first_value, actual_first_value);
             assert_eq!(second_value, actual_second_value);
-
-            // TODO - add calls check to ALL tests
-            mock.received
-                .return_value(Times::Exactly(2))
-                .no_other_calls();
         }
 
         #[test]
         fn return_value_NoMatchingConfiguration_Panics() {
             // Arrange
-            let mock = TraitMock::new();
+            let mock = Struct::new();
 
             // Act
             let actual_error_msg = record_panic(|| mock.return_value());
@@ -486,7 +486,7 @@ accept_value(*{first_value}*)
         #[test]
         fn accept_value_return_value_Ok() {
             // Arrange
-            let mock = TraitMock::new();
+            let mock = Struct::new();
             let first_accepted_value = 10;
             let first_returned_value = 11.1;
             let second_accepted_value = 20;
@@ -522,7 +522,7 @@ accept_value(*{first_value}*)
         #[test]
         fn accept_value_return_value_Many1_Ok() {
             // Arrange
-            let mock = TraitMock::new();
+            let mock = Struct::new();
             let single_accepted_value = 10;
             let double_accepted_value = 20;
             let first_returned_value = 11.1;
@@ -557,7 +557,7 @@ accept_value(*{first_value}*)
         #[test]
         fn accept_value_return_value_Many2_Ok() {
             // Arrange
-            let mock = TraitMock::new();
+            let mock = Struct::new();
             let first_accepted_value = 10;
             let first_first_returned_value = 11.1;
             let first_second_returned_value = 22.2;
@@ -622,7 +622,7 @@ accept_value(*{first_value}*)
         #[test]
         fn accept_value_return_value_Callback_Ok() {
             // Arrange
-            let mock = TraitMock::new();
+            let mock = Struct::new();
             let first_accepted_value = 10;
             let first_callback_number = Arc::new(RefCell::new(0));
             let first_callback_number_clone = first_callback_number.clone();
@@ -634,12 +634,12 @@ accept_value(*{first_value}*)
             mock.setup
                 .accept_value_return_value(Arg::eq(first_accepted_value))
                 .returns(first_returned_value)
-                .and_does(move |_| {
+                .and_does(move |_, _| {
                     *first_callback_number_clone.borrow_mut() = 1;
                 })
                 .accept_value_return_value(Arg::eq(second_accepted_value))
                 .returns(second_returned_value)
-                .and_does(move |_| {
+                .and_does(move |_, _| {
                     *second_callback_number_clone.borrow_mut() = 2;
                 });
 
@@ -668,7 +668,7 @@ accept_value(*{first_value}*)
         #[test]
         fn accept_two_values_Ok() {
             // Arrange
-            let mock = TraitMock::new();
+            let mock = Struct::new();
             let v1 = 10;
             let v2 = 20.2;
 
@@ -688,7 +688,7 @@ accept_value(*{first_value}*)
         #[test]
         fn accept_two_values_return_value_Ok() {
             // Arrange
-            let mock = TraitMock::new();
+            let mock = Struct::new();
             let v1 = 10;
             let v2 = 20.2;
             let returned_value = String::from("quo vadis");
@@ -710,7 +710,7 @@ accept_value(*{first_value}*)
         #[test]
         fn accept_two_values_return_value_Panics() {
             // Arrange
-            let mock = TraitMock::new();
+            let mock = Struct::new();
             let v1 = 10;
             let v2 = 20.2;
             let returned_value = String::from("veridis quo");
@@ -781,7 +781,7 @@ accept_two_values_return_value(*10*, *20.2*)
         #[test]
         fn accept_two_values_return_value_NoReturnValue_Panics() {
             // Arrange
-            let mock = TraitMock::new();
+            let mock = Struct::new();
             let unexpected_v1 = 10;
             let unexpected_v2 = 22.2;
             let expected_v1 = 30;

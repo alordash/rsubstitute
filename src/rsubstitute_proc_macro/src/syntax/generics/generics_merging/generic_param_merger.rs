@@ -1,3 +1,4 @@
+use quote::ToTokens;
 use syn::*;
 
 pub(crate) enum GenericParamMerger {
@@ -67,33 +68,46 @@ pub(crate) struct ConstParamMerger {
 
 impl LifetimeParamMerger {
     pub fn merge(&mut self, other: LifetimeParam) {
-        for other_lifetime_bound in other.bounds {
-            if !self.contains_lifetime_bound(&other_lifetime_bound) {
-                self.lifetime_param.bounds.push(other_lifetime_bound)
-            }
-        }
-    }
-
-    fn contains_lifetime_bound(&self, lifetime_bound: &Lifetime) -> bool {
-        self.lifetime_param
-            .bounds
-            .iter()
-            .any(|bound| bound.ident == lifetime_bound.ident)
+        self.lifetime_param.bounds.extend(other.bounds);
     }
 }
 
 impl TypeParamMerger {
     pub fn merge(&mut self, other: TypeParam) {
-        if self.type_param.default.is_some() && other.default.is_some() {
+        // TODO - write tests for cases with conflicts
+        if let Some(ref existing) = self.type_param.default
+            && let Some(ref new) = other.default
+        {
             panic!(
-                "Encountered conflicting generic type parameter default value. TODO write more decriptive error message and make compile fail test"
+                "Encountered conflicting generic type parameter default value. Type parameter: {}, existing default value: {}, new default value: {}",
+                self.type_param.ident.to_string(),
+                existing.to_token_stream().to_string(),
+                new.to_token_stream().to_string()
             );
         }
+        if other.default.is_some() {
+            self.type_param.eq_token = other.eq_token;
+            self.type_param.default = other.default;
+        }
+        self.type_param.bounds.extend(other.bounds);
     }
 }
 
 impl ConstParamMerger {
     pub fn merge(&mut self, other: ConstParam) {
-        todo!()
+        if let Some(ref existing) = self.const_param.default
+            && let Some(ref new) = other.default
+        {
+            panic!(
+                "Encountered conflicting generic const parameter default value. Const parameter: {}, existing default value: {}, new default value: {}",
+                self.const_param.ident.to_string(),
+                existing.to_token_stream().to_string(),
+                new.to_token_stream().to_string()
+            );
+        }
+        if other.default.is_some() {
+            self.const_param.eq_token = other.eq_token;
+            self.const_param.default = other.default;
+        }
     }
 }

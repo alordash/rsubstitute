@@ -18,7 +18,7 @@ trait Trait {
 mod tests {
     #![allow(non_snake_case)]
     use super::*;
-    use not_enough_asserts::panics::*;
+    use not_enough_asserts::*;
     use rsubstitute::*;
 
     mod accept_arc_tests {

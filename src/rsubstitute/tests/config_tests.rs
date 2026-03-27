@@ -12,23 +12,23 @@ trait Trait {
 mod max_invalid_calls_listed_count_tests {
     #![allow(non_snake_case)]
     use super::*;
-    use not_enough_asserts::panics::*;
+    use not_enough_asserts::*;
     use rsubstitute::*;
     use std::sync::*;
 
     // Used to run tests sequentially, otherwise `write_config` may cause deadlock
     // since `std::sync::RwLock` does not have priority policy for read and write locks.
-    static TESTS_SYNCER: LazyLock<Mutex<()>> = LazyLock::new(|| Default::default());
+    static TESTS_SEQ_SYNCER: LazyLock<Mutex<()>> = LazyLock::new(|| Default::default());
 
-    fn sync_test<'a>() -> MutexGuard<'a, ()> {
-        TESTS_SYNCER.lock().expect("Unable to lock `TESTS_SYNCER`.")
+    fn seq_sync<'a>() -> MutexGuard<'a, ()> {
+        TESTS_SEQ_SYNCER.lock().expect("Unable to lock `TESTS_SYNCER`.")
     }
 
     mod default {
         use super::*;
         #[test]
         fn CallsCountLessThanLimit_PrintsAll() {
-            let _lock = sync_test();
+            let _lock = seq_sync();
 
             // Arrange
             let mock = TraitMock::new();
@@ -68,7 +68,7 @@ Received {calls_count} non-matching calls (non-matching arguments indicated with
 
         #[test]
         fn CallsCountMoreThanLimit_PrintsTrimmed() {
-            let _lock = sync_test();
+            let _lock = seq_sync();
 
             // Arrange
             let mock = TraitMock::new();

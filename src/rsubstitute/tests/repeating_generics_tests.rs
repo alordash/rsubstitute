@@ -31,7 +31,7 @@ mocked_base! {
         }
     }
 
-    // TODO - write in docs about this limitation, i.e. trait impl's generics get inserted into struct's generics
+    // TODO - as_Different::<Td>
     impl<'a, 'd, T, Td> Different<'d, Td> for Struct<'a, T> {
         fn work(&self, t: &'d Td) {
             unreachable!()

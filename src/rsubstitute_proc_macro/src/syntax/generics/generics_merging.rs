@@ -110,4 +110,5 @@ fn does_not_reference_self_type(where_predicate: &WherePredicate) -> bool {
     return !self_ident_searcher.references_self;
 }
 
+// It was revealed to me in a dream
 const HEURISTIC_MAX_GENERIC_PARAM_VEC_CAPACITY: usize = 40;

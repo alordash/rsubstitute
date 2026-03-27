@@ -19,3 +19,9 @@ impl Counter {
         self.0.load(Ordering::Relaxed)
     }
 }
+
+mod tests {
+
+    #[test]
+    fn compile() {}
+}

@@ -33,7 +33,7 @@ trait Trait {
         TT: ToString;
 }
 
-// TODO - write in docs about limitation: `Self` should not be used ambigiously, e.g.
+// TODO - write in docs about limitation: `Self` should not be used ambiguously, e.g.
 // correct: <Self as Trait>::OutputType
 //   wrong: Self::OutputType
 mocked_base! {
