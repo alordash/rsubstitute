@@ -21,7 +21,6 @@ mocked! {
     impl Trait for Struct {
         fn f(&self) { }
     }
-
 }
 
 impl Struct {
@@ -160,7 +159,7 @@ Received no non-matching calls"#,
         fn Trait_f_Ok() {
             // Arrange
             let value = 22;
-            let mock = Struct::<u8>::new(value);
+            let mock = Struct::<i32>::new(value);
             let callback_flag = Arc::new(RefCell::new(false));
             let callback_flag_clone = callback_flag.clone();
             let return_value = ();
@@ -185,7 +184,7 @@ Received no non-matching calls"#,
         #[test]
         fn Trait_f_NoConfig_Ok() {
             // Arrange
-            let mock = Struct::<u8>::new(1);
+            let mock = Struct::<i32>::new(1);
 
             // Act
             let result = Trait::f(&mock);
@@ -199,7 +198,7 @@ Received no non-matching calls"#,
         #[test]
         fn Trait_f_MultipleTimes_Ok() {
             // Arrange
-            let mock = Struct::<u8>::new(1);
+            let mock = Struct::<i32>::new(1);
 
             // Act
             let result1 = Trait::f(&mock);
@@ -218,7 +217,7 @@ Received no non-matching calls"#,
         #[test]
         fn Trait_f_MultipleTimes_Panics() {
             // Arrange
-            let mock = Struct::<u8>::new(1);
+            let mock = Struct::<i32>::new(1);
 
             // Act
             Trait::f(&mock);

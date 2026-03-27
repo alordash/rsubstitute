@@ -12,10 +12,13 @@ mocked! {
         t2_ref: &'a T2,
         number: i32,
     }
-    
-    impl<'a, T1, T2> Trait for Struct<'a, T1, T2> {}
 
-    impl<'a, T1: Debug, T2: ToString> Struct<'a, T1, T2> {
+    impl<'a, T1: ToString, T2> Trait for Struct<'a, T1, T2> where T2: AsRef<[i32]> {}
+
+    impl<'a, T1: ToString + Debug, T2: ToString> Struct<'a, T1, T2>
+    where
+        T2: AsRef<[i32]>,
+    {
         pub fn new(t1: T1, t2_ref: &'a T2, number: i32) -> Self {
             Self { t1, t2_ref, number }
         }
