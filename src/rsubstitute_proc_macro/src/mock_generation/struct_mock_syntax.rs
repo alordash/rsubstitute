@@ -10,7 +10,6 @@ pub(crate) fn parse(input: ParseStream) -> Result<StructMockSyntax> {
     let mut maybe_new_fn = None;
     let mut trait_impls = Vec::new();
     let mut struct_impls = Vec::new();
-    let mut ignored_impls = Vec::new();
     while !input.is_empty() {
         let item_impl = input.call(ItemImpl::parse)?;
         let Type::Path(type_path) = item_impl.self_ty.as_ref() else {
@@ -25,10 +24,6 @@ pub(crate) fn parse(input: ParseStream) -> Result<StructMockSyntax> {
         let type_ident = &type_path_segment.ident;
         if *type_ident != r#struct.ident {
             panic!("{STRUCT_MOCK_INVALID_IDENT_ERROR_MESSAGE}");
-        }
-        if should_ignore_impl(&item_impl) {
-            ignored_impls.push(item_impl);
-            continue;
         }
         if item_impl.trait_.is_some() {
             let trait_path = item_impl
@@ -58,7 +53,6 @@ pub(crate) fn parse(input: ParseStream) -> Result<StructMockSyntax> {
         new_fn,
         trait_impls,
         struct_impls,
-        ignored_impls,
     };
     return Ok(struct_mock_syntax);
 }
@@ -66,29 +60,11 @@ pub(crate) fn parse(input: ParseStream) -> Result<StructMockSyntax> {
 const STRUCT_MOCK_INVALID_IMPL_TARGET_PATH_ERROR_MSG: &'static str = "(`impl` target's path length) Struct type ident in `impl` block can not be long path, it should be just a single ident.";
 const STRUCT_MOCK_INVALID_IDENT_ERROR_MESSAGE: &'static str =
     "Struct mock should contain only `impl` blocks for it's own type.";
-const STRUCT_MOCK_INVALID_FN_SIG_ERROR_MESSAGE: LazyCell<String> = LazyCell::new(|| {
-    format!(
-        "Struct mock `impl` functions should all be associated.
-(!) Note: You can ignore `impl` block with `#[{}]` attribute.",
-        constants::IGNORE_IMPL_ATTRIBUTE_IDENT_NAME
-    )
-});
+const STRUCT_MOCK_INVALID_FN_SIG_ERROR_MESSAGE: &'static str = "Struct mock `impl` functions should all be associated.";
 const NO_NEW_FN_ERROR_MESSAGE: &'static str = "In order to be mockable structure must have function `pub(crate) fn new(args) -> Self`, where `args` is arbitrary collection of user-defined arguments.";
 const NEW_FN_MUST_BE_PUBLIC_ERROR_MESSAGE: &'static str = "Function `new` must be public.";
 const NEW_FN_MUST_HAVE_RETURN_TYPE_ERROR_MESSAGE_PART: &'static str =
     "Function `new` must have return type that is equal to `Self`";
-
-fn should_ignore_impl(item_impl: &ItemImpl) -> bool {
-    return item_impl
-        .attrs
-        .iter()
-        .find(|attr| {
-            attr.path().get_ident().is_some_and(|attr_ident| {
-                *attr_ident == constants::IGNORE_IMPL_ATTRIBUTE_IDENT.clone()
-            })
-        })
-        .is_some();
-}
 
 fn validate_item_impl(item_impl: &ItemImpl) {
     let impl_item_fns = item_impl.items.iter().filter_map(|x| match x {
@@ -106,7 +82,7 @@ fn validate_item_impl(item_impl: &ItemImpl) {
         {
             continue;
         }
-        panic!("{}", *STRUCT_MOCK_INVALID_FN_SIG_ERROR_MESSAGE);
+        panic!("{}", STRUCT_MOCK_INVALID_FN_SIG_ERROR_MESSAGE);
     }
 }
 

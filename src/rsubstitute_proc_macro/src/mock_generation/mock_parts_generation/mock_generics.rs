@@ -1,5 +1,4 @@
 use crate::mock_generation::mock_parts_generation::models::*;
-use crate::mock_generation::models::*;
 use crate::mock_generation::parameters::*;
 use crate::mock_generation::*;
 use crate::syntax::generics;
@@ -15,23 +14,6 @@ pub(crate) fn generate(
         source_generics,
         target,
         maybe_associated_generics,
-    );
-}
-
-pub(crate) fn generate_for_struct(
-    source_generics: &Generics,
-    trait_impls: &[TraitImpl],
-) -> MockGenerics {
-    let mut modified_source_generics = source_generics.clone();
-    for trait_impl in trait_impls {
-        modified_source_generics =
-            generics::merge(modified_source_generics, &trait_impl.item_impl.generics);
-    }
-    return generate_core(
-        modified_source_generics,
-        source_generics,
-        Target::TraitOrStruct,
-        None,
     );
 }
 

@@ -161,7 +161,6 @@ pub(crate) fn handle(ctx: &Ctx, mut struct_mock_syntax: StructMockSyntax) -> Tok
         mock_setup_impl::generate_for_trait(&mock_type, &mock_setup_struct, &struct_fn_infos);
     let mock_received_impl =
         mock_received_impl::generate_for_trait(&mock_type, &mock_received_struct, &struct_fn_infos);
-    ignored_impl::fix(&mock_type, &mut struct_mock_syntax.ignored_impls);
     let generated_mod = module::generate_struct(
         target_ident,
         mock_struct_traits,
@@ -178,7 +177,6 @@ pub(crate) fn handle(ctx: &Ctx, mut struct_mock_syntax: StructMockSyntax) -> Tok
         mock_impl,
         mock_setup_impl,
         mock_received_impl,
-        struct_mock_syntax.ignored_impls,
     );
 
     let GeneratedMod {

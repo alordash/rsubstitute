@@ -36,11 +36,11 @@ mocked! {
         }
     }
 
-    #[unmock]
-    impl Debug for Struct {
-        fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-            return write!(f, "Struct = {{ number = {} }}", self.number);
-        }
+}
+
+impl Debug for Struct {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        return write!(f, "Struct = {{ number = {} }}", self.number);
     }
 }
 

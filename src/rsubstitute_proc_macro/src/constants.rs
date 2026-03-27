@@ -444,12 +444,6 @@ define!(DEREF_TRAIT_PATH, Path, path::create(format_ident!("Deref")));
 ident!(DEREF_TARGET_TYPE_IDENT, "Target");
 ident!(DEREF_FN_IDENT, "deref");
 
-pub const IGNORE_IMPL_ATTRIBUTE_IDENT_NAME: &'static str = "unmock";
-ident!(
-    IGNORE_IMPL_ATTRIBUTE_IDENT,
-    IGNORE_IMPL_ATTRIBUTE_IDENT_NAME
-);
-
 ident!(HASH_FN_IDENT, "hash");
 
 ident!(ARG_PRINTER_STRUCT_IDENT, "ArgPrinter");

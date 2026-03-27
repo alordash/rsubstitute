@@ -111,7 +111,6 @@ pub(crate) fn generate_struct(
     mock_impl: MockImpl,
     mock_setup_impl: MockSetupImpl,
     mock_received_impl: MockReceivedImpl,
-    ignored_impls: Vec<ItemImpl>,
 ) -> GeneratedMod {
     let usings = [
         constants::USE_SUPER.clone(),
@@ -156,7 +155,6 @@ pub(crate) fn generate_struct(
             Item::Impl(mock_setup_impl.item_impl),
             Item::Impl(mock_received_impl.item_impl),
         ])
-        .chain(ignored_impls.into_iter().map(Item::Impl))
         .collect();
     let item_mod = create_item_mod(ident, items);
     let use_generated_mod = create_use_generated_mod(item_mod.ident.clone());
