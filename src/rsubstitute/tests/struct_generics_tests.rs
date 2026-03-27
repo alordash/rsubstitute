@@ -1,6 +1,7 @@
 use rsubstitute::macros::*;
 use std::fmt::Debug;
 
+// TODO - write about limitation: you can `struct S<T>; impl<T> S<T> {}` but can't `struct S<T>; impl<Q> S<Q> {}` (and why would you?)
 trait Trait {}
 
 mocked! {
