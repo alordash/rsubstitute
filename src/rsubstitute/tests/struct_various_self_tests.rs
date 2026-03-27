@@ -9,6 +9,7 @@ use std::sync::Arc;
 #[rustfmt::skip]
 #[allow(unused)]
 mod consts {
+    pub const DEFAULT_STRUCT_VALUE:                           i32 = 115;
     pub const BY_VALUE:                                       i32 = 1 ;
     pub const BY_VALUE_COLON:                                 i32 = 2 ;
     pub const BY_MUT_VALUE:                                   i32 = 3 ;
@@ -53,12 +54,12 @@ use consts::*;
 
 mocked_base! {
     #[derive(Clone)]
-    struct Struct;
+    struct Struct(pub i32);
 
     #[rustfmt::skip]
     #[allow(unused_mut)] // TODO - this should disable warnings
     impl Struct {
-        pub fn new() -> Self { Self }
+        pub fn new() -> Self { Self(DEFAULT_STRUCT_VALUE) }
 
         pub fn by_value          (    self      ) {}
         pub fn by_value_colon    (    self: Self) {}
@@ -177,10 +178,12 @@ mod tests {
             let counter = Counter::new();
             // TODO - assert mock type in callback
             mock.setup.by_value().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Struct);
                 counter.inc()
             });
             mock.setup.by_value().call_base().and_does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Struct);
                 counter.double_inc()
             });
@@ -200,6 +203,7 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_value_colon().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Struct);
                 counter.inc()
             });
@@ -207,6 +211,7 @@ mod tests {
                 .by_value_colon()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Struct);
                     counter.double_inc()
                 });
@@ -229,6 +234,7 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_mut_value().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Struct);
                 counter.inc()
             });
@@ -236,6 +242,7 @@ mod tests {
                 .by_mut_value()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Struct);
                     counter.double_inc()
                 });
@@ -257,6 +264,7 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_mut_value_colon().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Struct);
                 counter.inc()
             });
@@ -264,6 +272,7 @@ mod tests {
                 .by_mut_value_colon()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Struct);
                     counter.double_inc()
                 });
@@ -285,10 +294,12 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_ref().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, &Struct);
                 counter.inc()
             });
             mock.setup.by_ref().call_base().and_does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, &Struct);
                 counter.double_inc()
             });
@@ -308,6 +319,7 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_ref_colon().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, &Struct);
                 counter.inc()
             });
@@ -315,6 +327,7 @@ mod tests {
                 .by_ref_colon()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, &Struct);
                     counter.double_inc()
                 });
@@ -336,6 +349,7 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_ref_with_lifetime().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, &Struct);
                 counter.inc()
             });
@@ -343,6 +357,7 @@ mod tests {
                 .by_ref_with_lifetime()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, &Struct);
                     counter.double_inc()
                 });
@@ -366,6 +381,7 @@ mod tests {
             mock.setup
                 .by_ref_colon_with_lifetime()
                 .does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, &Struct);
                     counter.inc()
                 });
@@ -373,6 +389,7 @@ mod tests {
                 .by_ref_colon_with_lifetime()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, &Struct);
                     counter.double_inc()
                 });
@@ -394,6 +411,7 @@ mod tests {
             let mut mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_ref_mut().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, &mut Struct);
                 counter.inc()
             });
@@ -401,6 +419,7 @@ mod tests {
                 .by_ref_mut()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, &mut Struct);
                     counter.double_inc()
                 });
@@ -420,6 +439,7 @@ mod tests {
             let mut mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_ref_mut_colon().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, &mut Struct);
                 counter.inc()
             });
@@ -427,6 +447,7 @@ mod tests {
                 .by_ref_mut_colon()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, &mut Struct);
                     counter.double_inc()
                 });
@@ -448,6 +469,7 @@ mod tests {
             let mut mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_ref_mut_with_lifetime().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, &mut Struct);
                 counter.inc()
             });
@@ -455,6 +477,7 @@ mod tests {
                 .by_ref_mut_with_lifetime()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, &mut Struct);
                     counter.double_inc()
                 });
@@ -478,6 +501,7 @@ mod tests {
             mock.setup
                 .by_ref_mut_colon_with_lifetime()
                 .does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, &mut Struct);
                     counter.inc()
                 });
@@ -485,6 +509,7 @@ mod tests {
                 .by_ref_mut_colon_with_lifetime()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, &mut Struct);
                     counter.double_inc()
                 });
@@ -506,10 +531,12 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_box().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Box<Struct>);
                 counter.inc()
             });
             mock.setup.by_box().call_base().and_does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Box<Struct>);
                 counter.double_inc()
             });
@@ -529,6 +556,7 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_box_ref().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Box<&Struct>);
                 counter.inc()
             });
@@ -536,6 +564,7 @@ mod tests {
                 .by_box_ref()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Box<&Struct>);
                     counter.double_inc()
                 });
@@ -555,6 +584,7 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_box_ref_mut().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Box<&mut Struct>);
                 counter.inc()
             });
@@ -562,6 +592,7 @@ mod tests {
                 .by_box_ref_mut()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Box<&mut Struct>);
                     counter.double_inc()
                 });
@@ -583,6 +614,7 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_mut_box().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Box<Struct>);
                 counter.inc()
             });
@@ -590,6 +622,7 @@ mod tests {
                 .by_mut_box()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Box<Struct>);
                     counter.double_inc()
                 });
@@ -609,6 +642,7 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_mut_box_ref().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Box<&Struct>);
                 counter.inc()
             });
@@ -616,6 +650,7 @@ mod tests {
                 .by_mut_box_ref()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Box<&Struct>);
                     counter.double_inc()
                 });
@@ -637,6 +672,7 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_mut_box_ref_mut().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Box<&mut Struct>);
                 counter.inc()
             });
@@ -644,6 +680,7 @@ mod tests {
                 .by_mut_box_ref_mut()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Box<&mut Struct>);
                     counter.double_inc()
                 });
@@ -665,10 +702,12 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_rc().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Rc<Struct>);
                 counter.inc()
             });
             mock.setup.by_rc().call_base().and_does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Rc<Struct>);
                 counter.double_inc()
             });
@@ -688,10 +727,12 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_rc_ref().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Rc<&Struct>);
                 counter.inc()
             });
             mock.setup.by_rc_ref().call_base().and_does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Rc<&Struct>);
                 counter.double_inc()
             });
@@ -711,6 +752,7 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_rc_ref_mut().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Rc<&mut Struct>);
                 counter.inc()
             });
@@ -718,6 +760,7 @@ mod tests {
                 .by_rc_ref_mut()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Rc<&mut Struct>);
                     counter.double_inc()
                 });
@@ -739,10 +782,12 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_mut_rc().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Rc<Struct>);
                 counter.inc()
             });
             mock.setup.by_mut_rc().call_base().and_does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Rc<Struct>);
                 counter.double_inc()
             });
@@ -762,6 +807,7 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_mut_rc_ref().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Rc<&Struct>);
                 counter.inc()
             });
@@ -769,6 +815,7 @@ mod tests {
                 .by_mut_rc_ref()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Rc<&Struct>);
                     counter.double_inc()
                 });
@@ -790,6 +837,7 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_mut_rc_ref_mut().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Rc<&mut Struct>);
                 counter.inc()
             });
@@ -797,6 +845,7 @@ mod tests {
                 .by_mut_rc_ref_mut()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Rc<&mut Struct>);
                     counter.double_inc()
                 });
@@ -818,10 +867,12 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_arc().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Arc<Struct>);
                 counter.inc()
             });
             mock.setup.by_arc().call_base().and_does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Arc<Struct>);
                 counter.double_inc()
             });
@@ -841,6 +892,7 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_arc_ref().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Arc<&Struct>);
                 counter.inc()
             });
@@ -848,6 +900,7 @@ mod tests {
                 .by_arc_ref()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Arc<&Struct>);
                     counter.double_inc()
                 });
@@ -867,6 +920,7 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_arc_ref_mut().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Arc<&mut Struct>);
                 counter.inc()
             });
@@ -874,6 +928,7 @@ mod tests {
                 .by_arc_ref_mut()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Arc<&mut Struct>);
                     counter.double_inc()
                 });
@@ -895,6 +950,7 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_mut_arc().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Arc<Struct>);
                 counter.inc()
             });
@@ -902,6 +958,7 @@ mod tests {
                 .by_mut_arc()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Arc<Struct>);
                     counter.double_inc()
                 });
@@ -921,6 +978,7 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_mut_arc_ref().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Arc<&Struct>);
                 counter.inc()
             });
@@ -928,6 +986,7 @@ mod tests {
                 .by_mut_arc_ref()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Arc<&Struct>);
                     counter.double_inc()
                 });
@@ -949,6 +1008,7 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_mut_arc_ref_mut().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Arc<&mut Struct>);
                 counter.inc()
             });
@@ -956,6 +1016,7 @@ mod tests {
                 .by_mut_arc_ref_mut()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Arc<&mut Struct>);
                     counter.double_inc()
                 });
@@ -977,6 +1038,7 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_pin_ref().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Pin<&Struct>);
                 counter.inc()
             });
@@ -984,6 +1046,7 @@ mod tests {
                 .by_pin_ref()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Pin<&Struct>);
                     counter.double_inc()
                 });
@@ -1003,6 +1066,7 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_pin_ref_mut().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Pin<&mut Struct>);
                 counter.inc()
             });
@@ -1010,6 +1074,7 @@ mod tests {
                 .by_pin_ref_mut()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Pin<&mut Struct>);
                     counter.double_inc()
                 });
@@ -1031,6 +1096,7 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_mut_pin_ref().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Pin<&Struct>);
                 counter.inc()
             });
@@ -1038,6 +1104,7 @@ mod tests {
                 .by_mut_pin_ref()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Pin<&Struct>);
                     counter.double_inc()
                 });
@@ -1059,6 +1126,7 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.by_mut_pin_ref_mut().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(mock, Pin<&mut Struct>);
                 counter.inc()
             });
@@ -1066,6 +1134,7 @@ mod tests {
                 .by_mut_pin_ref_mut()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Pin<&mut Struct>);
                     counter.double_inc()
                 });
@@ -1089,6 +1158,7 @@ mod tests {
             mock.setup
                 .by_mut_ref_mut_box_mut_ref_mut_with_lifetimes()
                 .does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, &mut Box<&mut Struct>);
                     counter.inc()
                 });
@@ -1096,6 +1166,7 @@ mod tests {
                 .by_mut_ref_mut_box_mut_ref_mut_with_lifetimes()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, &mut Box<&mut Struct>);
                     counter.double_inc()
                 });
@@ -1119,6 +1190,7 @@ mod tests {
             mock.setup
                 .by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes()
                 .does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, &mut Rc<&mut Struct>);
                     counter.inc()
                 });
@@ -1126,6 +1198,7 @@ mod tests {
                 .by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, &mut Rc<&mut Struct>);
                     counter.double_inc()
                 });
@@ -1149,6 +1222,7 @@ mod tests {
             mock.setup
                 .by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes()
                 .does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, &mut Arc<&mut Struct>);
                     counter.inc()
                 });
@@ -1156,6 +1230,7 @@ mod tests {
                 .by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, &mut Arc<&mut Struct>);
                     counter.double_inc()
                 });
@@ -1179,6 +1254,7 @@ mod tests {
             mock.setup
                 .by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes()
                 .does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, &mut Pin<&mut Struct>);
                     counter.inc()
                 });
@@ -1186,6 +1262,7 @@ mod tests {
                 .by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, &mut Pin<&mut Struct>);
                     counter.double_inc()
                 });
@@ -1207,6 +1284,7 @@ mod tests {
             let mock = Struct::new();
             let counter = Counter::new();
             mock.setup.nested().does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(
                     mock,
                     &Box<&mut Pin<&mut Rc<&mut Box<&&Arc<&mut &Pin<Rc<&mut &&mut Struct>>>>>>>
@@ -1214,6 +1292,7 @@ mod tests {
                 counter.inc()
             });
             mock.setup.nested().call_base().and_does(move |mock, _| {
+                assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                 assert_type_eq!(
                     mock,
                     &Box<&mut Pin<&mut Rc<&mut Box<&&Arc<&mut &Pin<Rc<&mut &&mut Struct>>>>>>>
@@ -1254,6 +1333,7 @@ mod tests {
                 .return_by_value()
                 .returns(first_value)
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Struct);
                     counter.inc()
                 });
@@ -1261,6 +1341,7 @@ mod tests {
                 .return_by_value()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Struct);
                     counter.double_inc()
                 });
@@ -1288,6 +1369,7 @@ mod tests {
                 .return_by_value_colon()
                 .returns(first_value)
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Struct);
                     counter.inc()
                 });
@@ -1295,6 +1377,7 @@ mod tests {
                 .return_by_value_colon()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Struct);
                     counter.double_inc()
                 });
@@ -1322,6 +1405,7 @@ mod tests {
                 .return_by_mut_value()
                 .returns(first_value)
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Struct);
                     counter.inc()
                 });
@@ -1329,6 +1413,7 @@ mod tests {
                 .return_by_mut_value()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Struct);
                     counter.double_inc()
                 });
@@ -1356,6 +1441,7 @@ mod tests {
                 .return_by_mut_value_colon()
                 .returns(first_value)
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Struct);
                     counter.inc()
                 });
@@ -1363,6 +1449,7 @@ mod tests {
                 .return_by_mut_value_colon()
                 .call_base()
                 .and_does(move |mock, _| {
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
                     assert_type_eq!(mock, Struct);
                     counter.double_inc()
                 });
@@ -1390,14 +1477,16 @@ mod tests {
                 .return_by_ref()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, &Struct);
                     counter.inc()
                 });
             mock.setup
                 .return_by_ref()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, &Struct);
                     counter.double_inc()
                 });
 
@@ -1424,14 +1513,16 @@ mod tests {
                 .return_by_ref_colon()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, &Struct);
                     counter.inc()
                 });
             mock.setup
                 .return_by_ref_colon()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, &Struct);
                     counter.double_inc()
                 });
 
@@ -1458,14 +1549,16 @@ mod tests {
                 .return_by_ref_with_lifetime()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, &Struct);
                     counter.inc()
                 });
             mock.setup
                 .return_by_ref_with_lifetime()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, &Struct);
                     counter.double_inc()
                 });
 
@@ -1492,14 +1585,16 @@ mod tests {
                 .return_by_ref_colon_with_lifetime()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, &Struct);
                     counter.inc()
                 });
             mock.setup
                 .return_by_ref_colon_with_lifetime()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, &Struct);
                     counter.double_inc()
                 });
 
@@ -1526,14 +1621,16 @@ mod tests {
                 .return_by_ref_mut()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, &mut Struct);
                     counter.inc()
                 });
             mock.setup
                 .return_by_ref_mut()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, &mut Struct);
                     counter.double_inc()
                 });
 
@@ -1560,14 +1657,16 @@ mod tests {
                 .return_by_ref_mut_colon()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, &mut Struct);
                     counter.inc()
                 });
             mock.setup
                 .return_by_ref_mut_colon()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, &mut Struct);
                     counter.double_inc()
                 });
 
@@ -1594,14 +1693,16 @@ mod tests {
                 .return_by_ref_mut_with_lifetime()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, &mut Struct);
                     counter.inc()
                 });
             mock.setup
                 .return_by_ref_mut_with_lifetime()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, &mut Struct);
                     counter.double_inc()
                 });
 
@@ -1628,14 +1729,16 @@ mod tests {
                 .return_by_ref_mut_colon_with_lifetime()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, &mut Struct);
                     counter.inc()
                 });
             mock.setup
                 .return_by_ref_mut_colon_with_lifetime()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, &mut Struct);
                     counter.double_inc()
                 });
 
@@ -1662,14 +1765,16 @@ mod tests {
                 .return_by_box()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Box<Struct>);
                     counter.inc()
                 });
             mock.setup
                 .return_by_box()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Box<Struct>);
                     counter.double_inc()
                 });
 
@@ -1696,14 +1801,16 @@ mod tests {
                 .return_by_box_ref()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Box<&Struct>);
                     counter.inc()
                 });
             mock.setup
                 .return_by_box_ref()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Box<&Struct>);
                     counter.double_inc()
                 });
 
@@ -1730,14 +1837,16 @@ mod tests {
                 .return_by_box_ref_mut()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Box<&mut Struct>);
                     counter.inc()
                 });
             mock.setup
                 .return_by_box_ref_mut()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Box<&mut Struct>);
                     counter.double_inc()
                 });
 
@@ -1764,14 +1873,16 @@ mod tests {
                 .return_by_mut_box()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Box<Struct>);
                     counter.inc()
                 });
             mock.setup
                 .return_by_mut_box()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Box<Struct>);
                     counter.double_inc()
                 });
 
@@ -1798,14 +1909,16 @@ mod tests {
                 .return_by_mut_box_ref()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Box<&Struct>);
                     counter.inc()
                 });
             mock.setup
                 .return_by_mut_box_ref()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Box<&Struct>);
                     counter.double_inc()
                 });
 
@@ -1832,14 +1945,16 @@ mod tests {
                 .return_by_mut_box_ref_mut()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Box<&mut Struct>);
                     counter.inc()
                 });
             mock.setup
                 .return_by_mut_box_ref_mut()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Box<&mut Struct>);
                     counter.double_inc()
                 });
 
@@ -1866,14 +1981,16 @@ mod tests {
                 .return_by_rc()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Rc<Struct>);
                     counter.inc()
                 });
             mock.setup
                 .return_by_rc()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Rc<Struct>);
                     counter.double_inc()
                 });
 
@@ -1900,14 +2017,16 @@ mod tests {
                 .return_by_rc_ref()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Rc<&Struct>);
                     counter.inc()
                 });
             mock.setup
                 .return_by_rc_ref()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Rc<&Struct>);
                     counter.double_inc()
                 });
 
@@ -1934,14 +2053,16 @@ mod tests {
                 .return_by_rc_ref_mut()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Rc<&mut Struct>);
                     counter.inc()
                 });
             mock.setup
                 .return_by_rc_ref_mut()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Rc<&mut Struct>);
                     counter.double_inc()
                 });
 
@@ -1968,14 +2089,16 @@ mod tests {
                 .return_by_mut_rc()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Rc<Struct>);
                     counter.inc()
                 });
             mock.setup
                 .return_by_mut_rc()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Rc<Struct>);
                     counter.double_inc()
                 });
 
@@ -2002,14 +2125,16 @@ mod tests {
                 .return_by_mut_rc_ref()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Rc<&Struct>);
                     counter.inc()
                 });
             mock.setup
                 .return_by_mut_rc_ref()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Rc<&Struct>);
                     counter.double_inc()
                 });
 
@@ -2036,14 +2161,16 @@ mod tests {
                 .return_by_mut_rc_ref_mut()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Rc<&mut Struct>);
                     counter.inc()
                 });
             mock.setup
                 .return_by_mut_rc_ref_mut()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Rc<&mut Struct>);
                     counter.double_inc()
                 });
 
@@ -2070,14 +2197,16 @@ mod tests {
                 .return_by_arc()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Arc<Struct>);
                     counter.inc()
                 });
             mock.setup
                 .return_by_arc()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Arc<Struct>);
                     counter.double_inc()
                 });
 
@@ -2104,14 +2233,16 @@ mod tests {
                 .return_by_arc_ref()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Arc<&Struct>);
                     counter.inc()
                 });
             mock.setup
                 .return_by_arc_ref()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Arc<&Struct>);
                     counter.double_inc()
                 });
 
@@ -2138,14 +2269,16 @@ mod tests {
                 .return_by_arc_ref_mut()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Arc<&mut Struct>);
                     counter.inc()
                 });
             mock.setup
                 .return_by_arc_ref_mut()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Arc<&mut Struct>);
                     counter.double_inc()
                 });
 
@@ -2172,14 +2305,16 @@ mod tests {
                 .return_by_mut_arc()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Arc<Struct>);
                     counter.inc()
                 });
             mock.setup
                 .return_by_mut_arc()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Arc<Struct>);
                     counter.double_inc()
                 });
 
@@ -2206,14 +2341,16 @@ mod tests {
                 .return_by_mut_arc_ref()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Arc<&Struct>);
                     counter.inc()
                 });
             mock.setup
                 .return_by_mut_arc_ref()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Arc<&Struct>);
                     counter.double_inc()
                 });
 
@@ -2240,14 +2377,16 @@ mod tests {
                 .return_by_mut_arc_ref_mut()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Arc<&mut Struct>);
                     counter.inc()
                 });
             mock.setup
                 .return_by_mut_arc_ref_mut()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Arc<&mut Struct>);
                     counter.double_inc()
                 });
 
@@ -2274,14 +2413,16 @@ mod tests {
                 .return_by_pin_ref()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Pin<&Struct>);
                     counter.inc()
                 });
             mock.setup
                 .return_by_pin_ref()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Pin<&Struct>);
                     counter.double_inc()
                 });
 
@@ -2308,14 +2449,16 @@ mod tests {
                 .return_by_pin_ref_mut()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Pin<&mut Struct>);
                     counter.inc()
                 });
             mock.setup
                 .return_by_pin_ref_mut()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Pin<&mut Struct>);
                     counter.double_inc()
                 });
 
@@ -2342,14 +2485,16 @@ mod tests {
                 .return_by_mut_pin_ref()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Pin<&Struct>);
                     counter.inc()
                 });
             mock.setup
                 .return_by_mut_pin_ref()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Pin<&Struct>);
                     counter.double_inc()
                 });
 
@@ -2376,14 +2521,16 @@ mod tests {
                 .return_by_mut_pin_ref_mut()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Pin<&mut Struct>);
                     counter.inc()
                 });
             mock.setup
                 .return_by_mut_pin_ref_mut()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, Pin<&mut Struct>);
                     counter.double_inc()
                 });
 
@@ -2410,14 +2557,16 @@ mod tests {
                 .return_by_mut_ref_mut_box_mut_ref_mut_with_lifetimes()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, &mut Box<&mut Struct>);
                     counter.inc()
                 });
             mock.setup
                 .return_by_mut_ref_mut_box_mut_ref_mut_with_lifetimes()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, &mut Box<&mut Struct>);
                     counter.double_inc()
                 });
 
@@ -2449,14 +2598,16 @@ mod tests {
                 .return_by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, &mut Rc<&mut Struct>);
                     counter.inc()
                 });
             mock.setup
                 .return_by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, &mut Rc<&mut Struct>);
                     counter.double_inc()
                 });
 
@@ -2488,14 +2639,16 @@ mod tests {
                 .return_by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, &mut Arc<&mut Struct>);
                     counter.inc()
                 });
             mock.setup
                 .return_by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, &mut Arc<&mut Struct>);
                     counter.double_inc()
                 });
 
@@ -2527,14 +2680,16 @@ mod tests {
                 .return_by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, &mut Pin<&mut Struct>);
                     counter.inc()
                 });
             mock.setup
                 .return_by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(mock, &mut Pin<&mut Struct>);
                     counter.double_inc()
                 });
 
@@ -2566,14 +2721,22 @@ mod tests {
                 .return_nested()
                 .returns(first_value)
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(
+                        mock,
+                        &Box<&mut Pin<&mut Rc<&mut Box<&&Arc<&mut &Pin<Rc<&mut &&mut Struct>>>>>>>
+                    );
                     counter.inc()
                 });
             mock.setup
                 .return_nested()
                 .call_base()
                 .and_does(move |mock, _| {
-                    assert_type_eq!(mock, Struct);
+                    assert_eq!(DEFAULT_STRUCT_VALUE, mock.0);
+                    assert_type_eq!(
+                        mock,
+                        &Box<&mut Pin<&mut Rc<&mut Box<&&Arc<&mut &Pin<Rc<&mut &&mut Struct>>>>>>>
+                    );
                     counter.double_inc()
                 });
 
