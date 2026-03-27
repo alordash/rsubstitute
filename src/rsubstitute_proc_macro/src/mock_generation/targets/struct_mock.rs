@@ -14,9 +14,14 @@ pub(crate) fn handle(ctx: &Ctx, mut struct_mock_syntax: StructMockSyntax) -> Tok
 
     let mock_ident = struct_mock_syntax.r#struct.ident.clone();
 
-    let mock_generics = mock_generics::generate_for_struct(
+    // let mock_generics = mock_generics::generate_for_struct(
+    //     &struct_mock_syntax.r#struct.generics,
+    //     &struct_mock_syntax.trait_impls,
+    // );
+    let mock_generics = mock_generics::generate(
         &struct_mock_syntax.r#struct.generics,
-        &struct_mock_syntax.trait_impls,
+        Target::TraitOrStruct,
+        None,
     );
     let mock_type = mock_type::generate_for_struct(mock_ident.clone(), mock_generics);
     let mock_struct_trait_infos: Vec<_> = core::mem::take(&mut struct_mock_syntax.trait_impls)

@@ -4,7 +4,6 @@ use crate::mock_generation::mock_parts_generation::models::*;
 use crate::mock_generation::models::*;
 use crate::mock_generation::*;
 use crate::syntax::*;
-use std::ops::Deref;
 use syn::visit_mut::VisitMut;
 use syn::*;
 
