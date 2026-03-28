@@ -7,11 +7,12 @@ use syn::*;
 
 pub(crate) fn merge(mut first: Generics, second: &Generics) -> Generics {
     let where_clause = merge_where_clause(first.where_clause, second.where_clause.clone());
-    let params = merge_params(first.params, second.params.clone());
-    // first.params.extend(second.params.clone());
+    // let params = merge_params(first.params, second.params.clone());
+    first.params.extend(second.params.clone());
     let result = Generics {
         lt_token: Some(Default::default()),
-        params,
+        // params,
+        params: first.params,
         gt_token: Some(Default::default()),
         where_clause,
     };

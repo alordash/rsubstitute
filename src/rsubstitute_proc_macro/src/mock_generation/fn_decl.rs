@@ -167,9 +167,9 @@ fn create_fn_decl(
         ),
         GenericsStrategy::UseMockGenerics => mock_type.generics.impl_generics.clone(),
     };
-    if let Some(struct_parent_trait_generics) = maybe_struct_parent_trait_generics {
-        merged_generics = generics::merge(merged_generics, struct_parent_trait_generics);
-    }
+    // if let Some(struct_parent_trait_generics) = maybe_struct_parent_trait_generics {
+    //     merged_generics = generics::merge(merged_generics, struct_parent_trait_generics);
+    // }
     let arguments: Vec<_> = actual_sig.inputs.iter().cloned().collect();
     let arg_refs_tuple = generate_arg_refs_tuple(&arguments);
     let internal_phantom_fields: Vec<_> = actual_sig

@@ -88,7 +88,41 @@ mocked_base! {
 
 #[cfg(test)]
 mod tests {
+    #![allow(non_snake_case)]
     use super::*;
+
+    #[test]
+    fn lifetimes_joined() {
+        // Arrange
+        fn accept_joined_lifetimes<'x: 'a + 'b + 'c + 'd, 'a, 'b, 'c, 'd>(
+            _: &dyn ILifetime<'x, 'a, 'b, 'c, 'd>,
+        ) {
+        }
+        let lifetime_mock = Lifetime::new();
+        
+        // Assert
+        accept_joined_lifetimes(&lifetime_mock);
+    }
+    
+    #[test]
+    fn type_traits_joined() {
+        // Arrange
+        fn accept_joined_type_traits<T: M1 + M2 + M3 + M4>(_: &dyn IType<T>) {}
+        let type_mock = Type::<()>::new();
+        
+        // Assert
+        accept_joined_type_traits(&type_mock);
+    }
+    
+    #[test]
+    fn const_joined() {
+        // Arrange
+        fn accept_joined_const<const C: usize>(_ :&dyn IConst<C>) {}
+        let const_mock = Const::<5>::new();
+        
+        // Assert
+        accept_joined_const(&const_mock);
+    }
 
     #[test]
     fn compile() {}
