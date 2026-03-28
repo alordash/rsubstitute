@@ -70,7 +70,7 @@ fn generate_fn_setup(
     );
 
     let mut generics = match target {
-        Target::TraitOrStruct => fn_info.parent.own_generics.clone(),
+        Target::TraitOrStruct => fn_info.parent.sig_generics.clone(),
         Target::Static => Default::default(),
     };
     generics = generics.with_head_lifetime_param(constants::PLACEHOLDER_LIFETIME_PARAM.clone());

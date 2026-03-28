@@ -1,5 +1,6 @@
 use rsubstitute::prelude::*;
 
+// TODO - write in docs limitation: if mocking `base`, then all args must be cloneable
 trait Trait<T> {
     fn work(&self, t: T) -> T;
 }
@@ -13,7 +14,7 @@ trait Trait<T> {
 //         }
 //     }
 //
-//     impl<T> Trait<T> for Struct {
+//     impl<T: Clone> Trait<T> for Struct {
 //         fn work(&self, t: T) -> T {
 //             t
 //         }
@@ -21,8 +22,6 @@ trait Trait<T> {
 // }
 
 mod tests {
-    use super::*;
-
     #[test]
     fn compile() {}
 }

@@ -9,7 +9,7 @@ pub(crate) struct FnDecl {
     pub fn_ident: Ident,
     pub arguments: Vec<FnArg>,
     pub return_value: ReturnType,
-    pub own_generics: Generics,
+    pub sig_generics: Generics,
     pub merged_generics: Generics,
     pub visibility: Visibility,
     pub maybe_base_fn_block: Option<Block>,

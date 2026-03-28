@@ -167,6 +167,10 @@ fn create_fn_decl(
         ),
         GenericsStrategy::UseMockGenerics => mock_type.generics.impl_generics.clone(),
     };
+    // let merged_generics = match maybe_struct_parent_trait_generics {
+    //     None => {}
+    //     Some(_) => {}
+    // };
     // if let Some(struct_parent_trait_generics) = maybe_struct_parent_trait_generics {
     //     merged_generics = generics::merge(merged_generics, struct_parent_trait_generics);
     // }
@@ -194,7 +198,7 @@ fn create_fn_decl(
         fn_ident: actual_sig.ident.clone(),
         arguments,
         return_value: actual_sig.output.clone(),
-        own_generics: actual_sig.generics.clone(),
+        sig_generics: actual_sig.generics.clone(),
         merged_generics,
         visibility,
         maybe_base_fn_block: maybe_base_fn_block.filter(|_| ctx.support_base_calling),
@@ -260,6 +264,10 @@ fn is_type_path_receiver_self(ty_path: &TypePath) -> bool {
         .get_ident()
         .is_some_and(|ident| ident == constants::SELF_TYPE_NAME)
 }
+
+// fn get_traits_generics(item_impl: ItemImpl) -> Generics {
+//     item_impl.trait_
+// }
 
 enum GenericsStrategy {
     MergeWithMockGenerics,

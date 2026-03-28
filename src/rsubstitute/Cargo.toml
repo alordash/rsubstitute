@@ -76,6 +76,27 @@ bench = false
 #test = false
 #doctest = false
 
+[[bin]]
+name = "bin_struct_trait"
+path = "bin/bin_struct_trait.rs"
+#test = false
+doctest = false
+bench = false
+
+[[bin]]
+name = "bin_struct_generics"
+path = "bin/bin_struct_generics.rs"
+#test = false
+doctest = false
+bench = false
+
+[[bin]]
+name = "bin_struct_trait_more"
+path = "bin/bin_struct_trait_more.rs"
+#test = false
+doctest = false
+bench = false
+
 [dependencies]
 rsubstitute_core = { workspace = true }
 rsubstitute_proc_macro = { workspace = true }

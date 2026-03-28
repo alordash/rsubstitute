@@ -1,3 +1,5 @@
+mod bin_struct_trait;
+
 use rsubstitute::macros::*;
 use std::fmt::Debug;
 

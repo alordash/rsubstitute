@@ -130,7 +130,7 @@ fn generate_impl_item_fn(
         abi: None,
         fn_token: Default::default(),
         ident: fn_info.parent.fn_ident.clone(),
-        generics: fn_info.parent.own_generics.clone(),
+        generics: fn_info.parent.sig_generics.clone(),
         paren_token: Default::default(),
         inputs: mock_fn_inputs::generate(&fn_info.parent.arguments),
         variadic: None,

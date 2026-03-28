@@ -79,7 +79,7 @@ fn generate(
     let output_type = generate_output_type(fn_info.parent.arg_refs_tuple.clone(), owner_type);
 
     let mut generics = match output_type_generics {
-        OutputTypeGenerics::UseFnOwn => fn_info.parent.own_generics.clone(),
+        OutputTypeGenerics::UseFnOwn => fn_info.parent.sig_generics.clone(),
         OutputTypeGenerics::UseMock => mock_type.generics.impl_generics.clone(),
         OutputTypeGenerics::DoNotUse => Default::default(),
     };
