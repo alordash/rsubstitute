@@ -49,7 +49,7 @@ pub(crate) fn generate_for_static(
     return mock_setup_impl;
 }
 
-const FN_TUNER_VAR_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("fn_tuner"));
+const FN_CONFIGURATOR_VAR_IDENT: LazyCell<Ident> = LazyCell::new(|| format_ident!("fn_configurator"));
 
 fn generate_fn_setup(
     fn_info: &FnInfo,
@@ -105,20 +105,20 @@ fn generate_fn_setup(
 fn generate_fn_setup_block(fn_info: &FnInfo, output_type: &TypePath) -> Block {
     let (args_checker_var_ident, args_checker_decl_stmt) =
         input_args::generate_args_checker_var_ident_and_decl_stmt(fn_info);
-    let mut fn_tuner_type = output_type.clone();
-    let PathArguments::AngleBracketed(ref mut fn_tuner_type_generics) =
-        fn_tuner_type.path.segments[0].arguments
+    let mut fn_configurator_type = output_type.clone();
+    let PathArguments::AngleBracketed(ref mut fn_configurator_type_generics) =
+        fn_configurator_type.path.segments[0].arguments
     else {
-        panic!("Setup function return type (FnTuner) must have generics.")
+        panic!("Setup function return type (FnConfigurator) must have generics.")
     };
-    let GenericArgument::Lifetime(ref mut fn_tuner_lifetime) = fn_tuner_type_generics.args[0]
+    let GenericArgument::Lifetime(ref mut fn_configurator_lifetime) = fn_configurator_type_generics.args[0]
     else {
-        panic!("Setup function return type (FnTuner) must have lifetime as first generic parameter")
+        panic!("Setup function return type (FnConfigurator) must have lifetime as first generic parameter")
     };
-    *fn_tuner_lifetime = Lifetime::new("'_", Span::call_site());
-    let fn_tuner_decl_stmt = Stmt::Local(local::create_with_type(
-        FN_TUNER_VAR_IDENT.clone(),
-        Type::Path(fn_tuner_type),
+    *fn_configurator_lifetime = Lifetime::new("'_", Span::call_site());
+    let fn_configurator_decl_stmt = Stmt::Local(local::create_with_type(
+        FN_CONFIGURATOR_VAR_IDENT.clone(),
+        Type::Path(fn_configurator_type),
         LocalInit {
             eq_token: Default::default(),
             expr: Box::new(Expr::MethodCall(method_call::create(
@@ -138,12 +138,12 @@ fn generate_fn_setup_block(fn_info: &FnInfo, output_type: &TypePath) -> Block {
             attrs: Vec::new(),
             return_token: Default::default(),
             expr: Some(Box::new(transmute_lifetime_expr::create_for_expr(
-                path::create_expr(FN_TUNER_VAR_IDENT.clone()),
+                path::create_expr(FN_CONFIGURATOR_VAR_IDENT.clone()),
             ))),
         }),
         Some(Default::default()),
     );
-    let stmts = vec![args_checker_decl_stmt, fn_tuner_decl_stmt, return_stmt];
+    let stmts = vec![args_checker_decl_stmt, fn_configurator_decl_stmt, return_stmt];
     let block = Block {
         brace_token: Default::default(),
         stmts,

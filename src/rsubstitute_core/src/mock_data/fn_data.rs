@@ -42,8 +42,8 @@ impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool
     >(
         &self,
         args_checker: TArgsChecker,
-        fn_tuner_owner: &'a TOwner,
-    ) -> FnTuner<
+        fn_configurator_owner: &'a TOwner,
+    ) -> FnConfigurator<
         'a,
         TMock,
         TOwner,
@@ -62,8 +62,8 @@ impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool
             .entry(generics_hash_key)
             .or_default()
             .push(transmute_lifetime!(arc_config.clone()));
-        let fn_tuner = FnTuner::new(arc_config, fn_tuner_owner);
-        return fn_tuner;
+        let fn_configurator = FnConfigurator::new(arc_config, fn_configurator_owner);
+        return fn_configurator;
     }
 
     pub fn verify_received<'a, TArgsChecker: IArgsChecker + 'a>(

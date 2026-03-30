@@ -5,7 +5,7 @@ use std::cell::RefCell;
 use std::marker::PhantomData;
 use std::sync::Arc;
 
-pub struct FnTuner<
+pub struct FnConfigurator<
     'rs,
     TMock,
     TOwner,
@@ -18,8 +18,8 @@ pub struct FnTuner<
     _phantom_return_value: PhantomData<TReturnValue>,
     fn_config: Arc<RefCell<FnConfig<'rs, TMock>>>,
     owner: &'rs TOwner,
-    fn_callback_tuner:
-        FnReturnCallbackTuner<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA>,
+    fn_callback_configurator:
+        FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA>,
 }
 
 impl<
@@ -32,7 +32,7 @@ impl<
     const SUPPORTS_BASE_CALLING: bool,
     const STORES_MOCK_DATA: bool,
 >
-    FnTuner<
+    FnConfigurator<
         'rs,
         TMock,
         TOwner,
@@ -48,14 +48,14 @@ impl<
             _phantom_return_value: PhantomData,
             fn_config: fn_config.clone(),
             owner,
-            fn_callback_tuner: FnReturnCallbackTuner::new(fn_config.clone(), owner),
+            fn_callback_configurator: FnCallbackConfigurator::new(fn_config.clone(), owner),
         }
     }
 
     pub fn returns<'a>(
         &self,
         return_value: TReturnValue,
-    ) -> &FnReturnCallbackTuner<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA>
+    ) -> &FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA>
     where
         TReturnValue: IReturnValue<'a> + 'a,
     {
@@ -64,13 +64,13 @@ impl<
         self.fn_config
             .borrow_mut()
             .add_return_value_source(return_value_source);
-        return &self.fn_callback_tuner;
+        return &self.fn_callback_configurator;
     }
 
     pub fn returns_many<'a>(
         &self,
         return_values: impl IntoIterator<Item = TReturnValue>,
-    ) -> &FnReturnCallbackTuner<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA>
+    ) -> &FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA>
     where
         TReturnValue: IReturnValue<'a> + 'a,
     {
@@ -81,13 +81,13 @@ impl<
         self.fn_config
             .borrow_mut()
             .add_return_value_sources(return_value_sources);
-        return &self.fn_callback_tuner;
+        return &self.fn_callback_configurator;
     }
 
     pub fn returns_always<'a>(
         &self,
         return_value: TReturnValue,
-    ) -> &FnReturnCallbackTuner<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA>
+    ) -> &FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA>
     where
         TReturnValue: 'rs + 'a + IReturnValue<'a> + Clone,
     {
@@ -97,13 +97,13 @@ impl<
         self.fn_config
             .borrow_mut()
             .add_return_value_source(return_value_source);
-        return &self.fn_callback_tuner;
+        return &self.fn_callback_configurator;
     }
 
     pub fn returns_with<'a>(
         &self,
         f: impl Fn(TArgRefsTuple) -> TReturnValue + 'rs,
-    ) -> &FnReturnCallbackTuner<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA> {
+    ) -> &FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA> {
         let return_value_source = ReturnValueSource::Factory(Box::new(
             move |dyn_arg_refs_tuple: DynArgRefsTuple<'rs>| {
                 let arg_refs_tuple: TArgRefsTuple =
@@ -115,12 +115,12 @@ impl<
         self.fn_config
             .borrow_mut()
             .add_return_value_source(return_value_source);
-        return &self.fn_callback_tuner;
+        return &self.fn_callback_configurator;
     }
 }
 
 impl<'rs, TMock, TOwner, TArgRefsTuple: Copy, TMockArg, const SUPPORTS_BASE_CALLING: bool>
-    FnTuner<'rs, TMock, TOwner, TArgRefsTuple, (), TMockArg, SUPPORTS_BASE_CALLING, false>
+    FnConfigurator<'rs, TMock, TOwner, TArgRefsTuple, (), TMockArg, SUPPORTS_BASE_CALLING, false>
 {
     pub fn does(&self, mut callback: impl FnMut(TArgRefsTuple) + 'static) -> &'rs TOwner {
         let callback_with_mock =
@@ -131,7 +131,7 @@ impl<'rs, TMock, TOwner, TArgRefsTuple: Copy, TMockArg, const SUPPORTS_BASE_CALL
 }
 
 impl<'rs, TMock, TOwner, TArgRefsTuple: Copy, TMockArg, const SUPPORTS_BASE_CALLING: bool>
-    FnTuner<'rs, TMock, TOwner, TArgRefsTuple, (), TMockArg, SUPPORTS_BASE_CALLING, true>
+    FnConfigurator<'rs, TMock, TOwner, TArgRefsTuple, (), TMockArg, SUPPORTS_BASE_CALLING, true>
 {
     pub fn does(&self, callback: impl FnMut(&TMockArg, TArgRefsTuple) + 'static) -> &'rs TOwner {
         self.fn_config.borrow_mut().set_callback(callback);
@@ -140,12 +140,12 @@ impl<'rs, TMock, TOwner, TArgRefsTuple: Copy, TMockArg, const SUPPORTS_BASE_CALL
 }
 
 impl<'rs, TMock, TOwner, TArgRefsTuple: Copy, TReturnValue, TMockArg, const STORES_MOCK_DATA: bool>
-    FnTuner<'rs, TMock, TOwner, TArgRefsTuple, TReturnValue, TMockArg, true, STORES_MOCK_DATA>
+    FnConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TReturnValue, TMockArg, true, STORES_MOCK_DATA>
 {
     pub fn call_base(
         &self,
-    ) -> &FnReturnCallbackTuner<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA> {
+    ) -> &FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA> {
         self.fn_config.borrow_mut().set_call_base();
-        return &self.fn_callback_tuner;
+        return &self.fn_callback_configurator;
     }
 }

@@ -92,16 +92,16 @@ mod __rsubstitute_generated_Trait {
             &self,
             t1: impl Into<Arg<'rs, T1>>,
             t2: impl Into<Arg<'rs, &'rs T2>>,
-        ) -> FnTuner<'rs, Self, (&T1, &&T2), T3, false> {
+        ) -> FnConfigurator<'rs, Self, (&T1, &&T2), T3, false> {
             let work_args_checker: work_ArgsChecker<T1, T2, T3, B, N> = work_ArgsChecker {
                 _phantom_lifetime: PhantomData,
                 _return_type: PhantomData,
                 t1: t1.into(),
                 t2: t2.into(),
             };
-            let fn_tuner: FnTuner<'_, _, (&T1, &&T2), T3, _> =
+            let fn_configurator: FnConfigurator<'_, _, (&T1, &&T2), T3, _> =
                 self.data.work_data.add_config(work_args_checker, self);
-            return unsafe { core::mem::transmute(fn_tuner) };
+            return unsafe { core::mem::transmute(fn_configurator) };
         }
     }
     impl<'rs, T1> TraitMockReceived<'rs, T1> {

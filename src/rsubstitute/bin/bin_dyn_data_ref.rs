@@ -82,14 +82,14 @@ mod __rsubstitute_generated_Trait {
             // Notice: 'a: 'rs only in setup, not needed in received
             &self,
             v: impl Into<Arg<'rs, &'a i32>>,
-        ) -> FnTuner<'rs, Self, &(&'a i32), &'a i32, false> {
+        ) -> FnConfigurator<'rs, Self, &(&'a i32), &'a i32, false> {
             let work_args_checker = work_ArgsChecker {
                 _phantom_lifetime: PhantomData,
                 v: v.into(),
             };
-            let fn_tuner: FnTuner<'_, _, &(&'a i32), &'a i32, _> =
+            let fn_configurator: FnConfigurator<'_, _, &(&'a i32), &'a i32, _> =
                 self.data.work_data.add_config(work_args_checker, self);
-            return unsafe { core::mem::transmute(fn_tuner) };
+            return unsafe { core::mem::transmute(fn_configurator) };
         }
     }
     impl<'rs> TraitMockReceived<'rs> {

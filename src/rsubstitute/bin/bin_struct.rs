@@ -181,7 +181,7 @@ mod tests {
 //         pub fn work(
 //             &'a self,
 //             value: impl Into<Arg<i32>>,
-//         ) -> FnTuner<
+//         ) -> FnConfigurator<
 //             'a,
 //             StructMock<'a>,
 //             MyTrait_work_Call<'a>,
@@ -197,8 +197,8 @@ mod tests {
 //                 .data
 //                 .MyTrait_work_data
 //                 .add_config(MyTrait_work_ArgsChecker);
-//             let fn_tuner = FnTuner::new(fn_config, self);
-//             return fn_tuner;
+//             let fn_configurator = FnConfigurator::new(fn_config, self);
+//             return fn_configurator;
 //         }
 //     }
 //
@@ -391,7 +391,7 @@ mod tests {
 //         #[allow(mismatched_lifetime_syntaxes)]
 //         pub fn get_number(
 //             &'a self,
-//         ) -> FnTuner<
+//         ) -> FnConfigurator<
 //             'a,
 //             StructMock<'a>,
 //             get_number_Call<'a>,
@@ -406,21 +406,21 @@ mod tests {
 //                 .data
 //                 .get_number_data
 //                 .add_config(get_number_args_checker);
-//             let fn_tuner = FnTuner::new(fn_config, self);
-//             return fn_tuner;
+//             let fn_configurator = FnConfigurator::new(fn_config, self);
+//             return fn_configurator;
 //         }
 //         #[allow(dead_code)]
 //         #[allow(mismatched_lifetime_syntaxes)]
 //         pub fn format(
 //             &'a self,
-//         ) -> FnTuner<'a, StructMock<'a>, format_Call<'a>, format_ArgsChecker<'a>, String, Self>
+//         ) -> FnConfigurator<'a, StructMock<'a>, format_Call<'a>, format_ArgsChecker<'a>, String, Self>
 //         {
 //             let format_args_checker = format_ArgsChecker {
 //                 _phantom_lifetime: PhantomData,
 //             };
 //             let fn_config = self.data.format_data.add_config(format_args_checker);
-//             let fn_tuner = FnTuner::new(fn_config, self);
-//             return fn_tuner;
+//             let fn_configurator = FnConfigurator::new(fn_config, self);
+//             return fn_configurator;
 //         }
 //     }
 //

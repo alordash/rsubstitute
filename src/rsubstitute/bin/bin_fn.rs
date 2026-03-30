@@ -104,15 +104,15 @@ mod global {
         pub fn setup(
             &'a self,
             number: Arg<i32>,
-        ) -> FnTuner<'a, globalMock, global_Call<'a>, global_ArgsChecker<'a>, String, Self>
+        ) -> FnConfigurator<'a, globalMock, global_Call<'a>, global_ArgsChecker<'a>, String, Self>
         {
             let global_args_checker = global_ArgsChecker {
                 phantom_lifetime: PhantomData,
                 number,
             };
             let fn_config = self.data.global_data.add_config(global_args_checker);
-            let fn_tuner = FnTuner::new(fn_config, self);
-            return fn_tuner;
+            let fn_configurator = FnConfigurator::new(fn_config, self);
+            return fn_configurator;
         }
     }
 
@@ -131,7 +131,7 @@ mod global {
 
     pub fn setup(
         number: Arg<i32>,
-    ) -> FnTuner<
+    ) -> FnConfigurator<
         'static,
         globalMock,
         global_Call<'static>,

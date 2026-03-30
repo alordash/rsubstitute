@@ -78,14 +78,14 @@ mod __rsubstitute_generated_Trait {
         }
     }
     impl<'rs> TraitMockSetup<'rs> {
-        pub fn work(&self, v: impl Into<Arg<'rs, i32>>) -> FnTuner<'rs, Self, (&i32), i32, false> {
+        pub fn work(&self, v: impl Into<Arg<'rs, i32>>) -> FnConfigurator<'rs, Self, (&i32), i32, false> {
             let work_args_checker = work_ArgsChecker {
                 _phantom_lifetime: PhantomData,
                 v: v.into(),
             };
-            let fn_tuner: FnTuner<'_, _, (&i32), i32, _> =
+            let fn_configurator: FnConfigurator<'_, _, (&i32), i32, _> =
                 self.data.work_data.add_config(work_args_checker, self);
-            return unsafe { core::mem::transmute(fn_tuner) };
+            return unsafe { core::mem::transmute(fn_configurator) };
         }
     }
     impl<'rs> TraitMockReceived<'rs> {

@@ -4,7 +4,7 @@ use std::marker::PhantomData;
 use std::ops::Deref;
 use std::sync::Arc;
 
-pub struct FnReturnCallbackTuner<
+pub struct FnCallbackConfigurator<
     'rs,
     TMock,
     TOwner,
@@ -19,7 +19,7 @@ pub struct FnReturnCallbackTuner<
 }
 
 impl<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, const STORES_MOCK_DATA: bool>
-    FnReturnCallbackTuner<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA>
+    FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA>
 {
     pub(crate) fn new(fn_config: Arc<RefCell<FnConfig<'rs, TMock>>>, owner: &'rs TOwner) -> Self {
         Self {
@@ -32,7 +32,7 @@ impl<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, const STORES_MOCK_DATA: bool>
 }
 
 impl<'rs, TMock, TOwner, TArgRefsTuple, TMockArg>
-    FnReturnCallbackTuner<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, false>
+    FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, false>
 {
     pub fn and_does<'a>(&self, mut callback: impl FnMut(TArgRefsTuple) + 'static) -> &'rs TOwner {
         let callback_with_mock =
@@ -43,7 +43,7 @@ impl<'rs, TMock, TOwner, TArgRefsTuple, TMockArg>
 }
 
 impl<'rs, TMock, TOwner, TArgRefsTuple, TMockArg>
-    FnReturnCallbackTuner<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, true>
+    FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, true>
 {
     pub fn and_does<'a>(
         &self,
@@ -55,7 +55,7 @@ impl<'rs, TMock, TOwner, TArgRefsTuple, TMockArg>
 }
 
 impl<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, const STORES_MOCK_DATA: bool> Deref
-    for FnReturnCallbackTuner<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA>
+    for FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA>
 {
     type Target = TOwner;
 

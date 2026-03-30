@@ -150,7 +150,7 @@ ident!(FN_DATA_ADD_CONFIG_FN_IDENT, "add_config");
 
 ident!(FN_DATA_VERIFY_RECEIVED_FN_IDENT, "verify_received");
 
-ident!(FN_TUNER_TYPE_IDENT, "FnTuner");
+ident!(FN_CONFIGURATOR_TYPE_IDENT, "FnConfigurator");
 
 ident!(FN_VERIFIER_TYPE_IDENT, "FnVerifier");
 define!(
