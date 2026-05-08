@@ -1,8 +1,8 @@
-use rsubstitute_proc_macro::mock;
+use rsubstitute_proc_macro::automock;
 use std::cell::RefCell;
 use std::sync::Arc;
 
-#[mock]
+#[automock]
 fn f() {}
 
 #[cfg(test)]

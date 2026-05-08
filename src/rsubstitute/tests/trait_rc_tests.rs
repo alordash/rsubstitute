@@ -1,7 +1,7 @@
-use rsubstitute::macros::mock;
+use rsubstitute::macros::automock;
 use std::rc::Rc;
 
-#[mock]
+#[automock]
 trait Trait {
     fn accept_rc(&self, r: Rc<i32>);
 

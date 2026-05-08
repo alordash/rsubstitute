@@ -1,6 +1,6 @@
-use rsubstitute::macros::mock;
+use rsubstitute::macros::automock;
 
-#[mock]
+#[automock]
 trait Trait<T1, T2> {
     fn get_return(&self, value: T1) -> T1;
 

@@ -1,50 +1,50 @@
 #![allow(unused)]
-use rsubstitute::macros::mock;
+use rsubstitute::macros::automock;
 
-#[mock(base)]
+#[automock(base)]
 fn accept_ref(r: &i32) {}
 
 // TODO - do not forget to specify in docs that calling `setup` on static fn clears all existing configurations (this is done because otherwise configs would interrupt each other in tests)
 const BASE_RETURN_REF: &'static i32 = &1000;
-#[mock(base)]
+#[automock(base)]
 fn return_ref() -> &'static i32 {
     BASE_RETURN_REF
 }
 
 const BASE_ACCEPT_REF_RETURN_REF: &'static i32 = &2000;
-#[mock(base)]
+#[automock(base)]
 fn accept_ref_return_ref(r: &i32) -> &'static i32 {
     BASE_ACCEPT_REF_RETURN_REF
 }
 
-#[mock(base)]
+#[automock(base)]
 fn accept_two_refs(r1: &i32, r2: &f32) {}
 
 const ACCEPT_TWO_REFS_RETURN_REF: &'static str = "quo vadis";
-#[mock(base)]
+#[automock(base)]
 fn accept_two_refs_return_ref(r1: &i32, r2: &f32) -> &'static str {
     ACCEPT_TWO_REFS_RETURN_REF
 }
 
-#[mock(base)]
+#[automock(base)]
 fn accept_mut_ref(r: &mut i32) {}
 
 static mut BASE_RETURN_MUT_REF: i32 = 12;
-#[mock(base)]
+#[automock(base)]
 fn return_mut_ref() -> &'static mut i32 {
     unsafe { &mut *&raw mut BASE_RETURN_MUT_REF }
 }
 
-#[mock(base)]
+#[automock(base)]
 fn accept_mut_ref_return_mut_ref(r: &mut i32) -> &'static i32 {
     BASE_ACCEPT_REF_RETURN_REF
 }
 
-#[mock(base)]
+#[automock(base)]
 fn accept_two_mut_refs(r1: &mut i32, r2: &mut f32) {}
 
 static mut ACCEPT_TWO_REFS_RETURN_MUT_REF: i32 = 382;
-#[mock(base)]
+#[automock(base)]
 fn accept_two_mut_refs_return_mut_ref(r1: &mut i32, r2: &mut f32) -> &'static mut i32 {
     unsafe { &mut *&raw mut ACCEPT_TWO_REFS_RETURN_MUT_REF }
 }

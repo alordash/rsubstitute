@@ -1,6 +1,6 @@
-use rsubstitute::macros::mock;
+use rsubstitute::macros::automock;
 
-#[mock]
+#[automock]
 trait Trait {
     fn accept_ref(&self, r: &i32);
 

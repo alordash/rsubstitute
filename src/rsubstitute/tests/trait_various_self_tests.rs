@@ -51,7 +51,7 @@ mod consts {
 use consts::*;
 
 #[rustfmt::skip]
-#[mock(base)]
+#[automock(base)]
 #[allow(unused_mut)] // TODO - this should disable warnings
 trait Trait: Sized {
     fn by_value          (    self      ) {}

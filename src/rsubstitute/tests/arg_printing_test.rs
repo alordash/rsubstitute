@@ -1,7 +1,7 @@
 use rsubstitute::prelude::*;
 use std::marker::PhantomData;
 
-#[mock]
+#[automock]
 trait Trait<'a, T0> {
     fn accept_ref<'b>(&self, r: &'a &&'b i32) -> i32;
 

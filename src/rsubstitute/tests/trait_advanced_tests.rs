@@ -1,4 +1,4 @@
-use rsubstitute::macros::mock;
+use rsubstitute::macros::automock;
 
 #[derive(Clone, Debug, PartialOrd, PartialEq)]
 struct Foo {
@@ -7,7 +7,7 @@ struct Foo {
 
 static mut BASE_MUT_REF: i32 = 10;
 
-#[mock(base)]
+#[automock(base)]
 trait Trait<'a, 'b> {
     fn accept_ref(&self, r: &'a &'b &'a &i32) -> &'b &'a &'b &'a i32;
 

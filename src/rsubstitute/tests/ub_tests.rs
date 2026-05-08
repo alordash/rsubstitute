@@ -1,6 +1,6 @@
-use rsubstitute_proc_macro::mock;
+use rsubstitute_proc_macro::automock;
 
-#[mock]
+#[automock]
 trait Trait {
     fn work(&self, r: &i32);
 }

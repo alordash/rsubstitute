@@ -1,7 +1,7 @@
-use rsubstitute::macros::mock;
+use rsubstitute::macros::automock;
 use std::sync::Arc;
 
-#[mock]
+#[automock]
 trait Trait {
     fn accept_arc(&self, r: Arc<i32>);
 
