@@ -5,6 +5,7 @@ use crate::preparation::models::*;
 mod constants;
 mod models;
 mod preparation;
+mod syntax;
 
 // TODO - make it work only in test mode.
 // basically use `#[cfg(test, mock)]` everywhere (same with `mocked!` ?)

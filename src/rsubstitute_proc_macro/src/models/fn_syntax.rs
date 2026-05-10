@@ -1,0 +1,13 @@
+use syn::*;
+
+pub(crate) struct FnSyntax {
+    pub attributes: Vec<Attribute>,
+    pub visibility: Visibility,
+    pub generics: Generics,
+    pub fn_ident: Ident,
+    pub is_default: bool,
+    pub maybe_self_type: Option<Receiver>,
+    pub arguments: Vec<FnArg>,
+    pub return_type: ReturnType,
+    pub maybe_base_impl: Option<Box<Block>>,
+}
