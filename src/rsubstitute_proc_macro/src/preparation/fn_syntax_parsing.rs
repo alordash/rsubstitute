@@ -37,14 +37,14 @@ fn format_fn_ident(
     generics: &Generics,
 ) -> Ident {
     let generics_suffixes = generics.params.iter().map(|x| match x {
-        GenericParam::Lifetime(l) => l.lifetime.ident.clone(),
-        GenericParam::Type(t) => t.ident.clone(),
-        GenericParam::Const(c) => c.ident.clone(),
+        GenericParam::Lifetime(l) => &l.lifetime.ident,
+        GenericParam::Type(t) => &t.ident,
+        GenericParam::Const(c) => &c.ident,
     });
     let ident_parts = maybe_owner
-        .map(|x| x.ident().clone())
+        .map(|x| x.ident())
         .into_iter()
-        .chain(core::iter::once(fn_ident))
+        .chain(core::iter::once(&fn_ident))
         .chain(generics_suffixes);
     let result = syntax::join_idents(ident_parts, constants::IDENTS_SEPARATOR);
     return result;
