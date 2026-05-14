@@ -1,15 +1,26 @@
 use crate::models::*;
-use crate::{constants, syntax};
+use crate::*;
 use syn::punctuated::Punctuated;
 use syn::*;
 
+pub(crate) struct ParseFnSyntaxArgs<'a> {
+    pub attributes: Vec<Attribute>,
+    pub visibility: Visibility,
+    pub signature: Signature,
+    pub is_default: bool,
+    pub maybe_base_impl: Option<Box<Block>>,
+    pub maybe_owner: Option<&'a dyn IFnOwner>,
+}
+
 pub(crate) fn parse_fn_syntax(
-    attributes: Vec<Attribute>,
-    visibility: Visibility,
-    signature: Signature,
-    is_default: bool,
-    maybe_base_impl: Option<Box<Block>>,
-    maybe_owner: Option<&dyn IFnOwner>,
+    ParseFnSyntaxArgs {
+        attributes,
+        visibility,
+        signature,
+        is_default,
+        maybe_base_impl,
+        maybe_owner,
+    }: ParseFnSyntaxArgs,
 ) -> FnSyntax {
     let generics = combine_generics(signature.generics, maybe_owner);
     let fn_ident = format_fn_ident(signature.ident, maybe_owner, &generics);

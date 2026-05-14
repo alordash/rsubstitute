@@ -1,0 +1,1 @@
+pub(crate) fn parse_struct_syntax() {}

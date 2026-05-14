@@ -21,7 +21,7 @@ where
 
 trait IConst<const C: usize> {}
 
-mocked_base! {
+mock_base! {
     struct Lifetime<'x: 'a, 'a, 'b, 'c, 'd>(PhantomData<&'x &'a &'b &'c &'d ()>)
     where
         'x: 'b;

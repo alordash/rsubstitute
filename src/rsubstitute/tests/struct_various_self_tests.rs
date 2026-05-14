@@ -52,7 +52,7 @@ mod consts {
 }
 use consts::*;
 
-mocked_base! {
+mock_base! {
     #[derive(Clone)]
     struct Struct(pub i32);
 

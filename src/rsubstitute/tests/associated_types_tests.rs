@@ -36,7 +36,7 @@ trait Trait {
 // TODO - write in docs about limitation: `Self` should not be used ambiguously, e.g.
 // correct: <Self as Trait>::OutputType
 //   wrong: Self::OutputType
-mocked_base! {
+mock_base! {
     #[derive(Clone)]
     struct Struct;
 

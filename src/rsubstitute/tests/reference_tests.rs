@@ -67,7 +67,7 @@ fn work<'x, 'a, 'b: 'a, 'c, 'd: 'a, T1, T2>(
     unreachable!()
 }
 
-mocked_base! {
+mock_base! {
     #[allow(unused)]
     struct Struct<'a, 'b: 'a, T1: Clone> {
         _phantom_a: PhantomData<&'a ()>,

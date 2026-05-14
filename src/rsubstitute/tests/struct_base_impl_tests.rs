@@ -12,7 +12,7 @@ pub const DEFAULT_STRUCT_GET_VALUE: i32 = 200;
 pub const DEFAULT_FIRST_TRAIT_GET_VALUE: i32 = 500;
 pub const DEFAULT_SECOND_TRAIT_GET_VALUE: &'static str = "quo vadis";
 
-mocked_base! {
+mock_base! {
     struct Struct;
 
     impl Struct {

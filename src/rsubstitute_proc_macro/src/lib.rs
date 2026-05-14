@@ -1,7 +1,9 @@
 #![allow(clippy::needless_return)]
 
-use crate::preparation::models::*;
+use crate::automock_handling::handle_automock;
+use crate::models::*;
 
+mod automock_handling;
 mod constants;
 mod models;
 mod preparation;
@@ -14,27 +16,30 @@ pub fn automock(
     proc_macro_attribute: proc_macro::TokenStream,
     proc_macro_item: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
-    let context = preparation::create_context_for_automock_macro(proc_macro_attribute);
-    proc_macro_item
+    handle_automock(proc_macro_attribute, proc_macro_item)
 }
 
 #[proc_macro]
 pub fn mock(proc_macro_item: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    let context = preparation::create_context_for_mock_macro(MockMacroUsage::Simple);
-    proc_macro_item
+    mock_core(proc_macro_item, MockMacroUsage::Simple)
 }
-
 
 #[cfg(not(feature = "mock_base_by_default"))]
 #[proc_macro]
-pub fn mocked_base(proc_macro_item: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    let context = preparation::create_context_for_mock_macro(MockMacroUsage::WithBase);
-    proc_macro_item
+pub fn mock_base(proc_macro_item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    mock_core(proc_macro_item, MockMacroUsage::WithBase)
 }
 
 #[cfg(feature = "mock_base_by_default")]
 #[proc_macro]
-pub fn mocked_no_base(proc_macro_item: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    let context = preparation::create_context_for_mock_macro(MockMacroUsage::WithoutBase);
+pub fn mock_without_base(proc_macro_item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+    mock_core(proc_macro_item, MockMacroUsage::WithoutBase)
+}
+
+fn mock_core(
+    proc_macro_item: proc_macro::TokenStream,
+    mock_macro_usage: MockMacroUsage,
+) -> proc_macro::TokenStream {
+    let context = preparation::create_context_for_mock_macro(mock_macro_usage);
     proc_macro_item
 }
