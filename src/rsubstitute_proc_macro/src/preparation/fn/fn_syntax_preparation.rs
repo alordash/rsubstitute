@@ -3,7 +3,7 @@ use crate::*;
 use syn::punctuated::Punctuated;
 use syn::*;
 
-pub(crate) struct ParseFnSyntaxArgs<'a> {
+pub(crate) struct PrepareFnSyntaxArgs<'a> {
     pub attributes: Vec<Attribute>,
     pub visibility: Visibility,
     pub signature: Signature,
@@ -12,15 +12,15 @@ pub(crate) struct ParseFnSyntaxArgs<'a> {
     pub maybe_owner: Option<&'a dyn IFnOwner>,
 }
 
-pub(crate) fn parse_fn_syntax(
-    ParseFnSyntaxArgs {
+pub(crate) fn prepare_fn_syntax(
+    PrepareFnSyntaxArgs {
         attributes,
         visibility,
         signature,
         is_default,
         maybe_base_impl,
         maybe_owner,
-    }: ParseFnSyntaxArgs,
+    }: PrepareFnSyntaxArgs,
 ) -> FnSyntax {
     let generics = combine_generics(signature.generics, maybe_owner);
     let fn_ident = format_fn_ident(signature.ident, maybe_owner, &generics);

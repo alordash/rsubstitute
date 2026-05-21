@@ -1,13 +1,14 @@
 #![allow(clippy::needless_return)]
 
-use crate::automock_handling::handle_automock;
+use crate::automock::handle_automock;
 use crate::models::*;
 
-mod automock_handling;
+mod automock;
 mod constants;
 mod models;
 mod preparation;
 mod syntax;
+mod targets;
 
 // TODO - make it work only in test mode.
 // basically use `#[cfg(test, mock)]` everywhere (same with `mocked!` ?)

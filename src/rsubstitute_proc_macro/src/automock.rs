@@ -1,6 +1,6 @@
 use crate::models::Context;
-use crate::preparation;
 use crate::preparation::r#fn::*;
+use crate::{preparation, targets};
 use syn::*;
 
 pub(crate) fn handle_automock(
@@ -10,14 +10,7 @@ pub(crate) fn handle_automock(
     let context = preparation::create_context_for_automock_macro(proc_macro_attribute);
     let maybe_item_fn = syn::parse::<ItemFn>(proc_macro_item.clone());
     if let Ok(item_fn) = maybe_item_fn {
-        let result = parse_fn_syntax(ParseFnSyntaxArgs {
-            attributes: item_fn.attrs,
-            visibility: item_fn.vis,
-            signature: item_fn.sig,
-            is_default: false,
-            maybe_base_impl: Some(item_fn.block),
-            maybe_owner: None,
-        });
+        let result = targets::handle_fn(item_fn);
         return todo!("result");
     }
     let maybe_trait_item = syn::parse::<ItemTrait>(proc_macro_item.clone());
