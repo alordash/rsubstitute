@@ -1,5 +1,5 @@
-use syn::*;
 use crate::preparation::r#fn::*;
+use syn::*;
 
 pub(crate) fn handle_fn(item_fn: ItemFn) {
     let fn_syntax = prepare_fn_syntax(PrepareFnSyntaxArgs {
