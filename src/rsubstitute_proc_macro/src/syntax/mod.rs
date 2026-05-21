@@ -1,3 +1,3 @@
-mod idents_join;
-
-pub use idents_join::*;
+pub mod ident;
+pub mod generics;
+pub mod generic_param;

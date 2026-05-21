@@ -5,7 +5,7 @@ trait Trait<T> {
 }
 
 // mocked_base! {
-//     struct Struct;
+//     trait Struct;
 // 
 //     impl Struct {
 //         pub fn new() -> Self {

@@ -1,7 +1,7 @@
 use proc_macro2::Ident;
 use quote::format_ident;
 
-pub(crate) fn join_idents<'a, TIdents: Iterator<Item = &'a Ident>>(
+pub(crate) fn join<'a, TIdents: Iterator<Item = &'a Ident>>(
     mut idents: TIdents,
     sep: char,
 ) -> Ident {

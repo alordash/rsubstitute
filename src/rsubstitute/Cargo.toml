@@ -21,7 +21,7 @@ readme = "../../README.md"
 #path = "bin/bin_fn.rs"
 #
 #[[bin]]
-#name = "struct"
+#name = "trait"
 #path = "bin/bin_struct.rs"
 
 #[[bin]]

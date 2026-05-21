@@ -2,8 +2,8 @@
 // This is needed because mock object needs to store information about all its fn parameters.
 //
 // Using real fn parameters types would clutter mock object type with all their generic parameters.
-// Basically all functions generic parameters will be flattened and stored in mock object struct.
-// For example `trait Trait { fn work<T>(&self, v: i32) -> T }` would make `struct TraitMock { work_data: FnData<i32, T> }.
+// Basically all functions generic parameters will be flattened and stored in mock object trait.
+// For example `trait Trait { fn work<T>(&self, v: i32) -> T }` would make `trait TraitMock { work_data: FnData<i32, T> }.
 // This also leads to a problem of overlapping type arguments.
 //
 // To relieve mock structs from knowing their functions parameters dynamic fn parameters are used.

@@ -12,7 +12,7 @@ trait Trait<'a, T0> {
 
 // mocked_base! {
 //     #[derive(Clone)]
-//     struct Struct<'s, TS>(PhantomData<&'s TS>);
+//     trait Struct<'s, TS>(PhantomData<&'s TS>);
 //     
 //     impl<'s, TS> Struct<'s, TS> {
 //         pub fn new() -> Self {
@@ -324,7 +324,7 @@ Received no non-matching calls"
         }
     }
 
-//     mod struct {
+//     mod trait {
 //         use super::*;
 // 
 //         #[test]

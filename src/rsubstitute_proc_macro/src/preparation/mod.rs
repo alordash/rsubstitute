@@ -1,6 +1,6 @@
 // TODO - add `trait` and `use`
 pub mod r#fn;
-pub mod r#struct;
+pub mod r#trait;
 
 mod context_creation;
 

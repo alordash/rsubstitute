@@ -46,8 +46,8 @@ impl Debug for Struct {
 
 #[cfg(not(test))]
 fn main() {
-    // let r#struct = Struct::new(2);
-    // dbg!(r#struct);
+    // let r#trait = Struct::new(2);
+    // dbg!(r#trait);
 
     println!("done")
 }
@@ -138,7 +138,7 @@ mod tests {
 //     use std::ops::Deref;
 //
 //     #[derive(Clone)]
-//     pub struct MyTrait_work_Call<'a> {
+//     pub trait MyTrait_work_Call<'a> {
 //         _phantom_lifetime: PhantomData<&'a ()>,
 //         pub value: i32,
 //     }
@@ -149,16 +149,16 @@ mod tests {
 //     }
 //
 //     #[derive(Debug, IArgsFormatter)]
-//     pub struct MyTrait_work_ArgsChecker<'a> {
+//     pub trait MyTrait_work_ArgsChecker<'a> {
 //         _phantom_lifetime: PhantomData<&'a ()>,
 //         pub value: Arg<i32>,
 //     }
 //
-//     pub struct MyTraitSetup<'a> {
+//     pub trait MyTraitSetup<'a> {
 //         data: Arc<StructMockData<'a>>,
 //     }
 //
-//     pub struct MyTraitReceived<'a> {
+//     pub trait MyTraitReceived<'a> {
 //         data: Arc<StructMockData<'a>>,
 //     }
 //
@@ -222,7 +222,7 @@ mod tests {
 //     }
 //
 //     #[derive(Clone)]
-//     pub struct get_number_Call<'a> {
+//     pub trait get_number_Call<'a> {
 //         _phantom_lifetime: PhantomData<&'a ()>,
 //     }
 //     impl<'a> IArgInfosProvider for get_number_Call<'a> {
@@ -232,7 +232,7 @@ mod tests {
 //     }
 //
 //     #[derive(Debug, IArgsFormatter)]
-//     pub struct get_number_ArgsChecker<'a> {
+//     pub trait get_number_ArgsChecker<'a> {
 //         _phantom_lifetime: PhantomData<&'a ()>,
 //     }
 //
@@ -250,7 +250,7 @@ mod tests {
 //     }
 //
 //     #[derive(Clone)]
-//     pub struct format_Call<'a> {
+//     pub trait format_Call<'a> {
 //         _phantom_lifetime: PhantomData<&'a ()>,
 //     }
 //     impl<'a> IArgInfosProvider for format_Call<'a> {
@@ -260,7 +260,7 @@ mod tests {
 //     }
 //
 //     #[derive(Debug, IArgsFormatter)]
-//     pub struct format_ArgsChecker<'a> {
+//     pub trait format_ArgsChecker<'a> {
 //         _phantom_lifetime: PhantomData<&'a ()>,
 //     }
 //
@@ -281,7 +281,7 @@ mod tests {
 //     }
 //
 //     #[derive(IMockData)]
-//     pub struct StructMockData<'a> {
+//     pub trait StructMockData<'a> {
 //         _phantom_lifetime: PhantomData<&'a ()>,
 //         MyTrait_work_data:
 //             FnData<StructMock<'a>, MyTrait_work_Call<'a>, MyTrait_work_ArgsChecker<'a>, String>,
@@ -290,17 +290,17 @@ mod tests {
 //         format_data: FnData<StructMock<'a>, format_Call<'a>, format_ArgsChecker<'a>, String>,
 //     }
 //
-//     pub struct StructMockSetup<'a> {
+//     pub trait StructMockSetup<'a> {
 //         pub MyTrait: MyTraitSetup<'a>,
 //         data: Arc<StructMockData<'a>>,
 //     }
 //
-//     pub struct StructMockReceived<'a> {
+//     pub trait StructMockReceived<'a> {
 //         pub MyTrait: MyTraitReceived<'a>,
 //         data: Arc<StructMockData<'a>>,
 //     }
 //
-//     pub struct Struct_InnerData {
+//     pub trait Struct_InnerData {
 //         number: i32,
 //     }
 //
@@ -311,7 +311,7 @@ mod tests {
 //     }
 //
 //     #[allow(non_camel_case_types)]
-//     pub struct StructMock<'a> {
+//     pub trait StructMock<'a> {
 //         pub setup: StructMockSetup<'a>,
 //         pub received: StructMockReceived<'a>,
 //         data: Arc<StructMockData<'a>>,

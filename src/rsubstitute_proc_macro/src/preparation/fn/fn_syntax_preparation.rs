@@ -22,8 +22,8 @@ pub(crate) fn prepare_fn_syntax(
         maybe_owner,
     }: PrepareFnSyntaxArgs,
 ) -> FnSyntax {
-    let generics = combine_generics(signature.generics, maybe_owner);
-    let fn_ident = format_fn_ident(signature.ident, maybe_owner, &generics);
+    let merged_generics = combine_generics(signature.generics, maybe_owner);
+    let fn_ident = format_fn_ident(signature.ident, maybe_owner, &merged_generics);
     let InputsSplit {
         maybe_self_type,
         arguments,
@@ -31,7 +31,7 @@ pub(crate) fn prepare_fn_syntax(
     let result = FnSyntax {
         attributes,
         visibility,
-        generics,
+        merged_generics,
         fn_ident,
         is_default,
         maybe_self_type,
@@ -57,7 +57,7 @@ fn format_fn_ident(
         .into_iter()
         .chain(core::iter::once(&fn_ident))
         .chain(generics_suffixes);
-    let result = syntax::join_idents(ident_parts, constants::IDENTS_SEPARATOR);
+    let result = syntax::ident::join(ident_parts, constants::IDENTS_SEPARATOR);
     return result;
 }
 
@@ -67,13 +67,7 @@ fn combine_generics(mut fn_generics: Generics, maybe_owner: Option<&dyn IFnOwner
         return fn_generics;
     };
 
-    fn_generics.params.extend(owner_generics.params.clone());
-    if let Some(owner_generics_where_clause) = &owner_generics.where_clause {
-        fn_generics
-            .make_where_clause()
-            .predicates
-            .extend(owner_generics_where_clause.predicates.clone());
-    }
+    fn_generics = syntax::generics::combine(fn_generics, owner_generics);
     return fn_generics;
 }
 

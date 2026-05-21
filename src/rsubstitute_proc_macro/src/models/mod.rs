@@ -1,4 +1,5 @@
 pub mod r#fn;
+pub mod r#trait;
 
 mod args_checker_struct;
 mod call_struct;
