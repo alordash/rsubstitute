@@ -1,3 +1,4 @@
+use crate::models::r#fn::*;
 use crate::models::*;
 
 pub(crate) struct FnInfo {

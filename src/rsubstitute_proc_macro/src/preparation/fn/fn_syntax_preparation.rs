@@ -1,4 +1,4 @@
-use crate::models::*;
+use crate::models::r#fn::*;
 use crate::*;
 use syn::punctuated::Punctuated;
 use syn::*;
