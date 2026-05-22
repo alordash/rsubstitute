@@ -1,6 +1,6 @@
 use crate::models::r#fn::IFnOwner;
 use crate::models::r#trait::*;
-use crate::preparation::r#fn::{prepare_fn_syntax, PrepareFnSyntaxArgs};
+use crate::preparation::r#fn::{PrepareFnSyntaxArgs, prepare_fn_syntax};
 use crate::syntax;
 use quote::ToTokens;
 use syn::*;
