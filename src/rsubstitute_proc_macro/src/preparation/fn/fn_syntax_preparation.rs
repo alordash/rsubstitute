@@ -2,6 +2,7 @@ use crate::models::r#fn::*;
 use crate::*;
 use syn::punctuated::Punctuated;
 use syn::*;
+use syntax::*;
 
 pub(crate) struct PrepareFnSyntaxArgs<'a> {
     pub attributes: Vec<Attribute>,
@@ -57,7 +58,7 @@ fn format_fn_ident(
         .into_iter()
         .chain(core::iter::once(&fn_ident))
         .chain(generics_suffixes);
-    let result = syntax::ident::join(ident_parts, constants::IDENTS_SEPARATOR);
+    let result = ident::join(ident_parts, constants::IDENTS_SEPARATOR);
     return result;
 }
 
@@ -67,7 +68,7 @@ fn combine_generics(mut fn_generics: Generics, maybe_owner: Option<&dyn IFnOwner
         return fn_generics;
     };
 
-    fn_generics = syntax::generics::combine(fn_generics, owner_generics);
+    fn_generics = generics::combine(fn_generics, owner_generics);
     return fn_generics;
 }
 

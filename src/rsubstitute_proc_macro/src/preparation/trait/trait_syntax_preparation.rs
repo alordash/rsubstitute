@@ -1,7 +1,7 @@
 use crate::models::r#fn::IFnOwner;
 use crate::models::r#trait::*;
 use crate::preparation::r#fn::{PrepareFnSyntaxArgs, prepare_fn_syntax};
-use crate::syntax;
+use crate::syntax::*;
 use quote::ToTokens;
 use syn::*;
 
@@ -86,7 +86,7 @@ fn merge_generics_with_assoc_types(
 ) -> Generics {
     let assoc_types_as_generic_parameters = assoc_types
         .iter()
-        .map(|x| syntax::generic_param::from_type_ident(x.ident.clone()));
+        .map(|x| generic_param::from_type_ident(x.ident.clone()));
     generics.params.extend(assoc_types_as_generic_parameters);
     return generics;
 }

@@ -1,16 +1,11 @@
-use proc_macro2::Ident;
-use quote::format_ident;
+use proc_macro2::*;
 
 pub(crate) fn join<'a, TIdents: Iterator<Item = &'a Ident>>(
-    mut idents: TIdents,
-    sep: char,
+    idents: TIdents,
+    separator: &str,
 ) -> Ident {
-    let mut result = idents
-        .next()
-        .expect("Idents for joining should not be empty.")
-        .clone();
-    while let Some(next) = idents.next() {
-        result = format_ident!("{result}{sep}{next}");
-    }
-    return result;
+    let idents_strings: Vec<_> = idents.map(|x| x.to_string()).collect();
+    let ident_string = idents_strings.join(separator);
+    let ident = Ident::new(&ident_string, Span::call_site());
+    return ident;
 }
