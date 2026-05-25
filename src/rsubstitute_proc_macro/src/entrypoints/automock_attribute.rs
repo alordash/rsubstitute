@@ -1,28 +1,22 @@
 use crate::{preparation, targets};
 use syn::*;
 
+// TODO - rename to just `mock`, not `automock`
 pub(crate) fn handle_automock(
     proc_macro_attribute: proc_macro::TokenStream,
     proc_macro_item: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
-    let context = preparation::create_context_for_automock_macro(proc_macro_attribute);
-    let maybe_item_fn = syn::parse::<ItemFn>(proc_macro_item.clone());
-    if let Ok(item_fn) = maybe_item_fn {
-        let result = targets::handle_fn(item_fn);
-        return todo!("result");
-    }
-    let maybe_trait_item = syn::parse::<ItemTrait>(proc_macro_item.clone());
-    if let Ok(trait_item) = maybe_trait_item {
-        let result = todo!("parse_trait_syntax");
-        return todo!("result");
-    }
-    let maybe_use_item = syn::parse::<ItemUse>(proc_macro_item);
-    if let Ok(use_item) = maybe_use_item {
-        let result = todo!("parse_use_item");
-        return todo!("result");
-    }
+    let ctx = preparation::create_context_for_automock_macro(proc_macro_attribute);
+    let item = parse_macro_input!(proc_macro_item as Item);
+    let result = match item {
+        Item::Fn(item_fn) => targets::handle_fn(ctx, item_fn),
+        Item::Impl(item_impl) => targets::handle_impl(ctx, item_impl),
+        Item::Struct(item_struct) => targets::handle_struct(ctx, item_struct),
+        Item::Trait(item_trait) => targets::handle_trait(ctx, item_trait),
+        _ => todo!("PANIC HERE AND WRITE CORRECT ERROR MSG. Can automock only `fn`, `trait` or `use`.")
+    };
+    todo!("return result");
 
-    // TODO - move `use` to `mock!`
+    // TODO - move `use` to `mock!` (or should I? maybe just support Item::Block for that)
     // Should be used as `mock! { core::char::from_u32(i: u32) }
-    panic!("Can automock only `fn`, `trait` or `use`.");
 }

@@ -1,7 +1,8 @@
 use crate::preparation::r#fn::*;
 use syn::*;
+use crate::models::Context;
 
-pub(crate) fn handle_fn(item_fn: ItemFn) {
+pub(crate) fn handle_fn(ctx: Context, item_fn: ItemFn) {
     let fn_syntax = prepare_fn_syntax(PrepareFnSyntaxArgs {
         attributes: item_fn.attrs,
         visibility: item_fn.vis,
