@@ -1,7 +1,6 @@
-use crate::constants;
 use crate::models::r#fn::IFnOwner;
 use crate::models::r#struct::*;
-use crate::preparation::r#fn::{PrepareFnSyntaxArgs, prepare_fn_syntax};
+use crate::preparation::r#fn::{prepare_fn_syntax, PrepareFnSyntaxArgs};
 use crate::syntax::*;
 use proc_macro2::Ident;
 use quote::ToTokens;
@@ -23,7 +22,7 @@ pub(crate) fn prepare_impl_struct_syntax(
     }: PrepareImplStructSyntaxArgs,
 ) -> ImplStructSyntax {
     let split_items = split_items(impl_items);
-    let ident = r#type::to_ident(&self_ty, constants::IDENTS_SEPARATOR);
+    let ident = r#type::to_ident(&self_ty);
     let impl_struct_syntax_as_fn_owner = ImplStructSyntaxAsFnOwner {
         ident: &ident,
         generics: &generics,

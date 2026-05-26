@@ -1,7 +1,8 @@
-use crate::syntax::type_path;
 use syn::*;
 
-pub(crate) fn to_ident(ty: &Type, separator: &str) -> Ident {
+pub mod path;
+
+pub(crate) fn to_ident(ty: &Type) -> Ident {
     match ty {
         Type::Array(_) => {}
         Type::BareFn(_) => {}
@@ -11,7 +12,7 @@ pub(crate) fn to_ident(ty: &Type, separator: &str) -> Ident {
         Type::Macro(_) => {}
         Type::Never(_) => {}
         Type::Paren(_) => {}
-        Type::Path(type_path) => return type_path::to_ident(type_path, separator),
+        Type::Path(type_path) => return path::to_ident(type_path),
         Type::Ptr(_) => {}
         Type::Reference(_) => {}
         Type::Slice(_) => {}
