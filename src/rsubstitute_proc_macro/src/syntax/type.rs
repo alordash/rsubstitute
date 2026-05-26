@@ -1,10 +1,11 @@
 use syn::*;
 
+pub mod array;
 pub mod path;
 
 pub(crate) fn to_ident(ty: &Type) -> Ident {
     match ty {
-        Type::Array(_) => {}
+        Type::Array(type_array) => return array::to_ident(type_array),
         Type::BareFn(_) => {}
         Type::Group(_) => {}
         Type::ImplTrait(_) => {}
