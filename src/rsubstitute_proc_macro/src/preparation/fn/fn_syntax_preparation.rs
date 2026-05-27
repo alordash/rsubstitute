@@ -1,8 +1,8 @@
 use crate::models::r#fn::*;
+use crate::syntax::{generics, ident};
 use crate::*;
 use syn::punctuated::Punctuated;
 use syn::*;
-use syntax::*;
 
 pub(crate) struct PrepareFnSyntaxArgs<'a> {
     pub attributes: Vec<Attribute>,

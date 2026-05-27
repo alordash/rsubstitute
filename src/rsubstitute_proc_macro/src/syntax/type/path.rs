@@ -1,9 +1,8 @@
+use crate::syntax::constants::IDENT_SEGMENTS_SEPARATOR;
 use crate::syntax::path;
 use syn::*;
 
 pub(crate) fn to_ident(type_path: &TypePath) -> Ident {
-    let result = path::to_ident(&type_path.path, TYPE_PATH_SEGMENTS_SEPARATOR);
+    let result = path::to_ident(&type_path.path, IDENT_SEGMENTS_SEPARATOR);
     return result;
 }
-
-pub const TYPE_PATH_SEGMENTS_SEPARATOR: &'static str = "_";

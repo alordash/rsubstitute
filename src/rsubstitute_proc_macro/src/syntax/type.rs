@@ -1,6 +1,7 @@
 use syn::*;
 
 pub mod array;
+pub mod bare_fn;
 pub mod path;
 
 pub(crate) fn to_ident(ty: &Type) -> Ident {
