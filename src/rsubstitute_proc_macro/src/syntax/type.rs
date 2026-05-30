@@ -7,7 +7,7 @@ pub mod path;
 pub(crate) fn to_ident(ty: &Type) -> Ident {
     match ty {
         Type::Array(type_array) => return array::to_ident(type_array),
-        Type::BareFn(_) => {}
+        Type::BareFn(bare_fn) => return bare_fn::to_ident(bare_fn),
         Type::Group(_) => {}
         Type::ImplTrait(_) => {}
         Type::Infer(_) => {}

@@ -1,7 +1,6 @@
 use proc_macro2::*;
-use syn::spanned::Spanned;
 
-pub(crate) fn join<'a, TIdents: Iterator<Item = &'a Ident>>(
+pub(crate) fn join<TIdents: Iterator<Item = Ident>>(
     idents: TIdents,
     separator: &str,
 ) -> Ident {
