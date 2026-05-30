@@ -1,11 +1,6 @@
-pub mod bare_fn_arg;
-pub mod bound_lifetimes;
 pub mod constants;
 pub mod generic_param;
 pub mod generics;
 pub mod ident;
-pub mod lifetime;
 pub mod path;
 pub mod r#type;
-pub mod type_param_bound;
-pub mod return_type;
