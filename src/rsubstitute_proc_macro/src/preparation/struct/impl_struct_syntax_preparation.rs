@@ -1,6 +1,6 @@
 use crate::models::r#fn::IFnOwner;
 use crate::models::r#struct::*;
-use crate::preparation::r#fn::{prepare_fn_syntax, PrepareFnSyntaxArgs};
+use crate::preparation::r#fn::{PrepareFnSyntaxArgs, prepare_fn_syntax};
 use crate::syntax::*;
 use proc_macro2::Ident;
 use quote::ToTokens;
@@ -9,7 +9,7 @@ use syn::*;
 pub(crate) struct PrepareImplStructSyntaxArgs {
     pub attributes: Vec<Attribute>,
     pub generics: Generics,
-    pub self_ty: Box<Type>,
+    pub target_type: Box<Type>,
     pub impl_items: Vec<ImplItem>,
 }
 
@@ -17,7 +17,7 @@ pub(crate) fn prepare_impl_struct_syntax(
     PrepareImplStructSyntaxArgs {
         attributes,
         generics,
-        self_ty,
+        target_type,
         impl_items,
     }: PrepareImplStructSyntaxArgs,
 ) -> ImplStructSyntax {
@@ -46,7 +46,7 @@ pub(crate) fn prepare_impl_struct_syntax(
         attributes,
         target_ident: ident,
         generics,
-        target_type: *self_ty,
+        target_type: *target_type,
         constants: split_items.constants,
         assoc_types: split_items.assoc_types,
         methods,
@@ -77,6 +77,28 @@ fn split_items(items: Vec<ImplItem>) -> SplitItems {
     }
 
     return split_items;
+}
+
+struct SplitTargetType {
+    pub target_ident: Ident,
+    pub modules: Vec<Ident>,
+}
+fn split_target_ident(target_type: &Type) {
+    let Type::Path(type_path) = target_type else {
+        panic!("Can mock only `impl`s of structs.");
+    };
+    if type_path.qself.is_some() {
+        panic!("Can not mock structs qualified with self-type.");
+    }
+
+    let segments_len = type_path.path.segments.len();
+    let modules: Vec<_> = type_path
+        .path
+        .segments
+        .iter()
+        .take(segments_len - 1)
+        .map(|x| x.ident.clone())
+        .collect();
 }
 
 struct ImplStructSyntaxAsFnOwner<'a> {
