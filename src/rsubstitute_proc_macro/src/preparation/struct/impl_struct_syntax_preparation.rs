@@ -21,14 +21,20 @@ pub(crate) fn prepare_impl_struct_syntax(
         impl_items,
     }: PrepareImplStructSyntaxArgs,
 ) -> ImplStructSyntax {
-    let split_items = split_items(impl_items);
-    let ident = r#type::to_ident(&self_ty);
+    let SplitItems {
+        constants,
+        assoc_types,
+        fns,
+    } = split_items(impl_items);
+    let SplitTargetType {
+        modules,
+        target_ident,
+    } = split_target_type(&target_type);
     let impl_struct_syntax_as_fn_owner = ImplStructSyntaxAsFnOwner {
-        ident: &ident,
+        ident: &target_ident,
         generics: &generics,
     };
-    let methods = split_items
-        .fns
+    let methods = fns
         .into_iter()
         .map(|x| {
             prepare_fn_syntax(PrepareFnSyntaxArgs {
@@ -44,11 +50,12 @@ pub(crate) fn prepare_impl_struct_syntax(
 
     let result = ImplStructSyntax {
         attributes,
-        target_ident: ident,
+        modules,
+        target_ident,
         generics,
         target_type: *target_type,
-        constants: split_items.constants,
-        assoc_types: split_items.assoc_types,
+        constants,
+        assoc_types,
         methods,
     };
     return result;
@@ -80,10 +87,10 @@ fn split_items(items: Vec<ImplItem>) -> SplitItems {
 }
 
 struct SplitTargetType {
-    pub target_ident: Ident,
     pub modules: Vec<Ident>,
+    pub target_ident: Ident,
 }
-fn split_target_ident(target_type: &Type) {
+fn split_target_type(target_type: &Type) -> SplitTargetType {
     let Type::Path(type_path) = target_type else {
         panic!("Can mock only `impl`s of structs.");
     };
@@ -91,14 +98,25 @@ fn split_target_ident(target_type: &Type) {
         panic!("Can not mock structs qualified with self-type.");
     }
 
-    let segments_len = type_path.path.segments.len();
     let modules: Vec<_> = type_path
         .path
         .segments
         .iter()
-        .take(segments_len - 1)
+        .take(type_path.path.segments.len() - 1)
         .map(|x| x.ident.clone())
         .collect();
+    let target_ident = type_path
+        .path
+        .segments
+        .last()
+        .expect("`impl` struct target type path should not be empty.")
+        .ident
+        .clone();
+    let result = SplitTargetType {
+        modules,
+        target_ident,
+    };
+    return result;
 }
 
 struct ImplStructSyntaxAsFnOwner<'a> {
