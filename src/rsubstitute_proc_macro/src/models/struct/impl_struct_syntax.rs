@@ -1,5 +1,4 @@
 use crate::models::r#fn::FnSyntax;
-use proc_macro2::Ident;
 use syn::*;
 
 pub(crate) struct ImplStructSyntax {
