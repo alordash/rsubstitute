@@ -7,7 +7,7 @@ mod preparation;
 mod syntax;
 mod targets;
 
-use crate::entrypoints::MockMacroUsage;
+use crate::entrypoints::models::*;
 
 // TODO - make it work only in test mode.
 // basically use `#[cfg(test, mock)]` everywhere (same with `mocked!` ?)

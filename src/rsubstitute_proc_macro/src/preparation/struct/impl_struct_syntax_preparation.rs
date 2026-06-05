@@ -1,5 +1,5 @@
-use super::*;
-use crate::preparation::r#fn::IFnOwner;
+use super::models::*;
+use crate::preparation::r#fn::models::IFnOwner;
 use crate::preparation::r#fn::{PrepareFnSyntaxArgs, prepare_fn_syntax};
 use proc_macro2::Ident;
 use quote::ToTokens;

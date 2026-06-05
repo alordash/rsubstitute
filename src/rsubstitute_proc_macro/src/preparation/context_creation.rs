@@ -1,6 +1,6 @@
-use super::*;
+use super::models::*;
 use crate::constants;
-use crate::entrypoints::MockMacroUsage;
+use crate::entrypoints::models::*;
 
 pub(crate) fn create_context_for_automock_macro(
     proc_macro_attribute: proc_macro::TokenStream,

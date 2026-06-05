@@ -1,4 +1,4 @@
-use crate::preparation::r#fn::FnSyntax;
+use crate::preparation::r#fn::models::FnSyntax;
 use syn::*;
 
 pub(crate) struct TraitSyntax {

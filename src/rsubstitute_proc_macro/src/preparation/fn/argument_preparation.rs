@@ -1,4 +1,4 @@
-use super::*;
+use super::models::*;
 use proc_macro2::Span;
 use syn::visit_mut::{self, VisitMut};
 use syn::*;

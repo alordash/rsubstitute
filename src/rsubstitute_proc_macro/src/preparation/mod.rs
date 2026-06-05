@@ -3,8 +3,12 @@ pub mod r#fn;
 pub mod r#struct;
 pub mod r#trait;
 
-mod context;
+pub mod models {
+    mod context;
+
+    pub use context::*;
+}
+
 mod context_creation;
 
-pub use context::*;
 pub use context_creation::*;
