@@ -1,6 +1,8 @@
 use crate::models::r#fn::*;
+use crate::preparation::r#fn::argument_preparation;
 use crate::syntax::{generics, ident};
 use crate::*;
+use quote::ToTokens;
 use syn::punctuated::Punctuated;
 use syn::*;
 
@@ -74,7 +76,7 @@ fn combine_generics(mut fn_generics: Generics, maybe_owner: Option<&dyn IFnOwner
 
 struct InputsSplit {
     pub maybe_self_type: Option<Receiver>,
-    pub arguments: Vec<FnArg>,
+    pub arguments: Vec<Argument>,
 }
 fn split_inputs_into_maybe_self_type_and_arguments(
     inputs: Punctuated<FnArg, Token![,]>,
@@ -91,7 +93,16 @@ fn split_inputs_into_maybe_self_type_and_arguments(
         FnArg::Receiver(receiver) => Some(receiver.clone()),
         FnArg::Typed(_) => None,
     };
-    let arguments = inputs_iter.collect();
+    let arguments = inputs_iter
+        .map(|fn_arg| match fn_arg {
+            FnArg::Typed(pat_type) => pat_type,
+            unexpected => panic!(
+                "All arguments except first should be `FnArg::Typed`, received: {}.",
+                unexpected.to_token_stream().to_string()
+            ),
+        })
+        .map(argument_preparation::prepare_argument)
+        .collect();
     let result = InputsSplit {
         maybe_self_type,
         arguments,
