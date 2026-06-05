@@ -1,4 +1,4 @@
-use crate::models::r#fn::*;
+use super::*;
 use crate::preparation::r#fn::argument_preparation;
 use crate::syntax::{generics, ident};
 use crate::*;

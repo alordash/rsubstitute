@@ -1,4 +1,4 @@
-use crate::models::r#fn::Argument;
+use super::*;
 use syn::*;
 
 pub(crate) struct FnSyntax {

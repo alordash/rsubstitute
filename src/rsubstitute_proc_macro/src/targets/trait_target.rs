@@ -1,6 +1,6 @@
+use crate::preparation::Context;
 use crate::preparation::r#trait::*;
 use syn::*;
-use crate::models::Context;
 
 pub(crate) fn handle_trait(ctx: Context, item_trait: ItemTrait) {
     let syntax = prepare_trait_syntax(PrepareTraitFnSyntaxArgs {
@@ -10,4 +10,5 @@ pub(crate) fn handle_trait(ctx: Context, item_trait: ItemTrait) {
         generics: item_trait.generics,
         items: item_trait.items,
     });
+    todo!()
 }

@@ -1,6 +1,6 @@
+use crate::preparation::Context;
 use crate::preparation::r#fn::*;
 use syn::*;
-use crate::models::Context;
 
 pub(crate) fn handle_fn(ctx: Context, item_fn: ItemFn) {
     let fn_syntax = prepare_fn_syntax(PrepareFnSyntaxArgs {
@@ -11,4 +11,5 @@ pub(crate) fn handle_fn(ctx: Context, item_fn: ItemFn) {
         maybe_base_impl: Some(item_fn.block),
         maybe_owner: None,
     });
+    todo!()
 }

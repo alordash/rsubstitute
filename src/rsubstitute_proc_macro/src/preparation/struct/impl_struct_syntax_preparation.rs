@@ -1,7 +1,6 @@
-use crate::models::r#fn::IFnOwner;
-use crate::models::r#struct::*;
+use super::*;
+use crate::preparation::r#fn::IFnOwner;
 use crate::preparation::r#fn::{PrepareFnSyntaxArgs, prepare_fn_syntax};
-use crate::syntax::*;
 use proc_macro2::Ident;
 use quote::ToTokens;
 use syn::*;

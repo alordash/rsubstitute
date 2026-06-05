@@ -1,5 +1,5 @@
-use crate::models::r#fn::*;
-use crate::models::*;
+use super::*;
+use crate::preparation::r#fn::*;
 
 pub(crate) struct FnInfo {
     pub syntax: FnSyntax,

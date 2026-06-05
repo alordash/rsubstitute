@@ -1,4 +1,4 @@
-use crate::models::r#fn::*;
+use super::*;
 use proc_macro2::Span;
 use syn::visit_mut::{self, VisitMut};
 use syn::*;

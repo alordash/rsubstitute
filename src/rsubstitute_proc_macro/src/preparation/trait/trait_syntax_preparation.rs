@@ -1,5 +1,5 @@
-use crate::models::r#fn::IFnOwner;
-use crate::models::r#trait::*;
+use super::*;
+use crate::preparation::r#fn::IFnOwner;
 use crate::preparation::r#fn::{PrepareFnSyntaxArgs, prepare_fn_syntax};
 use crate::syntax::*;
 use quote::ToTokens;

@@ -1,13 +1,13 @@
 #![allow(clippy::needless_return)]
 
-use crate::models::*;
-
 mod constants;
 mod entrypoints;
-mod models;
+mod generation;
 mod preparation;
 mod syntax;
 mod targets;
+
+use crate::entrypoints::MockMacroUsage;
 
 // TODO - make it work only in test mode.
 // basically use `#[cfg(test, mock)]` everywhere (same with `mocked!` ?)
