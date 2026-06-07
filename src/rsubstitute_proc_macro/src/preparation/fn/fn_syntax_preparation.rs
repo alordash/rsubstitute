@@ -101,6 +101,7 @@ fn split_inputs_into_maybe_self_type_and_arguments(
                 unexpected.to_token_stream().to_string()
             ),
         })
+        .enumerate()
         .map(argument_preparation::prepare_argument)
         .collect();
     let result = InputsSplit {

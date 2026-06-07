@@ -1,23 +1,26 @@
 use super::models::*;
 use proc_macro2::Span;
+use syn::spanned::Spanned;
 use syn::visit_mut::{self, VisitMut};
 use syn::*;
 
-pub(crate) fn prepare_argument(pat_type: PatType) -> Argument {
-    let ident = prepare_ident(&pat_type);
-    let mut inner = pat_type.clone();
-    let outer = pat_type;
-    replace_refs_with_ptrs(&mut inner.ty);
+pub(crate) fn prepare_argument((number, pat_type): (usize, PatType)) -> Argument {
+    let ident = prepare_ident(number, &pat_type);
+    let mut inner_type = pat_type.ty.clone();
+    replace_refs_with_ptrs(&mut inner_type);
     let result = Argument {
+        pat_type,
         ident,
-        inner,
-        outer,
+        inner_type,
     };
     return result;
 }
 
-fn prepare_ident(pat_type: &PatType) -> Ident {
-    let result = todo!("Use previous version implementation");
+fn prepare_ident(number: usize, pat_type: &PatType) -> Ident {
+    let result = match pat_type.pat.as_ref() {
+        Pat::Ident(pat_ident) => pat_ident.ident.clone(),
+        not_ident => Ident::new(&format!("__pat_arg{number}"), not_ident.span()),
+    };
 
     return result;
 }

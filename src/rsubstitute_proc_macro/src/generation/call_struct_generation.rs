@@ -43,7 +43,7 @@ fn generate_field(argument: &Argument) -> Field {
         mutability: FieldMutability::None,
         ident: Some(argument.ident.clone()),
         colon_token: Some(Default::default()),
-        ty: *argument.inner.ty.clone(),
+        ty: *argument.inner_type.clone(),
     };
 
     return result;

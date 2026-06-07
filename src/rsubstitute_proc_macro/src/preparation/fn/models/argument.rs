@@ -1,7 +1,7 @@
 use syn::*;
 
 pub(crate) struct Argument {
+    pub pat_type: PatType,
     pub ident: Ident,
-    pub inner: PatType,
-    pub outer: PatType,
+    pub inner_type: Box<Type>,
 }
