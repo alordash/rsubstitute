@@ -1,5 +1,7 @@
+use crate::generation::generics_info_provider_generation::generate_generics_info_provider;
 use crate::generation::r#fn::models::CallStruct;
 use crate::preparation::r#fn::models::*;
+use crate::syntax::r#type;
 use quote::format_ident;
 use syn::*;
 
@@ -16,9 +18,17 @@ pub(crate) fn generate_call_struct(fn_syntax: &FnSyntax) -> CallStruct {
         semi_token: None,
     };
 
+    let r#type = Type::Path(r#type::path::new(
+        [&item_struct.ident.to_string()],
+        fn_syntax.fn_ident.span(),
+    ));
+    let generics_info_provider_impl =
+        generate_generics_info_provider(fn_syntax.merged_generics.clone(), r#type.clone());
+
     let result = CallStruct {
+        r#type,
         item_struct,
-        generics_info_provider_impl: todo!(),
+        generics_info_provider_impl,
         args_infos_provider_impl: todo!(),
         args_tuple_provider_impl: todo!(),
     };
