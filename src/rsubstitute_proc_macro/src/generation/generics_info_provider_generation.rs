@@ -1,6 +1,5 @@
-use crate::syntax;
 use crate::syntax::*;
-use quote::{ToTokens, format_ident};
+use quote::ToTokens;
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::*;
@@ -16,9 +15,9 @@ pub(crate) fn generate_generics_info_provider(generics: Generics, target_type: T
         unsafety: None,
         impl_token: Token![impl](span),
         generics,
-        // todo - maybe somehow test that it's equal to real trait
         trait_: Some((
             None,
+            // todo - maybe somehow test that it's equal to real trait
             path::new(["IGenericsInfoProvider"], span),
             Token![for](span),
         )),
@@ -68,8 +67,19 @@ fn generate_get_generic_parameter_infos(generics: &Generics) -> ImplItemFn {
                 ],
                 span,
             ))),
-            GenericParam::Const(_) => {
-                todo!()
+            GenericParam::Const(const_param) => {
+                let const_param_ident_string = const_param.ident.to_string();
+                Some(Expr::Call(expr::call::new(
+                    Expr::Path(expr::path::new(["generic_const_info"], span)),
+                    [
+                        Expr::Lit(ExprLit {
+                            attrs: Vec::new(),
+                            lit: Lit::Str(LitStr::new(&const_param_ident_string, span)),
+                        }),
+                        Expr::Path(expr::path::new([&const_param_ident_string], span)),
+                    ],
+                    span,
+                )))
             }
             _ => None,
         })
