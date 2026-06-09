@@ -4,6 +4,7 @@ use crate::syntax::{generics, ident};
 use crate::*;
 use quote::ToTokens;
 use syn::punctuated::Punctuated;
+use syn::spanned::Spanned;
 use syn::*;
 
 pub(crate) struct PrepareFnSyntaxArgs<'a> {
@@ -27,6 +28,9 @@ pub(crate) fn prepare_fn_syntax(
 ) -> FnSyntax {
     let merged_generics = combine_generics(signature.generics, maybe_owner);
     let fn_ident = format_fn_ident(signature.ident, maybe_owner, &merged_generics);
+    let spans = Spans {
+        inputs: signature.inputs.span(),
+    };
     let InputsSplit {
         maybe_self_type,
         arguments,
@@ -41,6 +45,7 @@ pub(crate) fn prepare_fn_syntax(
         arguments,
         return_type: signature.output,
         maybe_base_impl,
+        spans,
     };
     return result;
 }

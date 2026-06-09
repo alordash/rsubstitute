@@ -1,4 +1,5 @@
 use super::*;
+use proc_macro2::Span;
 use syn::*;
 
 pub(crate) struct FnSyntax {
@@ -11,4 +12,9 @@ pub(crate) struct FnSyntax {
     pub arguments: Vec<Argument>,
     pub return_type: ReturnType,
     pub maybe_base_impl: Option<Box<Block>>,
+    pub spans: Spans,
+}
+
+pub(crate) struct Spans {
+    pub inputs: Span,
 }

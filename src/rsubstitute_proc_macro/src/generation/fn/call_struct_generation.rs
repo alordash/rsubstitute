@@ -1,4 +1,4 @@
-use crate::generation::r#fn::generate_generics_info_provider;
+use crate::generation::r#fn::generate_generics_info_provider_impl;
 use crate::generation::r#fn::models::CallStruct;
 use crate::preparation::r#fn::models::*;
 use crate::syntax::r#type;
@@ -23,7 +23,7 @@ pub(crate) fn generate_call_struct(fn_syntax: &FnSyntax) -> CallStruct {
         fn_syntax.fn_ident.span(),
     ));
     let generics_info_provider_impl =
-        generate_generics_info_provider(fn_syntax.merged_generics.clone(), r#type.clone());
+        generate_generics_info_provider_impl(fn_syntax.merged_generics.clone(), r#type.clone());
 
     let result = CallStruct {
         r#type,
