@@ -1,6 +1,9 @@
+use crate::args::ArgInfo;
 use crate::fn_parameters::DynArgRefsTuple;
 
-pub trait IArgsTupleProvider {
+pub trait IArgsProvider {
+    fn get_arg_infos(&self) -> Vec<ArgInfo>;
+
     fn get_ptr_to_boxed_tuple_of_refs(&self) -> *mut ();
 
     #[doc(hidden)]
