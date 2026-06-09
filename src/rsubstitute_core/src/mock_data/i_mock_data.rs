@@ -5,10 +5,10 @@ pub trait IMockData {
 
     fn verify_received_nothing_else(&self) {
         let all_error_msgs: Vec<_> = self.get_received_nothing_else_error_msgs();
-        let error_msgs: Vec<_> = all_error_msgs.into_iter().flatten().collect();
-        if error_msgs.is_empty() {
+        if all_error_msgs.is_empty() {
             return;
         }
+        let error_msgs: Vec<_> = all_error_msgs.into_iter().flatten().collect();
         error_printing::panic_received_unexpected_calls_error(error_msgs);
     }
 }
