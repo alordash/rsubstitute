@@ -7,3 +7,9 @@ pub mod models {
     pub use call_struct::*;
     pub use fn_info::*;
 }
+
+mod call_struct_generation;
+mod generics_info_provider_generation;
+
+pub use call_struct_generation::*;
+pub use generics_info_provider_generation::*;

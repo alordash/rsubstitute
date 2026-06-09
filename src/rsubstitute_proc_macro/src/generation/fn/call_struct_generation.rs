@@ -1,4 +1,4 @@
-use crate::generation::generics_info_provider_generation::generate_generics_info_provider;
+use crate::generation::r#fn::generate_generics_info_provider;
 use crate::generation::r#fn::models::CallStruct;
 use crate::preparation::r#fn::models::*;
 use crate::syntax::r#type;
