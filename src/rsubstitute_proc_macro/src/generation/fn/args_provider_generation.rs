@@ -4,7 +4,6 @@ use crate::syntax::*;
 use proc_macro2::Span;
 use quote::ToTokens;
 use syn::punctuated::Punctuated;
-use syn::spanned::Spanned;
 use syn::*;
 
 pub(crate) fn generate_args_provider_impl(
@@ -13,11 +12,12 @@ pub(crate) fn generate_args_provider_impl(
     span: Span,
 ) -> ItemImpl {
     let fn_get_arg_infos = generate_fn_get_args_infos(arguments, span);
-    let fn_get_ptr_to_boxed_tuple_of_refs = todo!();
-    let items = vec![ImplItem::Fn(
-        fn_get_arg_infos,
-        fn_get_ptr_to_boxed_tuple_of_refs,
-    )];
+    let fn_get_ptr_to_boxed_tuple_of_refs =
+        generate_fn_get_ptr_to_boxed_tuple_of_refs(arguments, span);
+    let items = vec![
+        ImplItem::Fn(fn_get_arg_infos),
+        ImplItem::Fn(fn_get_ptr_to_boxed_tuple_of_refs),
+    ];
 
     let result = ItemImpl {
         attrs: Vec::new(),
@@ -97,12 +97,7 @@ fn generate_arg_info_new_expr(argument: &Argument) -> Expr {
         },
     });
 
-    let arg_field_expr = Expr::Field(ExprField {
-        attrs: Vec::new(),
-        base: Box::new(Expr::Path(self_path(span))),
-        dot_token: Token![.](span),
-        member: Member::Named(argument.ident.clone()),
-    });
+    let arg_field_expr = Expr::Field(expr::field::new_self(argument.ident.clone()));
     let arg_value_argument = Expr::Reference(ExprReference {
         attrs: Vec::new(),
         and_token: Token![&](span),
@@ -137,6 +132,69 @@ fn generate_arg_info_new_expr(argument: &Argument) -> Expr {
         ],
         span,
     ));
+
+    return result;
+}
+
+fn generate_fn_get_ptr_to_boxed_tuple_of_refs(arguments: &[Argument], span: Span) -> ImplItemFn {
+    let sig = Signature {
+        constness: None,
+        asyncness: None,
+        unsafety: None,
+        abi: None,
+        fn_token: Token![fn](span),
+        ident: Ident::new("get_ptr_to_boxed_tuple_of_refs", span),
+        generics: Generics::default(),
+        paren_token: token::Paren(span),
+        inputs: [ref_self_fn_arg(span)].into_iter().collect(),
+        variadic: None,
+        output: ReturnType::Type(Token!(->)(span), Box::new(mut_ptr_void(span))),
+    };
+
+    let fields: Punctuated<Expr, Token![,]> = arguments
+        .iter()
+        .map(|argument| Expr::Field(expr::field::new_self(argument.ident.clone())))
+        .collect();
+    let tuple = Expr::Tuple(ExprTuple {
+        attrs: Vec::new(),
+        paren_token: token::Paren(span),
+        elems: fields,
+    });
+    let box_new = Expr::Call(expr::call::new(
+        Expr::Path(expr::path::new(["Box", "new"], span)),
+        [tuple],
+        span,
+    ));
+    let box_leak = Expr::Call(expr::call::new(
+        Expr::Path(expr::path::new(["Box", "leak"], span)),
+        [box_new],
+        span,
+    ));
+    let as_mut_infer = Expr::Cast(ExprCast {
+        attrs: Vec::new(),
+        expr: Box::new(box_leak),
+        as_token: Token![as](span),
+        ty: Box::new(mut_ptr_infer(span)),
+    });
+    let as_mut_void = Expr::Cast(ExprCast {
+        attrs: Vec::new(),
+        expr: Box::new(as_mut_infer),
+        as_token: Token![as](span),
+        ty: Box::new(mut_ptr_void(span)),
+    });
+
+    let block = Block {
+        brace_token: token::Brace(span),
+        stmts: vec![Stmt::Expr(as_mut_void, None)],
+    };
+
+    let result = ImplItemFn {
+        attrs: Vec::new(),
+        vis: Visibility::Inherited,
+        defaultness: None,
+        sig,
+        block,
+    };
 
     return result;
 }

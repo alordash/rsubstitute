@@ -1,5 +1,6 @@
 use crate::syntax::*;
 use proc_macro2::Span;
+use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::*;
 
@@ -53,6 +54,33 @@ pub(crate) fn transmute_expr(expr: Expr) -> Expr {
                 None,
             )],
         },
+    });
+
+    return result;
+}
+
+pub(crate) fn mut_ptr_infer(span: Span) -> Type {
+    let result = Type::Ptr(TypePtr {
+        star_token: Token![*](span),
+        const_token: None,
+        mutability: Some(Token![mut](span)),
+        elem: Box::new(Type::Infer(TypeInfer {
+            underscore_token: Token![_](span),
+        })),
+    });
+
+    return result;
+}
+
+pub(crate) fn mut_ptr_void(span: Span) -> Type {
+    let result = Type::Ptr(TypePtr {
+        star_token: Token![*](span),
+        const_token: None,
+        mutability: Some(Token![mut](span)),
+        elem: Box::new(Type::Tuple(TypeTuple {
+            paren_token: token::Paren(span),
+            elems: Punctuated::new(),
+        })),
     });
 
     return result;
