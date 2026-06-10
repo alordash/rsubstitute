@@ -1,5 +1,5 @@
-use crate::generation::r#fn::generate_generics_info_provider_impl;
 use crate::generation::r#fn::models::CallStruct;
+use crate::generation::r#fn::{generate_args_provider_impl, generate_generics_info_provider_impl};
 use crate::preparation::r#fn::models::*;
 use crate::syntax::r#type;
 use quote::format_ident;
@@ -24,13 +24,14 @@ pub(crate) fn generate_call_struct(fn_syntax: &FnSyntax) -> CallStruct {
     ));
     let generics_info_provider_impl =
         generate_generics_info_provider_impl(fn_syntax.merged_generics.clone(), r#type.clone());
+    let args_provider_impl =
+        generate_args_provider_impl(&fn_syntax.arguments, r#type.clone(), fn_syntax.spans.inputs);
 
     let result = CallStruct {
         r#type,
         item_struct,
         generics_info_provider_impl,
-        args_infos_provider_impl: todo!(),
-        args_tuple_provider_impl: todo!(),
+        args_provider_impl,
     };
 
     return result;

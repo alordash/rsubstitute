@@ -1,4 +1,3 @@
-use crate::syntax::expr;
 use proc_macro2::Span;
 use syn::*;
 

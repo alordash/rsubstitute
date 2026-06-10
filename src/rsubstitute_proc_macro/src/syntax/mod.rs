@@ -5,6 +5,7 @@ pub mod path;
 pub mod r#type;
 pub mod expr;
 pub mod attributes;
+pub mod r#macro;
 
 mod common;
 

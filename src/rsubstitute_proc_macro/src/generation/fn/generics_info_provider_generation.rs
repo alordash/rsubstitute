@@ -100,12 +100,7 @@ fn generate_fn_get_generic_parameter_infos<'a>(
         brace_token: token::Brace(span),
         stmts: vec![Stmt::Macro(StmtMacro {
             attrs: Vec::new(),
-            mac: Macro {
-                path: path::new(["vec"], span),
-                bang_token: Token![!](span),
-                delimiter: MacroDelimiter::Bracket(token::Bracket(span)),
-                tokens: generic_parameter_infos.to_token_stream(),
-            },
+            mac: r#macro::vec(generic_parameter_infos.to_token_stream(), span),
             semi_token: None,
         })],
     };

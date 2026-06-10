@@ -1,10 +1,15 @@
-use crate::syntax::r#type;
+use crate::syntax::*;
 use proc_macro2::Span;
+use syn::spanned::Spanned;
 use syn::*;
+
+pub(crate) fn self_path(span: Span) -> ExprPath {
+    let result = expr::path::new(["self"], span);
+    return result;
+}
 
 pub(crate) fn self_type(span: Span) -> TypePath {
     let result = r#type::path::new(["Self"], span);
-
     return result;
 }
 
@@ -27,6 +32,27 @@ pub(crate) fn ref_self_fn_arg(span: Span) -> FnArg {
         self_token: Token!(self)(Span::call_site()),
         colon_token: None,
         ty: Box::new(Type::Reference(ref_self_type(span))),
+    });
+
+    return result;
+}
+
+pub(crate) fn transmute_expr(expr: Expr) -> Expr {
+    let span = expr.span();
+    let result = Expr::Unsafe(ExprUnsafe {
+        attrs: Vec::new(),
+        unsafe_token: Token![unsafe](span),
+        block: Block {
+            brace_token: token::Brace(span),
+            stmts: vec![Stmt::Expr(
+                Expr::Call(expr::call::new(
+                    Expr::Path(expr::path::new(["transmute"], span)),
+                    [expr],
+                    span,
+                )),
+                None,
+            )],
+        },
     });
 
     return result;
