@@ -1,3 +1,4 @@
+use crate::generation::r#fn::*;
 use crate::preparation::models::*;
 use crate::preparation::r#fn::*;
 use syn::*;
@@ -11,5 +12,6 @@ pub(crate) fn handle_fn(ctx: Context, item_fn: ItemFn) {
         maybe_base_impl: Some(item_fn.block),
         maybe_owner: None,
     });
+    let fn_info = generate_fn_info(fn_syntax);
     todo!()
 }
