@@ -9,12 +9,13 @@ use quote::format_ident;
 use syn::*;
 
 pub(crate) fn generate_call_struct(fn_syntax: &FnSyntax) -> CallStruct {
+    let span = fn_syntax.spans.inputs;
     let fields = generate_fields(fn_syntax);
 
     let item_struct = ItemStruct {
         attrs: Vec::new(),
-        vis: Visibility::Public(Default::default()),
-        struct_token: Default::default(),
+        vis: Visibility::Public(Token![pub](span)),
+        struct_token: Token![struct](span),
         ident: format_ident!("{}_Call", fn_syntax.fn_ident),
         generics: fn_syntax.merged_generics.clone(),
         fields,
