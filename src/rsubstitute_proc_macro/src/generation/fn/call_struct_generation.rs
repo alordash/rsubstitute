@@ -1,7 +1,10 @@
+mod args_provider_generation;
+
 use crate::generation::r#fn::models::CallStruct;
-use crate::generation::r#fn::{generate_args_provider_impl, generate_generics_info_provider_impl};
+use crate::generation::r#fn::*;
 use crate::preparation::r#fn::models::*;
 use crate::syntax::r#type;
+use args_provider_generation::*;
 use quote::format_ident;
 use syn::*;
 
