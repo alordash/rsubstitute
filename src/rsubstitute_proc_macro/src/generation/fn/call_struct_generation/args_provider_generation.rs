@@ -1,3 +1,4 @@
+use crate::generation::r#fn::arg_printer_expr;
 use crate::preparation::r#fn::models::*;
 use crate::syntax::r#type::vec_of;
 use crate::syntax::*;
@@ -105,23 +106,8 @@ fn generate_arg_info_new_expr(argument: &Argument) -> Expr {
         expr: Box::new(arg_field_expr.clone()),
     });
 
-    let arg_debug_string_argument = Expr::MethodCall(ExprMethodCall {
-        attrs: Vec::new(),
-        receiver: Box::new(Expr::Call(expr::call::new(
-            Expr::Path(expr::path::new_generics(
-                ["ArgPrinter"],
-                GenericArgument::Type(*argument.pat_type.ty.clone()),
-                span,
-            )),
-            [transmute_expr(arg_field_expr)],
-            span,
-        ))),
-        dot_token: Token![.](span),
-        method: Ident::new("debug_string", span),
-        turbofish: None,
-        paren_token: token::Paren(span),
-        args: Punctuated::new(),
-    });
+    let arg_debug_string_argument =
+        arg_printer_expr::new(arg_field_expr, *argument.pat_type.ty.clone(), span);
 
     let result = Expr::Call(expr::call::new(
         Expr::Path(expr::path::new(["ArgInfo", "new"], span)),

@@ -1,3 +1,4 @@
+use crate::generation::r#fn::generate_generics_info_provider_impl;
 use crate::generation::r#fn::models::*;
 use crate::preparation::r#fn::models::*;
 use quote::format_ident;
@@ -28,6 +29,9 @@ pub(crate) fn generate_args_checker_struct(fn_syntax: &FnSyntax) -> ArgsCheckerS
             .collect(),
         },
     });
+    let generics_info_provider_impl =
+        generate_generics_info_provider_impl(fn_syntax.merged_generics.clone(), r#type.clone());
+
     let result = ArgsCheckerStruct {
         r#type,
         item_struct,
