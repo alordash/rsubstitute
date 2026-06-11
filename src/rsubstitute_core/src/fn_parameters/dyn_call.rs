@@ -6,7 +6,7 @@ pub struct DynCall<'rs> {
     inner: Box<dyn ICall + 'rs>,
 }
 
-impl<'rs> IArgsProvider for DynCall<'rs> {
+impl<'rs> ICall for DynCall<'rs> {
     fn get_arg_infos(&self) -> Vec<ArgInfo> {
         self.inner.get_arg_infos()
     }

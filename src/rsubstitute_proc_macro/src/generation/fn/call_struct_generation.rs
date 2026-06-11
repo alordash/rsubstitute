@@ -1,9 +1,9 @@
-mod args_provider_generation;
+mod call_impl_generation;
 
 use crate::generation::r#fn::models::CallStruct;
 use crate::generation::r#fn::*;
 use crate::preparation::r#fn::models::*;
-use args_provider_generation::*;
+use call_impl_generation::*;
 use quote::format_ident;
 use syn::*;
 
@@ -35,14 +35,13 @@ pub(crate) fn generate_call_struct(fn_syntax: &FnSyntax) -> CallStruct {
     });
     let generics_info_provider_impl =
         generate_generics_info_provider_impl(fn_syntax.merged_generics.clone(), r#type.clone());
-    let args_provider_impl =
-        generate_args_provider_impl(&fn_syntax.arguments, r#type.clone(), span);
+    let call_impl = generate_call_impl(&fn_syntax.arguments, r#type.clone(), span);
 
     let result = CallStruct {
         r#type,
         item_struct,
         generics_info_provider_impl,
-        args_provider_impl,
+        call_impl,
     };
 
     return result;

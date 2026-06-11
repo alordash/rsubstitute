@@ -7,7 +7,7 @@ use quote::ToTokens;
 use syn::punctuated::Punctuated;
 use syn::*;
 
-pub(crate) fn generate_args_provider_impl(
+pub(crate) fn generate_call_impl(
     arguments: &[Argument],
     target_type: Type,
     span: Span,

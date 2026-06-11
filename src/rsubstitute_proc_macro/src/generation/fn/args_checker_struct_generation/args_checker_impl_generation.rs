@@ -3,7 +3,7 @@ use crate::syntax::path;
 use proc_macro2::Span;
 use syn::*;
 
-pub(crate) fn generate_args_formatter_impl(
+pub(crate) fn generate_args_checker_impl(
     arguments: &[Argument],
     target_type: Type,
     span: Span,
