@@ -59,12 +59,13 @@ fn generate_fields(fn_syntax: &FnSyntax) -> Fields {
 }
 
 fn generate_field(argument: &Argument) -> Field {
+    let span = argument.ident.span();
     let result = Field {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
         mutability: FieldMutability::None,
         ident: Some(argument.ident.clone()),
-        colon_token: Some(Token![:](argument.ident.span())),
+        colon_token: Some(Token![:](span)),
         ty: *argument.inner_type.clone(),
     };
 

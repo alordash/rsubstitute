@@ -31,8 +31,8 @@ pub(crate) fn generate_args_checker_struct(fn_syntax: &FnSyntax) -> ArgsCheckerS
     let result = ArgsCheckerStruct {
         r#type,
         item_struct,
-        generics_info_provider_impl,
-        args_formatter_impl,
+        generics_info_provider_impl: todo!(),
+        args_formatter_impl: todo!(),
     };
 
     return result;
@@ -49,13 +49,34 @@ fn generate_fields(fn_syntax: &FnSyntax) -> Fields {
 }
 
 fn generate_field(argument: &Argument) -> Field {
+    let span = argument.ident.span();
+    let ty = TypePath {
+        qself: None,
+        path: Path {
+            leading_colon: None,
+            segments: [PathSegment {
+                ident: Ident::new("Arg", span),
+                arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
+                    colon2_token: None,
+                    lt_token: Token![<](span),
+                    args: [GenericArgument::Type(*argument.inner_type.clone())]
+                        .into_iter()
+                        .collect(),
+                    gt_token: Token![>](span),
+                }),
+            }]
+            .into_iter()
+            .collect(),
+        },
+    };
+
     let result = Field {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
         mutability: FieldMutability::None,
         ident: Some(argument.ident.clone()),
         colon_token: Some(Token![:](argument.ident.span())),
-        ty: todo!(),
+        ty: Type::Path(ty),
     };
 
     return result;
