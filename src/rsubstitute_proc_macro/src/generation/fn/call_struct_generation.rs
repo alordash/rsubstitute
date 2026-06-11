@@ -36,7 +36,7 @@ pub(crate) fn generate_call_struct(fn_syntax: &FnSyntax) -> CallStruct {
     let generics_info_provider_impl =
         generate_generics_info_provider_impl(fn_syntax.merged_generics.clone(), r#type.clone());
     let args_provider_impl =
-        generate_args_provider_impl(&fn_syntax.arguments, r#type.clone(), fn_syntax.spans.inputs);
+        generate_args_provider_impl(&fn_syntax.arguments, r#type.clone(), span);
 
     let result = CallStruct {
         r#type,

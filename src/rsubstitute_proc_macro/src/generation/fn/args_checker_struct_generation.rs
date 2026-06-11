@@ -1,3 +1,6 @@
+mod args_formatter_generation;
+
+use crate::generation::r#fn::args_checker_struct_generation::args_formatter_generation::generate_args_formatter_impl;
 use crate::generation::r#fn::generate_generics_info_provider_impl;
 use crate::generation::r#fn::models::*;
 use crate::preparation::r#fn::models::*;
@@ -31,12 +34,14 @@ pub(crate) fn generate_args_checker_struct(fn_syntax: &FnSyntax) -> ArgsCheckerS
     });
     let generics_info_provider_impl =
         generate_generics_info_provider_impl(fn_syntax.merged_generics.clone(), r#type.clone());
+    let args_formatter_impl =
+        generate_args_formatter_impl(&fn_syntax.arguments, r#type.clone(), span);
 
     let result = ArgsCheckerStruct {
         r#type,
         item_struct,
-        generics_info_provider_impl: todo!(),
-        args_formatter_impl: todo!(),
+        generics_info_provider_impl,
+        args_formatter_impl,
     };
 
     return result;
