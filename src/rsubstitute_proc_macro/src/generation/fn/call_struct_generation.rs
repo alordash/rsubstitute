@@ -1,6 +1,6 @@
 mod call_impl_generation;
 
-use crate::generation::r#fn::models::CallStruct;
+use crate::generation::r#fn::models::*;
 use crate::generation::r#fn::*;
 use crate::preparation::r#fn::models::*;
 use call_impl_generation::*;

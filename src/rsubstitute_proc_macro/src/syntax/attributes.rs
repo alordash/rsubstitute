@@ -3,6 +3,7 @@ use proc_macro2::Span;
 use quote::ToTokens;
 use syn::*;
 
+// TODO - verify that this is actually needed (remove it from generated code and see if there are any warnings)
 pub(crate) fn allow_unused_variables(span: Span) -> Attribute {
     let result = Attribute {
         pound_token: Token![#](span),
