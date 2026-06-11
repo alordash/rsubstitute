@@ -1,7 +1,7 @@
 use proc_macro2::Span;
 use syn::*;
 
-pub(crate) fn new<const N: usize>(path_parts: [&str; N], span: Span) -> Path {
+pub(crate) fn new<const N: usize>(span: Span, path_parts: [&str; N]) -> Path {
     let result = Path {
         leading_colon: None,
         segments: path_parts
@@ -17,11 +17,11 @@ pub(crate) fn new<const N: usize>(path_parts: [&str; N], span: Span) -> Path {
 }
 
 pub(crate) fn new_generics<const N: usize>(
+    span: Span,
     path_parts: [&str; N],
     generic_argument: GenericArgument,
-    span: Span,
 ) -> Path {
-    let mut result = new(path_parts, span);
+    let mut result = new(span, path_parts);
     result
         .segments
         .last_mut()

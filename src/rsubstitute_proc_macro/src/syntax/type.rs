@@ -4,10 +4,10 @@ use syn::*;
 
 pub mod path;
 
-pub(crate) fn vec_of(vec_t: Type, span: Span) -> TypePath {
+pub(crate) fn vec_of(span: Span, vec_t: Type) -> TypePath {
     let result = TypePath {
         qself: None,
-        path: syntax::path::new_generics(["Vec"], GenericArgument::Type(vec_t), span),
+        path: syntax::path::new_generics(span, ["Vec"], GenericArgument::Type(vec_t)),
     };
 
     return result;

@@ -8,13 +8,13 @@ use syn::punctuated::Punctuated;
 use syn::*;
 
 pub(crate) fn generate_call_impl(
+    span: Span,
     arguments: &[Argument],
     target_type: Type,
-    span: Span,
 ) -> ItemImpl {
-    let fn_get_arg_infos = generate_fn_get_args_infos(arguments, span);
+    let fn_get_arg_infos = generate_fn_get_args_infos(span, arguments);
     let fn_get_ptr_to_boxed_tuple_of_refs =
-        generate_fn_get_ptr_to_boxed_tuple_of_refs(arguments, span);
+        generate_fn_get_ptr_to_boxed_tuple_of_refs(span, arguments);
     let items = vec![
         ImplItem::Fn(fn_get_arg_infos),
         ImplItem::Fn(fn_get_ptr_to_boxed_tuple_of_refs),
@@ -26,7 +26,7 @@ pub(crate) fn generate_call_impl(
         unsafety: None,
         impl_token: Token![impl](span),
         generics: Generics::default(),
-        trait_: Some((None, path::new(["IArgsProvider"], span), Token![for](span))),
+        trait_: Some((None, path::new(span, ["IArgsProvider"]), Token![for](span))),
         self_ty: Box::new(target_type),
         brace_token: token::Brace(span),
         items,
@@ -35,7 +35,7 @@ pub(crate) fn generate_call_impl(
     return result;
 }
 
-fn generate_fn_get_args_infos(arguments: &[Argument], span: Span) -> ImplItemFn {
+fn generate_fn_get_args_infos(span: Span, arguments: &[Argument]) -> ImplItemFn {
     let sig = Signature {
         constness: None,
         asyncness: None,
@@ -50,8 +50,8 @@ fn generate_fn_get_args_infos(arguments: &[Argument], span: Span) -> ImplItemFn 
         output: ReturnType::Type(
             Token!(->)(span),
             Box::new(Type::Path(vec_of(
-                Type::Path(r#type::path::new(["ArgInfo"], span)),
                 span,
+                Type::Path(r#type::path::new(span, ["ArgInfo"])),
             ))),
         ),
     };
@@ -61,7 +61,7 @@ fn generate_fn_get_args_infos(arguments: &[Argument], span: Span) -> ImplItemFn 
     let vec_stmt = Stmt::Expr(
         Expr::Macro(ExprMacro {
             attrs: Vec::new(),
-            mac: r#macro::vec(arg_info_new_exprs.to_token_stream(), span),
+            mac: r#macro::vec(span, arg_info_new_exprs.to_token_stream()),
         }),
         None,
     );
@@ -107,22 +107,22 @@ fn generate_arg_info_new_expr(argument: &Argument) -> Expr {
     });
 
     let arg_debug_string_argument =
-        arg_printer_expr::new(arg_field_expr, *argument.pat_type.ty.clone(), span);
+        arg_printer_expr::new(span, arg_field_expr, *argument.pat_type.ty.clone());
 
     let result = Expr::Call(expr::call::new(
-        Expr::Path(expr::path::new(["ArgInfo", "new"], span)),
+        span,
+        Expr::Path(expr::path::new(span, ["ArgInfo", "new"])),
         [
             arg_name_argument,
             arg_value_argument,
             arg_debug_string_argument,
         ],
-        span,
     ));
 
     return result;
 }
 
-fn generate_fn_get_ptr_to_boxed_tuple_of_refs(arguments: &[Argument], span: Span) -> ImplItemFn {
+fn generate_fn_get_ptr_to_boxed_tuple_of_refs(span: Span, arguments: &[Argument]) -> ImplItemFn {
     let sig = Signature {
         constness: None,
         asyncness: None,
@@ -147,14 +147,14 @@ fn generate_fn_get_ptr_to_boxed_tuple_of_refs(arguments: &[Argument], span: Span
         elems: fields,
     });
     let box_new = Expr::Call(expr::call::new(
-        Expr::Path(expr::path::new(["Box", "new"], span)),
-        [tuple],
         span,
+        Expr::Path(expr::path::new(span, ["Box", "new"])),
+        [tuple],
     ));
     let box_leak = Expr::Call(expr::call::new(
-        Expr::Path(expr::path::new(["Box", "leak"], span)),
-        [box_new],
         span,
+        Expr::Path(expr::path::new(span, ["Box", "leak"])),
+        [box_new],
     ));
     let as_mut_infer = Expr::Cast(ExprCast {
         attrs: Vec::new(),

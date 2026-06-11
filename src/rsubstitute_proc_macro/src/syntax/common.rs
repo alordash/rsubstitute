@@ -1,17 +1,15 @@
 use crate::syntax::*;
 use proc_macro2::Span;
-use quote::ToTokens;
 use syn::punctuated::Punctuated;
-use syn::spanned::Spanned;
 use syn::*;
 
 pub(crate) fn self_path(span: Span) -> ExprPath {
-    let result = expr::path::new(["self"], span);
+    let result = expr::path::new(span, ["self"]);
     return result;
 }
 
 pub(crate) fn self_type(span: Span) -> TypePath {
-    let result = r#type::path::new(["Self"], span);
+    let result = r#type::path::new(span, ["Self"]);
     return result;
 }
 

@@ -34,7 +34,7 @@ pub(crate) fn generate_args_checker_struct(fn_syntax: &FnSyntax) -> ArgsCheckerS
     });
     let generics_info_provider_impl =
         generate_generics_info_provider_impl(fn_syntax.merged_generics.clone(), r#type.clone());
-    let args_checker_impl = generate_args_checker_impl(&fn_syntax.arguments, r#type.clone(), span);
+    let args_checker_impl = generate_args_checker_impl(span, &fn_syntax.arguments, r#type.clone());
 
     let result = ArgsCheckerStruct {
         r#type,

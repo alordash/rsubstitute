@@ -4,11 +4,11 @@ use proc_macro2::Span;
 use syn::punctuated::Punctuated;
 use syn::*;
 
-pub(crate) fn new(expr: Expr, target_type: Type, span: Span) -> Expr {
+pub(crate) fn new(span: Span, expr: Expr, target_type: Type) -> Expr {
     let arg_printer = Expr::Call(expr::call::new(
-        Expr::Path(expr::path::new(["ArgPrinter"], span)),
-        [transmute_lifetime_expr::new(expr, target_type)],
         span,
+        Expr::Path(expr::path::new(span, ["ArgPrinter"])),
+        [transmute_lifetime_expr::new(expr, target_type)],
     ));
     let arg_printer_ref = Expr::Reference(ExprReference {
         attrs: Vec::new(),

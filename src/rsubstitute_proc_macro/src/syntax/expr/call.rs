@@ -1,7 +1,7 @@
 use proc_macro2::Span;
 use syn::*;
 
-pub(crate) fn new<const N: usize>(func: Expr, args: [Expr; N], span: Span) -> ExprCall {
+pub(crate) fn new<const N: usize>(span: Span, func: Expr, args: [Expr; N]) -> ExprCall {
     let result = ExprCall {
         attrs: Vec::new(),
         func: Box::new(func),

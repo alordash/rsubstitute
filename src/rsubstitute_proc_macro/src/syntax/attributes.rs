@@ -10,7 +10,7 @@ pub(crate) fn allow_unused_variables(span: Span) -> Attribute {
         style: AttrStyle::Outer,
         bracket_token: token::Bracket(span),
         meta: Meta::List(MetaList {
-            path: path::new(["allow"], span),
+            path: path::new(span, ["allow"]),
             delimiter: MacroDelimiter::Paren(token::Paren(span)),
             tokens: Ident::new("unused_variables", span).to_token_stream(),
         }),
