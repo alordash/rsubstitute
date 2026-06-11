@@ -3,7 +3,6 @@ mod args_provider_generation;
 use crate::generation::r#fn::models::CallStruct;
 use crate::generation::r#fn::*;
 use crate::preparation::r#fn::models::*;
-use crate::syntax::r#type;
 use args_provider_generation::*;
 use quote::format_ident;
 use syn::*;
@@ -22,10 +21,18 @@ pub(crate) fn generate_call_struct(fn_syntax: &FnSyntax) -> CallStruct {
         semi_token: None,
     };
 
-    let r#type = Type::Path(r#type::path::new(
-        [&item_struct.ident.to_string()],
-        fn_syntax.fn_ident.span(),
-    ));
+    let r#type = Type::Path(TypePath {
+        qself: None,
+        path: Path {
+            leading_colon: None,
+            segments: [PathSegment {
+                ident: item_struct.ident.clone(),
+                arguments: PathArguments::None,
+            }]
+            .into_iter()
+            .collect(),
+        },
+    });
     let generics_info_provider_impl =
         generate_generics_info_provider_impl(fn_syntax.merged_generics.clone(), r#type.clone());
     let args_provider_impl =
@@ -43,7 +50,7 @@ pub(crate) fn generate_call_struct(fn_syntax: &FnSyntax) -> CallStruct {
 
 fn generate_fields(fn_syntax: &FnSyntax) -> Fields {
     let fields_named = FieldsNamed {
-        brace_token: Default::default(),
+        brace_token: token::Brace(fn_syntax.spans.inputs),
         named: fn_syntax.arguments.iter().map(generate_field).collect(),
     };
     let result = Fields::Named(fields_named);
@@ -57,7 +64,7 @@ fn generate_field(argument: &Argument) -> Field {
         vis: Visibility::Inherited,
         mutability: FieldMutability::None,
         ident: Some(argument.ident.clone()),
-        colon_token: Some(Default::default()),
+        colon_token: Some(Token![:](argument.ident.span())),
         ty: *argument.inner_type.clone(),
     };
 
