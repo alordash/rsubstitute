@@ -7,7 +7,10 @@ use args_checker_impl_generation::*;
 use quote::format_ident;
 use syn::*;
 
-pub(crate) fn generate_args_checker_struct(fn_syntax: &FnSyntax) -> ArgsCheckerStruct {
+pub(crate) fn generate_args_checker_struct(
+    fn_syntax: &FnSyntax,
+    call_struct_type: Type,
+) -> ArgsCheckerStruct {
     let span = fn_syntax.spans.inputs;
     let fields = generate_fields(fn_syntax);
     let item_struct = ItemStruct {
@@ -34,7 +37,8 @@ pub(crate) fn generate_args_checker_struct(fn_syntax: &FnSyntax) -> ArgsCheckerS
     });
     let generics_info_provider_impl =
         generate_generics_info_provider_impl(fn_syntax.merged_generics.clone(), r#type.clone());
-    let args_checker_impl = generate_args_checker_impl(span, &fn_syntax.arguments, r#type.clone());
+    let args_checker_impl =
+        generate_args_checker_impl(span, &fn_syntax.arguments, r#type.clone(), call_struct_type);
 
     let result = ArgsCheckerStruct {
         r#type,

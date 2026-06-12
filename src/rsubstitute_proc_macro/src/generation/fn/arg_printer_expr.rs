@@ -1,7 +1,6 @@
 use crate::generation::r#fn::transmute_lifetime_expr;
 use crate::syntax::*;
 use proc_macro2::Span;
-use syn::punctuated::Punctuated;
 use syn::*;
 
 pub(crate) fn new(span: Span, expr: Expr, target_type: Type) -> Expr {
@@ -21,15 +20,12 @@ pub(crate) fn new(span: Span, expr: Expr, target_type: Type) -> Expr {
         paren_token: token::Paren(span),
         expr: Box::new(arg_printer_ref),
     });
-    let result = Expr::MethodCall(ExprMethodCall {
-        attrs: Vec::new(),
-        receiver: Box::new(arg_printer_ref_paren),
-        dot_token: Token![.](span),
-        method: Ident::new("debug_string", span),
-        turbofish: None,
-        paren_token: token::Paren(span),
-        args: Punctuated::new(),
-    });
+    let result = expr::method_call::new(
+        span,
+        arg_printer_ref_paren,
+        Ident::new("debug_string", span),
+        [],
+    );
 
-    return result;
+    return Expr::MethodCall(result);
 }
