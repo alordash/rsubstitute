@@ -1,5 +1,5 @@
 use crate::preparation::r#fn::models::*;
-use crate::syntax::{path, r#type};
+use crate::syntax::{path, r#type, ref_self_fn_arg};
 use proc_macro2::Span;
 use syn::*;
 
@@ -28,6 +28,7 @@ pub(crate) fn generate_args_checker_impl(
 }
 
 fn generate_fn_check(span: Span, arguments: &[Argument]) -> ImplItemFn {
+    let dyn_call_arg_path = path::new(span, ["dyn_call"]);
     let sig = Signature {
         constness: None,
         asyncness: None,
@@ -37,7 +38,26 @@ fn generate_fn_check(span: Span, arguments: &[Argument]) -> ImplItemFn {
         ident: Ident::new("check", span),
         generics: Generics::default(),
         paren_token: token::Paren(span),
-        inputs: todo!(),
+        inputs: [
+            ref_self_fn_arg(span),
+            FnArg::Typed(PatType {
+                attrs: Vec::new(),
+                pat: Box::new(Pat::Path(PatPath {
+                    attrs: Vec::new(),
+                    qself: None,
+                    path: dyn_call_arg_path,
+                })),
+                colon_token: Token![:](span),
+                ty: Box::new(Type::Reference(TypeReference {
+                    and_token: Token![&](span),
+                    lifetime: None,
+                    mutability: None,
+                    elem: Box::new(Type::Path(r#type::path::new(span, ["DynCall"]))),
+                })),
+            }),
+        ]
+        .into_iter()
+        .collect(),
         variadic: None,
         output: ReturnType::Type(
             Token!(->)(span),
@@ -48,7 +68,12 @@ fn generate_fn_check(span: Span, arguments: &[Argument]) -> ImplItemFn {
         ),
     };
 
-    let block = todo!();
+    let call_stmt = todo!();
+    let vec_stmt = todo!();
+    let block = Block {
+        brace_token: token::Brace(span),
+        stmts: vec![call_stmt, vec_stmt],
+    };
 
     let result = ImplItemFn {
         attrs: Vec::new(),
