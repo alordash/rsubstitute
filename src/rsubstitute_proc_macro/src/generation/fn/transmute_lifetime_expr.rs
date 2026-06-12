@@ -4,12 +4,27 @@ use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::*;
 
-pub(crate) fn new(expr: Expr, target_type: Type) -> Expr {
+pub(crate) fn new(expr: Expr) -> ExprMacro {
+    let span = expr.span();
+    let result = ExprMacro {
+        attrs: Vec::new(),
+        mac: Macro {
+            path: path::new(span, ["transmute_lifetime"]),
+            bang_token: Token![!](span),
+            delimiter: MacroDelimiter::Paren(token::Paren(span)),
+            tokens: expr.to_token_stream(),
+        },
+    };
+
+    return result;
+}
+
+pub(crate) fn new_with_target(expr: Expr, target_type: Type) -> ExprMacro {
     let span = expr.span();
     let args: Punctuated<Expr, Token![,]> = [expr, Expr::Verbatim(target_type.to_token_stream())]
         .into_iter()
         .collect();
-    let result = Expr::Macro(ExprMacro {
+    let result = ExprMacro {
         attrs: Vec::new(),
         mac: Macro {
             path: path::new(span, ["transmute_lifetime"]),
@@ -17,7 +32,7 @@ pub(crate) fn new(expr: Expr, target_type: Type) -> Expr {
             delimiter: MacroDelimiter::Paren(token::Paren(span)),
             tokens: args.to_token_stream(),
         },
-    });
+    };
 
     return result;
 }

@@ -1,6 +1,8 @@
+use crate::generation::r#fn::transmute_lifetime_expr;
 use crate::preparation::r#fn::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
+use syn::punctuated::Punctuated;
 use syn::*;
 
 pub(crate) fn generate_args_checker_impl(
@@ -103,6 +105,26 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
         }),
         semi_token: Token![;](span),
     });
+    let vec_stmt_exprs: Punctuated<Expr, Token![,]> = arguments
+        .iter()
+        .map(|argument| {
+            let result = expr::method_call::new(
+                span,
+                Expr::Macro(transmute_lifetime_expr::new_with_target(
+                    Expr::Reference(ExprReference {
+                        attrs: Vec::new(),
+                        and_token: Token![&](span),
+                        mutability: None,
+                        expr: Box::new(Expr::Field(expr::field::new_self(argument.ident.clone()))),
+                    }),
+                    todo!(Arg<arg_type>),
+                )),
+                Ident::new("check_ref", argument.ident.span()),
+                [],
+            );
+            return Expr::MethodCall(result);
+        })
+        .collect();
     let vec_stmt = todo!();
     let block = Block {
         brace_token: token::Brace(span),
