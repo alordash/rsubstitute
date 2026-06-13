@@ -1,4 +1,4 @@
-use crate::generation::r#fn::{arg_printer_expr, arg_type, transmute_lifetime_expr};
+use crate::generation::r#fn::*;
 use crate::preparation::r#fn::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
@@ -129,7 +129,15 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
                         mutability: None,
                         expr: Box::new(Expr::Field(expr::field::new_self(argument.ident.clone()))),
                     }),
-                    Type::Path(arg_type::of(span, *argument.pat_type.ty.clone())),
+                    Type::Reference(TypeReference {
+                        and_token: Token![&](span),
+                        lifetime: None,
+                        mutability: None,
+                        elem: Box::new(Type::Path(arg_type::of(
+                            span,
+                            *argument.pat_type.ty.clone(),
+                        ))),
+                    }),
                 )),
                 Ident::new("check_ref", span),
                 [
@@ -175,7 +183,72 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
 }
 
 fn generate_fn_fmt_args(span: Span, arguments: &[Argument]) -> ImplItemFn {
-    let result = todo!();
+    let sig = Signature {
+        constness: None,
+        asyncness: None,
+        unsafety: None,
+        abi: None,
+        fn_token: Token![fn](span),
+        ident: Ident::new("fmt_args", span),
+        generics: Generics::default(),
+        paren_token: token::Paren(span),
+        inputs: [ref_self_fn_arg(span)].into_iter().collect(),
+        variadic: None,
+        output: ReturnType::Type(
+            Token!(->)(span),
+            Box::new(Type::Path(r#type::path::new(span, ["String"]))),
+        ),
+    };
+
+    let format_template_lit = Expr::Lit(ExprLit {
+        attrs: Vec::new(),
+        lit: Lit::Str(LitStr::new(&vec!["{}"; arguments.len()].join(", "), span)),
+    });
+    let arg_print_exprs = arguments.iter().map(|argument| {
+        arg_printer_expr::new(
+            span,
+            Expr::Reference(ExprReference {
+                attrs: Vec::new(),
+                and_token: Token![&](span),
+                mutability: None,
+                expr: Box::new(Expr::Field(expr::field::new_self(argument.ident.clone()))),
+            }),
+            Type::Reference(TypeReference {
+                and_token: Token![&](span),
+                lifetime: None,
+                mutability: None,
+                elem: Box::new(Type::Path(arg_type::of(
+                    span,
+                    *argument.pat_type.ty.clone(),
+                ))),
+            }),
+        )
+    });
+
+    let format_expr_args: Punctuated<Expr, Token![,]> = core::iter::once(format_template_lit)
+        .chain(arg_print_exprs)
+        .collect();
+    let format_expr = ExprMacro {
+        attrs: Vec::new(),
+        mac: Macro {
+            path: path::new(span, ["format"]),
+            bang_token: Token![!](span),
+            delimiter: MacroDelimiter::Paren(token::Paren(span)),
+            tokens: format_expr_args.to_token_stream(),
+        },
+    };
+    let block = Block {
+        brace_token: token::Brace(span),
+        stmts: vec![Stmt::Expr(Expr::Macro(format_expr), None)],
+    };
+
+    let result = ImplItemFn {
+        attrs: Vec::new(),
+        vis: Visibility::Inherited,
+        defaultness: None,
+        sig,
+        block,
+    };
 
     return result;
 }
