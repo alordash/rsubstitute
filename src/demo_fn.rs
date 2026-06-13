@@ -97,6 +97,13 @@ mod accept_two_mut_refs_return_mut_ref {
         pub accept_two_mut_refs_return_mut_ref:
             FnData<'static, accept_two_mut_refs_return_mut_refMock, true, false>,
     }
+    impl IMockData for accept_two_mut_refs_return_mut_refMockData {
+        fn get_received_nothing_else_error_msgs(&self) -> Vec<Vec<String>> {
+            return vec![self
+                .accept_two_mut_refs_return_mut_ref
+                .get_unexpected_calls_error_msgs()];
+        }
+    }
     #[doc(hidden)]
     pub struct accept_two_mut_refs_return_mut_refMockSetup {
         data: Arc<accept_two_mut_refs_return_mut_refMockData>,

@@ -63,3 +63,12 @@ pub(crate) fn mut_ptr_void(span: Span) -> Type {
 
     return result;
 }
+
+pub(crate) fn static_lifetime(span: Span) -> Lifetime {
+    let result = Lifetime {
+        apostrophe: span,
+        ident: Ident::new("static", span),
+    };
+
+    return result;
+}

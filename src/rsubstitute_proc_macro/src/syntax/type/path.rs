@@ -10,3 +10,20 @@ pub(crate) fn new<const N: usize>(span: Span, path_parts: [&str; N]) -> TypePath
 
     return result;
 }
+
+pub(crate) fn from_ident(ident: Ident) -> TypePath {
+    let result = TypePath {
+        qself: None,
+        path: Path {
+            leading_colon: None,
+            segments: [PathSegment {
+                ident,
+                arguments: PathArguments::None,
+            }]
+            .into_iter()
+            .collect(),
+        },
+    };
+
+    return result;
+}

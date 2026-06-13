@@ -1,0 +1,108 @@
+use crate::generation::mock_controls::models::*;
+use crate::generation::r#fn::models::*;
+use crate::syntax::{r#type, static_lifetime};
+use proc_macro2::Span;
+use quote::format_ident;
+use syn::*;
+
+pub(crate) fn generate_mock_data(
+    span: Span,
+    target_ident: Ident,
+    mock_type: Type,
+    fn_infos: &[FnInfo],
+    support_base_calling: bool,
+    store_mock_data: bool,
+) -> MockDataStruct {
+    let fields_named = generate_fields(
+        span,
+        mock_type,
+        fn_infos,
+        support_base_calling,
+        store_mock_data,
+    );
+
+    let item_struct = ItemStruct {
+        attrs: Vec::new(),
+        vis: Visibility::Public(Token![pub](span)),
+        struct_token: Token![struct](span),
+        ident: format_ident!("{target_ident}MockData"),
+        generics: Generics::default(),
+        fields: Fields::Named(fields_named),
+        semi_token: None,
+    };
+
+    let r#type = Type::Path(r#type::path::from_ident(item_struct.ident.clone()));
+    let mock_data_impl = todo!();
+
+    let result = MockDataStruct {
+        r#type,
+        item_struct,
+        mock_data_impl,
+    };
+
+    return result;
+}
+
+fn generate_fields(
+    span: Span,
+    mock_type: Type,
+    fn_infos: &[FnInfo],
+    support_base_calling: bool,
+    store_mock_data: bool,
+) -> FieldsNamed {
+    let result = FieldsNamed {
+        brace_token: token::Brace(span),
+        named: fn_infos
+            .iter()
+            .map(|fn_info| {
+                let span = fn_info.syntax.spans.inputs;
+                let result = Field {
+                    attrs: Vec::new(),
+                    vis: Visibility::Inherited,
+                    mutability: FieldMutability::None,
+                    ident: Some(fn_info.syntax.fn_ident.clone()),
+                    colon_token: Some(Token![:](span)),
+                    ty: Type::Path(TypePath {
+                        qself: None,
+                        path: Path {
+                            leading_colon: None,
+                            segments: [PathSegment {
+                                ident: Ident::new("FnData", span),
+                                arguments: PathArguments::AngleBracketed(
+                                    AngleBracketedGenericArguments {
+                                        colon2_token: None,
+                                        lt_token: Token![<](span),
+                                        args: [
+                                            GenericArgument::Lifetime(static_lifetime(span)),
+                                            GenericArgument::Type(mock_type.clone()),
+                                            fn_data_bool(span, support_base_calling),
+                                            fn_data_bool(span, store_mock_data),
+                                        ]
+                                        .into_iter()
+                                        .collect(),
+                                        gt_token: Token![>](span),
+                                    },
+                                ),
+                            }]
+                            .into_iter()
+                            .collect(),
+                        },
+                    }),
+                };
+
+                return result;
+            })
+            .collect(),
+    };
+
+    return result;
+}
+
+fn fn_data_bool(span: Span, value: bool) -> GenericArgument {
+    let result = GenericArgument::Const(Expr::Lit(ExprLit {
+        attrs: Vec::new(),
+        lit: Lit::Bool(LitBool::new(value, span)),
+    }));
+
+    return result;
+}
