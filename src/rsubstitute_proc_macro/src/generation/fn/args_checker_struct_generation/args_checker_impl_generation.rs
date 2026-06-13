@@ -1,8 +1,10 @@
-use crate::generation::r#fn::transmute_lifetime_expr;
+use crate::generation::r#fn::{arg_printer_expr, arg_type, transmute_lifetime_expr};
 use crate::preparation::r#fn::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
+use quote::ToTokens;
 use syn::punctuated::Punctuated;
+use syn::spanned::Spanned;
 use syn::*;
 
 pub(crate) fn generate_args_checker_impl(
@@ -71,6 +73,7 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
         ),
     };
 
+    let call_path = path::new(span, ["call"]);
     let call_stmt = Stmt::Local(Local {
         attrs: Vec::new(),
         let_token: Token![let](span),
@@ -79,7 +82,7 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
             pat: Box::new(Pat::Path(PatPath {
                 attrs: Vec::new(),
                 qself: None,
-                path: path::new(span, ["span"]),
+                path: call_path.clone(),
             })),
             colon_token: Token![:](span),
             ty: Box::new(Type::Reference(TypeReference {
@@ -108,6 +111,15 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
     let vec_stmt_exprs: Punctuated<Expr, Token![,]> = arguments
         .iter()
         .map(|argument| {
+            let span = argument.pat_type.span();
+            let call_field = Expr::Field(expr::field::new(
+                Expr::Path(ExprPath {
+                    attrs: Vec::new(),
+                    qself: None,
+                    path: call_path.clone(),
+                }),
+                argument.ident.clone(),
+            ));
             let result = expr::method_call::new(
                 span,
                 Expr::Macro(transmute_lifetime_expr::new_with_target(
@@ -117,15 +129,35 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
                         mutability: None,
                         expr: Box::new(Expr::Field(expr::field::new_self(argument.ident.clone()))),
                     }),
-                    todo!(Arg<arg_type>),
+                    Type::Path(arg_type::of(span, *argument.pat_type.ty.clone())),
                 )),
-                Ident::new("check_ref", argument.ident.span()),
-                [],
+                Ident::new("check_ref", span),
+                [
+                    Expr::Lit(ExprLit {
+                        attrs: Vec::new(),
+                        lit: Lit::Str(LitStr::new(&argument.ident.to_string(), span)),
+                    }),
+                    Expr::Macro(transmute_lifetime_expr::new(Expr::Reference(
+                        ExprReference {
+                            attrs: Vec::new(),
+                            and_token: Token![&](span),
+                            mutability: None,
+                            expr: Box::new(call_field.clone()),
+                        },
+                    ))),
+                    arg_printer_expr::new(span, call_field, *argument.pat_type.ty.clone()),
+                ],
             );
             return Expr::MethodCall(result);
         })
         .collect();
-    let vec_stmt = todo!();
+    let vec_stmt = Stmt::Expr(
+        Expr::Macro(ExprMacro {
+            attrs: Vec::new(),
+            mac: r#macro::vec(span, vec_stmt_exprs.to_token_stream()),
+        }),
+        None,
+    );
     let block = Block {
         brace_token: token::Brace(span),
         stmts: vec![call_stmt, vec_stmt],

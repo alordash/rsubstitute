@@ -62,25 +62,7 @@ fn generate_fields(fn_syntax: &FnSyntax) -> Fields {
 
 fn generate_field(argument: &Argument) -> Field {
     let span = argument.ident.span();
-    let ty = TypePath {
-        qself: None,
-        path: Path {
-            leading_colon: None,
-            segments: [PathSegment {
-                ident: Ident::new("Arg", span),
-                arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
-                    colon2_token: None,
-                    lt_token: Token![<](span),
-                    args: [GenericArgument::Type(*argument.inner_type.clone())]
-                        .into_iter()
-                        .collect(),
-                    gt_token: Token![>](span),
-                }),
-            }]
-            .into_iter()
-            .collect(),
-        },
-    };
+    let ty = arg_type::of(span, *argument.inner_type.clone());
 
     let result = Field {
         attrs: Vec::new(),
