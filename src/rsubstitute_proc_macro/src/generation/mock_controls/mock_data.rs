@@ -8,7 +8,7 @@ use quote::format_ident;
 use syn::*;
 
 pub(crate) fn generate(
-    span: Span,
+    source_span: Span,
     target_ident: Ident,
     mock_type: Type,
     fn_infos: &[FnInfo],
@@ -16,7 +16,7 @@ pub(crate) fn generate(
     store_mock_data: bool,
 ) -> MockDataStruct {
     let fields_named = generate_fields(
-        span,
+        source_span,
         mock_type,
         fn_infos,
         support_base_calling,
@@ -25,8 +25,8 @@ pub(crate) fn generate(
 
     let item_struct = ItemStruct {
         attrs: Vec::new(),
-        vis: Visibility::Public(Token![pub](span)),
-        struct_token: Token![struct](span),
+        vis: Visibility::Public(Token![pub](source_span)),
+        struct_token: Token![struct](source_span),
         ident: format_ident!("{target_ident}MockData"),
         generics: Generics::default(),
         fields: Fields::Named(fields_named),
@@ -34,7 +34,7 @@ pub(crate) fn generate(
     };
 
     let r#type = Type::Path(r#type::path::from_ident(item_struct.ident.clone()));
-    let mock_data_impl = mock_data_impl::generate(span, fn_infos, r#type.clone());
+    let mock_data_impl = mock_data_impl::generate(source_span, fn_infos, r#type.clone());
 
     let result = MockDataStruct {
         r#type,
@@ -46,14 +46,14 @@ pub(crate) fn generate(
 }
 
 fn generate_fields(
-    span: Span,
+    source_span: Span,
     mock_type: Type,
     fn_infos: &[FnInfo],
     support_base_calling: bool,
     store_mock_data: bool,
 ) -> FieldsNamed {
     let result = FieldsNamed {
-        brace_token: token::Brace(span),
+        brace_token: token::Brace(source_span),
         named: fn_infos
             .iter()
             .map(|fn_info| {
