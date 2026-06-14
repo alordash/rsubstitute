@@ -4,6 +4,4 @@ pub mod models {
     pub use impl_struct_syntax::*;
 }
 
-mod impl_struct_syntax_preparation;
-
-pub use impl_struct_syntax_preparation::*;
+pub mod impl_struct_syntax;

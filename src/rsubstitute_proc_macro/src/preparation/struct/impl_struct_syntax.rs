@@ -1,24 +1,24 @@
 use super::models::*;
 use crate::preparation::r#fn::models::IFnOwner;
-use crate::preparation::r#fn::{PrepareFnSyntaxArgs, prepare_fn_syntax};
+use crate::preparation::r#fn::*;
 use proc_macro2::Ident;
 use quote::ToTokens;
 use syn::*;
 
-pub(crate) struct PrepareImplStructSyntaxArgs {
+pub(crate) struct Params {
     pub attributes: Vec<Attribute>,
     pub generics: Generics,
     pub target_type: Box<Type>,
     pub impl_items: Vec<ImplItem>,
 }
 
-pub(crate) fn prepare_impl_struct_syntax(
-    PrepareImplStructSyntaxArgs {
+pub(crate) fn new(
+    Params {
         attributes,
         generics,
         target_type,
         impl_items,
-    }: PrepareImplStructSyntaxArgs,
+    }: Params,
 ) -> ImplStructSyntax {
     let SplitItems {
         constants,
@@ -36,7 +36,7 @@ pub(crate) fn prepare_impl_struct_syntax(
     let methods = fns
         .into_iter()
         .map(|x| {
-            prepare_fn_syntax(PrepareFnSyntaxArgs {
+            fn_syntax::new(fn_syntax::Params {
                 attributes: x.attrs,
                 visibility: Visibility::Inherited,
                 signature: x.sig,

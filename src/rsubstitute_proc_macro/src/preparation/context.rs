@@ -2,7 +2,7 @@ use super::models::*;
 use crate::constants;
 use crate::entrypoints::models::*;
 
-pub(crate) fn create_context_for_automock_macro(
+pub(crate) fn create_for_automock_macro(
     proc_macro_attribute: proc_macro::TokenStream,
 ) -> Context {
     if proc_macro_attribute.is_empty() {
@@ -23,7 +23,7 @@ pub(crate) fn create_context_for_automock_macro(
     return ctx;
 }
 
-pub(crate) fn create_context_for_mock_macro(mock_macro_usage: MockMacroUsage) -> Context {
+pub(crate) fn create_for_mock_macro(mock_macro_usage: MockMacroUsage) -> Context {
     let support_base_calling = match mock_macro_usage {
         MockMacroUsage::Simple => DEFAULT_SUPPORT_BASE_CALLING,
         #[cfg(not(feature = "mock_base_by_default"))]

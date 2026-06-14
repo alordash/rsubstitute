@@ -3,7 +3,7 @@ use crate::preparation::r#struct::*;
 use syn::*;
 
 pub(crate) fn handle_impl(ctx: Context, item_impl: ItemImpl) {
-    let syntax = prepare_impl_struct_syntax(PrepareImplStructSyntaxArgs {
+    let syntax = impl_struct_syntax::new(impl_struct_syntax::Params {
         attributes: item_impl.attrs,
         generics: item_impl.generics,
         target_type: item_impl.self_ty,

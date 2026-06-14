@@ -1,23 +1,20 @@
-mod call_impl_generation;
+mod args_checker_impl;
 
-use crate::generation::r#fn::common::generics_info_provider_impl;
+use crate::generation::r#fn::common::*;
 use crate::generation::r#fn::models::*;
-use crate::generation::r#fn::*;
 use crate::preparation::r#fn::models::*;
-use crate::syntax::*;
-use call_impl_generation::*;
+use crate::syntax::r#type;
 use quote::format_ident;
 use syn::*;
 
-pub(crate) fn generate_call_struct(fn_syntax: &FnSyntax) -> CallStruct {
+pub(crate) fn new(fn_syntax: &FnSyntax, call_struct_type: Type) -> ArgsCheckerStruct {
     let span = fn_syntax.spans.inputs;
     let fields_named = generate_fields(fn_syntax);
-
     let item_struct = ItemStruct {
         attrs: Vec::new(),
-        vis: Visibility::Public(Token![pub](span)),
+        vis: Visibility::Inherited,
         struct_token: Token![struct](span),
-        ident: format_ident!("{}_Call", fn_syntax.fn_ident),
+        ident: format_ident!("{}_ArgsChecker", fn_syntax.fn_ident),
         generics: fn_syntax.merged_generics.clone(),
         fields: Fields::Named(fields_named),
         semi_token: None,
@@ -26,13 +23,14 @@ pub(crate) fn generate_call_struct(fn_syntax: &FnSyntax) -> CallStruct {
     let r#type = Type::Path(r#type::path::from_ident(item_struct.ident.clone()));
     let generics_info_provider_impl =
         generics_info_provider_impl::new(fn_syntax.merged_generics.clone(), r#type.clone());
-    let call_impl = generate_call_impl(span, &fn_syntax.arguments, r#type.clone());
+    let args_checker_impl =
+        args_checker_impl::new(span, &fn_syntax.arguments, r#type.clone(), call_struct_type);
 
-    let result = CallStruct {
+    let result = ArgsCheckerStruct {
         r#type,
         item_struct,
         generics_info_provider_impl,
-        call_impl,
+        args_checker_impl,
     };
 
     return result;
@@ -46,13 +44,15 @@ fn generate_fields(fn_syntax: &FnSyntax) -> FieldsNamed {
             .iter()
             .map(|argument| {
                 let span = argument.ident.span();
+                let ty = arg_type::of(span, *argument.inner_type.clone());
+
                 let result = Field {
                     attrs: Vec::new(),
                     vis: Visibility::Inherited,
                     mutability: FieldMutability::None,
                     ident: Some(argument.ident.clone()),
-                    colon_token: Some(Token![:](span)),
-                    ty: *argument.inner_type.clone(),
+                    colon_token: Some(Token![:](argument.ident.span())),
+                    ty: Type::Path(ty),
                 };
 
                 return result;

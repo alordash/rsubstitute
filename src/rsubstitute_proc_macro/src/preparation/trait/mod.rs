@@ -4,6 +4,4 @@ pub mod models {
     pub use trait_syntax::*;
 }
 
-mod trait_syntax_preparation;
-
-pub use trait_syntax_preparation::*;
+pub mod trait_syntax;

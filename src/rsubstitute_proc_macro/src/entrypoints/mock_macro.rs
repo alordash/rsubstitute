@@ -5,7 +5,7 @@ pub(crate) fn handle_mock(
     token_stream: proc_macro::TokenStream,
     mock_macro_usage: MockMacroUsage,
 ) -> proc_macro::TokenStream {
-    let context = preparation::create_context_for_mock_macro(mock_macro_usage);
+    let context = preparation::context::create_for_mock_macro(mock_macro_usage);
     // THIS MAY BE NOT THE BEST APPROACH!
     // IIRC there was some method in parse stream lik `peek` that returns what is current syn item
     // TODO - parse using `impl Parse for StructMockSyntax/UseMockSyntax`

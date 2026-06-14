@@ -1,5 +1,5 @@
 use super::models::*;
-use crate::preparation::r#fn::argument_preparation;
+use crate::preparation::r#fn::argument;
 use crate::syntax::{generics, ident};
 use crate::*;
 use quote::ToTokens;
@@ -7,7 +7,7 @@ use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::*;
 
-pub(crate) struct PrepareFnSyntaxArgs<'a> {
+pub(crate) struct Params<'a> {
     pub attributes: Vec<Attribute>,
     pub visibility: Visibility,
     pub signature: Signature,
@@ -16,15 +16,15 @@ pub(crate) struct PrepareFnSyntaxArgs<'a> {
     pub maybe_owner: Option<&'a dyn IFnOwner>,
 }
 
-pub(crate) fn prepare_fn_syntax(
-    PrepareFnSyntaxArgs {
+pub(crate) fn new(
+    Params {
         attributes,
         visibility,
         signature,
         is_default,
         maybe_base_impl,
         maybe_owner,
-    }: PrepareFnSyntaxArgs,
+    }: Params,
 ) -> FnSyntax {
     let merged_generics = combine_generics(signature.generics, maybe_owner);
     let fn_ident = format_fn_ident(signature.ident, maybe_owner, &merged_generics);
@@ -107,7 +107,7 @@ fn split_inputs_into_maybe_self_type_and_arguments(
             ),
         })
         .enumerate()
-        .map(argument_preparation::prepare_argument)
+        .map(argument::new)
         .collect();
     let result = InputsSplit {
         maybe_self_type,

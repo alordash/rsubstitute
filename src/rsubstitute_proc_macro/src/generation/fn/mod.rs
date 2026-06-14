@@ -10,10 +10,6 @@ pub mod models {
 
 pub mod common;
 
-mod args_checker_struct_generation;
-mod call_struct_generation;
-mod fn_info_generation;
-
-pub use args_checker_struct_generation::*;
-pub use call_struct_generation::*;
-pub use fn_info_generation::*;
+pub mod args_checker_struct;
+pub mod call_struct;
+pub mod fn_info;

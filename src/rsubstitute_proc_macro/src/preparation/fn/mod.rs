@@ -8,8 +8,5 @@ pub mod models {
     pub use i_fn_owner::*;
 }
 
-mod argument_preparation;
-mod fn_syntax_preparation;
-
-pub use argument_preparation::*;
-pub use fn_syntax_preparation::*;
+pub mod argument;
+pub mod fn_syntax;

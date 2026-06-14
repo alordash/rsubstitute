@@ -4,7 +4,7 @@ use syn::spanned::Spanned;
 use syn::visit_mut::{self, VisitMut};
 use syn::*;
 
-pub(crate) fn prepare_argument((number, pat_type): (usize, PatType)) -> Argument {
+pub(crate) fn new((number, pat_type): (usize, PatType)) -> Argument {
     let ident = prepare_ident(number, &pat_type);
     let mut inner_type = pat_type.ty.clone();
     replace_refs_with_ptrs(&mut inner_type);

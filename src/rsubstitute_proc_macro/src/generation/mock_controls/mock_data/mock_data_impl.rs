@@ -5,11 +5,7 @@ use quote::ToTokens;
 use syn::punctuated::Punctuated;
 use syn::*;
 
-pub(crate) fn generate_mock_data_impl(
-    span: Span,
-    fn_infos: &[FnInfo],
-    target_type: Type,
-) -> ItemImpl {
+pub(crate) fn new(span: Span, fn_infos: &[FnInfo], target_type: Type) -> ItemImpl {
     let fn_get_received_nothing_else_error_msgs =
         generate_fn_get_received_nothing_else_error_msgs(span, fn_infos);
 

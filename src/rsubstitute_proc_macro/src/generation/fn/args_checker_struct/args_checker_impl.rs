@@ -8,7 +8,7 @@ use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::*;
 
-pub(crate) fn generate_args_checker_impl(
+pub(crate) fn new(
     span: Span,
     arguments: &[Argument],
     target_type: Type,

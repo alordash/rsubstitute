@@ -1,11 +1,11 @@
 use super::models::*;
+use crate::preparation::r#fn::fn_syntax;
 use crate::preparation::r#fn::models::IFnOwner;
-use crate::preparation::r#fn::{PrepareFnSyntaxArgs, prepare_fn_syntax};
 use crate::syntax::*;
 use quote::ToTokens;
 use syn::*;
 
-pub(crate) struct PrepareTraitFnSyntaxArgs {
+pub(crate) struct Params {
     pub attributes: Vec<Attribute>,
     pub visibility: Visibility,
     pub ident: Ident,
@@ -13,14 +13,14 @@ pub(crate) struct PrepareTraitFnSyntaxArgs {
     pub items: Vec<TraitItem>,
 }
 
-pub(crate) fn prepare_trait_syntax(
-    PrepareTraitFnSyntaxArgs {
+pub(crate) fn new(
+    Params {
         attributes,
         visibility,
         ident,
         generics,
         items,
-    }: PrepareTraitFnSyntaxArgs,
+    }: Params,
 ) -> TraitSyntax {
     let split_items = split_items(items);
     let trait_syntax_as_fn_owner = TraitSyntaxAsFnOwner {
@@ -31,7 +31,7 @@ pub(crate) fn prepare_trait_syntax(
         .fns
         .into_iter()
         .map(|x| {
-            prepare_fn_syntax(PrepareFnSyntaxArgs {
+            fn_syntax::new(fn_syntax::Params {
                 attributes: x.attrs,
                 visibility: Visibility::Inherited,
                 signature: x.sig,

@@ -1,14 +1,13 @@
-mod mock_data_impl_generation;
+mod mock_data_impl;
 
 use crate::generation::mock_controls::models::*;
 use crate::generation::r#fn::models::*;
 use crate::syntax::*;
-use mock_data_impl_generation::*;
 use proc_macro2::Span;
 use quote::format_ident;
 use syn::*;
 
-pub(crate) fn generate_mock_data(
+pub(crate) fn new(
     span: Span,
     target_ident: Ident,
     mock_type: Type,
@@ -35,7 +34,7 @@ pub(crate) fn generate_mock_data(
     };
 
     let r#type = Type::Path(r#type::path::from_ident(item_struct.ident.clone()));
-    let mock_data_impl = generate_mock_data_impl(span, fn_infos, r#type.clone());
+    let mock_data_impl = mock_data_impl::new(span, fn_infos, r#type.clone());
 
     let result = MockDataStruct {
         r#type,
