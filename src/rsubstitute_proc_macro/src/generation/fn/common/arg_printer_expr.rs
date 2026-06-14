@@ -1,4 +1,4 @@
-use crate::generation::common::*;
+use crate::generation::*;
 use crate::syntax::*;
 use proc_macro2::Span;
 use syn::*;

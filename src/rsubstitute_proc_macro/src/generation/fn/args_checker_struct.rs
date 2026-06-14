@@ -1,6 +1,6 @@
 mod args_checker_impl;
 
-use crate::generation::r#fn::common::*;
+use crate::generation::r#fn::*;
 use crate::generation::r#fn::models::*;
 use crate::preparation::r#fn::models::*;
 use crate::syntax::r#type;

@@ -8,7 +8,9 @@ pub mod models {
     pub use fn_info::*;
 }
 
-pub mod common;
+mod common;
+
+pub use common::*;
 
 pub mod args_checker_struct;
 pub mod call_struct;

@@ -1,6 +1,6 @@
 mod call_impl;
 
-use crate::generation::r#fn::common::generics_info_provider_impl;
+use crate::generation::r#fn::*;
 use crate::generation::r#fn::models::*;
 use crate::preparation::r#fn::models::*;
 use crate::syntax::*;

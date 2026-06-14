@@ -1,5 +1,6 @@
 use super::*;
 use crate::generation::mock_controls::models::*;
+use crate::generation::mock_controls::*;
 use crate::syntax::*;
 use proc_macro2::Span;
 use quote::format_ident;
@@ -32,11 +33,12 @@ pub(crate) fn generate(source_span: Span, target_ident: Ident, data_ident: Ident
     };
 
     let r#type = Type::Path(r#type::path::from_ident(item_struct.ident.clone()));
+    let clone_impl = clone_impl::new(source_span, r#type.clone());
 
     let result = MockSetup {
         r#type,
         item_struct,
-        clone_impl: todo!(),
+        clone_impl,
         r#impl: todo!(),
     };
 
