@@ -50,7 +50,7 @@ fn generate_fields(fn_syntax: &FnSyntax) -> FieldsNamed {
                     mutability: FieldMutability::None,
                     ident: Some(argument.ident.clone()),
                     colon_token: Some(Token![:](span)),
-                    ty: *argument.inner_type.clone(),
+                    ty: *argument.ptr_style_type.clone(),
                 };
 
                 return result;

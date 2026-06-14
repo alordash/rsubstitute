@@ -101,7 +101,7 @@ fn generate_arg_info_new_expr(argument: &Argument) -> Expr {
     });
 
     let arg_debug_string_argument =
-        arg_printer_expr::new(span, arg_field_expr, *argument.pat_type.ty.clone());
+        arg_printer_expr::new(span, arg_field_expr, *argument.source_pat_type.ty.clone());
 
     let result = Expr::Call(expr::call::new(
         span,
@@ -128,7 +128,7 @@ fn generate_fn_get_ptr_to_boxed_tuple_of_refs(span: Span, arguments: &[Argument]
         paren_token: token::Paren(span),
         inputs: punctuated([ref_self_fn_arg(span)]),
         variadic: None,
-        output: ReturnType::Type(Token!(->)(span), Box::new(mut_ptr_void(span))),
+        output: ReturnType::Type(Token!(->)(span), Box::new(mut_ptr_void_type(span))),
     };
 
     let fields: Punctuated<Expr, Token![,]> = arguments
@@ -154,13 +154,13 @@ fn generate_fn_get_ptr_to_boxed_tuple_of_refs(span: Span, arguments: &[Argument]
         attrs: Vec::new(),
         expr: Box::new(box_leak),
         as_token: Token![as](span),
-        ty: Box::new(mut_ptr_infer(span)),
+        ty: Box::new(mut_ptr_infer_type(span)),
     });
     let as_mut_void = Expr::Cast(ExprCast {
         attrs: Vec::new(),
         expr: Box::new(as_mut_infer),
         as_token: Token![as](span),
-        ty: Box::new(mut_ptr_void(span)),
+        ty: Box::new(mut_ptr_void_type(span)),
     });
 
     let block = Block {

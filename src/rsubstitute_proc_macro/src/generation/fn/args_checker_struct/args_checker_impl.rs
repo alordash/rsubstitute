@@ -110,7 +110,7 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
     let vec_stmt_exprs: Punctuated<Expr, Token![,]> = arguments
         .iter()
         .map(|argument| {
-            let span = argument.pat_type.span();
+            let span = argument.source_pat_type.span();
             let call_field = Expr::Field(expr::field::new(
                 Expr::Path(ExprPath {
                     attrs: Vec::new(),
@@ -134,7 +134,7 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
                         mutability: None,
                         elem: Box::new(Type::Path(arg_type::of(
                             span,
-                            *argument.pat_type.ty.clone(),
+                            *argument.source_pat_type.ty.clone(),
                         ))),
                     }),
                 )),
@@ -152,7 +152,7 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
                             expr: Box::new(call_field.clone()),
                         },
                     ))),
-                    arg_printer_expr::new(span, call_field, *argument.pat_type.ty.clone()),
+                    arg_printer_expr::new(span, call_field, *argument.source_pat_type.ty.clone()),
                 ],
             );
             return Expr::MethodCall(result);
@@ -218,7 +218,7 @@ fn generate_fn_fmt_args(span: Span, arguments: &[Argument]) -> ImplItemFn {
                 mutability: None,
                 elem: Box::new(Type::Path(arg_type::of(
                     span,
-                    *argument.pat_type.ty.clone(),
+                    *argument.source_pat_type.ty.clone(),
                 ))),
             }),
         )

@@ -44,7 +44,7 @@ fn generate_fields(fn_syntax: &FnSyntax) -> FieldsNamed {
             .iter()
             .map(|argument| {
                 let span = argument.ident.span();
-                let ty = arg_type::of(span, *argument.inner_type.clone());
+                let ty = arg_type::of(span, *argument.ptr_style_type.clone());
 
                 let result = Field {
                     attrs: Vec::new(),

@@ -50,7 +50,16 @@ pub(crate) fn ref_self_fn_arg(span: Span) -> FnArg {
     return result;
 }
 
-pub(crate) fn mut_ptr_infer(span: Span) -> Type {
+pub(crate) fn void_type(span: Span) -> Type {
+    let result = TypeTuple {
+        paren_token: token::Paren(span),
+        elems: Punctuated::new(),
+    };
+
+    return Type::Tuple(result);
+}
+
+pub(crate) fn mut_ptr_infer_type(span: Span) -> Type {
     let result = Type::Ptr(TypePtr {
         star_token: Token![*](span),
         const_token: None,
@@ -63,15 +72,12 @@ pub(crate) fn mut_ptr_infer(span: Span) -> Type {
     return result;
 }
 
-pub(crate) fn mut_ptr_void(span: Span) -> Type {
+pub(crate) fn mut_ptr_void_type(span: Span) -> Type {
     let result = Type::Ptr(TypePtr {
         star_token: Token![*](span),
         const_token: None,
         mutability: Some(Token![mut](span)),
-        elem: Box::new(Type::Tuple(TypeTuple {
-            paren_token: token::Paren(span),
-            elems: Punctuated::new(),
-        })),
+        elem: Box::new(void_type(span)),
     });
 
     return result;

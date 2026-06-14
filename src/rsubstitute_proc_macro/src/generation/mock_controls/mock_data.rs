@@ -1,19 +1,30 @@
 mod mock_data_impl;
 
-use crate::generation::mock_controls::models::*;
 use crate::generation::r#fn::models::*;
+use crate::generation::mock_controls::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
 use quote::format_ident;
 use syn::*;
 
+pub(crate) struct Params<'a> {
+    pub source_span: Span,
+    pub target_ident: Ident,
+    pub mock_type: Type,
+    pub fn_infos: &'a [FnInfo],
+    pub support_base_calling: bool,
+    pub store_mock_data: bool,
+}
+
 pub(crate) fn generate(
-    source_span: Span,
-    target_ident: Ident,
-    mock_type: Type,
-    fn_infos: &[FnInfo],
-    support_base_calling: bool,
-    store_mock_data: bool,
+    Params {
+        source_span,
+        target_ident,
+        mock_type,
+        fn_infos,
+        support_base_calling,
+        store_mock_data,
+    }: Params,
 ) -> MockDataStruct {
     let fields_named = generate_fields(
         source_span,
