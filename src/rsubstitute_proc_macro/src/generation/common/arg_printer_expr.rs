@@ -1,4 +1,4 @@
-use crate::generation::r#fn::transmute_lifetime_expr;
+use crate::generation::common::*;
 use crate::syntax::*;
 use proc_macro2::Span;
 use syn::*;

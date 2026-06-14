@@ -8,10 +8,6 @@ pub mod models {
     pub use fn_info::*;
 }
 
-pub mod arg_printer_expr;
-pub mod arg_type;
-pub mod transmute_lifetime_expr;
-
 mod args_checker_struct_generation;
 mod call_struct_generation;
 mod fn_info_generation;
