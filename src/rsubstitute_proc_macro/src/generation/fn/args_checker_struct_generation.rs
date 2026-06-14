@@ -1,6 +1,6 @@
 mod args_checker_impl_generation;
 
-use crate::generation::common::*;
+use crate::generation::r#fn::common::*;
 use crate::generation::r#fn::models::*;
 use crate::generation::r#fn::*;
 use crate::preparation::r#fn::models::*;
@@ -27,7 +27,7 @@ pub(crate) fn generate_args_checker_struct(
 
     let r#type = Type::Path(r#type::path::from_ident(item_struct.ident.clone()));
     let generics_info_provider_impl =
-        generate_generics_info_provider_impl(fn_syntax.merged_generics.clone(), r#type.clone());
+        generics_info_provider_impl::new(fn_syntax.merged_generics.clone(), r#type.clone());
     let args_checker_impl =
         generate_args_checker_impl(span, &fn_syntax.arguments, r#type.clone(), call_struct_type);
 

@@ -5,7 +5,7 @@ use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::*;
 
-pub(crate) fn generate_generics_info_provider_impl(
+pub(crate) fn new(
     generics: Generics,
     target_type: Type,
 ) -> ItemImpl {
