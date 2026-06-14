@@ -50,7 +50,7 @@ fn generate_fn_get_generic_parameter_infos<'a>(
         ident: Ident::new("get_generic_parameter_infos", span),
         generics: Generics::default(),
         paren_token: token::Paren(span),
-        inputs: [ref_self_fn_arg(span)].into_iter().collect(),
+        inputs: punctuated([ref_self_fn_arg(span)]),
         variadic: None,
         output: ReturnType::Type(
             Token![->](span),
@@ -129,12 +129,10 @@ fn generate_fn_hash_generics_type_ids<'a>(
                         qself: None,
                         path: Path {
                             leading_colon: None,
-                            segments: [PathSegment {
+                            segments: punctuated([PathSegment {
                                 ident: type_param.ident.clone(),
                                 arguments: PathArguments::None,
-                            }]
-                            .into_iter()
-                            .collect(),
+                            }]),
                         },
                     })),
                 )),
@@ -187,12 +185,10 @@ fn generate_fn_hash_const_values<'a>(
                             qself: None,
                             path: Path {
                                 leading_colon: None,
-                                segments: [PathSegment {
+                                segments: punctuated([PathSegment {
                                     ident: const_param.ident.clone(),
                                     arguments: PathArguments::None,
-                                }]
-                                .into_iter()
-                                .collect(),
+                                }]),
                             },
                         })),
                     }),
@@ -218,7 +214,7 @@ fn generate_fn_hash_const_values<'a>(
 }
 
 fn generate_hash_fn_sig(span: Span, fn_name: &'static str) -> Signature {
-    let inputs = [
+    let inputs = punctuated([
         ref_self_fn_arg(span),
         FnArg::Typed(PatType {
             attrs: vec![attributes::allow_unused_variables(span)],
@@ -237,9 +233,7 @@ fn generate_hash_fn_sig(span: Span, fn_name: &'static str) -> Signature {
                 elem: Box::new(Type::Path(r#type::path::new(span, ["GenericsHasher"]))),
             })),
         }),
-    ]
-    .into_iter()
-    .collect();
+    ]);
 
     let result = Signature {
         constness: None,

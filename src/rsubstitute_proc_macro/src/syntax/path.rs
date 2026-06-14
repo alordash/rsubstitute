@@ -1,3 +1,4 @@
+use crate::syntax::punctuated;
 use proc_macro2::Span;
 use syn::*;
 
@@ -29,7 +30,7 @@ pub(crate) fn new_generics<const N: usize>(
         .arguments = PathArguments::AngleBracketed(AngleBracketedGenericArguments {
         colon2_token: Some(Token![::](span)),
         lt_token: Token![<](span),
-        args: [generic_argument].into_iter().collect(),
+        args: punctuated([generic_argument]),
         gt_token: Token![>](span),
     });
     return result;

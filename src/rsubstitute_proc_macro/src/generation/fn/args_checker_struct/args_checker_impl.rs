@@ -44,7 +44,7 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
         ident: Ident::new("check", span),
         generics: Generics::default(),
         paren_token: token::Paren(span),
-        inputs: [
+        inputs: punctuated([
             ref_self_fn_arg(span),
             FnArg::Typed(PatType {
                 attrs: Vec::new(),
@@ -61,9 +61,7 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
                     elem: Box::new(Type::Path(r#type::path::new(span, ["DynCall"]))),
                 })),
             }),
-        ]
-        .into_iter()
-        .collect(),
+        ]),
         variadic: None,
         output: ReturnType::Type(
             Token!(->)(span),
@@ -193,7 +191,7 @@ fn generate_fn_fmt_args(span: Span, arguments: &[Argument]) -> ImplItemFn {
         ident: Ident::new("fmt_args", span),
         generics: Generics::default(),
         paren_token: token::Paren(span),
-        inputs: [ref_self_fn_arg(span)].into_iter().collect(),
+        inputs: punctuated([ref_self_fn_arg(span)]),
         variadic: None,
         output: ReturnType::Type(
             Token!(->)(span),

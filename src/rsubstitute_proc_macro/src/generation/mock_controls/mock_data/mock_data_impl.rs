@@ -36,7 +36,7 @@ fn generate_fn_get_received_nothing_else_error_msgs(span: Span, fn_infos: &[FnIn
         ident: Ident::new("get_received_nothing_else_error_msgs", span),
         generics: Generics::default(),
         paren_token: token::Paren(span),
-        inputs: [ref_self_fn_arg(span)].into_iter().collect(),
+        inputs: punctuated([ref_self_fn_arg(span)]),
         variadic: None,
         output: ReturnType::Type(
             Token!(->)(span),

@@ -68,26 +68,22 @@ fn generate_fields(
                         qself: None,
                         path: Path {
                             leading_colon: None,
-                            segments: [PathSegment {
+                            segments: punctuated([PathSegment {
                                 ident: Ident::new("FnData", span),
                                 arguments: PathArguments::AngleBracketed(
                                     AngleBracketedGenericArguments {
                                         colon2_token: None,
                                         lt_token: Token![<](span),
-                                        args: [
+                                        args: punctuated([
                                             GenericArgument::Lifetime(static_lifetime(span)),
                                             GenericArgument::Type(mock_type.clone()),
                                             fn_data_bool(span, support_base_calling),
                                             fn_data_bool(span, store_mock_data),
-                                        ]
-                                        .into_iter()
-                                        .collect(),
+                                        ]),
                                         gt_token: Token![>](span),
                                     },
                                 ),
-                            }]
-                            .into_iter()
-                            .collect(),
+                            }]),
                         },
                     }),
                 };

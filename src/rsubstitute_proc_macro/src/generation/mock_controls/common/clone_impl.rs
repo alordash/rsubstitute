@@ -35,7 +35,6 @@ fn generate_fn_clone(source_span: Span) -> ImplItemFn {
         ident: Ident::new("clone", source_span),
         generics: Generics::default(),
         paren_token: token::Paren(source_span),
-        // inputs: [ref_self_fn_arg(source_span)].into_iter().collect(),
         inputs: punctuated([ref_self_fn_arg(source_span)]),
         variadic: None,
         output: ReturnType::Type(

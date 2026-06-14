@@ -1,4 +1,4 @@
-use crate::syntax::path;
+use crate::syntax::*;
 use quote::ToTokens;
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
@@ -21,9 +21,8 @@ pub(crate) fn new(expr: Expr) -> ExprMacro {
 
 pub(crate) fn new_with_target(expr: Expr, target_type: Type) -> ExprMacro {
     let span = expr.span();
-    let args: Punctuated<Expr, Token![,]> = [expr, Expr::Verbatim(target_type.to_token_stream())]
-        .into_iter()
-        .collect();
+    let args: Punctuated<Expr, Token![,]> =
+        punctuated([expr, Expr::Verbatim(target_type.to_token_stream())]);
     let result = ExprMacro {
         attrs: Vec::new(),
         mac: Macro {

@@ -41,7 +41,7 @@ fn generate_fn_get_args_infos(span: Span, arguments: &[Argument]) -> ImplItemFn 
         ident: Ident::new("get_arg_infos", span),
         generics: Generics::default(),
         paren_token: token::Paren(span),
-        inputs: [ref_self_fn_arg(span)].into_iter().collect(),
+        inputs: punctuated([ref_self_fn_arg(span)]),
         variadic: None,
         output: ReturnType::Type(
             Token!(->)(span),
@@ -85,12 +85,10 @@ fn generate_arg_info_new_expr(argument: &Argument) -> Expr {
         qself: None,
         path: Path {
             leading_colon: None,
-            segments: [PathSegment {
+            segments: punctuated([PathSegment {
                 ident: argument.ident.clone(),
                 arguments: PathArguments::None,
-            }]
-            .into_iter()
-            .collect(),
+            }]),
         },
     });
 
@@ -128,7 +126,7 @@ fn generate_fn_get_ptr_to_boxed_tuple_of_refs(span: Span, arguments: &[Argument]
         ident: Ident::new("get_ptr_to_boxed_tuple_of_refs", span),
         generics: Generics::default(),
         paren_token: token::Paren(span),
-        inputs: [ref_self_fn_arg(span)].into_iter().collect(),
+        inputs: punctuated([ref_self_fn_arg(span)]),
         variadic: None,
         output: ReturnType::Type(Token!(->)(span), Box::new(mut_ptr_void(span))),
     };

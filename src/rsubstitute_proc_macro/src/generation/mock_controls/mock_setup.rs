@@ -8,7 +8,7 @@ use syn::*;
 pub(crate) fn generate(source_span: Span, target_ident: Ident, data_ident: Ident) -> MockSetup {
     let fields_named = FieldsNamed {
         brace_token: token::Brace(source_span),
-        named: [Field {
+        named: punctuated([Field {
             attrs: Vec::new(),
             vis: Visibility::Inherited,
             mutability: FieldMutability::None,
@@ -18,9 +18,7 @@ pub(crate) fn generate(source_span: Span, target_ident: Ident, data_ident: Ident
                 source_span,
                 Type::Path(r#type::path::from_ident(data_ident)),
             )),
-        }]
-        .into_iter()
-        .collect(),
+        }]),
     };
 
     let item_struct = ItemStruct {

@@ -1,4 +1,4 @@
-use crate::syntax::path;
+use crate::syntax::{path, punctuated};
 use proc_macro2::Span;
 use syn::*;
 
@@ -16,12 +16,10 @@ pub(crate) fn from_ident(ident: Ident) -> TypePath {
         qself: None,
         path: Path {
             leading_colon: None,
-            segments: [PathSegment {
+            segments: punctuated([PathSegment {
                 ident,
                 arguments: PathArguments::None,
-            }]
-            .into_iter()
-            .collect(),
+            }]),
         },
     };
 
