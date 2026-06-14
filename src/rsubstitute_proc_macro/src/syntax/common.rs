@@ -72,3 +72,7 @@ pub(crate) fn static_lifetime(span: Span) -> Lifetime {
 
     return result;
 }
+
+pub(crate) fn punctuated<T, P: Default, const N: usize>(items: [T; N]) -> Punctuated<T, P> {
+    items.into_iter().collect()
+}

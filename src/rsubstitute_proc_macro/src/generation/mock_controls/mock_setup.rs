@@ -1,3 +1,4 @@
+use super::*;
 use crate::generation::mock_controls::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
@@ -11,7 +12,7 @@ pub(crate) fn generate(source_span: Span, target_ident: Ident, data_ident: Ident
             attrs: Vec::new(),
             vis: Visibility::Inherited,
             mutability: FieldMutability::None,
-            ident: Some(format_ident!("data")),
+            ident: Some(Ident::new(constants::DATA_FIELD, source_span)),
             colon_token: Some(Token![:](source_span)),
             ty: Type::Path(r#type::arc_of(
                 source_span,
