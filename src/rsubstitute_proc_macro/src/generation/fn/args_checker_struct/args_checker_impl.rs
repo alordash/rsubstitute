@@ -8,7 +8,7 @@ use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::*;
 
-pub(crate) fn new(
+pub(crate) fn generate(
     span: Span,
     arguments: &[Argument],
     target_type: Type,

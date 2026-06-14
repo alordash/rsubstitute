@@ -2,8 +2,8 @@ use crate::preparation::models::*;
 use crate::preparation::r#struct::*;
 use syn::*;
 
-pub(crate) fn handle_impl(ctx: Context, item_impl: ItemImpl) {
-    let syntax = impl_struct_syntax::new(impl_struct_syntax::Params {
+pub(crate) fn handle(ctx: Context, item_impl: ItemImpl) {
+    let syntax = impl_struct_syntax::prepare(impl_struct_syntax::Params {
         attributes: item_impl.attrs,
         generics: item_impl.generics,
         target_type: item_impl.self_ty,

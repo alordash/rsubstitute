@@ -13,7 +13,7 @@ pub(crate) struct Params {
     pub items: Vec<TraitItem>,
 }
 
-pub(crate) fn new(
+pub(crate) fn prepare(
     Params {
         attributes,
         visibility,
@@ -31,7 +31,7 @@ pub(crate) fn new(
         .fns
         .into_iter()
         .map(|x| {
-            fn_syntax::new(fn_syntax::Params {
+            fn_syntax::prepare(fn_syntax::Params {
                 attributes: x.attrs,
                 visibility: Visibility::Inherited,
                 signature: x.sig,

@@ -1,5 +1,6 @@
+mod argument;
+
 use super::models::*;
-use crate::preparation::r#fn::argument;
 use crate::syntax::{generics, ident};
 use crate::*;
 use quote::ToTokens;
@@ -16,7 +17,7 @@ pub(crate) struct Params<'a> {
     pub maybe_owner: Option<&'a dyn IFnOwner>,
 }
 
-pub(crate) fn new(
+pub(crate) fn prepare(
     Params {
         attributes,
         visibility,

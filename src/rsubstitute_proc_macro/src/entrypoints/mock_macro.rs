@@ -1,7 +1,7 @@
 use super::models::*;
 use crate::preparation;
 
-pub(crate) fn handle_mock(
+pub(crate) fn handle(
     token_stream: proc_macro::TokenStream,
     mock_macro_usage: MockMacroUsage,
 ) -> proc_macro::TokenStream {

@@ -12,7 +12,7 @@ pub(crate) struct Params {
     pub impl_items: Vec<ImplItem>,
 }
 
-pub(crate) fn new(
+pub(crate) fn prepare(
     Params {
         attributes,
         generics,
@@ -36,7 +36,7 @@ pub(crate) fn new(
     let methods = fns
         .into_iter()
         .map(|x| {
-            fn_syntax::new(fn_syntax::Params {
+            fn_syntax::prepare(fn_syntax::Params {
                 attributes: x.attrs,
                 visibility: Visibility::Inherited,
                 signature: x.sig,

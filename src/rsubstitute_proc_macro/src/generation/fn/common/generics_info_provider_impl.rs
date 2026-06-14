@@ -5,10 +5,7 @@ use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::*;
 
-pub(crate) fn new(
-    generics: Generics,
-    target_type: Type,
-) -> ItemImpl {
+pub(crate) fn generate(generics: Generics, target_type: Type) -> ItemImpl {
     let span = generics.span();
     let fn_get_generic_parameter_infos =
         generate_fn_get_generic_parameter_infos(span, generics.params.iter());

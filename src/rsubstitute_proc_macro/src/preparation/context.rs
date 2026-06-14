@@ -2,9 +2,7 @@ use super::models::*;
 use crate::constants;
 use crate::entrypoints::models::*;
 
-pub(crate) fn create_for_automock_macro(
-    proc_macro_attribute: proc_macro::TokenStream,
-) -> Context {
+pub(crate) fn create_for_automock_macro(proc_macro_attribute: proc_macro::TokenStream) -> Context {
     if proc_macro_attribute.is_empty() {
         return Default::default();
     }

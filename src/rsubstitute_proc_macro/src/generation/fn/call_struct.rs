@@ -7,7 +7,7 @@ use crate::syntax::*;
 use quote::format_ident;
 use syn::*;
 
-pub(crate) fn new(fn_syntax: &FnSyntax) -> CallStruct {
+pub(crate) fn generate(fn_syntax: &FnSyntax) -> CallStruct {
     let span = fn_syntax.spans.inputs;
     let fields_named = generate_fields(fn_syntax);
 
@@ -23,8 +23,8 @@ pub(crate) fn new(fn_syntax: &FnSyntax) -> CallStruct {
 
     let r#type = Type::Path(r#type::path::from_ident(item_struct.ident.clone()));
     let generics_info_provider_impl =
-        generics_info_provider_impl::new(fn_syntax.merged_generics.clone(), r#type.clone());
-    let call_impl = call_impl::new(span, &fn_syntax.arguments, r#type.clone());
+        generics_info_provider_impl::generate(fn_syntax.merged_generics.clone(), r#type.clone());
+    let call_impl = call_impl::generate(span, &fn_syntax.arguments, r#type.clone());
 
     let result = CallStruct {
         r#type,

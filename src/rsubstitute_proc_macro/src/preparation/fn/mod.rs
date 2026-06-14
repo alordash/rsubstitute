@@ -8,5 +8,4 @@ pub mod models {
     pub use i_fn_owner::*;
 }
 
-pub mod argument;
 pub mod fn_syntax;

@@ -7,7 +7,7 @@ use proc_macro2::Span;
 use quote::format_ident;
 use syn::*;
 
-pub(crate) fn new(
+pub(crate) fn generate(
     span: Span,
     target_ident: Ident,
     mock_type: Type,
@@ -34,7 +34,7 @@ pub(crate) fn new(
     };
 
     let r#type = Type::Path(r#type::path::from_ident(item_struct.ident.clone()));
-    let mock_data_impl = mock_data_impl::new(span, fn_infos, r#type.clone());
+    let mock_data_impl = mock_data_impl::generate(span, fn_infos, r#type.clone());
 
     let result = MockDataStruct {
         r#type,
