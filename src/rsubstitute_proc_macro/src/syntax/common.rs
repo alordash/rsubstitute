@@ -3,13 +3,26 @@ use proc_macro2::Span;
 use syn::punctuated::Punctuated;
 use syn::*;
 
-pub(crate) fn self_path(span: Span) -> ExprPath {
-    let result = expr::path::new(span, ["self"]);
+const SELF: &'static str = "self";
+const SELF_TYPE: &'static str = "Self";
+
+pub(crate) fn self_path(span: Span) -> Path {
+    let result = path::new(span, [SELF]);
+    return result;
+}
+
+pub(crate) fn self_expr_path(span: Span) -> ExprPath {
+    let result = expr::path::new(span, [SELF]);
+    return result;
+}
+
+pub(crate) fn self_type_path(span: Span) -> Path {
+    let result = path::new(span, [SELF_TYPE]);
     return result;
 }
 
 pub(crate) fn self_type(span: Span) -> TypePath {
-    let result = r#type::path::new(span, ["Self"]);
+    let result = r#type::path::new(span, [SELF_TYPE]);
     return result;
 }
 
