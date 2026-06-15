@@ -65,48 +65,29 @@ pub(crate) fn generate(
         path: path::from_ident(item_struct.ident.clone()),
     });
     let clone_impl = clone_impl::new(source_span, r#type.clone());
-    let r#impl = generate_impl(
-        ctx,
-        source_span,
-        r#type.clone(),
-        mock_type,
-        stores_mock_data,
-        fn_infos,
-    );
 
-    let result = MockSetup {
-        r#type,
-        item_struct,
-        clone_impl,
-        r#impl,
-    };
-
-    return result;
-}
-
-fn generate_impl(
-    ctx: &Context,
-    source_span: Span,
-    target_type: Type,
-    mock_type: Type,
-    stores_mock_data: bool,
-    fn_infos: &[FnInfo],
-) -> ItemImpl {
     let items = fn_infos
         .into_iter()
         .map(|x| generate_impl_fn(ctx, mock_type.clone(), stores_mock_data, x))
         .collect();
 
-    let result = ItemImpl {
+    let r#impl = ItemImpl {
         attrs: Vec::new(),
         defaultness: None,
         unsafety: None,
         impl_token: Token![impl](source_span),
         generics: Generics::default(),
         trait_: None,
-        self_ty: Box::new(target_type),
+        self_ty: Box::new(r#type.clone()),
         brace_token: token::Brace(source_span),
         items,
+    };
+
+    let result = MockSetup {
+        r#type,
+        item_struct,
+        clone_impl,
+        r#impl,
     };
 
     return result;
