@@ -1,9 +1,9 @@
 mod args_checker_impl;
 
-use crate::generation::r#fn::*;
 use crate::generation::r#fn::models::*;
+use crate::generation::r#fn::*;
 use crate::preparation::r#fn::models::*;
-use crate::syntax::r#type;
+use crate::syntax::path;
 use quote::format_ident;
 use syn::*;
 
@@ -20,14 +20,18 @@ pub(crate) fn generate(fn_syntax: &FnSyntax, call_struct_type: Type) -> ArgsChec
         semi_token: None,
     };
 
-    let r#type = Type::Path(r#type::path::from_ident(item_struct.ident.clone()));
+    let path = path::from_ident(item_struct.ident.clone());
+    let r#type = Type::Path(TypePath {
+        qself: None,
+        path: path.clone(),
+    });
     let generics_info_provider_impl =
         generics_info_provider_impl::generate(fn_syntax.merged_generics.clone(), r#type.clone());
     let args_checker_impl =
-        args_checker_impl::generate(span, &fn_syntax.arguments, r#type.clone(), call_struct_type);
+        args_checker_impl::generate(span, &fn_syntax.arguments, r#type, call_struct_type);
 
     let result = ArgsCheckerStruct {
-        r#type,
+        path,
         item_struct,
         generics_info_provider_impl,
         args_checker_impl,

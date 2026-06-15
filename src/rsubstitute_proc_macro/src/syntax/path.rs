@@ -35,3 +35,15 @@ pub(crate) fn new_generics<const N: usize>(
     });
     return result;
 }
+
+pub(crate) fn from_ident(ident: Ident) -> Path {
+    let result = Path {
+        leading_colon: None,
+        segments: punctuated([PathSegment {
+            ident,
+            arguments: PathArguments::None,
+        }]),
+    };
+
+    return result;
+}

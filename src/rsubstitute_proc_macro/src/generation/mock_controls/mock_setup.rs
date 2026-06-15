@@ -154,6 +154,14 @@ fn generate_impl_fn(
         variadic: None,
         output: ReturnType::Type(Token!(->)(span), Box::new(Type::Path(return_type))),
     };
+    
+    let args_checker_stmt = Stmt::Local(Local {
+        attrs: Vec::new(),
+        let_token: Token![let](span),
+        pat: Pat::Path(),
+        init: Some(),
+        semi_token: Token![;](span)
+    });
 
     let block = Block {
         brace_token: token::Brace(span),

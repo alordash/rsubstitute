@@ -1,7 +1,7 @@
 mod mock_data_impl;
 
-use crate::generation::r#fn::models::*;
 use crate::generation::mock_controls::models::*;
+use crate::generation::r#fn::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
 use quote::format_ident;
@@ -44,7 +44,10 @@ pub(crate) fn generate(
         semi_token: None,
     };
 
-    let r#type = Type::Path(r#type::path::from_ident(item_struct.ident.clone()));
+    let r#type = Type::Path(TypePath {
+        qself: None,
+        path: path::from_ident(item_struct.ident.clone()),
+    });
     let mock_data_impl = mock_data_impl::generate(source_span, fn_infos, r#type.clone());
 
     let result = MockDataStruct {
