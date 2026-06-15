@@ -1,4 +1,4 @@
-use crate::generation::mock_controls::constants;
+use crate::generation::mock_controls::constants::*;
 use crate::syntax::*;
 use proc_macro2::Span;
 use syn::*;
@@ -51,7 +51,7 @@ fn generate_fn_clone(source_span: Span) -> ImplItemFn {
         brace_token: token::Brace(source_span),
         fields: punctuated([FieldValue {
             attrs: Vec::new(),
-            member: Member::Named(Ident::new(constants::DATA_FIELD, source_span)),
+            member: Member::Named(data_ident(source_span)),
             colon_token: Some(Token![:](source_span)),
             expr: Expr::MethodCall(expr::method_call::new(
                 source_span,
@@ -64,7 +64,7 @@ fn generate_fn_clone(source_span: Span) -> ImplItemFn {
                         mutability: None,
                         expr: Box::new(Expr::Field(expr::field::new(
                             Expr::Path(self_expr_path(source_span)),
-                            Ident::new(constants::DATA_FIELD, source_span),
+                            data_ident(source_span),
                         ))),
                     })),
                 }),

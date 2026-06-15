@@ -1,7 +1,8 @@
 use super::*;
-use crate::generation::r#fn::models::*;
+use crate::generation::mock_controls::constants::data_ident;
 use crate::generation::mock_controls::models::*;
 use crate::generation::mock_controls::*;
+use crate::generation::r#fn::models::*;
 use crate::generation::*;
 use crate::preparation::models::Context;
 use crate::syntax::*;
@@ -37,11 +38,14 @@ pub(crate) fn generate(
             attrs: Vec::new(),
             vis: Visibility::Inherited,
             mutability: FieldMutability::None,
-            ident: Some(Ident::new(constants::DATA_FIELD, source_span)),
+            ident: Some(data_ident(source_span)),
             colon_token: Some(Token![:](source_span)),
             ty: Type::Path(r#type::arc_of(
                 source_span,
-                Type::Path(r#type::path::from_ident(mock_data_ident)),
+                Type::Path(TypePath {
+                    qself: None,
+                    path: path::from_ident(mock_data_ident),
+                }),
             )),
         }]),
     };
@@ -56,7 +60,10 @@ pub(crate) fn generate(
         semi_token: None,
     };
 
-    let r#type = Type::Path(r#type::path::from_ident(item_struct.ident.clone()));
+    let r#type = Type::Path(TypePath {
+        qself: None,
+        path: path::from_ident(item_struct.ident.clone()),
+    });
     let clone_impl = clone_impl::new(source_span, r#type.clone());
     let r#impl = generate_impl(
         ctx,
@@ -152,20 +159,111 @@ fn generate_impl_fn(
         paren_token: token::Paren(span),
         inputs,
         variadic: None,
-        output: ReturnType::Type(Token!(->)(span), Box::new(Type::Path(return_type))),
+        output: ReturnType::Type(Token!(->)(span), Box::new(Type::Path(return_type.clone()))),
     };
-    
-    let args_checker_stmt = Stmt::Local(Local {
+
+    let args_checker_stmt = Local {
         attrs: Vec::new(),
         let_token: Token![let](span),
-        pat: Pat::Path(),
-        init: Some(),
-        semi_token: Token![;](span)
-    });
+        pat: Pat::Type(PatType {
+            attrs: Vec::new(),
+            pat: Box::new(Pat::Path(ExprPath {
+                attrs: Vec::new(),
+                qself: None,
+                path: fn_info.args_checker_struct.path.clone(),
+            })),
+            colon_token: Token![:](span),
+            ty: Box::new(Type::Path(TypePath {
+                qself: None,
+                path: fn_info.args_checker_struct.path.clone(),
+            })),
+        }),
+        init: Some(LocalInit {
+            eq_token: Token![=](span),
+            expr: Box::new(Expr::Struct(ExprStruct {
+                attrs: Vec::new(),
+                qself: None,
+                path: fn_info.args_checker_struct.path.clone(),
+                brace_token: token::Brace(span),
+                fields: fn_info
+                    .syntax
+                    .arguments
+                    .iter()
+                    .map(|argument| FieldValue {
+                        attrs: Vec::new(),
+                        member: Member::Named(argument.ident.clone()),
+                        colon_token: Some(Token![:](span)),
+                        expr: Expr::Macro(transmute_lifetime_expr::new(Expr::MethodCall(
+                            expr::method_call::new(
+                                span,
+                                Expr::Path(ExprPath {
+                                    attrs: Vec::new(),
+                                    qself: None,
+                                    path: fn_info.args_checker_struct.path.clone(),
+                                }),
+                                Ident::new("into", span),
+                                [],
+                            ),
+                        ))),
+                    })
+                    .collect(),
+                dot2_token: None,
+                rest: None,
+            })),
+            diverge: None,
+        }),
+        semi_token: Token![;](span),
+    };
+
+    const FN_CONFIGURATOR_VAR_NAME: &'static str = "fn_configurator";
+    let fn_configurator_stmt = Local {
+        attrs: Vec::new(),
+        let_token: Token![let](span),
+        pat: Pat::Type(PatType {
+            attrs: Vec::new(),
+            pat: Box::new(Pat::Path(PatPath {
+                attrs: Vec::new(),
+                qself: None,
+                path: path::new(span, [FN_CONFIGURATOR_VAR_NAME]),
+            })),
+            colon_token: Token![:](span),
+            ty: Box::new(Type::Path(return_type)),
+        }),
+        init: Some(LocalInit {
+            eq_token: Token![=](span),
+            expr: Box::new(Expr::MethodCall(expr::method_call::new(
+                span,
+                Expr::Field(expr::field::new(
+                    Expr::Field(expr::field::new_self(data_ident(span))),
+                    fn_info.syntax.fn_ident.clone(),
+                )),
+                Ident::new("add_config", span),
+                [
+                    Expr::Path(ExprPath {
+                        attrs: Vec::new(),
+                        qself: None,
+                        path: fn_info.args_checker_struct.path.clone(),
+                    }),
+                    Expr::Path(self_expr_path(span)),
+                ],
+            ))),
+            diverge: None,
+        }),
+        semi_token: Token![;](span),
+    };
+    let return_stmt = transmute_lifetime_expr::new(Expr::Path(ExprPath {
+        attrs: Vec::new(),
+        qself: None,
+        path: path::new(span, [FN_CONFIGURATOR_VAR_NAME]),
+    }));
 
     let block = Block {
         brace_token: token::Brace(span),
-        stmts: vec![todo!()],
+        stmts: vec![
+            Stmt::Local(args_checker_stmt),
+            Stmt::Local(fn_configurator_stmt),
+            Stmt::Expr(Expr::Macro(return_stmt), None),
+        ],
     };
 
     let result = ImplItemFn {
