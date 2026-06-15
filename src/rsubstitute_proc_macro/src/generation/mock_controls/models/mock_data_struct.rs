@@ -1,7 +1,7 @@
 use syn::*;
 
 pub(crate) struct MockDataStruct {
-    pub r#type: Type,
+    pub path: Path,
     pub item_struct: ItemStruct,
-    pub mock_data_impl: ItemImpl
+    pub mock_data_impl: ItemImpl,
 }

@@ -1,10 +1,9 @@
 use super::*;
 use crate::generation::mock_controls::constants::data_ident;
 use crate::generation::mock_controls::models::*;
-use crate::generation::mock_controls::*;
 use crate::generation::r#fn::models::*;
 use crate::generation::*;
-use crate::preparation::models::Context;
+use crate::preparation::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
 use quote::format_ident;
@@ -60,9 +59,10 @@ pub(crate) fn generate(
         semi_token: None,
     };
 
+    let path = path::from_ident(item_struct.ident.clone());
     let r#type = Type::Path(TypePath {
         qself: None,
-        path: path::from_ident(item_struct.ident.clone()),
+        path: path.clone(),
     });
     let clone_impl = clone_impl::new(source_span, r#type.clone());
 
@@ -78,13 +78,13 @@ pub(crate) fn generate(
         impl_token: Token![impl](source_span),
         generics: Generics::default(),
         trait_: None,
-        self_ty: Box::new(r#type.clone()),
+        self_ty: Box::new(r#type),
         brace_token: token::Brace(source_span),
         items,
     };
 
     let result = MockSetup {
-        r#type,
+        path,
         item_struct,
         clone_impl,
         r#impl,

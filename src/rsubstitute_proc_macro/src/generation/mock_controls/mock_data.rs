@@ -44,14 +44,18 @@ pub(crate) fn generate(
         semi_token: None,
     };
 
-    let r#type = Type::Path(TypePath {
-        qself: None,
-        path: path::from_ident(item_struct.ident.clone()),
-    });
-    let mock_data_impl = mock_data_impl::generate(source_span, fn_infos, r#type.clone());
+    let path = path::from_ident(item_struct.ident.clone());
+    let mock_data_impl = mock_data_impl::generate(
+        source_span,
+        fn_infos,
+        Type::Path(TypePath {
+            qself: None,
+            path: path.clone(),
+        }),
+    );
 
     let result = MockDataStruct {
-        r#type,
+        path,
         item_struct,
         mock_data_impl,
     };
