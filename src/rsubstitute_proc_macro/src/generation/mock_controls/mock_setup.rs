@@ -1,7 +1,7 @@
 use super::*;
+use crate::generation::r#fn::models::*;
 use crate::generation::mock_controls::constants::data_ident;
 use crate::generation::mock_controls::models::*;
-use crate::generation::r#fn::models::*;
 use crate::generation::*;
 use crate::preparation::models::*;
 use crate::syntax::*;
@@ -33,20 +33,7 @@ pub(crate) fn generate(
 ) -> MockSetup {
     let fields_named = FieldsNamed {
         brace_token: token::Brace(source_span),
-        named: punctuated([Field {
-            attrs: Vec::new(),
-            vis: Visibility::Inherited,
-            mutability: FieldMutability::None,
-            ident: Some(data_ident(source_span)),
-            colon_token: Some(Token![:](source_span)),
-            ty: Type::Path(r#type::arc_of(
-                source_span,
-                Type::Path(TypePath {
-                    qself: None,
-                    path: path::from_ident(mock_data_ident),
-                }),
-            )),
-        }]),
+        named: punctuated([arc_data_field::new(source_span, mock_data_ident)]),
     };
 
     let item_struct = ItemStruct {
@@ -138,7 +125,7 @@ fn generate_impl_fn(
         output: ReturnType::Type(Token!(->)(span), Box::new(Type::Path(return_type.clone()))),
     };
 
-    let args_checker_stmt = args_checker_stmt::new(span, fn_info);
+    let args_checker_syntax = args_checker_syntax::new(span, fn_info);
 
     const FN_CONFIGURATOR_VAR_NAME: &'static str = "fn_configurator";
     let fn_configurator_stmt = Local {
@@ -167,7 +154,7 @@ fn generate_impl_fn(
                     Expr::Path(ExprPath {
                         attrs: Vec::new(),
                         qself: None,
-                        path: fn_info.args_checker_struct.path.clone(),
+                        path: args_checker_syntax.var_path,
                     }),
                     Expr::Path(self_expr_path(span)),
                 ],
@@ -185,7 +172,7 @@ fn generate_impl_fn(
     let block = Block {
         brace_token: token::Brace(span),
         stmts: vec![
-            Stmt::Local(args_checker_stmt),
+            Stmt::Local(args_checker_syntax.local),
             Stmt::Local(fn_configurator_stmt),
             Stmt::Expr(Expr::Macro(return_stmt), None),
         ],

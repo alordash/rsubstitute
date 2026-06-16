@@ -36,5 +36,11 @@ pub(crate) fn handle(ctx: Context, item_fn: ItemFn) {
         stores_mock_data: false,
         fn_infos: &fn_infos,
     });
+    let mock_received = mock_received::generate(mock_received::Params {
+        source_span,
+        target_ident: target_ident.clone(),
+        mock_data_ident: mock_data.item_struct.ident.clone(),
+        fn_infos: &fn_infos,
+    });
     todo!()
 }
