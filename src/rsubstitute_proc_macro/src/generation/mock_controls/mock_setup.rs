@@ -122,12 +122,7 @@ fn generate_impl_fn(
         )
         .collect();
 
-    let return_type = fn_configurator::new(fn_configurator::Params {
-        ctx,
-        mock_type,
-        stores_mock_data,
-        fn_info,
-    });
+    let return_type = generate_fn_configurator(ctx, mock_type, stores_mock_data, fn_info);
 
     let sig = Signature {
         constness: None,
@@ -143,58 +138,7 @@ fn generate_impl_fn(
         output: ReturnType::Type(Token!(->)(span), Box::new(Type::Path(return_type.clone()))),
     };
 
-    let args_checker_stmt = Local {
-        attrs: Vec::new(),
-        let_token: Token![let](span),
-        pat: Pat::Type(PatType {
-            attrs: Vec::new(),
-            pat: Box::new(Pat::Path(ExprPath {
-                attrs: Vec::new(),
-                qself: None,
-                path: fn_info.args_checker_struct.path.clone(),
-            })),
-            colon_token: Token![:](span),
-            ty: Box::new(Type::Path(TypePath {
-                qself: None,
-                path: fn_info.args_checker_struct.path.clone(),
-            })),
-        }),
-        init: Some(LocalInit {
-            eq_token: Token![=](span),
-            expr: Box::new(Expr::Struct(ExprStruct {
-                attrs: Vec::new(),
-                qself: None,
-                path: fn_info.args_checker_struct.path.clone(),
-                brace_token: token::Brace(span),
-                fields: fn_info
-                    .syntax
-                    .arguments
-                    .iter()
-                    .map(|argument| FieldValue {
-                        attrs: Vec::new(),
-                        member: Member::Named(argument.ident.clone()),
-                        colon_token: Some(Token![:](span)),
-                        expr: Expr::Macro(transmute_lifetime_expr::new(Expr::MethodCall(
-                            expr::method_call::new(
-                                span,
-                                Expr::Path(ExprPath {
-                                    attrs: Vec::new(),
-                                    qself: None,
-                                    path: fn_info.args_checker_struct.path.clone(),
-                                }),
-                                Ident::new("into", span),
-                                [],
-                            ),
-                        ))),
-                    })
-                    .collect(),
-                dot2_token: None,
-                rest: None,
-            })),
-            diverge: None,
-        }),
-        semi_token: Token![;](span),
-    };
+    let args_checker_stmt = args_checker_stmt::new(span, fn_info);
 
     const FN_CONFIGURATOR_VAR_NAME: &'static str = "fn_configurator";
     let fn_configurator_stmt = Local {
@@ -256,4 +200,58 @@ fn generate_impl_fn(
     };
 
     return ImplItem::Fn(result);
+}
+
+fn generate_fn_configurator(
+    ctx: &Context,
+    mock_type: Type,
+    stores_mock_data: bool,
+    fn_info: &FnInfo,
+) -> TypePath {
+    let span = fn_info.syntax.spans.inputs;
+
+    let arg_refs_tuple = arg_refs_tuple::new(span, &fn_info.syntax.arguments);
+
+    let return_type = match &fn_info.syntax.return_type {
+        ReturnType::Default => void_type(span),
+        ReturnType::Type(_, ty) => r#type::anonymize_all_references(*ty.clone()),
+    };
+
+    let mock_arg = if stores_mock_data {
+        Type::Reference(TypeReference {
+            and_token: Token![&](span),
+            lifetime: None,
+            mutability: None,
+            elem: Box::new(mock_type.clone()),
+        })
+    } else {
+        mock_type.clone()
+    };
+
+    let result = TypePath {
+        qself: None,
+        path: Path {
+            leading_colon: None,
+            segments: punctuated([PathSegment {
+                ident: Ident::new("FnConfigurator", span),
+                arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
+                    colon2_token: None,
+                    lt_token: Token![<](span),
+                    args: punctuated([
+                        GenericArgument::Lifetime(placeholder_lifetime::new(span)),
+                        GenericArgument::Type(mock_type),
+                        GenericArgument::Type(Type::Path(self_type(span))),
+                        GenericArgument::Type(Type::Tuple(arg_refs_tuple)),
+                        GenericArgument::Type(return_type),
+                        GenericArgument::Type(mock_arg),
+                        bool_generic_arg::new(span, ctx.support_base_calling),
+                        bool_generic_arg::new(span, stores_mock_data),
+                    ]),
+                    gt_token: Token![>](span),
+                }),
+            }]),
+        },
+    };
+
+    return result;
 }

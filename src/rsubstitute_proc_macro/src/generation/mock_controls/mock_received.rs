@@ -137,7 +137,7 @@ fn generate_impl_fn(
         .chain(core::iter::once(FnArg::Typed(times_arg)))
         .collect();
 
-    let return_type = todo!();
+    let return_type = generate_fn_verifier(fn_info);
 
     let sig = Signature {
         constness: None,
@@ -153,66 +153,30 @@ fn generate_impl_fn(
         output: ReturnType::Type(Token!(->)(span), Box::new(Type::Path(return_type.clone()))),
     };
 
-    let args_checker_stmt = Local {
-        attrs: Vec::new(),
-        let_token: Token![let](span),
-        pat: Pat::Type(PatType {
-            attrs: Vec::new(),
-            pat: Box::new(Pat::Path(ExprPath {
-                attrs: Vec::new(),
-                qself: None,
-                path: fn_info.args_checker_struct.path.clone(),
-            })),
-            colon_token: Token![:](span),
-            ty: Box::new(Type::Path(TypePath {
-                qself: None,
-                path: fn_info.args_checker_struct.path.clone(),
-            })),
-        }),
-        init: Some(LocalInit {
-            eq_token: Token![=](span),
-            expr: Box::new(Expr::Struct(ExprStruct {
-                attrs: Vec::new(),
-                qself: None,
-                path: fn_info.args_checker_struct.path.clone(),
-                brace_token: token::Brace(span),
-                fields: fn_info
-                    .syntax
-                    .arguments
-                    .iter()
-                    .map(|argument| FieldValue {
-                        attrs: Vec::new(),
-                        member: Member::Named(argument.ident.clone()),
-                        colon_token: Some(Token![:](span)),
-                        expr: Expr::Macro(transmute_lifetime_expr::new(Expr::MethodCall(
-                            expr::method_call::new(
-                                span,
-                                Expr::Path(ExprPath {
-                                    attrs: Vec::new(),
-                                    qself: None,
-                                    path: fn_info.args_checker_struct.path.clone(),
-                                }),
-                                Ident::new("into", span),
-                                [],
-                            ),
-                        ))),
-                    })
-                    .collect(),
-                dot2_token: None,
-                rest: None,
-            })),
-            diverge: None,
-        }),
-        semi_token: Token![;](span),
-    };
+    let args_checker_stmt = args_checker_stmt::new(span, fn_info);
 
-    let verify_received_stmt = todo!();
+    let verify_received_stmt = Expr::MethodCall(expr::method_call::new(
+        span,
+        Expr::Field(expr::field::new(
+            Expr::Field(expr::field::new(
+                Expr::Path(self_expr_path(span)),
+                data_ident(span),
+            )),
+            fn_info.syntax.fn_ident.clone(),
+        )),
+        Ident::new("verify_received", span),
+        [Expr::Path(ExprPath {
+            attrs: Vec::new(),
+            qself: None,
+            path: args_checker_stmt.var_path,
+        })],
+    ));
     let return_stmt = todo!();
 
     let block = Block {
         brace_token: token::Brace(span),
         stmts: vec![
-            Stmt::Local(args_checker_stmt),
+            Stmt::Local(args_checker_stmt.local),
             Stmt::Expr(verify_received_stmt, Some(Token![;](span))),
             Stmt::Expr(Expr::Macro(return_stmt), None),
         ],
@@ -227,4 +191,31 @@ fn generate_impl_fn(
     };
 
     return ImplItem::Fn(result);
+}
+
+fn generate_fn_verifier(fn_info: &FnInfo) -> TypePath {
+    let span = fn_info.syntax.spans.inputs;
+
+    let arg_refs_tuple = arg_refs_tuple::new(span, &fn_info.syntax.arguments);
+
+    let result = TypePath {
+        qself: None,
+        path: Path {
+            leading_colon: None,
+            segments: punctuated([PathSegment {
+                ident: Ident::new("FnVerifier", span),
+                arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
+                    colon2_token: None,
+                    lt_token: Token![<](span),
+                    args: punctuated([
+                        GenericArgument::Type(Type::Path(self_type(span))),
+                        GenericArgument::Type(Type::Tuple(arg_refs_tuple)),
+                    ]),
+                    gt_token: Token![>](span),
+                }),
+            }]),
+        },
+    };
+
+    return result;
 }

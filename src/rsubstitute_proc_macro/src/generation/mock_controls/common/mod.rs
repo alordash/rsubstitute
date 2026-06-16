@@ -1,2 +1,4 @@
 pub mod clone_impl;
-pub mod fn_configurator;
+pub mod arg_refs_tuple;
+pub mod bool_generic_arg;
+pub mod args_checker_stmt;
