@@ -21,7 +21,7 @@ pub(crate) struct Params<'a> {
 }
 
 pub(crate) fn generate(
-    crate::generation::mock_controls::mock_setup::Params {
+    Params {
         ctx,
         source_span,
         target_ident,
@@ -29,7 +29,202 @@ pub(crate) fn generate(
         mock_data_ident,
         stores_mock_data,
         fn_infos,
-    }: crate::generation::mock_controls::mock_setup::Params,
+    }: Params,
 ) -> MockReceived {
+    let fields_named = FieldsNamed {
+        brace_token: token::Brace(source_span),
+        named: punctuated([Field {
+            attrs: Vec::new(),
+            vis: Visibility::Inherited,
+            mutability: FieldMutability::None,
+            ident: Some(data_ident(source_span)),
+            colon_token: Some(Token![:](source_span)),
+            ty: Type::Path(r#type::arc_of(
+                source_span,
+                Type::Path(TypePath {
+                    qself: None,
+                    path: path::from_ident(mock_data_ident),
+                }),
+            )),
+        }]),
+    };
 
+    let item_struct = ItemStruct {
+        attrs: Vec::new(),
+        vis: Visibility::Inherited,
+        struct_token: Token![struct](source_span),
+        ident: format_ident!("{target_ident}Received"),
+        generics: Generics::default(),
+        fields: Fields::Named(fields_named),
+        semi_token: None,
+    };
+
+    let path = path::from_ident(item_struct.ident.clone());
+    let r#type = Type::Path(TypePath {
+        qself: None,
+        path: path.clone(),
+    });
+    let clone_impl = clone_impl::new(source_span, r#type.clone());
+
+    let items = fn_infos
+        .into_iter()
+        .map(|x| generate_impl_fn(ctx, mock_type.clone(), stores_mock_data, x))
+        .collect();
+
+    let r#impl = ItemImpl {
+        attrs: Vec::new(),
+        defaultness: None,
+        unsafety: None,
+        impl_token: Token![impl](source_span),
+        generics: Generics::default(),
+        trait_: None,
+        self_ty: Box::new(r#type),
+        brace_token: token::Brace(source_span),
+        items,
+    };
+
+    let result = MockReceived {
+        path,
+        item_struct,
+        clone_impl,
+        r#impl,
+    };
+
+    return result;
+}
+
+fn generate_impl_fn(
+    ctx: &Context,
+    mock_type: Type,
+    stores_mock_data: bool,
+    fn_info: &FnInfo,
+) -> ImplItem {
+    let span = fn_info.syntax.spans.inputs;
+
+    let mut generics = fn_info.syntax.merged_generics.clone();
+    generics.params.insert(
+        0,
+        GenericParam::Lifetime(LifetimeParam {
+            attrs: Vec::new(),
+            lifetime: anonymous_lifetime::new(span),
+            colon_token: None,
+            bounds: Punctuated::new(),
+        }),
+    );
+
+    const TIMES_ARG_NAME: &'static str = "times";
+    let times_arg = PatType {
+        attrs: Vec::new(),
+        pat: Box::new(Pat::Path(ExprPath {
+            attrs: Vec::new(),
+            qself: None,
+            path: path::new(span, [TIMES_ARG_NAME]),
+        })),
+        colon_token: Token![:](span),
+        ty: Box::new(Type::Path(TypePath {
+            qself: None,
+            path: path::new(span, ["Times"]),
+        })),
+    };
+    let inputs = core::iter::once(ref_self_fn_arg(span))
+        .chain(
+            fn_info
+                .syntax
+                .arguments
+                .iter()
+                .map(|x| x.control_fn_arg.clone()),
+        )
+        .chain(core::iter::once(FnArg::Typed(times_arg)))
+        .collect();
+
+    let return_type = todo!();
+
+    let sig = Signature {
+        constness: None,
+        asyncness: None,
+        unsafety: None,
+        abi: None,
+        fn_token: Token![fn](span),
+        ident: fn_info.syntax.fn_ident.clone(),
+        generics,
+        paren_token: token::Paren(span),
+        inputs,
+        variadic: None,
+        output: ReturnType::Type(Token!(->)(span), Box::new(Type::Path(return_type.clone()))),
+    };
+
+    let args_checker_stmt = Local {
+        attrs: Vec::new(),
+        let_token: Token![let](span),
+        pat: Pat::Type(PatType {
+            attrs: Vec::new(),
+            pat: Box::new(Pat::Path(ExprPath {
+                attrs: Vec::new(),
+                qself: None,
+                path: fn_info.args_checker_struct.path.clone(),
+            })),
+            colon_token: Token![:](span),
+            ty: Box::new(Type::Path(TypePath {
+                qself: None,
+                path: fn_info.args_checker_struct.path.clone(),
+            })),
+        }),
+        init: Some(LocalInit {
+            eq_token: Token![=](span),
+            expr: Box::new(Expr::Struct(ExprStruct {
+                attrs: Vec::new(),
+                qself: None,
+                path: fn_info.args_checker_struct.path.clone(),
+                brace_token: token::Brace(span),
+                fields: fn_info
+                    .syntax
+                    .arguments
+                    .iter()
+                    .map(|argument| FieldValue {
+                        attrs: Vec::new(),
+                        member: Member::Named(argument.ident.clone()),
+                        colon_token: Some(Token![:](span)),
+                        expr: Expr::Macro(transmute_lifetime_expr::new(Expr::MethodCall(
+                            expr::method_call::new(
+                                span,
+                                Expr::Path(ExprPath {
+                                    attrs: Vec::new(),
+                                    qself: None,
+                                    path: fn_info.args_checker_struct.path.clone(),
+                                }),
+                                Ident::new("into", span),
+                                [],
+                            ),
+                        ))),
+                    })
+                    .collect(),
+                dot2_token: None,
+                rest: None,
+            })),
+            diverge: None,
+        }),
+        semi_token: Token![;](span),
+    };
+
+    let verify_received_stmt = todo!();
+    let return_stmt = todo!();
+
+    let block = Block {
+        brace_token: token::Brace(span),
+        stmts: vec![
+            Stmt::Local(args_checker_stmt),
+            Stmt::Expr(verify_received_stmt, Some(Token![;](span))),
+            Stmt::Expr(Expr::Macro(return_stmt), None),
+        ],
+    };
+
+    let result = ImplItemFn {
+        attrs: Vec::new(),
+        vis: Visibility::Public(Token!(pub)(span)),
+        defaultness: None,
+        sig,
+        block,
+    };
+
+    return ImplItem::Fn(result);
 }
