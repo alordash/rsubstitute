@@ -5,6 +5,8 @@ use crate::syntax::*;
 use proc_macro2::Span;
 use syn::*;
 
+// TODO - separately generate mock_impl - its what generated for static fn
+// and what's generated for #[mock] on struct impl
 pub(crate) fn generate(
     source_span: Span,
     mock_ident: Ident,
