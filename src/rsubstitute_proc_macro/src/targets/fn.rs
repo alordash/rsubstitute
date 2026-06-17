@@ -27,19 +27,20 @@ pub(crate) fn handle(ctx: Context, item_fn: ItemFn) {
         support_base_calling: ctx.support_base_calling,
         store_mock_data: false,
     });
+    let mock_data_ident = mock_data.item_struct.ident.clone();
     let mock_setup = mock_setup::generate(mock_setup::Params {
         ctx: &ctx,
         source_span,
         target_ident: target_ident.clone(),
         mock_type: mock_type.clone(),
-        mock_data_ident: mock_data.item_struct.ident.clone(),
+        mock_data_ident: mock_data_ident.clone(),
         stores_mock_data: false,
         fn_infos: &fn_infos,
     });
     let mock_received = mock_received::generate(mock_received::Params {
         source_span,
         target_ident: target_ident.clone(),
-        mock_data_ident: mock_data.item_struct.ident.clone(),
+        mock_data_ident: mock_data_ident.clone(),
         fn_infos: &fn_infos,
     });
     todo!()

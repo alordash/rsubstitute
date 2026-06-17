@@ -36,7 +36,7 @@ pub(crate) fn generate(
 
     let item_struct = ItemStruct {
         attrs: Vec::new(),
-        vis: Visibility::Public(Token![pub](source_span)),
+        vis: Visibility::Public(Token!(pub)(source_span)),
         struct_token: Token![struct](source_span),
         ident: format_ident!("{target_ident}MockData"),
         generics: Generics::default(),
