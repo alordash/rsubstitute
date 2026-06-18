@@ -17,7 +17,7 @@ pub mod for_generated {
     pub use crate::*;
     pub use macros::*;
     pub use rsubstitute_core::fn_parameters::*;
-    pub use rsubstitute_core::mock_data::*;
+    pub use rsubstitute_core::infrastructure::*;
     pub use rsubstitute_core::*;
     pub use std::cell::LazyCell;
     pub use std::cell::RefCell;

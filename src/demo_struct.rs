@@ -1,7 +1,7 @@
 #[cfg(not(test))]
-struct Struct;
+struct StructMock;
 #[cfg(not(test))]
-impl Struct {
+impl StructMock {
     pub fn new() -> Self {
         Self
     }
@@ -350,11 +350,11 @@ mod __rsubstitute_generated_Struct {
     #[doc(hidden)]
     #[derive(IMockData)]
     pub struct StructData {
-        pub accept_ref: FnData<'static, Struct, false, true>,
-        pub return_ref: FnData<'static, Struct, false, true>,
-        pub accept_ref_return_ref: FnData<'static, Struct, false, true>,
-        pub accept_two_refs: FnData<'static, Struct, false, true>,
-        pub accept_two_refs_return_ref: FnData<'static, Struct, false, true>,
+        pub accept_ref: FnData<'static, StructMock, false, true>,
+        pub return_ref: FnData<'static, StructMock, false, true>,
+        pub accept_ref_return_ref: FnData<'static, StructMock, false, true>,
+        pub accept_two_refs: FnData<'static, StructMock, false, true>,
+        pub accept_two_refs_return_ref: FnData<'static, StructMock, false, true>,
     }
     #[doc(hidden)]
     pub struct StructSetup {
@@ -386,25 +386,23 @@ mod __rsubstitute_generated_Struct {
             Self
         }
     }
-    pub struct Struct {
+    pub struct StructMock<'__rs> {
+        pub mocked: &'__rs mut Struct,
         pub setup: StructSetup,
         pub received: StructReceived,
         pub data: Arc<StructData>,
-        inner_data: Struct_InnerData,
     }
-    impl AsRef<Struct> for Struct {
-        fn as_ref(&self) -> &Struct {
-            self
+    struct Struct(Struct_InnerData);
+    impl IMockable<StructMock> for Struct {
+        fn mock_from_ref(&mut self) -> StructMock {
+            StructMock {
+                mocked: self,
+                ..Default::default()
+            }
         }
     }
-    impl Deref for Struct {
-        type Target = Struct_InnerData;
-
-        fn deref(&self) -> &Self::Target {
-            &self.inner_data
-        }
-    }
-    impl Struct {
+    
+    impl StructMock {
         pub fn accept_ref(&self, r: &i32) {
             let call: accept_ref_Call = accept_ref_Call {
                 _phantom_r: PhantomData,
@@ -454,7 +452,7 @@ mod __rsubstitute_generated_Struct {
                 .handle_returning(self, call);
         }
     }
-    impl Struct {
+    impl StructMock {
         pub fn new() -> Self {
             let data = Arc::new(StructData {
                 accept_ref: FnData::new("accept_ref"),
@@ -464,7 +462,7 @@ mod __rsubstitute_generated_Struct {
                 accept_two_refs_return_ref: FnData::new("accept_two_refs_return_ref"),
             });
             let inner_data = Struct_InnerData::new();
-            return Struct {
+            return StructMock {
                 setup: StructSetup { data: data.clone() },
                 received: StructReceived { data: data.clone() },
                 data,
@@ -476,7 +474,7 @@ mod __rsubstitute_generated_Struct {
         pub fn accept_ref<'__rsa>(
             &self,
             r: impl Into<Arg<&'__rsa i32>>,
-        ) -> FnConfigurator<'_, Struct, Self, (&'__rsa &'__rsa i32,), (), &Struct, false, true>
+        ) -> FnConfigurator<'_, StructMock, Self, (&'__rsa &'__rsa i32,), (), &StructMock, false, true>
         {
             let accept_ref_args_checker: accept_ref_ArgsChecker = accept_ref_ArgsChecker {
                 _phantom_r: PhantomData,
@@ -484,11 +482,11 @@ mod __rsubstitute_generated_Struct {
             };
             let fn_configurator: FnConfigurator<
                 '_,
-                Struct,
+                StructMock,
                 Self,
                 (&'__rsa &'__rsa i32,),
                 (),
-                &Struct,
+                &StructMock,
                 false,
                 true,
             > = self
@@ -499,15 +497,15 @@ mod __rsubstitute_generated_Struct {
         }
         pub fn return_ref<'__rsa>(
             &self,
-        ) -> FnConfigurator<'_, Struct, Self, (), &'__rsa i32, &Struct, false, true> {
+        ) -> FnConfigurator<'_, StructMock, Self, (), &'__rsa i32, &StructMock, false, true> {
             let return_ref_args_checker: return_ref_ArgsChecker = return_ref_ArgsChecker {};
             let fn_configurator: FnConfigurator<
                 '_,
-                Struct,
+                StructMock,
                 Self,
                 (),
                 &'__rsa i32,
-                &Struct,
+                &StructMock,
                 false,
                 true,
             > = self
@@ -521,11 +519,11 @@ mod __rsubstitute_generated_Struct {
             r: impl Into<Arg<&'__rsa i32>>,
         ) -> FnConfigurator<
             '_,
-            Struct,
+            StructMock,
             Self,
             (&'__rsa &'__rsa i32,),
             &'__rsa i32,
-            &Struct,
+            &StructMock,
             false,
             true,
         > {
@@ -536,11 +534,11 @@ mod __rsubstitute_generated_Struct {
                 };
             let fn_configurator: FnConfigurator<
                 '_,
-                Struct,
+                StructMock,
                 Self,
                 (&'__rsa &'__rsa i32,),
                 &'__rsa i32,
-                &Struct,
+                &StructMock,
                 false,
                 true,
             > = self
@@ -555,11 +553,11 @@ mod __rsubstitute_generated_Struct {
             r2: impl Into<Arg<&'__rsa f32>>,
         ) -> FnConfigurator<
             '_,
-            Struct,
+            StructMock,
             Self,
             (&'__rsa &'__rsa i32, &'__rsa &'__rsa f32),
             (),
-            &Struct,
+            &StructMock,
             false,
             true,
         > {
@@ -572,11 +570,11 @@ mod __rsubstitute_generated_Struct {
                 };
             let fn_configurator: FnConfigurator<
                 '_,
-                Struct,
+                StructMock,
                 Self,
                 (&'__rsa &'__rsa i32, &'__rsa &'__rsa f32),
                 (),
-                &Struct,
+                &StructMock,
                 false,
                 true,
             > = self
@@ -591,11 +589,11 @@ mod __rsubstitute_generated_Struct {
             r2: impl Into<Arg<&'__rsa f32>>,
         ) -> FnConfigurator<
             '_,
-            Struct,
+            StructMock,
             Self,
             (&'__rsa &'__rsa i32, &'__rsa &'__rsa f32),
             &'__rsa str,
-            &Struct,
+            &StructMock,
             false,
             true,
         > {
@@ -608,11 +606,11 @@ mod __rsubstitute_generated_Struct {
                 };
             let fn_configurator: FnConfigurator<
                 '_,
-                Struct,
+                StructMock,
                 Self,
                 (&'__rsa &'__rsa i32, &'__rsa &'__rsa f32),
                 &'__rsa str,
-                &Struct,
+                &StructMock,
                 false,
                 true,
             > = self
@@ -699,4 +697,9 @@ mod __rsubstitute_generated_Struct {
             self.data.verify_received_nothing_else();
         }
     }
+}
+
+fn usage() {
+    let s = StructMock { /* ... */ };
+    let (s, s_mock): (Arc<StructMock>, StructMock) = s.mock();
 }

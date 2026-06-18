@@ -1,4 +1,4 @@
-use crate::error_printing;
+use crate::infrastructure::*;
 
 pub trait IMockData {
     fn get_received_nothing_else_error_msgs(&self) -> Vec<Vec<String>>;

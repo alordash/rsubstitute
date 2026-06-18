@@ -1,6 +1,6 @@
 use crate::args::*;
 use crate::fn_parameters::DynArgsChecker;
-use crate::matching_config_search_result::MatchingConfigSearchErr;
+use crate::infrastructure::MatchingConfigSearchErr;
 use crate::*;
 
 pub(crate) fn panic_received_verification_error(
