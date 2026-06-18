@@ -17,5 +17,6 @@ pub use fn_data::*;
 pub use fn_verifier::*;
 pub use i_mock::*;
 pub use i_mock_data::*;
+pub use i_mockable::*;
 pub(crate) use matching_config_search_result::*;
 pub use static_fn_mocks_global_map::*;
