@@ -1,0 +1,7 @@
+[package]
+name = "wip_demos"
+version = "0.1.0"
+edition = "2024"
+
+[dependencies]
+rsubstitute_core = { path = "../rsubstitute_core" }
