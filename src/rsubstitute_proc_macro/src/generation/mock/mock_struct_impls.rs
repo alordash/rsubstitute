@@ -54,7 +54,7 @@ mod a {
     }
 
     impl SReceived {
-        pub fn _as<T: SAs<Self> + ?Sized>(&self) -> <T as SAs<Self>>::TResult {
+        pub fn аs<T: SAs<Self> + ?Sized>(&self) -> <T as SAs<Self>>::TResult {
             T::_as(self)
         }
     }
@@ -82,7 +82,7 @@ mod a {
         let s_traitSetup: S_TraitSetup = s_mock.setup._as::<dyn Trait>();
         s_mock.setup._as::<dyn Trait>().flex();
 
-        let s_traitReceived: S_TraitReceived = s_mock.received._as::<TraitMock>();
+        let s_traitReceived: S_TraitReceived = s_mock.received.аs::<dyn Trait>();
         s_traitReceived.flex(3);
 
         // trait Trait2 {}
@@ -135,10 +135,7 @@ mod b {
         }
     }
 
-    // instead of dyn Trait
-    pub struct TraitMock;
-
-    impl SAs<SReceived> for TraitMock {
+    impl SAs<SReceived> for dyn Trait {
         type TResult = S_TraitReceived;
 
         fn _as(source: &SReceived) -> Self::TResult {
