@@ -82,7 +82,7 @@ mod a {
         let s_traitSetup: S_TraitSetup = s_mock.setup._as::<dyn Trait>();
         s_mock.setup._as::<dyn Trait>().flex();
 
-        let s_traitReceived: S_TraitReceived = s_mock.received._as::<dyn Trait>();
+        let s_traitReceived: S_TraitReceived = s_mock.received._as::<TraitMock>();
         s_traitReceived.flex(3);
 
         // trait Trait2 {}
@@ -135,7 +135,10 @@ mod b {
         }
     }
 
-    impl STransform<SReceived> for dyn Trait {
+    // instead of dyn Trait
+    pub struct TraitMock;
+
+    impl STransform<SReceived> for TraitMock {
         type TResult = S_TraitReceived;
 
         fn convert(source: &SReceived) -> Self::TResult {
