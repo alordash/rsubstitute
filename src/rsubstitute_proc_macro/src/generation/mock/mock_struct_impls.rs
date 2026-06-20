@@ -44,8 +44,8 @@ mod a {
     }
 
     impl SSetup {
-        pub fn _as<T: STransform<Self> + ?Sized>(&self) -> <T as STransform<Self>>::TResult {
-            T::convert(self)
+        pub fn _as<T: SAs<Self> + ?Sized>(&self) -> <T as SAs<Self>>::TResult {
+            T::_as(self)
         }
     }
 
@@ -54,8 +54,8 @@ mod a {
     }
 
     impl SReceived {
-        pub fn _as<T: STransform<Self> + ?Sized>(&self) -> <T as STransform<Self>>::TResult {
-            T::convert(self)
+        pub fn _as<T: SAs<Self> + ?Sized>(&self) -> <T as SAs<Self>>::TResult {
+            T::_as(self)
         }
     }
 
@@ -91,10 +91,10 @@ mod a {
 
     // global trait, defined in rsubstitute_core
     // or make it local for ability to impl it for external traits?
-    pub trait STransform<TSource> {
+    pub trait SAs<TSource> {
         type TResult;
 
-        fn convert(source: &TSource) -> Self::TResult;
+        fn _as(source: &TSource) -> Self::TResult;
     }
 }
 
@@ -124,10 +124,10 @@ mod b {
         fn flex(&self) {}
     }
 
-    impl STransform<SSetup> for dyn Trait {
+    impl SAs<SSetup> for dyn Trait {
         type TResult = S_TraitSetup;
 
-        fn convert(source: &SSetup) -> Self::TResult {
+        fn _as(source: &SSetup) -> Self::TResult {
             // should I create new S_TraitSetup here each time `_as` called
             // or should I keep it as part of SSetup?
             // I CANT store S_TraitSetup in SSetup if S_TraitSetup is in another module though
@@ -138,10 +138,10 @@ mod b {
     // instead of dyn Trait
     pub struct TraitMock;
 
-    impl STransform<SReceived> for TraitMock {
+    impl SAs<SReceived> for TraitMock {
         type TResult = S_TraitReceived;
 
-        fn convert(source: &SReceived) -> Self::TResult {
+        fn _as(source: &SReceived) -> Self::TResult {
             todo!()
         }
     }
