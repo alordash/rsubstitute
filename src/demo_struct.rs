@@ -401,7 +401,7 @@ mod __rsubstitute_generated_Struct {
             }
         }
     }
-    
+
     impl StructMock {
         pub fn accept_ref(&self, r: &i32) {
             let call: accept_ref_Call = accept_ref_Call {
@@ -474,8 +474,16 @@ mod __rsubstitute_generated_Struct {
         pub fn accept_ref<'__rsa>(
             &self,
             r: impl Into<Arg<&'__rsa i32>>,
-        ) -> FnConfigurator<'_, StructMock, Self, (&'__rsa &'__rsa i32,), (), &StructMock, false, true>
-        {
+        ) -> FnConfigurator<
+            '_,
+            StructMock,
+            Self,
+            (&'__rsa &'__rsa i32,),
+            (),
+            &StructMock,
+            false,
+            true,
+        > {
             let accept_ref_args_checker: accept_ref_ArgsChecker = accept_ref_ArgsChecker {
                 _phantom_r: PhantomData,
                 r: transmute_lifetime!(r.into()),
@@ -497,7 +505,8 @@ mod __rsubstitute_generated_Struct {
         }
         pub fn return_ref<'__rsa>(
             &self,
-        ) -> FnConfigurator<'_, StructMock, Self, (), &'__rsa i32, &StructMock, false, true> {
+        ) -> FnConfigurator<'_, StructMock, Self, (), &'__rsa i32, &StructMock, false, true>
+        {
             let return_ref_args_checker: return_ref_ArgsChecker = return_ref_ArgsChecker {};
             let fn_configurator: FnConfigurator<
                 '_,

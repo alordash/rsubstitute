@@ -24,6 +24,9 @@ struct Struct<'b> {
 }
 
 struct StructMock<'__rs, 'b> {
+    pub setup: String,
+    pub received: String,
+    pub data: Arc<String>,
     mockable: &'__rs mut Struct<'b>,
 }
 
@@ -31,6 +34,9 @@ struct StructMock<'__rs, 'b> {
 impl<'__rs, 'b> IMockable<StructMock<'__rs, 'b>> for Struct<'b> {
     fn mock_from_ref(&mut self) -> StructMock<'__rs, 'b> {
         StructMock {
+            setup: todo!(),
+            received: todo!(),
+            data: todo!(),
             mockable: transmute_lifetime!(self),
         }
     }
