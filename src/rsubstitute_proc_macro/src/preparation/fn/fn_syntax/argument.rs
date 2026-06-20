@@ -1,4 +1,4 @@
-use crate::generation::anonymous_lifetime;
+use crate::generation::rsubstitute_lifetime;
 use crate::preparation::r#fn::models::*;
 use crate::syntax::{path, punctuated};
 use proc_macro2::Span;
@@ -77,7 +77,7 @@ struct AnonymousLifetimeReplacer;
 impl VisitMut for AnonymousLifetimeReplacer {
     fn visit_type_reference_mut(&mut self, i: &mut TypeReference) {
         if i.lifetime.is_none() {
-            i.lifetime = Some(anonymous_lifetime::new(i.span()))
+            i.lifetime = Some(rsubstitute_lifetime::new(i.span()))
         }
         visit_mut::visit_type_reference_mut(self, i);
     }

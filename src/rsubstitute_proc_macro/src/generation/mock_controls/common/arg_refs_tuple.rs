@@ -1,4 +1,4 @@
-use crate::generation::anonymous_lifetime;
+use crate::generation::rsubstitute_lifetime;
 use crate::preparation::r#fn::models::*;
 use proc_macro2::Span;
 use syn::*;
@@ -11,7 +11,7 @@ pub(crate) fn new(span: Span, arguments: &[Argument]) -> TypeTuple {
             .map(|argument| {
                 Type::Reference(TypeReference {
                     and_token: Token![&](span),
-                    lifetime: Some(anonymous_lifetime::new(span)),
+                    lifetime: Some(rsubstitute_lifetime::new(span)),
                     mutability: None,
                     elem: Box::new(*argument.ref_style_type.clone()),
                 })

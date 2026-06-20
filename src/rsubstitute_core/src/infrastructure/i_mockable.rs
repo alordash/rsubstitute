@@ -6,7 +6,7 @@ use std::sync::Arc;
 pub trait IMockable<TMock>: Sized {
     fn mock_from_ref(&mut self) -> TMock;
 
-    fn mock<'a>(self) -> TMock {
+    fn mock<'__rs>(self) -> TMock {
         let mock_box = Box::new(self);
         // LEAK: mock is leaked because it will be cleared by
         // `TMock`'s `Drop` implementation using `IMock::drop_boxed_mockable`.
@@ -16,25 +16,28 @@ pub trait IMockable<TMock>: Sized {
     }
 }
 
+// TODO - remove
 // Usage
 struct Struct<'b> {
     pub data: Arc<Vec<i32>>,
     pub r: &'b [u8; 3],
 }
 
-struct StructMock<'a, 'b> {
-    mockable: &'a mut Struct<'b>,
+struct StructMock<'__rs, 'b> {
+    mockable: &'__rs mut Struct<'b>,
 }
 
-impl<'a, 'b> IMockable<StructMock<'a, 'b>> for Struct<'b> {
-    fn mock_from_ref(&mut self) -> StructMock<'a, 'b> {
+// gen
+impl<'__rs, 'b> IMockable<StructMock<'__rs, 'b>> for Struct<'b> {
+    fn mock_from_ref(&mut self) -> StructMock<'__rs, 'b> {
         StructMock {
             mockable: transmute_lifetime!(self),
         }
     }
 }
 
-impl<'a, 'b> Deref for StructMock<'a, 'b> {
+// gen
+impl<'__rs, 'b> Deref for StructMock<'__rs, 'b> {
     type Target = Struct<'b>;
 
     fn deref(&self) -> &Self::Target {
@@ -42,15 +45,18 @@ impl<'a, 'b> Deref for StructMock<'a, 'b> {
     }
 }
 
-impl<'a, 'b> DerefMut for StructMock<'a, 'b> {
+// gen
+impl<'__rs, 'b> DerefMut for StructMock<'__rs, 'b> {
     fn deref_mut(&mut self) -> &mut Self::Target {
         self.mockable
     }
 }
 
-impl<'a, 'b> IMock<Struct<'b>> for StructMock<'a, 'b> {}
+// gen
+impl<'__rs, 'b> IMock<Struct<'b>> for StructMock<'__rs, 'b> {}
 
-impl<'a, 'b> Drop for StructMock<'a, 'b> {
+// gen
+impl<'__rs, 'b> Drop for StructMock<'__rs, 'b> {
     fn drop(&mut self) {
         self.drop_boxed_mockable()
     }

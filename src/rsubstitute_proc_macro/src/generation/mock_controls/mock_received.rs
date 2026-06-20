@@ -78,7 +78,7 @@ fn generate_impl_fn(fn_info: &FnInfo) -> ImplItem {
         0,
         GenericParam::Lifetime(LifetimeParam {
             attrs: Vec::new(),
-            lifetime: anonymous_lifetime::new(span),
+            lifetime: rsubstitute_lifetime::new(span),
             colon_token: None,
             bounds: Punctuated::new(),
         }),
