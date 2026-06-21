@@ -68,11 +68,13 @@ mod result {
 
         pub struct Struct<S1>(pub S1);
 
-        impl<'__rs, S1> IMockable<StructMock<'__rs, S1>> for Struct<S1> {
-            fn mock_from_ref(&mut self) -> StructMock<'__rs, S1> {
+        impl<S1> IMockable for Struct<S1> {
+            type Mock = StructMock<S1>;
+
+            fn convert(mockable: Box<Self>) -> Self::Mock {
                 StructMock {
                     setup: todo!(),
-                    mockable: transmute_lifetime!(self),
+                    mockable,
                 }
             }
         }
@@ -80,28 +82,28 @@ mod result {
         pub struct StructSetup<S1>(String, PhantomData<S1>);
         pub struct StructStaticSetup<S1>(PhantomData<S1>);
 
-        pub struct StructMock<'__rs, S1> {
+        pub struct StructMock<S1> {
             pub setup: StructSetup<S1>,
-            mockable: &'__rs mut Struct<S1>,
+            mockable: Box<Struct<S1>>,
         }
 
-        impl<'__rs, S1> Deref for StructMock<'__rs, S1> {
+        impl<S1> Deref for StructMock<S1> {
             type Target = Struct<S1>;
 
             fn deref(&self) -> &Self::Target {
-                self.mockable
+                self.mockable.as_ref()
             }
         }
 
-        impl<'__rs, S1> DerefMut for StructMock<'__rs, S1> {
+        impl<S1> DerefMut for StructMock<S1> {
             fn deref_mut(&mut self) -> &mut Self::Target {
-                self.mockable
+                self.mockable.as_mut()
             }
         }
 
-        impl<'__rs, S1> IMock<Struct<S1>> for StructMock<'__rs, S1> {}
+        impl<S1> IMock<Struct<S1>> for StructMock<S1> {}
 
-        impl<'__rs, S1> Drop for StructMock<'__rs, S1> {
+        impl<S1> Drop for StructMock<S1> {
             fn drop(&mut self) {
                 self.drop_boxed_mockable()
             }
@@ -132,7 +134,7 @@ mod result {
 
         // Applying impl to StructMock because that's where fn config is used
         // (and optionally base impl is called)
-        impl<'__rs, S1> StructMock<'__rs, S1> {
+        impl<S1> StructMock<S1> {
             pub fn f<S2>(&self) {}
             pub fn g<S3>() {}
         }
@@ -155,7 +157,7 @@ mod result {
             pub fn sstatic<S5>(&self, _: i32) {}
         }
 
-        impl<'__rs> StructMock<'__rs, i8> {
+        impl<'__rs> StructMock<i8> {
             pub fn sself<S4>(&self) {}
             pub fn sstatic<S5>() {}
         }
@@ -197,7 +199,7 @@ mod result {
             }
         }
 
-        impl<'__rs, T1> Trait<T1> for StructMock<'__rs, i16> {
+        impl<T1> Trait<T1> for StructMock<i16> {
             fn f<T2>(&self) {}
             fn g<T3>() {}
             fn tself<T4>(&self) {}
@@ -241,7 +243,7 @@ mod result {
             }
         }
 
-        impl<'__rs> Trait<i64> for StructMock<'__rs, i128> {
+        impl<'__rs> Trait<i64> for StructMock<i128> {
             fn f<T2>(&self) {}
             fn g<T3>() {}
             fn tself<T4>(&self) {}
@@ -286,7 +288,7 @@ mod result {
             }
         }
 
-        impl<'__rs, G1, S1> Gen<G1> for StructMock<'__rs, S1> {
+        impl<G1, S1> Gen<G1> for StructMock<S1> {
             fn f<T2>(&self) {}
             fn g<T3>() {}
             fn gself<T4>(&self) {}
