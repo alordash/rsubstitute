@@ -64,9 +64,18 @@ mod result {
     mod struct_mock {
         use super::*;
         use std::marker::PhantomData;
-        use std::ops::Deref;
+        use std::ops::{Deref, DerefMut};
 
         pub struct Struct<S1>(pub S1);
+
+        impl<'__rs, S1> IMockable<StructMock<'__rs, S1>> for Struct<S1> {
+            fn mock_from_ref(&mut self) -> StructMock<'__rs, S1> {
+                StructMock {
+                    setup: todo!(),
+                    mockable: transmute_lifetime!(self),
+                }
+            }
+        }
 
         pub struct StructSetup<S1>(String, PhantomData<S1>);
         pub struct StructStaticSetup<S1>(PhantomData<S1>);
@@ -84,12 +93,17 @@ mod result {
             }
         }
 
-        impl<'__rs, S1> IMockable<StructMock<'__rs, S1>> for Struct<S1> {
-            fn mock_from_ref(&mut self) -> StructMock<'__rs, S1> {
-                StructMock {
-                    setup: todo!(),
-                    mockable: transmute_lifetime!(self),
-                }
+        impl<'__rs, S1> DerefMut for StructMock<'__rs, S1> {
+            fn deref_mut(&mut self) -> &mut Self::Target {
+                self.mockable
+            }
+        }
+
+        impl<'__rs, S1> IMock<Struct<S1>> for StructMock<'__rs, S1> {}
+
+        impl<'__rs, S1> Drop for StructMock<'__rs, S1> {
+            fn drop(&mut self) {
+                self.drop_boxed_mockable()
             }
         }
 
