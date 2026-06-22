@@ -1,6 +1,6 @@
+use crate::fn_parameters::DynCall;
 use std::cell::Cell;
 use std::sync::Arc;
-use crate::fn_parameters::DynCall;
 
 pub struct CallCheck<'rs> {
     pub number: usize,

@@ -103,7 +103,8 @@ impl<
     pub fn returns_with<'a>(
         &self,
         f: impl Fn(TArgRefsTuple) -> TReturnValue + 'rs,
-    ) -> &FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA> {
+    ) -> &FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA>
+    {
         let return_value_source = ReturnValueSource::Factory(Box::new(
             move |dyn_arg_refs_tuple: DynArgRefsTuple<'rs>| {
                 let arg_refs_tuple: TArgRefsTuple =
@@ -140,11 +141,21 @@ impl<'rs, TMock, TOwner, TArgRefsTuple: Copy, TMockArg, const SUPPORTS_BASE_CALL
 }
 
 impl<'rs, TMock, TOwner, TArgRefsTuple: Copy, TReturnValue, TMockArg, const STORES_MOCK_DATA: bool>
-    FnConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TReturnValue, TMockArg, true, STORES_MOCK_DATA>
+    FnConfigurator<
+        'rs,
+        TMock,
+        TOwner,
+        TArgRefsTuple,
+        TReturnValue,
+        TMockArg,
+        true,
+        STORES_MOCK_DATA,
+    >
 {
     pub fn call_base(
         &self,
-    ) -> &FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA> {
+    ) -> &FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA>
+    {
         self.fn_config.borrow_mut().set_call_base();
         return &self.fn_callback_configurator;
     }

@@ -4,19 +4,15 @@ mod fn_config;
 mod fn_configurator;
 mod fn_data;
 mod fn_verifier;
-mod i_mock;
 mod i_mock_data;
-mod i_mockable;
 mod matching_config_search_result;
-mod static_fn_mocks_global_map;
 
 pub use fn_callback_configurator::*;
 pub(crate) use fn_config::*;
 pub use fn_configurator::*;
 pub use fn_data::*;
 pub use fn_verifier::*;
-pub use i_mock::*;
 pub use i_mock_data::*;
-pub use i_mockable::*;
 pub(crate) use matching_config_search_result::*;
-pub use static_fn_mocks_global_map::*;
+
+pub mod fn_data_storage;
