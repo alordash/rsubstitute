@@ -161,7 +161,7 @@ mod accept_two_mut_refs_return_mut_ref {
         }
     }
     impl accept_two_mut_refs_return_mut_refMockSetup {
-        pub fn accept_two_mut_refs_return_mut_ref<'__rsa>(
+        pub fn setup<'__rsa>(
             &self,
             r1: impl Into<Arg<*mut i32>>,
             r2: impl Into<Arg<*mut f32>>,
@@ -193,7 +193,7 @@ mod accept_two_mut_refs_return_mut_ref {
         }
     }
     impl accept_two_mut_refs_return_mut_refMockReceived {
-        pub fn accept_two_mut_refs_return_mut_ref<'__rsa>(
+        pub fn received<'__rsa>(
             &self,
             r1: impl Into<Arg<*mut i32>>,
             r2: impl Into<Arg<*mut f32>>,
