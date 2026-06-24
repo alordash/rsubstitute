@@ -12,6 +12,7 @@ pub struct FnConfigurator<
     TArgRefsTuple: Copy,
     TReturnValue,
     TMockArg,
+    const HAS_RETURN_VALUE: bool,
     const SUPPORTS_BASE_CALLING: bool,
     const STORES_MOCK_DATA: bool,
 > {
@@ -20,6 +21,39 @@ pub struct FnConfigurator<
     owner: &'rs TOwner,
     fn_callback_configurator:
         FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA>,
+}
+
+impl<
+    'rs,
+    TMock,
+    TOwner,
+    TArgRefsTuple: Copy,
+    TReturnValue,
+    TMockArg,
+    const HAS_RETURN_VALUE: bool,
+    const SUPPORTS_BASE_CALLING: bool,
+    const STORES_MOCK_DATA: bool,
+>
+    FnConfigurator<
+        'rs,
+        TMock,
+        TOwner,
+        TArgRefsTuple,
+        TReturnValue,
+        TMockArg,
+        HAS_RETURN_VALUE,
+        SUPPORTS_BASE_CALLING,
+        STORES_MOCK_DATA,
+    >
+{
+    pub(crate) fn new(fn_config: Rc<RefCell<FnConfig<'rs, TMock>>>, owner: &'rs TOwner) -> Self {
+        Self {
+            _phantom_return_value: PhantomData,
+            fn_config: fn_config.clone(),
+            owner,
+            fn_callback_configurator: FnCallbackConfigurator::new(fn_config.clone(), owner),
+        }
+    }
 }
 
 impl<
@@ -39,19 +73,11 @@ impl<
         TArgRefsTuple,
         TReturnValue,
         TMockArg,
+        true,
         SUPPORTS_BASE_CALLING,
         STORES_MOCK_DATA,
     >
 {
-    pub(crate) fn new(fn_config: Rc<RefCell<FnConfig<'rs, TMock>>>, owner: &'rs TOwner) -> Self {
-        Self {
-            _phantom_return_value: PhantomData,
-            fn_config: fn_config.clone(),
-            owner,
-            fn_callback_configurator: FnCallbackConfigurator::new(fn_config.clone(), owner),
-        }
-    }
-
     pub fn returns<'a>(
         &self,
         return_value: TReturnValue,
@@ -120,27 +146,16 @@ impl<
     }
 }
 
-impl<'rs, TMock, TOwner, TArgRefsTuple: Copy, TMockArg, const SUPPORTS_BASE_CALLING: bool>
-    FnConfigurator<'rs, TMock, TOwner, TArgRefsTuple, (), TMockArg, SUPPORTS_BASE_CALLING, false>
-{
-    pub fn does(&self, mut callback: impl FnMut(TArgRefsTuple) + 'static) -> &'rs TOwner {
-        let callback_with_mock =
-            move |_mock: &(), arg_refs_tuple: TArgRefsTuple| callback(arg_refs_tuple);
-        self.fn_config.borrow_mut().set_callback(callback_with_mock);
-        return self.owner;
-    }
-}
-
-impl<'rs, TMock, TOwner, TArgRefsTuple: Copy, TMockArg, const SUPPORTS_BASE_CALLING: bool>
-    FnConfigurator<'rs, TMock, TOwner, TArgRefsTuple, (), TMockArg, SUPPORTS_BASE_CALLING, true>
-{
-    pub fn does(&self, callback: impl FnMut(&TMockArg, TArgRefsTuple) + 'static) -> &'rs TOwner {
-        self.fn_config.borrow_mut().set_callback(callback);
-        return self.owner;
-    }
-}
-
-impl<'rs, TMock, TOwner, TArgRefsTuple: Copy, TReturnValue, TMockArg, const STORES_MOCK_DATA: bool>
+impl<
+    'rs,
+    TMock,
+    TOwner,
+    TArgRefsTuple: Copy,
+    TReturnValue,
+    TMockArg,
+    const HAS_RETURN_VALUE: bool,
+    const SUPPORTS_BASE_CALLING: bool,
+>
     FnConfigurator<
         'rs,
         TMock,
@@ -148,6 +163,65 @@ impl<'rs, TMock, TOwner, TArgRefsTuple: Copy, TReturnValue, TMockArg, const STOR
         TArgRefsTuple,
         TReturnValue,
         TMockArg,
+        HAS_RETURN_VALUE,
+        SUPPORTS_BASE_CALLING,
+        false,
+    >
+{
+    pub fn does(&self, mut callback: impl FnMut(TArgRefsTuple) + 'static) -> &'rs TOwner {
+        let callback_with_mock =
+            move |_mock: &TMock, arg_refs_tuple: TArgRefsTuple| callback(arg_refs_tuple);
+        self.fn_config.borrow_mut().set_callback(callback_with_mock);
+        return self.owner;
+    }
+}
+
+impl<
+    'rs,
+    TMock,
+    TOwner,
+    TArgRefsTuple: Copy,
+    TReturnValue,
+    TMockArg,
+    const HAS_RETURN_VALUE: bool,
+    const SUPPORTS_BASE_CALLING: bool,
+>
+    FnConfigurator<
+        'rs,
+        TMock,
+        TOwner,
+        TArgRefsTuple,
+        TReturnValue,
+        TMockArg,
+        HAS_RETURN_VALUE,
+        SUPPORTS_BASE_CALLING,
+        true,
+    >
+{
+    pub fn does(&self, callback: impl FnMut(&TMockArg, TArgRefsTuple) + 'static) -> &'rs TOwner {
+        self.fn_config.borrow_mut().set_callback(callback);
+        return self.owner;
+    }
+}
+
+impl<
+    'rs,
+    TMock,
+    TOwner,
+    TArgRefsTuple: Copy,
+    TReturnValue,
+    TMockArg,
+    const HAS_RETURN_VALUE: bool,
+    const STORES_MOCK_DATA: bool,
+>
+    FnConfigurator<
+        'rs,
+        TMock,
+        TOwner,
+        TArgRefsTuple,
+        TReturnValue,
+        TMockArg,
+        HAS_RETURN_VALUE,
         true,
         STORES_MOCK_DATA,
     >

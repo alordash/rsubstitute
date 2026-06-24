@@ -7,7 +7,13 @@ use std::collections::HashMap;
 use std::rc::Rc;
 use std::sync::atomic::AtomicUsize;
 
-pub struct FnData<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool> {
+pub struct FnData<
+    'rs,
+    TMock,
+    const HAS_RETURN_VALUE: bool,
+    const SUPPORTS_BASE_CALLING: bool,
+    const STORES_MOCK_DATA: bool,
+> {
     fn_name: &'static str,
     // TODO - remove RefCell? can I just make mock methods all requires `&mut self`?
     pub call_infos: RefCell<HashMap<GenericsHashKey, Vec<CallCheck<'rs>>>>,
@@ -15,8 +21,13 @@ pub struct FnData<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MO
     next_call_number: AtomicUsize,
 }
 
-impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool>
-    FnData<'rs, TMock, SUPPORTS_BASE_CALLING, STORES_MOCK_DATA>
+impl<
+    'rs,
+    TMock,
+    const HAS_RETURN_VALUE: bool,
+    const SUPPORTS_BASE_CALLING: bool,
+    const STORES_MOCK_DATA: bool,
+> FnData<'rs, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, STORES_MOCK_DATA>
 {
     pub fn new(fn_name: &'static str) -> Self {
         Self {
@@ -50,6 +61,7 @@ impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool
         TArgRefsTuple,
         TReturnValue,
         TMockArg,
+        HAS_RETURN_VALUE,
         SUPPORTS_BASE_CALLING,
         STORES_MOCK_DATA,
     > {
@@ -113,7 +125,7 @@ impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool
     }
 }
 
-impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, false, STORES_MOCK_DATA> {
+impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, false, false, STORES_MOCK_DATA> {
     pub fn handle<'a, TMockArg, TCall: ICall + 'a>(&self, mock_arg: TMockArg, the_call: TCall) {
         let call = Rc::new(DynCall::new(the_call));
         let maybe_fn_config = self.get_optional_matching_config(&call);
@@ -125,7 +137,9 @@ impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, false, STORES_
             }
         }
     }
+}
 
+impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, true, false, STORES_MOCK_DATA> {
     pub fn handle_returning<'a, 'b, TMockArg, TCall: ICall + 'a, TReturnValue: IReturnValue<'b>>(
         &self,
         mock_arg: TMockArg,
@@ -152,7 +166,7 @@ impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, false, STORES_
     }
 }
 
-impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, true, STORES_MOCK_DATA> {
+impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, false, true, STORES_MOCK_DATA> {
     pub fn handle_base<'a, TMockArg, TCall: ICall + Clone + 'a>(
         &self,
         mock_arg: TMockArg,
@@ -176,7 +190,9 @@ impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, true, STORES_M
             }
         }
     }
+}
 
+impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, true, true, STORES_MOCK_DATA> {
     pub fn handle_base_returning<
         'a,
         TMockArg,
@@ -219,8 +235,13 @@ mod internal {
     use super::*;
     use std::sync::atomic::Ordering;
 
-    impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool>
-        FnData<'rs, TMock, SUPPORTS_BASE_CALLING, STORES_MOCK_DATA>
+    impl<
+        'rs,
+        TMock,
+        const HAS_RETURN_VALUE: bool,
+        const SUPPORTS_BASE_CALLING: bool,
+        const STORES_MOCK_DATA: bool,
+    > FnData<'rs, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, STORES_MOCK_DATA>
     {
         pub(crate) fn register_call(&self, call: Rc<DynCall<'rs>>) -> &Self {
             let generics_hash_key = call.get_generics_hash_key();

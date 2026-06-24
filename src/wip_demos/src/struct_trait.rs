@@ -89,7 +89,7 @@ mod result {
 
         pub struct StructMock<S1> {
             #[doc(hidden)]
-            pub data: SharedMockData<StructMock<S1>, true, false>,
+            pub data: SharedMockData<StructMock<S1>>,
             mockable: Box<Struct<S1>>,
         }
 
@@ -110,7 +110,7 @@ mod result {
 
         pub struct StructSetup<S1> {
             #[doc(hidden)]
-            pub data: SharedMockData<StructMock<S1>, true, false>,
+            pub data: SharedMockData<StructMock<S1>>,
             _generics: PhantomData<(S1,)>,
         }
         pub struct StructStaticSetup<S1> {
@@ -161,10 +161,11 @@ mod result {
                 (),
                 (),
                 &mut Struct<S1>,
+                false,
                 true,
                 true,
             > {
-                let fn_data: &FnData<StructMock<S1>, true, false> =
+                let fn_data: &FnData<StructMock<S1>, false, true, false> =
                     self.data.get_shared_fn_data("f");
                 todo!()
             }
@@ -179,12 +180,13 @@ mod result {
                 StructMock<S1>,
                 StructStaticSetup<S1>,
                 (),
-                S1,
                 (),
+                (),
+                false,
                 true,
                 false,
             > {
-                let fn_data: &FnData<StructMock<S1>, true, false> = get_static_fn_data("g");
+                let fn_data: &FnData<StructMock<S1>, false, true, false> = get_static_fn_data("g");
                 todo!()
             }
         }
@@ -193,11 +195,11 @@ mod result {
         // (and optionally base impl is called)
         impl<S1> StructMock<S1> {
             pub fn f<S2>(&self) {
-                let fn_data: &FnData<StructMock<S1>, true, false> =
+                let fn_data: &FnData<StructMock<S1>, false, true, false> =
                     self.data.get_shared_fn_data("f");
             }
             pub fn g<S3>() {
-                let fn_data: &FnData<StructMock<S1>, true, false> = get_static_fn_data("g");
+                let fn_data: &FnData<StructMock<S1>, false, true, false> = get_static_fn_data("g");
             }
         }
     }
@@ -212,29 +214,55 @@ mod result {
         }
 
         impl StructSetup<i8> {
-            pub fn sself<S4>(
+            pub fn sself<'__rsa, S4>(
                 &self,
                 _: i32,
-            ) -> FnConfigurator<'__rsa, StructMock<i8>, StructSetup<i8>, (), S1, (), true, true>
-            {
-                let fn_data: &FnData<StructMock<i8>, true, false> =
+            ) -> FnConfigurator<
+                '__rsa,
+                StructMock<i8>,
+                StructSetup<i8>,
+                (),
+                (),
+                &mut Struct<i8>,
+                false,
+                true,
+                true,
+            > {
+                let fn_data: &FnData<StructMock<i8>, false, true, false> =
                     self.data.get_shared_fn_data("sself");
+                todo!()
             }
         }
 
         impl StructStaticSetup<i8> {
-            pub fn sstatic<S5>(&self, _: i32) {
-                let fn_data: &FnData<StructMock<i8>, true, false> = get_static_fn_data("sstatic");
+            pub fn sstatic<'__rsa, S5>(
+                &self,
+                _: i32,
+            ) -> FnConfigurator<
+                '__rsa,
+                StructMock<i8>,
+                StructStaticSetup<i8>,
+                (),
+                (),
+                (),
+                false,
+                true,
+                false,
+            > {
+                let fn_data: &FnData<StructMock<i8>, false, true, false> =
+                    get_static_fn_data("sstatic");
+                todo!()
             }
         }
 
         impl<'__rs> StructMock<i8> {
             pub fn sself<S4>(&self) {
-                let fn_data: &FnData<StructMock<i8>, true, false> =
+                let fn_data: &FnData<StructMock<i8>, false, true, false> =
                     self.data.get_shared_fn_data("sself");
             }
             pub fn sstatic<S5>() {
-                let fn_data: &FnData<StructMock<i8>, true, false> = get_static_fn_data("sstatic");
+                let fn_data: &FnData<StructMock<i8>, false, true, false> =
+                    get_static_fn_data("sstatic");
             }
         }
     }
@@ -256,7 +284,7 @@ mod result {
 
         pub struct StructTraitSetup<T1> {
             #[doc(hidden)]
-            pub data: SharedMockData<StructMock<i16>, true, false>,
+            pub data: SharedMockData<StructMock<i16>>,
             _generics: PhantomData<(T1,)>,
         }
         pub struct StructTraitStaticSetup<T1> {
@@ -264,23 +292,80 @@ mod result {
         }
 
         impl<T1> StructTraitSetup<T1> {
-            pub fn f<T2>(&self, _: i32) {
-                let fn_data: &FnData<StructMock<i16>, true, false> =
+            pub fn f<'__rsa, T2>(
+                &self,
+                _: i32,
+            ) -> FnConfigurator<
+                '__rsa,
+                StructMock<i16>,
+                StructTraitSetup<i16>,
+                (),
+                T1,
+                &mut Struct<i16>,
+                true,
+                true,
+                true,
+            > {
+                let fn_data: &FnData<StructMock<i16>, true, true, false> =
                     self.data.get_shared_fn_data("Trait::f");
+                todo!()
             }
-            pub fn tself<T4>(&self, _: i32) {
-                let fn_data: &FnData<StructMock<i16>, true, false> =
+            pub fn tself<'__rsa, T4>(
+                &self,
+                _: i32,
+            ) -> FnConfigurator<
+                '__rsa,
+                StructMock<i16>,
+                StructTraitSetup<i16>,
+                (),
+                (),
+                &mut Struct<i16>,
+                false,
+                true,
+                true,
+            > {
+                let fn_data: &FnData<StructMock<i16>, false, true, false> =
                     self.data.get_shared_fn_data("Trait::tself");
+                todo!()
             }
         }
 
         impl<T1> StructTraitStaticSetup<T1> {
-            pub fn g<T4>(&self, _: i32) {
-                let fn_data: &FnData<StructMock<i16>, true, false> = get_static_fn_data("Trait::g");
+            pub fn g<'__rsa, T4>(
+                &self,
+                _: i32,
+            ) -> FnConfigurator<
+                '__rsa,
+                StructMock<i16>,
+                StructTraitStaticSetup<i16>,
+                (),
+                (),
+                (),
+                false,
+                true,
+                false,
+            > {
+                let fn_data: &FnData<StructMock<i16>, false, true, false> =
+                    get_static_fn_data("Trait::g");
+                todo!()
             }
-            pub fn tstatic<T5>(&self, _: i32) {
-                let fn_data: &FnData<StructMock<i16>, true, false> =
+            pub fn tstatic<'__rsa, T5>(
+                &self,
+                _: i32,
+            ) -> FnConfigurator<
+                '__rsa,
+                StructMock<i16>,
+                StructTraitStaticSetup<i16>,
+                (),
+                (),
+                (),
+                false,
+                true,
+                false,
+            > {
+                let fn_data: &FnData<StructMock<i16>, false, true, false> =
                     get_static_fn_data("Trait::tstatic");
+                todo!()
             }
         }
 
@@ -303,19 +388,20 @@ mod result {
 
         impl<T1> Trait<T1> for StructMock<i16> {
             fn f<T2>(&self) -> T1 {
-                let fn_data: &FnData<StructMock<i16>, true, false> =
+                let fn_data: &FnData<StructMock<i16>, false, true, false> =
                     self.data.get_shared_fn_data("Trait::f");
                 todo!()
             }
             fn g<T3>() {
-                let fn_data: &FnData<StructMock<i16>, true, false> = get_static_fn_data("Trait::g");
+                let fn_data: &FnData<StructMock<i16>, false, true, false> =
+                    get_static_fn_data("Trait::g");
             }
             fn tself<T4>(&self) {
-                let fn_data: &FnData<StructMock<i16>, true, false> =
+                let fn_data: &FnData<StructMock<i16>, false, true, false> =
                     self.data.get_shared_fn_data("Trait::tself");
             }
             fn tstatic<T5>() {
-                let fn_data: &FnData<StructMock<i16>, true, false> =
+                let fn_data: &FnData<StructMock<i16>, false, true, false> =
                     get_static_fn_data("Trait::tstatic");
             }
         }
@@ -338,7 +424,7 @@ mod result {
 
         pub struct StructTraitSetup {
             #[doc(hidden)]
-            pub data: SharedMockData<StructMock<i128>, true, false>,
+            pub data: SharedMockData<StructMock<i128>>,
             _generics: PhantomData<()>,
         }
         pub struct StructTraitStaticSetup {
@@ -346,24 +432,80 @@ mod result {
         }
 
         impl StructTraitSetup {
-            pub fn f<T2>(&self, _: i32) {
-                let fn_data: &FnData<StructMock<i128>, true, false> =
+            pub fn f<'__rsa, T2>(
+                &self,
+                _: i32,
+            ) -> FnConfigurator<
+                '__rsa,
+                StructMock<i16>,
+                crate::struct_trait::result::struct_impl_line34_col4::StructTraitSetup<i16>,
+                (),
+                (),
+                &mut Struct<i16>,
+                false,
+                true,
+                true,
+            > {
+                let fn_data: &FnData<StructMock<i128>, false, true, false> =
                     self.data.get_shared_fn_data("Trait::f");
+                todo!()
             }
-            pub fn tself<T4>(&self, _: i32) {
-                let fn_data: &FnData<StructMock<i128>, true, false> =
+            pub fn tself<'__rsa, T4>(
+                &self,
+                _: i32,
+            ) -> FnConfigurator<
+                '__rsa,
+                StructMock<i16>,
+                crate::struct_trait::result::struct_impl_line34_col4::StructTraitSetup<i16>,
+                (),
+                (),
+                &mut Struct<i16>,
+                false,
+                true,
+                true,
+            > {
+                let fn_data: &FnData<StructMock<i128>, false, true, false> =
                     self.data.get_shared_fn_data("Trait::tself");
+                todo!()
             }
         }
 
         impl StructTraitStaticSetup {
-            pub fn g<T4>(&self, _: i32) {
-                let fn_data: &FnData<StructMock<i128>, true, false> =
+            pub fn g<'__rsa, T4>(
+                &self,
+                _: i32,
+            ) -> FnConfigurator<
+                '__rsa,
+                StructMock<i16>,
+                crate::struct_trait::result::struct_impl_line34_col4::StructTraitStaticSetup<i16>,
+                (),
+                (),
+                (),
+                false,
+                true,
+                false,
+            > {
+                let fn_data: &FnData<StructMock<i128>, false, true, false> =
                     get_static_fn_data("Trait::g");
+                todo!()
             }
-            pub fn tstatic<T5>(&self, _: i32) {
-                let fn_data: &FnData<StructMock<i128>, true, false> =
+            pub fn tstatic<'__rsa, T5>(
+                &self,
+                _: i32,
+            ) -> FnConfigurator<
+                '__rsa,
+                StructMock<i16>,
+                crate::struct_trait::result::struct_impl_line34_col4::StructTraitStaticSetup<i16>,
+                (),
+                (),
+                (),
+                false,
+                true,
+                false,
+            > {
+                let fn_data: &FnData<StructMock<i128>, false, true, false> =
                     get_static_fn_data("Trait::tstatic");
+                todo!()
             }
         }
 
@@ -386,20 +528,20 @@ mod result {
 
         impl<'__rs> Trait<i64> for StructMock<i128> {
             fn f<T2>(&self) -> i64 {
-                let fn_data: &FnData<StructMock<i128>, true, false> =
+                let fn_data: &FnData<StructMock<i128>, false, true, false> =
                     self.data.get_shared_fn_data("Trait::f");
                 todo!()
             }
             fn g<T3>() {
-                let fn_data: &FnData<StructMock<i128>, true, false> =
+                let fn_data: &FnData<StructMock<i128>, false, true, false> =
                     get_static_fn_data("Trait::g");
             }
             fn tself<T4>(&self) {
-                let fn_data: &FnData<StructMock<i128>, true, false> =
+                let fn_data: &FnData<StructMock<i128>, false, true, false> =
                     self.data.get_shared_fn_data("Trait::tself");
             }
             fn tstatic<T5>() {
-                let fn_data: &FnData<StructMock<i128>, true, false> =
+                let fn_data: &FnData<StructMock<i128>, false, true, false> =
                     get_static_fn_data("Trait::tstatic");
             }
         }
@@ -420,7 +562,7 @@ mod result {
 
         pub struct StructGenSetup<G1, S1> {
             #[doc(hidden)]
-            pub data: SharedMockData<StructMock<S1>, true, false>,
+            pub data: SharedMockData<StructMock<S1>>,
             _generics: PhantomData<(G1, S1)>,
         }
         pub struct StructGenStaticSetup<G1, S1> {
@@ -428,23 +570,80 @@ mod result {
         }
 
         impl<G1, S1> StructGenSetup<G1, S1> {
-            pub fn f<T2>(&self, _: i32) {
-                let fn_data: &FnData<StructMock<S1>, true, false> =
+            pub fn f<'__rsa, T2>(
+                &self,
+                _: i32,
+            ) -> FnConfigurator<
+                '__rsa,
+                StructMock<S1>,
+                StructGenSetup<G1, S1>,
+                (),
+                (),
+                &mut Struct<S1>,
+                false,
+                true,
+                true,
+            > {
+                let fn_data: &FnData<StructMock<S1>, false, true, false> =
                     self.data.get_shared_fn_data("Gen::f");
+                todo!()
             }
-            pub fn gself<T4>(&self, _: i32) {
-                let fn_data: &FnData<StructMock<S1>, true, false> =
+            pub fn gself<'__rsa, T4>(
+                &self,
+                _: i32,
+            ) -> FnConfigurator<
+                '__rsa,
+                StructMock<S1>,
+                StructGenSetup<G1, S1>,
+                (),
+                (),
+                &mut Struct<S1>,
+                false,
+                true,
+                true,
+            > {
+                let fn_data: &FnData<StructMock<S1>, false, true, false> =
                     self.data.get_shared_fn_data("Gen::tself");
+                todo!()
             }
         }
 
         impl<G1, S1> StructGenStaticSetup<G1, S1> {
-            pub fn g<T4>(&self, _: i32) {
-                let fn_data: &FnData<StructMock<S1>, true, false> = get_static_fn_data("Gen::g");
+            pub fn g<'__rsa, T4>(
+                &self,
+                _: i32,
+            ) -> FnConfigurator<
+                '__rsa,
+                StructMock<S1>,
+                StructGenStaticSetup<G1, S1>,
+                (),
+                (),
+                (),
+                false,
+                true,
+                false,
+            > {
+                let fn_data: &FnData<StructMock<S1>, false, true, false> =
+                    get_static_fn_data("Gen::g");
+                todo!()
             }
-            pub fn gstatic<T5>(&self, _: i32) {
-                let fn_data: &FnData<StructMock<S1>, true, false> =
+            pub fn gstatic<'__rsa, T5>(
+                &self,
+                _: i32,
+            ) -> FnConfigurator<
+                '__rsa,
+                StructMock<S1>,
+                StructGenStaticSetup<G1, S1>,
+                (),
+                (),
+                (),
+                false,
+                true,
+                false,
+            > {
+                let fn_data: &FnData<StructMock<S1>, false, true, false> =
                     get_static_fn_data("Gen::tstatic");
+                todo!()
             }
         }
 
@@ -467,18 +666,19 @@ mod result {
 
         impl<G1, S1> Gen<G1> for StructMock<S1> {
             fn f<T2>(&self) {
-                let fn_data: &FnData<StructMock<S1>, true, false> =
+                let fn_data: &FnData<StructMock<S1>, false, true, false> =
                     self.data.get_shared_fn_data("Gen::f");
             }
             fn g<T3>() {
-                let fn_data: &FnData<StructMock<S1>, true, false> = get_static_fn_data("Gen::g");
+                let fn_data: &FnData<StructMock<S1>, false, true, false> =
+                    get_static_fn_data("Gen::g");
             }
             fn gself<T4>(&self) {
-                let fn_data: &FnData<StructMock<S1>, true, false> =
+                let fn_data: &FnData<StructMock<S1>, false, true, false> =
                     self.data.get_shared_fn_data("Gen::tself");
             }
             fn gstatic<T5>() {
-                let fn_data: &FnData<StructMock<i16>, true, false> =
+                let fn_data: &FnData<StructMock<i16>, false, true, false> =
                     get_static_fn_data("Gen::tstatic");
             }
         }
@@ -527,7 +727,16 @@ mod result {
             <Struct<i16> as Trait<[u8; 1]>>::tstatic::<[u8; 2]>();
             let mock = s.mock();
             <Struct<i16> as Trait<[u8; 1]>>::tself::<[u8; 1]>(&mock);
-            mock.setup().as_Trait::<[u8; 1]>().tself::<[u8; 2]>(1);
+            mock.setup()
+                .as_Trait::<[u8; 1]>()
+                .tself::<[u8; 2]>(1)
+                .call_base()
+                .f::<Vec<u8>>(3222)
+                .returns_with(|_| 101)
+                .and_does(|s, _| println!("{}", s.0))
+                .f::<String>(111)
+                .call_base()
+                .and_does(|s, _| println!("called base after returning!"));
             Struct::<i16>::setup()
                 .as_Trait::<[u8; 1]>()
                 .tstatic::<[u8; 2]>(2);
@@ -554,7 +763,10 @@ mod result {
             mock.setup().as_Gen::<[u8; 24]>().gself::<[u8; 3]>(1);
             Struct::<i32>::setup()
                 .as_Gen::<[u8; 2]>()
-                .gstatic::<[u8; 3]>(3);
+                .gstatic::<[u8; 3]>(3)
+                .call_base()
+                .g::<[u8; 111]>(21)
+                .does(|_| {});
         }
     }
 }

@@ -24,9 +24,18 @@ mod result {
                 &self,
                 _: T,
                 _: i32,
-            ) -> FnConfigurator<'__rsa, fMock<T>, fStaticSetup<T>, (&'__rsa T,), T, (), true, false>
-            {
-                let data: &FnData<fMock<T>, true, false> = get_static_fn_data("f");
+            ) -> FnConfigurator<
+                '__rsa,
+                fMock<T>,
+                fStaticSetup<T>,
+                (&'__rsa T,),
+                T,
+                (),
+                true,
+                true,
+                false,
+            > {
+                let data: &FnData<fMock<T>, true, true, false> = get_static_fn_data("f");
                 todo!()
             }
         }
@@ -34,9 +43,9 @@ mod result {
         pub fn setup<'__rsa, T>(
             _: T,
             _: i32,
-        ) -> FnConfigurator<'__rsa, fMock<T>, fStaticSetup<T>, (&'__rsa T,), T, (), true, false>
+        ) -> FnConfigurator<'__rsa, fMock<T>, fStaticSetup<T>, (&'__rsa T,), T, (), true, true, false>
         {
-            let data: &FnData<fMock<T>, true, false> = get_static_fn_data("f");
+            let data: &FnData<fMock<T>, true, true, false> = get_static_fn_data("f");
             todo!()
         }
 
@@ -68,8 +77,8 @@ mod result {
         }
 
         pub fn f<T>(input: T) -> T {
-            let data: &FnData<fMock<T>, true, false> = get_static_fn_data("f");
-            data.handle_base(
+            let data: &FnData<fMock<T>, true, true, false> = get_static_fn_data("f");
+            data.handle_base_returning(
                 &fMock {
                     generics: PhantomData,
                 },
@@ -77,11 +86,12 @@ mod result {
                     generics: PhantomData,
                 },
                 __rs_base_f::<T>,
-            );
-            todo!()
+            )
         }
 
-        fn __rs_base_f<T>(_: &fMock<T>, _: fCall<T>) {}
+        fn __rs_base_f<T>(_: &fMock<T>, _: fCall<T>) -> T {
+            todo!()
+        }
     }
 
     fn usage() {

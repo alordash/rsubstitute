@@ -9,13 +9,16 @@ struct StaticFnDatasGlobalMap {
     pub map: UnsafeCell<HashMap<TypeId, *const ()>>,
 }
 
-struct StaticFnMock;
-
 impl StaticFnDatasGlobalMap {
-    pub fn get_specific_fn_data<'a, TMock, const SUPPORTS_BASE_CALLING: bool>(
+    pub fn get_specific_fn_data<
+        'a,
+        TMock,
+        const HAS_RETURN_VALUE: bool,
+        const SUPPORTS_BASE_CALLING: bool,
+    >(
         &'_ self,
         fn_ident: &'static str,
-    ) -> &'a FnData<'static, TMock, SUPPORTS_BASE_CALLING, false> {
+    ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, false> {
         // SAFETY: `StaticFn
         let maybe_map = unsafe { self.map.get().as_mut() };
         // SAFETY: `UnsafeCell::get` can not return null pointer.
@@ -23,6 +26,7 @@ impl StaticFnDatasGlobalMap {
         let type_id = typeid::of::<TMock>();
         let raw_ptr = map.entry(type_id).or_insert(Box::leak(Box::new(FnData::<
             TMock,
+            HAS_RETURN_VALUE,
             SUPPORTS_BASE_CALLING,
             false,
         >::new(fn_ident))) as *mut _
@@ -34,6 +38,7 @@ impl StaticFnDatasGlobalMap {
         let fn_data_ref = unsafe {
             ((*raw_ptr) as *const FnData<
                 TMock,
+                HAS_RETURN_VALUE,
                 SUPPORTS_BASE_CALLING,
                 false,
             >).as_ref().unwrap_or_else(|| {
@@ -54,9 +59,14 @@ thread_local! {
     };
 }
 
-pub fn get_static_fn_data<'a, TMock, const SUPPORTS_BASE_CALLING: bool>(
+pub fn get_static_fn_data<
+    'a,
+    TMock,
+    const HAS_RETURN_VALUE: bool,
+    const SUPPORTS_BASE_CALLING: bool,
+>(
     fn_ident: &'static str,
-) -> &'a FnData<'static, TMock, SUPPORTS_BASE_CALLING, false> {
+) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, false> {
     let result = STATIC_FN_DATAS_GLOBAL_MAP.with(|this| this.get_specific_fn_data(fn_ident));
     return result;
 }
