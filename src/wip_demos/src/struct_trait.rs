@@ -152,8 +152,7 @@ mod result {
 
         impl<S1> StructSetup<S1> {
             pub fn f<S2>(&mut self, _: i32) {
-                let fn_data: &FnData<StructMock<S1>, true, false> =
-                    self.data.borrow_mut().get_fn_data("f");
+                let fn_data: &FnData<StructMock<S1>, true, false> = self.data.get_shared_fn_data("f");
             }
         }
 
@@ -167,8 +166,7 @@ mod result {
         // (and optionally base impl is called)
         impl<S1> StructMock<S1> {
             pub fn f<S2>(&self) {
-                let fn_data: &FnData<StructMock<S1>, true, false> =
-                    self.data.borrow_mut().get_fn_data("f");
+                let fn_data: &FnData<StructMock<S1>, true, false> = self.data.get_shared_fn_data("f");
             }
             pub fn g<S3>() {
                 let fn_data: &FnData<StructMock<S1>, true, false> = get_static_fn_data("g");
@@ -187,8 +185,7 @@ mod result {
 
         impl StructSetup<i8> {
             pub fn sself<S4>(&self, _: i32) {
-                let fn_data: &FnData<StructMock<i8>, true, false> =
-                    self.data.borrow_mut().get_fn_data("sself");
+                let fn_data: &FnData<StructMock<i8>, true, false> = self.data.get_shared_fn_data("sself");
             }
         }
 
@@ -200,8 +197,7 @@ mod result {
 
         impl<'__rs> StructMock<i8> {
             pub fn sself<S4>(&self) {
-                let fn_data: &FnData<StructMock<i8>, true, false> =
-                    self.data.borrow_mut().get_fn_data("sself");
+                let fn_data: &FnData<StructMock<i8>, true, false> = self.data.get_shared_fn_data("sself");
             }
             pub fn sstatic<S5>() {
                 let fn_data: &FnData<StructMock<i8>, true, false> = get_static_fn_data("sstatic");
@@ -236,11 +232,11 @@ mod result {
         impl<T1> StructTraitSetup<T1> {
             pub fn f<T2>(&self, _: i32) {
                 let fn_data: &FnData<StructMock<i16>, true, false> =
-                    self.data.borrow_mut().get_fn_data("Trait::f");
+                    self.data.get_shared_fn_data("Trait::f");
             }
             pub fn tself<T4>(&self, _: i32) {
                 let fn_data: &FnData<StructMock<i16>, true, false> =
-                    self.data.borrow_mut().get_fn_data("Trait::tself");
+                    self.data.get_shared_fn_data("Trait::tself");
             }
         }
 
@@ -274,7 +270,7 @@ mod result {
         impl<T1> Trait<T1> for StructMock<i16> {
             fn f<T2>(&self) -> T1 {
                 let fn_data: &FnData<StructMock<i16>, true, false> =
-                    self.data.borrow_mut().get_fn_data("Trait::f");
+                    self.data.get_shared_fn_data("Trait::f");
                 todo!()
             }
             fn g<T3>() {
@@ -282,7 +278,7 @@ mod result {
             }
             fn tself<T4>(&self) {
                 let fn_data: &FnData<StructMock<i16>, true, false> =
-                    self.data.borrow_mut().get_fn_data("Trait::tself");
+                    self.data.get_shared_fn_data("Trait::tself");
             }
             fn tstatic<T5>() {
                 let fn_data: &FnData<StructMock<i16>, true, false> =
@@ -318,11 +314,11 @@ mod result {
         impl StructTraitSetup {
             pub fn f<T2>(&self, _: i32) {
                 let fn_data: &FnData<StructMock<i128>, true, false> =
-                    self.data.borrow_mut().get_fn_data("Trait::f");
+                    self.data.get_shared_fn_data("Trait::f");
             }
             pub fn tself<T4>(&self, _: i32) {
                 let fn_data: &FnData<StructMock<i128>, true, false> =
-                    self.data.borrow_mut().get_fn_data("Trait::tself");
+                    self.data.get_shared_fn_data("Trait::tself");
             }
         }
 
@@ -357,7 +353,7 @@ mod result {
         impl<'__rs> Trait<i64> for StructMock<i128> {
             fn f<T2>(&self) -> i64 {
                 let fn_data: &FnData<StructMock<i128>, true, false> =
-                    self.data.borrow_mut().get_fn_data("Trait::f");
+                    self.data.get_shared_fn_data("Trait::f");
                 todo!()
             }
             fn g<T3>() {
@@ -366,7 +362,7 @@ mod result {
             }
             fn tself<T4>(&self) {
                 let fn_data: &FnData<StructMock<i128>, true, false> =
-                    self.data.borrow_mut().get_fn_data("Trait::tself");
+                    self.data.get_shared_fn_data("Trait::tself");
             }
             fn tstatic<T5>() {
                 let fn_data: &FnData<StructMock<i128>, true, false> =
@@ -399,12 +395,11 @@ mod result {
 
         impl<G1, S1> StructGenSetup<G1, S1> {
             pub fn f<T2>(&self, _: i32) {
-                let fn_data: &FnData<StructMock<S1>, true, false> =
-                    self.data.borrow_mut().get_fn_data("Gen::f");
+                let fn_data: &FnData<StructMock<S1>, true, false> = self.data.get_shared_fn_data("Gen::f");
             }
             pub fn gself<T4>(&self, _: i32) {
                 let fn_data: &FnData<StructMock<S1>, true, false> =
-                    self.data.borrow_mut().get_fn_data("Gen::tself");
+                    self.data.get_shared_fn_data("Gen::tself");
             }
         }
 
@@ -437,15 +432,14 @@ mod result {
 
         impl<G1, S1> Gen<G1> for StructMock<S1> {
             fn f<T2>(&self) {
-                let fn_data: &FnData<StructMock<S1>, true, false> =
-                    self.data.borrow_mut().get_fn_data("Gen::f");
+                let fn_data: &FnData<StructMock<S1>, true, false> = self.data.get_shared_fn_data("Gen::f");
             }
             fn g<T3>() {
                 let fn_data: &FnData<StructMock<S1>, true, false> = get_static_fn_data("Gen::g");
             }
             fn gself<T4>(&self) {
                 let fn_data: &FnData<StructMock<S1>, true, false> =
-                    self.data.borrow_mut().get_fn_data("Gen::tself");
+                    self.data.get_shared_fn_data("Gen::tself");
             }
             fn gstatic<T5>() {
                 let fn_data: &FnData<StructMock<i16>, true, false> =
