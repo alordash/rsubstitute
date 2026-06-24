@@ -3,7 +3,7 @@ use crate::infrastructure::*;
 use crate::*;
 use std::cell::RefCell;
 use std::marker::PhantomData;
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct FnConfigurator<
     'rs,
@@ -16,7 +16,7 @@ pub struct FnConfigurator<
     const STORES_MOCK_DATA: bool,
 > {
     _phantom_return_value: PhantomData<TReturnValue>,
-    fn_config: Arc<RefCell<FnConfig<'rs, TMock>>>,
+    fn_config: Rc<RefCell<FnConfig<'rs, TMock>>>,
     owner: &'rs TOwner,
     fn_callback_configurator:
         FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA>,
@@ -43,7 +43,7 @@ impl<
         STORES_MOCK_DATA,
     >
 {
-    pub(crate) fn new(fn_config: Arc<RefCell<FnConfig<'rs, TMock>>>, owner: &'rs TOwner) -> Self {
+    pub(crate) fn new(fn_config: Rc<RefCell<FnConfig<'rs, TMock>>>, owner: &'rs TOwner) -> Self {
         Self {
             _phantom_return_value: PhantomData,
             fn_config: fn_config.clone(),
@@ -125,7 +125,7 @@ impl<'rs, TMock, TOwner, TArgRefsTuple: Copy, TMockArg, const SUPPORTS_BASE_CALL
 {
     pub fn does(&self, mut callback: impl FnMut(TArgRefsTuple) + 'static) -> &'rs TOwner {
         let callback_with_mock =
-            move |_mock: &TMock, arg_refs_tuple: TArgRefsTuple| callback(arg_refs_tuple);
+            move |_mock: &(), arg_refs_tuple: TArgRefsTuple| callback(arg_refs_tuple);
         self.fn_config.borrow_mut().set_callback(callback_with_mock);
         return self.owner;
     }

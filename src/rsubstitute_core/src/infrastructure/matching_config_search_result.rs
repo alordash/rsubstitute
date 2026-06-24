@@ -1,10 +1,10 @@
 use crate::args::CallsCheckResult;
 use crate::infrastructure::FnConfig;
 use std::cell::RefCell;
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub(crate) enum MatchingConfigSearchResult<'rs, TMock> {
-    Ok(Arc<RefCell<FnConfig<'rs, TMock>>>),
+    Ok(Rc<RefCell<FnConfig<'rs, TMock>>>),
     Err(MatchingConfigSearchErr),
 }
 

@@ -2,7 +2,7 @@ use crate::infrastructure::*;
 use std::cell::RefCell;
 use std::marker::PhantomData;
 use std::ops::Deref;
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct FnCallbackConfigurator<
     'rs,
@@ -14,14 +14,14 @@ pub struct FnCallbackConfigurator<
 > {
     _phantom_args_tuple: PhantomData<TArgRefsTuple>,
     _phantom_mock_arg: PhantomData<TMockArg>,
-    fn_config: Arc<RefCell<FnConfig<'rs, TMock>>>,
+    fn_config: Rc<RefCell<FnConfig<'rs, TMock>>>,
     owner: &'rs TOwner,
 }
 
 impl<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, const STORES_MOCK_DATA: bool>
     FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA>
 {
-    pub(crate) fn new(fn_config: Arc<RefCell<FnConfig<'rs, TMock>>>, owner: &'rs TOwner) -> Self {
+    pub(crate) fn new(fn_config: Rc<RefCell<FnConfig<'rs, TMock>>>, owner: &'rs TOwner) -> Self {
         Self {
             _phantom_args_tuple: PhantomData,
             _phantom_mock_arg: PhantomData,

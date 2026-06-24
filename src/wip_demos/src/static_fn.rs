@@ -24,16 +24,8 @@ mod result {
                 &self,
                 _: T,
                 _: i32,
-            ) -> FnConfigurator<
-                '__rsa,
-                fMock<T>,
-                fStaticSetup<T>,
-                (&'__rsa T,),
-                T,
-                fMock<T>,
-                true,
-                false,
-            > {
+            ) -> FnConfigurator<'__rsa, fMock<T>, fStaticSetup<T>, (&'__rsa T,), T, (), true, false>
+            {
                 let data: &FnData<fMock<T>, true, false> = get_static_fn_data("f");
                 todo!()
             }
@@ -42,7 +34,7 @@ mod result {
         pub fn setup<'__rsa, T>(
             _: T,
             _: i32,
-        ) -> FnConfigurator<'__rsa, fMock<T>, fStaticSetup<T>, (&'__rsa T,), T, fMock<T>, true, false>
+        ) -> FnConfigurator<'__rsa, fMock<T>, fStaticSetup<T>, (&'__rsa T,), T, (), true, false>
         {
             let data: &FnData<fMock<T>, true, false> = get_static_fn_data("f");
             todo!()

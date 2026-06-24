@@ -4,14 +4,14 @@ use crate::infrastructure::*;
 use crate::*;
 use std::cell::RefCell;
 use std::collections::HashMap;
-use std::sync::Arc;
+use std::rc::Rc;
 use std::sync::atomic::AtomicUsize;
 
 pub struct FnData<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool> {
     fn_name: &'static str,
     // TODO - remove RefCell? can I just make mock methods all requires `&mut self`?
     pub call_infos: RefCell<HashMap<GenericsHashKey, Vec<CallCheck<'rs>>>>,
-    pub configs: RefCell<HashMap<GenericsHashKey, Vec<Arc<RefCell<FnConfig<'rs, TMock>>>>>>,
+    pub configs: RefCell<HashMap<GenericsHashKey, Vec<Rc<RefCell<FnConfig<'rs, TMock>>>>>>,
     next_call_number: AtomicUsize,
 }
 
@@ -56,7 +56,7 @@ impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool
         let dyn_args_checker: DynArgsChecker<'a> = DynArgsChecker::new(args_checker);
         let generics_hash_key = dyn_args_checker.get_generics_hash_key();
         let config = FnConfig::<'a>::new(dyn_args_checker);
-        let arc_config = Arc::new(RefCell::new(config));
+        let arc_config = Rc::new(RefCell::new(config));
         self.configs
             .borrow_mut()
             .entry(generics_hash_key)
@@ -115,7 +115,7 @@ impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool
 
 impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, false, STORES_MOCK_DATA> {
     pub fn handle<'a, TMockArg, TCall: ICall + 'a>(&self, mock_arg: TMockArg, the_call: TCall) {
-        let call = Arc::new(DynCall::new(the_call));
+        let call = Rc::new(DynCall::new(the_call));
         let maybe_fn_config = self.get_optional_matching_config(&call);
         self.register_call(call.clone());
         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
@@ -132,7 +132,7 @@ impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, false, STORES_
         the_call: TCall,
     ) -> TReturnValue {
         let dyn_call = DynCall::new(the_call);
-        let call = Arc::new(dyn_call);
+        let call = Rc::new(dyn_call);
         let fn_config = self.get_required_matching_config(&call);
         self.register_call(call.clone());
         fn_config.borrow_mut().register_call(call.clone());
@@ -161,7 +161,7 @@ impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, true, STORES_M
     ) {
         let call_for_base_call = the_call.clone();
         let dyn_call = DynCall::new(the_call);
-        let call = Arc::new(dyn_call);
+        let call = Rc::new(dyn_call);
         let maybe_fn_config = self.get_optional_matching_config(&call);
         self.register_call(call.clone());
         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
@@ -191,7 +191,7 @@ impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, true, STORES_M
     ) -> TReturnValue {
         let call_for_base_call = the_call.clone();
         let dyn_call = DynCall::new(the_call);
-        let call = Arc::new(dyn_call);
+        let call = Rc::new(dyn_call);
         let fn_config = self.get_required_matching_config(&call);
         self.register_call(call.clone());
         fn_config.borrow_mut().register_call(call.clone());
@@ -222,7 +222,7 @@ mod internal {
     impl<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool>
         FnData<'rs, TMock, SUPPORTS_BASE_CALLING, STORES_MOCK_DATA>
     {
-        pub(crate) fn register_call(&self, call: Arc<DynCall<'rs>>) -> &Self {
+        pub(crate) fn register_call(&self, call: Rc<DynCall<'rs>>) -> &Self {
             let generics_hash_key = call.get_generics_hash_key();
             self.call_infos
                 .borrow_mut()
@@ -272,7 +272,7 @@ mod internal {
         pub(crate) fn get_required_matching_config(
             &self,
             dyn_call: &DynCall<'rs>,
-        ) -> Arc<RefCell<FnConfig<'rs, TMock>>> {
+        ) -> Rc<RefCell<FnConfig<'rs, TMock>>> {
             let with_return_value = true;
             let fn_config = match self.try_get_matching_config(&dyn_call, with_return_value) {
                 MatchingConfigSearchResult::Ok(matching_config) => matching_config,

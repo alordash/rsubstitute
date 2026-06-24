@@ -151,14 +151,41 @@ mod result {
         }
 
         impl<S1> StructSetup<S1> {
-            pub fn f<S2>(&mut self, _: i32) {
-                let fn_data: &FnData<StructMock<S1>, true, false> = self.data.get_shared_fn_data("f");
+            pub fn f<'__rsa, S2>(
+                &mut self,
+                _: i32,
+            ) -> FnConfigurator<
+                '__rsa,
+                StructMock<S1>,
+                StructSetup<S1>,
+                (),
+                (),
+                &mut Struct<S1>,
+                true,
+                true,
+            > {
+                let fn_data: &FnData<StructMock<S1>, true, false> =
+                    self.data.get_shared_fn_data("f");
+                todo!()
             }
         }
 
         impl<S1> StructStaticSetup<S1> {
-            pub fn g<S3>(&self, _: i32) {
+            pub fn g<'__rsa, S3>(
+                &self,
+                _: i32,
+            ) -> FnConfigurator<
+                '__rsa,
+                StructMock<S1>,
+                StructStaticSetup<S1>,
+                (),
+                S1,
+                (),
+                true,
+                false,
+            > {
                 let fn_data: &FnData<StructMock<S1>, true, false> = get_static_fn_data("g");
+                todo!()
             }
         }
 
@@ -166,7 +193,8 @@ mod result {
         // (and optionally base impl is called)
         impl<S1> StructMock<S1> {
             pub fn f<S2>(&self) {
-                let fn_data: &FnData<StructMock<S1>, true, false> = self.data.get_shared_fn_data("f");
+                let fn_data: &FnData<StructMock<S1>, true, false> =
+                    self.data.get_shared_fn_data("f");
             }
             pub fn g<S3>() {
                 let fn_data: &FnData<StructMock<S1>, true, false> = get_static_fn_data("g");
@@ -184,8 +212,13 @@ mod result {
         }
 
         impl StructSetup<i8> {
-            pub fn sself<S4>(&self, _: i32) {
-                let fn_data: &FnData<StructMock<i8>, true, false> = self.data.get_shared_fn_data("sself");
+            pub fn sself<S4>(
+                &self,
+                _: i32,
+            ) -> FnConfigurator<'__rsa, StructMock<i8>, StructSetup<i8>, (), S1, (), true, true>
+            {
+                let fn_data: &FnData<StructMock<i8>, true, false> =
+                    self.data.get_shared_fn_data("sself");
             }
         }
 
@@ -197,7 +230,8 @@ mod result {
 
         impl<'__rs> StructMock<i8> {
             pub fn sself<S4>(&self) {
-                let fn_data: &FnData<StructMock<i8>, true, false> = self.data.get_shared_fn_data("sself");
+                let fn_data: &FnData<StructMock<i8>, true, false> =
+                    self.data.get_shared_fn_data("sself");
             }
             pub fn sstatic<S5>() {
                 let fn_data: &FnData<StructMock<i8>, true, false> = get_static_fn_data("sstatic");
@@ -395,7 +429,8 @@ mod result {
 
         impl<G1, S1> StructGenSetup<G1, S1> {
             pub fn f<T2>(&self, _: i32) {
-                let fn_data: &FnData<StructMock<S1>, true, false> = self.data.get_shared_fn_data("Gen::f");
+                let fn_data: &FnData<StructMock<S1>, true, false> =
+                    self.data.get_shared_fn_data("Gen::f");
             }
             pub fn gself<T4>(&self, _: i32) {
                 let fn_data: &FnData<StructMock<S1>, true, false> =
@@ -432,7 +467,8 @@ mod result {
 
         impl<G1, S1> Gen<G1> for StructMock<S1> {
             fn f<T2>(&self) {
-                let fn_data: &FnData<StructMock<S1>, true, false> = self.data.get_shared_fn_data("Gen::f");
+                let fn_data: &FnData<StructMock<S1>, true, false> =
+                    self.data.get_shared_fn_data("Gen::f");
             }
             fn g<T3>() {
                 let fn_data: &FnData<StructMock<S1>, true, false> = get_static_fn_data("Gen::g");

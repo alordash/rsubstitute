@@ -3,14 +3,14 @@ use crate::fn_parameters::*;
 use std::cell::RefCell;
 use std::collections::VecDeque;
 use std::marker::PhantomData;
-use std::sync::Arc;
+use std::rc::Rc;
 
 pub struct FnConfig<'rs, TMock> {
     _phantom_mock: PhantomData<TMock>,
     pub args_checker: DynArgsChecker<'rs>,
     pub return_value_sources: VecDeque<ReturnValueSource<'rs>>,
-    pub calls: Vec<Arc<DynCall<'rs>>>,
-    pub callback: Option<Arc<RefCell<dyn FnMut(*const (), &DynCall<'rs>)>>>,
+    pub calls: Vec<Rc<DynCall<'rs>>>,
+    pub callback: Option<Rc<RefCell<dyn FnMut(*const (), &DynCall<'rs>)>>>,
     pub call_base: bool,
 }
 
@@ -61,10 +61,10 @@ impl<'rs, TMock> FnConfig<'rs, TMock> {
             };
             callback(mock_ref, arg_refs_tuple)
         };
-        self.callback = Some(Arc::new(RefCell::new(dyn_callback)));
+        self.callback = Some(Rc::new(RefCell::new(dyn_callback)));
     }
 
-    pub(crate) fn register_call(&mut self, call: Arc<DynCall<'rs>>) {
+    pub(crate) fn register_call(&mut self, call: Rc<DynCall<'rs>>) {
         self.calls.push(call);
     }
 
@@ -106,7 +106,7 @@ impl<'rs, TMock> FnConfig<'rs, TMock> {
         };
     }
 
-    pub(crate) fn get_callback(&self) -> Option<Arc<RefCell<dyn FnMut(*const (), &DynCall<'rs>)>>> {
+    pub(crate) fn get_callback(&self) -> Option<Rc<RefCell<dyn FnMut(*const (), &DynCall<'rs>)>>> {
         self.callback.clone()
     }
 
