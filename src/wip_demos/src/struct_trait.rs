@@ -66,7 +66,6 @@ mod result {
     use struct_mock::*;
     mod struct_mock {
         use super::*;
-        use rsubstitute_core::infrastructure::fn_data_storage::{mock_table, MockId};
         use std::marker::PhantomData;
         use std::ops::{Deref, DerefMut};
 
@@ -82,10 +81,16 @@ mod result {
             type Mock = StructMock<S1>;
             fn mock(self) -> StructMock<S1> {
                 StructMock {
-                    mock_id: MockId::next(),
+                    data: Default::default(),
                     mockable: Box::new(self),
                 }
             }
+        }
+
+        pub struct StructMock<S1> {
+            #[doc(hidden)]
+            pub data: SharedMockData<StructMock<S1>, true, false>,
+            mockable: Box<Struct<S1>>,
         }
 
         // TODO - create only if there are static fns
@@ -98,33 +103,27 @@ mod result {
             type Setup = StructStaticSetup<S1>;
             fn setup() -> Self::Setup {
                 StructStaticSetup {
-                    generics: PhantomData,
+                    _generics: PhantomData,
                 }
             }
         }
 
         pub struct StructSetup<S1> {
             #[doc(hidden)]
-            pub mock_id: MockId,
-            generics: PhantomData<(S1,)>,
+            pub data: SharedMockData<StructMock<S1>, true, false>,
+            _generics: PhantomData<(S1,)>,
         }
         pub struct StructStaticSetup<S1> {
-            generics: PhantomData<(S1,)>,
+            _generics: PhantomData<(S1,)>,
         }
 
         impl<S1> StructMock<S1> {
             pub fn setup(&self) -> StructSetup<S1> {
                 StructSetup {
-                    mock_id: self.mock_id,
-                    generics: PhantomData,
+                    data: self.data.clone(),
+                    _generics: PhantomData,
                 }
             }
-        }
-
-        pub struct StructMock<S1> {
-            #[doc(hidden)]
-            pub mock_id: MockId,
-            mockable: Box<Struct<S1>>,
         }
 
         impl<S1> Deref for StructMock<S1> {
@@ -140,17 +139,10 @@ mod result {
                 self.mockable.as_mut()
             }
         }
-
-        impl<S1> Drop for StructMock<S1> {
-            fn drop(&mut self) {
-                mock_table::free_mock::<Self, true, false>(self.mock_id)
-            }
-        }
     }
 
     mod struct_impl_line22_col4 {
         use super::*;
-        use rsubstitute_core::infrastructure::fn_data_storage::mock_table;
 
         // source
         impl<S1> Struct<S1> {
@@ -159,16 +151,15 @@ mod result {
         }
 
         impl<S1> StructSetup<S1> {
-            pub fn f<S2>(&self, _: i32) {
-                let data: &FnData<StructMock<S1>, true, false> =
-                    mock_table::get_fn_data(self.mock_id, "f");
+            pub fn f<S2>(&mut self, _: i32) {
+                let fn_data: &FnData<StructMock<S1>, true, false> =
+                    self.data.borrow_mut().get_fn_data("f");
             }
         }
 
         impl<S1> StructStaticSetup<S1> {
             pub fn g<S3>(&self, _: i32) {
-                let data: &FnData<StructMock<S1>, true, false> =
-                    mock_table::get_static_fn_data("g");
+                let fn_data: &FnData<StructMock<S1>, true, false> = get_static_fn_data("g");
             }
         }
 
@@ -176,19 +167,17 @@ mod result {
         // (and optionally base impl is called)
         impl<S1> StructMock<S1> {
             pub fn f<S2>(&self) {
-                let data: &FnData<StructMock<S1>, true, false> =
-                    mock_table::get_fn_data(self.mock_id, "f");
+                let fn_data: &FnData<StructMock<S1>, true, false> =
+                    self.data.borrow_mut().get_fn_data("f");
             }
             pub fn g<S3>() {
-                let data: &FnData<StructMock<S1>, true, false> =
-                    mock_table::get_static_fn_data("g");
+                let fn_data: &FnData<StructMock<S1>, true, false> = get_static_fn_data("g");
             }
         }
     }
 
     mod struct_impl_line27_col4 {
         use super::*;
-        use rsubstitute_core::infrastructure::fn_data_storage::mock_table;
 
         // source
         impl Struct<i8> {
@@ -198,26 +187,24 @@ mod result {
 
         impl StructSetup<i8> {
             pub fn sself<S4>(&self, _: i32) {
-                let data: &FnData<StructMock<i8>, true, false> =
-                    mock_table::get_fn_data(self.mock_id, "sself");
+                let fn_data: &FnData<StructMock<i8>, true, false> =
+                    self.data.borrow_mut().get_fn_data("sself");
             }
         }
 
         impl StructStaticSetup<i8> {
             pub fn sstatic<S5>(&self, _: i32) {
-                let data: &FnData<StructMock<i8>, true, false> =
-                    mock_table::get_static_fn_data("sstatic");
+                let fn_data: &FnData<StructMock<i8>, true, false> = get_static_fn_data("sstatic");
             }
         }
 
         impl<'__rs> StructMock<i8> {
             pub fn sself<S4>(&self) {
-                let data: &FnData<StructMock<i8>, true, false> =
-                    mock_table::get_fn_data(self.mock_id, "sself");
+                let fn_data: &FnData<StructMock<i8>, true, false> =
+                    self.data.borrow_mut().get_fn_data("sself");
             }
             pub fn sstatic<S5>() {
-                let data: &FnData<StructMock<i8>, true, false> =
-                    mock_table::get_static_fn_data("sstatic");
+                let fn_data: &FnData<StructMock<i8>, true, false> = get_static_fn_data("sstatic");
             }
         }
     }
@@ -225,7 +212,7 @@ mod result {
     use struct_impl_line34_col4::*;
     mod struct_impl_line34_col4 {
         use super::*;
-        use rsubstitute_core::infrastructure::fn_data_storage::{mock_table, MockId};
+        use std::marker::PhantomData;
 
         // source
         impl<T1> Trait<T1> for Struct<i16> {
@@ -237,65 +224,69 @@ mod result {
             fn tstatic<T5>() {}
         }
 
-        pub struct StructTraitSetup {
+        pub struct StructTraitSetup<T1> {
             #[doc(hidden)]
-            pub mock_id: MockId,
+            pub data: SharedMockData<StructMock<i16>, true, false>,
+            _generics: PhantomData<(T1,)>,
         }
-        pub struct StructTraitStaticSetup {}
+        pub struct StructTraitStaticSetup<T1> {
+            _generics: PhantomData<(T1,)>,
+        }
 
-        impl StructTraitSetup {
+        impl<T1> StructTraitSetup<T1> {
             pub fn f<T2>(&self, _: i32) {
-                let data: &FnData<StructMock<i16>, true, false> =
-                    mock_table::get_fn_data(self.mock_id, "Trait::f");
+                let fn_data: &FnData<StructMock<i16>, true, false> =
+                    self.data.borrow_mut().get_fn_data("Trait::f");
             }
             pub fn tself<T4>(&self, _: i32) {
-                let data: &FnData<StructMock<i16>, true, false> =
-                    mock_table::get_fn_data(self.mock_id, "Trait::tself");
+                let fn_data: &FnData<StructMock<i16>, true, false> =
+                    self.data.borrow_mut().get_fn_data("Trait::tself");
             }
         }
 
-        impl StructTraitStaticSetup {
+        impl<T1> StructTraitStaticSetup<T1> {
             pub fn g<T4>(&self, _: i32) {
-                let data: &FnData<StructMock<i16>, true, false> =
-                    mock_table::get_static_fn_data("Trait::g");
+                let fn_data: &FnData<StructMock<i16>, true, false> = get_static_fn_data("Trait::g");
             }
             pub fn tstatic<T5>(&self, _: i32) {
-                let data: &FnData<StructMock<i16>, true, false> =
-                    mock_table::get_static_fn_data("Trait::tstatic");
+                let fn_data: &FnData<StructMock<i16>, true, false> =
+                    get_static_fn_data("Trait::tstatic");
             }
         }
 
         impl StructSetup<i16> {
-            pub fn as_Trait<T1>(&self) -> StructTraitSetup {
+            pub fn as_Trait<T1>(&self) -> StructTraitSetup<T1> {
                 StructTraitSetup {
-                    mock_id: self.mock_id,
+                    data: self.data.clone(),
+                    _generics: PhantomData,
                 }
             }
         }
 
         impl StructStaticSetup<i16> {
-            pub fn as_Trait<T1>(&self) -> StructTraitStaticSetup {
-                StructTraitStaticSetup {}
+            pub fn as_Trait<T1>(&self) -> StructTraitStaticSetup<T1> {
+                StructTraitStaticSetup {
+                    _generics: PhantomData,
+                }
             }
         }
 
         impl<T1> Trait<T1> for StructMock<i16> {
             fn f<T2>(&self) -> T1 {
-                let data: &FnData<StructMock<i16>, true, false> =
-                    mock_table::get_fn_data(self.mock_id, "Trait::f");
+                let fn_data: &FnData<StructMock<i16>, true, false> =
+                    self.data.borrow_mut().get_fn_data("Trait::f");
                 todo!()
             }
             fn g<T3>() {
-                let data: &FnData<StructMock<i16>, true, false> =
-                    mock_table::get_static_fn_data("Trait::g");
+                let fn_data: &FnData<StructMock<i16>, true, false> = get_static_fn_data("Trait::g");
             }
             fn tself<T4>(&self) {
-                let data: &FnData<StructMock<i16>, true, false> =
-                    mock_table::get_fn_data(self.mock_id, "Trait::tself");
+                let fn_data: &FnData<StructMock<i16>, true, false> =
+                    self.data.borrow_mut().get_fn_data("Trait::tself");
             }
             fn tstatic<T5>() {
-                let data: &FnData<StructMock<i16>, true, false> =
-                    mock_table::get_static_fn_data("Trait::tstatic");
+                let fn_data: &FnData<StructMock<i16>, true, false> =
+                    get_static_fn_data("Trait::tstatic");
             }
         }
     }
@@ -303,7 +294,7 @@ mod result {
     use struct_impl_line41_col4::*;
     mod struct_impl_line41_col4 {
         use super::*;
-        use rsubstitute_core::infrastructure::fn_data_storage::{mock_table, MockId};
+        use std::marker::PhantomData;
 
         // source
         impl Trait<i64> for Struct<i128> {
@@ -317,60 +308,76 @@ mod result {
 
         pub struct StructTraitSetup {
             #[doc(hidden)]
-            pub mock_id: MockId,
+            pub data: SharedMockData<StructMock<i128>, true, false>,
+            _generics: PhantomData<()>,
         }
-        pub struct StructTraitStaticSetup {}
+        pub struct StructTraitStaticSetup {
+            _generics: PhantomData<()>,
+        }
 
         impl StructTraitSetup {
             pub fn f<T2>(&self, _: i32) {
-                let data: &FnData<StructMock<i128>, true, false> =
-                    mock_table::get_fn_data(self.mock_id, "Trait::f");
+                let fn_data: &FnData<StructMock<i128>, true, false> =
+                    self.data.borrow_mut().get_fn_data("Trait::f");
             }
             pub fn tself<T4>(&self, _: i32) {
-                let data: &FnData<StructMock<i128>, true, false> =
-                    mock_table::get_fn_data(self.mock_id, "Trait::tself");
+                let fn_data: &FnData<StructMock<i128>, true, false> =
+                    self.data.borrow_mut().get_fn_data("Trait::tself");
             }
         }
 
         impl StructTraitStaticSetup {
             pub fn g<T4>(&self, _: i32) {
-                let data: &FnData<StructMock<i128>, true, false> =
-                    mock_table::get_static_fn_data("Trait::g");
+                let fn_data: &FnData<StructMock<i128>, true, false> =
+                    get_static_fn_data("Trait::g");
             }
             pub fn tstatic<T5>(&self, _: i32) {
-                let data: &FnData<StructMock<i128>, true, false> =
-                    mock_table::get_static_fn_data("Trait::tstatic");
+                let fn_data: &FnData<StructMock<i128>, true, false> =
+                    get_static_fn_data("Trait::tstatic");
             }
         }
 
         impl StructSetup<i128> {
             pub fn as_Trait(&self) -> StructTraitSetup {
                 StructTraitSetup {
-                    mock_id: self.mock_id,
+                    data: self.data.clone(),
+                    _generics: PhantomData,
                 }
             }
         }
 
         impl StructStaticSetup<i128> {
             pub fn as_Trait(&self) -> StructTraitStaticSetup {
-                StructTraitStaticSetup {}
+                StructTraitStaticSetup {
+                    _generics: PhantomData,
+                }
             }
         }
 
         impl<'__rs> Trait<i64> for StructMock<i128> {
             fn f<T2>(&self) -> i64 {
+                let fn_data: &FnData<StructMock<i128>, true, false> =
+                    self.data.borrow_mut().get_fn_data("Trait::f");
                 todo!()
             }
-            fn g<T3>() {}
-            fn tself<T4>(&self) {}
-            fn tstatic<T5>() {}
+            fn g<T3>() {
+                let fn_data: &FnData<StructMock<i128>, true, false> =
+                    get_static_fn_data("Trait::g");
+            }
+            fn tself<T4>(&self) {
+                let fn_data: &FnData<StructMock<i128>, true, false> =
+                    self.data.borrow_mut().get_fn_data("Trait::tself");
+            }
+            fn tstatic<T5>() {
+                let fn_data: &FnData<StructMock<i128>, true, false> =
+                    get_static_fn_data("Trait::tstatic");
+            }
         }
     }
 
     use struct_impl_line48_col4::*;
     mod struct_impl_line48_col4 {
         use super::*;
-        use rsubstitute_core::infrastructure::fn_data_storage::{mock_table, MockId};
         use std::marker::PhantomData;
 
         // source
@@ -383,40 +390,39 @@ mod result {
 
         pub struct StructGenSetup<G1, S1> {
             #[doc(hidden)]
-            pub mock_id: MockId,
-            generics: PhantomData<(G1, S1)>,
+            pub data: SharedMockData<StructMock<S1>, true, false>,
+            _generics: PhantomData<(G1, S1)>,
         }
         pub struct StructGenStaticSetup<G1, S1> {
-            generics: PhantomData<(G1, S1)>,
+            _generics: PhantomData<(G1, S1)>,
         }
 
         impl<G1, S1> StructGenSetup<G1, S1> {
             pub fn f<T2>(&self, _: i32) {
-                let data: &FnData<StructMock<S1>, true, false> =
-                    mock_table::get_fn_data(self.mock_id, "Gen::f");
+                let fn_data: &FnData<StructMock<S1>, true, false> =
+                    self.data.borrow_mut().get_fn_data("Gen::f");
             }
             pub fn gself<T4>(&self, _: i32) {
-                let data: &FnData<StructMock<S1>, true, false> =
-                    mock_table::get_fn_data(self.mock_id, "Trait::gself");
+                let fn_data: &FnData<StructMock<S1>, true, false> =
+                    self.data.borrow_mut().get_fn_data("Gen::tself");
             }
         }
 
         impl<G1, S1> StructGenStaticSetup<G1, S1> {
             pub fn g<T4>(&self, _: i32) {
-                let data: &FnData<StructMock<S1>, true, false> =
-                    mock_table::get_static_fn_data("Gen::g");
+                let fn_data: &FnData<StructMock<S1>, true, false> = get_static_fn_data("Gen::g");
             }
             pub fn gstatic<T5>(&self, _: i32) {
-                let data: &FnData<StructMock<S1>, true, false> =
-                    mock_table::get_static_fn_data("Gen::gstatic");
+                let fn_data: &FnData<StructMock<S1>, true, false> =
+                    get_static_fn_data("Gen::tstatic");
             }
         }
 
         impl<S1> StructSetup<S1> {
             pub fn as_Gen<G1>(&self) -> StructGenSetup<G1, S1> {
                 StructGenSetup {
-                    mock_id: self.mock_id,
-                    generics: PhantomData,
+                    data: self.data.clone(),
+                    _generics: PhantomData,
                 }
             }
         }
@@ -424,27 +430,26 @@ mod result {
         impl<S1> StructStaticSetup<S1> {
             pub fn as_Gen<G1>(&self) -> StructGenStaticSetup<G1, S1> {
                 StructGenStaticSetup {
-                    generics: PhantomData,
+                    _generics: PhantomData,
                 }
             }
         }
 
         impl<G1, S1> Gen<G1> for StructMock<S1> {
             fn f<T2>(&self) {
-                let data: &FnData<StructMock<S1>, true, false> =
-                    mock_table::get_fn_data(self.mock_id, "Gen::f");
+                let fn_data: &FnData<StructMock<S1>, true, false> =
+                    self.data.borrow_mut().get_fn_data("Gen::f");
             }
             fn g<T3>() {
-                let data: &FnData<StructMock<S1>, true, false> =
-                    mock_table::get_static_fn_data("Gen::g");
+                let fn_data: &FnData<StructMock<S1>, true, false> = get_static_fn_data("Gen::g");
             }
             fn gself<T4>(&self) {
-                let data: &FnData<StructMock<S1>, true, false> =
-                    mock_table::get_fn_data(self.mock_id, "Gen::gself");
+                let fn_data: &FnData<StructMock<S1>, true, false> =
+                    self.data.borrow_mut().get_fn_data("Gen::tself");
             }
             fn gstatic<T5>() {
-                let data: &FnData<StructMock<S1>, true, false> =
-                    mock_table::get_static_fn_data("Gen::gstatic");
+                let fn_data: &FnData<StructMock<i16>, true, false> =
+                    get_static_fn_data("Gen::tstatic");
             }
         }
     }

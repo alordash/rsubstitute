@@ -9,7 +9,6 @@ mod result {
     mod f {
         use rsubstitute_core::args::*;
         use rsubstitute_core::fn_parameters::*;
-        use rsubstitute_core::infrastructure::fn_data_storage::*;
         use rsubstitute_core::infrastructure::*;
         use std::marker::PhantomData;
 
@@ -35,7 +34,7 @@ mod result {
                 true,
                 false,
             > {
-                let data: &FnData<fMock<T>, true, false> = mock_table::get_static_fn_data("f");
+                let data: &FnData<fMock<T>, true, false> = get_static_fn_data("f");
                 todo!()
             }
         }
@@ -45,7 +44,7 @@ mod result {
             _: i32,
         ) -> FnConfigurator<'__rsa, fMock<T>, fStaticSetup<T>, (&'__rsa T,), T, fMock<T>, true, false>
         {
-            let data: &FnData<fMock<T>, true, false> = mock_table::get_static_fn_data("f");
+            let data: &FnData<fMock<T>, true, false> = get_static_fn_data("f");
             todo!()
         }
 
@@ -77,7 +76,7 @@ mod result {
         }
 
         pub fn f<T>(input: T) -> T {
-            let data: &FnData<fMock<T>, true, false> = mock_table::get_static_fn_data("f");
+            let data: &FnData<fMock<T>, true, false> = get_static_fn_data("f");
             data.handle_base(
                 &fMock {
                     generics: PhantomData,

@@ -6,6 +6,8 @@ mod fn_data;
 mod fn_verifier;
 mod i_mock_data;
 mod matching_config_search_result;
+mod mock_data;
+mod static_fn_datas_global_map;
 
 pub use fn_callback_configurator::*;
 pub(crate) use fn_config::*;
@@ -14,5 +16,5 @@ pub use fn_data::*;
 pub use fn_verifier::*;
 pub use i_mock_data::*;
 pub(crate) use matching_config_search_result::*;
-
-pub mod fn_data_storage;
+pub use mock_data::*;
+pub use static_fn_datas_global_map::*;

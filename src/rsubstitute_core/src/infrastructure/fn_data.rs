@@ -9,6 +9,7 @@ use std::sync::atomic::AtomicUsize;
 
 pub struct FnData<'rs, TMock, const SUPPORTS_BASE_CALLING: bool, const STORES_MOCK_DATA: bool> {
     fn_name: &'static str,
+    // TODO - remove RefCell? can I just make mock methods all requires `&mut self`?
     pub call_infos: RefCell<HashMap<GenericsHashKey, Vec<CallCheck<'rs>>>>,
     pub configs: RefCell<HashMap<GenericsHashKey, Vec<Arc<RefCell<FnConfig<'rs, TMock>>>>>>,
     next_call_number: AtomicUsize,
