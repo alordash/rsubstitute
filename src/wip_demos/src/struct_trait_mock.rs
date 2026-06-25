@@ -438,7 +438,7 @@ mod result {
             ) -> FnConfigurator<
                 '__rsa,
                 StructMock<i16>,
-                crate::struct_trait::result::struct_impl_line34_col4::StructTraitSetup<i16>,
+                crate::struct_trait_mock::result::struct_impl_line34_col4::StructTraitSetup<i16>,
                 (),
                 (),
                 &mut Struct<i16>,
@@ -456,7 +456,7 @@ mod result {
             ) -> FnConfigurator<
                 '__rsa,
                 StructMock<i16>,
-                crate::struct_trait::result::struct_impl_line34_col4::StructTraitSetup<i16>,
+                crate::struct_trait_mock::result::struct_impl_line34_col4::StructTraitSetup<i16>,
                 (),
                 (),
                 &mut Struct<i16>,
@@ -477,7 +477,7 @@ mod result {
             ) -> FnConfigurator<
                 '__rsa,
                 StructMock<i16>,
-                crate::struct_trait::result::struct_impl_line34_col4::StructTraitStaticSetup<i16>,
+                crate::struct_trait_mock::result::struct_impl_line34_col4::StructTraitStaticSetup<i16>,
                 (),
                 (),
                 (),
@@ -495,7 +495,7 @@ mod result {
             ) -> FnConfigurator<
                 '__rsa,
                 StructMock<i16>,
-                crate::struct_trait::result::struct_impl_line34_col4::StructTraitStaticSetup<i16>,
+                crate::struct_trait_mock::result::struct_impl_line34_col4::StructTraitStaticSetup<i16>,
                 (),
                 (),
                 (),
