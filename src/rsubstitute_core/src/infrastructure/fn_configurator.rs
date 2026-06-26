@@ -14,13 +14,13 @@ pub struct FnConfigurator<
     TMockArg,
     const HAS_RETURN_VALUE: bool,
     const SUPPORTS_BASE_CALLING: bool,
-    const STORES_MOCK_DATA: bool,
+    const PASSES_MOCK_TO_CALLBACK: bool,
 > {
     _phantom_return_value: PhantomData<TReturnValue>,
     fn_config: Rc<RefCell<FnConfig<'rs, TMock>>>,
     owner: &'rs TOwner,
     fn_callback_configurator:
-        FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA>,
+        FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, PASSES_MOCK_TO_CALLBACK>,
 }
 
 impl<
@@ -32,7 +32,7 @@ impl<
     TMockArg,
     const HAS_RETURN_VALUE: bool,
     const SUPPORTS_BASE_CALLING: bool,
-    const STORES_MOCK_DATA: bool,
+    const PASSES_MOCK_TO_CALLBACK: bool,
 >
     FnConfigurator<
         'rs,
@@ -43,7 +43,7 @@ impl<
         TMockArg,
         HAS_RETURN_VALUE,
         SUPPORTS_BASE_CALLING,
-        STORES_MOCK_DATA,
+        PASSES_MOCK_TO_CALLBACK,
     >
 {
     pub(crate) fn new(fn_config: Rc<RefCell<FnConfig<'rs, TMock>>>, owner: &'rs TOwner) -> Self {
@@ -64,7 +64,7 @@ impl<
     TReturnValue,
     TMockArg,
     const SUPPORTS_BASE_CALLING: bool,
-    const STORES_MOCK_DATA: bool,
+    const PASSES_MOCK_TO_CALLBACK: bool,
 >
     FnConfigurator<
         'rs,
@@ -75,13 +75,13 @@ impl<
         TMockArg,
         true,
         SUPPORTS_BASE_CALLING,
-        STORES_MOCK_DATA,
+        PASSES_MOCK_TO_CALLBACK,
     >
 {
     pub fn returns<'a>(
         &self,
         return_value: TReturnValue,
-    ) -> &FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA>
+    ) -> &FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, PASSES_MOCK_TO_CALLBACK>
     where
         TReturnValue: IReturnValue<'a> + 'a,
     {
@@ -96,7 +96,7 @@ impl<
     pub fn returns_many<'a>(
         &self,
         return_values: impl IntoIterator<Item = TReturnValue>,
-    ) -> &FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA>
+    ) -> &FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, PASSES_MOCK_TO_CALLBACK>
     where
         TReturnValue: IReturnValue<'a> + 'a,
     {
@@ -113,7 +113,7 @@ impl<
     pub fn returns_always<'a>(
         &self,
         return_value: TReturnValue,
-    ) -> &FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA>
+    ) -> &FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, PASSES_MOCK_TO_CALLBACK>
     where
         TReturnValue: 'rs + 'a + IReturnValue<'a> + Clone,
     {
@@ -129,7 +129,7 @@ impl<
     pub fn returns_with<'a>(
         &self,
         f: impl Fn(TArgRefsTuple) -> TReturnValue + 'rs,
-    ) -> &FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA>
+    ) -> &FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, PASSES_MOCK_TO_CALLBACK>
     {
         let return_value_source = ReturnValueSource::Factory(Box::new(
             move |dyn_arg_refs_tuple: DynArgRefsTuple<'rs>| {
@@ -212,7 +212,7 @@ impl<
     TReturnValue,
     TMockArg,
     const HAS_RETURN_VALUE: bool,
-    const STORES_MOCK_DATA: bool,
+    const PASSES_MOCK_TO_CALLBACK: bool,
 >
     FnConfigurator<
         'rs,
@@ -223,12 +223,12 @@ impl<
         TMockArg,
         HAS_RETURN_VALUE,
         true,
-        STORES_MOCK_DATA,
+        PASSES_MOCK_TO_CALLBACK,
     >
 {
     pub fn call_base(
         &self,
-    ) -> &FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA>
+    ) -> &FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, PASSES_MOCK_TO_CALLBACK>
     {
         self.fn_config.borrow_mut().set_call_base();
         return &self.fn_callback_configurator;

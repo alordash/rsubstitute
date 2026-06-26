@@ -7,11 +7,11 @@ pub trait ISharedMockData<TMock> {
         'a,
         const HAS_RETURN_VALUE: bool,
         const SUPPORTS_BASE_CALLING: bool,
-        const STORES_MOCK_DATA: bool,
+        const PASSES_MOCK_TO_CALLBACK: bool,
     >(
         &'_ self,
         fn_ident: &'static str,
-    ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, STORES_MOCK_DATA>;
+    ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, PASSES_MOCK_TO_CALLBACK>;
 }
 
 pub type SharedMockData<TMock> = Rc<RefCell<MockData<TMock>>>;
@@ -21,11 +21,11 @@ impl<TMock> ISharedMockData<TMock> for SharedMockData<TMock> {
         'a,
         const HAS_RETURN_VALUE: bool,
         const SUPPORTS_BASE_CALLING: bool,
-        const STORES_MOCK_DATA: bool,
+        const PASSES_MOCK_TO_CALLBACK: bool,
     >(
         &'_ self,
         fn_ident: &'static str,
-    ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, STORES_MOCK_DATA> {
+    ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, PASSES_MOCK_TO_CALLBACK> {
         self.borrow_mut().get_fn_data(fn_ident)
     }
 }

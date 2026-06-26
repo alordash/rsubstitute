@@ -78,7 +78,7 @@ mod result {
 
         pub fn f<T>(input: T) -> T {
             let data: &FnData<fMock<T>, true, true, false> = get_static_fn_data("f");
-            data.handle_base_returning(
+            data.handle(
                 &fMock {
                     generics: PhantomData,
                 },

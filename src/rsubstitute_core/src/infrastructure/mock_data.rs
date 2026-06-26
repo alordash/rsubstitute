@@ -21,18 +21,18 @@ impl<TMock> MockData<TMock> {
         'a,
         const HAS_RETURN_VALUE: bool,
         const SUPPORTS_BASE_CALLING: bool,
-        const STORES_MOCK_DATA: bool,
+        const PASSES_MOCK_TO_CALLBACK: bool,
     >(
         &'_ mut self,
         fn_ident: &'static str,
-    ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, STORES_MOCK_DATA> {
+    ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, PASSES_MOCK_TO_CALLBACK> {
         let fn_data_ptr = self.map.entry(fn_ident).or_insert_with(|| {
             Box::leak(Box::new(FnData::<
                 '_,
                 TMock,
                 HAS_RETURN_VALUE,
                 SUPPORTS_BASE_CALLING,
-                STORES_MOCK_DATA,
+                PASSES_MOCK_TO_CALLBACK,
             >::new(fn_ident))) as *const _ as *const ()
         });
 
@@ -49,7 +49,7 @@ impl<TMock> MockData<TMock> {
                     TMock,
                     HAS_RETURN_VALUE,
                     SUPPORTS_BASE_CALLING,
-                    STORES_MOCK_DATA,
+                    PASSES_MOCK_TO_CALLBACK,
                 >)
                 .as_ref()
                 .unwrap_unchecked()
@@ -61,7 +61,7 @@ impl<TMock> MockData<TMock> {
 
 const IRRELEVANT_HAS_RETURN_VALUE: bool = false;
 const IRRELEVANT_SUPPORTS_BASE_CALLING: bool = false;
-const IRRELEVANT_STORES_MOCK_DATA: bool = false;
+const IRRELEVANT_PASSES_MOCK_TO_CALLBACK: bool = false;
 
 impl<TMock> Drop for MockData<TMock> {
     fn drop(&mut self) {
@@ -74,7 +74,7 @@ impl<TMock> Drop for MockData<TMock> {
                             TMock,
                             IRRELEVANT_HAS_RETURN_VALUE,
                             IRRELEVANT_SUPPORTS_BASE_CALLING,
-                            IRRELEVANT_STORES_MOCK_DATA,
+                            IRRELEVANT_PASSES_MOCK_TO_CALLBACK,
                         >,
                 )
             };

@@ -12,7 +12,7 @@ pub struct FnData<
     TMock,
     const HAS_RETURN_VALUE: bool,
     const SUPPORTS_BASE_CALLING: bool,
-    const STORES_MOCK_DATA: bool,
+    const PASSES_MOCK_TO_CALLBACK: bool,
 > {
     fn_name: &'static str,
     // TODO - remove RefCell? can I just make mock methods all requires `&mut self`?
@@ -26,8 +26,8 @@ impl<
     TMock,
     const HAS_RETURN_VALUE: bool,
     const SUPPORTS_BASE_CALLING: bool,
-    const STORES_MOCK_DATA: bool,
-> FnData<'rs, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, STORES_MOCK_DATA>
+    const PASSES_MOCK_TO_CALLBACK: bool,
+> FnData<'rs, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, PASSES_MOCK_TO_CALLBACK>
 {
     pub fn new(fn_name: &'static str) -> Self {
         Self {
@@ -63,7 +63,7 @@ impl<
         TMockArg,
         HAS_RETURN_VALUE,
         SUPPORTS_BASE_CALLING,
-        STORES_MOCK_DATA,
+        PASSES_MOCK_TO_CALLBACK,
     > {
         let dyn_args_checker: DynArgsChecker<'a> = DynArgsChecker::new(args_checker);
         let generics_hash_key = dyn_args_checker.get_generics_hash_key();
@@ -125,7 +125,9 @@ impl<
     }
 }
 
-impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, false, false, STORES_MOCK_DATA> {
+impl<'rs, TMock, const PASSES_MOCK_TO_CALLBACK: bool>
+    FnData<'rs, TMock, false, false, PASSES_MOCK_TO_CALLBACK>
+{
     pub fn handle<'a, TMockArg, TCall: ICall + 'a>(&self, mock_arg: TMockArg, the_call: TCall) {
         let call = Rc::new(DynCall::new(the_call));
         let maybe_fn_config = self.get_optional_matching_config(&call);
@@ -139,8 +141,10 @@ impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, false, false, 
     }
 }
 
-impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, true, false, STORES_MOCK_DATA> {
-    pub fn handle_returning<'a, 'b, TMockArg, TCall: ICall + 'a, TReturnValue: IReturnValue<'b>>(
+impl<'rs, TMock, const PASSES_MOCK_TO_CALLBACK: bool>
+    FnData<'rs, TMock, true, false, PASSES_MOCK_TO_CALLBACK>
+{
+    pub fn handle<'a, 'b, TMockArg, TCall: ICall + 'a, TReturnValue: IReturnValue<'b>>(
         &self,
         mock_arg: TMockArg,
         the_call: TCall,
@@ -166,8 +170,10 @@ impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, true, false, S
     }
 }
 
-impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, false, true, STORES_MOCK_DATA> {
-    pub fn handle_base<'a, TMockArg, TCall: ICall + Clone + 'a>(
+impl<'rs, TMock, const PASSES_MOCK_TO_CALLBACK: bool>
+    FnData<'rs, TMock, false, true, PASSES_MOCK_TO_CALLBACK>
+{
+    pub fn handle<'a, TMockArg, TCall: ICall + Clone + 'a>(
         &self,
         mock_arg: TMockArg,
         the_call: TCall,
@@ -192,8 +198,10 @@ impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, false, true, S
     }
 }
 
-impl<'rs, TMock, const STORES_MOCK_DATA: bool> FnData<'rs, TMock, true, true, STORES_MOCK_DATA> {
-    pub fn handle_base_returning<
+impl<'rs, TMock, const PASSES_MOCK_TO_CALLBACK: bool>
+    FnData<'rs, TMock, true, true, PASSES_MOCK_TO_CALLBACK>
+{
+    pub fn handle<
         'a,
         TMockArg,
         TCall: ICall + Clone,
@@ -240,8 +248,8 @@ mod internal {
         TMock,
         const HAS_RETURN_VALUE: bool,
         const SUPPORTS_BASE_CALLING: bool,
-        const STORES_MOCK_DATA: bool,
-    > FnData<'rs, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, STORES_MOCK_DATA>
+        const PASSES_MOCK_TO_CALLBACK: bool,
+    > FnData<'rs, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, PASSES_MOCK_TO_CALLBACK>
     {
         pub(crate) fn register_call(&self, call: Rc<DynCall<'rs>>) -> &Self {
             let generics_hash_key = call.get_generics_hash_key();

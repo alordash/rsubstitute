@@ -10,7 +10,7 @@ pub struct FnCallbackConfigurator<
     TOwner,
     TArgRefsTuple,
     TMockArg,
-    const STORES_MOCK_DATA: bool,
+    const PASSES_MOCK_TO_CALLBACK: bool,
 > {
     _phantom_args_tuple: PhantomData<TArgRefsTuple>,
     _phantom_mock_arg: PhantomData<TMockArg>,
@@ -18,8 +18,8 @@ pub struct FnCallbackConfigurator<
     owner: &'rs TOwner,
 }
 
-impl<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, const STORES_MOCK_DATA: bool>
-    FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA>
+impl<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, const PASSES_MOCK_TO_CALLBACK: bool>
+    FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, PASSES_MOCK_TO_CALLBACK>
 {
     pub(crate) fn new(fn_config: Rc<RefCell<FnConfig<'rs, TMock>>>, owner: &'rs TOwner) -> Self {
         Self {
@@ -54,8 +54,8 @@ impl<'rs, TMock, TOwner, TArgRefsTuple, TMockArg>
     }
 }
 
-impl<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, const STORES_MOCK_DATA: bool> Deref
-    for FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, STORES_MOCK_DATA>
+impl<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, const PASSES_MOCK_TO_CALLBACK: bool> Deref
+    for FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, PASSES_MOCK_TO_CALLBACK>
 {
     type Target = TOwner;
 
