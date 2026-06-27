@@ -27,24 +27,24 @@ pub(crate) fn prepare(
         maybe_owner,
     }: Params,
 ) -> FnSyntax {
-    let merged_generics = combine_generics(signature.generics, maybe_owner);
-    let fn_ident = format_fn_ident(signature.ident, maybe_owner, &merged_generics);
+    let merged_generics = combine_generics(signature.generics.clone(), maybe_owner);
+    let fn_ident = format_fn_ident(signature.ident.clone(), maybe_owner, &merged_generics);
     let spans = Spans {
         inputs: signature.inputs.span(),
     };
     let InputsSplit {
         maybe_self_type,
         arguments,
-    } = split_inputs_into_maybe_self_type_and_arguments(signature.inputs);
+    } = split_inputs_into_maybe_self_type_and_arguments(signature.inputs.clone());
     let result = FnSyntax {
         attributes,
+        source_signature: Box::new(signature),
         visibility,
         merged_generics,
         fn_ident,
         is_default,
         maybe_self_type,
         arguments,
-        return_type: signature.output,
         maybe_base_impl,
         spans,
     };
