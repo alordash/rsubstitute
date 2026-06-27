@@ -12,6 +12,23 @@ mod result {
         use rsubstitute_core::infrastructure::*;
         use std::marker::PhantomData;
 
+        pub fn f<T>(input: T) -> T {
+            let data: &FnData<fMock<T>, true, true, false> = get_static_fn_data("f");
+            data.handle(
+                &fMock {
+                    generics: PhantomData,
+                },
+                fCall {
+                    generics: PhantomData,
+                },
+                __rs_base_f::<T>,
+            )
+        }
+
+        fn __rs_base_f<T>(_: &fMock<T>, _: fCall<T>) -> T {
+            todo!()
+        }
+
         pub struct fMock<T> {
             generics: PhantomData<(T,)>,
         }
@@ -74,23 +91,6 @@ mod result {
             fn clone(&self) -> Self {
                 todo!()
             }
-        }
-
-        pub fn f<T>(input: T) -> T {
-            let data: &FnData<fMock<T>, true, true, false> = get_static_fn_data("f");
-            data.handle(
-                &fMock {
-                    generics: PhantomData,
-                },
-                fCall {
-                    generics: PhantomData,
-                },
-                __rs_base_f::<T>,
-            )
-        }
-
-        fn __rs_base_f<T>(_: &fMock<T>, _: fCall<T>) -> T {
-            todo!()
         }
     }
 

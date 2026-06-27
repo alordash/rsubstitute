@@ -72,12 +72,12 @@ mod result {
         // source
         pub struct Struct<S1>(pub S1);
 
-        pub trait IMockable<S1> {
+        pub trait IMockable {
             type Mock;
             fn mock(self) -> Self::Mock;
         }
 
-        impl<S1> IMockable<S1> for Struct<S1> {
+        impl<S1> IMockable for Struct<S1> {
             type Mock = StructMock<S1>;
             fn mock(self) -> StructMock<S1> {
                 StructMock {
