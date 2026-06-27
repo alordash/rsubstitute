@@ -17,7 +17,7 @@ readme = "../../README.md"
 #path = "bin/bin_trait_generics.rs"
 #
 #[[bin]]
-#name = "fn"
+#name = "fn_info"
 #path = "bin/bin_fn.rs"
 #
 #[[bin]]

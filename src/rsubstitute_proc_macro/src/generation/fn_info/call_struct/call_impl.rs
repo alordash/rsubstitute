@@ -1,4 +1,4 @@
-use crate::generation::r#fn::*;
+use crate::generation::fn_info::*;
 use crate::preparation::r#fn::models::*;
 use crate::syntax::r#type::vec_of;
 use crate::syntax::*;

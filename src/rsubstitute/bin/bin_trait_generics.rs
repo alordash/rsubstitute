@@ -16,9 +16,9 @@ trait MyTrait<T> {
 
     fn get(&self) -> T;
 
-    // fn standalone(number: i32) -> f32;
+    // fn_info standalone(number: i32) -> f32;
     //
-    // fn standalone_with_ref(number: &i32) -> f32;
+    // fn_info standalone_with_ref(number: &i32) -> f32;
 }
 
 pub use generated::*;

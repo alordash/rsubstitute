@@ -1,12 +1,12 @@
 // Fn parameters (arguments and return values) are boxed and treated as trait objects.
-// This is needed because mock object needs to store information about all its fn parameters.
+// This is needed because mock object needs to store information about all its fn_info parameters.
 //
-// Using real fn parameters types would clutter mock object type with all their generic parameters.
+// Using real fn_info parameters types would clutter mock object type with all their generic parameters.
 // Basically all functions generic parameters will be flattened and stored in mock object trait.
-// For example `trait Trait { fn work<T>(&self, v: i32) -> T }` would make `trait TraitMock { work_data: FnData<i32, T> }.
+// For example `trait Trait { fn_info work<T>(&self, v: i32) -> T }` would make `trait TraitMock { work_data: FnData<i32, T> }.
 // This also leads to a problem of overlapping type arguments.
 //
-// To relieve mock structs from knowing their functions parameters dynamic fn parameters are used.
+// To relieve mock structs from knowing their functions parameters dynamic fn_info parameters are used.
 //
 // SAFETY (dyn structs):
 // `Dyn*` structs contain some boxed data. Their primary purpose is downcasting to specific types.

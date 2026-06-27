@@ -191,7 +191,7 @@ mod result {
             }
         }
 
-        // Applying impl to StructMock because that's where fn config is used
+        // Applying impl to StructMock because that's where fn_info config is used
         // (and optionally base impl is called)
         impl<S1> StructMock<S1> {
             pub fn f<S2>(&self) {

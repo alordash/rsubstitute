@@ -1,6 +1,6 @@
 mod mocked_fn;
 
-use crate::generation::r#fn::models::*;
+use crate::generation::fn_info::models::*;
 use proc_macro2::Span;
 use syn::*;
 

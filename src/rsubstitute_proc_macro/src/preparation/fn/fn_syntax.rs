@@ -70,7 +70,7 @@ fn format_fn_ident(
     return result;
 }
 
-// TODO - prove assumption - assuming fn generics and owner generics can not intersect
+// TODO - prove assumption - assuming fn_info generics and owner generics can not intersect
 fn combine_generics(mut fn_generics: Generics, maybe_owner: Option<&dyn IFnOwner>) -> Generics {
     let Some(owner_generics) = maybe_owner.map(IFnOwner::generics) else {
         return fn_generics;

@@ -9,9 +9,10 @@ pub mod models {
 }
 
 mod common;
+mod generation;
 
 pub use common::*;
+pub use generation::*;
 
 pub mod args_checker_struct;
 pub mod call_struct;
-pub mod fn_info;

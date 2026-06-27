@@ -1,5 +1,5 @@
-use crate::generation::r#fn::models::*;
-use crate::generation::r#fn::*;
+use crate::generation::fn_info::models::*;
+use crate::generation::fn_info::*;
 use crate::preparation::r#fn::models::*;
 use syn::*;
 

@@ -8,13 +8,13 @@ trait Trait<T> {
 //     trait Struct;
 // 
 //     impl Struct {
-//         pub fn new() -> Self {
+//         pub fn_info new() -> Self {
 //             Self
 //         }
 //     }
 // 
 //     impl<T> Trait<T> for Struct {
-//         fn work(&self, t: T) -> T {
+//         fn_info work(&self, t: T) -> T {
 //             t
 //         }
 //     }

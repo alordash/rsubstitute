@@ -15,33 +15,33 @@ trait Trait<'a, T0> {
 //     trait Struct<'s, TS>(PhantomData<&'s TS>);
 //     
 //     impl<'s, TS> Struct<'s, TS> {
-//         pub fn new() -> Self {
+//         pub fn_info new() -> Self {
 //             Self(PhantomData)
 //         }
 //     
-//         fn accept_ref<'b>(&self, r: &'s &&'b i32) -> i32 {
+//         fn_info accept_ref<'b>(&self, r: &'s &&'b i32) -> i32 {
 //             unreachable!()
 //         }
 //     
-//         fn accept_ref_ptr<'b>(&self, r: &'s &*const &&'b i32) -> i32 {
+//         fn_info accept_ref_ptr<'b>(&self, r: &'s &*const &&'b i32) -> i32 {
 //             unreachable!()
 //         }
 //     
-//         fn generic<T1, T2>(&self, t1: T1) -> T2 {
+//         fn_info generic<T1, T2>(&self, t1: T1) -> T2 {
 //             unreachable!()
 //         }
 //     }
 //     
 //     impl<'s, 'a, TS, T0> Trait<'a, T0> for Struct<'s, TS> {
-//         fn accept_ref<'b>(&self, r: &'a &&'b i32) -> i32 {
+//         fn_info accept_ref<'b>(&self, r: &'a &&'b i32) -> i32 {
 //             Self::accept_ref(self, transmute_lifetime!(r))
 //         }
 //     
-//         fn accept_ref_ptr<'b>(&self, r: &'a &*const &&'b i32) -> i32 {
+//         fn_info accept_ref_ptr<'b>(&self, r: &'a &*const &&'b i32) -> i32 {
 //             Self::accept_ref_ptr(self, transmute_lifetime!(r))
 //         }
 //     
-//         fn generic<T1, T2>(&self, t1: T1) -> T2 {
+//         fn_info generic<T1, T2>(&self, t1: T1) -> T2 {
 //             Self::generic(self, t1)
 //         }
 //     }
@@ -328,7 +328,7 @@ Received no non-matching calls"
 //         use super::*;
 // 
 //         #[test]
-//         fn accept_ref_NoConfig_Ok() {
+//         fn_info accept_ref_NoConfig_Ok() {
 //             // Arrange
 //             let mock = Struct::<T0>::new();
 // 
@@ -346,7 +346,7 @@ Received no non-matching calls"
 //         }
 // 
 //         #[test]
-//         fn accept_ref_DidNotReceive_Ok() {
+//         fn_info accept_ref_DidNotReceive_Ok() {
 //             // Arrange
 //             let mock = Struct::<T0>::new();
 // 
@@ -379,7 +379,7 @@ Received no non-matching calls"
 //         }
 // 
 //         #[test]
-//         fn accept_ref_UnexpectedCall_Ok() {
+//         fn_info accept_ref_UnexpectedCall_Ok() {
 //             // Arrange
 //             let mock = Struct::<T0>::new();
 // 
@@ -403,7 +403,7 @@ Received no non-matching calls"
 //         }
 // 
 //         #[test]
-//         fn accept_ref_ptr_NoConfig_Ok() {
+//         fn_info accept_ref_ptr_NoConfig_Ok() {
 //             // Arrange
 //             let mock = Struct::<T0>::new();
 // 
@@ -421,7 +421,7 @@ Received no non-matching calls"
 //         }
 // 
 //         #[test]
-//         fn accept_ref_ptr_DidNotReceive_Ok() {
+//         fn_info accept_ref_ptr_DidNotReceive_Ok() {
 //             // Arrange
 //             let mock = Struct::<T0>::new();
 // 
@@ -455,7 +455,7 @@ Received no non-matching calls"
 //         }
 // 
 //         #[test]
-//         fn accept_ref_ptr_UnexpectedCall_Ok() {
+//         fn_info accept_ref_ptr_UnexpectedCall_Ok() {
 //             // Arrange
 //             let mock = Struct::<T0>::new();
 // 
@@ -479,7 +479,7 @@ Received no non-matching calls"
 //         }
 // 
 //         #[test]
-//         fn generic_NoConfig_Ok() {
+//         fn_info generic_NoConfig_Ok() {
 //             // Arrange
 //             let mock = Struct::<T0>::new();
 //             type T1 = i32;
@@ -500,7 +500,7 @@ Received no non-matching calls"
 //         }
 // 
 //         #[test]
-//         fn generic_DidNotReceiveSameGenerics_Ok() {
+//         fn_info generic_DidNotReceiveSameGenerics_Ok() {
 //             // Arrange
 //             let mock = Struct::<T0>::new();
 //             type T1 = i32;
@@ -534,7 +534,7 @@ Received no non-matching calls"
 //         }
 // 
 //         #[test]
-//         fn generic_DidNotReceiveDifferentGenerics_Ok() {
+//         fn_info generic_DidNotReceiveDifferentGenerics_Ok() {
 //             // Arrange
 //             let mock = Struct::<T0>::new();
 //             type T1 = i32;
@@ -566,7 +566,7 @@ Received no non-matching calls"
 //         }
 // 
 //         #[test]
-//         fn generic_ref_UnexpectedCall_Ok() {
+//         fn_info generic_ref_UnexpectedCall_Ok() {
 //             // Arrange
 //             let mock = Struct::<T0>::new();
 //             type T1 = i32;

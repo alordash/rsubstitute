@@ -14,5 +14,5 @@ pub(crate) fn handle(
 
     // TODO - move `use` to `mock!`
     // Should be used as `mock! { core::char::from_u32(i: u32) }
-    panic!("Can automock only `fn`, `trait` or `use`.");
+    panic!("Can automock only `fn_info`, `trait` or `use`.");
 }

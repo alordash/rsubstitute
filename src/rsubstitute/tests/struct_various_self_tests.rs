@@ -5,7 +5,7 @@ use std::pin::Pin;
 use std::rc::Rc;
 use std::sync::Arc;
 
-// TODO - also test callbacks - they must receive reference to same `self` type that was used in fn
+// TODO - also test callbacks - they must receive reference to same `self` type that was used in fn_info
 #[rustfmt::skip]
 #[allow(unused)]
 mod consts {

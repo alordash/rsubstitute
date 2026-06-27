@@ -143,7 +143,7 @@ mod tests {
 //         pub value: i32,
 //     }
 //     impl<'a> IArgInfosProvider for MyTrait_work_Call<'a> {
-//         fn get_arg_infos(&self) -> Vec<ArgInfo> {
+//         fn_info get_arg_infos(&self) -> Vec<ArgInfo> {
 //             vec![ArgInfo::new("value", self.value)]
 //         }
 //     }
@@ -163,13 +163,13 @@ mod tests {
 //     }
 //
 //     impl<'a> IArgsChecker<MyTrait_work_Call<'a>> for MyTrait_work_ArgsChecker<'a> {
-//         fn check(&self, call: MyTrait_work_Call<'a>) -> Vec<ArgCheckResult> {
+//         fn_info check(&self, call: MyTrait_work_Call<'a>) -> Vec<ArgCheckResult> {
 //             vec![self.value.check("value", call.value)]
 //         }
 //     }
 //
 //     impl<'a> IBaseCaller<MyTrait_work_Call<'a>, String> for StructMock<'a> {
-//         fn call_base(&self, call: MyTrait_work_Call<'a>) -> String {
+//         fn_info call_base(&self, call: MyTrait_work_Call<'a>) -> String {
 //             let MyTrait_work_Call { value, .. } = call;
 //             return "working...".to_owned();
 //         }
@@ -178,7 +178,7 @@ mod tests {
 //     impl<'a> MyTraitSetup<'a> {
 //         #[allow(dead_code)]
 //         #[allow(mismatched_lifetime_syntaxes)]
-//         pub fn work(
+//         pub fn_info work(
 //             &'a self,
 //             value: impl Into<Arg<i32>>,
 //         ) -> FnConfigurator<
@@ -205,7 +205,7 @@ mod tests {
 //     impl<'a> MyTraitReceived<'a> {
 //         #[allow(dead_code)]
 //         #[allow(mismatched_lifetime_syntaxes)]
-//         pub fn work(&'a self, value: impl Into<Arg<i32>>, times: Times) -> &'a Self {
+//         pub fn_info work(&'a self, value: impl Into<Arg<i32>>, times: Times) -> &'a Self {
 //             let MyTrait_work_ArgsChecker = MyTrait_work_ArgsChecker {
 //                 _phantom_lifetime: PhantomData,
 //                 value: value.into(),
@@ -216,7 +216,7 @@ mod tests {
 //             return self;
 //         }
 //
-//         pub fn no_other_calls(&self) {
+//         pub fn_info no_other_calls(&self) {
 //             self.data.verify_received_nothing_else()
 //         }
 //     }
@@ -226,7 +226,7 @@ mod tests {
 //         _phantom_lifetime: PhantomData<&'a ()>,
 //     }
 //     impl<'a> IArgInfosProvider for get_number_Call<'a> {
-//         fn get_arg_infos(&self) -> Vec<ArgInfo> {
+//         fn_info get_arg_infos(&self) -> Vec<ArgInfo> {
 //             vec![]
 //         }
 //     }
@@ -237,13 +237,13 @@ mod tests {
 //     }
 //
 //     impl<'a> IArgsChecker<get_number_Call<'a>> for get_number_ArgsChecker<'a> {
-//         fn check(&self, call: get_number_Call<'a>) -> Vec<ArgCheckResult> {
+//         fn_info check(&self, call: get_number_Call<'a>) -> Vec<ArgCheckResult> {
 //             vec![]
 //         }
 //     }
 //
 //     impl<'a> IBaseCaller<get_number_Call<'a>, i32> for StructMock<'a> {
-//         fn call_base(&self, call: get_number_Call<'a>) -> i32 {
+//         fn_info call_base(&self, call: get_number_Call<'a>) -> i32 {
 //             let get_number_Call { .. } = call;
 //             return self.number;
 //         }
@@ -254,7 +254,7 @@ mod tests {
 //         _phantom_lifetime: PhantomData<&'a ()>,
 //     }
 //     impl<'a> IArgInfosProvider for format_Call<'a> {
-//         fn get_arg_infos(&self) -> Vec<ArgInfo> {
+//         fn_info get_arg_infos(&self) -> Vec<ArgInfo> {
 //             vec![]
 //         }
 //     }
@@ -265,13 +265,13 @@ mod tests {
 //     }
 //
 //     impl<'a> IArgsChecker<format_Call<'a>> for format_ArgsChecker<'a> {
-//         fn check(&self, call: format_Call<'a>) -> Vec<ArgCheckResult> {
+//         fn_info check(&self, call: format_Call<'a>) -> Vec<ArgCheckResult> {
 //             vec![]
 //         }
 //     }
 //
 //     impl<'a> IBaseCaller<format_Call<'a>, String> for StructMock<'a> {
-//         fn call_base(&self, call: format_Call<'a>) -> String {
+//         fn_info call_base(&self, call: format_Call<'a>) -> String {
 //             let format_Call { .. } = call;
 //             let number = self.get_number();
 //             let work_result = self.work(number);
@@ -305,7 +305,7 @@ mod tests {
 //     }
 //
 //     impl Struct_InnerData {
-//         fn new(number: i32) -> Self {
+//         fn_info new(number: i32) -> Self {
 //             Self { number }
 //         }
 //     }
@@ -321,13 +321,13 @@ mod tests {
 //     impl<'a> Deref for StructMock<'a> {
 //         type Target = Struct_InnerData;
 //
-//         fn deref(&self) -> &Self::Target {
+//         fn_info deref(&self) -> &Self::Target {
 //             &self.inner_data
 //         }
 //     }
 //
 //     impl<'a> MyTrait for StructMock<'a> {
-//         fn work(&self, value: i32) -> String {
+//         fn_info work(&self, value: i32) -> String {
 //             let call = unsafe {
 //                 MyTrait_work_Call {
 //                     _phantom_lifetime: PhantomData,
@@ -342,7 +342,7 @@ mod tests {
 //     }
 //
 //     impl<'a> StructMock<'a> {
-//         pub fn get_number<'__rsubstitute_arg_anonymous>(&'__rsubstitute_arg_anonymous self) -> i32 {
+//         pub fn_info get_number<'__rsubstitute_arg_anonymous>(&'__rsubstitute_arg_anonymous self) -> i32 {
 //             let call = unsafe {
 //                 get_number_Call {
 //                     _phantom_lifetime: PhantomData,
@@ -351,7 +351,7 @@ mod tests {
 //             return self.data.get_number_data.handle_base_returning(self, call);
 //         }
 //
-//         pub fn format<'__rsubstitute_arg_anonymous>(&'__rsubstitute_arg_anonymous self) -> String {
+//         pub fn_info format<'__rsubstitute_arg_anonymous>(&'__rsubstitute_arg_anonymous self) -> String {
 //             let call = unsafe {
 //                 format_Call {
 //                     _phantom_lifetime: PhantomData,
@@ -363,7 +363,7 @@ mod tests {
 //
 //     impl<'a> StructMock<'a> {
 //         #[allow(dead_code)]
-//         pub fn new(number: i32) -> Self {
+//         pub fn_info new(number: i32) -> Self {
 //             let data = Arc::new(StructMockData {
 //                 _phantom_lifetime: PhantomData,
 //                 MyTrait_work_data: FnData::new("MyTrait_work", &SERVICES),
@@ -389,7 +389,7 @@ mod tests {
 //     impl<'a> StructMockSetup<'a> {
 //         #[allow(dead_code)]
 //         #[allow(mismatched_lifetime_syntaxes)]
-//         pub fn get_number(
+//         pub fn_info get_number(
 //             &'a self,
 //         ) -> FnConfigurator<
 //             'a,
@@ -411,7 +411,7 @@ mod tests {
 //         }
 //         #[allow(dead_code)]
 //         #[allow(mismatched_lifetime_syntaxes)]
-//         pub fn format(
+//         pub fn_info format(
 //             &'a self,
 //         ) -> FnConfigurator<'a, StructMock<'a>, format_Call<'a>, format_ArgsChecker<'a>, String, Self>
 //         {
@@ -427,7 +427,7 @@ mod tests {
 //     impl<'a> StructMockReceived<'a> {
 //         #[allow(dead_code)]
 //         #[allow(mismatched_lifetime_syntaxes)]
-//         pub fn get_number(&'a self, times: Times) -> &'a Self {
+//         pub fn_info get_number(&'a self, times: Times) -> &'a Self {
 //             let get_number_args_checker = get_number_ArgsChecker {
 //                 _phantom_lifetime: PhantomData,
 //             };
@@ -438,7 +438,7 @@ mod tests {
 //         }
 //         #[allow(dead_code)]
 //         #[allow(mismatched_lifetime_syntaxes)]
-//         pub fn format(&'a self, times: Times) -> &'a Self {
+//         pub fn_info format(&'a self, times: Times) -> &'a Self {
 //             let format_args_checker = format_ArgsChecker {
 //                 _phantom_lifetime: PhantomData,
 //             };
@@ -447,7 +447,7 @@ mod tests {
 //                 .verify_received(format_args_checker, times);
 //             return self;
 //         }
-//         pub fn no_other_calls(&'a self) {
+//         pub fn_info no_other_calls(&'a self) {
 //             self.data.verify_received_nothing_else();
 //         }
 //     }

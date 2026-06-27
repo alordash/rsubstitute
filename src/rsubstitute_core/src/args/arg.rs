@@ -33,7 +33,7 @@ impl<'a, T> From<&'a T> for Arg<*const T> {
 
 impl<T: Debug> Debug for Arg<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        // TODO - extract to const field when std::any::type_name becomes stabilized as const fn
+        // TODO - extract to const field when std::any::type_name becomes stabilized as const fn_info
         // https://github.com/rust-lang/rust/issues/63084
         let arg_type_name = std::any::type_name::<T>();
         match self {

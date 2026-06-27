@@ -4,7 +4,7 @@ use rsubstitute::macros::automock;
 #[automock(base)]
 fn accept_ref(r: &i32) {}
 
-// TODO - do not forget to specify in docs that calling `setup` on static fn clears all existing configurations (this is done because otherwise configs would interrupt each other in tests)
+// TODO - do not forget to specify in docs that calling `setup` on static fn_info clears all existing configurations (this is done because otherwise configs would interrupt each other in tests)
 const BASE_RETURN_REF: &'static i32 = &1000;
 #[automock(base)]
 fn return_ref() -> &'static i32 {
