@@ -1,3 +1,4 @@
+mod base_fn;
 mod mocked_fn;
 
 use crate::generation::fn_info::models::*;
@@ -9,9 +10,11 @@ pub(crate) fn generate_module(source_span: Span, fn_info: FnInfo) -> ItemMod {
     let ident = fn_info.syntax.source_signature.ident.clone();
 
     let mock_path = todo!();
-    let base_fn_ident = todo!();
-    let mocked_fn = mocked_fn::generate(source_span, fn_info, mock_path, base_fn_ident);
-    let items = vec![Item::Fn(mocked_fn)];
+
+    let base_fn = base_fn::generate(source_span, &fn_info);
+
+    let mocked_fn = mocked_fn::generate(source_span, fn_info, mock_path, base_fn.sig.ident.clone());
+    let items = vec![Item::Fn(mocked_fn), Item::Fn(base_fn)];
 
     let result = ItemMod {
         attrs,
