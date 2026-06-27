@@ -8,7 +8,9 @@ pub(crate) fn generate_module(source_span: Span, fn_info: FnInfo) -> ItemMod {
     let attrs = vec![];
     let ident = fn_info.syntax.source_signature.ident.clone();
 
-    let mocked_fn = mocked_fn::generate(source_span, fn_info);
+    let mock_path = todo!();
+    let base_fn_ident = todo!();
+    let mocked_fn = mocked_fn::generate(source_span, fn_info, mock_path, base_fn_ident);
     let items = vec![Item::Fn(mocked_fn)];
 
     let result = ItemMod {
