@@ -13,7 +13,7 @@ pub(crate) fn generate(fn_syntax: &FnSyntax) -> CallStruct {
 
     let item_struct = ItemStruct {
         attrs: Vec::new(),
-        vis: Visibility::Public(Token!(pub)(span)),
+        vis: Visibility::Public(Token![pub](span)),
         struct_token: Token![struct](span),
         ident: format_ident!("{}_Call", fn_syntax.fn_ident),
         generics: fn_syntax.merged_generics.clone(),

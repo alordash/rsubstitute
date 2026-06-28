@@ -1,5 +1,6 @@
 #![allow(clippy::needless_return)]
 
+mod common;
 mod constants;
 mod entrypoints;
 mod generation;

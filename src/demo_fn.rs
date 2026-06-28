@@ -240,13 +240,12 @@ mod accept_two_mut_refs_return_mut_ref {
         return get_mock().received.clone().received(r1, r2, times);
     }
     pub fn accept_two_mut_refs_return_mut_ref(r1: &mut i32, r2: &mut f32) -> &'static mut i32 {
-        let call =
-            accept_two_mut_refs_return_mut_ref_Call {
-                _phantom_r1: PhantomData,
-                _phantom_r2: PhantomData,
-                r1: transmute_lifetime!(r1),
-                r2: transmute_lifetime!(r2),
-            };
+        let call = accept_two_mut_refs_return_mut_ref_Call {
+            _phantom_r1: PhantomData,
+            _phantom_r2: PhantomData,
+            r1: transmute_lifetime!(r1),
+            r2: transmute_lifetime!(r2),
+        };
         let mock = get_mock::<'_>();
         return mock
             .data

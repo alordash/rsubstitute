@@ -1,5 +1,5 @@
+use crate::common::*;
 use crate::generation::fn_info::models::*;
-use crate::generation::transmute_lifetime_expr;
 use crate::syntax::*;
 use proc_macro2::Span;
 use quote::format_ident;
@@ -78,7 +78,7 @@ pub(crate) fn generate(
                 .collect(),
             rest: Some(PatRest {
                 attrs: Vec::new(),
-                dot2_token: Token!(..)(source_span),
+                dot2_token: Token![..](source_span),
             }),
         }),
         init: Some(LocalInit {

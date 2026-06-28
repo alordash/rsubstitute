@@ -3,6 +3,7 @@ use proc_macro2::Span;
 use syn::*;
 
 pub(crate) struct FnSyntax {
+    pub spans: Spans,
     pub attributes: Vec<Attribute>,
     pub source_signature: Box<Signature>,
     pub visibility: Visibility,
@@ -11,8 +12,9 @@ pub(crate) struct FnSyntax {
     pub is_default: bool,
     pub maybe_self_type: Option<Receiver>,
     pub arguments: Vec<Argument>,
+    pub arg_refs_tuple: TypeTuple,
     pub maybe_base_impl: Option<Box<Block>>,
-    pub spans: Spans,
+    pub return_type: ReturnType,
 }
 
 pub(crate) struct Spans {

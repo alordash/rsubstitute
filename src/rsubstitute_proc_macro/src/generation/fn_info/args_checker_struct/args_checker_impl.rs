@@ -1,4 +1,4 @@
-use crate::generation::*;
+use crate::common::*;
 use crate::generation::fn_info::*;
 use crate::preparation::r#fn::models::*;
 use crate::syntax::*;
@@ -64,7 +64,7 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
         ]),
         variadic: None,
         output: ReturnType::Type(
-            Token!(->)(span),
+            Token![->](span),
             Box::new(Type::Path(r#type::vec_of(
                 span,
                 Type::Path(r#type::path::new(span, ["ArgCheckResult"])),
@@ -194,7 +194,7 @@ fn generate_fn_fmt_args(span: Span, arguments: &[Argument]) -> ImplItemFn {
         inputs: punctuated([ref_self_fn_arg(span)]),
         variadic: None,
         output: ReturnType::Type(
-            Token!(->)(span),
+            Token![->](span),
             Box::new(Type::Path(r#type::path::new(span, ["String"]))),
         ),
     };

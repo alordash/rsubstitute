@@ -41,7 +41,7 @@ pub(crate) fn ref_self_fn_arg(span: Span) -> FnArg {
         attrs: Vec::new(),
         reference: Some((Token![&](Span::call_site()), None)),
         mutability: None,
-        self_token: Token!(self)(Span::call_site()),
+        self_token: Token![self](Span::call_site()),
         colon_token: None,
         ty: Box::new(Type::Reference(ref_self_type(span))),
     });
@@ -88,6 +88,14 @@ pub(crate) fn static_lifetime(span: Span) -> Lifetime {
 
 pub(crate) fn generics_field_ident(span: Span) -> Ident {
     let result = Ident::new("generics", span);
+    return result;
+}
+
+pub(crate) fn placeholder_lifetime(span: Span) -> Lifetime {
+    let result = Lifetime {
+        apostrophe: span,
+        ident: Ident::new("_", span),
+    };
     return result;
 }
 

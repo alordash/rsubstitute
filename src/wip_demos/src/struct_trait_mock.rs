@@ -75,37 +75,32 @@ mod result {
         pub trait IMockable {
             type Mock;
             fn mock(self) -> Self::Mock;
+            type StaticSetup;
+            fn static_setup() -> Self::StaticSetup;
         }
 
         impl<S1> IMockable for Struct<S1> {
             type Mock = StructMock<S1>;
             fn mock(self) -> StructMock<S1> {
                 StructMock {
+                    _generics: PhantomData,
                     data: Default::default(),
                     mockable: Box::new(self),
+                }
+            }
+            type StaticSetup = StructStaticSetup<S1>;
+            fn static_setup() -> Self::StaticSetup {
+                StructStaticSetup {
+                    _generics: PhantomData,
                 }
             }
         }
 
         pub struct StructMock<S1> {
+            _generics: PhantomData<(S1,)>,
             #[doc(hidden)]
             pub data: SharedMockData<StructMock<S1>>,
             mockable: Box<Struct<S1>>,
-        }
-
-        // TODO - create only if there are static fns
-        pub trait IStaticSetup {
-            type Setup;
-            fn setup_static() -> Self::Setup;
-        }
-
-        impl<S1> IStaticSetup for Struct<S1> {
-            type Setup = StructStaticSetup<S1>;
-            fn setup_static() -> Self::Setup {
-                StructStaticSetup {
-                    _generics: PhantomData,
-                }
-            }
         }
 
         pub struct StructSetup<S1> {
@@ -699,8 +694,8 @@ mod result {
             mock.f::<i32>();
             // mock.sself();
 
-            Struct::<i32>::setup_static().g::<i64>(2);
-            Struct::<[u8; 1]>::setup_static().g::<[u8; 2]>(2);
+            Struct::<i32>::static_setup().g::<i64>(2);
+            Struct::<[u8; 1]>::static_setup().g::<[u8; 2]>(2);
             // Struct::<i32>::setup.sstatic::<i32>(2);
             Struct::<i32>::g::<i32>();
             Struct::<[u8; 1]>::g::<[u8; 2]>();
@@ -716,9 +711,9 @@ mod result {
             mock.f::<i32>();
             mock.sself::<i32>();
 
-            Struct::<i32>::setup_static().g::<i64>(2);
-            Struct::<[u8; 1]>::setup_static().g::<[u8; 2]>(2);
-            Struct::<i8>::setup_static().sstatic::<i32>(2);
+            Struct::<i32>::static_setup().g::<i64>(2);
+            Struct::<[u8; 1]>::static_setup().g::<[u8; 2]>(2);
+            Struct::<i8>::static_setup().sstatic::<i32>(2);
             Struct::<i32>::g::<i32>();
             Struct::<[u8; 1]>::g::<[u8; 2]>();
             Struct::<i8>::sstatic::<i32>();
@@ -741,7 +736,7 @@ mod result {
                 .f::<String>(111)
                 .call_base()
                 .and_does(|s, _| println!("called base after returning!"));
-            Struct::<i16>::setup_static()
+            Struct::<i16>::static_setup()
                 .as_Trait::<[u8; 1]>()
                 .tstatic::<[u8; 2]>(2);
         }
@@ -754,7 +749,7 @@ mod result {
             let mut mock = s.mock();
             <Struct<i128> as Trait<i64>>::tself::<[u8; 1]>(&mock);
             mock.setup().as_Trait().tself::<[u8; 2]>(1);
-            Struct::<i128>::setup_static()
+            Struct::<i128>::static_setup()
                 .as_Trait()
                 .tstatic::<[u8; 2]>(2);
         }
@@ -767,7 +762,7 @@ mod result {
             let mut mock = s.mock();
             <Struct<i32> as Gen<i64>>::gself::<[u8; 1]>(&mock);
             mock.setup().as_Gen::<[u8; 24]>().gself::<[u8; 3]>(1);
-            Struct::<i32>::setup_static()
+            Struct::<i32>::static_setup()
                 .as_Gen::<[u8; 2]>()
                 .gstatic::<[u8; 3]>(3)
                 .call_base()

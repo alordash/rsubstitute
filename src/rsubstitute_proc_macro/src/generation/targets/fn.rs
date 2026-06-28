@@ -1,13 +1,13 @@
 mod base_fn;
 mod mocked_fn;
 
+use crate::common::models::*;
 use crate::generation::*;
-use crate::preparation::models::Context;
 use crate::preparation::r#fn::fn_syntax;
 use syn::spanned::Spanned;
 use syn::*;
 
-pub(crate) fn generate_module(ctx: Context, item_fn: ItemFn) -> ItemMod {
+pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> ItemMod {
     let source_span = item_fn.span();
     let fn_syntax = fn_syntax::prepare(fn_syntax::Params {
         attributes: item_fn.attrs,
@@ -21,21 +21,35 @@ pub(crate) fn generate_module(ctx: Context, item_fn: ItemFn) -> ItemMod {
 
     let mock_struct = mock_struct::generate_for_static_fn(source_span, &fn_info.syntax);
 
-    let base_impl = fn_info
-        .syntax
-        .maybe_base_impl
-        .take()
-        .expect("Static `fn`s should always have base implementation.");
-    let base_fn = base_fn::generate(source_span, &fn_info, mock_struct.path.clone(), base_impl);
+    let maybe_base_fn = if ctx.support_base_calling {
+        let base_impl = fn_info
+            .syntax
+            .maybe_base_impl
+            .take()
+            .expect("Static `fn`s should always have base implementation.");
+        Some(base_fn::generate(
+            source_span,
+            &fn_info,
+            mock_struct.path.clone(),
+            base_impl,
+        ))
+    } else {
+        None
+    };
 
     let mod_ident = fn_info.syntax.source_signature.ident.clone();
     let mocked_fn = mocked_fn::generate(
         source_span,
         fn_info,
         mock_struct.path,
-        base_fn.sig.ident.clone(),
+        maybe_base_fn.as_ref().map(|x| x.sig.ident.clone()),
     );
-    let items = vec![Item::Fn(mocked_fn), Item::Fn(base_fn)];
+    let fn_items = if let Some(base_fn) = maybe_base_fn {
+        vec![Item::Fn(mocked_fn), Item::Fn(base_fn)]
+    } else {
+        vec![Item::Fn(mocked_fn)]
+    };
+    let items = fn_items;
 
     let result = ItemMod {
         attrs: Vec::new(),

@@ -1,13 +1,12 @@
-use crate::syntax;
-use proc_macro2::Span;
-use syn::*;
-
-mod reference_anonymization;
+mod references_replacement;
+pub use references_replacement::*;
 
 pub mod path;
 
-pub use reference_anonymization::*;
-pub use reference_anonymization::*;
+use crate::syntax;
+use proc_macro2::Span;
+use syn::visit_mut::VisitMut;
+use syn::*;
 
 pub(crate) fn vec_of(span: Span, vec_t: Type) -> TypePath {
     wrap(span, "Vec", vec_t)

@@ -59,20 +59,6 @@ mod result {
             }
         }
 
-        pub trait IStaticSetup {
-            type Setup;
-            fn setup_static() -> Self::Setup;
-        }
-
-        impl<T1> IStaticSetup for TraitMock<T1> {
-            type Setup = TraitStaticSetup<T1>;
-            fn setup_static() -> Self::Setup {
-                TraitStaticSetup {
-                    _generics: PhantomData,
-                }
-            }
-        }
-
         impl<T1> TraitMock<T1> {
             pub fn new() -> Self {
                 Self {
@@ -83,6 +69,12 @@ mod result {
             pub fn setup(&mut self) -> TraitSetup<T1> {
                 TraitSetup {
                     data: self.data.clone(),
+                }
+            }
+            
+            pub fn static_setup() -> TraitStaticSetup<T1> {
+                TraitStaticSetup {
+                    _generics: PhantomData,
                 }
             }
 
@@ -111,7 +103,7 @@ mod result {
                 TraitSetup<T1>,
                 (),
                 T1,
-                &TraitMock<T1>,
+                TraitMock<T1>,
                 true,
                 true,
                 false,
@@ -132,7 +124,7 @@ mod result {
                 TraitStaticSetup<T1>,
                 (),
                 (),
-                (),
+                TraitMock<T1>,
                 false,
                 true,
                 false,
@@ -154,7 +146,7 @@ mod result {
     fn usage() {
         let mut trait_mock = TraitMock::new();
         trait_mock.setup().f::<[u8; 1]>(1).returns("amogus");
-        TraitMock::<[u8; 11]>::setup_static()
+        TraitMock::<[u8; 11]>::static_setup()
             .g::<Vec<f32>>(443)
             .call_base();
     }

@@ -44,7 +44,7 @@ fn generate_fn_get_args_infos(span: Span, arguments: &[Argument]) -> ImplItemFn 
         inputs: punctuated([ref_self_fn_arg(span)]),
         variadic: None,
         output: ReturnType::Type(
-            Token!(->)(span),
+            Token![->](span),
             Box::new(Type::Path(vec_of(
                 span,
                 Type::Path(r#type::path::new(span, ["ArgInfo"])),
@@ -128,7 +128,7 @@ fn generate_fn_get_ptr_to_boxed_tuple_of_refs(span: Span, arguments: &[Argument]
         paren_token: token::Paren(span),
         inputs: punctuated([ref_self_fn_arg(span)]),
         variadic: None,
-        output: ReturnType::Type(Token!(->)(span), Box::new(mut_ptr_void_type(span))),
+        output: ReturnType::Type(Token![->](span), Box::new(mut_ptr_void_type(span))),
     };
 
     let fields: Punctuated<Expr, Token![,]> = arguments

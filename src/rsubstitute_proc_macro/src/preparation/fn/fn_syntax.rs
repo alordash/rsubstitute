@@ -1,8 +1,10 @@
 mod argument;
 
 use super::models::*;
-use crate::syntax::{generics, ident};
+use crate::common::rsubstitute_lifetime;
+use crate::syntax::{generics, ident, r#type};
 use crate::*;
+use proc_macro2::Span;
 use quote::ToTokens;
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
@@ -36,7 +38,19 @@ pub(crate) fn prepare(
         maybe_self_type,
         arguments,
     } = split_inputs_into_maybe_self_type_and_arguments(signature.inputs.clone());
+    let arg_refs_tuple = generate_arg_refs_tuple(spans.inputs, &arguments);
+    let return_type = match &signature.output {
+        ReturnType::Default => ReturnType::Default,
+        ReturnType::Type(arrow_token, ty) => ReturnType::Type(
+            arrow_token.clone(),
+            r#type::replace_anonymous_lifetimes_in_references(
+                ty.clone(),
+                &rsubstitute_lifetime::new(spans.inputs),
+            ),
+        ),
+    };
     let result = FnSyntax {
+        spans,
         attributes,
         source_signature: Box::new(signature),
         visibility,
@@ -45,8 +59,9 @@ pub(crate) fn prepare(
         is_default,
         maybe_self_type,
         arguments,
+        arg_refs_tuple,
         maybe_base_impl,
-        spans,
+        return_type,
     };
     return result;
 }
@@ -113,6 +128,24 @@ fn split_inputs_into_maybe_self_type_and_arguments(
     let result = InputsSplit {
         maybe_self_type,
         arguments,
+    };
+    return result;
+}
+
+fn generate_arg_refs_tuple(span: Span, arguments: &[Argument]) -> TypeTuple {
+    let result = TypeTuple {
+        paren_token: token::Paren(span),
+        elems: arguments
+            .iter()
+            .map(|x| {
+                Type::Reference(TypeReference {
+                    and_token: Token![&](span),
+                    lifetime: Some(rsubstitute_lifetime::new(span)),
+                    mutability: None,
+                    elem: x.ref_style_type.clone(),
+                })
+            })
+            .collect(),
     };
     return result;
 }
