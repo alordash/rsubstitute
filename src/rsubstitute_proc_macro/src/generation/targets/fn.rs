@@ -11,7 +11,15 @@ pub(crate) fn generate_module(source_span: Span, fn_info: FnInfo) -> ItemMod {
 
     let mock_path = todo!();
 
-    let base_fn = base_fn::generate(source_span, &fn_info);
+    let base_fn = base_fn::generate(
+        source_span,
+        &fn_info,
+        mock_path.clone(),
+        fn_info
+            .syntax
+            .maybe_base_impl
+            .expect("Static `fn`s should always have base implementation."),
+    );
 
     let mocked_fn = mocked_fn::generate(source_span, fn_info, mock_path, base_fn.sig.ident.clone());
     let items = vec![Item::Fn(mocked_fn), Item::Fn(base_fn)];
