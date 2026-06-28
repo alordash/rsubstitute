@@ -5,7 +5,6 @@ mod entrypoints;
 mod generation;
 mod preparation;
 mod syntax;
-mod targets;
 
 use crate::entrypoints::models::*;
 

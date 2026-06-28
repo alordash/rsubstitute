@@ -1,4 +1,5 @@
-use crate::{preparation, targets};
+use crate::generation::targets;
+use crate::preparation;
 use syn::*;
 
 // TODO - rename to just `mock`, not `automock`
@@ -8,13 +9,13 @@ pub(crate) fn handle(
 ) -> proc_macro::TokenStream {
     let ctx = preparation::context::create_for_automock_macro(proc_macro_attribute);
     let item = parse_macro_input!(proc_macro_item as Item);
-    let result = match item {
-        Item::Fn(item_fn) => targets::r#fn::handle(ctx, item_fn),
-        Item::Impl(item_impl) => targets::r#impl::handle(ctx, item_impl),
-        Item::Struct(item_struct) => targets::r#struct::handle(ctx, item_struct),
-        Item::Trait(item_trait) => targets::r#trait::handle(ctx, item_trait),
+    let r#mod = match item {
+        Item::Fn(item_fn) => targets::r#fn::generate_module(ctx, item_fn),
+        Item::Impl(item_impl) => todo!(),
+        Item::Struct(item_struct) => todo!(),
+        Item::Trait(item_trait) => todo!(),
         _ => todo!(
-            "PANIC HERE AND WRITE CORRECT ERROR MSG. Can automock only `fn`, `trait` or `use`."
+            "PANIC HERE AND WRITE CORRECT ERROR MSG. Can automock only `fn`, `trait`, `impl` or `use`."
         ),
     };
     todo!("return result");

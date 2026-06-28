@@ -7,7 +7,7 @@ use syn::*;
 pub(crate) fn generate(
     source_span: Span,
     fn_info: FnInfo,
-    mock_path: Path,
+    mock_struct_path: Path,
     base_fn_ident: Ident,
 ) -> ItemFn {
     let data_path = expr::path::new(source_span, ["data"]);
@@ -35,7 +35,7 @@ pub(crate) fn generate(
                                     args: [
                                         GenericArgument::Type(Type::Path(TypePath {
                                             qself: None,
-                                            path: mock_path.clone(),
+                                            path: mock_struct_path.clone(),
                                         })),
                                         generic_argument::bool(
                                             source_span,
@@ -88,7 +88,7 @@ pub(crate) fn generate(
                 expr: Box::new(Expr::Struct(ExprStruct {
                     attrs: Vec::new(),
                     qself: None,
-                    path: mock_path,
+                    path: mock_struct_path,
                     brace_token: token::Brace(source_span),
                     fields: [generics_field_value::new(source_span)]
                         .into_iter()

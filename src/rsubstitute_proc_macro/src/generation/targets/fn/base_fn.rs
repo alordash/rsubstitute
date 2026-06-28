@@ -8,7 +8,7 @@ use syn::*;
 pub(crate) fn generate(
     source_span: Span,
     fn_info: &FnInfo,
-    mock_path: Path,
+    mock_struct_path: Path,
     base_impl: Box<Block>,
 ) -> ItemFn {
     let source_signature = &fn_info.syntax.source_signature;
@@ -32,7 +32,7 @@ pub(crate) fn generate(
                 colon_token: Token![:](source_span),
                 ty: Box::new(Type::Path(TypePath {
                     qself: None,
-                    path: mock_path,
+                    path: mock_struct_path,
                 })),
             }),
             FnArg::Typed(PatType {
