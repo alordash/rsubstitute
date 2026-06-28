@@ -6,7 +6,7 @@ use syn::*;
 
 pub(crate) fn generate(
     source_span: Span,
-    fn_info: FnInfo,
+    fn_info: &FnInfo,
     mock_struct_path: Path,
     maybe_base_fn_ident: Option<Ident>,
 ) -> ItemFn {
@@ -91,26 +91,20 @@ pub(crate) fn generate(
     let the_call = Expr::Struct(ExprStruct {
         attrs: Vec::new(),
         qself: None,
-        path: fn_info.call_struct.path,
+        path: fn_info.call_struct.path.clone(),
         brace_token: token::Brace(source_span),
         fields: [generics_field::new_value(source_span)]
             .into_iter()
-            .chain(
-                fn_info
-                    .syntax
-                    .arguments
-                    .into_iter()
-                    .map(|argument| FieldValue {
-                        attrs: Vec::new(),
-                        member: Member::Named(argument.ident.clone()),
-                        colon_token: Some(Token![:](source_span)),
-                        expr: Expr::Macro(transmute_lifetime_expr::new(Expr::Path(ExprPath {
-                            attrs: Vec::new(),
-                            qself: None,
-                            path: path::from_ident(argument.ident),
-                        }))),
-                    }),
-            )
+            .chain(fn_info.syntax.arguments.iter().map(|x| FieldValue {
+                attrs: Vec::new(),
+                member: Member::Named(x.ident.clone()),
+                colon_token: Some(Token![:](source_span)),
+                expr: Expr::Macro(transmute_lifetime_expr::new(Expr::Path(ExprPath {
+                    attrs: Vec::new(),
+                    qself: None,
+                    path: path::from_ident(x.ident.clone()),
+                }))),
+            }))
             .collect(),
         dot2_token: None,
         rest: None,
@@ -130,7 +124,8 @@ pub(crate) fn generate(
                             .syntax
                             .merged_generics
                             .params
-                            .into_iter()
+                            .iter()
+                            .cloned()
                             .map(generic_argument::from_param)
                             .collect(),
                         gt_token: Token![>](source_span),
@@ -162,9 +157,9 @@ pub(crate) fn generate(
     };
 
     let result = ItemFn {
-        attrs: fn_info.syntax.attributes,
+        attrs: fn_info.syntax.attributes.clone(),
         vis: Visibility::Public(Token![pub](source_span)),
-        sig: *fn_info.syntax.source_signature,
+        sig: *fn_info.syntax.source_signature.clone(),
         block: Box::new(block),
     };
     return result;

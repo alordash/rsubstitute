@@ -53,7 +53,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> ItemMod {
     let mod_ident = fn_info.syntax.source_signature.ident.clone();
     let mocked_fn = mocked_fn::generate(
         source_span,
-        fn_info,
+        &fn_info,
         mock_struct.path,
         maybe_base_fn.as_ref().map(|x| x.sig.ident.clone()),
     );
@@ -66,6 +66,13 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> ItemMod {
     let items = fn_items
         .into_iter()
         .chain([
+            Item::Struct(fn_info.call_struct.item_struct),
+            Item::Impl(fn_info.call_struct.generics_info_provider_impl),
+            Item::Impl(fn_info.call_struct.call_impl),
+            Item::Struct(fn_info.args_checker_struct.item_struct),
+            Item::Impl(fn_info.args_checker_struct.generics_info_provider_impl),
+            Item::Impl(fn_info.args_checker_struct.args_checker_impl),
+            Item::Struct(mock_struct.item_struct),
             Item::Struct(static_setup_struct.item_struct),
             Item::Impl(static_setup_struct.item_impl),
         ])
