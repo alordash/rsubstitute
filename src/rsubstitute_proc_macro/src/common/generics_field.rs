@@ -2,7 +2,7 @@ use crate::syntax::*;
 use proc_macro2::Span;
 use syn::*;
 
-pub(crate) fn new_field(span: Span, generics: &Generics) -> Field {
+pub(crate) fn new_field(span: Span, generics: Generics) -> Field {
     let result = Field {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
@@ -17,12 +17,14 @@ pub(crate) fn new_field(span: Span, generics: &Generics) -> Field {
                 GenericArgument::Type(Type::Tuple(TypeTuple {
                     paren_token: token::Paren(span),
                     elems: generics
-                        .type_params()
-                        .map(|x| {
-                            Type::Path(TypePath {
+                        .params
+                        .into_iter()
+                        .filter_map(|x| match x {
+                            GenericParam::Type(ty) => Some(Type::Path(TypePath {
                                 qself: None,
-                                path: path::from_ident(x.ident.clone()),
-                            })
+                                path: path::from_ident(ty.ident.clone()),
+                            })),
+                            _ => None,
                         })
                         .collect(),
                 })),
@@ -31,7 +33,6 @@ pub(crate) fn new_field(span: Span, generics: &Generics) -> Field {
     };
     return result;
 }
-
 
 pub(crate) fn new_value(span: Span) -> FieldValue {
     let result = FieldValue {

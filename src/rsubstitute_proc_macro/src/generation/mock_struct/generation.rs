@@ -17,7 +17,7 @@ pub(crate) fn generate_for_static_fn(source_span: Span, fn_syntax: &FnSyntax) ->
             brace_token: token::Brace(source_span),
             named: punctuated([generics_field::new_field(
                 source_span,
-                &fn_syntax.merged_generics,
+                fn_syntax.merged_generics.clone(),
             )]),
         }),
         semi_token: None,

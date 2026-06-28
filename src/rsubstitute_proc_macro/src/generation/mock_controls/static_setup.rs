@@ -7,30 +7,49 @@ use proc_macro2::Span;
 use quote::format_ident;
 use syn::*;
 
-pub(crate) fn generate_for_static_fn(
-    ctx: &Context,
-    source_span: Span,
-    fn_info: &FnInfo,
-    mock_path: Path,
+pub(crate) struct Params<'a, 'b, 'c> {
+    pub ctx: &'a Context,
+    pub source_span: Span,
+    pub target_ident: Ident,
+    pub target_generics: Generics,
+    pub mock_path: &'b Path,
+    pub fn_infos: &'c [FnInfo],
+}
+pub(crate) fn generate(
+    Params {
+        ctx,
+        source_span,
+        target_ident,
+        target_generics,
+        mock_path,
+        fn_infos,
+    }: Params,
 ) -> StaticSetupStruct {
     let item_struct = ItemStruct {
         attrs: Vec::new(),
         vis: Visibility::Public(Token![pub](source_span)),
         struct_token: Token![struct](source_span),
-        ident: format_ident!("{}StaticSetup", fn_info.syntax.fn_ident),
-        generics: fn_info.syntax.merged_generics.clone(),
+        ident: format_ident!("{}StaticSetup", target_ident),
+        generics: target_generics.clone(),
         fields: Fields::Named(FieldsNamed {
             brace_token: token::Brace(source_span),
             named: punctuated([generics_field::new_field(
                 source_span,
-                &fn_info.syntax.merged_generics,
+                target_generics.clone(),
             )]),
         }),
         semi_token: None,
     };
     let path = path::from_ident(item_struct.ident.clone());
 
-    let item_impl = generate_item_impl(ctx, source_span, mock_path, path.clone(), fn_info);
+    let item_impl = generate_item_impl(
+        ctx,
+        source_span,
+        target_generics,
+        mock_path,
+        path.clone(),
+        fn_infos,
+    );
 
     let result = StaticSetupStruct {
         path,
@@ -43,33 +62,38 @@ pub(crate) fn generate_for_static_fn(
 fn generate_item_impl(
     ctx: &Context,
     span: Span,
-    mock_path: Path,
+    target_generics: Generics,
+    mock_path: &Path,
     static_setup_struct_path: Path,
-    fn_info: &FnInfo,
+    fn_infos: &[FnInfo],
 ) -> ItemImpl {
-    let fn_setup = generate_setup_fn(ctx, span, mock_path, fn_info);
+    let fn_setups = fn_infos
+        .iter()
+        .map(|fn_info| generate_setup_fn(ctx, span, mock_path, fn_info))
+        .map(ImplItem::Fn)
+        .collect();
 
     let result = ItemImpl {
         attrs: Vec::new(),
         defaultness: None,
         unsafety: None,
         impl_token: Token![impl](span),
-        generics: fn_info.syntax.merged_generics.clone(),
+        generics: target_generics,
         trait_: None,
         self_ty: Box::new(Type::Path(TypePath {
             qself: None,
             path: static_setup_struct_path,
         })),
         brace_token: token::Brace(span),
-        items: vec![ImplItem::Fn(fn_setup)],
+        items: fn_setups,
     };
     return result;
 }
 
-fn generate_setup_fn(ctx: &Context, span: Span, mock_path: Path, fn_info: &FnInfo) -> ImplItemFn {
+fn generate_setup_fn(ctx: &Context, span: Span, mock_path: &Path, fn_info: &FnInfo) -> ImplItemFn {
     let mock_generic_argument = GenericArgument::Type(Type::Path(TypePath {
         qself: None,
-        path: mock_path,
+        path: mock_path.clone(),
     }));
     let sig = Signature {
         constness: None,

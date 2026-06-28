@@ -2,6 +2,7 @@ mod base_fn;
 mod mocked_fn;
 
 use crate::common::models::*;
+use crate::generation::mock_controls::*;
 use crate::generation::*;
 use crate::preparation::r#fn::fn_syntax;
 use syn::spanned::Spanned;
@@ -36,6 +37,18 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> ItemMod {
     } else {
         None
     };
+    let target_ident = fn_info.syntax.fn_ident.clone();
+    let target_generics = fn_info.syntax.merged_generics.clone();
+    let fn_infos = [fn_info];
+    let static_setup_struct = static_setup::generate(static_setup::Params {
+        ctx,
+        source_span,
+        target_ident,
+        target_generics,
+        mock_path: &mock_struct.path,
+        fn_infos: &fn_infos,
+    });
+    let [fn_info] = fn_infos;
 
     let mod_ident = fn_info.syntax.source_signature.ident.clone();
     let mocked_fn = mocked_fn::generate(
@@ -49,7 +62,14 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> ItemMod {
     } else {
         vec![Item::Fn(mocked_fn)]
     };
-    let items = fn_items;
+
+    let items = fn_items
+        .into_iter()
+        .chain([
+            Item::Struct(static_setup_struct.item_struct),
+            Item::Impl(static_setup_struct.item_impl),
+        ])
+        .collect();
 
     let result = ItemMod {
         attrs: Vec::new(),
