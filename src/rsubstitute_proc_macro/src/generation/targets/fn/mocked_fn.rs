@@ -26,13 +26,13 @@ pub(crate) fn generate(
                     qself: None,
                     path: Path {
                         leading_colon: None,
-                        segments: [PathSegment {
+                        segments: punctuated([PathSegment {
                             ident: Ident::new("FnData", source_span),
                             arguments: PathArguments::AngleBracketed(
                                 AngleBracketedGenericArguments {
                                     colon2_token: None,
                                     lt_token: Token![<](source_span),
-                                    args: [
+                                    args: punctuated([
                                         GenericArgument::Type(Type::Path(TypePath {
                                             qself: None,
                                             path: mock_struct_path.clone(),
@@ -46,15 +46,11 @@ pub(crate) fn generate(
                                         ),
                                         generic_argument::bool(source_span, true),
                                         generic_argument::bool(source_span, false),
-                                    ]
-                                    .into_iter()
-                                    .collect(),
+                                    ]),
                                     gt_token: Token![>](source_span),
                                 },
                             ),
-                        }]
-                        .into_iter()
-                        .collect(),
+                        }]),
                     },
                 })),
             })),

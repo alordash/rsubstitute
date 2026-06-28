@@ -19,7 +19,7 @@ pub(crate) fn generate_module(ctx: Context, item_fn: ItemFn) -> ItemMod {
     });
     let mut fn_info = fn_info::generate(fn_syntax);
 
-    let mock_struct = mock_struct::generate_for_static_fn();
+    let mock_struct = mock_struct::generate_for_static_fn(source_span, &fn_info.syntax);
 
     let base_impl = fn_info
         .syntax

@@ -22,7 +22,7 @@ pub(crate) fn generate(
         ident: format_ident!("__rs_base_{}", source_signature.ident),
         generics: source_signature.generics.clone(),
         paren_token: token::Paren(source_span),
-        inputs: [
+        inputs: punctuated([
             FnArg::Typed(PatType {
                 attrs: Vec::new(),
                 pat: Box::new(Pat::Wild(PatWild {
@@ -48,9 +48,7 @@ pub(crate) fn generate(
                     path: fn_info.call_struct.path.clone(),
                 })),
             }),
-        ]
-        .into_iter()
-        .collect(),
+        ]),
         variadic: None,
         output: source_signature.output.clone(),
     };

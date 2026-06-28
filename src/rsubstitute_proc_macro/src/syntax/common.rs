@@ -33,7 +33,6 @@ pub(crate) fn ref_self_type(span: Span) -> TypeReference {
         mutability: None,
         elem: Box::new(Type::Path(self_type(span))),
     };
-
     return result;
 }
 
@@ -46,7 +45,6 @@ pub(crate) fn ref_self_fn_arg(span: Span) -> FnArg {
         colon_token: None,
         ty: Box::new(Type::Reference(ref_self_type(span))),
     });
-
     return result;
 }
 
@@ -55,7 +53,6 @@ pub(crate) fn void_type(span: Span) -> Type {
         paren_token: token::Paren(span),
         elems: Punctuated::new(),
     };
-
     return Type::Tuple(result);
 }
 
@@ -68,7 +65,6 @@ pub(crate) fn mut_ptr_infer_type(span: Span) -> Type {
             underscore_token: Token![_](span),
         })),
     });
-
     return result;
 }
 
@@ -79,7 +75,6 @@ pub(crate) fn mut_ptr_void_type(span: Span) -> Type {
         mutability: Some(Token![mut](span)),
         elem: Box::new(void_type(span)),
     });
-
     return result;
 }
 
@@ -88,7 +83,11 @@ pub(crate) fn static_lifetime(span: Span) -> Lifetime {
         apostrophe: span,
         ident: Ident::new("static", span),
     };
+    return result;
+}
 
+pub(crate) fn generics_field_ident(span: Span) -> Ident {
+    let result = Ident::new("generics", span);
     return result;
 }
 
