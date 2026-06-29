@@ -11,7 +11,7 @@ struct Data<'a, 'b, T1, T2> {
     ),
 }
 
-#[automock]
+#[mock]
 #[allow(unused)]
 trait Trait<'a, 'b: 'a, T1> {
     fn work<'c, 'd: 'a, T2: Clone>(
@@ -42,7 +42,7 @@ trait Trait<'a, 'b: 'a, T1> {
     ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32;
 }
 
-#[automock]
+#[mock]
 #[allow(unused)]
 fn work<'x, 'a, 'b: 'a, 'c, 'd: 'a, T1, T2>(
     a: &'a i32,

@@ -1,6 +1,6 @@
-use rsubstitute::macros::automock;
+use rsubstitute::macros::mock;
 
-#[automock]
+#[mock]
 trait Trait {
     fn f(&self);
 
@@ -11,7 +11,7 @@ trait Trait {
     fn consume(self) -> i32;
 }
 
-#[automock]
+#[mock]
 #[allow(unused)]
 trait AnotherTestTrait {}
 

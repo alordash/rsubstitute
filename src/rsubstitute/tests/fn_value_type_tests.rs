@@ -1,6 +1,6 @@
 #![allow(unused)]
 
-use rsubstitute::macros::automock;
+use rsubstitute::macros::mock;
 use std::cell::{Cell, RefCell};
 use std::sync::Arc;
 
@@ -8,32 +8,32 @@ thread_local! {
     pub static BASE_CALLED_FLAG: Cell<bool> = Cell::new(false);
 }
 
-#[automock(base)]
+#[mock(base)]
 fn accept_value(v: i32) {
     BASE_CALLED_FLAG.set(true);
 }
 
 const BASE_RETURN_VALUE: i32 = 12321;
-#[automock(base)]
+#[mock(base)]
 fn return_value() -> i32 {
     BASE_CALLED_FLAG.set(true);
     return BASE_RETURN_VALUE;
 }
 
 const BASE_ACCEPT_VALUE_RETURN_VALUE: f32 = 44.2;
-#[automock(base)]
+#[mock(base)]
 fn accept_value_return_value(v: i32) -> f32 {
     BASE_CALLED_FLAG.set(true);
     return BASE_ACCEPT_VALUE_RETURN_VALUE;
 }
 
-#[automock(base)]
+#[mock(base)]
 fn accept_two_values(v1: i32, v2: f32) {
     BASE_CALLED_FLAG.set(true);
 }
 
 const BASE_ACCEPT_TWO_VALUES_RETURN_VALUE: &'static str = "quo vadis";
-#[automock(base)]
+#[mock(base)]
 fn accept_two_values_return_value(v1: i32, v2: f32) -> &'static str {
     BASE_CALLED_FLAG.set(true);
     return BASE_ACCEPT_TWO_VALUES_RETURN_VALUE;

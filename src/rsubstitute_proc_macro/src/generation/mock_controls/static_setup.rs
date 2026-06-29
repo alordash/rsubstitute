@@ -93,7 +93,13 @@ fn generate_item_impl(
 
 fn generate_setup_fn(ctx: &Context, span: Span, mock_path: &Path, fn_info: &FnInfo) -> ImplItemFn {
     let generic_arguments = generic_arguments::new(ctx, span, mock_path.clone(), fn_info);
-    let fn_configurator_path = fn_configurator_path::new(span, fn_info, &generic_arguments, None);
+    let fn_configurator_path = fn_configurator_path::new(
+        span,
+        fn_info,
+        &generic_arguments,
+        static_lifetime(span),
+        None,
+    );
     let sig = Signature {
         constness: None,
         asyncness: None,
@@ -123,19 +129,31 @@ fn generate_setup_fn(ctx: &Context, span: Span, mock_path: &Path, fn_info: &FnIn
         ),
     };
 
-    let (data_var_path, data_stmt) = data_stmt::new_static(span, fn_info, generic_arguments);
+    let mut fn_configurator_path_for_var = fn_configurator_path;
+    let PathArguments::AngleBracketed(ref mut fn_configurator_path_for_var_args) =
+        fn_configurator_path_for_var.segments[0].arguments
+    else {
+        panic!("FnConfigurator should have angle bracketed arguments.");
+    };
+    fn_configurator_path_for_var_args.args[0] =
+        GenericArgument::Lifetime(placeholder_lifetime(span));
+    let (data_var_path, data_stmt) = fn_data_stmt::new_static(span, fn_info, generic_arguments);
     let (args_checker_var_path, args_checker_stmt) = args_checker_stmt::new(span, fn_info);
-    let fn_configurator_var_path = expr::path::new(span, ["fn_configurator"]);
+    let fn_configurator_var_path = path::new(span, ["fn_configurator"]);
     let fn_configurator_stmt = Local {
         attrs: Vec::new(),
         let_token: Token![let](span),
         pat: Pat::Type(PatType {
             attrs: Vec::new(),
-            pat: Box::new(Pat::Path(fn_configurator_var_path)),
+            pat: Box::new(Pat::Path(ExprPath {
+                attrs: Vec::new(),
+                qself: None,
+                path: fn_configurator_var_path.clone(),
+            })),
             colon_token: Token![:](span),
             ty: Box::new(Type::Path(TypePath {
                 qself: None,
-                path: fn_configurator_path.clone(),
+                path: fn_configurator_path_for_var,
             })),
         }),
         init: Some(LocalInit {
@@ -156,7 +174,7 @@ fn generate_setup_fn(ctx: &Context, span: Span, mock_path: &Path, fn_info: &FnIn
     let return_stmt = Expr::Macro(transmute_lifetime_expr::new(Expr::Path(ExprPath {
         attrs: Vec::new(),
         qself: None,
-        path: fn_configurator_path,
+        path: fn_configurator_var_path,
     })));
 
     let block = Block {

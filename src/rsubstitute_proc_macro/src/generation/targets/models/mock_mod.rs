@@ -1,6 +1,6 @@
 use syn::*;
 
 pub(crate) struct MockMod {
-    pub visibility: Visibility,
+    pub usage: ItemUse,
     pub item_mod: ItemMod,
 }

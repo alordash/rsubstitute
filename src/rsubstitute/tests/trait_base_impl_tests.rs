@@ -1,6 +1,6 @@
-use rsubstitute::macros::automock;
+use rsubstitute::macros::mock;
 
-#[automock(base)]
+#[mock(base)]
 trait Trait {
     fn get(&self) -> i32;
 

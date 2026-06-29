@@ -1,7 +1,7 @@
 use rsubstitute::macros::*;
 use std::fmt::Debug;
 
-#[automock(base)]
+#[mock(base)]
 #[allow(unused)]
 trait Trait<'rs, T1> {
     fn work<T2: Clone, T3: Default, const B: bool, const N: usize>(

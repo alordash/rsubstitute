@@ -1,11 +1,11 @@
-use rsubstitute::macros::automock;
+use rsubstitute::macros::mock;
 
-#[automock]
+#[mock]
 trait Trait {
     fn work(&self, v1: i32, v2: i32, v3: i32, v4: i32) -> i32;
 }
 
-#[automock]
+#[mock]
 fn work(_v1: i32, _v2: i32, _v3: i32, _v4: i32) -> i32 {
     1
 }

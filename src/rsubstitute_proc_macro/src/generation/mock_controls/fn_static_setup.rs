@@ -18,6 +18,7 @@ pub(crate) fn generate(
         span,
         fn_info,
         &generic_arguments,
+        static_lifetime(span),
         Some(Type::Path(TypePath {
             qself: None,
             path: static_setup_path.clone(),
@@ -49,7 +50,7 @@ pub(crate) fn generate(
         ),
     };
 
-    let (data_var_path, data_stmt) = data_stmt::new_static(span, fn_info, generic_arguments);
+    let (data_var_path, data_stmt) = fn_data_stmt::new_static(span, fn_info, generic_arguments);
     let data_reset_stmt = expr::method_call::new(
         span,
         Expr::Path(data_var_path),

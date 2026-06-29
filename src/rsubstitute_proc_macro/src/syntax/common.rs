@@ -36,6 +36,18 @@ pub(crate) fn ref_self_type(span: Span) -> TypeReference {
     return result;
 }
 
+pub(crate) fn self_fn_arg(span: Span) -> FnArg {
+    let result = FnArg::Receiver(Receiver {
+        attrs: Vec::new(),
+        reference: None,
+        mutability: None,
+        self_token: Token![self](Span::call_site()),
+        colon_token: None,
+        ty: Box::new(Type::Path(self_type(span))),
+    });
+    return result;
+}
+
 pub(crate) fn ref_self_fn_arg(span: Span) -> FnArg {
     let result = FnArg::Receiver(Receiver {
         attrs: Vec::new(),

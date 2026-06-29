@@ -1,6 +1,6 @@
-use rsubstitute::macros::automock;
+use rsubstitute::macros::mock;
 
-#[automock]
+#[mock]
 trait Trait {
     fn accept_value(&self, v: i32);
 

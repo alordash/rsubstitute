@@ -8,6 +8,7 @@ pub(crate) fn new(
     span: Span,
     fn_info: &FnInfo,
     generic_arguments: &generic_arguments::Result,
+    lifetime: Lifetime,
     maybe_owner_type: Option<Type>,
 ) -> Path {
     let result = Path {
@@ -18,7 +19,7 @@ pub(crate) fn new(
                 colon2_token: None,
                 lt_token: Token![<](span),
                 args: punctuated([
-                    GenericArgument::Lifetime(placeholder_lifetime(span)),
+                    GenericArgument::Lifetime(lifetime),
                     generic_arguments.mock_generic_argument.clone(),
                     GenericArgument::Type(
                         maybe_owner_type.unwrap_or_else(|| Type::Path(self_type(span))),

@@ -5,10 +5,10 @@ use std::fmt::Debug;
 
 // TODO - test how TraitA : TraitB behaves
 // TODO - write that mock(base) has no effect on static fns
-#[automock]
+#[mock]
 fn f() {}
 
-#[automock(base)]
+#[mock(base)]
 trait Trait {
     const CONST: usize = 43;
 

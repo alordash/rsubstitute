@@ -6,6 +6,7 @@ use crate::generation::mock_controls::*;
 use crate::syntax::*;
 use proc_macro2::Span;
 use quote::format_ident;
+use syn::punctuated::Punctuated;
 use syn::*;
 
 pub(crate) struct Params<'a, 'b, 'c> {
@@ -15,6 +16,7 @@ pub(crate) struct Params<'a, 'b, 'c> {
     pub target_generics: Generics,
     pub mock_path: &'b Path,
     pub fn_infos: &'c [FnInfo],
+    pub static_no_other_calls: bool,
 }
 pub(crate) fn generate(
     Params {
@@ -24,6 +26,7 @@ pub(crate) fn generate(
         target_generics,
         mock_path,
         fn_infos,
+        static_no_other_calls,
     }: Params,
 ) -> StaticReceivedStruct {
     let item_struct = ItemStruct {
@@ -50,6 +53,7 @@ pub(crate) fn generate(
         mock_path,
         path.clone(),
         fn_infos,
+        static_no_other_calls,
     );
 
     let result = StaticReceivedStruct {
@@ -67,11 +71,16 @@ fn generate_item_impl(
     mock_path: &Path,
     static_received_struct_path: Path,
     fn_infos: &[FnInfo],
+    static_no_other_calls: bool,
 ) -> ItemImpl {
     let items = fn_infos
         .iter()
         .map(|fn_info| generate_received_fn(ctx, span, mock_path, fn_info))
-        .chain(core::iter::once(generate_no_other_calls_fn(span, fn_infos)))
+        .chain(core::iter::once(if static_no_other_calls {
+            generate_fn_no_other_calls_for_static(ctx, span, mock_path.clone(), fn_infos)
+        } else {
+            generate_fn_no_other_calls_for_method(span, fn_infos)
+        }))
         .map(ImplItem::Fn)
         .collect();
 
@@ -109,7 +118,7 @@ fn generate_received_fn(
         ident: Ident::new("received", span),
         generics: Generics::default(),
         paren_token: token::Paren(span),
-        inputs: [ref_self_fn_arg(span)]
+        inputs: [self_fn_arg(span)]
             .into_iter()
             .chain(
                 fn_info
@@ -124,7 +133,7 @@ fn generate_received_fn(
         output: ReturnType::Type(Token![->](span), Box::new(Type::Path(self_type(span)))),
     };
 
-    let (data_var_path, data_stmt) = data_stmt::new_static(span, fn_info, generic_arguments);
+    let (data_var_path, data_stmt) = fn_data_stmt::new_static(span, fn_info, generic_arguments);
     let (args_checker_var_path, args_checker_stmt) = args_checker_stmt::new(span, fn_info);
     let verify_received_stmt = Expr::MethodCall(expr::method_call::new(
         span,
@@ -157,21 +166,50 @@ fn generate_received_fn(
     return result;
 }
 
-fn generate_no_other_calls_fn(span: Span, fn_infos: &[FnInfo]) -> ImplItemFn {
-    let sig = Signature {
-        constness: None,
-        asyncness: None,
-        unsafety: None,
-        abi: None,
-        fn_token: Token![fn](span),
-        ident: Ident::new("no_other_calls", span),
-        generics: Generics::default(),
+fn generate_fn_no_other_calls_for_static(
+    ctx: &Context,
+    span: Span,
+    mock_path: Path,
+    fn_infos: &[FnInfo],
+) -> ImplItemFn {
+    let sig = fn_no_other_calls_signature(span);
+    let fn_info = &fn_infos[0];
+    let generic_arguments = generic_arguments::new(ctx, span, mock_path.clone(), fn_info);
+    let (data_var_path, data_stmt) = fn_data_stmt::new_static(span, fn_info, generic_arguments);
+    let verify_received_nothing_else_stmt = Expr::MethodCall(ExprMethodCall {
+        attrs: Vec::new(),
+        receiver: Box::new(Expr::Path(data_var_path)),
+        dot_token: Token![.](span),
+        method: Ident::new("verify_received_nothing_else", span),
+        turbofish: None,
         paren_token: token::Paren(span),
-        inputs: punctuated([ref_self_fn_arg(span)]),
-        variadic: None,
-        output: ReturnType::Default,
+        args: punctuated([Expr::Array(ExprArray {
+            attrs: Vec::new(),
+            bracket_token: token::Bracket(span),
+            elems: Punctuated::new(),
+        })]),
+    });
+
+    let block = Block {
+        brace_token: token::Brace(span),
+        stmts: vec![
+            Stmt::Local(data_stmt),
+            Stmt::Expr(verify_received_nothing_else_stmt, None),
+        ],
     };
 
+    let result = ImplItemFn {
+        attrs: Vec::new(),
+        vis: Visibility::Public(Token![pub](span)),
+        defaultness: None,
+        sig,
+        block,
+    };
+    return result;
+}
+
+fn generate_fn_no_other_calls_for_method(span: Span, fn_infos: &[FnInfo]) -> ImplItemFn {
+    let sig = fn_no_other_calls_signature(span);
     let verify_received_nothing_else_stmt = Expr::MethodCall(ExprMethodCall {
         attrs: Vec::new(),
         receiver: Box::new(Expr::Field(expr::field::new_self(Ident::new("data", span)))),
@@ -179,15 +217,19 @@ fn generate_no_other_calls_fn(span: Span, fn_infos: &[FnInfo]) -> ImplItemFn {
         method: Ident::new("verify_received_nothing_else", span),
         turbofish: None,
         paren_token: token::Paren(span),
-        args: fn_infos
-            .iter()
-            .map(|x| {
-                Expr::Lit(ExprLit {
-                    attrs: Vec::new(),
-                    lit: Lit::Str(LitStr::new(&x.syntax.fn_ident.to_string(), span)),
+        args: punctuated([Expr::Array(ExprArray {
+            attrs: Vec::new(),
+            bracket_token: token::Bracket(span),
+            elems: fn_infos
+                .iter()
+                .map(|x| {
+                    Expr::Lit(ExprLit {
+                        attrs: Vec::new(),
+                        lit: Lit::Str(LitStr::new(&x.syntax.fn_ident.to_string(), span)),
+                    })
                 })
-            })
-            .collect(),
+                .collect(),
+        })]),
     });
 
     let block = Block {
@@ -202,6 +244,22 @@ fn generate_no_other_calls_fn(span: Span, fn_infos: &[FnInfo]) -> ImplItemFn {
         sig,
         block,
     };
+    return result;
+}
 
+fn fn_no_other_calls_signature(span: Span) -> Signature {
+    let result = Signature {
+        constness: None,
+        asyncness: None,
+        unsafety: None,
+        abi: None,
+        fn_token: Token![fn](span),
+        ident: Ident::new("no_other_calls", span),
+        generics: Generics::default(),
+        paren_token: token::Paren(span),
+        inputs: punctuated([self_fn_arg(span)]),
+        variadic: None,
+        output: ReturnType::Default,
+    };
     return result;
 }

@@ -239,6 +239,24 @@ impl<'rs, TMock, const PASSES_MOCK_TO_CALLBACK: bool>
     }
 }
 
+// For static fns
+impl<
+    'rs,
+    TMock,
+    const HAS_RETURN_VALUE: bool,
+    const SUPPORTS_BASE_CALLING: bool,
+    const PASSES_MOCK_TO_CALLBACK: bool,
+> IMockData
+    for FnData<'rs, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, PASSES_MOCK_TO_CALLBACK>
+{
+    fn get_received_nothing_else_error_msgs<const N: usize>(
+        &self,
+        fn_idents: [&'static str; N],
+    ) -> Vec<Vec<String>> {
+        vec![self.get_unexpected_calls_error_msgs()]
+    }
+}
+
 mod internal {
     use super::*;
     use std::sync::atomic::Ordering;

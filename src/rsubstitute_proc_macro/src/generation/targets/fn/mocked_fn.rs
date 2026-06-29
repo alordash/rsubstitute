@@ -1,3 +1,4 @@
+use crate::common::models::*;
 use crate::common::*;
 use crate::generation::fn_info::models::*;
 use crate::syntax::*;
@@ -5,6 +6,7 @@ use proc_macro2::Span;
 use syn::*;
 
 pub(crate) fn generate(
+    ctx: &Context,
     source_span: Span,
     fn_info: &FnInfo,
     mock_struct_path: Path,
@@ -44,7 +46,10 @@ pub(crate) fn generate(
                                                 _ => false,
                                             },
                                         ),
-                                        generic_argument::bool(source_span, true),
+                                        generic_argument::bool(
+                                            source_span,
+                                            ctx.support_base_calling,
+                                        ),
                                         generic_argument::bool(source_span, false),
                                     ]),
                                     gt_token: Token![>](source_span),

@@ -9,7 +9,7 @@ pub(crate) fn new(
     fn_info: &FnInfo,
     generic_arguments: generic_arguments::Result,
 ) -> (ExprPath, Local) {
-    let data_var_path = expr::path::new(span, ["data"]);
+    let data_var_path = expr::path::new(span, ["fn_data"]);
     let data_stmt = Local {
         attrs: Vec::new(),
         let_token: Token![let](span),
@@ -34,7 +34,7 @@ pub(crate) fn new_static(
     fn_info: &FnInfo,
     generic_arguments: generic_arguments::Result,
 ) -> (ExprPath, Local) {
-    let data_var_path = expr::path::new(span, ["data"]);
+    let data_var_path = expr::path::new(span, ["fn_data"]);
     let data_stmt = Local {
         attrs: Vec::new(),
         let_token: Token![let](span),

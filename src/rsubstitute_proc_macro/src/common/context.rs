@@ -2,7 +2,7 @@ use super::models::*;
 use crate::constants;
 use crate::entrypoints::models::*;
 
-pub(crate) fn create_for_automock_macro(proc_macro_attribute: proc_macro::TokenStream) -> Context {
+pub(crate) fn create_for_mock_macro(proc_macro_attribute: proc_macro::TokenStream) -> Context {
     if proc_macro_attribute.is_empty() {
         return Default::default();
     }
@@ -21,19 +21,19 @@ pub(crate) fn create_for_automock_macro(proc_macro_attribute: proc_macro::TokenS
     return ctx;
 }
 
-pub(crate) fn create_for_mock_macro(mock_macro_usage: MockMacroUsage) -> Context {
-    let support_base_calling = match mock_macro_usage {
-        MockMacroUsage::Simple => DEFAULT_SUPPORT_BASE_CALLING,
-        #[cfg(not(feature = "mock_base_by_default"))]
-        MockMacroUsage::WithBase => true,
-        #[cfg(feature = "mock_base_by_default")]
-        MockedMacroMode::WithoutBase => false,
-    };
-    let ctx = Context {
-        support_base_calling,
-    };
-    return ctx;
-}
+// pub(crate) fn create_for_mock_macro(mock_macro_usage: MockMacroUsage) -> Context {
+//     let support_base_calling = match mock_macro_usage {
+//         MockMacroUsage::Simple => DEFAULT_SUPPORT_BASE_CALLING,
+//         #[cfg(not(feature = "mock_base_by_default"))]
+//         MockMacroUsage::WithBase => true,
+//         #[cfg(feature = "mock_base_by_default")]
+//         MockedMacroMode::WithoutBase => false,
+//     };
+//     let ctx = Context {
+//         support_base_calling,
+//     };
+//     return ctx;
+// }
 
 fn support_base_calling_from_parameters(parameters: &[&str]) -> bool {
     #[cfg(not(feature = "mock_base_by_default"))]
@@ -47,8 +47,8 @@ fn support_base_calling_from_parameters(parameters: &[&str]) -> bool {
         .any(|parameter| *parameter == constants::DO_NOT_SUPPORT_BASE_PARAMETER);
 }
 
-#[cfg(not(feature = "mock_base_by_default"))]
-const DEFAULT_SUPPORT_BASE_CALLING: bool = false;
-
-#[cfg(feature = "mock_base_by_default")]
-const DEFAULT_SUPPORT_BASE_CALLING: bool = true;
+// #[cfg(not(feature = "mock_base_by_default"))]
+// const DEFAULT_SUPPORT_BASE_CALLING: bool = false;
+// 
+// #[cfg(feature = "mock_base_by_default")]
+// const DEFAULT_SUPPORT_BASE_CALLING: bool = true;

@@ -1,6 +1,6 @@
-use rsubstitute_proc_macro::automock;
+use rsubstitute_proc_macro::mock;
 
-#[automock]
+#[mock]
 trait Trait<'a, T1, const B: bool> {
     fn work<T2, 'b, const N: usize>(&self, v: &'b T1) -> T2;
 }

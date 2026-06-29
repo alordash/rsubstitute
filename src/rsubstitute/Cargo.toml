@@ -76,6 +76,12 @@ bench = false
 #test = false
 #doctest = false
 
+[[bin]]
+name = "NEW_static_fn"
+path = "bin/NEW_static_fn.rs"
+test = false
+doctest = false
+
 [dependencies]
 rsubstitute_core = { workspace = true }
 rsubstitute_proc_macro = { workspace = true }

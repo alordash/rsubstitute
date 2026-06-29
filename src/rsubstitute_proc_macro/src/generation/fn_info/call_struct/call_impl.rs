@@ -22,7 +22,7 @@ pub(crate) fn generate(span: Span, arguments: &[Argument], target_type: Type) ->
         unsafety: None,
         impl_token: Token![impl](span),
         generics: Generics::default(),
-        trait_: Some((None, path::new(span, ["IArgsProvider"]), Token![for](span))),
+        trait_: Some((None, path::new(span, ["ICall"]), Token![for](span))),
         self_ty: Box::new(target_type),
         brace_token: token::Brace(span),
         items,

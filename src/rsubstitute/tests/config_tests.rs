@@ -1,8 +1,8 @@
 #![feature(rwlock_downgrade)]
 
-use rsubstitute::macros::automock;
+use rsubstitute::macros::mock;
 
-#[automock]
+#[mock]
 trait Trait {
     fn work(&self, v: i32);
 }

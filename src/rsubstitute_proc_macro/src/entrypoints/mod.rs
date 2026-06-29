@@ -4,5 +4,5 @@ pub mod models {
     pub use mock_macro_usage::*;
 }
 
-pub mod automock_attribute;
-pub mod mock_macro;
+pub mod mock_attribute;
+// pub mod mock_macro;

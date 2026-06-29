@@ -3,6 +3,7 @@ mod mocked_fn;
 
 use crate::common::models::*;
 use crate::generation::mock_controls::*;
+use crate::generation::targets::mock_mod_usages;
 use crate::generation::targets::models::*;
 use crate::generation::*;
 use crate::preparation::r#fn::fn_syntax;
@@ -56,6 +57,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
         target_generics,
         mock_path: &mock_struct.path,
         fn_infos: &fn_infos,
+        static_no_other_calls: true,
     });
     let [fn_info] = fn_infos;
     let fn_static_setup = fn_static_setup::generate(
@@ -70,37 +72,57 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
 
     let mod_ident = fn_info.syntax.source_signature.ident.clone();
     let mocked_fn = mocked_fn::generate(
+        ctx,
         source_span,
         &fn_info,
         mock_struct.path,
         maybe_base_fn.as_ref().map(|x| x.sig.ident.clone()),
     );
+    let usage_ident = mocked_fn.sig.ident.clone();
     let fn_items = if let Some(base_fn) = maybe_base_fn {
         vec![Item::Fn(mocked_fn), Item::Fn(base_fn)]
     } else {
         vec![Item::Fn(mocked_fn)]
     };
 
-    let items = fn_items
-        .into_iter()
-        .chain([
-            Item::Fn(fn_static_setup),
-            Item::Fn(fn_static_received),
-            Item::Struct(fn_info.call_struct.item_struct),
-            Item::Impl(fn_info.call_struct.generics_info_provider_impl),
-            Item::Impl(fn_info.call_struct.call_impl),
-            Item::Struct(fn_info.args_checker_struct.item_struct),
-            Item::Impl(fn_info.args_checker_struct.generics_info_provider_impl),
-            Item::Impl(fn_info.args_checker_struct.args_checker_impl),
-            Item::Struct(mock_struct.item_struct),
-            Item::Struct(static_setup_struct.item_struct),
-            Item::Impl(static_setup_struct.item_impl),
-            Item::Struct(static_received_struct.item_struct),
-            Item::Impl(static_received_struct.item_impl),
-        ])
-        .collect();
+    let mock_mod_usages = mock_mod_usages::new(source_span);
 
-    let visibility = fn_info.syntax.visibility.clone();
+    let items = [
+        Item::Use(mock_mod_usages.use_rsubstitute_for_generated),
+        Item::Use(mock_mod_usages.use_super),
+    ]
+    .into_iter()
+    .chain(fn_items)
+    .chain([
+        Item::Fn(fn_static_setup),
+        Item::Fn(fn_static_received),
+        Item::Struct(fn_info.call_struct.item_struct),
+        Item::Impl(fn_info.call_struct.generics_info_provider_impl),
+        Item::Impl(fn_info.call_struct.call_impl),
+        // TODO - call should also have Clone impl if mocking with base
+        Item::Struct(fn_info.args_checker_struct.item_struct),
+        Item::Impl(fn_info.args_checker_struct.generics_info_provider_impl),
+        Item::Impl(fn_info.args_checker_struct.args_checker_impl),
+        Item::Struct(mock_struct.item_struct),
+        Item::Struct(static_setup_struct.item_struct),
+        Item::Impl(static_setup_struct.item_impl),
+        Item::Struct(static_received_struct.item_struct),
+        Item::Impl(static_received_struct.item_impl),
+    ])
+    .collect();
+
+    let usage = ItemUse {
+        attrs: Vec::new(),
+        vis: fn_info.syntax.visibility.clone(),
+        use_token: Token![use](source_span),
+        leading_colon: None,
+        tree: UseTree::Path(UsePath {
+            ident: mod_ident.clone(),
+            colon2_token: Token![::](source_span),
+            tree: Box::new(UseTree::Name(UseName { ident: usage_ident })),
+        }),
+        semi_token: Token![;](source_span),
+    };
     let item_mod = ItemMod {
         attrs: Vec::new(),
         vis: Visibility::Public(Token![pub](source_span)),
@@ -110,9 +132,6 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
         content: Some((token::Brace(source_span), items)),
         semi: None,
     };
-    let result = MockMod {
-        visibility,
-        item_mod,
-    };
+    let result = MockMod { usage, item_mod };
     return result;
 }
