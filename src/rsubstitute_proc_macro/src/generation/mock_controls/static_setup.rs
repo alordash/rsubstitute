@@ -95,6 +95,40 @@ fn generate_setup_fn(ctx: &Context, span: Span, mock_path: &Path, fn_info: &FnIn
         qself: None,
         path: mock_path.clone(),
     }));
+    let has_return_value_argument = generic_argument::bool(
+        span,
+        match fn_info.syntax.return_type {
+            ReturnType::Default => false,
+            ReturnType::Type(_, _) => true,
+        },
+    );
+    let supports_base_calling_argument = generic_argument::bool(span, ctx.support_base_calling);
+    let passes_mock_to_callback_argument = generic_argument::bool(span, false);
+    let fn_configurator_path = Path {
+        leading_colon: None,
+        segments: punctuated([PathSegment {
+            ident: Ident::new("FnConfigurator", span),
+            arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
+                colon2_token: None,
+                lt_token: Token![<](span),
+                args: punctuated([
+                    GenericArgument::Lifetime(placeholder_lifetime(span)),
+                    mock_generic_argument.clone(),
+                    GenericArgument::Type(Type::Path(self_type(span))),
+                    GenericArgument::Type(Type::Tuple(fn_info.syntax.arg_refs_tuple.clone())),
+                    GenericArgument::Type(match &fn_info.syntax.return_type {
+                        ReturnType::Default => void_type(span),
+                        ReturnType::Type(_, return_type) => *return_type.clone(),
+                    }),
+                    mock_generic_argument.clone(),
+                    has_return_value_argument.clone(),
+                    supports_base_calling_argument.clone(),
+                    passes_mock_to_callback_argument.clone(),
+                ]),
+                gt_token: Token![>](span),
+            }),
+        }]),
+    };
     let sig = Signature {
         constness: None,
         asyncness: None,
@@ -119,41 +153,65 @@ fn generate_setup_fn(ctx: &Context, span: Span, mock_path: &Path, fn_info: &FnIn
             Token![->](span),
             Box::new(Type::Path(TypePath {
                 qself: None,
-                path: Path {
-                    leading_colon: None,
-                    segments: punctuated([PathSegment {
-                        ident: Ident::new("FnConfigurator", span),
-                        arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
-                            colon2_token: None,
-                            lt_token: Token![<](span),
-                            args: punctuated([
-                                GenericArgument::Lifetime(placeholder_lifetime(span)),
-                                mock_generic_argument.clone(),
-                                GenericArgument::Type(Type::Path(self_type(span))),
-                                GenericArgument::Type(Type::Tuple(
-                                    fn_info.syntax.arg_refs_tuple.clone(),
-                                )),
-                                GenericArgument::Type(match &fn_info.syntax.return_type {
-                                    ReturnType::Default => void_type(span),
-                                    ReturnType::Type(_, return_type) => *return_type.clone(),
-                                }),
-                                mock_generic_argument,
-                                generic_argument::bool(
-                                    span,
-                                    match fn_info.syntax.return_type {
-                                        ReturnType::Default => false,
-                                        ReturnType::Type(_, _) => true,
-                                    },
-                                ),
-                                generic_argument::bool(span, ctx.support_base_calling),
-                                generic_argument::bool(span, false),
-                            ]),
-                            gt_token: Token![>](span),
-                        }),
-                    }]),
-                },
+                path: fn_configurator_path.clone(),
             })),
         ),
+    };
+
+    let data_var_path = path::new(span, ["data"]);
+    let data_stmt = Local {
+        attrs: Vec::new(),
+        let_token: Token![let](span),
+        pat: Pat::Type(PatType {
+            attrs: Vec::new(),
+            pat: Box::new(Pat::Path(PatPath {
+                attrs: Vec::new(),
+                qself: None,
+                path: data_var_path.clone(),
+            })),
+            colon_token: Token![:](span),
+            ty: Box::new(Type::Reference(TypeReference {
+                and_token: Token![&](span),
+                lifetime: None,
+                mutability: None,
+                elem: Box::new(Type::Path(TypePath {
+                    qself: None,
+                    path: Path {
+                        leading_colon: None,
+                        segments: punctuated([PathSegment {
+                            ident: Ident::new("FnData", span),
+                            arguments: PathArguments::AngleBracketed(
+                                AngleBracketedGenericArguments {
+                                    colon2_token: None,
+                                    lt_token: Token![<](span),
+                                    args: punctuated([
+                                        mock_generic_argument,
+                                        has_return_value_argument,
+                                        supports_base_calling_argument,
+                                        passes_mock_to_callback_argument,
+                                    ]),
+                                    gt_token: Token![>](span),
+                                },
+                            ),
+                        }]),
+                    },
+                })),
+            })),
+        }),
+        init: Some(LocalInit {
+            eq_token: Token![=](span),
+            expr: Box::new(Expr::MethodCall(expr::method_call::new(
+                span,
+                Expr::Field(expr::field::new_self(Ident::new("data", span))),
+                Ident::new("get_shared_fn_data", span),
+                [Expr::Lit(ExprLit {
+                    attrs: Vec::new(),
+                    lit: Lit::Str(LitStr::new(&fn_info.syntax.fn_ident.to_string(), span)),
+                })],
+            ))),
+            diverge: None,
+        }),
+        semi_token: Token![;](span),
     };
 
     let args_checker_var_path = expr::path::new(span, ["args_checker"]);
@@ -195,10 +253,52 @@ fn generate_setup_fn(ctx: &Context, span: Span, mock_path: &Path, fn_info: &FnIn
         }),
         semi_token: Token![;](span),
     };
+    let fn_configurator_var_path = expr::path::new(span, ["fn_configurator"]);
+    let fn_configurator_stmt = Local {
+        attrs: Vec::new(),
+        let_token: Token![let](span),
+        pat: Pat::Type(PatType {
+            attrs: Vec::new(),
+            pat: Box::new(Pat::Path(fn_configurator_var_path)),
+            colon_token: Token![:](span),
+            ty: Box::new(Type::Path(TypePath {
+                qself: None,
+                path: fn_configurator_path.clone(),
+            })),
+        }),
+        init: Some(LocalInit {
+            eq_token: Token![=](span),
+            expr: Box::new(Expr::MethodCall(expr::method_call::new(
+                span,
+                Expr::Path(ExprPath {
+                    attrs: Vec::new(),
+                    qself: None,
+                    path: data_var_path,
+                }),
+                Ident::new("add_config", span),
+                [
+                    Expr::Path(args_checker_var_path),
+                    Expr::Path(self_expr_path(span)),
+                ],
+            ))),
+            diverge: None,
+        }),
+        semi_token: Token![;](span),
+    };
+    let return_stmt = Expr::Macro(transmute_lifetime_expr::new(Expr::Path(ExprPath {
+        attrs: Vec::new(),
+        qself: None,
+        path: fn_configurator_path,
+    })));
 
     let block = Block {
         brace_token: token::Brace(span),
-        stmts: vec![Stmt::Local(args_checker_stmt)],
+        stmts: vec![
+            Stmt::Local(data_stmt),
+            Stmt::Local(args_checker_stmt),
+            Stmt::Local(fn_configurator_stmt),
+            Stmt::Expr(return_stmt, None),
+        ],
     };
 
     let result = ImplItemFn {

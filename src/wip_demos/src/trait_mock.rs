@@ -110,6 +110,7 @@ mod result {
             > {
                 let fn_data: &FnData<TraitMock<T1>, true, true, false> =
                     self.data.get_shared_fn_data("f");
+                    // fn_data.add_config()
                 todo!()
             }
         }

@@ -198,7 +198,7 @@ mod accept_two_mut_refs_return_mut_ref {
             r1: impl Into<Arg<*mut i32>>,
             r2: impl Into<Arg<*mut f32>>,
             times: Times,
-        ) -> FnVerifier<Self, (&'__rsa &'__rsa mut i32, &'__rsa &'__rsa mut f32)> {
+        ) -> Self {
             let accept_two_mut_refs_return_mut_ref_args_checker: accept_two_mut_refs_return_mut_ref_ArgsChecker = accept_two_mut_refs_return_mut_ref_ArgsChecker { _phantom_r1: PhantomData, _phantom_r2: PhantomData, r1: transmute_lifetime!(r1 . into ()), r2: transmute_lifetime!(r2 . into ()) };
             self.data
                 .accept_two_mut_refs_return_mut_ref
