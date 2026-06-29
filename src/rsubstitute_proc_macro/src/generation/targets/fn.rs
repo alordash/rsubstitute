@@ -3,12 +3,13 @@ mod mocked_fn;
 
 use crate::common::models::*;
 use crate::generation::mock_controls::*;
+use crate::generation::targets::models::*;
 use crate::generation::*;
 use crate::preparation::r#fn::fn_syntax;
 use syn::spanned::Spanned;
 use syn::*;
 
-pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> ItemMod {
+pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
     let source_span = item_fn.span();
     let fn_syntax = fn_syntax::prepare(fn_syntax::Params {
         attributes: item_fn.attrs,
@@ -99,7 +100,8 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> ItemMod {
         ])
         .collect();
 
-    let result = ItemMod {
+    let visibility = fn_info.syntax.visibility.clone();
+    let item_mod = ItemMod {
         attrs: Vec::new(),
         vis: Visibility::Public(Token![pub](source_span)),
         unsafety: None,
@@ -107,6 +109,10 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> ItemMod {
         ident: mod_ident,
         content: Some((token::Brace(source_span), items)),
         semi: None,
+    };
+    let result = MockMod {
+        visibility,
+        item_mod,
     };
     return result;
 }
