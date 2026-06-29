@@ -17,9 +17,7 @@ mod tests {
         // Arrange
         let callback_flag = Arc::new(RefCell::new(false));
         let callback_flag_clone = callback_flag.clone();
-        f::setup()
-            .returns(())
-            .and_does(move |_| *callback_flag_clone.borrow_mut() = true);
+        f::setup().does(move |_| *callback_flag_clone.borrow_mut() = true);
 
         // Act
         let result = f();

@@ -11,7 +11,10 @@ use std::fmt::Debug;
 fn f() {}
 
 fn main() {
-    f::setup().does(|_| println!("em kavo))")).setup().does(|_| println!("chevooo"));
+    f::setup()
+        .does(|_| println!("em kavo))"))
+        .setup()
+        .does(|_| println!("chevooo"));
     f();
     f();
     f();

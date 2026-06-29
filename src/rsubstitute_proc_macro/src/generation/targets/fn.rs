@@ -7,6 +7,7 @@ use crate::generation::targets::mock_mod_usages;
 use crate::generation::targets::models::*;
 use crate::generation::*;
 use crate::preparation::r#fn::fn_syntax;
+use crate::syntax::attributes;
 use syn::spanned::Spanned;
 use syn::*;
 
@@ -124,7 +125,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
         semi_token: Token![;](source_span),
     };
     let item_mod = ItemMod {
-        attrs: Vec::new(),
+        attrs: vec![attributes::allow_non_camel_case_types(source_span)],
         vis: Visibility::Public(Token![pub](source_span)),
         unsafety: None,
         mod_token: Token![mod](source_span),

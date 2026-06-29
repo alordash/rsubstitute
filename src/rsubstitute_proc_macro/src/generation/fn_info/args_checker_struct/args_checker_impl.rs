@@ -1,6 +1,7 @@
 use crate::common::*;
 use crate::generation::fn_info::*;
 use crate::preparation::r#fn::models::*;
+use crate::syntax::attributes::allow_unused_variables;
 use crate::syntax::*;
 use proc_macro2::Span;
 use quote::ToTokens;
@@ -74,7 +75,7 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
 
     let call_path = path::new(span, ["call"]);
     let call_stmt = Stmt::Local(Local {
-        attrs: Vec::new(),
+        attrs: vec![allow_unused_variables(span)],
         let_token: Token![let](span),
         pat: Pat::Type(PatType {
             attrs: Vec::new(),

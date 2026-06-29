@@ -1,4 +1,5 @@
 use crate::generation::targets::models::*;
+use crate::syntax::*;
 use proc_macro2::Span;
 use syn::*;
 
@@ -22,7 +23,7 @@ pub(crate) fn new(span: Span) -> MockModUsages {
         semi_token: Token![;](span),
     };
     let use_super = ItemUse {
-        attrs: Vec::new(),
+        attrs: vec![attributes::allow_unused_imports(span)],
         vis: Visibility::Inherited,
         use_token: Token![use](span),
         leading_colon: None,
