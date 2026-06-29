@@ -43,6 +43,14 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> ItemMod {
     let static_setup_struct = static_setup::generate(static_setup::Params {
         ctx,
         source_span,
+        target_ident: target_ident.clone(),
+        target_generics: target_generics.clone(),
+        mock_path: &mock_struct.path,
+        fn_infos: &fn_infos,
+    });
+    let static_received_struct = static_received::generate(static_received::Params {
+        ctx,
+        source_span,
         target_ident,
         target_generics,
         mock_path: &mock_struct.path,
@@ -75,6 +83,8 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> ItemMod {
             Item::Struct(mock_struct.item_struct),
             Item::Struct(static_setup_struct.item_struct),
             Item::Impl(static_setup_struct.item_impl),
+            Item::Struct(static_received_struct.item_struct),
+            Item::Impl(static_received_struct.item_impl),
         ])
         .collect();
 

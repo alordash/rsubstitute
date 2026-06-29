@@ -25,12 +25,12 @@ pub(crate) fn generate(
         mock_path,
         fn_infos,
     }: Params,
-) -> StaticSetupStruct {
+) -> StaticReceivedStruct {
     let item_struct = ItemStruct {
         attrs: Vec::new(),
         vis: Visibility::Public(Token![pub](source_span)),
         struct_token: Token![struct](source_span),
-        ident: format_ident!("{}StaticSetup", target_ident),
+        ident: format_ident!("{}StaticReceived", target_ident),
         generics: target_generics.clone(),
         fields: Fields::Named(FieldsNamed {
             brace_token: token::Brace(source_span),
@@ -52,7 +52,7 @@ pub(crate) fn generate(
         fn_infos,
     );
 
-    let result = StaticSetupStruct {
+    let result = StaticReceivedStruct {
         path,
         item_struct,
         item_impl,
@@ -65,12 +65,13 @@ fn generate_item_impl(
     span: Span,
     target_generics: Generics,
     mock_path: &Path,
-    static_setup_struct_path: Path,
+    static_received_struct_path: Path,
     fn_infos: &[FnInfo],
 ) -> ItemImpl {
-    let fn_setups = fn_infos
+    let items = fn_infos
         .iter()
-        .map(|fn_info| generate_setup_fn(ctx, span, mock_path, fn_info))
+        .map(|fn_info| generate_received_fn(ctx, span, mock_path, fn_info))
+        .chain(core::iter::once(generate_no_other_calls_fn(span, fn_infos)))
         .map(ImplItem::Fn)
         .collect();
 
@@ -83,48 +84,29 @@ fn generate_item_impl(
         trait_: None,
         self_ty: Box::new(Type::Path(TypePath {
             qself: None,
-            path: static_setup_struct_path,
+            path: static_received_struct_path,
         })),
         brace_token: token::Brace(span),
-        items: fn_setups,
+        items,
     };
     return result;
 }
 
-fn generate_setup_fn(ctx: &Context, span: Span, mock_path: &Path, fn_info: &FnInfo) -> ImplItemFn {
+fn generate_received_fn(
+    ctx: &Context,
+    span: Span,
+    mock_path: &Path,
+    fn_info: &FnInfo,
+) -> ImplItemFn {
+    let times_arg_path = expr::path::new(span, ["times"]);
     let generic_arguments = generic_arguments::new(ctx, span, mock_path.clone(), fn_info);
-    let fn_configurator_path = Path {
-        leading_colon: None,
-        segments: punctuated([PathSegment {
-            ident: Ident::new("FnConfigurator", span),
-            arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
-                colon2_token: None,
-                lt_token: Token![<](span),
-                args: punctuated([
-                    GenericArgument::Lifetime(placeholder_lifetime(span)),
-                    generic_arguments.mock_generic_argument.clone(),
-                    GenericArgument::Type(Type::Path(self_type(span))),
-                    GenericArgument::Type(Type::Tuple(fn_info.syntax.arg_refs_tuple.clone())),
-                    GenericArgument::Type(match &fn_info.syntax.return_type {
-                        ReturnType::Default => void_type(span),
-                        ReturnType::Type(_, return_type) => *return_type.clone(),
-                    }),
-                    generic_arguments.mock_generic_argument.clone(),
-                    generic_arguments.has_return_value_argument.clone(),
-                    generic_arguments.supports_base_calling_argument.clone(),
-                    generic_arguments.passes_mock_to_callback_argument.clone(),
-                ]),
-                gt_token: Token![>](span),
-            }),
-        }]),
-    };
     let sig = Signature {
         constness: None,
         asyncness: None,
         unsafety: None,
         abi: None,
         fn_token: Token![fn](span),
-        ident: Ident::new("setup", span),
+        ident: Ident::new("received", span),
         generics: Generics::default(),
         paren_token: token::Paren(span),
         inputs: [ref_self_fn_arg(span)]
@@ -136,59 +118,36 @@ fn generate_setup_fn(ctx: &Context, span: Span, mock_path: &Path, fn_info: &FnIn
                     .iter()
                     .map(|x| x.control_fn_arg.clone()),
             )
+            .chain(core::iter::once(FnArg::Typed(PatType {
+                attrs: Vec::new(),
+                pat: Box::new(Pat::Path(times_arg_path.clone())),
+                colon_token: Token![:](span),
+                ty: Box::new(Type::Path(r#type::path::new(span, ["Times"]))),
+            })))
             .collect(),
         variadic: None,
-        output: ReturnType::Type(
-            Token![->](span),
-            Box::new(Type::Path(TypePath {
-                qself: None,
-                path: fn_configurator_path.clone(),
-            })),
-        ),
+        output: ReturnType::Type(Token![->](span), Box::new(Type::Path(self_type(span)))),
     };
 
     let (data_var_path, data_stmt) = data_stmt::new(span, fn_info, generic_arguments);
     let (args_checker_var_path, args_checker_stmt) = args_checker_stmt::new(span, fn_info);
-    let fn_configurator_var_path = expr::path::new(span, ["fn_configurator"]);
-    let fn_configurator_stmt = Local {
-        attrs: Vec::new(),
-        let_token: Token![let](span),
-        pat: Pat::Type(PatType {
-            attrs: Vec::new(),
-            pat: Box::new(Pat::Path(fn_configurator_var_path)),
-            colon_token: Token![:](span),
-            ty: Box::new(Type::Path(TypePath {
-                qself: None,
-                path: fn_configurator_path.clone(),
-            })),
-        }),
-        init: Some(LocalInit {
-            eq_token: Token![=](span),
-            expr: Box::new(Expr::MethodCall(expr::method_call::new(
-                span,
-                Expr::Path(data_var_path.clone()),
-                Ident::new("add_config", span),
-                [
-                    Expr::Path(args_checker_var_path),
-                    Expr::Path(self_expr_path(span)),
-                ],
-            ))),
-            diverge: None,
-        }),
-        semi_token: Token![;](span),
-    };
-    let return_stmt = Expr::Macro(transmute_lifetime_expr::new(Expr::Path(ExprPath {
-        attrs: Vec::new(),
-        qself: None,
-        path: fn_configurator_path,
-    })));
+    let verify_received_stmt = Expr::MethodCall(expr::method_call::new(
+        span,
+        Expr::Path(data_var_path),
+        Ident::new("verify_received", span),
+        [
+            Expr::Path(args_checker_var_path),
+            Expr::Path(times_arg_path),
+        ],
+    ));
+    let return_stmt = Expr::Path(self_expr_path(span));
 
     let block = Block {
         brace_token: token::Brace(span),
         stmts: vec![
             Stmt::Local(data_stmt),
             Stmt::Local(args_checker_stmt),
-            Stmt::Local(fn_configurator_stmt),
+            Stmt::Expr(verify_received_stmt, Some(Token![;](span))),
             Stmt::Expr(return_stmt, None),
         ],
     };
@@ -200,5 +159,54 @@ fn generate_setup_fn(ctx: &Context, span: Span, mock_path: &Path, fn_info: &FnIn
         sig,
         block,
     };
+    return result;
+}
+
+fn generate_no_other_calls_fn(span: Span, fn_infos: &[FnInfo]) -> ImplItemFn {
+    let sig = Signature {
+        constness: None,
+        asyncness: None,
+        unsafety: None,
+        abi: None,
+        fn_token: Token![fn](span),
+        ident: Ident::new("no_other_calls", span),
+        generics: Generics::default(),
+        paren_token: token::Paren(span),
+        inputs: punctuated([ref_self_fn_arg(span)]),
+        variadic: None,
+        output: ReturnType::Default,
+    };
+
+    let verify_received_nothing_else_stmt = Expr::MethodCall(ExprMethodCall {
+        attrs: Vec::new(),
+        receiver: Box::new(Expr::Field(expr::field::new_self(Ident::new("data", span)))),
+        dot_token: Token![.](span),
+        method: Ident::new("verify_received_nothing_else", span),
+        turbofish: None,
+        paren_token: token::Paren(span),
+        args: fn_infos
+            .iter()
+            .map(|x| {
+                Expr::Lit(ExprLit {
+                    attrs: Vec::new(),
+                    lit: Lit::Str(LitStr::new(&x.syntax.fn_ident.to_string(), span)),
+                })
+            })
+            .collect(),
+    });
+
+    let block = Block {
+        brace_token: token::Brace(span),
+        stmts: vec![Stmt::Expr(verify_received_nothing_else_stmt, None)],
+    };
+
+    let result = ImplItemFn {
+        attrs: Vec::new(),
+        vis: Visibility::Public(Token![pub](span)),
+        defaultness: None,
+        sig,
+        block,
+    };
+
     return result;
 }

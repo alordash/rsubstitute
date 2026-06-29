@@ -25,7 +25,18 @@ impl<TMock> ISharedMockData<TMock> for SharedMockData<TMock> {
     >(
         &'_ self,
         fn_ident: &'static str,
-    ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, PASSES_MOCK_TO_CALLBACK> {
+    ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, PASSES_MOCK_TO_CALLBACK>
+    {
         self.borrow_mut().get_fn_data(fn_ident)
+    }
+}
+
+impl<TMock> IMockData for SharedMockData<TMock> {
+    fn get_received_nothing_else_error_msgs<const N: usize>(
+        &self,
+        fn_idents: [&'static str; N],
+    ) -> Vec<Vec<String>> {
+        self.borrow()
+            .get_received_nothing_else_error_msgs(fn_idents)
     }
 }
