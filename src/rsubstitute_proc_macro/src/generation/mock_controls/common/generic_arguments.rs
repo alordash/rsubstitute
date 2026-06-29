@@ -15,7 +15,7 @@ pub(crate) fn new(ctx: &Context, span: Span, mock_path: Path, fn_info: &FnInfo) 
     let result = Result {
         mock_generic_argument: GenericArgument::Type(Type::Path(TypePath {
             qself: None,
-            path: mock_path.clone(),
+            path: mock_path,
         })),
         has_return_value_argument: generic_argument::bool(
             span,

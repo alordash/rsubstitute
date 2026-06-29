@@ -41,7 +41,7 @@ pub(crate) fn generate(
         }),
         semi_token: None,
     };
-    let path = path::from_ident(item_struct.ident.clone());
+    let path = path::from_ident_with_generics(item_struct.ident.clone(), &item_struct.generics);
 
     let item_impl = generate_item_impl(
         ctx,
@@ -93,31 +93,7 @@ fn generate_item_impl(
 
 fn generate_setup_fn(ctx: &Context, span: Span, mock_path: &Path, fn_info: &FnInfo) -> ImplItemFn {
     let generic_arguments = generic_arguments::new(ctx, span, mock_path.clone(), fn_info);
-    let fn_configurator_path = Path {
-        leading_colon: None,
-        segments: punctuated([PathSegment {
-            ident: Ident::new("FnConfigurator", span),
-            arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
-                colon2_token: None,
-                lt_token: Token![<](span),
-                args: punctuated([
-                    GenericArgument::Lifetime(placeholder_lifetime(span)),
-                    generic_arguments.mock_generic_argument.clone(),
-                    GenericArgument::Type(Type::Path(self_type(span))),
-                    GenericArgument::Type(Type::Tuple(fn_info.syntax.arg_refs_tuple.clone())),
-                    GenericArgument::Type(match &fn_info.syntax.return_type {
-                        ReturnType::Default => void_type(span),
-                        ReturnType::Type(_, return_type) => *return_type.clone(),
-                    }),
-                    generic_arguments.mock_generic_argument.clone(),
-                    generic_arguments.has_return_value_argument.clone(),
-                    generic_arguments.supports_base_calling_argument.clone(),
-                    generic_arguments.passes_mock_to_callback_argument.clone(),
-                ]),
-                gt_token: Token![>](span),
-            }),
-        }]),
-    };
+    let fn_configurator_path = fn_configurator_path::new(span, fn_info, &generic_arguments, None);
     let sig = Signature {
         constness: None,
         asyncness: None,

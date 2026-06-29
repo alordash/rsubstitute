@@ -1,4 +1,4 @@
-use crate::syntax::punctuated;
+use crate::syntax::{generic_argument, punctuated};
 use proc_macro2::Span;
 use syn::*;
 
@@ -13,7 +13,6 @@ pub(crate) fn new<const N: usize>(span: Span, path_parts: [&str; N]) -> Path {
             })
             .collect(),
     };
-
     return result;
 }
 
@@ -44,6 +43,27 @@ pub(crate) fn from_ident(ident: Ident) -> Path {
             arguments: PathArguments::None,
         }]),
     };
+    return result;
+}
 
+pub(crate) fn from_ident_with_generics(ident: Ident, generics: &Generics) -> Path {
+    let span = ident.span();
+    let result = Path {
+        leading_colon: None,
+        segments: punctuated([PathSegment {
+            ident,
+            arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
+                colon2_token: Some(Token![::](span)),
+                lt_token: Token![<](span),
+                args: generics
+                    .params
+                    .iter()
+                    .cloned()
+                    .map(generic_argument::from_param)
+                    .collect(),
+                gt_token: Token![>](span),
+            }),
+        }]),
+    };
     return result;
 }

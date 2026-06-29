@@ -41,7 +41,7 @@ pub(crate) fn generate(
         }),
         semi_token: None,
     };
-    let path = path::from_ident(item_struct.ident.clone());
+    let path = path::from_ident_with_generics(item_struct.ident.clone(), &item_struct.generics);
 
     let item_impl = generate_item_impl(
         ctx,
