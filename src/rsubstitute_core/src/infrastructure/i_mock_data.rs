@@ -8,7 +8,7 @@ pub trait IMockData {
 
     fn verify_received_nothing_else<const N: usize>(&self, fn_idents: [&'static str; N]) {
         let all_error_msgs: Vec<_> = self.get_received_nothing_else_error_msgs(fn_idents);
-        if all_error_msgs.is_empty() {
+        if all_error_msgs.first().is_none_or(|x| x.is_empty()) {
             return;
         }
         let error_msgs: Vec<_> = all_error_msgs.into_iter().flatten().collect();
