@@ -64,6 +64,8 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> ItemMod {
         static_setup_struct.path.clone(),
         &fn_info,
     );
+    let fn_static_received =
+        fn_static_received::generate(source_span, static_received_struct.path.clone(), &fn_info);
 
     let mod_ident = fn_info.syntax.source_signature.ident.clone();
     let mocked_fn = mocked_fn::generate(
@@ -82,6 +84,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> ItemMod {
         .into_iter()
         .chain([
             Item::Fn(fn_static_setup),
+            Item::Fn(fn_static_received),
             Item::Struct(fn_info.call_struct.item_struct),
             Item::Impl(fn_info.call_struct.generics_info_provider_impl),
             Item::Impl(fn_info.call_struct.call_impl),

@@ -98,7 +98,7 @@ fn generate_received_fn(
     mock_path: &Path,
     fn_info: &FnInfo,
 ) -> ImplItemFn {
-    let times_arg_path = expr::path::new(span, ["times"]);
+    let (times_arg_path, times_arg) = times_arg::new(span);
     let generic_arguments = generic_arguments::new(ctx, span, mock_path.clone(), fn_info);
     let sig = Signature {
         constness: None,
@@ -118,12 +118,7 @@ fn generate_received_fn(
                     .iter()
                     .map(|x| x.control_fn_arg.clone()),
             )
-            .chain(core::iter::once(FnArg::Typed(PatType {
-                attrs: Vec::new(),
-                pat: Box::new(Pat::Path(times_arg_path.clone())),
-                colon_token: Token![:](span),
-                ty: Box::new(Type::Path(r#type::path::new(span, ["Times"]))),
-            })))
+            .chain(core::iter::once(FnArg::Typed(times_arg)))
             .collect(),
         variadic: None,
         output: ReturnType::Type(Token![->](span), Box::new(Type::Path(self_type(span)))),

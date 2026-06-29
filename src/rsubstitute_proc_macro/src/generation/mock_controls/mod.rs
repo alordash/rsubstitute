@@ -9,12 +9,14 @@ pub mod models {
 mod common {
     pub(crate) mod args_checker_stmt;
     pub(crate) mod data_stmt;
-    pub(crate) mod generic_arguments;
     pub(crate) mod fn_configurator_path;
+    pub(crate) mod generic_arguments;
+    pub(crate) mod times_arg;
 }
 
 use common::*;
 
+pub mod fn_static_received;
 pub mod fn_static_setup;
 pub mod static_received;
 pub mod static_setup;
