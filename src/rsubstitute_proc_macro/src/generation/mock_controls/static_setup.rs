@@ -147,7 +147,7 @@ fn generate_setup_fn(ctx: &Context, span: Span, mock_path: &Path, fn_info: &FnIn
         ),
     };
 
-    let (data_var_path, data_stmt) = data_stmt::new(span, fn_info, generic_arguments);
+    let (data_var_path, data_stmt) = data_stmt::new_static(span, fn_info, generic_arguments);
     let (args_checker_var_path, args_checker_stmt) = args_checker_stmt::new(span, fn_info);
     let fn_configurator_var_path = expr::path::new(span, ["fn_configurator"]);
     let fn_configurator_stmt = Local {
