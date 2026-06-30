@@ -1,10 +1,11 @@
+use crate::common::models::*;
 use crate::generation::fn_info::models::*;
 use crate::generation::fn_info::*;
 use crate::preparation::r#fn::models::*;
 use syn::*;
 
-pub(crate) fn generate(fn_syntax: FnSyntax) -> FnInfo {
-    let call_struct = call_struct::generate(&fn_syntax);
+pub(crate) fn generate(ctx: &Context, fn_syntax: FnSyntax) -> FnInfo {
+    let call_struct = call_struct::generate(ctx, &fn_syntax);
     let args_checker_struct = args_checker_struct::generate(
         &fn_syntax,
         Type::Path(TypePath {

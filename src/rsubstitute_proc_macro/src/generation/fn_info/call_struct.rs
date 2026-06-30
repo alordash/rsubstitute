@@ -1,6 +1,8 @@
 mod call_impl;
+mod clone_impl;
 
 use crate::common::generics_field;
+use crate::common::models::*;
 use crate::generation::fn_info::models::*;
 use crate::generation::fn_info::*;
 use crate::preparation::r#fn::models::*;
@@ -9,15 +11,25 @@ use quote::format_ident;
 use syn::spanned::Spanned;
 use syn::*;
 
-pub(crate) fn generate(fn_syntax: &FnSyntax) -> CallStruct {
+pub(crate) fn generate(ctx: &Context, fn_syntax: &FnSyntax) -> CallStruct {
     let span = fn_syntax.spans.inputs;
     let fields_named = generate_fields(fn_syntax);
+    let struct_ident = format_ident!("{}_Call", fn_syntax.fn_ident);
+    let maybe_clone_impl = if ctx.support_base_calling {
+        Some(clone_impl::generate(
+            span,
+            path::from_ident(struct_ident.clone()),
+            &fields_named,
+        ))
+    } else {
+        None
+    };
 
     let item_struct = ItemStruct {
         attrs: Vec::new(),
         vis: Visibility::Public(Token![pub](span)),
         struct_token: Token![struct](span),
-        ident: format_ident!("{}_Call", fn_syntax.fn_ident),
+        ident: struct_ident,
         generics: fn_syntax.merged_generics.clone(),
         fields: Fields::Named(fields_named),
         semi_token: None,
@@ -37,6 +49,7 @@ pub(crate) fn generate(fn_syntax: &FnSyntax) -> CallStruct {
         item_struct,
         generics_info_provider_impl,
         call_impl,
+        maybe_clone_impl,
     };
 
     return result;

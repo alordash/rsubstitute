@@ -21,7 +21,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
         maybe_base_impl: Some(item_fn.block),
         maybe_owner: None,
     });
-    let mut fn_info = fn_info::generate(fn_syntax);
+    let mut fn_info = fn_info::generate(ctx, fn_syntax);
 
     let mock_struct = mock_struct::generate_for_static_fn(source_span, &fn_info.syntax);
 
@@ -100,7 +100,15 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
         Item::Struct(fn_info.call_struct.item_struct),
         Item::Impl(fn_info.call_struct.generics_info_provider_impl),
         Item::Impl(fn_info.call_struct.call_impl),
-        // TODO - call should also have Clone impl if mocking with base
+    ])
+    .chain(
+        fn_info
+            .call_struct
+            .maybe_clone_impl
+            .map(Item::Impl)
+            .into_iter(),
+    )
+    .chain([
         Item::Struct(fn_info.args_checker_struct.item_struct),
         Item::Impl(fn_info.args_checker_struct.generics_info_provider_impl),
         Item::Impl(fn_info.args_checker_struct.args_checker_impl),

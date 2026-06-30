@@ -3,7 +3,16 @@ use proc_macro2::Span;
 use quote::ToTokens;
 use syn::*;
 
-// TODO - verify that this is actually needed (remove it from generated code and see if there are any warnings)
+pub(crate) fn inline(span: Span) -> Attribute {
+    let result = Attribute {
+        pound_token: Token![#](span),
+        style: AttrStyle::Outer,
+        bracket_token: token::Bracket(span),
+        meta: Meta::Path(path::new(span, ["inline"])),
+    };
+    return result;
+}
+
 pub(crate) fn allow_unused_variables(span: Span) -> Attribute {
     allow(span, "unused_variables")
 }

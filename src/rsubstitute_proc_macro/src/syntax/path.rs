@@ -16,6 +16,12 @@ pub(crate) fn new<const N: usize>(span: Span, path_parts: [&str; N]) -> Path {
     return result;
 }
 
+pub(crate) fn new_global<const N: usize>(span: Span, path_parts: [&str; N]) -> Path {
+    let mut result = new(span, path_parts);
+    result.leading_colon = Some(Token![::](span));
+    return result;
+}
+
 pub(crate) fn new_generics<const N: usize>(
     span: Span,
     path_parts: [&str; N],

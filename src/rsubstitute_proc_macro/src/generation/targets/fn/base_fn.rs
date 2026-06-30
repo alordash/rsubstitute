@@ -30,9 +30,14 @@ pub(crate) fn generate(
                     underscore_token: Token![_](source_span),
                 })),
                 colon_token: Token![:](source_span),
-                ty: Box::new(Type::Path(TypePath {
-                    qself: None,
-                    path: mock_struct_path,
+                ty: Box::new(Type::Reference(TypeReference {
+                    and_token: Token![&](source_span),
+                    lifetime: None,
+                    mutability: None,
+                    elem: Box::new(Type::Path(TypePath {
+                        qself: None,
+                        path: mock_struct_path,
+                    })),
                 })),
             }),
             FnArg::Typed(PatType {
