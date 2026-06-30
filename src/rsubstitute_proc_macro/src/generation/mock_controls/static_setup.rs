@@ -107,7 +107,7 @@ fn generate_setup_fn(ctx: &Context, span: Span, mock_path: &Path, fn_info: &FnIn
         abi: None,
         fn_token: Token![fn](span),
         ident: Ident::new("setup", span),
-        generics: Generics::default(),
+        generics: generics_with_rsubstitute_anonymous_lifetime::new(Generics::default()),
         paren_token: token::Paren(span),
         inputs: [ref_self_fn_arg(span)]
             .into_iter()

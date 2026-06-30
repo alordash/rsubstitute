@@ -12,6 +12,7 @@ mod common {
     pub(crate) mod fn_configurator_path;
     pub(crate) mod generic_arguments;
     pub(crate) mod times_arg;
+    pub(crate) mod generics_with_rsubstitute_anonymous_lifetime;
 }
 
 use common::*;

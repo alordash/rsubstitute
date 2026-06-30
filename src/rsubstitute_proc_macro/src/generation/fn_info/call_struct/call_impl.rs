@@ -80,16 +80,9 @@ fn generate_fn_get_args_infos(span: Span, arguments: &[Argument]) -> ImplItemFn 
 fn generate_arg_info_new_expr(argument: &Argument) -> Expr {
     let span = argument.ident.span();
 
-    let arg_name_argument = Expr::Path(ExprPath {
+    let arg_name_argument = Expr::Lit(ExprLit {
         attrs: Vec::new(),
-        qself: None,
-        path: Path {
-            leading_colon: None,
-            segments: punctuated([PathSegment {
-                ident: argument.ident.clone(),
-                arguments: PathArguments::None,
-            }]),
-        },
+        lit: Lit::Str(LitStr::new(&argument.ident.to_string(), span)),
     });
 
     let arg_field_expr = Expr::Field(expr::field::new_self(argument.ident.clone()));
@@ -133,7 +126,14 @@ fn generate_fn_get_ptr_to_boxed_tuple_of_refs(span: Span, arguments: &[Argument]
 
     let fields: Punctuated<Expr, Token![,]> = arguments
         .iter()
-        .map(|argument| Expr::Field(expr::field::new_self(argument.ident.clone())))
+        .map(|argument| {
+            Expr::Reference(ExprReference {
+                attrs: Vec::new(),
+                and_token: Token![&](span),
+                mutability: None,
+                expr: Box::new(Expr::Field(expr::field::new_self(argument.ident.clone()))),
+            })
+        })
         .collect();
     let tuple = Expr::Tuple(ExprTuple {
         attrs: Vec::new(),

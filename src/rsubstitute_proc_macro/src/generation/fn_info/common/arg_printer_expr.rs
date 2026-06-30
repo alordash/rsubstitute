@@ -8,8 +8,18 @@ pub(crate) fn new(span: Span, expr: Expr, target_type: Type) -> Expr {
         span,
         Expr::Path(expr::path::new(span, ["ArgPrinter"])),
         [Expr::Macro(transmute_lifetime_expr::new_with_target(
-            expr,
-            target_type,
+            Expr::Reference(ExprReference {
+                attrs: Vec::new(),
+                and_token: Token![&](span),
+                mutability: None,
+                expr: Box::new(expr),
+            }),
+            Type::Reference(TypeReference {
+                and_token: Token![&](span),
+                lifetime: None,
+                mutability: None,
+                elem: Box::new(target_type),
+            }),
         ))],
     ));
     let arg_printer_ref = Expr::Reference(ExprReference {

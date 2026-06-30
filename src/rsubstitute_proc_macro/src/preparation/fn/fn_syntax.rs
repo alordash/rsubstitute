@@ -102,6 +102,8 @@ struct InputsSplit {
 fn split_inputs_into_maybe_self_type_and_arguments(
     inputs: Punctuated<FnArg, Token![,]>,
 ) -> InputsSplit {
+    dbg!(inputs.to_token_stream().to_string());
+
     let mut inputs_iter = inputs.into_iter();
     let Some(first_arg) = inputs_iter.next() else {
         return InputsSplit {
@@ -110,11 +112,13 @@ fn split_inputs_into_maybe_self_type_and_arguments(
         };
     };
 
-    let maybe_self_type = match first_arg {
-        FnArg::Receiver(receiver) => Some(receiver.clone()),
-        FnArg::Typed(_) => None,
+    let (maybe_self_type, maybe_first_arg) = match first_arg {
+        FnArg::Receiver(receiver) => (Some(receiver.clone()), None),
+        FnArg::Typed(_) => (None, Some(first_arg)),
     };
-    let arguments = inputs_iter
+    let arguments = maybe_first_arg
+        .into_iter()
+        .chain(inputs_iter)
         .map(|fn_arg| match fn_arg {
             FnArg::Typed(pat_type) => pat_type,
             unexpected => panic!(

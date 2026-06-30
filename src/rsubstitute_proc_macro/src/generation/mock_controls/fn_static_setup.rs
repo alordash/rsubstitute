@@ -32,7 +32,9 @@ pub(crate) fn generate(
         abi: None,
         fn_token: Token![fn](span),
         ident: Ident::new("setup", span),
-        generics: fn_info.syntax.merged_generics.clone(),
+        generics: generics_with_rsubstitute_anonymous_lifetime::new(
+            fn_info.syntax.merged_generics.clone(),
+        ),
         paren_token: token::Paren(span),
         inputs: fn_info
             .syntax
