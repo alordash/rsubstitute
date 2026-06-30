@@ -102,8 +102,6 @@ struct InputsSplit {
 fn split_inputs_into_maybe_self_type_and_arguments(
     inputs: Punctuated<FnArg, Token![,]>,
 ) -> InputsSplit {
-    dbg!(inputs.to_token_stream().to_string());
-
     let mut inputs_iter = inputs.into_iter();
     let Some(first_arg) = inputs_iter.next() else {
         return InputsSplit {

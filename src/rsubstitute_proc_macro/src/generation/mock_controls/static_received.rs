@@ -116,7 +116,7 @@ fn generate_received_fn(
         abi: None,
         fn_token: Token![fn](span),
         ident: Ident::new("received", span),
-        generics: Generics::default(),
+        generics: generics_with_rsubstitute_anonymous_lifetime::new(Generics::default()),
         paren_token: token::Paren(span),
         inputs: [self_fn_arg(span)]
             .into_iter()

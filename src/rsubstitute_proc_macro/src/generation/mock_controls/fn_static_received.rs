@@ -14,7 +14,9 @@ pub(crate) fn generate(span: Span, static_received_path: Path, fn_info: &FnInfo)
         abi: None,
         fn_token: Token![fn](span),
         ident: Ident::new("received", span),
-        generics: fn_info.syntax.merged_generics.clone(),
+        generics: generics_with_rsubstitute_anonymous_lifetime::new(
+            fn_info.syntax.merged_generics.clone(),
+        ),
         paren_token: token::Paren(span),
         inputs: fn_info
             .syntax

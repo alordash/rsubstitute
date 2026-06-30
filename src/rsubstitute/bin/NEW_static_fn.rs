@@ -4,22 +4,22 @@
 
 use rsubstitute_core::args::Arg;
 use rsubstitute_core::Times;
-#[allow(unused_imports)]
 use rsubstitute_proc_macro::mock;
-#[allow(unused_imports)]
-use std::fmt::Debug;
 
-#[mock]
-fn f(v: i32) {}
+#[mock(base)]
+fn f(v: &i32) {}
 
 fn main() {
-    f::setup(1)
+    let a = [1, 0, 1];
+    let a0 = &a[0];
+    let a2 = &a[2];
+    f::setup(a0)
         .does(|_| println!("em kavo))"))
         .setup(Arg::Any)
         .does(|(v,)| println!("chevooo {v}"));
-    f(1);
-    f(2);
-    f(3);
-    f::received(3, Times::Exactly(1));
+    f(a0);
+    f(&2);
+    f(&3);
+    f::received(&3, Times::Exactly(1));
     println!("Done");
 }
