@@ -67,7 +67,10 @@ fn generate_fn_get_generic_parameter_infos<'a>(
                 span,
                 Expr::Path(expr::path::new(span, ["generic_type_info"])),
                 [
-                    Expr::Path(expr::path::new(span, [&type_param.ident.to_string()])),
+                    Expr::Lit(ExprLit {
+                        attrs: Vec::new(),
+                        lit: Lit::Str(LitStr::new(&type_param.ident.to_string(), span)),
+                    }),
                     Expr::Call(expr::call::new(
                         span,
                         Expr::Path(expr::path::new(span, ["core", "any", "type_name"])),
@@ -146,7 +149,7 @@ fn generate_fn_hash_generics_type_ids<'a>(
             bracket_token: token::Bracket(span),
             elems: tids,
         });
-        let stmt = Stmt::Expr(tids_array, None);
+        let stmt = Stmt::Expr(tids_array, Some(Token![;](span)));
         vec![stmt]
     } else {
         Vec::new()
