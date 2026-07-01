@@ -7,7 +7,7 @@ use rsubstitute_core::Times;
 use rsubstitute_proc_macro::mock;
 
 #[mock(base)]
-fn f(v: &i32) {}
+fn f<T>(v: T) -> T { v }
 
 fn main() {
     let a = [1, 0, 1];
