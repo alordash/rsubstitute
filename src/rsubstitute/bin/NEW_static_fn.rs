@@ -16,8 +16,9 @@ fn main() {
     f::setup(a0)
         .does(|_| println!("em kavo))"))
         .setup(Arg::Any)
-        .does(|(v,)| println!("chevooo {v}"));
+        .does(|(v, )| println!("chevooo {v}"));
     f(a0);
+    f(a2);
     f(&2);
     f(&3);
     f::received(&3, Times::Exactly(1));

@@ -100,15 +100,28 @@ pub(crate) fn generate(
     let cast_args_stmt = Local {
         attrs: Vec::new(),
         let_token: Token![let](source_span),
-        pat: Pat::Tuple(PatTuple {
+        pat: Pat::Type(PatType {
             attrs: Vec::new(),
-            paren_token: token::Paren(source_span),
-            elems: fn_info
-                .syntax
-                .arguments
-                .iter()
-                .map(|x| Pat::Type(x.source_pat_type.clone()))
-                .collect(),
+            pat: Box::new(Pat::Tuple(PatTuple {
+                attrs: Vec::new(),
+                paren_token: token::Paren(source_span),
+                elems: fn_info
+                    .syntax
+                    .arguments
+                    .iter()
+                    .map(|x| *x.source_pat_type.pat.clone())
+                    .collect(),
+            })),
+            colon_token: Token![:](source_span),
+            ty: Box::new(Type::Tuple(TypeTuple {
+                paren_token: token::Paren(source_span),
+                elems: fn_info
+                    .syntax
+                    .arguments
+                    .iter()
+                    .map(|x| *x.source_pat_type.ty.clone())
+                    .collect(),
+            })),
         }),
         init: Some(LocalInit {
             eq_token: Token![=](source_span),
