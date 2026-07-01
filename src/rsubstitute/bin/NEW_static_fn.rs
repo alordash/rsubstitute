@@ -18,9 +18,14 @@ fn main() {
     let a0 = &a[0];
     let a2 = &a[2];
     f::setup::<&i32>(a0)
-        .does(|_| println!("em kavo))"))
+        .returns(&101)
+        .and_does(|_| println!("em kavo))"))
         .setup(Arg::Any)
-        .does(|(v,)| println!("chevooo {v}"));
+        .returns_with(|(v,)| {
+            println!("re-returning {v}");
+            return v;
+        })
+        .and_does(|(v,)| println!("chevooo {v}"));
     f(a0);
     f(a2);
     f(&2);

@@ -19,8 +19,14 @@ pub struct FnConfigurator<
     _phantom_return_value: PhantomData<TReturnValue>,
     fn_config: Rc<RefCell<FnConfig<'rs, TMock>>>,
     owner: &'rs TOwner,
-    fn_callback_configurator:
-        FnCallbackConfigurator<'rs, TMock, TOwner, TArgRefsTuple, TMockArg, PASSES_MOCK_TO_CALLBACK>,
+    fn_callback_configurator: FnCallbackConfigurator<
+        'rs,
+        TMock,
+        TOwner,
+        TArgRefsTuple,
+        TMockArg,
+        PASSES_MOCK_TO_CALLBACK,
+    >,
 }
 
 impl<
@@ -153,7 +159,6 @@ impl<
     TArgRefsTuple: Copy,
     TReturnValue,
     TMockArg,
-    const HAS_RETURN_VALUE: bool,
     const SUPPORTS_BASE_CALLING: bool,
 >
     FnConfigurator<
@@ -163,7 +168,7 @@ impl<
         TArgRefsTuple,
         TReturnValue,
         TMockArg,
-        HAS_RETURN_VALUE,
+        false,
         SUPPORTS_BASE_CALLING,
         false,
     >
