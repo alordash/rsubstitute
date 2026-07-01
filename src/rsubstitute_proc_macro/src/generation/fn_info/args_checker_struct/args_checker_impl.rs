@@ -11,6 +11,7 @@ use syn::*;
 
 pub(crate) fn generate(
     span: Span,
+    generics: Generics,
     arguments: &[Argument],
     target_type: Type,
     call_struct_type: Type,
@@ -24,7 +25,7 @@ pub(crate) fn generate(
         defaultness: None,
         unsafety: None,
         impl_token: Token![impl](span),
-        generics: Generics::default(),
+        generics,
         trait_: Some((None, path::new(span, ["IArgsChecker"]), Token![for](span))),
         self_ty: Box::new(target_type),
         brace_token: token::Brace(span),

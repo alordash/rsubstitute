@@ -73,7 +73,14 @@ fn generate_fn_get_generic_parameter_infos<'a>(
                     }),
                     Expr::Call(expr::call::new(
                         span,
-                        Expr::Path(expr::path::new(span, ["core", "any", "type_name"])),
+                        Expr::Path(expr::path::new_generics(
+                            span,
+                            ["core", "any", "type_name"],
+                            GenericArgument::Type(Type::Path(TypePath {
+                                qself: None,
+                                path: path::from_ident(type_param.ident.clone()),
+                            })),
+                        )),
                         [],
                     )),
                 ],

@@ -81,6 +81,7 @@ pub(crate) fn panic_no_suitable_fn_configuration_found(
         format_received_unexpected_call_error(fn_name, unexpected_call, generic_parameter_infos);
     let calls = matching_config_search_err
         .args_check_results_sorted_by_number_of_correctly_matched_args_descending;
+    let needed_return_value = matching_config_search_err.needed_return_value;
     let configs_report = if calls.calls_args_check_results.len() > 0 {
         let args_check_results_msgs: Vec<_> = calls
             .calls_args_check_results
@@ -103,8 +104,13 @@ List of existing configuration ordered by number of correctly matched arguments 
     } else {
         String::new()
     };
+    let needed_return_value_msg = if needed_return_value {
+        " because no return value was supplied"
+    } else {
+        ""
+    };
     let error_msg = format!(
-        "Mock wasn't configured to handle following call:
+        "Mock wasn't configured to handle following call{needed_return_value_msg}:
 \t{call_msg}{configs_report}"
     );
     panic!("{error_msg}");

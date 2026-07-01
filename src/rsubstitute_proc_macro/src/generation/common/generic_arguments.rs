@@ -11,11 +11,11 @@ pub(crate) struct Result {
     pub passes_mock_to_callback_argument: GenericArgument,
 }
 
-pub(crate) fn new(ctx: &Context, span: Span, mock_path: Path, fn_info: &FnInfo) -> Result {
+pub(crate) fn new(ctx: &Context, span: Span, mock_struct_path: Path, fn_info: &FnInfo) -> Result {
     let result = Result {
         mock_generic_argument: GenericArgument::Type(Type::Path(TypePath {
             qself: None,
-            path: mock_path,
+            path: mock_struct_path,
         })),
         has_return_value_argument: generic_argument::bool(
             span,

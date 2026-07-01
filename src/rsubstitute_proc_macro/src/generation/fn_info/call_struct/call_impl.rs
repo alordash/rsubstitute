@@ -7,7 +7,7 @@ use quote::ToTokens;
 use syn::punctuated::Punctuated;
 use syn::*;
 
-pub(crate) fn generate(span: Span, arguments: &[Argument], target_type: Type) -> ItemImpl {
+pub(crate) fn generate(span: Span, generics: Generics, arguments: &[Argument], target_type: Type) -> ItemImpl {
     let fn_get_arg_infos = generate_fn_get_args_infos(span, arguments);
     let fn_get_ptr_to_boxed_tuple_of_refs =
         generate_fn_get_ptr_to_boxed_tuple_of_refs(span, arguments);
@@ -21,7 +21,7 @@ pub(crate) fn generate(span: Span, arguments: &[Argument], target_type: Type) ->
         defaultness: None,
         unsafety: None,
         impl_token: Token![impl](span),
-        generics: Generics::default(),
+        generics,
         trait_: Some((None, path::new(span, ["ICall"]), Token![for](span))),
         self_ty: Box::new(target_type),
         brace_token: token::Brace(span),

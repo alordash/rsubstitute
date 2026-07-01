@@ -369,6 +369,7 @@ mod internal {
             return MatchingConfigSearchResult::Err(MatchingConfigSearchErr {
                 args_check_results_sorted_by_number_of_correctly_matched_args_descending:
                     calls_check_result,
+                needed_return_value: with_return_value,
             });
         }
     }

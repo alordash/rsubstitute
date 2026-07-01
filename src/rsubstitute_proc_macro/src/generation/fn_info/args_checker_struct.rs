@@ -22,15 +22,20 @@ pub(crate) fn generate(fn_syntax: &FnSyntax, call_struct_type: Type) -> ArgsChec
         semi_token: None,
     };
 
-    let path = path::from_ident(item_struct.ident.clone());
+    let path = path::from_ident_with_generics(item_struct.ident.clone(), &item_struct.generics);
     let r#type = Type::Path(TypePath {
         qself: None,
         path: path.clone(),
     });
     let generics_info_provider_impl =
         generics_info_provider_impl::generate(fn_syntax.merged_generics.clone(), r#type.clone());
-    let args_checker_impl =
-        args_checker_impl::generate(span, &fn_syntax.arguments, r#type, call_struct_type);
+    let args_checker_impl = args_checker_impl::generate(
+        span,
+        fn_syntax.merged_generics.clone(),
+        &fn_syntax.arguments,
+        r#type,
+        call_struct_type,
+    );
 
     let result = ArgsCheckerStruct {
         path,

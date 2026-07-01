@@ -71,6 +71,7 @@ fn format_fn_ident(
     maybe_owner: Option<&dyn IFnOwner>,
     generics: &Generics,
 ) -> Ident {
+    #[allow(unused_variables)]
     let generics_suffixes = generics.params.iter().map(|x| match x {
         GenericParam::Lifetime(l) => l.lifetime.ident.clone(),
         GenericParam::Type(t) => t.ident.clone(),
@@ -80,7 +81,9 @@ fn format_fn_ident(
         .map(|x| x.ident().clone())
         .into_iter()
         .chain(core::iter::once(fn_ident))
-        .chain(generics_suffixes);
+    // TODO: is this needed?
+    // .chain(generics_suffixes)
+        ;
     let result = ident::join(ident_parts, constants::IDENTS_SEPARATOR);
     return result;
 }

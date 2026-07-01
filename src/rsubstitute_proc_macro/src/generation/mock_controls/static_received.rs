@@ -1,5 +1,6 @@
 use crate::common::models::*;
 use crate::common::*;
+use crate::generation::common::*;
 use crate::generation::fn_info::models::*;
 use crate::generation::mock_controls::models::*;
 use crate::generation::mock_controls::*;
@@ -133,11 +134,11 @@ fn generate_received_fn(
         output: ReturnType::Type(Token![->](span), Box::new(Type::Path(self_type(span)))),
     };
 
-    let (data_var_path, data_stmt) = fn_data_stmt::new_static(span, fn_info, generic_arguments);
+    let (fn_data_var_path, fn_data_stmt) = fn_data_stmt::new_static(span, fn_info, generic_arguments);
     let (args_checker_var_path, args_checker_stmt) = args_checker_stmt::new(span, fn_info);
     let verify_received_stmt = Expr::MethodCall(expr::method_call::new(
         span,
-        Expr::Path(data_var_path),
+        Expr::Path(fn_data_var_path),
         Ident::new("verify_received", span),
         [
             Expr::Path(args_checker_var_path),
@@ -149,7 +150,7 @@ fn generate_received_fn(
     let block = Block {
         brace_token: token::Brace(span),
         stmts: vec![
-            Stmt::Local(data_stmt),
+            Stmt::Local(fn_data_stmt),
             Stmt::Local(args_checker_stmt),
             Stmt::Expr(verify_received_stmt, Some(Token![;](span))),
             Stmt::Expr(return_stmt, None),
@@ -175,10 +176,10 @@ fn generate_fn_no_other_calls_for_static(
     let sig = fn_no_other_calls_signature(span);
     let fn_info = &fn_infos[0];
     let generic_arguments = generic_arguments::new(ctx, span, mock_path.clone(), fn_info);
-    let (data_var_path, data_stmt) = fn_data_stmt::new_static(span, fn_info, generic_arguments);
+    let (fn_data_var_path, fn_data_stmt) = fn_data_stmt::new_static(span, fn_info, generic_arguments);
     let verify_received_nothing_else_stmt = Expr::MethodCall(ExprMethodCall {
         attrs: Vec::new(),
-        receiver: Box::new(Expr::Path(data_var_path)),
+        receiver: Box::new(Expr::Path(fn_data_var_path)),
         dot_token: Token![.](span),
         method: Ident::new("verify_received_nothing_else", span),
         turbofish: None,
@@ -193,7 +194,7 @@ fn generate_fn_no_other_calls_for_static(
     let block = Block {
         brace_token: token::Brace(span),
         stmts: vec![
-            Stmt::Local(data_stmt),
+            Stmt::Local(fn_data_stmt),
             Stmt::Expr(verify_received_nothing_else_stmt, None),
         ],
     };

@@ -1,5 +1,6 @@
 use crate::common::models::*;
 use crate::common::*;
+use crate::generation::common::*;
 use crate::generation::fn_info::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
@@ -12,71 +13,10 @@ pub(crate) fn generate(
     mock_struct_path: Path,
     maybe_base_fn_ident: Option<Ident>,
 ) -> ItemFn {
-    let data_path = expr::path::new(source_span, ["data"]);
-    let data_stmt = Local {
-        attrs: Vec::new(),
-        let_token: Token![let](source_span),
-        pat: Pat::Type(PatType {
-            attrs: Vec::new(),
-            pat: Box::new(Pat::Path(data_path.clone())),
-            colon_token: Token![:](source_span),
-            ty: Box::new(Type::Reference(TypeReference {
-                and_token: Token![&](source_span),
-                lifetime: None,
-                mutability: None,
-                elem: Box::new(Type::Path(TypePath {
-                    qself: None,
-                    path: Path {
-                        leading_colon: None,
-                        segments: punctuated([PathSegment {
-                            ident: Ident::new("FnData", source_span),
-                            arguments: PathArguments::AngleBracketed(
-                                AngleBracketedGenericArguments {
-                                    colon2_token: None,
-                                    lt_token: Token![<](source_span),
-                                    args: punctuated([
-                                        GenericArgument::Type(Type::Path(TypePath {
-                                            qself: None,
-                                            path: mock_struct_path.clone(),
-                                        })),
-                                        generic_argument::bool(
-                                            source_span,
-                                            match fn_info.syntax.source_signature.output {
-                                                ReturnType::Type(_, _) => true,
-                                                _ => false,
-                                            },
-                                        ),
-                                        generic_argument::bool(
-                                            source_span,
-                                            ctx.support_base_calling,
-                                        ),
-                                        generic_argument::bool(source_span, false),
-                                    ]),
-                                    gt_token: Token![>](source_span),
-                                },
-                            ),
-                        }]),
-                    },
-                })),
-            })),
-        }),
-        init: Some(LocalInit {
-            eq_token: Token![=](source_span),
-            expr: Box::new(Expr::Call(expr::call::new(
-                source_span,
-                Expr::Path(expr::path::new(source_span, ["get_static_fn_data"])),
-                [Expr::Lit(ExprLit {
-                    attrs: Vec::new(),
-                    lit: Lit::Str(LitStr::new(
-                        &fn_info.syntax.source_signature.ident.to_string(),
-                        source_span,
-                    )),
-                })],
-            ))),
-            diverge: None,
-        }),
-        semi_token: Token![;](source_span),
-    };
+    let generic_arguments =
+        generic_arguments::new(ctx, source_span, mock_struct_path.clone(), fn_info);
+    let (fn_data_var_path, fn_data_stmt) =
+        fn_data_stmt::new_static(source_span, fn_info, generic_arguments);
     let mock_arg = Expr::Reference(ExprReference {
         attrs: Vec::new(),
         and_token: Token![&](source_span),
@@ -148,7 +88,7 @@ pub(crate) fn generate(
     };
     let handle_stmt = Expr::MethodCall(ExprMethodCall {
         attrs: Vec::new(),
-        receiver: Box::new(Expr::Path(data_path)),
+        receiver: Box::new(Expr::Path(fn_data_var_path)),
         dot_token: Token![.](source_span),
         method: Ident::new("handle", source_span),
         turbofish: None,
@@ -158,7 +98,7 @@ pub(crate) fn generate(
 
     let block = Block {
         brace_token: token::Brace(source_span),
-        stmts: vec![Stmt::Local(data_stmt), Stmt::Expr(handle_stmt, None)],
+        stmts: vec![Stmt::Local(fn_data_stmt), Stmt::Expr(handle_stmt, None)],
     };
 
     let result = ItemFn {

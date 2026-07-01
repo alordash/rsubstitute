@@ -1,5 +1,6 @@
 use crate::common::models::*;
 use crate::common::*;
+use crate::generation::common::*;
 use crate::generation::fn_info::models::*;
 use crate::generation::mock_controls::models::*;
 use crate::generation::mock_controls::*;
@@ -97,7 +98,7 @@ fn generate_setup_fn(ctx: &Context, span: Span, mock_path: &Path, fn_info: &FnIn
         span,
         fn_info,
         &generic_arguments,
-        static_lifetime(span),
+        placeholder_lifetime(span),
         None,
     );
     let sig = Signature {
@@ -137,7 +138,7 @@ fn generate_setup_fn(ctx: &Context, span: Span, mock_path: &Path, fn_info: &FnIn
     };
     fn_configurator_path_for_var_args.args[0] =
         GenericArgument::Lifetime(placeholder_lifetime(span));
-    let (data_var_path, data_stmt) = fn_data_stmt::new_static(span, fn_info, generic_arguments);
+    let (fn_data_var_path, fn_data_stmt) = fn_data_stmt::new_static(span, fn_info, generic_arguments);
     let (args_checker_var_path, args_checker_stmt) = args_checker_stmt::new(span, fn_info);
     let fn_configurator_var_path = path::new(span, ["fn_configurator"]);
     let fn_configurator_stmt = Local {
@@ -160,7 +161,7 @@ fn generate_setup_fn(ctx: &Context, span: Span, mock_path: &Path, fn_info: &FnIn
             eq_token: Token![=](span),
             expr: Box::new(Expr::MethodCall(expr::method_call::new(
                 span,
-                Expr::Path(data_var_path.clone()),
+                Expr::Path(fn_data_var_path.clone()),
                 Ident::new("add_config", span),
                 [
                     Expr::Path(args_checker_var_path),
@@ -171,16 +172,16 @@ fn generate_setup_fn(ctx: &Context, span: Span, mock_path: &Path, fn_info: &FnIn
         }),
         semi_token: Token![;](span),
     };
-    let return_stmt = Expr::Macro(transmute_lifetime_expr::new(Expr::Path(ExprPath {
+    let return_stmt = Expr::Path(ExprPath {
         attrs: Vec::new(),
         qself: None,
         path: fn_configurator_var_path,
-    })));
+    });
 
     let block = Block {
         brace_token: token::Brace(span),
         stmts: vec![
-            Stmt::Local(data_stmt),
+            Stmt::Local(fn_data_stmt),
             Stmt::Local(args_checker_stmt),
             Stmt::Local(fn_configurator_stmt),
             Stmt::Expr(return_stmt, None),

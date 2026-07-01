@@ -1,5 +1,6 @@
-use crate::common::generics_field;
 use crate::common::models::*;
+use crate::common::*;
+use crate::generation::common::*;
 use crate::generation::fn_info::models::*;
 use crate::generation::mock_controls::common::*;
 use crate::syntax::*;
@@ -18,7 +19,7 @@ pub(crate) fn generate(
         span,
         fn_info,
         &generic_arguments,
-        static_lifetime(span),
+        rsubstitute_lifetime::new(span),
         Some(Type::Path(TypePath {
             qself: None,
             path: static_setup_path.clone(),
@@ -52,10 +53,10 @@ pub(crate) fn generate(
         ),
     };
 
-    let (data_var_path, data_stmt) = fn_data_stmt::new_static(span, fn_info, generic_arguments);
+    let (fn_data_var_path, fn_data_stmt) = fn_data_stmt::new_static(span, fn_info, generic_arguments);
     let data_reset_stmt = expr::method_call::new(
         span,
-        Expr::Path(data_var_path),
+        Expr::Path(fn_data_var_path),
         Ident::new("reset", span),
         [],
     );
@@ -91,7 +92,7 @@ pub(crate) fn generate(
     let block = Block {
         brace_token: token::Brace(span),
         stmts: vec![
-            Stmt::Local(data_stmt),
+            Stmt::Local(fn_data_stmt),
             Stmt::Expr(Expr::MethodCall(data_reset_stmt), Some(Token![;](span))),
             Stmt::Expr(Expr::MethodCall(setup_stmt), None),
         ],

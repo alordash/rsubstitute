@@ -2,7 +2,12 @@ use crate::syntax::*;
 use proc_macro2::Span;
 use syn::*;
 
-pub(crate) fn generate(span: Span, call_struct_path: Path, fields_named: &FieldsNamed) -> ItemImpl {
+pub(crate) fn generate(
+    span: Span,
+    generics: Generics,
+    call_struct_path: Path,
+    fields_named: &FieldsNamed,
+) -> ItemImpl {
     let target_type = TypePath {
         qself: None,
         path: call_struct_path.clone(),
@@ -76,7 +81,7 @@ pub(crate) fn generate(span: Span, call_struct_path: Path, fields_named: &Fields
         defaultness: None,
         unsafety: None,
         impl_token: Token![impl](span),
-        generics: Generics::default(),
+        generics,
         trait_: Some((
             None,
             path::new_global(span, ["core", "clone", "Clone"]),

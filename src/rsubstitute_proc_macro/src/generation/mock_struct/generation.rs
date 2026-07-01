@@ -22,7 +22,7 @@ pub(crate) fn generate_for_static_fn(source_span: Span, fn_syntax: &FnSyntax) ->
         }),
         semi_token: None,
     };
-    let path = path::from_ident(item_struct.ident.clone());
+    let path = path::from_ident_with_generics(item_struct.ident.clone(), &item_struct.generics);
 
     let result = MockStruct { path, item_struct };
     return result;

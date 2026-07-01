@@ -1,5 +1,5 @@
+use crate::generation::common::*;
 use crate::generation::fn_info::models::*;
-use crate::generation::mock_controls::common::*;
 use crate::syntax::*;
 use proc_macro2::Span;
 use syn::*;
@@ -9,11 +9,11 @@ pub(crate) fn new(
     fn_info: &FnInfo,
     generic_arguments: generic_arguments::Result,
 ) -> (ExprPath, Local) {
-    let data_var_path = expr::path::new(span, ["fn_data"]);
-    let data_stmt = Local {
+    let fn_data_var_path = expr::path::new(span, ["fn_data"]);
+    let fn_data_stmt = Local {
         attrs: Vec::new(),
         let_token: Token![let](span),
-        pat: fn_data_pat(span, data_var_path.clone(), generic_arguments),
+        pat: fn_data_pat(span, fn_data_var_path.clone(), generic_arguments),
         init: Some(LocalInit {
             eq_token: Token![=](span),
             expr: Box::new(Expr::MethodCall(expr::method_call::new(
@@ -26,7 +26,7 @@ pub(crate) fn new(
         }),
         semi_token: Token![;](span),
     };
-    return (data_var_path, data_stmt);
+    return (fn_data_var_path, fn_data_stmt);
 }
 
 pub(crate) fn new_static(
@@ -34,11 +34,11 @@ pub(crate) fn new_static(
     fn_info: &FnInfo,
     generic_arguments: generic_arguments::Result,
 ) -> (ExprPath, Local) {
-    let data_var_path = expr::path::new(span, ["fn_data"]);
-    let data_stmt = Local {
+    let fn_data_var_path = expr::path::new(span, ["fn_data"]);
+    let fn_data_stmt = Local {
         attrs: Vec::new(),
         let_token: Token![let](span),
-        pat: fn_data_pat(span, data_var_path.clone(), generic_arguments),
+        pat: fn_data_pat(span, fn_data_var_path.clone(), generic_arguments),
         init: Some(LocalInit {
             eq_token: Token![=](span),
             expr: Box::new(Expr::Call(expr::call::new(
@@ -50,7 +50,7 @@ pub(crate) fn new_static(
         }),
         semi_token: Token![;](span),
     };
-    return (data_var_path, data_stmt);
+    return (fn_data_var_path, fn_data_stmt);
 }
 
 fn fn_info_ident_to_expr_lit(span: Span, fn_info: &FnInfo) -> Expr {
