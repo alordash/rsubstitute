@@ -1,5 +1,6 @@
 use crate::common::*;
 use crate::generation::fn_info::models::*;
+use crate::preparation::r#fn::models::IArgumentTypesCloner;
 use crate::syntax::*;
 use proc_macro2::Span;
 use quote::format_ident;
@@ -20,7 +21,7 @@ pub(crate) fn generate(
         abi: source_signature.abi.clone(),
         fn_token: Token![fn](source_span),
         ident: format_ident!("__rs_base_{}", source_signature.ident),
-        generics: generics::without_lifetimes(source_signature.generics.clone()),
+        generics: source_signature.generics.clone(),
         paren_token: token::Paren(source_span),
         inputs: punctuated([
             FnArg::Typed(PatType {
@@ -115,12 +116,7 @@ pub(crate) fn generate(
             colon_token: Token![:](source_span),
             ty: Box::new(Type::Tuple(TypeTuple {
                 paren_token: token::Paren(source_span),
-                elems: fn_info
-                    .syntax
-                    .arguments
-                    .iter()
-                    .map(|x| *x.source_pat_type.ty.clone())
-                    .collect(),
+                elems: fn_info.syntax.arguments.iter_types().collect(),
             })),
         }),
         init: Some(LocalInit {

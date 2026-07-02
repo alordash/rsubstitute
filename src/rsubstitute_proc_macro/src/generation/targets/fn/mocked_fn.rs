@@ -70,6 +70,10 @@ pub(crate) fn generate(
                             .merged_generics
                             .params
                             .iter()
+                            .filter(|x| match x {
+                                GenericParam::Lifetime(_) => false,
+                                _ => true,
+                            })
                             .cloned()
                             .map(generic_argument::from_param)
                             .collect(),

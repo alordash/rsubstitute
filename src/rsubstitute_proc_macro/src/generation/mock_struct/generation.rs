@@ -18,6 +18,7 @@ pub(crate) fn generate_for_static_fn(source_span: Span, fn_syntax: &FnSyntax) ->
             named: punctuated([generics_field::new_field(
                 source_span,
                 fn_syntax.merged_generics.clone(),
+                Some(fn_syntax.arguments.iter_types().collect()),
             )]),
         }),
         semi_token: None,

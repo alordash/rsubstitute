@@ -2,7 +2,11 @@ use crate::syntax::*;
 use proc_macro2::Span;
 use syn::*;
 
-pub(crate) fn new_field(span: Span, generics: Generics) -> Field {
+pub(crate) fn new_field(
+    span: Span,
+    generics: Generics,
+    maybe_argument_types: Option<Vec<Type>>,
+) -> Field {
     let result = Field {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
@@ -20,12 +24,25 @@ pub(crate) fn new_field(span: Span, generics: Generics) -> Field {
                         .params
                         .into_iter()
                         .filter_map(|x| match x {
+                            GenericParam::Lifetime(lifetime) => {
+                                Some(Type::Reference(TypeReference {
+                                    and_token: Token![&](span),
+                                    lifetime: Some(lifetime.lifetime),
+                                    mutability: None,
+                                    elem: Box::new(void_type(span)),
+                                }))
+                            }
                             GenericParam::Type(ty) => Some(Type::Path(TypePath {
                                 qself: None,
                                 path: path::from_ident(ty.ident.clone()),
                             })),
                             _ => None,
                         })
+                        .chain(
+                            maybe_argument_types
+                                .into_iter()
+                                .flat_map(|arguments| arguments.into_iter()),
+                        )
                         .collect(),
                 })),
             ),

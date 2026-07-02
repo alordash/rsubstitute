@@ -30,8 +30,6 @@ pub(crate) fn prepare(
     }: Params,
 ) -> FnSyntax {
     let merged_generics = combine_generics(signature.generics.clone(), maybe_owner);
-    let generics_field =
-        generics_field::new_field(signature.generics.span(), merged_generics.clone());
     let fn_ident = format_fn_ident(signature.ident.clone(), maybe_owner, &merged_generics);
     let spans = Spans {
         inputs: signature.inputs.span(),
@@ -40,6 +38,11 @@ pub(crate) fn prepare(
         maybe_self_type,
         arguments,
     } = split_inputs_into_maybe_self_type_and_arguments(signature.inputs.clone());
+    let generics_field = generics_field::new_field(
+        signature.generics.span(),
+        merged_generics.clone(),
+        Some(arguments.iter_types().collect()),
+    );
     let arg_refs_tuple = generate_arg_refs_tuple(spans.inputs, &arguments);
     let return_type = match &signature.output {
         ReturnType::Default => ReturnType::Default,

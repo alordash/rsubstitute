@@ -14,6 +14,7 @@ pub(crate) struct Params<'a, 'b, 'c> {
     pub source_span: Span,
     pub target_ident: Ident,
     pub target_generics: Generics,
+    pub maybe_target_argument_types: Option<Vec<Type>>,
     pub mock_path: &'b Path,
     pub fn_infos: &'c [FnInfo],
 }
@@ -23,6 +24,7 @@ pub(crate) fn generate(
         source_span,
         target_ident,
         target_generics,
+        maybe_target_argument_types,
         mock_path,
         fn_infos,
     }: Params,
@@ -38,6 +40,7 @@ pub(crate) fn generate(
             named: punctuated([generics_field::new_field(
                 source_span,
                 target_generics.clone(),
+                maybe_target_argument_types,
             )]),
         }),
         semi_token: None,
@@ -138,7 +141,8 @@ fn generate_setup_fn(ctx: &Context, span: Span, mock_path: &Path, fn_info: &FnIn
     };
     fn_configurator_path_for_var_args.args[0] =
         GenericArgument::Lifetime(placeholder_lifetime(span));
-    let (fn_data_var_path, fn_data_stmt) = fn_data_stmt::new_static(span, fn_info, generic_arguments);
+    let (fn_data_var_path, fn_data_stmt) =
+        fn_data_stmt::new_static(span, fn_info, generic_arguments);
     let (args_checker_var_path, args_checker_stmt) = args_checker_stmt::new(span, fn_info);
     let fn_configurator_var_path = path::new(span, ["fn_configurator"]);
     let fn_configurator_stmt = Local {

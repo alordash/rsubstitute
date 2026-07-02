@@ -10,13 +10,14 @@ use quote::format_ident;
 use syn::punctuated::Punctuated;
 use syn::*;
 
-pub(crate) struct Params<'a, 'b, 'c> {
+pub(crate) struct Params<'a> {
     pub ctx: &'a Context,
     pub source_span: Span,
     pub target_ident: Ident,
     pub target_generics: Generics,
-    pub mock_path: &'b Path,
-    pub fn_infos: &'c [FnInfo],
+    pub maybe_target_argument_types: Option<Vec<Type>>,
+    pub mock_path: &'a Path,
+    pub fn_infos: &'a [FnInfo],
     pub static_no_other_calls: bool,
 }
 pub(crate) fn generate(
@@ -25,6 +26,7 @@ pub(crate) fn generate(
         source_span,
         target_ident,
         target_generics,
+        maybe_target_argument_types,
         mock_path,
         fn_infos,
         static_no_other_calls,
@@ -41,6 +43,7 @@ pub(crate) fn generate(
             named: punctuated([generics_field::new_field(
                 source_span,
                 target_generics.clone(),
+                maybe_target_argument_types,
             )]),
         }),
         semi_token: None,
@@ -134,7 +137,8 @@ fn generate_received_fn(
         output: ReturnType::Type(Token![->](span), Box::new(Type::Path(self_type(span)))),
     };
 
-    let (fn_data_var_path, fn_data_stmt) = fn_data_stmt::new_static(span, fn_info, generic_arguments);
+    let (fn_data_var_path, fn_data_stmt) =
+        fn_data_stmt::new_static(span, fn_info, generic_arguments);
     let (args_checker_var_path, args_checker_stmt) = args_checker_stmt::new(span, fn_info);
     let verify_received_stmt = Expr::MethodCall(expr::method_call::new(
         span,
@@ -176,7 +180,8 @@ fn generate_fn_no_other_calls_for_static(
     let sig = fn_no_other_calls_signature(span);
     let fn_info = &fn_infos[0];
     let generic_arguments = generic_arguments::new(ctx, span, mock_path.clone(), fn_info);
-    let (fn_data_var_path, fn_data_stmt) = fn_data_stmt::new_static(span, fn_info, generic_arguments);
+    let (fn_data_var_path, fn_data_stmt) =
+        fn_data_stmt::new_static(span, fn_info, generic_arguments);
     let verify_received_nothing_else_stmt = Expr::MethodCall(ExprMethodCall {
         attrs: Vec::new(),
         receiver: Box::new(Expr::Path(fn_data_var_path)),

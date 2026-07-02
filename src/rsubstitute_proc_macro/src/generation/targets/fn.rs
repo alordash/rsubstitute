@@ -7,6 +7,7 @@ use crate::generation::targets::mock_mod_usages;
 use crate::generation::targets::models::*;
 use crate::generation::*;
 use crate::preparation::r#fn::fn_syntax;
+use crate::preparation::r#fn::models::IArgumentTypesCloner;
 use crate::syntax::attributes;
 use syn::spanned::Spanned;
 use syn::*;
@@ -42,12 +43,14 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
     };
     let target_ident = fn_info.syntax.fn_ident.clone();
     let target_generics = fn_info.syntax.merged_generics.clone();
+    let target_argument_types: Vec<_> = fn_info.syntax.arguments.iter_types().collect();
     let fn_infos = [fn_info];
     let static_setup_struct = static_setup::generate(static_setup::Params {
         ctx,
         source_span,
         target_ident: target_ident.clone(),
         target_generics: target_generics.clone(),
+        maybe_target_argument_types: Some(target_argument_types.clone()),
         mock_path: &mock_struct.path,
         fn_infos: &fn_infos,
     });
@@ -56,6 +59,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
         source_span,
         target_ident,
         target_generics,
+        maybe_target_argument_types: Some(target_argument_types),
         mock_path: &mock_struct.path,
         fn_infos: &fn_infos,
         static_no_other_calls: true,
