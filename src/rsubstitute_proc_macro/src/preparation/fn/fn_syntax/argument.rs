@@ -44,7 +44,8 @@ fn prepare_ident(number: usize, pat_type: &PatType) -> Ident {
     return result;
 }
 
-fn generate_control_fn_arg(span: Span, pat: Box<Pat>, ptr_style_type: Box<Type>) -> FnArg {
+// Can not pass ptr_style_type because this is the type that gets exposed to user in `mock.received()`
+fn generate_control_fn_arg(span: Span, pat: Box<Pat>, ref_style_type: Box<Type>) -> FnArg {
     let result = PatType {
         attrs: Vec::new(),
         pat,
@@ -63,7 +64,7 @@ fn generate_control_fn_arg(span: Span, pat: Box<Pat>, ptr_style_type: Box<Type>)
                         path: path::new_generics(
                             span,
                             ["Arg"],
-                            GenericArgument::Type(*ptr_style_type),
+                            GenericArgument::Type(*ref_style_type),
                         ),
                     })),
                 ),

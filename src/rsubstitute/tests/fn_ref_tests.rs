@@ -133,7 +133,7 @@ Received no non-matching calls"
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
 accept_ref(*{r}*)
-	1. r (&i32):
+	1. __pat_arg0 (&i32):
 		Expected reference (ptr: {invalid_r_ptr:?}): {invalid_r}
 		Actual reference   (ptr: {r_ptr:?}): {r}"
                 ),

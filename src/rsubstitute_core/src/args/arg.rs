@@ -23,11 +23,18 @@ impl<T: PartialEq> From<T> for Arg<T> {
     }
 }
 
-impl<'a, T> From<&'a T> for Arg<*const T> {
-    fn from(value: &'a T) -> Self {
-        Arg::eq(value as *const T)
-    }
-}
+// TODO - is this needed?
+// impl<'a, T> From<&'a T> for Arg<*const T> {
+//     fn from(value: &'a T) -> Self {
+//         Arg::eq(value as *const T)
+//     }
+// }
+//
+// impl<'a, T> From<&'a mut T> for Arg<*mut T> {
+//     fn from(value: &'a mut T) -> Self {
+//         Arg::eq(value as *mut T)
+//     }
+// }
 
 impl<T: Debug> Debug for Arg<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
