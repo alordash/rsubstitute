@@ -1,8 +1,8 @@
 mod argument;
 
 use super::models::*;
-use crate::common::rsubstitute_lifetime;
-use crate::syntax::{generics, ident, r#type};
+use crate::common::*;
+use crate::syntax::*;
 use crate::*;
 use proc_macro2::Span;
 use quote::ToTokens;
@@ -30,6 +30,8 @@ pub(crate) fn prepare(
     }: Params,
 ) -> FnSyntax {
     let merged_generics = combine_generics(signature.generics.clone(), maybe_owner);
+    let generics_field =
+        generics_field::new_field(signature.generics.span(), merged_generics.clone());
     let fn_ident = format_fn_ident(signature.ident.clone(), maybe_owner, &merged_generics);
     let spans = Spans {
         inputs: signature.inputs.span(),
@@ -55,6 +57,7 @@ pub(crate) fn prepare(
         source_signature: Box::new(signature),
         visibility,
         merged_generics,
+        generics_field,
         fn_ident,
         is_default,
         maybe_self_type,

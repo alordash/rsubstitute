@@ -1,6 +1,5 @@
 mod args_checker_impl;
 
-use crate::common::generics_field;
 use crate::generation::fn_info::models::*;
 use crate::generation::fn_info::*;
 use crate::preparation::r#fn::models::*;
@@ -50,26 +49,23 @@ pub(crate) fn generate(fn_syntax: &FnSyntax, call_struct_type: Type) -> ArgsChec
 fn generate_fields(fn_syntax: &FnSyntax) -> FieldsNamed {
     let result = FieldsNamed {
         brace_token: token::Brace(fn_syntax.spans.inputs),
-        named: core::iter::once(generics_field::new_field(
-            fn_syntax.merged_generics.span(),
-            fn_syntax.merged_generics.clone(),
-        ))
-        .chain(fn_syntax.arguments.iter().map(|argument| {
-            let span = argument.ident.span();
-            let ty = arg_type::of(span, *argument.ptr_style_type.clone());
+        named: core::iter::once(fn_syntax.generics_field.clone())
+            .chain(fn_syntax.arguments.iter().map(|argument| {
+                let span = argument.ident.span();
+                let ty = arg_type::of(span, *argument.ptr_style_type.clone());
 
-            let result = Field {
-                attrs: Vec::new(),
-                vis: Visibility::Inherited,
-                mutability: FieldMutability::None,
-                ident: Some(argument.ident.clone()),
-                colon_token: Some(Token![:](argument.ident.span())),
-                ty: Type::Path(ty),
-            };
+                let result = Field {
+                    attrs: Vec::new(),
+                    vis: Visibility::Inherited,
+                    mutability: FieldMutability::None,
+                    ident: Some(argument.ident.clone()),
+                    colon_token: Some(Token![:](argument.ident.span())),
+                    ty: Type::Path(ty),
+                };
 
-            return result;
-        }))
-        .collect(),
+                return result;
+            }))
+            .collect(),
     };
 
     return result;

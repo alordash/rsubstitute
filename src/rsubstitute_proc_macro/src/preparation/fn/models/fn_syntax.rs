@@ -8,8 +8,9 @@ pub(crate) struct FnSyntax {
     pub source_signature: Box<Signature>,
     pub visibility: Visibility,
     pub merged_generics: Generics,
+    pub generics_field: Field,
     pub fn_ident: Ident,
-    pub is_default: bool,
+    pub is_default: bool,   // TODO - what is this for, I forgor💀
     pub maybe_self_type: Option<Receiver>,
     pub arguments: Vec<Argument>,
     pub arg_refs_tuple: TypeTuple,

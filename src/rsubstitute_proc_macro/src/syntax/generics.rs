@@ -10,3 +10,15 @@ pub(crate) fn combine(mut generics: Generics, extension: &Generics) -> Generics 
     }
     return generics;
 }
+
+pub(crate) fn without_lifetimes(mut generics: Generics) -> Generics {
+    generics.params = generics
+        .params
+        .into_iter()
+        .skip_while(|x| match x {
+            GenericParam::Lifetime(_) => true,
+            _ => false,
+        })
+        .collect();
+    return generics;
+}

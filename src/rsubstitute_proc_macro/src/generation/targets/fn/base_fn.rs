@@ -20,7 +20,7 @@ pub(crate) fn generate(
         abi: source_signature.abi.clone(),
         fn_token: Token![fn](source_span),
         ident: format_ident!("__rs_base_{}", source_signature.ident),
-        generics: source_signature.generics.clone(),
+        generics: generics::without_lifetimes(source_signature.generics.clone()),
         paren_token: token::Paren(source_span),
         inputs: punctuated([
             FnArg::Typed(PatType {

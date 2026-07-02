@@ -1,7 +1,6 @@
 mod call_impl;
 mod clone_impl;
 
-use crate::common::generics_field;
 use crate::common::models::*;
 use crate::generation::fn_info::models::*;
 use crate::generation::fn_info::*;
@@ -65,24 +64,21 @@ pub(crate) fn generate(ctx: &Context, fn_syntax: &FnSyntax) -> CallStruct {
 fn generate_fields(fn_syntax: &FnSyntax) -> FieldsNamed {
     let result = FieldsNamed {
         brace_token: token::Brace(fn_syntax.spans.inputs),
-        named: core::iter::once(generics_field::new_field(
-            fn_syntax.merged_generics.span(),
-            fn_syntax.merged_generics.clone(),
-        ))
-        .chain(fn_syntax.arguments.iter().map(|argument| {
-            let span = argument.ident.span();
-            let result = Field {
-                attrs: Vec::new(),
-                vis: Visibility::Inherited,
-                mutability: FieldMutability::None,
-                ident: Some(argument.ident.clone()),
-                colon_token: Some(Token![:](span)),
-                ty: *argument.ptr_style_type.clone(),
-            };
+        named: core::iter::once(fn_syntax.generics_field.clone())
+            .chain(fn_syntax.arguments.iter().map(|argument| {
+                let span = argument.ident.span();
+                let result = Field {
+                    attrs: Vec::new(),
+                    vis: Visibility::Inherited,
+                    mutability: FieldMutability::None,
+                    ident: Some(argument.ident.clone()),
+                    colon_token: Some(Token![:](span)),
+                    ty: *argument.ptr_style_type.clone(),
+                };
 
-            return result;
-        }))
-        .collect(),
+                return result;
+            }))
+            .collect(),
     };
 
     return result;
