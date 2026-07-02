@@ -2,6 +2,7 @@ mod argument;
 
 use super::models::*;
 use crate::common::*;
+use crate::preparation::*;
 use crate::syntax::*;
 use crate::*;
 use proc_macro2::Span;
@@ -23,7 +24,7 @@ pub(crate) fn prepare(
     Params {
         attributes,
         visibility,
-        signature,
+        mut signature,
         is_default,
         maybe_base_impl,
         maybe_owner,
@@ -54,6 +55,7 @@ pub(crate) fn prepare(
             ),
         ),
     };
+    signature = r#fn::common::replace_arg_pats_with_idents(signature, &arguments);
     let result = FnSyntax {
         spans,
         attributes,

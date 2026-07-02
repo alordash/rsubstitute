@@ -5,6 +5,7 @@ pub(crate) struct Argument {
     pub ident: Ident,
     pub ptr_style_type: Box<Type>,
     pub ref_style_type: Box<Type>,
+    pub generic_arg_style_type: Box<Type>,
     pub control_fn_arg: FnArg,
 }
 
@@ -14,7 +15,7 @@ pub(crate) trait IArgumentTypesCloner {
 
 impl IArgumentTypesCloner for Vec<Argument> {
     fn iter_types(&self) -> impl Iterator<Item = Type> {
-        let result = self.iter().map(|x| *x.source_pat_type.ty.clone());
+        let result = self.iter().map(|x| *x.generic_arg_style_type.clone());
         return result;
     }
 }

@@ -1,12 +1,14 @@
 use crate::common::rsubstitute_lifetime;
 use crate::preparation::r#fn::models::*;
+use crate::preparation::r#fn::*;
 use crate::syntax::*;
 use proc_macro2::Span;
 use syn::spanned::Spanned;
 use syn::*;
 
-pub(crate) fn new((number, pat_type): (usize, PatType)) -> Argument {
+pub(crate) fn new((number, mut pat_type): (usize, PatType)) -> Argument {
     let ident = prepare_ident(number, &pat_type);
+    pat_type = common::replace_arg_pat_with_ident(pat_type, ident.clone());
 
     let ptr_style_type = r#type::replace_references_with_pointers(pat_type.ty.clone());
 
@@ -14,6 +16,9 @@ pub(crate) fn new((number, pat_type): (usize, PatType)) -> Argument {
         pat_type.ty.clone(),
         &rsubstitute_lifetime::new(pat_type.span()),
     );
+
+    let generic_arg_style_type =
+        r#type::replace_anonymous_references_with_pointers(pat_type.ty.clone());
 
     // TODO - perhaps need to pass here ptr_style_type
     let control_fn_arg =
@@ -24,6 +29,7 @@ pub(crate) fn new((number, pat_type): (usize, PatType)) -> Argument {
         ident,
         ptr_style_type,
         ref_style_type,
+        generic_arg_style_type,
         control_fn_arg,
     };
     return result;

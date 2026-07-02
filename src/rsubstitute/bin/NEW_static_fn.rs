@@ -12,6 +12,9 @@ fn f<'a, T: Clone>(v: &'a T) -> i32 {
     121
 }
 
+#[mock(base)]
+fn g(_: &i32) {}
+
 fn main() {
     let a = [1, 0, 1];
     let a0 = &a[0];

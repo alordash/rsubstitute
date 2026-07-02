@@ -1,8 +1,9 @@
 #![allow(unused)]
 use rsubstitute::macros::mock;
 
+// TODO - write more tests where arg is passed as wildcard
 #[mock(base)]
-fn accept_ref(r: &i32) {}
+fn accept_ref(_: &i32) {}
 
 // TODO - do not forget to specify in docs that calling `setup` on static fn_info clears all existing configurations (this is done because otherwise configs would interrupt each other in tests)
 const BASE_RETURN_REF: &'static i32 = &1000;
