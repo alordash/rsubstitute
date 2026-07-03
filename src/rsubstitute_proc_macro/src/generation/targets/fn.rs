@@ -43,7 +43,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
     };
     let target_ident = fn_info.syntax.fn_ident.clone();
     let target_generics = fn_info.syntax.merged_generics.clone();
-    let target_argument_types: Vec<_> = fn_info.syntax.arguments.iter_types().collect();
+    let target_argument_types: Vec<_> = fn_info.syntax.arguments.iter_generics_style_types().collect();
     let fn_infos = [fn_info];
     let static_setup_struct = static_setup::generate(static_setup::Params {
         ctx,

@@ -10,11 +10,11 @@ pub(crate) struct Argument {
 }
 
 pub(crate) trait IArgumentTypesCloner {
-    fn iter_types(&self) -> impl Iterator<Item = Type>;
+    fn iter_generics_style_types(&self) -> impl Iterator<Item = Type>;
 }
 
 impl IArgumentTypesCloner for Vec<Argument> {
-    fn iter_types(&self) -> impl Iterator<Item = Type> {
+    fn iter_generics_style_types(&self) -> impl Iterator<Item = Type> {
         let result = self.iter().map(|x| *x.generic_arg_style_type.clone());
         return result;
     }

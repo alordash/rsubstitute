@@ -1,4 +1,4 @@
-use crate::common::generics_field;
+use crate::common::{generics_field, rsubstitute_lifetime};
 use crate::generation::fn_info::models::*;
 use crate::generation::mock_controls::common::*;
 use crate::syntax::*;
@@ -7,6 +7,7 @@ use syn::*;
 
 pub(crate) fn generate(span: Span, static_received_path: Path, fn_info: &FnInfo) -> ItemFn {
     let (times_arg_path, times_arg) = times_arg::new(span);
+    let rsubstitute_lifetime = rsubstitute_lifetime::new(span);
     let sig = Signature {
         constness: None,
         asyncness: None,
@@ -14,8 +15,13 @@ pub(crate) fn generate(span: Span, static_received_path: Path, fn_info: &FnInfo)
         abi: None,
         fn_token: Token![fn](span),
         ident: Ident::new("received", span),
-        generics: generics_with_rsubstitute_anonymous_lifetime::new(
-            fn_info.syntax.merged_generics.clone(),
+        generics: generics::with_prefix_lifetime(
+            generics::with_lifetimes_tied_to(
+                fn_info.syntax.merged_generics.clone(),
+                &fn_info.syntax.merged_generics,
+                rsubstitute_lifetime.clone(),
+            ),
+            rsubstitute_lifetime,
         ),
         paren_token: token::Paren(span),
         inputs: fn_info

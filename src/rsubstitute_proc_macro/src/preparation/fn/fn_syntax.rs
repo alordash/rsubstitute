@@ -42,7 +42,7 @@ pub(crate) fn prepare(
     let generics_field = generics_field::new_field(
         signature.generics.span(),
         merged_generics.clone(),
-        Some(arguments.iter_types().collect()),
+        Some(arguments.iter_generics_style_types().collect()),
     );
     let arg_refs_tuple = generate_arg_refs_tuple(spans.inputs, &arguments);
     let return_type = match &signature.output {

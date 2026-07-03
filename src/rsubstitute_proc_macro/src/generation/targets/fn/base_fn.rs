@@ -116,7 +116,7 @@ pub(crate) fn generate(
             colon_token: Token![:](source_span),
             ty: Box::new(Type::Tuple(TypeTuple {
                 paren_token: token::Paren(source_span),
-                elems: fn_info.syntax.arguments.iter_types().collect(),
+                elems: fn_info.syntax.arguments.iter_generics_style_types().collect(),
             })),
         }),
         init: Some(LocalInit {

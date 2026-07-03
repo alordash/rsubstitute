@@ -113,6 +113,7 @@ fn generate_received_fn(
 ) -> ImplItemFn {
     let (times_arg_path, times_arg) = times_arg::new(span);
     let generic_arguments = generic_arguments::new(ctx, span, mock_path.clone(), fn_info);
+    let rsubstitute_lifetime = rsubstitute_lifetime::new(span);
     let sig = Signature {
         constness: None,
         asyncness: None,
@@ -120,7 +121,14 @@ fn generate_received_fn(
         abi: None,
         fn_token: Token![fn](span),
         ident: Ident::new("received", span),
-        generics: generics_with_rsubstitute_anonymous_lifetime::new(Generics::default()),
+        generics: generics::with_prefix_lifetime(
+            generics::with_lifetimes_tied_to(
+                Generics::default(),
+                &fn_info.syntax.merged_generics,
+                rsubstitute_lifetime.clone(),
+            ),
+            rsubstitute_lifetime,
+        ),
         paren_token: token::Paren(span),
         inputs: [self_fn_arg(span)]
             .into_iter()
