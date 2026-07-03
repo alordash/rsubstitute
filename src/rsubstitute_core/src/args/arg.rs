@@ -93,6 +93,17 @@ impl<T> Arg<T> {
         };
         return Self::PrivateNotEq(arg_cmp, Private);
     }
+
+    pub fn ref_eq<U>(value: T) -> Self
+    where
+        T: AsRef<U>,
+    {
+        let arg_cmp = ArgCmp {
+            value,
+            comparator: |a, b| core::ptr::eq(a.as_ref(), b.as_ref()),
+        };
+        return Self::PrivateEq(arg_cmp, Private);
+    }
 }
 
 impl<T> Arg<T> {
