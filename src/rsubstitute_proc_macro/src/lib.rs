@@ -35,3 +35,15 @@ pub fn mock(
 // pub fn mock_without_base(proc_macro_item: proc_macro::TokenStream) -> proc_macro::TokenStream {
 //     entrypoints::mock_macro::handle(proc_macro_item, MockMacroUsage::WithoutBase)
 // }
+
+
+// TODO - write test for this:
+// mod a { pub trait Trait {} }
+// mod b { pub trait Trait {} }
+// mod c { #[mock] pub struct S; }
+// #[mock]
+// impl a::Trait for c::S {}
+// #[mock]
+// impl b::Trait for c::S {}
+
+// TODO - write warning (?) if applying `#[mock(base)]` instead of just `#[mock]` on `struct`
