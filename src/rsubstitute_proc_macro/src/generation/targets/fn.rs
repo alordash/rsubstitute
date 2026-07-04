@@ -3,6 +3,7 @@ mod mocked_fn;
 
 use crate::common::models::*;
 use crate::generation::mock_controls::*;
+use crate::generation::targets::common::mod_usage;
 use crate::generation::targets::mock_mod_usages;
 use crate::generation::targets::models::*;
 use crate::generation::*;
@@ -43,7 +44,11 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
     };
     let target_ident = fn_info.syntax.fn_ident.clone();
     let target_generics = fn_info.syntax.merged_generics.clone();
-    let target_argument_types: Vec<_> = fn_info.syntax.arguments.iter_generics_style_types().collect();
+    let target_argument_types: Vec<_> = fn_info
+        .syntax
+        .arguments
+        .iter_generics_style_types()
+        .collect();
     let fn_infos = [fn_info];
     let static_setup_struct = static_setup::generate(static_setup::Params {
         ctx,
@@ -124,18 +129,11 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
     ])
     .collect();
 
-    let usage = ItemUse {
-        attrs: Vec::new(),
-        vis: fn_info.syntax.visibility.clone(),
-        use_token: Token![use](source_span),
-        leading_colon: None,
-        tree: UseTree::Path(UsePath {
-            ident: mod_ident.clone(),
-            colon2_token: Token![::](source_span),
-            tree: Box::new(UseTree::Name(UseName { ident: usage_ident })),
-        }),
-        semi_token: Token![;](source_span),
-    };
+    let usage = mod_usage::new(
+        fn_info.syntax.visibility.clone(),
+        mod_ident.clone(),
+        usage_ident,
+    );
     let item_mod = ItemMod {
         attrs: vec![attributes::allow_non_camel_case_types(source_span)],
         vis: Visibility::Public(Token![pub](source_span)),

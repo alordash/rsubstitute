@@ -7,19 +7,10 @@ pub(crate) mod models {
 }
 
 pub mod r#fn;
+pub mod r#trait;
+
+mod common {
+    pub(crate) mod mod_usage;
+}
 
 mod mock_mod_usages;
-
-// #[derive(Clone)]
-struct S {
-    pub number: i32,
-}
-
-impl ::core::clone::Clone for S {
-    #[inline]
-    fn clone(&self) -> S {
-        S {
-            number: ::core::clone::Clone::clone(&self.number),
-        }
-    }
-}
