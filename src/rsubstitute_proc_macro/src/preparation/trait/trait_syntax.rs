@@ -35,7 +35,6 @@ pub(crate) fn prepare(
                 attributes: x.attrs,
                 visibility: Visibility::Inherited,
                 signature: x.sig,
-                is_default: false,
                 maybe_base_impl: None,
                 maybe_owner: Some(&trait_syntax_as_fn_owner),
             })

@@ -15,7 +15,6 @@ pub(crate) struct Params<'a> {
     pub attributes: Vec<Attribute>,
     pub visibility: Visibility,
     pub signature: Signature,
-    pub is_default: bool,
     pub maybe_base_impl: Option<Box<Block>>,
     pub maybe_owner: Option<&'a dyn IFnOwner>,
 }
@@ -25,7 +24,6 @@ pub(crate) fn prepare(
         attributes,
         visibility,
         mut signature,
-        is_default,
         maybe_base_impl,
         maybe_owner,
     }: Params,
@@ -64,7 +62,6 @@ pub(crate) fn prepare(
         merged_generics,
         generics_field,
         fn_ident,
-        is_default,
         maybe_self_type,
         arguments,
         arg_refs_tuple,

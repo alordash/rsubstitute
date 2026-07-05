@@ -19,7 +19,6 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
         attributes: item_fn.attrs,
         visibility: item_fn.vis,
         signature: item_fn.sig,
-        is_default: false,
         maybe_base_impl: Some(item_fn.block),
         maybe_owner: None,
     });
@@ -130,13 +129,12 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
     .collect();
 
     let usage = mod_usage::new(
-        fn_info.syntax.visibility.clone(),
         mod_ident.clone(),
         usage_ident,
     );
     let item_mod = ItemMod {
         attrs: vec![attributes::allow_non_camel_case_types(source_span)],
-        vis: Visibility::Public(Token![pub](source_span)),
+        vis: fn_info.syntax.visibility.clone(),
         unsafety: None,
         mod_token: Token![mod](source_span),
         ident: mod_ident,

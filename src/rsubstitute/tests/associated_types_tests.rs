@@ -4,7 +4,6 @@ use rsubstitute::prelude::*;
 use std::fmt::Debug;
 
 // TODO - test how TraitA : TraitB behaves
-// TODO - write that mock(base) has no effect on static fns
 #[mock]
 fn f() {}
 

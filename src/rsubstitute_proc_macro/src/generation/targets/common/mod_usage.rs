@@ -1,9 +1,9 @@
 use syn::*;
 
-pub(crate) fn new(visibility: Visibility, mod_ident: Ident, target_ident: Ident) -> ItemUse {
+pub(crate) fn new(mod_ident: Ident, target_ident: Ident) -> ItemUse {
     let result = ItemUse {
         attrs: Vec::new(),
-        vis: visibility,
+        vis: Visibility::Public(Token![pub](mod_ident.span())),
         use_token: Token![use](mod_ident.span()),
         leading_colon: None,
         tree: UseTree::Path(UsePath {
