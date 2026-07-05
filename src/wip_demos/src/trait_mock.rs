@@ -11,7 +11,9 @@ mod result {
             ArgInfo, GenericParameterInfo, GenericsHasher, IGenericsInfoProvider,
         };
         use rsubstitute_core::fn_parameters::ICall;
-        use rsubstitute_core::infrastructure::{get_static_fn_data, FnConfigurator, FnData, IMockData, ISharedMockData, SharedMockData};
+        use rsubstitute_core::infrastructure::{
+            get_static_fn_data, FnConfigurator, FnData, IMockData, ISharedMockData, SharedMockData,
+        };
         use std::marker::PhantomData;
 
         pub trait Trait<T1> {
@@ -52,8 +54,7 @@ mod result {
 
             fn g<T3>() {
                 let fn_data: &FnData<TraitMock<T1>, true, true, false> = get_static_fn_data("g");
-                fn_data.handle((), fCall, Self::__rs_base_g::<T3>);
-                todo!()
+                fn_data.handle((), fCall, Self::__rs_base_g::<T3>)
             }
         }
 
@@ -69,7 +70,7 @@ mod result {
                     data: self.data.clone(),
                 }
             }
-            
+
             pub fn static_setup() -> TraitStaticSetup<T1> {
                 TraitStaticSetup {
                     _generics: PhantomData,
@@ -108,8 +109,8 @@ mod result {
             > {
                 let fn_data: &FnData<TraitMock<T1>, true, true, false> =
                     self.data.get_shared_fn_data("f");
-                    // fn_data.add_config()
-                    self.data.verify_received_nothing_else(["asd"]);
+                // fn_data.add_config()
+                self.data.verify_received_nothing_else(["asd"]);
                 todo!()
             }
         }

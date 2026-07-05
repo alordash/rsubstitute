@@ -1,6 +1,6 @@
 use syn::*;
 
-pub(crate) struct MockStruct {
+pub(crate) struct StaticFnMockStruct {
     pub path: Path,
     pub item_struct: ItemStruct,
 }

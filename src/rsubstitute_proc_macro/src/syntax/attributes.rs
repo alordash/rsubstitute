@@ -13,6 +13,20 @@ pub(crate) fn inline(span: Span) -> Attribute {
     return result;
 }
 
+pub(crate) fn doc_hidden(span: Span) -> Attribute {
+    let result = Attribute {
+        pound_token: Token![#](span),
+        style: AttrStyle::Outer,
+        bracket_token: token::Bracket(span),
+        meta: Meta::List(MetaList {
+            path: path::new(span, ["doc"]),
+            delimiter: MacroDelimiter::Paren(token::Paren(span)),
+            tokens: Ident::new("hidden", span).to_token_stream(),
+        }),
+    };
+    return result;
+}
+
 pub(crate) fn allow_unused_variables(span: Span) -> Attribute {
     allow(span, "unused_variables")
 }

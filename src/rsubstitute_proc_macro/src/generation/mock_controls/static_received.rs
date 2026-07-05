@@ -16,7 +16,7 @@ pub(crate) struct Params<'a> {
     pub target_ident: Ident,
     pub target_generics: Generics,
     pub maybe_target_argument_types: Option<Vec<Type>>,
-    pub mock_path: &'a Path,
+    pub mock_struct_path: &'a Path,
     pub fn_infos: &'a [FnInfo],
     pub static_no_other_calls: bool,
 }
@@ -27,7 +27,7 @@ pub(crate) fn generate(
         target_ident,
         target_generics,
         maybe_target_argument_types,
-        mock_path,
+        mock_struct_path,
         fn_infos,
         static_no_other_calls,
     }: Params,
@@ -54,7 +54,7 @@ pub(crate) fn generate(
         ctx,
         source_span,
         target_generics,
-        mock_path,
+        mock_struct_path,
         path.clone(),
         fn_infos,
         static_no_other_calls,
@@ -72,16 +72,16 @@ fn generate_item_impl(
     ctx: &Context,
     span: Span,
     target_generics: Generics,
-    mock_path: &Path,
+    mock_struct_path: &Path,
     static_received_struct_path: Path,
     fn_infos: &[FnInfo],
     static_no_other_calls: bool,
 ) -> ItemImpl {
     let items = fn_infos
         .iter()
-        .map(|fn_info| generate_received_fn(ctx, span, mock_path, fn_info))
+        .map(|fn_info| generate_received_fn(ctx, span, mock_struct_path, fn_info))
         .chain(core::iter::once(if static_no_other_calls {
-            generate_fn_no_other_calls_for_static(ctx, span, mock_path.clone(), fn_infos)
+            generate_fn_no_other_calls_for_static(ctx, span, mock_struct_path.clone(), fn_infos)
         } else {
             generate_fn_no_other_calls_for_method(span, fn_infos)
         }))
@@ -108,11 +108,11 @@ fn generate_item_impl(
 fn generate_received_fn(
     ctx: &Context,
     span: Span,
-    mock_path: &Path,
+    mock_struct_path: &Path,
     fn_info: &FnInfo,
 ) -> ImplItemFn {
     let (times_arg_path, times_arg) = times_arg::new(span);
-    let generic_arguments = generic_arguments::new(ctx, span, mock_path.clone(), fn_info);
+    let generic_arguments = generic_arguments::new(ctx, span, mock_struct_path.clone(), fn_info);
     let rsubstitute_lifetime = rsubstitute_lifetime::new(span);
     let sig = Signature {
         constness: None,
@@ -182,12 +182,12 @@ fn generate_received_fn(
 fn generate_fn_no_other_calls_for_static(
     ctx: &Context,
     span: Span,
-    mock_path: Path,
+    mock_struct_path: Path,
     fn_infos: &[FnInfo],
 ) -> ImplItemFn {
     let sig = fn_no_other_calls_signature(span);
     let fn_info = &fn_infos[0];
-    let generic_arguments = generic_arguments::new(ctx, span, mock_path.clone(), fn_info);
+    let generic_arguments = generic_arguments::new(ctx, span, mock_struct_path.clone(), fn_info);
     let (fn_data_var_path, fn_data_stmt) =
         fn_data_stmt::new_static(span, fn_info, generic_arguments);
     let verify_received_nothing_else_stmt = Expr::MethodCall(ExprMethodCall {

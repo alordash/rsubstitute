@@ -1,9 +1,11 @@
 pub mod models {
-    mod mock_struct;
+    mod static_fn_mock_struct;
+    mod trait_mock_struct;
 
-    pub use mock_struct::*;
+    pub use static_fn_mock_struct::*;
+    pub use trait_mock_struct::*;
 }
 
-mod generation;
-
-pub use generation::*;
+pub mod static_fn_block;
+pub mod static_fn_mock_struct;
+pub mod trait_mock_struct;

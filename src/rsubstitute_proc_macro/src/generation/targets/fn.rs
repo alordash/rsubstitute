@@ -3,12 +3,13 @@ mod mocked_fn;
 
 use crate::common::models::*;
 use crate::generation::mock_controls::*;
-use crate::generation::targets::common::mod_usage;
-use crate::generation::targets::mock_mod_usages;
+use crate::generation::mock_struct::*;
+use crate::generation::targets::common::*;
 use crate::generation::targets::models::*;
+use crate::generation::targets::*;
 use crate::generation::*;
 use crate::preparation::r#fn::fn_syntax;
-use crate::preparation::r#fn::models::IArgumentTypesCloner;
+use crate::preparation::r#fn::models::*;
 use crate::syntax::attributes;
 use syn::spanned::Spanned;
 use syn::*;
@@ -24,7 +25,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
     });
     let mut fn_info = fn_info::generate(ctx, fn_syntax);
 
-    let mock_struct = mock_struct::generate_for_static_fn(source_span, &fn_info.syntax);
+    let static_fn_mock_struct = static_fn_mock_struct::generate(source_span, &fn_info.syntax);
 
     let maybe_base_fn = if ctx.support_base_calling {
         let base_impl = fn_info
@@ -35,7 +36,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
         Some(base_fn::generate(
             source_span,
             &fn_info,
-            mock_struct.path.clone(),
+            static_fn_mock_struct.path.clone(),
             base_impl,
         ))
     } else {
@@ -55,7 +56,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
         target_ident: target_ident.clone(),
         target_generics: target_generics.clone(),
         maybe_target_argument_types: Some(target_argument_types.clone()),
-        mock_path: &mock_struct.path,
+        mock_path: &static_fn_mock_struct.path,
         fn_infos: &fn_infos,
     });
     let static_received_struct = static_received::generate(static_received::Params {
@@ -64,7 +65,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
         target_ident,
         target_generics,
         maybe_target_argument_types: Some(target_argument_types),
-        mock_path: &mock_struct.path,
+        mock_struct_path: &static_fn_mock_struct.path,
         fn_infos: &fn_infos,
         static_no_other_calls: true,
     });
@@ -72,7 +73,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
     let fn_static_setup = fn_static_setup::generate(
         ctx,
         source_span,
-        mock_struct.path.clone(),
+        static_fn_mock_struct.path.clone(),
         static_setup_struct.path.clone(),
         &fn_info,
     );
@@ -84,7 +85,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
         ctx,
         source_span,
         &fn_info,
-        mock_struct.path,
+        static_fn_mock_struct.path,
         maybe_base_fn.as_ref().map(|x| x.sig.ident.clone()),
     );
     let usage_ident = mocked_fn.sig.ident.clone();
@@ -120,7 +121,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
         Item::Struct(fn_info.args_checker_struct.item_struct),
         Item::Impl(fn_info.args_checker_struct.generics_info_provider_impl),
         Item::Impl(fn_info.args_checker_struct.args_checker_impl),
-        Item::Struct(mock_struct.item_struct),
+        Item::Struct(static_fn_mock_struct.item_struct),
         Item::Struct(static_setup_struct.item_struct),
         Item::Impl(static_setup_struct.item_impl),
         Item::Struct(static_received_struct.item_struct),
@@ -128,10 +129,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
     ])
     .collect();
 
-    let usage = mod_usage::new(
-        mod_ident.clone(),
-        usage_ident,
-    );
+    let usage = mod_usage::new(mod_ident.clone(), usage_ident);
     let item_mod = ItemMod {
         attrs: vec![attributes::allow_non_camel_case_types(source_span)],
         vis: fn_info.syntax.visibility.clone(),
