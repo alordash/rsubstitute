@@ -1,7 +1,11 @@
 pub mod models {
+    mod received;
+    mod setup;
     mod static_received;
     mod static_setup;
 
+    pub(crate) use received::*;
+    pub(crate) use setup::*;
     pub(crate) use static_received::*;
     pub(crate) use static_setup::*;
 }

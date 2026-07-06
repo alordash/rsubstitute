@@ -4,6 +4,7 @@ use crate::generation::targets::models::*;
 use crate::generation::*;
 use crate::preparation::r#trait::*;
 use crate::syntax::*;
+use quote::format_ident;
 use syn::spanned::Spanned;
 use syn::*;
 
@@ -19,7 +20,9 @@ pub(crate) fn generate_module(ctx: &Context, item_trait: ItemTrait) -> MockMod {
     });
     let trait_info = trait_info::generate(ctx, trait_syntax);
 
-    let trait_mock_struct = trait_mock_struct::generate(ctx, source_span, &trait_info);
+    let trait_mock_struct_ident = format_ident!("{}Mock", trait_info.ident);
+    let trait_mock_struct =
+        trait_mock_struct::generate(ctx, source_span, trait_mock_struct_ident, &trait_info);
 
     let mod_visibility = item_trait.vis.clone();
     let items = [Item::Trait(item_trait)].into_iter().collect();

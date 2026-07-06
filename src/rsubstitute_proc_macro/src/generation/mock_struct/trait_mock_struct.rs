@@ -1,5 +1,5 @@
-use crate::common::generics_field;
-use crate::common::models::Context;
+use crate::common::models::*;
+use crate::common::*;
 use crate::generation::fn_info::models::*;
 use crate::generation::mock_struct::associated_fn_block;
 use crate::generation::mock_struct::models::*;
@@ -8,16 +8,27 @@ use crate::preparation::common::models::*;
 use crate::preparation::r#trait::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
-use quote::format_ident;
 use syn::spanned::Spanned;
 use syn::*;
 
-pub(crate) fn generate(ctx: &Context, span: Span, trait_info: &TraitInfo) -> TraitMockStruct {
+pub(crate) struct Params<'a> {
+    pub ctx: &'a Context,
+    pub span: Span,
+    pub mock_struct_ident: Ident,
+    pub trait_info: &'a TraitInfo,
+}
+
+pub(crate) fn generate(
+    ctx: &Context,
+    span: Span,
+    mock_struct_ident: Ident,
+    trait_info: &TraitInfo,
+) -> TraitMockStruct {
     let item_struct = ItemStruct {
         attrs: Vec::new(),
         vis: Visibility::Public(Token![pub](span)),
         struct_token: Token![struct](span),
-        ident: format_ident!("{}Mock", trait_info.ident),
+        ident: mock_struct_ident,
         generics: trait_info.merged_generics.clone(),
         fields: Fields::Named(FieldsNamed {
             brace_token: token::Brace(span),
@@ -31,12 +42,21 @@ pub(crate) fn generate(ctx: &Context, span: Span, trait_info: &TraitInfo) -> Tra
     };
     let path = path::from_ident_with_generics(item_struct.ident.clone(), &item_struct.generics);
     let trait_impl = generate_trait_impl(ctx, span, trait_info, path.clone());
+    let maybe_inner_impl = generate_inner_impl(
+        ctx,
+        span,
+        trait_info,
+        path.clone(),
+        maybe_associated_fns_controls,
+        maybe_static_fns_controls,
+        base_fn_infos,
+    );
 
     let result = TraitMockStruct {
         path,
         item_struct,
         trait_impl,
-        inner_impl: todo!(),
+        maybe_inner_impl,
     };
     return result;
 }
@@ -54,7 +74,7 @@ fn generate_trait_impl(
         .chain(trait_info.assoc_types.iter().map(map_assoc_type))
         .chain(
             trait_info
-                .methods
+                .static_fns
                 .iter()
                 .map(|x| map_method(ctx, mock_struct_path.clone(), x)),
         )
@@ -148,4 +168,16 @@ fn map_method(
             ),
         })
     })
+}
+
+fn generate_inner_impl(
+    ctx: &Context,
+    span: Span,
+    trait_info: &TraitInfo,
+    mock_struct_path: Path,
+    maybe_associated_fns_controls: Option<AssociatedFnsControls>,
+    maybe_static_fns_controls: Option<AssociatedFnsControls>,
+    base_fn_infos: Vec<&FnInfo>,
+) -> Option<ItemImpl> {
+    todo!()
 }

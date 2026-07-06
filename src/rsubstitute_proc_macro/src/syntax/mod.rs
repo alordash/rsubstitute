@@ -7,6 +7,7 @@ pub mod ident;
 pub mod r#macro;
 pub mod path;
 pub mod r#type;
+pub mod signature;
 
 mod common;
 

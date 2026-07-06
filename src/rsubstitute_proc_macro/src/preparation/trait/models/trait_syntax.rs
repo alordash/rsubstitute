@@ -12,5 +12,6 @@ pub(crate) struct TraitSyntax {
     pub constants: Vec<Ordered<TraitItemConstSyntax>>,
     pub assoc_types: Vec<Ordered<TraitItemTypeSyntax>>,
     pub path: Path,
-    pub methods: Vec<Ordered<FnSyntax>>,
+    pub static_fns: Vec<Ordered<FnSyntax>>,
+    pub associated_fns: Vec<Ordered<FnSyntax>>,
 }

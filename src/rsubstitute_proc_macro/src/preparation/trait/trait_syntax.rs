@@ -30,19 +30,18 @@ pub(crate) fn prepare(
         ident: &ident,
         generics: &generics,
     };
-    let methods = split_items
-        .fns
+    let static_fns = split_items
+        .static_fns
         .into_iter()
         .map(|ordered| {
-            ordered.map(|x| {
-                fn_syntax::prepare(fn_syntax::Params {
-                    attributes: x.attrs,
-                    visibility: Visibility::Inherited,
-                    signature: x.sig,
-                    maybe_base_impl: None,
-                    maybe_owner: Some(&trait_syntax_as_fn_owner),
-                })
-            })
+            ordered.map(|x| map_trait_item_fn_to_fn_syntax(x, &trait_syntax_as_fn_owner))
+        })
+        .collect();
+    let associated_fns = split_items
+        .associated_fns
+        .into_iter()
+        .map(|ordered| {
+            ordered.map(|x| map_trait_item_fn_to_fn_syntax(x, &trait_syntax_as_fn_owner))
         })
         .collect();
     let merged_generics = merge_generics_with_assoc_types(generics, &split_items.assoc_types);
@@ -57,7 +56,8 @@ pub(crate) fn prepare(
         constants: split_items.constants,
         assoc_types: split_items.assoc_types,
         path,
-        methods,
+        static_fns,
+        associated_fns,
     };
     return result;
 }
@@ -66,7 +66,8 @@ pub(crate) fn prepare(
 struct SplitItems {
     pub constants: Vec<Ordered<TraitItemConstSyntax>>,
     pub assoc_types: Vec<Ordered<TraitItemTypeSyntax>>,
-    pub fns: Vec<Ordered<TraitItemFn>>,
+    pub static_fns: Vec<Ordered<TraitItemFn>>,
+    pub associated_fns: Vec<Ordered<TraitItemFn>>,
 }
 fn split_items(items: Vec<TraitItem>, trait_ident: &Ident) -> SplitItems {
     let mut split_items = SplitItems::default();
@@ -83,9 +84,17 @@ fn split_items(items: Vec<TraitItem>, trait_ident: &Ident) -> SplitItems {
                     item: trait_item_const,
                 },
             )),
-            TraitItem::Fn(trait_item_fn) => split_items
-                .fns
-                .push(Ordered::new(order_number, trait_item_fn)),
+            TraitItem::Fn(trait_item_fn) => {
+                if signature::is_static(&trait_item_fn.sig) {
+                    split_items
+                        .static_fns
+                        .push(Ordered::new(order_number, trait_item_fn))
+                } else {
+                    split_items
+                        .associated_fns
+                        .push(Ordered::new(order_number, trait_item_fn))
+                }
+            }
             TraitItem::Type(trait_item_type) => split_items.assoc_types.push(Ordered::new(
                 order_number,
                 TraitItemTypeSyntax {
@@ -107,6 +116,20 @@ fn split_items(items: Vec<TraitItem>, trait_ident: &Ident) -> SplitItems {
     }
 
     return split_items;
+}
+
+fn map_trait_item_fn_to_fn_syntax(
+    trait_item_fn: TraitItemFn,
+    trait_syntax_as_fn_owner: &TraitSyntaxAsFnOwner,
+) -> FnSyntax {
+    let result = fn_syntax::prepare(fn_syntax::Params {
+        attributes: trait_item_fn.attrs,
+        visibility: Visibility::Inherited,
+        signature: trait_item_fn.sig,
+        maybe_base_impl: None,
+        maybe_owner: Some(trait_syntax_as_fn_owner),
+    });
+    return result;
 }
 
 fn merge_generics_with_assoc_types(

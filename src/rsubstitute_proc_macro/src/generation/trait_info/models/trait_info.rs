@@ -12,5 +12,7 @@ pub(crate) struct TraitInfo {
     pub constants: Vec<Ordered<TraitItemConstSyntax>>,
     pub assoc_types: Vec<Ordered<TraitItemTypeSyntax>>,
     pub path: Path,
-    pub methods: Vec<Ordered<FnInfo>>,
+    pub static_fns: Vec<Ordered<FnInfo>>,
+    pub associated_fns: Vec<Ordered<FnInfo>>,
+    pub mock_struct_ident: Ident,
 }
