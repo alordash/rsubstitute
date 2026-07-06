@@ -106,7 +106,6 @@ mod result {
         pub struct StructSetup<S1> {
             #[doc(hidden)]
             pub data: SharedMockData<StructMock<S1>>,
-            _generics: PhantomData<(S1,)>,
         }
         pub struct StructStaticSetup<S1> {
             _generics: PhantomData<(S1,)>,
@@ -116,7 +115,6 @@ mod result {
             pub fn setup(&mut self) -> StructSetup<S1> {
                 StructSetup {
                     data: self.data.clone(),
-                    _generics: PhantomData,
                 }
             }
         }
@@ -275,6 +273,24 @@ mod result {
             fn g<T3>() {}
             fn tself<T4>(&self) {}
             fn tstatic<T5>() {}
+        }
+
+        trait Q {
+            type W;
+            fn flex(&self) -> Self::W;
+        }
+
+        impl Q for Struct<i16> {
+            type W = String;
+            fn flex(&self) -> Self::W {
+                "asd".to_string()
+            }
+        }
+
+        impl Struct<i16> {
+            fn base_flex(&self) -> <Self as Q>::W {
+                "qwe".to_string()
+            }
         }
 
         pub struct StructTraitSetup<T1> {
