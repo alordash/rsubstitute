@@ -4,7 +4,7 @@ use crate::syntax::*;
 use proc_macro2::Span;
 use syn::*;
 
-pub(crate) fn new(
+pub(crate) fn new_associated(
     span: Span,
     fn_info: &FnInfo,
     generic_arguments: generic_arguments::Result,
@@ -56,7 +56,7 @@ pub(crate) fn new_static(
 fn fn_info_ident_to_expr_lit(span: Span, fn_info: &FnInfo) -> Expr {
     Expr::Lit(ExprLit {
         attrs: Vec::new(),
-        lit: Lit::Str(LitStr::new(&fn_info.syntax.fn_ident.to_string(), span)),
+        lit: Lit::Str(LitStr::new(&fn_info.fn_ident.to_string(), span)),
     })
 }
 

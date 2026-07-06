@@ -24,8 +24,8 @@ pub(crate) fn new(
                     GenericArgument::Type(
                         maybe_owner_type.unwrap_or_else(|| Type::Path(self_type(span))),
                     ),
-                    GenericArgument::Type(Type::Tuple(fn_info.syntax.arg_refs_tuple.clone())),
-                    GenericArgument::Type(match &fn_info.syntax.return_type {
+                    GenericArgument::Type(Type::Tuple(fn_info.arg_refs_tuple.clone())),
+                    GenericArgument::Type(match &fn_info.return_type {
                         ReturnType::Default => void_type(span),
                         ReturnType::Type(_, return_type) => *return_type.clone(),
                     }),

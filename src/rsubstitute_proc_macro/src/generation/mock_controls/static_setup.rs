@@ -118,13 +118,7 @@ fn generate_setup_fn(ctx: &Context, span: Span, mock_path: &Path, fn_info: &FnIn
         paren_token: token::Paren(span),
         inputs: [ref_self_fn_arg(span)]
             .into_iter()
-            .chain(
-                fn_info
-                    .syntax
-                    .arguments
-                    .iter()
-                    .map(|x| x.control_fn_arg.clone()),
-            )
+            .chain(fn_info.arguments.iter().map(|x| x.control_fn_arg.clone()))
             .collect(),
         variadic: None,
         output: ReturnType::Type(

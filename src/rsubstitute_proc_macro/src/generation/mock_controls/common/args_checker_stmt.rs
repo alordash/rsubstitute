@@ -19,7 +19,7 @@ pub(crate) fn new(span: Span, fn_info: &FnInfo) -> (ExprPath, Local) {
                 brace_token: token::Brace(span),
                 fields: [generics_field::new_value(span)]
                     .into_iter()
-                    .chain(fn_info.syntax.arguments.iter().map(|x| FieldValue {
+                    .chain(fn_info.arguments.iter().map(|x| FieldValue {
                         attrs: Vec::new(),
                         member: Member::Named(x.ident.clone()),
                         colon_token: Some(Token![:](span)),

@@ -1,9 +1,6 @@
 use proc_macro2::*;
 
-pub(crate) fn join<TIdents: Iterator<Item = Ident>>(
-    idents: TIdents,
-    separator: &str,
-) -> Ident {
+pub(crate) fn join<TIdents: Iterator<Item = Ident>>(idents: TIdents, separator: &str) -> Ident {
     let (idents_strings, idents_spans): (Vec<_>, Vec<_>) =
         idents.map(|x| (x.to_string(), x.span())).unzip();
     let ident_string = idents_strings.join(separator);

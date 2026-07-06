@@ -1,9 +1,9 @@
+use crate::generation::fn_info::models::*;
 use crate::preparation::common::models::*;
-use crate::preparation::r#fn::models::*;
 use crate::preparation::r#trait::models::*;
 use syn::*;
 
-pub(crate) struct TraitSyntax {
+pub(crate) struct TraitInfo {
     pub attributes: Vec<Attribute>,
     pub unsafety: Option<Token![unsafe]>,
     pub visibility: Visibility,
@@ -12,5 +12,5 @@ pub(crate) struct TraitSyntax {
     pub constants: Vec<Ordered<TraitItemConstSyntax>>,
     pub assoc_types: Vec<Ordered<TraitItemTypeSyntax>>,
     pub path: Path,
-    pub methods: Vec<Ordered<FnSyntax>>,
+    pub methods: Vec<Ordered<FnInfo>>,
 }

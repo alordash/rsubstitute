@@ -124,7 +124,7 @@ fn generate_received_fn(
         generics: generics::with_prefix_lifetime(
             generics::with_lifetimes_tied_to(
                 Generics::default(),
-                &fn_info.syntax.merged_generics,
+                &fn_info.merged_generics,
                 rsubstitute_lifetime.clone(),
             ),
             rsubstitute_lifetime,
@@ -132,13 +132,7 @@ fn generate_received_fn(
         paren_token: token::Paren(span),
         inputs: [self_fn_arg(span)]
             .into_iter()
-            .chain(
-                fn_info
-                    .syntax
-                    .arguments
-                    .iter()
-                    .map(|x| x.control_fn_arg.clone()),
-            )
+            .chain(fn_info.arguments.iter().map(|x| x.control_fn_arg.clone()))
             .chain(core::iter::once(FnArg::Typed(times_arg)))
             .collect(),
         variadic: None,
@@ -239,7 +233,7 @@ fn generate_fn_no_other_calls_for_method(span: Span, fn_infos: &[FnInfo]) -> Imp
                 .map(|x| {
                     Expr::Lit(ExprLit {
                         attrs: Vec::new(),
-                        lit: Lit::Str(LitStr::new(&x.syntax.fn_ident.to_string(), span)),
+                        lit: Lit::Str(LitStr::new(&x.fn_ident.to_string(), span)),
                     })
                 })
                 .collect(),

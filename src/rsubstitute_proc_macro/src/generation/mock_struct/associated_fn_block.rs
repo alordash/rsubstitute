@@ -11,16 +11,18 @@ pub(crate) fn generate(
     span: Span,
     mock_struct_path: Path,
     fn_info: &FnInfo,
-    base_fn_kind: BaseFnKind,
+    maybe_base_fn_ident: Option<Ident>,
 ) -> Block {
     let generic_arguments = generic_arguments::new(ctx, span, mock_struct_path.clone(), fn_info);
     let (fn_data_var_path, fn_data_stmt) =
-        fn_data_stmt::new_static(span, fn_info, generic_arguments);
+        fn_data_stmt::new_associated(span, fn_info, generic_arguments);
     let fn_handle_stmt = fn_handle_stmt::generate(
         span,
         mock_struct_path,
         fn_info,
-        base_fn_kind,
+        maybe_base_fn_ident
+            .map(BaseFnKind::Associated)
+            .unwrap_or(BaseFnKind::None),
         fn_data_var_path,
     );
 

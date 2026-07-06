@@ -34,12 +34,11 @@ pub(crate) fn generate(
         fn_token: Token![fn](span),
         ident: Ident::new("setup", span),
         generics: generics::with_prefix_lifetime(
-            fn_info.syntax.merged_generics.clone(),
+            fn_info.merged_generics.clone(),
             rsubstitute_lifetime::new(span),
         ),
         paren_token: token::Paren(span),
         inputs: fn_info
-            .syntax
             .arguments
             .iter()
             .map(|x| x.control_fn_arg.clone())
@@ -54,7 +53,8 @@ pub(crate) fn generate(
         ),
     };
 
-    let (fn_data_var_path, fn_data_stmt) = fn_data_stmt::new_static(span, fn_info, generic_arguments);
+    let (fn_data_var_path, fn_data_stmt) =
+        fn_data_stmt::new_static(span, fn_info, generic_arguments);
     let data_reset_stmt = expr::method_call::new(
         span,
         Expr::Path(fn_data_var_path),
@@ -77,7 +77,6 @@ pub(crate) fn generate(
         turbofish: None,
         paren_token: token::Paren(span),
         args: fn_info
-            .syntax
             .arguments
             .iter()
             .map(|x| {

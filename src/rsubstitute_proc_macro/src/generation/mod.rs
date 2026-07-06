@@ -2,6 +2,7 @@ pub mod fn_info;
 pub mod mock_controls;
 pub mod mock_struct;
 pub mod targets;
+pub mod trait_info;
 
 mod common {
     pub(crate) mod fn_data_stmt;

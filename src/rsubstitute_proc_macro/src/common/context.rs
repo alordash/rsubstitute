@@ -1,6 +1,5 @@
 use super::models::*;
 use crate::constants;
-use crate::entrypoints::models::*;
 
 pub(crate) fn create_for_mock_macro(proc_macro_attribute: proc_macro::TokenStream) -> Context {
     if proc_macro_attribute.is_empty() {
@@ -49,6 +48,6 @@ fn support_base_calling_from_parameters(parameters: &[&str]) -> bool {
 
 // #[cfg(not(feature = "mock_base_by_default"))]
 // const DEFAULT_SUPPORT_BASE_CALLING: bool = false;
-// 
+//
 // #[cfg(feature = "mock_base_by_default")]
 // const DEFAULT_SUPPORT_BASE_CALLING: bool = true;

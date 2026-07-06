@@ -25,11 +25,10 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
     });
     let mut fn_info = fn_info::generate(ctx, fn_syntax);
 
-    let static_fn_mock_struct = static_fn_mock_struct::generate(source_span, &fn_info.syntax);
+    let static_fn_mock_struct = static_fn_mock_struct::generate(source_span, &fn_info);
 
     let maybe_base_fn = if ctx.support_base_calling {
         let base_impl = fn_info
-            .syntax
             .maybe_base_impl
             .take()
             .expect("Static `fn`s should always have base implementation.");
@@ -42,13 +41,9 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
     } else {
         None
     };
-    let target_ident = fn_info.syntax.fn_ident.clone();
-    let target_generics = fn_info.syntax.merged_generics.clone();
-    let target_argument_types: Vec<_> = fn_info
-        .syntax
-        .arguments
-        .iter_generics_style_types()
-        .collect();
+    let target_ident = fn_info.fn_ident.clone();
+    let target_generics = fn_info.merged_generics.clone();
+    let target_argument_types: Vec<_> = fn_info.arguments.iter_generics_style_types().collect();
     let fn_infos = [fn_info];
     let static_setup_struct = static_setup::generate(static_setup::Params {
         ctx,
@@ -80,7 +75,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
     let fn_static_received =
         fn_static_received::generate(source_span, static_received_struct.path.clone(), &fn_info);
 
-    let mod_ident = fn_info.syntax.source_signature.ident.clone();
+    let mod_ident = fn_info.source_signature.ident.clone();
     let mocked_fn = mocked_fn::generate(
         ctx,
         source_span,
@@ -132,7 +127,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
     let usage = mod_usage::new(mod_ident.clone(), usage_ident);
     let item_mod = ItemMod {
         attrs: vec![attributes::allow_non_camel_case_types(source_span)],
-        vis: fn_info.syntax.visibility.clone(),
+        vis: fn_info.visibility.clone(),
         unsafety: None,
         mod_token: Token![mod](source_span),
         ident: mod_ident,

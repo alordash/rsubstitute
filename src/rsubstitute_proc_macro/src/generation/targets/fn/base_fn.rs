@@ -12,7 +12,7 @@ pub(crate) fn generate(
     mock_struct_path: Path,
     base_impl: Box<Block>,
 ) -> ItemFn {
-    let source_signature = &fn_info.syntax.source_signature;
+    let source_signature = &fn_info.source_signature;
     let call_path = path::new(source_span, ["call"]);
     let sig = Signature {
         constness: source_signature.constness.clone(),
@@ -68,7 +68,6 @@ pub(crate) fn generate(
             path: fn_info.call_struct.path.clone(),
             brace_token: token::Brace(source_span),
             fields: fn_info
-                .syntax
                 .arguments
                 .iter()
                 .map(|x| FieldPat {
@@ -107,7 +106,6 @@ pub(crate) fn generate(
                 attrs: Vec::new(),
                 paren_token: token::Paren(source_span),
                 elems: fn_info
-                    .syntax
                     .arguments
                     .iter()
                     .map(|x| *x.source_pat_type.pat.clone())
@@ -116,7 +114,7 @@ pub(crate) fn generate(
             colon_token: Token![:](source_span),
             ty: Box::new(Type::Tuple(TypeTuple {
                 paren_token: token::Paren(source_span),
-                elems: fn_info.syntax.arguments.iter_generics_style_types().collect(),
+                elems: fn_info.arguments.iter_generics_style_types().collect(),
             })),
         }),
         init: Some(LocalInit {
@@ -126,7 +124,6 @@ pub(crate) fn generate(
                     attrs: Vec::new(),
                     paren_token: token::Paren(source_span),
                     elems: fn_info
-                        .syntax
                         .arguments
                         .iter()
                         .map(|x| {

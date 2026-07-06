@@ -17,15 +17,14 @@ pub(crate) fn generate(span: Span, static_received_path: Path, fn_info: &FnInfo)
         ident: Ident::new("received", span),
         generics: generics::with_prefix_lifetime(
             generics::with_lifetimes_tied_to(
-                fn_info.syntax.merged_generics.clone(),
-                &fn_info.syntax.merged_generics,
+                fn_info.merged_generics.clone(),
+                &fn_info.merged_generics,
                 rsubstitute_lifetime.clone(),
             ),
             rsubstitute_lifetime,
         ),
         paren_token: token::Paren(span),
         inputs: fn_info
-            .syntax
             .arguments
             .iter()
             .map(|x| x.control_fn_arg.clone())
@@ -57,7 +56,6 @@ pub(crate) fn generate(span: Span, static_received_path: Path, fn_info: &FnInfo)
         turbofish: None,
         paren_token: token::Paren(span),
         args: fn_info
-            .syntax
             .arguments
             .iter()
             .map(|x| {

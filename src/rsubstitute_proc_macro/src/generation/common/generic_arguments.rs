@@ -19,7 +19,7 @@ pub(crate) fn new(ctx: &Context, span: Span, mock_struct_path: Path, fn_info: &F
         })),
         has_return_value_argument: generic_argument::bool(
             span,
-            match fn_info.syntax.return_type {
+            match fn_info.return_type {
                 ReturnType::Default => false,
                 ReturnType::Type(_, _) => true,
             },
