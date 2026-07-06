@@ -293,6 +293,12 @@ mod result {
             }
         }
 
+        impl Struct<i16> {
+            fn use_q_trait_assoc_type(&self) -> <Struct<i16> as Q>::W {
+                "quo vadis".to_string()
+            }
+        }
+
         pub struct StructTraitSetup<T1> {
             #[doc(hidden)]
             pub data: SharedMockData<StructMock<i16>>,
