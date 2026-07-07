@@ -4,16 +4,18 @@ use crate::generation::mock_controls::models::*;
 use crate::generation::mock_controls::*;
 use crate::syntax::*;
 use proc_macro2::Span;
+use std::borrow::Borrow;
 use syn::*;
 
-pub(crate) struct Params<'a> {
+pub(crate) struct Params<'a, T: Borrow<FnInfo>> {
     pub ident: Ident,
     pub generics: Generics,
     pub maybe_argument_types: Option<Vec<Type>>,
     pub mock_struct_path: &'a Path,
-    pub fn_infos: &'a [FnInfo],
+    pub fn_infos: &'a [T],
+    pub for_static_fn: bool,
 }
-pub(crate) fn generate(
+pub(crate) fn generate<T: Borrow<FnInfo>>(
     ctx: &Context,
     source_span: Span,
     Params {
@@ -22,7 +24,8 @@ pub(crate) fn generate(
         maybe_argument_types,
         mock_struct_path,
         fn_infos,
-    }: Params,
+        for_static_fn,
+    }: Params<T>,
 ) -> StaticReceivedStruct {
     let item_struct = control_struct::new_static(
         source_span,
@@ -40,7 +43,7 @@ pub(crate) fn generate(
             generics,
             mock_struct_path,
             fn_infos,
-            is_static: true,
+            for_static_fn,
         },
     );
 

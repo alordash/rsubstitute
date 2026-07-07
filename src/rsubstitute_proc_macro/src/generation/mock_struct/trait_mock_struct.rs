@@ -1,8 +1,10 @@
 use crate::common::models::*;
 use crate::common::*;
 use crate::generation::fn_info::models::*;
-use crate::generation::mock_struct::associated_fn_block;
+use crate::generation::mock_controls::models::ControlType;
+use crate::generation::mock_struct::common::*;
 use crate::generation::mock_struct::models::*;
+use crate::generation::mock_struct::*;
 use crate::generation::trait_info::models::*;
 use crate::preparation::common::models::*;
 use crate::preparation::r#trait::models::*;
@@ -14,6 +16,8 @@ use syn::*;
 pub(crate) struct Params<'a> {
     pub mock_struct_ident: Ident,
     pub trait_info: &'a TraitInfo,
+    pub maybe_associated_controls: Option<AssociatedControls>,
+    pub maybe_static_controls: Option<StaticControls>,
 }
 
 pub(crate) fn generate(
@@ -22,6 +26,8 @@ pub(crate) fn generate(
     Params {
         mock_struct_ident,
         trait_info,
+        maybe_associated_controls,
+        maybe_static_controls,
     }: Params,
 ) -> TraitMockStruct {
     let item_struct = ItemStruct {
@@ -42,25 +48,20 @@ pub(crate) fn generate(
     };
     let path = path::from_ident_with_generics(item_struct.ident.clone(), &item_struct.generics);
     let trait_impl = generate_trait_impl(ctx, span, trait_info, path.clone());
-    let maybe_associated_fns_controls = todo!("from args");
-    let maybe_static_fns_controls = todo!("from args");
-    let base_fn_infos = todo!("from args");
-    let maybe_inner_impl = generate_inner_impl(
+    let inner_impl = generate_inner_impl(
         ctx,
         span,
         trait_info,
         path.clone(),
-        maybe_associated_fns_controls, // this
-        maybe_static_fns_controls,     // and this
-        base_fn_infos,                 // and this -> in mock_struct module
-                                       // but Setup and Received structures in mock_controls folder
+        maybe_associated_controls,
+        maybe_static_controls,
     );
 
     let result = TraitMockStruct {
         path,
         item_struct,
         trait_impl,
-        maybe_inner_impl,
+        inner_impl,
     };
     return result;
 }
@@ -174,15 +175,61 @@ fn map_method(
     })
 }
 
-struct AssociatedFnsControls;
 fn generate_inner_impl(
     ctx: &Context,
     span: Span,
     trait_info: &TraitInfo,
     mock_struct_path: Path,
-    maybe_associated_fns_controls: Option<AssociatedFnsControls>,
-    maybe_static_fns_controls: Option<AssociatedFnsControls>,
-    base_fn_infos: Vec<&FnInfo>,
-) -> Option<ItemImpl> {
-    todo!()
+    maybe_associated_controls: Option<AssociatedControls>,
+    maybe_static_controls: Option<StaticControls>,
+) -> ItemImpl {
+    let mock_struct_fn_new = mock_struct_fn_new::new(span);
+    let associated_controls_creation_fns = maybe_associated_controls.map(|associated_controls| {
+        [
+            ImplItem::Fn(control_creation_fn::generate_associated(
+                span,
+                associated_controls.setup_struct.path,
+                ControlType::Setup,
+            )),
+            ImplItem::Fn(control_creation_fn::generate_associated(
+                span,
+                associated_controls.received_struct.path,
+                ControlType::Received,
+            )),
+        ]
+    });
+    let static_controls_creation_fns = maybe_static_controls.map(|static_controls| {
+        [
+            ImplItem::Fn(control_creation_fn::generate_static(
+                span,
+                static_controls.static_setup_struct.path,
+                ControlType::Setup,
+            )),
+            ImplItem::Fn(control_creation_fn::generate_static(
+                span,
+                static_controls.static_received_struct.path,
+                ControlType::Received,
+            )),
+        ]
+    });
+    let items = core::iter::once(ImplItem::Fn(mock_struct_fn_new))
+        .chain(associated_controls_creation_fns.into_iter().flatten())
+        .chain(static_controls_creation_fns.into_iter().flatten())
+        .collect();
+
+    let result = ItemImpl {
+        attrs: Vec::new(),
+        defaultness: None,
+        unsafety: None,
+        impl_token: Token![impl](span),
+        generics: trait_info.merged_generics.clone(),
+        trait_: None,
+        self_ty: Box::new(Type::Path(TypePath {
+            qself: None,
+            path: mock_struct_path,
+        })),
+        brace_token: token::Brace(span),
+        items,
+    };
+    return result;
 }

@@ -1,3 +1,4 @@
+use std::borrow::Borrow;
 use crate::common::models::*;
 use crate::common::*;
 use crate::generation::common::*;
@@ -7,15 +8,15 @@ use crate::syntax::*;
 use proc_macro2::{Ident, Span};
 use syn::*;
 
-pub(crate) struct Params<'a> {
+pub(crate) struct Params<'a, T: Borrow<FnInfo>> {
     pub setup_struct_path: Path,
     pub generics: Generics,
     pub mock_struct_path: &'a Path,
-    pub fn_infos: &'a [FnInfo],
+    pub fn_infos: &'a [T],
     pub is_static: bool,
 }
 
-pub(crate) fn generate(
+pub(crate) fn generate<T: Borrow<FnInfo>>(
     ctx: &Context,
     span: Span,
     Params {
@@ -24,11 +25,11 @@ pub(crate) fn generate(
         mock_struct_path,
         fn_infos,
         is_static,
-    }: Params,
+    }: Params<T>,
 ) -> ItemImpl {
     let fn_setups = fn_infos
         .iter()
-        .map(|fn_info| generate_setup_fn(ctx, span, mock_struct_path, fn_info, is_static))
+        .map(|fn_info| generate_setup_fn(ctx, span, mock_struct_path, fn_info.borrow(), is_static))
         .map(ImplItem::Fn)
         .collect();
 

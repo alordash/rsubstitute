@@ -1,24 +1,24 @@
 pub mod models {
+    mod control_type;
     mod received;
     mod setup;
     mod static_received;
     mod static_setup;
-    mod control_type;
 
+    pub(crate) use control_type::*;
     pub(crate) use received::*;
     pub(crate) use setup::*;
     pub(crate) use static_received::*;
     pub(crate) use static_setup::*;
-    pub(crate) use control_type::*;
 }
 
 mod common {
     pub(crate) mod args_checker_stmt;
+    pub(crate) mod control_struct;
     pub(crate) mod fn_configurator_path;
     pub(crate) mod received_impl;
     pub(crate) mod setup_impl;
     pub(crate) mod times_arg;
-    pub(crate) mod control_struct;
 }
 
 use common::*;

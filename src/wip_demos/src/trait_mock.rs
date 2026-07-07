@@ -66,13 +66,13 @@ mod result {
             }
 
             pub fn setup(&mut self) -> TraitSetup<T1> {
-                TraitSetup {
+                TraitSetup::<T1> {
                     data: self.data.clone(),
                 }
             }
 
             pub fn static_setup() -> TraitStaticSetup<T1> {
-                TraitStaticSetup {
+                TraitStaticSetup::<T1> {
                     _generics: PhantomData,
                 }
             }

@@ -65,6 +65,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
             maybe_argument_types: Some(target_argument_types),
             mock_struct_path: &static_fn_mock_struct.path,
             fn_infos: &fn_infos,
+            for_static_fn: true,
         },
     );
     let [fn_info] = fn_infos;

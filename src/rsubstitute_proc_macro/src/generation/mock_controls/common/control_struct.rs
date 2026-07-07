@@ -22,7 +22,7 @@ pub(crate) fn new(
         generics,
         fields: Fields::Named(FieldsNamed {
             brace_token: token::Brace(span),
-            named: punctuated([data_field::new(
+            named: punctuated([data_field::new_field(
                 span,
                 data_field::Params {
                     mock_struct_path,

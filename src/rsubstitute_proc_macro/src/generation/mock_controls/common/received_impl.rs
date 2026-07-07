@@ -5,17 +5,18 @@ use crate::generation::fn_info::models::*;
 use crate::generation::mock_controls::common::*;
 use crate::syntax::*;
 use proc_macro2::{Ident, Span};
+use std::borrow::Borrow;
 use syn::punctuated::Punctuated;
 use syn::*;
 
-pub(crate) struct Params<'a> {
+pub(crate) struct Params<'a, T: Borrow<FnInfo>> {
     pub received_struct_path: Path,
     pub generics: Generics,
     pub mock_struct_path: &'a Path,
-    pub fn_infos: &'a [FnInfo],
-    pub is_static: bool,
+    pub fn_infos: &'a [T],
+    pub for_static_fn: bool,
 }
-pub(crate) fn generate(
+pub(crate) fn generate<T: Borrow<FnInfo>>(
     ctx: &Context,
     span: Span,
     Params {
@@ -23,16 +24,16 @@ pub(crate) fn generate(
         generics,
         mock_struct_path,
         fn_infos,
-        is_static,
-    }: Params,
+        for_static_fn,
+    }: Params<T>,
 ) -> ItemImpl {
     let items = fn_infos
         .iter()
-        .map(|fn_info| generate_received_fn(ctx, span, mock_struct_path, fn_info))
-        .chain(core::iter::once(if is_static {
-            generate_fn_no_other_calls_for_static(ctx, span, mock_struct_path.clone(), fn_infos)
+        .map(|fn_info| generate_received_fn(ctx, span, mock_struct_path, fn_info.borrow()))
+        .chain(core::iter::once(if for_static_fn {
+            generate_fn_no_other_calls_for_static_fn(ctx, span, mock_struct_path.clone(), fn_infos)
         } else {
-            generate_fn_no_other_calls_for_method(span, fn_infos)
+            generate_regular_fn_no_other_calls(span, fn_infos)
         }))
         .map(ImplItem::Fn)
         .collect();
@@ -122,17 +123,18 @@ fn generate_received_fn(
     return result;
 }
 
-fn generate_fn_no_other_calls_for_static(
+fn generate_fn_no_other_calls_for_static_fn<T: Borrow<FnInfo>>(
     ctx: &Context,
     span: Span,
     mock_struct_path: Path,
-    fn_infos: &[FnInfo],
+    fn_infos: &[T],
 ) -> ImplItemFn {
     let sig = fn_no_other_calls_signature(span);
     let fn_info = &fn_infos[0];
-    let generic_arguments = generic_arguments::new(ctx, span, mock_struct_path.clone(), fn_info);
+    let generic_arguments =
+        generic_arguments::new(ctx, span, mock_struct_path.clone(), fn_info.borrow());
     let (fn_data_var_path, fn_data_stmt) =
-        fn_data_stmt::new_static(span, fn_info, generic_arguments);
+        fn_data_stmt::new_static(span, fn_info.borrow(), generic_arguments);
     let verify_received_nothing_else_stmt = Expr::MethodCall(ExprMethodCall {
         attrs: Vec::new(),
         receiver: Box::new(Expr::Path(fn_data_var_path)),
@@ -165,7 +167,7 @@ fn generate_fn_no_other_calls_for_static(
     return result;
 }
 
-fn generate_fn_no_other_calls_for_method(span: Span, fn_infos: &[FnInfo]) -> ImplItemFn {
+fn generate_regular_fn_no_other_calls<T: Borrow<FnInfo>>(span: Span, fn_infos: &[T]) -> ImplItemFn {
     let sig = fn_no_other_calls_signature(span);
     let verify_received_nothing_else_stmt = Expr::MethodCall(ExprMethodCall {
         attrs: Vec::new(),
@@ -182,7 +184,7 @@ fn generate_fn_no_other_calls_for_method(span: Span, fn_infos: &[FnInfo]) -> Imp
                 .map(|x| {
                     Expr::Lit(ExprLit {
                         attrs: Vec::new(),
-                        lit: Lit::Str(LitStr::new(&x.fn_ident.to_string(), span)),
+                        lit: Lit::Str(LitStr::new(&x.borrow().fn_ident.to_string(), span)),
                     })
                 })
                 .collect(),

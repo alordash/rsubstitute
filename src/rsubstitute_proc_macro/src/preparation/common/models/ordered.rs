@@ -1,3 +1,4 @@
+use std::borrow::Borrow;
 use std::ops::Deref;
 
 pub(crate) struct Ordered<T> {
@@ -32,6 +33,12 @@ impl<T> Deref for Ordered<T> {
     type Target = T;
 
     fn deref(&self) -> &Self::Target {
+        &self.value
+    }
+}
+
+impl<T> Borrow<T> for Ordered<T> {
+    fn borrow(&self) -> &T {
         &self.value
     }
 }

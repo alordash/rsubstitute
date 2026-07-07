@@ -57,6 +57,17 @@ pub(crate) fn ref_self_fn_arg(span: Span) -> FnArg {
     })
 }
 
+pub(crate) fn mut_ref_self_fn_arg(span: Span) -> FnArg {
+    FnArg::Receiver(Receiver {
+        attrs: Vec::new(),
+        reference: Some((Token![&](Span::call_site()), None)),
+        mutability: Some(Token![mut](span)),
+        self_token: Token![self](Span::call_site()),
+        colon_token: None,
+        ty: Box::new(Type::Reference(ref_self_type(span))),
+    })
+}
+
 pub(crate) fn void_type(span: Span) -> Type {
     Type::Tuple(TypeTuple {
         paren_token: token::Paren(span),

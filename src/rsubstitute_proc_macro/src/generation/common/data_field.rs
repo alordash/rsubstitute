@@ -6,7 +6,7 @@ pub(crate) struct Params {
     pub mock_struct_path: Path,
     pub public: bool,
 }
-pub(crate) fn new(
+pub(crate) fn new_field(
     span: Span,
     Params {
         mock_struct_path,
@@ -44,6 +44,42 @@ pub(crate) fn new(
                 ),
             },
         }),
+    };
+    return result;
+}
+
+pub(crate) fn new_default_value(span: Span) -> FieldValue {
+    let result = FieldValue {
+        attrs: Vec::new(),
+        member: Member::Named(Ident::new("data", span)),
+        colon_token: Some(Token![:](span)),
+        expr: Expr::Call(expr::call::new(
+            span,
+            Expr::Path(ExprPath {
+                attrs: Vec::new(),
+                qself: None,
+                path: path::new_global(span, ["core", "default", "Default", "default"]),
+            }),
+            [],
+        )),
+    };
+    return result;
+}
+
+pub(crate) fn new_clone_value(span: Span) -> FieldValue {
+    let result = FieldValue {
+        attrs: Vec::new(),
+        member: Member::Named(Ident::new("data", span)),
+        colon_token: Some(Token![:](span)),
+        expr: Expr::MethodCall(expr::method_call::new(
+            span,
+            Expr::Field(expr::field::new(
+                Expr::Path(self_expr_path(span)),
+                Ident::new("data", span),
+            )),
+            Ident::new("clone", span),
+            [],
+        )),
     };
     return result;
 }

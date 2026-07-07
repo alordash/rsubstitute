@@ -56,7 +56,12 @@ pub(crate) fn new_value(span: Span) -> FieldValue {
         attrs: Vec::new(),
         member: Member::Named(Ident::new("generics", span)),
         colon_token: Some(Token![:](span)),
-        expr: Expr::Path(expr::path::new(span, ["PhantomData"])),
+        expr: Expr::Path(ExprPath {
+            attrs: Vec::new(),
+            qself: None,
+            // TODO - replace all other references to STD lib with global paths
+            path: path::new_global(span, ["core", "marker", "PhantomData"]),
+        }),
     };
     return result;
 }

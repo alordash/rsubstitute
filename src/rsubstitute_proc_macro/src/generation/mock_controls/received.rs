@@ -1,3 +1,4 @@
+use std::borrow::Borrow;
 use crate::common::models::*;
 use crate::generation::fn_info::models::*;
 use crate::generation::mock_controls::models::*;
@@ -6,13 +7,13 @@ use crate::syntax::path;
 use proc_macro2::Span;
 use syn::*;
 
-pub(crate) struct Params<'a> {
+pub(crate) struct Params<'a, T: Borrow<FnInfo>> {
     pub ident: Ident,
     pub generics: Generics,
     pub mock_struct_path: Path,
-    pub fn_infos: &'a [FnInfo],
+    pub fn_infos: &'a [T],
 }
-pub(crate) fn generate(
+pub(crate) fn generate<T: Borrow<FnInfo>>(
     ctx: &Context,
     span: Span,
     Params {
@@ -20,7 +21,7 @@ pub(crate) fn generate(
         generics,
         mock_struct_path,
         fn_infos,
-    }: Params,
+    }: Params<T>,
 ) -> ReceivedStruct {
     let item_struct = control_struct::new(
         span,
@@ -38,7 +39,7 @@ pub(crate) fn generate(
             generics: item_struct.generics.clone(),
             mock_struct_path: &mock_struct_path,
             fn_infos,
-            is_static: false,
+            for_static_fn: false,
         },
     );
 
