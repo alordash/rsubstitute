@@ -32,7 +32,14 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
     let items = fn_infos
         .iter()
         .map(|fn_info| {
-            generate_received_fn(ctx, span, mock_struct_path, fn_info.borrow(), for_static_fn)
+            generate_received_fn(
+                ctx,
+                span,
+                mock_struct_path,
+                fn_info.borrow(),
+                for_static_fn,
+                is_static,
+            )
         })
         .chain(core::iter::once(if is_static {
             generate_fn_no_other_calls_for_static_fn(ctx, span, mock_struct_path.clone(), fn_infos)
@@ -65,6 +72,7 @@ fn generate_received_fn(
     mock_struct_path: &Path,
     fn_info: &FnInfo,
     for_static_fn: bool,
+    is_static: bool,
 ) -> ImplItemFn {
     let (times_arg_path, times_arg) = times_arg::new(span);
     let generic_arguments = generic_arguments::new(ctx, span, mock_struct_path.clone(), fn_info);
@@ -97,9 +105,11 @@ fn generate_received_fn(
         variadic: None,
         output: ReturnType::Type(Token![->](span), Box::new(Type::Path(self_type(span)))),
     };
-
-    let (fn_data_var_path, fn_data_stmt) =
-        fn_data_stmt::new_static(span, fn_info, generic_arguments);
+    let (fn_data_var_path, fn_data_stmt) = if is_static {
+        fn_data_stmt::new_static(span, fn_info, generic_arguments)
+    } else {
+        fn_data_stmt::new_associated(span, fn_info, generic_arguments)
+    };
     let (args_checker_var_path, args_checker_stmt) = args_checker_stmt::new(span, fn_info);
     let verify_received_stmt = Expr::MethodCall(expr::method_call::new(
         span,

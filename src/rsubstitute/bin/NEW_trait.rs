@@ -3,6 +3,7 @@
 #![allow(unused)]
 
 use rsubstitute_core::args::Arg;
+use rsubstitute_core::Times;
 #[allow(unused_imports)]
 use rsubstitute_proc_macro::mock;
 
@@ -53,6 +54,8 @@ fn main() {
     TraitMock::f_static(22);
     TraitMock::f_static(22);
     TraitMock::f_static(33);
+    
+    mock.received().f(1, Times::Once);
 
     println!("Done");
 }

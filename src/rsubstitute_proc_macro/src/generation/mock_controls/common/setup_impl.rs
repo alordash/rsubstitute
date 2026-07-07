@@ -29,7 +29,7 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
         is_static,
     }: Params<T>,
 ) -> ItemImpl {
-    let fn_setups = fn_infos
+    let items = fn_infos
         .iter()
         .map(|fn_info| {
             generate_setup_fn(
@@ -56,7 +56,7 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
             path: setup_struct_path,
         })),
         brace_token: token::Brace(span),
-        items: fn_setups,
+        items,
     };
     return result;
 }
