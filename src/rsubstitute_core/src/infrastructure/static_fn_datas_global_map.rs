@@ -22,7 +22,9 @@ impl StaticFnDatasGlobalMap {
         &'_ self,
         fn_ident: &'static str,
     ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, false> {
-        // SAFETY: `StaticFn TODO - forgor to write it
+        // SAFETY: static functions data is stored in global TLS, which guarantees that there can't
+        // be more than one mutable reference to given static function data at the same time.
+        // This is why `UnsafeCell` can be safely used here.  
         let maybe_map = unsafe { self.map.get().as_mut() };
         // SAFETY: `UnsafeCell::get` can not return null pointer.
         let map = unsafe { maybe_map.unwrap_unchecked() };
