@@ -1,4 +1,5 @@
 use crate::common::*;
+use crate::generation::common::*;
 use crate::generation::fn_info::models::*;
 use crate::generation::mock_struct::models::*;
 use crate::syntax::*;
@@ -34,7 +35,7 @@ pub(crate) fn generate(
                 qself: None,
                 path: mock_struct_path,
                 brace_token: token::Brace(span),
-                fields: [generics_field::new_value(span)].into_iter().collect(),
+                fields: [data_field::new_clone_value(span)].into_iter().collect(),
                 dot2_token: None,
                 rest: None,
             })),

@@ -1,10 +1,10 @@
-use std::borrow::Borrow;
 use crate::common::models::*;
 use crate::generation::fn_info::models::*;
 use crate::generation::mock_controls::models::*;
 use crate::generation::mock_controls::*;
 use crate::syntax::path;
 use proc_macro2::Span;
+use std::borrow::Borrow;
 use syn::*;
 
 pub(crate) struct Params<'a, T: Borrow<FnInfo>> {
@@ -40,6 +40,7 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
             mock_struct_path: &mock_struct_path,
             fn_infos,
             for_static_fn: false,
+            is_static: false,
         },
     );
 

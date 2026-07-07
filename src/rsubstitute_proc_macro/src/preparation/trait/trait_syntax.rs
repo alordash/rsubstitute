@@ -85,13 +85,13 @@ fn split_items(items: Vec<TraitItem>, trait_ident: &Ident) -> SplitItems {
                 },
             )),
             TraitItem::Fn(trait_item_fn) => {
-                if signature::is_static(&trait_item_fn.sig) {
+                if signature::is_associated(&trait_item_fn.sig) {
                     split_items
-                        .static_fns
+                        .associated_fns
                         .push(Ordered::new(order_number, trait_item_fn))
                 } else {
                     split_items
-                        .associated_fns
+                        .static_fns
                         .push(Ordered::new(order_number, trait_item_fn))
                 }
             }

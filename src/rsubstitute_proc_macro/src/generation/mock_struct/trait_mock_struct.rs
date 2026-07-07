@@ -1,7 +1,7 @@
 use crate::common::models::*;
-use crate::common::*;
 use crate::constants;
 use crate::generation::base_fn;
+use crate::generation::common::*;
 use crate::generation::fn_info::models::*;
 use crate::generation::mock_controls::models::*;
 use crate::generation::mock_struct::common::*;
@@ -32,6 +32,8 @@ pub(crate) fn generate(
         maybe_static_controls,
     }: Params,
 ) -> TraitMockStruct {
+    let path =
+        path::from_ident_with_generics(mock_struct_ident.clone(), &trait_info.merged_generics);
     let item_struct = ItemStruct {
         attrs: Vec::new(),
         vis: Visibility::Public(Token![pub](span)),
@@ -40,15 +42,16 @@ pub(crate) fn generate(
         generics: trait_info.merged_generics.clone(),
         fields: Fields::Named(FieldsNamed {
             brace_token: token::Brace(span),
-            named: punctuated([generics_field::new_field(
+            named: punctuated([data_field::new_field(
                 span,
-                trait_info.merged_generics.clone(),
-                None,
+                data_field::Params {
+                    mock_struct_path: path.clone(),
+                    public: true,
+                },
             )]),
         }),
         semi_token: None,
     };
-    let path = path::from_ident_with_generics(item_struct.ident.clone(), &item_struct.generics);
     let trait_impl = generate_trait_impl(ctx, span, trait_info, path.clone());
     let inner_impl = generate_inner_impl(
         ctx,
@@ -83,9 +86,15 @@ fn generate_trait_impl(
         .chain(trait_info.assoc_types.iter().map(map_assoc_type))
         .chain(
             trait_info
-                .static_fns
+                .associated_fns
                 .iter()
                 .map(|x| map_method(ctx, mock_struct_path.clone(), x)),
+        )
+        .chain(
+            trait_info
+                .static_fns
+                .iter()
+                .map(|x| map_fn(ctx, mock_struct_path.clone(), x)),
         )
         .collect();
     items_with_order.sort_by(|a, b| a.order_number.cmp(&b.order_number));
@@ -173,6 +182,33 @@ fn map_method(
                     Some(x.fn_ident.clone())
                 } else {
                     None
+                },
+            ),
+        })
+    })
+}
+
+fn map_fn(
+    ctx: &Context,
+    mock_struct_path: Path,
+    ordered_method: &Ordered<FnInfo>,
+) -> Ordered<ImplItem> {
+    ordered_method.clone_map(|x| {
+        let span = x.spans.inputs;
+        ImplItem::Fn(ImplItemFn {
+            attrs: x.attributes.clone(),
+            vis: Visibility::Inherited,
+            defaultness: None, // TODO - verify that it's always None, IIRC you can trait Trait { default fn f() {} }
+            sig: *x.source_signature.clone(),
+            block: static_fn_block::generate(
+                ctx,
+                span,
+                mock_struct_path,
+                x,
+                if x.maybe_base_impl.is_some() {
+                    BaseFnKind::Static(x.fn_ident.clone())
+                } else {
+                    BaseFnKind::None
                 },
             ),
         })

@@ -12,7 +12,7 @@ use quote::format_ident;
 use syn::spanned::Spanned;
 use syn::*;
 
-pub(crate) fn generate_module(ctx: &Context, item_trait: ItemTrait) -> MockMod {
+pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockMod {
     let source_span = item_trait.span();
     let trait_syntax = trait_syntax::prepare(trait_syntax::Params {
         attributes: item_trait.attrs.clone(),
@@ -66,6 +66,7 @@ pub(crate) fn generate_module(ctx: &Context, item_trait: ItemTrait) -> MockMod {
                 maybe_argument_types: None,
                 mock_struct_path: &trait_mock_struct_path,
                 fn_infos: &trait_info.static_fns,
+                for_static_fn: false
             },
         );
         let static_received_struct = static_received::generate(
@@ -99,6 +100,7 @@ pub(crate) fn generate_module(ctx: &Context, item_trait: ItemTrait) -> MockMod {
 
     let mod_visibility = item_trait.vis.clone();
     let mock_mod_usages = mock_mod_usages::new(source_span);
+    item_trait.vis = Visibility::Public(Token![pub](source_span));
     let items = [
         Item::Use(mock_mod_usages.use_rsubstitute_for_generated),
         Item::Use(mock_mod_usages.use_super),
@@ -106,6 +108,22 @@ pub(crate) fn generate_module(ctx: &Context, item_trait: ItemTrait) -> MockMod {
     .into_iter()
     .chain(core::iter::once(Item::Trait(item_trait)))
     .chain(trait_info.associated_fns.into_iter().flat_map(|x| {
+        let call_struct = x.value.call_struct;
+        let args_checker = x.value.args_checker_struct;
+        [
+            Item::Struct(call_struct.item_struct),
+            Item::Impl(call_struct.generics_info_provider_impl),
+            Item::Impl(call_struct.call_impl),
+        ]
+        .into_iter()
+        .chain(call_struct.maybe_clone_impl.map(Item::Impl).into_iter())
+        .chain([
+            Item::Struct(args_checker.item_struct),
+            Item::Impl(args_checker.generics_info_provider_impl),
+            Item::Impl(args_checker.args_checker_impl),
+        ])
+    }))
+    .chain(trait_info.static_fns.into_iter().flat_map(|x| {
         let call_struct = x.value.call_struct;
         let args_checker = x.value.args_checker_struct;
         [
@@ -155,7 +173,7 @@ pub(crate) fn generate_module(ctx: &Context, item_trait: ItemTrait) -> MockMod {
     .collect();
 
     // TODO - add to generated mods `__rsubstitute_generated` prefix
-    let mod_ident = format_ident!("{}Mock", trait_info.ident);
+    let mod_ident = format_ident!("__TODO_{}Mock", trait_info.ident);
     let usage_ident = [trait_info.ident.clone(), trait_mock_struct_ident];
     let usage = mod_usage::new(mod_ident.clone(), usage_ident);
     let item_mod = ItemMod {

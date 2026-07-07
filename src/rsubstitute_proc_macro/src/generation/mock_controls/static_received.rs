@@ -44,6 +44,7 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
             mock_struct_path,
             fn_infos,
             for_static_fn,
+            is_static: true,
         },
     );
 

@@ -39,6 +39,7 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
             generics: item_struct.generics.clone(),
             mock_struct_path: &mock_struct_path,
             fn_infos,
+            for_static_fn: false,
             is_static: false,
         },
     );

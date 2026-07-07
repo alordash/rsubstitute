@@ -1,4 +1,3 @@
-use std::borrow::Borrow;
 use crate::common::models::*;
 use crate::common::*;
 use crate::generation::common::*;
@@ -6,6 +5,7 @@ use crate::generation::fn_info::models::*;
 use crate::generation::mock_controls::common::*;
 use crate::syntax::*;
 use proc_macro2::{Ident, Span};
+use std::borrow::Borrow;
 use syn::*;
 
 pub(crate) struct Params<'a, T: Borrow<FnInfo>> {
@@ -13,6 +13,7 @@ pub(crate) struct Params<'a, T: Borrow<FnInfo>> {
     pub generics: Generics,
     pub mock_struct_path: &'a Path,
     pub fn_infos: &'a [T],
+    pub for_static_fn: bool,
     pub is_static: bool,
 }
 
@@ -24,12 +25,22 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
         generics,
         mock_struct_path,
         fn_infos,
+        for_static_fn,
         is_static,
     }: Params<T>,
 ) -> ItemImpl {
     let fn_setups = fn_infos
         .iter()
-        .map(|fn_info| generate_setup_fn(ctx, span, mock_struct_path, fn_info.borrow(), is_static))
+        .map(|fn_info| {
+            generate_setup_fn(
+                ctx,
+                span,
+                mock_struct_path,
+                fn_info.borrow(),
+                for_static_fn,
+                is_static,
+            )
+        })
         .map(ImplItem::Fn)
         .collect();
 
@@ -55,6 +66,7 @@ fn generate_setup_fn(
     span: Span,
     mock_struct_path: &Path,
     fn_info: &FnInfo,
+    for_static_fn: bool,
     is_static: bool,
 ) -> ImplItemFn {
     let generic_arguments = generic_arguments::new(ctx, span, mock_struct_path.clone(), fn_info);
@@ -71,7 +83,11 @@ fn generate_setup_fn(
         unsafety: None,
         abi: None,
         fn_token: Token![fn](span),
-        ident: Ident::new("setup", span),
+        ident: if for_static_fn {
+            Ident::new("setup", span)
+        } else {
+            fn_info.source_signature.ident.clone()
+        },
         generics: generics::with_prefix_lifetime(
             Generics::default(),
             rsubstitute_lifetime::new(span),

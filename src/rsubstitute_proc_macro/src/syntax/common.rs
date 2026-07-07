@@ -35,6 +35,15 @@ pub(crate) fn ref_self_type(span: Span) -> TypeReference {
     }
 }
 
+pub(crate) fn mut_ref_self_type(span: Span) -> TypeReference {
+    TypeReference {
+        and_token: Token![&](span),
+        lifetime: None,
+        mutability: Some(Token![mut](span)),
+        elem: Box::new(Type::Path(self_type(span))),
+    }
+}
+
 pub(crate) fn self_fn_arg(span: Span) -> FnArg {
     FnArg::Receiver(Receiver {
         attrs: Vec::new(),
@@ -64,7 +73,7 @@ pub(crate) fn mut_ref_self_fn_arg(span: Span) -> FnArg {
         mutability: Some(Token![mut](span)),
         self_token: Token![self](Span::call_site()),
         colon_token: None,
-        ty: Box::new(Type::Reference(ref_self_type(span))),
+        ty: Box::new(Type::Reference(mut_ref_self_type(span))),
     })
 }
 

@@ -15,6 +15,7 @@ pub(crate) struct Params<'a, T: Borrow<FnInfo>> {
     pub mock_struct_path: &'a Path,
     pub fn_infos: &'a [T],
     pub for_static_fn: bool,
+    pub is_static: bool,
 }
 pub(crate) fn generate<T: Borrow<FnInfo>>(
     ctx: &Context,
@@ -25,12 +26,15 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
         mock_struct_path,
         fn_infos,
         for_static_fn,
+        is_static,
     }: Params<T>,
 ) -> ItemImpl {
     let items = fn_infos
         .iter()
-        .map(|fn_info| generate_received_fn(ctx, span, mock_struct_path, fn_info.borrow()))
-        .chain(core::iter::once(if for_static_fn {
+        .map(|fn_info| {
+            generate_received_fn(ctx, span, mock_struct_path, fn_info.borrow(), for_static_fn)
+        })
+        .chain(core::iter::once(if is_static {
             generate_fn_no_other_calls_for_static_fn(ctx, span, mock_struct_path.clone(), fn_infos)
         } else {
             generate_regular_fn_no_other_calls(span, fn_infos)
@@ -60,6 +64,7 @@ fn generate_received_fn(
     span: Span,
     mock_struct_path: &Path,
     fn_info: &FnInfo,
+    for_static_fn: bool,
 ) -> ImplItemFn {
     let (times_arg_path, times_arg) = times_arg::new(span);
     let generic_arguments = generic_arguments::new(ctx, span, mock_struct_path.clone(), fn_info);
@@ -70,7 +75,11 @@ fn generate_received_fn(
         unsafety: None,
         abi: None,
         fn_token: Token![fn](span),
-        ident: Ident::new("received", span),
+        ident: if for_static_fn {
+            Ident::new("received", span)
+        } else {
+            fn_info.source_signature.ident.clone()
+        },
         generics: generics::with_prefix_lifetime(
             generics::with_lifetimes_tied_to(
                 Generics::default(),
