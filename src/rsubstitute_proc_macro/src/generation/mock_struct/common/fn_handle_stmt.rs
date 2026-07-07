@@ -1,31 +1,45 @@
 use crate::common::*;
 use crate::generation::fn_info::models::*;
 use crate::generation::mock_struct::models::*;
-use crate::syntax::{generic_argument, path, self_type_ident};
+use crate::syntax::*;
 use proc_macro2::Span;
 use syn::*;
 
+pub(crate) struct Params<'a> {
+    pub mock_struct_path: Path,
+    pub fn_info: &'a FnInfo,
+    pub base_fn_kind: BaseFnKind,
+    pub fn_data_var_path: ExprPath,
+    pub is_static: bool,
+}
 pub(crate) fn generate(
     span: Span,
-    mock_struct_path: Path,
-    fn_info: &FnInfo,
-    base_fn_kind: BaseFnKind,
-    fn_data_var_path: ExprPath,
+    Params {
+        mock_struct_path,
+        fn_info,
+        base_fn_kind,
+        fn_data_var_path,
+        is_static,
+    }: Params,
 ) -> ExprMethodCall {
-    let mock_arg = Expr::Reference(ExprReference {
-        attrs: Vec::new(),
-        and_token: Token![&](span),
-        mutability: None,
-        expr: Box::new(Expr::Struct(ExprStruct {
+    let mock_arg = if is_static {
+        void_tuple(span)
+    } else {
+        Expr::Reference(ExprReference {
             attrs: Vec::new(),
-            qself: None,
-            path: mock_struct_path,
-            brace_token: token::Brace(span),
-            fields: [generics_field::new_value(span)].into_iter().collect(),
-            dot2_token: None,
-            rest: None,
-        })),
-    });
+            and_token: Token![&](span),
+            mutability: None,
+            expr: Box::new(Expr::Struct(ExprStruct {
+                attrs: Vec::new(),
+                qself: None,
+                path: mock_struct_path,
+                brace_token: token::Brace(span),
+                fields: [generics_field::new_value(span)].into_iter().collect(),
+                dot2_token: None,
+                rest: None,
+            })),
+        })
+    };
     let the_call = Expr::Struct(ExprStruct {
         attrs: Vec::new(),
         qself: None,

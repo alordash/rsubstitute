@@ -18,12 +18,15 @@ pub(crate) fn generate(
         fn_data_stmt::new_associated(span, fn_info, generic_arguments);
     let fn_handle_stmt = fn_handle_stmt::generate(
         span,
-        mock_struct_path,
-        fn_info,
-        maybe_base_fn_ident
-            .map(BaseFnKind::Associated)
-            .unwrap_or(BaseFnKind::None),
-        fn_data_var_path,
+        fn_handle_stmt::Params {
+            mock_struct_path,
+            fn_info,
+            base_fn_kind: maybe_base_fn_ident
+                .map(BaseFnKind::Associated)
+                .unwrap_or(BaseFnKind::None),
+            fn_data_var_path,
+            is_static: false,
+        },
     );
 
     let result = Block {

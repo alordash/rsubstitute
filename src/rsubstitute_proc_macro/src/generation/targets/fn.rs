@@ -1,7 +1,7 @@
-mod base_fn;
 mod mocked_fn;
 
 use crate::common::models::*;
+use crate::constants;
 use crate::generation::mock_controls::*;
 use crate::generation::mock_struct::*;
 use crate::generation::targets::common::*;
@@ -31,12 +31,14 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
         let base_impl = fn_info
             .maybe_base_impl
             .take()
-            .expect("Static `fn`s should always have base implementation.");
-        Some(base_fn::generate(
+            .expect(constants::FN_SHOULD_HAVE_BASE_IMPL_MSG);
+        Some(base_fn::generate_static(
             source_span,
-            &fn_info,
-            static_fn_mock_struct.path.clone(),
-            base_impl,
+            base_fn::StaticParams {
+                fn_info: &fn_info,
+                mock_struct_path: static_fn_mock_struct.path.clone(),
+                base_impl,
+            },
         ))
     } else {
         None

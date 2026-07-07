@@ -18,10 +18,13 @@ pub(crate) fn generate(
         fn_data_stmt::new_static(span, fn_info, generic_arguments);
     let fn_handle_stmt = fn_handle_stmt::generate(
         span,
-        mock_struct_path,
-        fn_info,
-        base_fn_kind,
-        fn_data_var_path,
+        fn_handle_stmt::Params {
+            mock_struct_path,
+            fn_info,
+            base_fn_kind,
+            fn_data_var_path,
+            is_static: true,
+        },
     );
 
     let result = Block {

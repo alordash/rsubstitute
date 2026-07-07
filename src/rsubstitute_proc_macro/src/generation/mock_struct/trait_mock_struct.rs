@@ -1,7 +1,9 @@
 use crate::common::models::*;
 use crate::common::*;
+use crate::constants;
+use crate::generation::base_fn;
 use crate::generation::fn_info::models::*;
-use crate::generation::mock_controls::models::ControlType;
+use crate::generation::mock_controls::models::*;
 use crate::generation::mock_struct::common::*;
 use crate::generation::mock_struct::models::*;
 use crate::generation::mock_struct::*;
@@ -186,35 +188,76 @@ fn generate_inner_impl(
     let mock_struct_fn_new = mock_struct_fn_new::new(span);
     let associated_controls_creation_fns = maybe_associated_controls.map(|associated_controls| {
         [
-            ImplItem::Fn(control_creation_fn::generate_associated(
+            control_creation_fn::generate_associated(
                 span,
                 associated_controls.setup_struct.path,
                 ControlType::Setup,
-            )),
-            ImplItem::Fn(control_creation_fn::generate_associated(
+            ),
+            control_creation_fn::generate_associated(
                 span,
                 associated_controls.received_struct.path,
                 ControlType::Received,
-            )),
+            ),
         ]
     });
     let static_controls_creation_fns = maybe_static_controls.map(|static_controls| {
         [
-            ImplItem::Fn(control_creation_fn::generate_static(
+            control_creation_fn::generate_static(
                 span,
                 static_controls.static_setup_struct.path,
                 ControlType::Setup,
-            )),
-            ImplItem::Fn(control_creation_fn::generate_static(
+            ),
+            control_creation_fn::generate_static(
                 span,
                 static_controls.static_received_struct.path,
                 ControlType::Received,
-            )),
+            ),
         ]
     });
-    let items = core::iter::once(ImplItem::Fn(mock_struct_fn_new))
+    let base_fns = if ctx.support_base_calling {
+        Some(
+            trait_info
+                .associated_fns
+                .iter()
+                .map(|fn_info| {
+                    base_fn::generate_associated(
+                        span,
+                        base_fn::AssociatedParams {
+                            fn_info,
+                            mock_struct_path: mock_struct_path.clone(),
+                            base_impl: fn_info
+                                .maybe_base_impl
+                                .clone()
+                                .expect(constants::FN_SHOULD_HAVE_BASE_IMPL_MSG),
+                            maybe_associated_items_info: Some(&trait_info.associated_items_info),
+                            is_static: false,
+                        },
+                    )
+                })
+                .chain(trait_info.static_fns.iter().map(|fn_info| {
+                    base_fn::generate_associated(
+                        span,
+                        base_fn::AssociatedParams {
+                            fn_info,
+                            mock_struct_path: mock_struct_path.clone(),
+                            base_impl: fn_info
+                                .maybe_base_impl
+                                .clone()
+                                .expect(constants::FN_SHOULD_HAVE_BASE_IMPL_MSG),
+                            maybe_associated_items_info: Some(&trait_info.associated_items_info),
+                            is_static: true,
+                        },
+                    )
+                })),
+        )
+    } else {
+        None
+    };
+    let items = core::iter::once(mock_struct_fn_new)
         .chain(associated_controls_creation_fns.into_iter().flatten())
         .chain(static_controls_creation_fns.into_iter().flatten())
+        .chain(base_fns.into_iter().flatten())
+        .map(ImplItem::Fn)
         .collect();
 
     let result = ItemImpl {

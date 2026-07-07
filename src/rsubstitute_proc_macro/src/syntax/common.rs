@@ -75,6 +75,14 @@ pub(crate) fn void_type(span: Span) -> Type {
     })
 }
 
+pub(crate) fn void_tuple(span: Span) -> Expr {
+    Expr::Tuple(ExprTuple {
+        attrs: Vec::new(),
+        paren_token: token::Paren(span),
+        elems: Punctuated::new(),
+    })
+}
+
 pub(crate) fn mut_ptr_infer_type(span: Span) -> Type {
     Type::Ptr(TypePtr {
         star_token: Token![*](span),

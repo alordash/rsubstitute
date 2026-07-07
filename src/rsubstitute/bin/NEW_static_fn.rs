@@ -35,3 +35,48 @@ fn main() {
     f::received::<i32>(&3, Times::Exactly(1));
     println!("Done");
 }
+
+struct Q;
+impl Q {
+    fn kavo(&self) {}
+    fn chevo(&self) {
+        self.kavo();
+    }
+}
+
+struct QMock;
+impl QMock {
+    fn __base_chevo(__rsa_self: &Q) {
+        __rsa_self.kavo()
+    }
+}
+
+trait Trait<T> {
+    type MyType;
+
+    fn flex(&self) -> Self::MyType;
+}
+
+impl<T> Trait<T> for Q {
+    type MyType = i32;
+
+    fn flex(&self) -> Self::MyType {
+        todo!()
+    }
+}
+
+impl Q {
+    fn trait_usage<T>(&self) -> <Self as Trait<T>>::MyType {
+        <Q as Trait<T>>::flex(self)
+    }
+}
+
+trait F {
+    fn ff(&self) {}
+}
+impl F for Q {}
+impl Q {
+    fn use_f(&self) {
+        Q::ff(self);
+    }
+}

@@ -1,3 +1,4 @@
+use crate::generation::common::models::*;
 use crate::generation::fn_info::models::*;
 use crate::preparation::common::models::*;
 use crate::preparation::r#trait::models::*;
@@ -15,4 +16,5 @@ pub(crate) struct TraitInfo {
     pub static_fns: Vec<Ordered<FnInfo>>,
     pub associated_fns: Vec<Ordered<FnInfo>>,
     pub mock_struct_ident: Ident,
+    pub associated_items_info: AssociatedItemsInfo,
 }
