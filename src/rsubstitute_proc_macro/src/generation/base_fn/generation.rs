@@ -9,18 +9,22 @@ use proc_macro2::Span;
 use quote::format_ident;
 use syn::*;
 
-pub(crate) struct StaticParams<'a> {
+pub(crate) fn get_base_fn_ident(fn_ident: &Ident) -> Ident {
+    format_ident!("__rs_base_{}", fn_ident)
+}
+
+pub(crate) struct StaticFnParams<'a> {
     pub fn_info: &'a FnInfo,
     pub mock_struct_path: Path,
     pub base_impl: Box<Block>,
 }
-pub(crate) fn generate_static(
+pub(crate) fn generate_static_fn(
     span: Span,
-    StaticParams {
+    StaticFnParams {
         fn_info,
         mock_struct_path,
         base_impl,
-    }: StaticParams,
+    }: StaticFnParams,
 ) -> ItemFn {
     let (sig, block) = generate_core(span, fn_info, mock_struct_path, base_impl, true);
     let result = ItemFn {
@@ -109,7 +113,7 @@ fn generate_core(
         unsafety: source_signature.unsafety.clone(),
         abi: source_signature.abi.clone(),
         fn_token: Token![fn](span),
-        ident: format_ident!("__rs_base_{}", source_signature.ident),
+        ident: get_base_fn_ident(&fn_info.fn_ident),
         generics: source_signature.generics.clone(),
         paren_token: token::Paren(span),
         inputs: punctuated([

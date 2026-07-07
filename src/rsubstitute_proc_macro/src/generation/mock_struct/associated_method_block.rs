@@ -17,6 +17,7 @@ pub(crate) fn generate(
     let (fn_data_var_path, fn_data_stmt) =
         fn_data_stmt::new_associated(span, fn_info, generic_arguments);
     let fn_handle_stmt = fn_handle_stmt::generate(
+        ctx,
         span,
         fn_handle_stmt::Params {
             mock_struct_path,

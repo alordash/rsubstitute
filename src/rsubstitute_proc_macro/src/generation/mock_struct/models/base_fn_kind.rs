@@ -2,6 +2,6 @@ use proc_macro2::Ident;
 
 pub(crate) enum BaseFnKind {
     None,
-    Static(Ident),
+    StaticFn(Ident),
     Associated(Ident),
 }

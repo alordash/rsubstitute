@@ -1,5 +1,4 @@
 use crate::common::models::*;
-use crate::constants;
 use crate::generation::base_fn;
 use crate::generation::common::*;
 use crate::generation::fn_info::models::*;
@@ -173,13 +172,13 @@ fn map_method(
             vis: Visibility::Inherited,
             defaultness: None, // TODO - verify that it's always None, IIRC you can trait Trait { default fn f() {} }
             sig: *x.source_signature.clone(),
-            block: associated_fn_block::generate(
+            block: associated_method_block::generate(
                 ctx,
                 span,
                 mock_struct_path,
                 x,
                 if x.maybe_base_impl.is_some() {
-                    Some(x.fn_ident.clone())
+                    Some(base_fn::get_base_fn_ident(&x.fn_ident))
                 } else {
                     None
                 },
@@ -206,7 +205,7 @@ fn map_fn(
                 mock_struct_path,
                 x,
                 if x.maybe_base_impl.is_some() {
-                    BaseFnKind::Static(x.fn_ident.clone())
+                    BaseFnKind::Associated(base_fn::get_base_fn_ident(&x.fn_ident))
                 } else {
                     BaseFnKind::None
                 },
@@ -260,35 +259,11 @@ fn generate_inner_impl(
             trait_info
                 .associated_fns
                 .iter()
-                .map(|fn_info| {
-                    base_fn::generate_associated(
-                        span,
-                        base_fn::AssociatedParams {
-                            fn_info,
-                            mock_struct_path: mock_struct_path.clone(),
-                            base_impl: fn_info
-                                .maybe_base_impl
-                                .clone()
-                                .expect(constants::FN_SHOULD_HAVE_BASE_IMPL_MSG),
-                            maybe_associated_items_info: Some(&trait_info.associated_items_info),
-                            is_static: false,
-                        },
-                    )
+                .filter_map(|fn_info| {
+                    try_extract_base_fn(span, &mock_struct_path, trait_info, fn_info, false)
                 })
-                .chain(trait_info.static_fns.iter().map(|fn_info| {
-                    base_fn::generate_associated(
-                        span,
-                        base_fn::AssociatedParams {
-                            fn_info,
-                            mock_struct_path: mock_struct_path.clone(),
-                            base_impl: fn_info
-                                .maybe_base_impl
-                                .clone()
-                                .expect(constants::FN_SHOULD_HAVE_BASE_IMPL_MSG),
-                            maybe_associated_items_info: Some(&trait_info.associated_items_info),
-                            is_static: true,
-                        },
-                    )
+                .chain(trait_info.static_fns.iter().filter_map(|fn_info| {
+                    try_extract_base_fn(span, &mock_struct_path, trait_info, fn_info, true)
                 })),
         )
     } else {
@@ -316,4 +291,25 @@ fn generate_inner_impl(
         items,
     };
     return result;
+}
+
+fn try_extract_base_fn(
+    span: Span,
+    mock_struct_path: &Path,
+    trait_info: &TraitInfo,
+    fn_info: &FnInfo,
+    is_static: bool,
+) -> Option<ImplItemFn> {
+    fn_info.maybe_base_impl.clone().map(|base_impl| {
+        base_fn::generate_associated(
+            span,
+            base_fn::AssociatedParams {
+                fn_info,
+                mock_struct_path: mock_struct_path.clone(),
+                base_impl,
+                maybe_associated_items_info: Some(&trait_info.associated_items_info),
+                is_static,
+            },
+        )
+    })
 }

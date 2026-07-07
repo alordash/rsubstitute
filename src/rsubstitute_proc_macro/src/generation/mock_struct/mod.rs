@@ -18,7 +18,7 @@ pub mod models {
     pub(crate) use trait_mock_struct::*;
 }
 
-pub mod associated_fn_block;
+pub mod associated_method_block;
 pub mod static_fn_block;
 pub mod static_fn_mock_struct;
 pub mod trait_mock_struct;

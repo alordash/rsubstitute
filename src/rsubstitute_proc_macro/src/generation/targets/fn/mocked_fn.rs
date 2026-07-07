@@ -18,7 +18,7 @@ pub(crate) fn generate(
         mock_struct_path,
         fn_info,
         match maybe_base_fn_ident {
-            Some(x) => BaseFnKind::Static(x),
+            Some(x) => BaseFnKind::StaticFn(x),
             None => BaseFnKind::None,
         },
     );

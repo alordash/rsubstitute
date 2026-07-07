@@ -1,3 +1,4 @@
+use crate::common::models::*;
 use crate::common::*;
 use crate::generation::common::*;
 use crate::generation::fn_info::models::*;
@@ -14,6 +15,7 @@ pub(crate) struct Params<'a> {
     pub is_static: bool,
 }
 pub(crate) fn generate(
+    ctx: &Context,
     span: Span,
     Params {
         mock_struct_path,
@@ -62,12 +64,11 @@ pub(crate) fn generate(
         dot2_token: None,
         rest: None,
     });
-    let maybe_base_fn_path = match base_fn_kind {
-        BaseFnKind::None => None,
-        BaseFnKind::Static(base_fn_ident) => {
+    let maybe_base_fn_path = match (ctx.support_base_calling, base_fn_kind) {
+        (true, BaseFnKind::StaticFn(base_fn_ident)) => {
             Some(generate_base_fn_path(span, fn_info, base_fn_ident))
         }
-        BaseFnKind::Associated(base_fn_ident) => {
+        (true, BaseFnKind::Associated(base_fn_ident)) => {
             let mut base_fn_path = generate_base_fn_path(span, fn_info, base_fn_ident);
             base_fn_path.segments.insert(
                 0,
@@ -78,6 +79,7 @@ pub(crate) fn generate(
             );
             Some(base_fn_path)
         }
+        (_, BaseFnKind::None) | (false, _) => None,
     };
     let maybe_base_call = maybe_base_fn_path.map(|path| {
         Expr::Path(ExprPath {

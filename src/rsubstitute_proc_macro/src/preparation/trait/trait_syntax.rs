@@ -26,23 +26,15 @@ pub(crate) fn prepare(
     }: Params,
 ) -> TraitSyntax {
     let split_items = split_items(items, &ident);
-    let trait_syntax_as_fn_owner = TraitSyntaxAsFnOwner {
-        ident: &ident,
-        generics: &generics,
-    };
     let static_fns = split_items
         .static_fns
         .into_iter()
-        .map(|ordered| {
-            ordered.map(|x| map_trait_item_fn_to_fn_syntax(x, &trait_syntax_as_fn_owner))
-        })
+        .map(|ordered| ordered.map(map_trait_item_fn_to_fn_syntax))
         .collect();
     let associated_fns = split_items
         .associated_fns
         .into_iter()
-        .map(|ordered| {
-            ordered.map(|x| map_trait_item_fn_to_fn_syntax(x, &trait_syntax_as_fn_owner))
-        })
+        .map(|ordered| ordered.map(map_trait_item_fn_to_fn_syntax))
         .collect();
     let merged_generics = merge_generics_with_assoc_types(generics, &split_items.assoc_types);
     let path = path::from_ident_with_generics(ident.clone(), &merged_generics);
@@ -118,16 +110,13 @@ fn split_items(items: Vec<TraitItem>, trait_ident: &Ident) -> SplitItems {
     return split_items;
 }
 
-fn map_trait_item_fn_to_fn_syntax(
-    trait_item_fn: TraitItemFn,
-    trait_syntax_as_fn_owner: &TraitSyntaxAsFnOwner,
-) -> FnSyntax {
+fn map_trait_item_fn_to_fn_syntax(trait_item_fn: TraitItemFn) -> FnSyntax {
     let result = fn_syntax::prepare(fn_syntax::Params {
         attributes: trait_item_fn.attrs,
         visibility: Visibility::Inherited,
         signature: trait_item_fn.sig,
-        maybe_base_impl: None,
-        maybe_owner: Some(trait_syntax_as_fn_owner),
+        maybe_base_impl: trait_item_fn.default.map(Box::new),
+        maybe_owner: None,
     });
     return result;
 }
@@ -141,18 +130,4 @@ fn merge_generics_with_assoc_types(
         .map(|x| generic_param::from_type_ident(x.item.ident.clone()));
     generics.params.extend(assoc_types_as_generic_parameters);
     return generics;
-}
-
-struct TraitSyntaxAsFnOwner<'a> {
-    pub ident: &'a Ident,
-    pub generics: &'a Generics,
-}
-impl<'a> IFnOwner for TraitSyntaxAsFnOwner<'a> {
-    fn ident(&self) -> &Ident {
-        self.ident
-    }
-
-    fn generics(&self) -> &Generics {
-        &self.generics
-    }
 }

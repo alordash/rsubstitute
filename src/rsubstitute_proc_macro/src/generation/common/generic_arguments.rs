@@ -24,7 +24,10 @@ pub(crate) fn new(ctx: &Context, span: Span, mock_struct_path: Path, fn_info: &F
                 ReturnType::Type(_, _) => true,
             },
         ),
-        supports_base_calling_argument: generic_argument::bool(span, ctx.support_base_calling),
+        supports_base_calling_argument: generic_argument::bool(
+            span,
+            ctx.support_base_calling && fn_info.maybe_base_impl.is_some(),
+        ),
         passes_mock_to_callback_argument: generic_argument::bool(span, false),
     };
     return result;
