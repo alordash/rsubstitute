@@ -82,6 +82,12 @@ path = "bin/NEW_static_fn.rs"
 test = false
 doctest = false
 
+[[bin]]
+name = "NEW_trait"
+path = "bin/NEW_trait.rs"
+test = false
+doctest = false
+
 [dependencies]
 rsubstitute_core = { workspace = true }
 rsubstitute_proc_macro = { workspace = true }
