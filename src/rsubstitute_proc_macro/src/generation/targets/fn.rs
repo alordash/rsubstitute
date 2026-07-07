@@ -89,7 +89,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
         static_fn_mock_struct.path,
         maybe_base_fn.as_ref().map(|x| x.sig.ident.clone()),
     );
-    let usage_ident = mocked_fn.sig.ident.clone();
+    let fn_ident = mocked_fn.sig.ident.clone();
     let fn_items = if let Some(base_fn) = maybe_base_fn {
         vec![Item::Fn(mocked_fn), Item::Fn(base_fn)]
     } else {
@@ -130,7 +130,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
     ])
     .collect();
 
-    let usage = mod_usage::new(mod_ident.clone(), usage_ident);
+    let usage = mod_usage::new(mod_ident.clone(), [fn_ident]);
     let item_mod = ItemMod {
         attrs: vec![attributes::allow_non_camel_case_types(source_span)],
         vis: fn_info.visibility.clone(),

@@ -55,8 +55,8 @@ pub(crate) fn generate(
         span,
         trait_info,
         path.clone(),
-        maybe_associated_controls,
-        maybe_static_controls,
+        &maybe_associated_controls,
+        &maybe_static_controls,
     );
 
     let result = TraitMockStruct {
@@ -64,6 +64,8 @@ pub(crate) fn generate(
         item_struct,
         trait_impl,
         inner_impl,
+        maybe_associated_controls,
+        maybe_static_controls,
     };
     return result;
 }
@@ -182,34 +184,37 @@ fn generate_inner_impl(
     span: Span,
     trait_info: &TraitInfo,
     mock_struct_path: Path,
-    maybe_associated_controls: Option<AssociatedControls>,
-    maybe_static_controls: Option<StaticControls>,
+    maybe_associated_controls: &Option<AssociatedControls>,
+    maybe_static_controls: &Option<StaticControls>,
 ) -> ItemImpl {
     let mock_struct_fn_new = mock_struct_fn_new::new(span);
-    let associated_controls_creation_fns = maybe_associated_controls.map(|associated_controls| {
-        [
-            control_creation_fn::generate_associated(
-                span,
-                associated_controls.setup_struct.path,
-                ControlType::Setup,
-            ),
-            control_creation_fn::generate_associated(
-                span,
-                associated_controls.received_struct.path,
-                ControlType::Received,
-            ),
-        ]
-    });
-    let static_controls_creation_fns = maybe_static_controls.map(|static_controls| {
+    let associated_controls_creation_fns =
+        maybe_associated_controls
+            .as_ref()
+            .map(|associated_controls| {
+                [
+                    control_creation_fn::generate_associated(
+                        span,
+                        associated_controls.setup_struct.path.clone(),
+                        ControlType::Setup,
+                    ),
+                    control_creation_fn::generate_associated(
+                        span,
+                        associated_controls.received_struct.path.clone(),
+                        ControlType::Received,
+                    ),
+                ]
+            });
+    let static_controls_creation_fns = maybe_static_controls.as_ref().map(|static_controls| {
         [
             control_creation_fn::generate_static(
                 span,
-                static_controls.static_setup_struct.path,
+                static_controls.static_setup_struct.path.clone(),
                 ControlType::Setup,
             ),
             control_creation_fn::generate_static(
                 span,
-                static_controls.static_received_struct.path,
+                static_controls.static_received_struct.path.clone(),
                 ControlType::Received,
             ),
         ]

@@ -2,6 +2,8 @@ use crate::common::models::*;
 use crate::generation::mock_controls::*;
 use crate::generation::mock_struct::models::*;
 use crate::generation::mock_struct::*;
+use crate::generation::targets::common::mod_usage;
+use crate::generation::targets::mock_mod_usages;
 use crate::generation::targets::models::*;
 use crate::generation::*;
 use crate::preparation::r#trait::*;
@@ -88,7 +90,7 @@ pub(crate) fn generate_module(ctx: &Context, item_trait: ItemTrait) -> MockMod {
         ctx,
         source_span,
         trait_mock_struct::Params {
-            mock_struct_ident: trait_mock_struct_ident,
+            mock_struct_ident: trait_mock_struct_ident.clone(),
             trait_info: &trait_info,
             maybe_associated_controls,
             maybe_static_controls,
@@ -96,15 +98,72 @@ pub(crate) fn generate_module(ctx: &Context, item_trait: ItemTrait) -> MockMod {
     );
 
     let mod_visibility = item_trait.vis.clone();
-    let items = [Item::Trait(item_trait)].into_iter().collect();
+    let mock_mod_usages = mock_mod_usages::new(source_span);
+    let items = [
+        Item::Use(mock_mod_usages.use_rsubstitute_for_generated),
+        Item::Use(mock_mod_usages.use_super),
+    ]
+    .into_iter()
+    .chain(core::iter::once(Item::Trait(item_trait)))
+    .chain(trait_info.associated_fns.into_iter().flat_map(|x| {
+        let call_struct = x.value.call_struct;
+        let args_checker = x.value.args_checker_struct;
+        [
+            Item::Struct(call_struct.item_struct),
+            Item::Impl(call_struct.generics_info_provider_impl),
+            Item::Impl(call_struct.call_impl),
+        ]
+        .into_iter()
+        .chain(call_struct.maybe_clone_impl.map(Item::Impl).into_iter())
+        .chain([
+            Item::Struct(args_checker.item_struct),
+            Item::Impl(args_checker.generics_info_provider_impl),
+            Item::Impl(args_checker.args_checker_impl),
+        ])
+    }))
+    .chain([
+        Item::Struct(trait_mock_struct.item_struct),
+        Item::Impl(trait_mock_struct.trait_impl),
+        Item::Impl(trait_mock_struct.inner_impl),
+    ])
+    .chain(
+        trait_mock_struct
+            .maybe_associated_controls
+            .into_iter()
+            .flat_map(|associated_controls| {
+                [
+                    Item::Struct(associated_controls.setup_struct.item_struct),
+                    Item::Impl(associated_controls.setup_struct.item_impl),
+                    Item::Struct(associated_controls.received_struct.item_struct),
+                    Item::Impl(associated_controls.received_struct.item_impl),
+                ]
+            }),
+    )
+    .chain(
+        trait_mock_struct
+            .maybe_static_controls
+            .into_iter()
+            .flat_map(|static_controls| {
+                [
+                    Item::Struct(static_controls.static_setup_struct.item_struct),
+                    Item::Impl(static_controls.static_setup_struct.item_impl),
+                    Item::Struct(static_controls.static_received_struct.item_struct),
+                    Item::Impl(static_controls.static_received_struct.item_impl),
+                ]
+            }),
+    )
+    .collect();
 
-    let usage = todo!();
+    // TODO - add to generated mods `__rsubstitute_generated` prefix
+    let mod_ident = format_ident!("{}Mock", trait_info.ident);
+    let usage_ident = [trait_info.ident.clone(), trait_mock_struct_ident];
+    let usage = mod_usage::new(mod_ident.clone(), usage_ident);
     let item_mod = ItemMod {
         attrs: vec![attributes::allow_non_camel_case_types(source_span)],
         vis: mod_visibility,
         unsafety: None,
         mod_token: Token![mod](source_span),
-        ident: todo!(),
+        ident: mod_ident,
         content: Some((token::Brace(source_span), items)),
         semi: None,
     };
