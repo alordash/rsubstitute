@@ -3,10 +3,13 @@ use std::any::TypeId;
 use std::cell::UnsafeCell;
 use std::collections::HashMap;
 
+#[derive(Hash, Eq, PartialEq)]
+struct StaticFnDataKey(TypeId, &'static str);
+
 // Used for storing static functions' mock data.
 #[derive(Default)]
 struct StaticFnDatasGlobalMap {
-    pub map: UnsafeCell<HashMap<TypeId, *const ()>>,
+    pub map: UnsafeCell<HashMap<StaticFnDataKey, *const ()>>,
 }
 
 impl StaticFnDatasGlobalMap {
@@ -19,12 +22,13 @@ impl StaticFnDatasGlobalMap {
         &'_ self,
         fn_ident: &'static str,
     ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, false> {
-        // SAFETY: `StaticFn
+        // SAFETY: `StaticFn TODO - forgor to write it
         let maybe_map = unsafe { self.map.get().as_mut() };
         // SAFETY: `UnsafeCell::get` can not return null pointer.
         let map = unsafe { maybe_map.unwrap_unchecked() };
         let type_id = typeid::of::<TMock>();
-        let raw_ptr = map.entry(type_id).or_insert(Box::leak(Box::new(FnData::<
+        let key = StaticFnDataKey(type_id, fn_ident);
+        let raw_ptr = map.entry(key).or_insert(Box::leak(Box::new(FnData::<
             TMock,
             HAS_RETURN_VALUE,
             SUPPORTS_BASE_CALLING,
