@@ -23,7 +23,7 @@ mod result {
 
         pub struct TraitMock<T1> {
             #[doc(hidden)]
-            pub data: SharedMockData<TraitMock<T1>>,
+            pub data: ::rsubstitute_core::infrastructure::SharedMockData<TraitMock<T1>>,
         }
 
         #[derive(Clone)]

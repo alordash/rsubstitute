@@ -4,6 +4,8 @@ use proc_macro2::Span;
 use syn::*;
 
 pub(crate) fn new(span: Span) -> MockModUsages {
+    // TODO - need to remove it, everything from rsubstitute must be refered as `::rsubstitute::for_generated::*`
+    // use rsubstitute_punctuated() like in data_field
     let use_rsubstitute_for_generated = ItemUse {
         attrs: Vec::new(),
         vis: Visibility::Inherited,

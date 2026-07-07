@@ -7,4 +7,5 @@ pub mod trait_info;
 mod common {
     pub(crate) mod fn_data_stmt;
     pub(crate) mod generic_arguments;
+    pub(crate) mod data_field;
 }

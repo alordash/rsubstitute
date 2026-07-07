@@ -105,3 +105,22 @@ pub(crate) fn placeholder_lifetime(span: Span) -> Lifetime {
 pub(crate) fn punctuated<T, P: Default, const N: usize>(items: [T; N]) -> Punctuated<T, P> {
     items.into_iter().collect()
 }
+
+pub(crate) fn rsubstitute_punctuated<P: Default, const N: usize>(
+    span: Span,
+    items: [PathSegment; N],
+) -> Punctuated<PathSegment, P> {
+    [
+        PathSegment {
+            ident: Ident::new("rsubstitute", span),
+            arguments: PathArguments::None,
+        },
+        PathSegment {
+            ident: Ident::new("for_generated", span),
+            arguments: PathArguments::None,
+        },
+    ]
+    .into_iter()
+    .chain(items.into_iter())
+    .collect()
+}

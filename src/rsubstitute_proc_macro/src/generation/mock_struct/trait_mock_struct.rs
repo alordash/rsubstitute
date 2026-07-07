@@ -12,8 +12,6 @@ use syn::spanned::Spanned;
 use syn::*;
 
 pub(crate) struct Params<'a> {
-    pub ctx: &'a Context,
-    pub span: Span,
     pub mock_struct_ident: Ident,
     pub trait_info: &'a TraitInfo,
 }
@@ -21,8 +19,10 @@ pub(crate) struct Params<'a> {
 pub(crate) fn generate(
     ctx: &Context,
     span: Span,
-    mock_struct_ident: Ident,
-    trait_info: &TraitInfo,
+    Params {
+        mock_struct_ident,
+        trait_info,
+    }: Params,
 ) -> TraitMockStruct {
     let item_struct = ItemStruct {
         attrs: Vec::new(),
@@ -42,14 +42,18 @@ pub(crate) fn generate(
     };
     let path = path::from_ident_with_generics(item_struct.ident.clone(), &item_struct.generics);
     let trait_impl = generate_trait_impl(ctx, span, trait_info, path.clone());
+    let maybe_associated_fns_controls = todo!("from args");
+    let maybe_static_fns_controls = todo!("from args");
+    let base_fn_infos = todo!("from args");
     let maybe_inner_impl = generate_inner_impl(
         ctx,
         span,
         trait_info,
         path.clone(),
-        maybe_associated_fns_controls,
-        maybe_static_fns_controls,
-        base_fn_infos,
+        maybe_associated_fns_controls, // this
+        maybe_static_fns_controls,     // and this
+        base_fn_infos,                 // and this -> in mock_struct module
+                                       // but Setup and Received structures in mock_controls folder
     );
 
     let result = TraitMockStruct {
@@ -170,6 +174,7 @@ fn map_method(
     })
 }
 
+struct AssociatedFnsControls;
 fn generate_inner_impl(
     ctx: &Context,
     span: Span,

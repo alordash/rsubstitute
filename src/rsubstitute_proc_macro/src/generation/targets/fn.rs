@@ -45,25 +45,28 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
     let target_generics = fn_info.merged_generics.clone();
     let target_argument_types: Vec<_> = fn_info.arguments.iter_generics_style_types().collect();
     let fn_infos = [fn_info];
-    let static_setup_struct = static_setup::generate(static_setup::Params {
+    let static_setup_struct = static_setup::generate(
         ctx,
         source_span,
-        target_ident: target_ident.clone(),
-        target_generics: target_generics.clone(),
-        maybe_target_argument_types: Some(target_argument_types.clone()),
-        mock_path: &static_fn_mock_struct.path,
-        fn_infos: &fn_infos,
-    });
-    let static_received_struct = static_received::generate(static_received::Params {
+        static_setup::Params {
+            ident: target_ident.clone(),
+            generics: target_generics.clone(),
+            maybe_argument_types: Some(target_argument_types.clone()),
+            mock_struct_path: &static_fn_mock_struct.path,
+            fn_infos: &fn_infos,
+        },
+    );
+    let static_received_struct = static_received::generate(
         ctx,
         source_span,
-        target_ident,
-        target_generics,
-        maybe_target_argument_types: Some(target_argument_types),
-        mock_struct_path: &static_fn_mock_struct.path,
-        fn_infos: &fn_infos,
-        static_no_other_calls: true,
-    });
+        static_received::Params {
+            ident: target_ident,
+            generics: target_generics,
+            maybe_argument_types: Some(target_argument_types),
+            mock_struct_path: &static_fn_mock_struct.path,
+            fn_infos: &fn_infos,
+        },
+    );
     let [fn_info] = fn_infos;
     let fn_static_setup = fn_static_setup::generate(
         ctx,
