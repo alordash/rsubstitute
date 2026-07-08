@@ -79,6 +79,7 @@ impl<T> Arg<T> {
         let arg_cmp = ArgCmp {
             value,
             comparator: PartialEq::eq,
+            maybe_as_ref_info: None,
         };
         return Self::PrivateEq(arg_cmp, Private);
     }
@@ -90,6 +91,7 @@ impl<T> Arg<T> {
         let arg_cmp = ArgCmp {
             value,
             comparator: PartialEq::eq,
+            maybe_as_ref_info: None,
         };
         return Self::PrivateNotEq(arg_cmp, Private);
     }
@@ -98,11 +100,26 @@ impl<T> Arg<T> {
     where
         T: AsRef<U>,
     {
+        let as_ref_info = AsRefInfo::new(&value);
         let arg_cmp = ArgCmp {
             value,
             comparator: |a, b| core::ptr::eq(a.as_ref(), b.as_ref()),
+            maybe_as_ref_info: Some(as_ref_info),
         };
         return Self::PrivateEq(arg_cmp, Private);
+    }
+
+    pub fn ref_not_eq<U>(value: T) -> Self
+    where
+        T: AsRef<U>,
+    {
+        let as_ref_info = AsRefInfo::new(&value);
+        let arg_cmp = ArgCmp {
+            value,
+            comparator: |a, b| core::ptr::eq(a.as_ref(), b.as_ref()),
+            maybe_as_ref_info: Some(as_ref_info),
+        };
+        return Self::PrivateNotEq(arg_cmp, Private);
     }
 }
 
@@ -119,6 +136,12 @@ impl<T> Arg<T> {
         let arg_info = ArgInfo::new(arg_name, actual_value, actual_value_str.clone());
         match self {
             Arg::PrivateEq(arg_cmp, _) => {
+                if let Some(as_ref_info) = &arg_cmp.maybe_as_ref_info {
+                    let expected_ptr = as_ref_info.value_as_ref_ptr;
+                    let actual_ptr = as_ref_info.get_actual_value_as_ref_ptr(actual_value);
+                    dbg!(expected_ptr);
+                    dbg!(actual_ptr);
+                }
                 if !arg_cmp.is_arg_equal_to(actual_value) {
                     let expected_value_str = print_arg(&arg_cmp.value);
                     return ArgCheckResult::Err(ArgCheckResultErr {
