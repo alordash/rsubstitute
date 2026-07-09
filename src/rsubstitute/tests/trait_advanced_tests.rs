@@ -34,10 +34,10 @@ mod tests {
     #[test]
     fn accept_ref_Ok() {
         // Arrange
-        let trait_mock = TraitMock::new();
+        let mut trait_mock = TraitMock::new();
         let v = &&&&32;
         let r = &&&&8;
-        trait_mock.setup.accept_ref(v).returns(r);
+        trait_mock.setup().accept_ref(v).returns(r);
 
         // Act
         let actual_r = trait_mock.accept_ref(v);
@@ -46,7 +46,7 @@ mod tests {
         assert_eq!(r, actual_r);
 
         trait_mock
-            .received
+            .received()
             .accept_ref(v, Times::Once)
             .no_other_calls();
     }
@@ -54,9 +54,9 @@ mod tests {
     #[test]
     fn return_mut_ref_Ok() {
         // Arrange
-        let trait_mock = TraitMock::new();
+        let mut trait_mock = TraitMock::new();
         let r = &mut 5;
-        trait_mock.setup.return_mut_ref().returns(r);
+        trait_mock.setup().return_mut_ref().returns(r);
 
         // Act
         let actual_r = trait_mock.return_mut_ref();
@@ -65,7 +65,7 @@ mod tests {
         assert_eq!(r, actual_r);
 
         trait_mock
-            .received
+            .received()
             .return_mut_ref(Times::Once)
             .no_other_calls();
     }
@@ -73,9 +73,9 @@ mod tests {
     #[test]
     fn return_mut_ref_with_base_Ok() {
         // Arrange
-        let trait_mock = TraitMock::new();
+        let mut trait_mock = TraitMock::new();
         let r = &mut 5;
-        trait_mock.setup.return_mut_ref_with_base().returns(r);
+        trait_mock.setup().return_mut_ref_with_base().returns(r);
 
         // Act
         let actual_r = trait_mock.return_mut_ref_with_base();
@@ -84,7 +84,7 @@ mod tests {
         assert_eq!(r, actual_r);
 
         trait_mock
-            .received
+            .received()
             .return_mut_ref_with_base(Times::Once)
             .no_other_calls();
     }
@@ -92,8 +92,8 @@ mod tests {
     #[test]
     fn return_mut_ref_with_base_CallBase_Ok() {
         // Arrange
-        let trait_mock = TraitMock::new();
-        trait_mock.setup.return_mut_ref_with_base().call_base();
+        let mut trait_mock = TraitMock::new();
+        trait_mock.setup().return_mut_ref_with_base().call_base();
 
         // Act
         let actual_r = trait_mock.return_mut_ref_with_base();
@@ -103,7 +103,7 @@ mod tests {
             assert_eq!(&*&raw mut BASE_MUT_REF, actual_r);
         }
         trait_mock
-            .received
+            .received()
             .return_mut_ref_with_base(Times::Once)
             .no_other_calls();
     }
@@ -116,7 +116,7 @@ mod tests {
             numbers: vec![5, 55],
         };
         let r = 42;
-        trait_mock.setup.foo_sum(v.clone()).returns(r);
+        trait_mock.setup().foo_sum(v.clone()).returns(r);
 
         // Act
         let actual_r = trait_mock.foo_sum(v.clone());
@@ -124,7 +124,10 @@ mod tests {
         // Assert
         assert_eq!(r, actual_r);
 
-        trait_mock.received.foo_sum(v, Times::Once).no_other_calls();
+        trait_mock
+            .received()
+            .foo_sum(v, Times::Once)
+            .no_other_calls();
     }
 
     #[test]
@@ -134,7 +137,7 @@ mod tests {
         let v = Foo {
             numbers: vec![5, 55],
         };
-        trait_mock.setup.foo_sum(v.clone()).call_base();
+        trait_mock.setup().foo_sum(v.clone()).call_base();
 
         // Act
         let actual_r = trait_mock.foo_sum(v.clone());
@@ -143,6 +146,9 @@ mod tests {
         let expected_r = v.numbers.iter().sum::<i32>() * 2;
         assert_eq!(expected_r, actual_r);
 
-        trait_mock.received.foo_sum(v, Times::Once).no_other_calls();
+        trait_mock
+            .received()
+            .foo_sum(v, Times::Once)
+            .no_other_calls();
     }
 }

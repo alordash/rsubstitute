@@ -6,26 +6,29 @@ use proc_macro2::Span;
 use syn::spanned::Spanned;
 use syn::*;
 
-pub(crate) fn new((number, mut pat_type): (usize, PatType)) -> Argument {
-    let ident = prepare_ident(number, &pat_type);
-    pat_type = common::replace_arg_pat_with_ident(pat_type, ident.clone());
+pub(crate) fn new((number, source_pat_type): (usize, PatType)) -> Argument {
+    let ident = prepare_ident(number, &source_pat_type);
+    let ident_pat_type = common::replace_arg_pat_with_ident(source_pat_type.clone(), ident.clone());
 
-    let ptr_style_type = r#type::replace_references_with_pointers(pat_type.ty.clone());
+    let ptr_style_type = r#type::replace_references_with_pointers(ident_pat_type.ty.clone());
 
     let ref_style_type = r#type::replace_anonymous_lifetimes_in_references(
-        pat_type.ty.clone(),
-        &rsubstitute_lifetime::new(pat_type.span()),
+        ident_pat_type.ty.clone(),
+        &rsubstitute_lifetime::new(ident_pat_type.span()),
     );
 
     let generic_arg_style_type =
-        r#type::replace_anonymous_references_with_pointers(pat_type.ty.clone());
+        r#type::replace_anonymous_references_with_pointers(ident_pat_type.ty.clone());
 
     // TODO - perhaps need to pass here ptr_style_type
-    let control_fn_arg =
-        generate_control_fn_arg(ident.span(), pat_type.pat.clone(), ref_style_type.clone());
+    let control_fn_arg = generate_control_fn_arg(
+        ident.span(),
+        ident_pat_type.pat.clone(),
+        ref_style_type.clone(),
+    );
 
     let result = Argument {
-        source_pat_type: pat_type,
+        source_pat_type,
         ident,
         ptr_style_type,
         ref_style_type,
