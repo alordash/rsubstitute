@@ -105,7 +105,7 @@ List of existing configuration ordered by number of correctly matched arguments 
         String::new()
     };
     let needed_return_value_msg = if needed_return_value {
-        " because no return value was supplied"
+        " because no return value was provided"
     } else {
         ""
     };

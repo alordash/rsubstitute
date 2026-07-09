@@ -147,7 +147,7 @@ impl<T> Arg<T> {
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
-                            "\t\tExpected{expected_ptr_info_suffix}: {expected_value_str}\n\t\tActual  {actual_ptr_info_suffix}: {actual_value_str}"
+                            "\t\tExpected{expected_ptr_info_suffix}: {expected_value_str}\n\t\tActual{actual_ptr_info_suffix} {actual_value_str}"
                         ),
                     });
                 }

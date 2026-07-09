@@ -172,8 +172,8 @@ pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockM
     )
     .collect();
 
-    // TODO - add to generated mods `__rsubstitute_generated` prefix
-    let mod_ident = format_ident!("__TODO_{}Mock", trait_info.ident);
+    // TODO - add to all targets generated mods `__rsubstitute_generated` prefix
+    let mod_ident = format_ident!("__rsubstitute_generated_{}Mock", trait_info.ident);
     let usage_ident = [trait_info.ident.clone(), trait_mock_struct_ident];
     let usage = mod_usage::new(mod_ident.clone(), usage_ident);
     let item_mod = ItemMod {
