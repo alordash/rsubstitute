@@ -42,20 +42,19 @@ pub(crate) fn generate(
                     attrs: Vec::new(),
                     member: Member::Named(field_ident.clone()),
                     colon_token: Some(Token![:](span)),
-                    expr: Expr::MethodCall(expr::method_call::new(
+                    expr: Expr::Call(expr::call::new(
                         span,
-                        Expr::Paren(ExprParen {
+                        Expr::Path(ExprPath {
                             attrs: Vec::new(),
-                            paren_token: token::Paren(span),
-                            expr: Box::new(Expr::Reference(ExprReference {
-                                attrs: Vec::new(),
-                                and_token: Token![&](span),
-                                mutability: None,
-                                expr: Box::new(Expr::Field(expr::field::new_self(field_ident))),
-                            })),
+                            qself: None,
+                            path: path::new_global(span, ["core", "clone", "Clone", "clone"]),
                         }),
-                        Ident::new("clone", span),
-                        [],
+                        [Expr::Reference(ExprReference {
+                            attrs: Vec::new(),
+                            and_token: Token![&](span),
+                            mutability: None,
+                            expr: Box::new(Expr::Field(expr::field::new_self(field_ident))),
+                        })],
                     )),
                 }
             })

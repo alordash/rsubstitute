@@ -77,6 +77,17 @@ fn generate_received_fn(
     let (times_arg_path, times_arg) = times_arg::new(span);
     let generic_arguments = generic_arguments::new(ctx, span, mock_struct_path.clone(), fn_info);
     let rsubstitute_lifetime = rsubstitute_lifetime::new(span);
+    let mut generics = generics::with_prefix_lifetime(
+        generics::with_lifetimes_tied_to(
+            Generics::default(),
+            &fn_info.merged_generics,
+            rsubstitute_lifetime.clone(),
+        ),
+        rsubstitute_lifetime,
+    );
+    if !for_static_fn {
+        generics = generics::combine(generics, &fn_info.source_signature.generics);
+    }
     let sig = Signature {
         constness: None,
         asyncness: None,
@@ -88,14 +99,7 @@ fn generate_received_fn(
         } else {
             fn_info.source_signature.ident.clone()
         },
-        generics: generics::with_prefix_lifetime(
-            generics::with_lifetimes_tied_to(
-                Generics::default(),
-                &fn_info.merged_generics,
-                rsubstitute_lifetime.clone(),
-            ),
-            rsubstitute_lifetime,
-        ),
+        generics,
         paren_token: token::Paren(span),
         inputs: [self_fn_arg(span)]
             .into_iter()

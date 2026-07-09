@@ -16,7 +16,7 @@ pub(crate) fn generate(ctx: &Context, fn_syntax: &FnSyntax) -> CallStruct {
     let struct_ident = format_ident!("{}_Call", fn_syntax.fn_ident);
     let generics = fn_syntax.merged_generics.clone();
     let path = path::from_ident_with_generics(struct_ident.clone(), &generics);
-    let maybe_clone_impl = if ctx.support_base_calling {
+    let maybe_clone_impl = if ctx.support_base_calling && fn_syntax.maybe_base_impl.is_some() {
         Some(clone_impl::generate(
             span,
             fn_syntax.merged_generics.clone(),

@@ -83,8 +83,9 @@ fn format_fn_ident(
         GenericParam::Const(c) => c.ident.clone(),
     });
     let ident_parts = maybe_owner
-        .map(|x| x.ident().clone())
+        .map(|x| x.maybe_ident().cloned())
         .into_iter()
+        .flatten()
         .chain(core::iter::once(fn_ident))
     // TODO: is this needed?
     // .chain(generics_suffixes)

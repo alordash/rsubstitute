@@ -122,8 +122,8 @@ struct ImplStructSyntaxAsFnOwner<'a> {
     pub generics: &'a Generics,
 }
 impl<'a> IFnOwner for ImplStructSyntaxAsFnOwner<'a> {
-    fn ident(&self) -> &Ident {
-        self.ident
+    fn maybe_ident(&self) -> Option<&Ident> {
+        Some(self.ident)
     }
 
     fn generics(&self) -> &Generics {

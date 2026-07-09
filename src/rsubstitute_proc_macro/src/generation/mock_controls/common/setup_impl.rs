@@ -77,6 +77,11 @@ fn generate_setup_fn(
         placeholder_lifetime(span),
         None,
     );
+    let mut generics =
+        generics::with_prefix_lifetime(Generics::default(), rsubstitute_lifetime::new(span));
+    if !for_static_fn {
+        generics = generics::combine(generics, &fn_info.source_signature.generics);
+    }
     let sig = Signature {
         constness: None,
         asyncness: None,
@@ -88,10 +93,7 @@ fn generate_setup_fn(
         } else {
             fn_info.source_signature.ident.clone()
         },
-        generics: generics::with_prefix_lifetime(
-            Generics::default(),
-            rsubstitute_lifetime::new(span),
-        ),
+        generics,
         paren_token: token::Paren(span),
         inputs: [ref_self_fn_arg(span)]
             .into_iter()
@@ -153,11 +155,11 @@ fn generate_setup_fn(
         }),
         semi_token: Token![;](span),
     };
-    let return_stmt = Expr::Path(ExprPath {
+    let return_stmt = Expr::Macro(transmute_lifetime_expr::new(Expr::Path(ExprPath {
         attrs: Vec::new(),
         qself: None,
         path: fn_configurator_var_path,
-    });
+    })));
 
     let block = Block {
         brace_token: token::Brace(span),

@@ -2,13 +2,13 @@
 #![allow(non_snake_case)]
 #![allow(unused)]
 
-use rsubstitute_core::args::Arg;
 use rsubstitute_core::Times;
+use rsubstitute_core::args::Arg;
 #[allow(unused_imports)]
 use rsubstitute_proc_macro::mock;
 
 #[mock(base)]
-trait Trait {
+trait Trait<T1: Clone> {
     fn ok(&self) -> i32;
     fn ok_static() -> i32;
     fn f(&self, v: i32) {
@@ -19,10 +19,14 @@ trait Trait {
         let ok_v = Self::ok_static();
         println!("base f static! v = {v}, self ok = {ok_v}");
     }
+
+    fn gg<T2>(&self, t1: T1, t2: T2);
+
+    fn gg_static<T2>(t1: T1, t2: T2);
 }
 
 fn main() {
-    let mut mock = TraitMock::new();
+    let mut mock = TraitMock::<u8>::new();
 
     mock.setup()
         .ok()
@@ -39,7 +43,7 @@ fn main() {
     mock.f(2);
     mock.f(2);
     mock.f(3);
-    TraitMock::static_setup()
+    TraitMock::<i32>::static_setup()
         .ok_static()
         .returns_many([99, 88, 77])
         .f_static(11)
@@ -49,12 +53,16 @@ fn main() {
         .and_does(|(v,)| println!("little extra static BEFORE base call, v = {v}"))
         .f_static(Arg::Any)
         .does(|(v,)| println!("static any v = {v}"));
-    TraitMock::f_static(11);
-    TraitMock::f_static(22);
-    TraitMock::f_static(22);
-    TraitMock::f_static(22);
-    TraitMock::f_static(33);
-    
+    TraitMock::<&[u8]>::static_setup()
+        .f_static(22)
+        .does(|_| println!("this is from &[u8]"));
+    TraitMock::<i32>::f_static(11);
+    TraitMock::<i32>::f_static(22);
+    TraitMock::<i32>::f_static(22);
+    TraitMock::<i32>::f_static(22);
+    TraitMock::<&[u8]>::f_static(22);
+    TraitMock::<i32>::f_static(33);
+
     mock.received().f(1, Times::Once);
 
     println!("Done");
