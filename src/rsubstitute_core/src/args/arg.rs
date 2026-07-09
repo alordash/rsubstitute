@@ -1,6 +1,7 @@
 use crate::args::*;
 use crate::transmute_lifetime;
 use std::fmt::{Debug, Formatter};
+use std::ops::Deref;
 
 struct Private;
 
@@ -79,7 +80,7 @@ impl<T> Arg<T> {
         let arg_cmp = ArgCmp {
             value,
             comparator: PartialEq::eq,
-            maybe_as_ref_info: None,
+            maybe_deref_info: None,
         };
         return Self::PrivateEq(arg_cmp, Private);
     }
@@ -91,33 +92,33 @@ impl<T> Arg<T> {
         let arg_cmp = ArgCmp {
             value,
             comparator: PartialEq::eq,
-            maybe_as_ref_info: None,
+            maybe_deref_info: None,
         };
         return Self::PrivateNotEq(arg_cmp, Private);
     }
 
     pub fn ref_eq<U>(value: T) -> Self
     where
-        T: AsRef<U>,
+        T: Deref<Target = U>,
     {
-        let as_ref_info = AsRefInfo::new(&value);
+        let deref_info = DerefInfo::new(&value);
         let arg_cmp = ArgCmp {
             value,
-            comparator: |a, b| core::ptr::eq(a.as_ref(), b.as_ref()),
-            maybe_as_ref_info: Some(as_ref_info),
+            comparator: |a, b| core::ptr::eq(a.deref(), b.deref()),
+            maybe_deref_info: Some(deref_info),
         };
         return Self::PrivateEq(arg_cmp, Private);
     }
 
     pub fn ref_not_eq<U>(value: T) -> Self
     where
-        T: AsRef<U>,
+        T: Deref<Target = U>,
     {
-        let as_ref_info = AsRefInfo::new(&value);
+        let deref_info = DerefInfo::new(&value);
         let arg_cmp = ArgCmp {
             value,
-            comparator: |a, b| core::ptr::eq(a.as_ref(), b.as_ref()),
-            maybe_as_ref_info: Some(as_ref_info),
+            comparator: |a, b| core::ptr::eq(a.deref(), b.deref()),
+            maybe_deref_info: Some(deref_info),
         };
         return Self::PrivateNotEq(arg_cmp, Private);
     }
@@ -136,9 +137,9 @@ impl<T> Arg<T> {
         let arg_info = ArgInfo::new(arg_name, actual_value, actual_value_str.clone());
         match self {
             Arg::PrivateEq(arg_cmp, _) => {
-                if let Some(as_ref_info) = &arg_cmp.maybe_as_ref_info {
-                    let expected_ptr = as_ref_info.value_as_ref_ptr;
-                    let actual_ptr = as_ref_info.get_actual_value_as_ref_ptr(actual_value);
+                if let Some(deref_info) = &arg_cmp.maybe_deref_info {
+                    let expected_ptr = deref_info.expected_value_deref_ptr;
+                    let actual_ptr = deref_info.get_actual_value_deref_ptr(actual_value);
                     dbg!(expected_ptr);
                     dbg!(actual_ptr);
                 }

@@ -1,10 +1,10 @@
-use crate::args::AsRefInfo;
+use crate::args::DerefInfo;
 
 #[repr(C)]
 pub(crate) struct ArgCmp<T> {
     pub value: T,
     pub comparator: fn(&T, &T) -> bool,
-    pub maybe_as_ref_info: Option<AsRefInfo>,
+    pub maybe_deref_info: Option<DerefInfo>,
 }
 
 impl<T> ArgCmp<T> {
