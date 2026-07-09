@@ -2,6 +2,7 @@
 mod test_utils;
 
 use rsubstitute::macros::mock;
+use std::ops::Deref;
 use std::rc::Rc;
 use std::sync::Arc;
 use test_utils::*;
@@ -22,8 +23,10 @@ impl Custom {
         Self(Rc::new(v))
     }
 }
-impl AsRef<i32> for Custom {
-    fn as_ref(&self) -> &i32 {
+impl Deref for Custom {
+    type Target = i32;
+
+    fn deref(&self) -> &Self::Target {
         &self.0
     }
 }

@@ -71,7 +71,6 @@ Received no non-matching calls"
             );
 
             let invalid_r = Rc::new(11);
-            let invalid_r = r.clone();
             let invalid_r_ptr = Rc::as_ptr(&invalid_r);
             assert_panics(
                 || {
@@ -85,8 +84,8 @@ Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
 accept_rc(*{r}*)
 	1. r (alloc::rc::Rc<i32>):
-		Expected Rc (ptr: {invalid_r_ptr:?}): {invalid_r}
-		Actual Rc   (ptr: {r_ptr:?}): {r}"
+		Expected (ptr: {invalid_r_ptr:?}): {invalid_r}
+		Actual   (ptr: {r_ptr:?}): {r}"
                 ),
             )
         }

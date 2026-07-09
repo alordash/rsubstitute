@@ -110,6 +110,7 @@ impl<T> Arg<T> {
         return Self::PrivateEq(arg_cmp, Private);
     }
 
+    // TODO - write tests for that
     pub fn ref_not_eq<U>(value: T) -> Self
     where
         T: Deref<Target = U>,
@@ -137,18 +138,16 @@ impl<T> Arg<T> {
         let arg_info = ArgInfo::new(arg_name, actual_value, actual_value_str.clone());
         match self {
             Arg::PrivateEq(arg_cmp, _) => {
-                if let Some(deref_info) = &arg_cmp.maybe_deref_info {
-                    let expected_ptr = deref_info.expected_value_deref_ptr;
-                    let actual_ptr = deref_info.get_actual_value_deref_ptr(actual_value);
-                    dbg!(expected_ptr);
-                    dbg!(actual_ptr);
-                }
                 if !arg_cmp.is_arg_equal_to(actual_value) {
                     let expected_value_str = print_arg(&arg_cmp.value);
+                    let PtrInfo {
+                        expected_ptr_info_suffix,
+                        actual_ptr_info_suffix,
+                    } = arg_cmp.get_ptrs_info_suffix(actual_value);
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
-                            "\t\tExpected: {expected_value_str}\n\t\tActual:   {actual_value_str}"
+                            "\t\tExpected{expected_ptr_info_suffix}: {expected_value_str}\n\t\tActual  {actual_ptr_info_suffix}: {actual_value_str}"
                         ),
                     });
                 }
@@ -156,9 +155,15 @@ impl<T> Arg<T> {
             Arg::PrivateNotEq(arg_cmp, _) => {
                 if arg_cmp.is_arg_equal_to(actual_value) {
                     let not_expected_value_str = print_arg(&arg_cmp.value);
+                    let PtrInfo {
+                        expected_ptr_info_suffix,
+                        ..
+                    } = arg_cmp.get_ptrs_info_suffix(actual_value);
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
-                        error_msg: format!("\t\tDid not expect to be {not_expected_value_str}"),
+                        error_msg: format!(
+                            "\t\tDid not expect to be {expected_ptr_info_suffix}{not_expected_value_str}"
+                        ),
                     });
                 }
             }

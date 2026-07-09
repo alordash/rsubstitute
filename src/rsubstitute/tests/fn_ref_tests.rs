@@ -12,6 +12,7 @@ fn return_ref() -> &'static i32 {
     BASE_RETURN_REF
 }
 
+// TODO - write test with passing `Deref` and checking that it's compared with `Arg::ref_eq`
 const BASE_ACCEPT_REF_RETURN_REF: &'static i32 = &2000;
 #[mock(base)]
 fn accept_ref_return_ref(r: &i32) -> &'static i32 {
