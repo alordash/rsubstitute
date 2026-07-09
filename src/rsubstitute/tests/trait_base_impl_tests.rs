@@ -19,10 +19,10 @@ mod tests {
     #[test]
     fn get_plus_one_Ok() {
         // Arrange
-        let mock = TraitMock::new();
+        let mut mock = TraitMock::new();
 
         let value = 302;
-        mock.setup.get_plus_one().returns(value);
+        mock.setup().get_plus_one().returns(value);
 
         // Act
         let actual_value = mock.get_plus_one();
@@ -30,7 +30,7 @@ mod tests {
         // Assert
         assert_eq!(value, actual_value);
 
-        mock.received
+        mock.received()
             .get_plus_one(Times::Once)
             .get(Times::Never)
             .no_other_calls();
@@ -39,10 +39,10 @@ mod tests {
     #[test]
     fn get_plus_one_CallBase_Ok() {
         // Arrange
-        let mock = TraitMock::new();
+        let mut mock = TraitMock::new();
 
         let value = 302;
-        mock.setup.get().returns(value).get_plus_one().call_base();
+        mock.setup().get().returns(value).get_plus_one().call_base();
 
         // Act
         let actual_value = mock.get_plus_one();
@@ -51,7 +51,7 @@ mod tests {
         let expected_value = value + 1;
         assert_eq!(expected_value, actual_value);
 
-        mock.received
+        mock.received()
             .get(Times::Once)
             .get_plus_one(Times::Once)
             .no_other_calls();
