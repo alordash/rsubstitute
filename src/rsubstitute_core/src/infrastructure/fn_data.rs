@@ -38,6 +38,7 @@ impl<
         }
     }
 
+    // TODO - is it supposed to be public? If so, document it's usage
     pub fn reset(&self) {
         self.call_infos.borrow_mut().clear();
         self.configs.borrow_mut().clear();
