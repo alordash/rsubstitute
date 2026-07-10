@@ -9,7 +9,7 @@ struct StaticFnDataKey(TypeId, &'static str);
 // Used for storing static functions' mock data.
 #[derive(Default)]
 struct StaticFnDatasGlobalMap {
-    pub map: UnsafeCell<HashMap<StaticFnDataKey, *const ()>>,
+    pub map: UnsafeCell<HashMap<TypeId, HashMap<&'static str, *const ()>>>,
 }
 
 impl StaticFnDatasGlobalMap {
@@ -76,3 +76,5 @@ pub fn get_static_fn_data<
     let result = STATIC_FN_DATAS_GLOBAL_MAP.with(|this| this.get_specific_fn_data(fn_ident));
     return result;
 }
+
+pub fn clear_static_fn_data<TMock>(fn_iden)

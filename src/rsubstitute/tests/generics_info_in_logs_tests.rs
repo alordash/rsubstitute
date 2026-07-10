@@ -1,11 +1,355 @@
-use rsubstitute_proc_macro::mock;
+pub use __rsubstitute_generated_TraitMock::{Trait, TraitMock};
+#[allow(non_camel_case_types)]
+mod __rsubstitute_generated_TraitMock {
+    #[allow(unused_imports)]
+    use super::*;
+    use rsubstitute::for_generated::*;
+    pub trait Trait<'a, T1, const B: bool> {
+        // TODO - decide what to do with incorrect generics order. Somehow lib is fixing this by placing lifetime `'b` before `T2`
+        fn work<'b, T2, const N: usize>(&self, v: &'b T1) -> T2;
 
-#[mock]
-trait Trait<'a, T1, const B: bool> {
-    // TODO - decide what to do with incorrect generics order. Somehow lib is fixing this by placing lifetime `'b` before `T2`
-    fn work<T2, 'b, const N: usize>(&self, v: &'b T1) -> T2;
-
-    fn static_work<'b, T2, const N: usize>(v: &'b T1) -> T2;
+        fn static_work<'b, T2, const N: usize>(v: &'b T1) -> T2;
+    }
+    pub struct work_Call<'b, 'a, T2, const N: usize, T1, const B: bool> {
+        generics: PhantomData<(T2, &'b (), &'a (), T1, &'b T1)>,
+        v: *const T1,
+    }
+    impl<'b, 'a, T2, const N: usize, T1, const B: bool> IGenericsInfoProvider
+        for work_Call<'b, 'a, T2, N, T1, B>
+    {
+        fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
+            vec![
+                generic_type_info("T2", core::any::type_name::<T2>()),
+                generic_const_info("N", N),
+            ]
+        }
+        fn hash_generics_type_ids(&self, #[allow(unused_variables)] hasher: &mut GenericsHasher) {
+            [tid::<T2>()];
+        }
+        fn hash_const_values(&self, #[allow(unused_variables)] hasher: &mut GenericsHasher) {
+            const_hash(&N, hasher);
+        }
+    }
+    impl<'b, 'a, T2, const N: usize, T1, const B: bool> ICall for work_Call<'b, 'a, T2, N, T1, B> {
+        fn get_arg_infos(&self) -> Vec<ArgInfo> {
+            vec![ArgInfo::new(
+                "v",
+                &self.v,
+                (&ArgPrinter(transmute_lifetime!(&self.v, &&'b T1))).debug_string(),
+            )]
+        }
+        fn get_ptr_to_boxed_tuple_of_refs(&self) -> *mut () {
+            Box::leak(Box::new((&self.v,))) as *mut _ as *mut ()
+        }
+    }
+    struct work_ArgsChecker<'b, 'a, T2, const N: usize, T1, const B: bool> {
+        generics: PhantomData<(T2, &'b (), &'a (), T1, &'b T1)>,
+        v: Arg<*const T1>,
+    }
+    impl<'b, 'a, T2, const N: usize, T1, const B: bool> IGenericsInfoProvider
+        for work_ArgsChecker<'b, 'a, T2, N, T1, B>
+    {
+        fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
+            vec![
+                generic_type_info("T2", core::any::type_name::<T2>()),
+                generic_const_info("N", N),
+            ]
+        }
+        fn hash_generics_type_ids(&self, #[allow(unused_variables)] hasher: &mut GenericsHasher) {
+            [tid::<T2>()];
+        }
+        fn hash_const_values(&self, #[allow(unused_variables)] hasher: &mut GenericsHasher) {
+            const_hash(&N, hasher);
+        }
+    }
+    impl<'b, 'a, T2, const N: usize, T1, const B: bool> IArgsChecker
+        for work_ArgsChecker<'b, 'a, T2, N, T1, B>
+    {
+        fn check(&self, dyn_call: &DynCall) -> Vec<ArgCheckResult> {
+            #[allow(unused_variables)]
+            let call: &work_Call<'b, 'a, T2, N, T1, B> = dyn_call.downcast_ref();
+            vec![transmute_lifetime!(&self.v, &Arg<&'b T1>).check_ref(
+                "v",
+                transmute_lifetime!(&call.v),
+                (&ArgPrinter(transmute_lifetime!(&call.v, &&'b T1))).debug_string(),
+            )]
+        }
+        fn fmt_args(&self) -> String {
+            format!(
+                "{}",
+                (&ArgPrinter(transmute_lifetime!(&&self.v, &&Arg<&'b T1>))).debug_string()
+            )
+        }
+    }
+    pub struct static_work_Call<'b, 'a, T2, const N: usize, T1, const B: bool> {
+        generics: PhantomData<(&'b (), T2, &'a (), T1, &'b T1)>,
+        v: *const T1,
+    }
+    impl<'b, 'a, T2, const N: usize, T1, const B: bool> IGenericsInfoProvider
+        for static_work_Call<'b, 'a, T2, N, T1, B>
+    {
+        fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
+            vec![
+                generic_type_info("T2", core::any::type_name::<T2>()),
+                generic_const_info("N", N),
+            ]
+        }
+        fn hash_generics_type_ids(&self, #[allow(unused_variables)] hasher: &mut GenericsHasher) {
+            [tid::<T2>()];
+        }
+        fn hash_const_values(&self, #[allow(unused_variables)] hasher: &mut GenericsHasher) {
+            const_hash(&N, hasher);
+        }
+    }
+    impl<'b, 'a, T2, const N: usize, T1, const B: bool> ICall
+        for static_work_Call<'b, 'a, T2, N, T1, B>
+    {
+        fn get_arg_infos(&self) -> Vec<ArgInfo> {
+            vec![ArgInfo::new(
+                "v",
+                &self.v,
+                (&ArgPrinter(transmute_lifetime!(&self.v, &&'b T1))).debug_string(),
+            )]
+        }
+        fn get_ptr_to_boxed_tuple_of_refs(&self) -> *mut () {
+            Box::leak(Box::new((&self.v,))) as *mut _ as *mut ()
+        }
+    }
+    struct static_work_ArgsChecker<'b, 'a, T2, const N: usize, T1, const B: bool> {
+        generics: PhantomData<(&'b (), T2, &'a (), T1, &'b T1)>,
+        v: Arg<*const T1>,
+    }
+    impl<'b, 'a, T2, const N: usize, T1, const B: bool> IGenericsInfoProvider
+        for static_work_ArgsChecker<'b, 'a, T2, N, T1, B>
+    {
+        fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
+            vec![
+                generic_type_info("T2", core::any::type_name::<T2>()),
+                generic_const_info("N", N),
+            ]
+        }
+        fn hash_generics_type_ids(&self, #[allow(unused_variables)] hasher: &mut GenericsHasher) {
+            [tid::<T2>()];
+        }
+        fn hash_const_values(&self, #[allow(unused_variables)] hasher: &mut GenericsHasher) {
+            const_hash(&N, hasher);
+        }
+    }
+    impl<'b, 'a, T2, const N: usize, T1, const B: bool> IArgsChecker
+        for static_work_ArgsChecker<'b, 'a, T2, N, T1, B>
+    {
+        fn check(&self, dyn_call: &DynCall) -> Vec<ArgCheckResult> {
+            #[allow(unused_variables)]
+            let call: &static_work_Call<'b, 'a, T2, N, T1, B> = dyn_call.downcast_ref();
+            vec![transmute_lifetime!(&self.v, &Arg<&'b T1>).check_ref(
+                "v",
+                transmute_lifetime!(&call.v),
+                (&ArgPrinter(transmute_lifetime!(&call.v, &&'b T1))).debug_string(),
+            )]
+        }
+        fn fmt_args(&self) -> String {
+            format!(
+                "{}",
+                (&ArgPrinter(transmute_lifetime!(&&self.v, &&Arg<&'b T1>))).debug_string()
+            )
+        }
+    }
+    pub struct TraitMock<'a, T1, const B: bool> {
+        generics: PhantomData<(&'a (), T1)>,
+        pub data: ::rsubstitute::for_generated::SharedMockData,
+    }
+    impl<'a, T1, const B: bool> Trait<'a, T1, B> for TraitMock<'a, T1, B> {
+        fn work<'b, T2, const N: usize>(&self, v: &'b T1) -> T2 {
+            let fn_data: &FnData<TraitMock<'a, T1, B>, true, false, false> =
+                self.data.get_shared_fn_data("work");
+            fn_data.handle(
+                &TraitMock::<'a, T1, B> {
+                    generics: ::core::marker::PhantomData,
+                    data: self.data.clone(),
+                },
+                work_Call::<'b, 'a, T2, N, T1, B> {
+                    generics: ::core::marker::PhantomData,
+                    v: transmute_lifetime!(v),
+                },
+            )
+        }
+        fn static_work<'b, T2, const N: usize>(v: &'b T1) -> T2 {
+            let fn_data: &FnData<TraitMock<'a, T1, B>, true, false, false> =
+                get_static_fn_data("static_work");
+            fn_data.handle(
+                (),
+                static_work_Call::<'b, 'a, T2, N, T1, B> {
+                    generics: ::core::marker::PhantomData,
+                    v: transmute_lifetime!(v),
+                },
+            )
+        }
+    }
+    impl<'a, T1, const B: bool> TraitMock<'a, T1, B> {
+        pub fn new() -> Self {
+            Self {
+                generics: ::core::marker::PhantomData,
+                data: ::core::default::Default::default(),
+            }
+        }
+        pub fn setup(&mut self) -> TraitSetup<'a, T1, B> {
+            TraitSetup::<'a, T1, B> {
+                generics: ::core::marker::PhantomData,
+                data: self.data.clone(),
+            }
+        }
+        pub fn received(&mut self) -> TraitReceived<'a, T1, B> {
+            TraitReceived::<'a, T1, B> {
+                generics: ::core::marker::PhantomData,
+                data: self.data.clone(),
+            }
+        }
+        pub fn static_setup() -> TraitStaticSetup<'a, T1, B> {
+            TraitStaticSetup::<'a, T1, B> {
+                generics: ::core::marker::PhantomData,
+            }
+        }
+        pub fn static_received() -> TraitStaticReceived<'a, T1, B> {
+        
+            TraitStaticReceived::<'a, T1, B> {
+                generics: ::core::marker::PhantomData,
+            }
+        }
+    }
+    pub struct TraitSetup<'a, T1, const B: bool> {
+        generics: PhantomData<(&'a (), T1)>,
+        data: ::rsubstitute::for_generated::SharedMockData,
+    }
+    impl<'a, T1, const B: bool> TraitSetup<'a, T1, B> {
+        pub fn work<'__rsa, 'b, T2, const N: usize>(
+            &self,
+            v: impl Into<Arg<&'b T1>>,
+        ) -> FnConfigurator<
+            '_,
+            TraitMock<'a, T1, B>,
+            Self,
+            (&'__rsa &'b T1,),
+            T2,
+            TraitMock<'a, T1, B>,
+            true,
+            false,
+            false,
+        > {
+            let fn_data: &FnData<TraitMock<'a, T1, B>, true, false, false> =
+                self.data.get_shared_fn_data("work");
+            let args_checker = work_ArgsChecker::<'b, 'a, T2, N, T1, B> {
+                generics: ::core::marker::PhantomData,
+                v: transmute_lifetime!(v.into()),
+            };
+            let fn_configurator: FnConfigurator<
+                '_,
+                TraitMock<'a, T1, B>,
+                Self,
+                (&'__rsa &'b T1,),
+                T2,
+                TraitMock<'a, T1, B>,
+                true,
+                false,
+                false,
+            > = fn_data.add_config(args_checker, self);
+            transmute_lifetime!(fn_configurator)
+        }
+    }
+    pub struct TraitReceived<'a, T1, const B: bool> {
+        generics: PhantomData<(&'a (), T1)>,
+        data: ::rsubstitute::for_generated::SharedMockData,
+    }
+    impl<'a, T1, const B: bool> TraitReceived<'a, T1, B> {
+        pub fn work<'__rsa, 'b, T2, const N: usize>(
+            &self,
+            v: impl Into<Arg<&'b T1>>,
+            times: Times,
+        ) -> &'__rsa Self
+        where
+            'b: '__rsa,
+            'a: '__rsa,
+            '__rsa: 'b + 'a,
+        {
+            let fn_data: &FnData<TraitMock<'a, T1, B>, true, false, false> =
+                self.data.get_shared_fn_data("work");
+            let args_checker = work_ArgsChecker::<'b, 'a, T2, N, T1, B> {
+                generics: ::core::marker::PhantomData,
+                v: transmute_lifetime!(v.into()),
+            };
+            fn_data.verify_received(args_checker, times);
+            transmute_lifetime!(self)
+        }
+        pub fn no_other_calls(&self) {
+            self.data.verify_received_nothing_else(["work"])
+        }
+    }
+    pub struct TraitStaticSetup<'a, T1, const B: bool> {
+        generics: PhantomData<(&'a (), T1)>,
+    }
+    impl<'a, T1, const B: bool> TraitStaticSetup<'a, T1, B> {
+        pub fn static_work<'__rsa, 'b, T2, const N: usize>(
+            &self,
+            v: impl Into<Arg<&'b T1>>,
+        ) -> FnConfigurator<
+            '_,
+            TraitMock<'a, T1, B>,
+            Self,
+            (&'__rsa &'b T1,),
+            T2,
+            TraitMock<'a, T1, B>,
+            true,
+            false,
+            false,
+        > {
+            let fn_data: &FnData<TraitMock<'a, T1, B>, true, false, false> =
+                get_static_fn_data("static_work");
+            let args_checker = static_work_ArgsChecker::<'b, 'a, T2, N, T1, B> {
+                generics: ::core::marker::PhantomData,
+                v: transmute_lifetime!(v.into()),
+            };
+            let fn_configurator: FnConfigurator<
+                '_,
+                TraitMock<'a, T1, B>,
+                Self,
+                (&'__rsa &'b T1,),
+                T2,
+                TraitMock<'a, T1, B>,
+                true,
+                false,
+                false,
+            > = fn_data.add_config(args_checker, self);
+            transmute_lifetime!(fn_configurator)
+        }
+    }
+    pub struct TraitStaticReceived<'a, T1, const B: bool> {
+        generics: PhantomData<(&'a (), T1)>,
+    }
+    impl<'a, T1, const B: bool> TraitStaticReceived<'a, T1, B> {
+        pub fn static_work<'__rsa, 'b, T2, const N: usize>(
+            &self,
+            v: impl Into<Arg<&'b T1>>,
+            times: Times,
+        ) -> &'__rsa Self
+        where
+            'b: '__rsa,
+            'a: '__rsa,
+            '__rsa: 'b + 'a,
+        {
+            let fn_data: &FnData<TraitMock<'a, T1, B>, true, false, false> =
+                get_static_fn_data("static_work");
+            let args_checker = static_work_ArgsChecker::<'b, 'a, T2, N, T1, B> {
+                generics: ::core::marker::PhantomData,
+                v: transmute_lifetime!(v.into()),
+            };
+            fn_data.verify_received(args_checker, times);
+            transmute_lifetime!(self)
+        }
+        pub fn no_other_calls(&self) {
+            let fn_data: &FnData<TraitMock<'a, T1, B>, true, false, false> =
+                get_static_fn_data("static_work");
+            fn_data.verify_received_nothing_else([])
+        }
+    }
 }
 
 #[cfg(test)]
