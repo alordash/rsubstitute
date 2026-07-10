@@ -37,7 +37,12 @@ pub(crate) fn generate(
                 qself: None,
                 path: mock_struct_path,
                 brace_token: token::Brace(span),
-                fields: [data_field::new_clone_value(span)].into_iter().collect(),
+                fields: [
+                    generics_field::new_value(span),
+                    data_field::new_clone_value(span),
+                ]
+                .into_iter()
+                .collect(),
                 dot2_token: None,
                 rest: None,
             })),

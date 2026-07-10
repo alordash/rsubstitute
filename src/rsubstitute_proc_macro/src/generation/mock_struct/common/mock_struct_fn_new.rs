@@ -1,3 +1,4 @@
+use crate::common::generics_field;
 use crate::generation::common::*;
 use crate::syntax::*;
 use proc_macro2::Span;
@@ -23,7 +24,10 @@ pub(crate) fn new(span: Span) -> ImplItemFn {
         qself: None,
         path: self_type_path(span),
         brace_token: token::Brace(span),
-        fields: punctuated([data_field::new_default_value(span)]),
+        fields: punctuated([
+            generics_field::new_value(span),
+            data_field::new_default_value(span),
+        ]),
         dot2_token: None,
         rest: None,
     });

@@ -10,7 +10,7 @@ use syn::*;
 pub(crate) struct Params<'a, T: Borrow<FnInfo>> {
     pub ident: Ident,
     pub generics: Generics,
-    pub mock_struct_path: Path,
+    pub mock_struct_path: &'a Path,
     pub fn_infos: &'a [T],
 }
 pub(crate) fn generate<T: Borrow<FnInfo>>(
@@ -23,13 +23,7 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
         fn_infos,
     }: Params<T>,
 ) -> SetupStruct {
-    let item_struct = control_struct::new(
-        span,
-        ident,
-        generics,
-        mock_struct_path.clone(),
-        ControlType::Setup,
-    );
+    let item_struct = control_struct::new(span, ident, generics, ControlType::Setup);
     let path = path::from_ident_with_generics(item_struct.ident.clone(), &item_struct.generics);
     let item_impl = setup_impl::generate(
         ctx,
@@ -37,7 +31,7 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
         setup_impl::Params {
             setup_struct_path: path.clone(),
             generics: item_struct.generics.clone(),
-            mock_struct_path: &mock_struct_path,
+            mock_struct_path,
             fn_infos,
             for_static_fn: false,
             is_static: false,

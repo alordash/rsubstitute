@@ -1,3 +1,4 @@
+use crate::common::generics_field;
 use crate::common::models::*;
 use crate::generation::base_fn;
 use crate::generation::common::*;
@@ -41,13 +42,10 @@ pub(crate) fn generate(
         generics: trait_info.merged_generics.clone(),
         fields: Fields::Named(FieldsNamed {
             brace_token: token::Brace(span),
-            named: punctuated([data_field::new_field(
-                span,
-                data_field::Params {
-                    mock_struct_path: path.clone(),
-                    public: true,
-                },
-            )]),
+            named: punctuated([
+                generics_field::new_field(span, trait_info.merged_generics.clone(), None),
+                data_field::new_field(span, data_field::Params { public: true }),
+            ]),
         }),
         semi_token: None,
     };

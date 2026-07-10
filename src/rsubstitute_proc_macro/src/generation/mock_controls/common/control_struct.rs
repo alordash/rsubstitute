@@ -18,13 +18,13 @@ pub(crate) fn new(
         vis: Visibility::Public(Token![pub](span)),
         struct_token: Token![struct](span),
         ident: format_ident!("{ident}{ident_suffix}"),
-        generics,
+        generics: generics.clone(),
         fields: Fields::Named(FieldsNamed {
             brace_token: token::Brace(span),
-            named: punctuated([data_field::new_field(
-                span,
-                data_field::Params { public: false },
-            )]),
+            named: punctuated([
+                generics_field::new_field(span, generics, None),
+                data_field::new_field(span, data_field::Params { public: false }),
+            ]),
         }),
         semi_token: None,
     };

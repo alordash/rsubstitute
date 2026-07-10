@@ -40,7 +40,10 @@ pub(crate) fn generate_associated(
         qself: None,
         path: control_path,
         brace_token: token::Brace(span),
-        fields: punctuated([data_field::new_clone_value(span)]),
+        fields: punctuated([
+            generics_field::new_value(span),
+            data_field::new_clone_value(span),
+        ]),
         dot2_token: None,
         rest: None,
     });

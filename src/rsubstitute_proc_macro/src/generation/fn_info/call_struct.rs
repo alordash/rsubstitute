@@ -41,8 +41,11 @@ pub(crate) fn generate(ctx: &Context, fn_syntax: &FnSyntax) -> CallStruct {
         qself: None,
         path: path.clone(),
     });
-    let generics_info_provider_impl =
-        generics_info_provider_impl::generate(fn_syntax.merged_generics.clone(), r#type.clone());
+    let generics_info_provider_impl = generics_info_provider_impl::generate(
+        fn_syntax.merged_generics.clone(),
+        fn_syntax.source_signature.generics.clone(),
+        r#type.clone(),
+    );
     let call_impl = call_impl::generate(
         span,
         fn_syntax.merged_generics.clone(),

@@ -88,6 +88,21 @@ fn generate_received_fn(
     if !for_static_fn {
         generics = generics::combine(generics, &fn_info.source_signature.generics);
     }
+    let self_arg = if for_static_fn {
+        self_fn_arg(span)
+    } else {
+        ref_self_fn_arg(span)
+    };
+    let output_type = if for_static_fn {
+        Type::Path(self_type(span))
+    } else {
+        Type::Reference(TypeReference {
+            and_token: Token![&](span),
+            lifetime: Some(rsubstitute_lifetime::new(span)),
+            mutability: None,
+            elem: Box::new(Type::Path(self_type(span))),
+        })
+    };
     let sig = Signature {
         constness: None,
         asyncness: None,
@@ -101,13 +116,13 @@ fn generate_received_fn(
         },
         generics,
         paren_token: token::Paren(span),
-        inputs: [self_fn_arg(span)]
+        inputs: [self_arg]
             .into_iter()
             .chain(fn_info.arguments.iter().map(|x| x.control_fn_arg.clone()))
             .chain(core::iter::once(FnArg::Typed(times_arg)))
             .collect(),
         variadic: None,
-        output: ReturnType::Type(Token![->](span), Box::new(Type::Path(self_type(span)))),
+        output: ReturnType::Type(Token![->](span), Box::new(output_type)),
     };
     let (fn_data_var_path, fn_data_stmt) = if is_static {
         fn_data_stmt::new_static(span, fn_info, generic_arguments)
@@ -124,7 +139,13 @@ fn generate_received_fn(
             Expr::Path(times_arg_path),
         ],
     ));
-    let return_stmt = Expr::Path(self_expr_path(span));
+    let return_stmt = if for_static_fn {
+        Expr::Path(self_expr_path(span))
+    } else {
+        Expr::Macro(transmute_lifetime_expr::new(Expr::Path(self_expr_path(
+            span,
+        ))))
+    };
 
     let block = Block {
         brace_token: token::Brace(span),
@@ -152,7 +173,7 @@ fn generate_fn_no_other_calls_for_static_fn<T: Borrow<FnInfo>>(
     mock_struct_path: Path,
     fn_infos: &[T],
 ) -> ImplItemFn {
-    let sig = fn_no_other_calls_signature(span);
+    let sig = fn_no_other_calls_signature(span, true);
     let fn_info = &fn_infos[0];
     let generic_arguments =
         generic_arguments::new(ctx, span, mock_struct_path.clone(), fn_info.borrow());
@@ -191,7 +212,7 @@ fn generate_fn_no_other_calls_for_static_fn<T: Borrow<FnInfo>>(
 }
 
 fn generate_regular_fn_no_other_calls<T: Borrow<FnInfo>>(span: Span, fn_infos: &[T]) -> ImplItemFn {
-    let sig = fn_no_other_calls_signature(span);
+    let sig = fn_no_other_calls_signature(span, false);
     let verify_received_nothing_else_stmt = Expr::MethodCall(ExprMethodCall {
         attrs: Vec::new(),
         receiver: Box::new(Expr::Field(expr::field::new_self(Ident::new("data", span)))),
@@ -229,7 +250,7 @@ fn generate_regular_fn_no_other_calls<T: Borrow<FnInfo>>(span: Span, fn_infos: &
     return result;
 }
 
-fn fn_no_other_calls_signature(span: Span) -> Signature {
+fn fn_no_other_calls_signature(span: Span, for_static_fn: bool) -> Signature {
     let result = Signature {
         constness: None,
         asyncness: None,
@@ -239,7 +260,11 @@ fn fn_no_other_calls_signature(span: Span) -> Signature {
         ident: Ident::new("no_other_calls", span),
         generics: Generics::default(),
         paren_token: token::Paren(span),
-        inputs: punctuated([self_fn_arg(span)]),
+        inputs: punctuated([if for_static_fn {
+            self_fn_arg(span)
+        } else {
+            ref_self_fn_arg(span)
+        }]),
         variadic: None,
         output: ReturnType::Default,
     };

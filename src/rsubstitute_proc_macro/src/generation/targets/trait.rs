@@ -36,7 +36,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockM
             setup::Params {
                 ident: trait_info.ident.clone(),
                 generics: trait_info.merged_generics.clone(),
-                mock_struct_path: trait_mock_struct_path.clone(),
+                mock_struct_path: &trait_mock_struct_path,
                 fn_infos: &trait_info.associated_fns,
             },
         );
@@ -46,7 +46,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockM
             received::Params {
                 ident: trait_info.ident.clone(),
                 generics: trait_info.merged_generics.clone(),
-                mock_struct_path: trait_mock_struct_path.clone(),
+                mock_struct_path: &trait_mock_struct_path,
                 fn_infos: &trait_info.associated_fns,
             },
         );
@@ -66,7 +66,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockM
                 maybe_argument_types: None,
                 mock_struct_path: &trait_mock_struct_path,
                 fn_infos: &trait_info.static_fns,
-                for_static_fn: false
+                for_static_fn: false,
             },
         );
         let static_received_struct = static_received::generate(

@@ -5,7 +5,7 @@ use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::*;
 
-pub(crate) fn generate(generics: Generics, target_type: Type) -> ItemImpl {
+pub(crate) fn generate(impl_generics: Generics, generics: Generics, target_type: Type) -> ItemImpl {
     let span = generics.span();
     let fn_get_generic_parameter_infos =
         generate_fn_get_generic_parameter_infos(span, generics.params.iter());
@@ -23,7 +23,7 @@ pub(crate) fn generate(generics: Generics, target_type: Type) -> ItemImpl {
         defaultness: None,
         unsafety: None,
         impl_token: Token![impl](span),
-        generics,
+        generics: impl_generics,
         trait_: Some((
             None,
             // todo - maybe somehow test that it's equal to real trait
