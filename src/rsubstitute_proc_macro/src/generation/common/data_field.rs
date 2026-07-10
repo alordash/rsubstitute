@@ -3,16 +3,9 @@ use proc_macro2::Span;
 use syn::*;
 
 pub(crate) struct Params {
-    pub mock_struct_path: Path,
     pub public: bool,
 }
-pub(crate) fn new_field(
-    span: Span,
-    Params {
-        mock_struct_path,
-        public,
-    }: Params,
-) -> Field {
+pub(crate) fn new_field(span: Span, Params { public }: Params) -> Field {
     let result = Field {
         attrs: Vec::new(),
         vis: if public {
@@ -31,15 +24,7 @@ pub(crate) fn new_field(
                     span,
                     [PathSegment {
                         ident: Ident::new("SharedMockData", span),
-                        arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
-                            colon2_token: None,
-                            lt_token: Token![<](span),
-                            args: punctuated([GenericArgument::Type(Type::Path(TypePath {
-                                qself: None,
-                                path: mock_struct_path,
-                            }))]),
-                            gt_token: Token![>](span),
-                        }),
+                        arguments: PathArguments::None,
                     }],
                 ),
             },

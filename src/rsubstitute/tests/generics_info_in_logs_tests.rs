@@ -183,7 +183,7 @@ mod __rsubstitute_generated_TraitMock {
             &self,
             v: impl Into<Arg<&'b T1>>,
             times: Times,
-        ) -> FnVerifier<Self, (&'__rsa &'b T1,)>
+        ) -> &'__rsa Self
         where
             'b: '__rsa,
             'a: '__rsa,
@@ -196,7 +196,7 @@ mod __rsubstitute_generated_TraitMock {
                 v: transmute_lifetime!(v.into()),
             };
             fn_data.verify_received(args_checker, times);
-            FnVerifier::new(self.clone())
+            transmute_lifetime!(self)
         }
         pub fn no_other_calls(&self) {
             self.data.verify_received_nothing_else(["work"])

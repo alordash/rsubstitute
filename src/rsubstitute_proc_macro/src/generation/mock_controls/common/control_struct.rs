@@ -10,7 +10,6 @@ pub(crate) fn new(
     span: Span,
     ident: Ident,
     generics: Generics,
-    mock_struct_path: Path,
     control_type: ControlType,
 ) -> ItemStruct {
     let ident_suffix = get_control_ident_suffix(control_type);
@@ -24,10 +23,7 @@ pub(crate) fn new(
             brace_token: token::Brace(span),
             named: punctuated([data_field::new_field(
                 span,
-                data_field::Params {
-                    mock_struct_path,
-                    public: false,
-                },
+                data_field::Params { public: false },
             )]),
         }),
         semi_token: None,
