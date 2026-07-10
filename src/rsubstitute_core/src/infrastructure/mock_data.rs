@@ -1,24 +1,22 @@
 use crate::infrastructure::*;
 use std::collections::HashMap;
-use std::marker::PhantomData;
 
-pub struct MockData<TMock> {
+pub struct MockData {
     map: HashMap<&'static str, *const ()>,
-    _mock: PhantomData<TMock>,
 }
 
-impl<TMock> Default for MockData<TMock> {
+impl Default for MockData {
     fn default() -> Self {
         Self {
             map: Default::default(),
-            _mock: PhantomData,
         }
     }
 }
 
-impl<TMock> MockData<TMock> {
+impl MockData {
     pub(crate) fn get_fn_data<
         'a,
+        TMock,
         const HAS_RETURN_VALUE: bool,
         const SUPPORTS_BASE_CALLING: bool,
         const PASSES_MOCK_TO_CALLBACK: bool,
@@ -43,6 +41,7 @@ impl<TMock> MockData<TMock> {
 
     fn cast_ptr_to_ref<
         'a,
+        TMock,
         const HAS_RETURN_VALUE: bool,
         const SUPPORTS_BASE_CALLING: bool,
         const PASSES_MOCK_TO_CALLBACK: bool,
@@ -77,8 +76,8 @@ const IRRELEVANT_HAS_RETURN_VALUE: bool = false;
 const IRRELEVANT_SUPPORTS_BASE_CALLING: bool = false;
 const IRRELEVANT_PASSES_MOCK_TO_CALLBACK: bool = false;
 
-impl<TMock> IMockData for MockData<TMock> {
-    fn get_received_nothing_else_error_msgs<const N: usize>(
+impl IMockData for MockData {
+    fn get_received_nothing_else_error_msgs<TMock, const N: usize>(
         &self,
         fn_idents: [&'static str; N],
     ) -> Vec<Vec<String>> {
@@ -89,6 +88,7 @@ impl<TMock> IMockData for MockData<TMock> {
             .map(
                 Self::cast_ptr_to_ref::<
                     'static,
+                    TMock,
                     IRRELEVANT_HAS_RETURN_VALUE,
                     IRRELEVANT_SUPPORTS_BASE_CALLING,
                     IRRELEVANT_PASSES_MOCK_TO_CALLBACK,
@@ -100,7 +100,7 @@ impl<TMock> IMockData for MockData<TMock> {
     }
 }
 
-impl<TMock> Drop for MockData<TMock> {
+impl Drop for MockData {
     fn drop(&mut self) {
         for fn_data_ptr in self.map.values() {
             let boxed_fn_data = unsafe {
@@ -108,7 +108,7 @@ impl<TMock> Drop for MockData<TMock> {
                     (*fn_data_ptr) as *const _
                         as *mut FnData<
                             'static,
-                            TMock,
+                            (),
                             IRRELEVANT_HAS_RETURN_VALUE,
                             IRRELEVANT_SUPPORTS_BASE_CALLING,
                             IRRELEVANT_PASSES_MOCK_TO_CALLBACK,

@@ -2,9 +2,10 @@ use crate::infrastructure::*;
 use std::cell::RefCell;
 use std::rc::Rc;
 
-pub trait ISharedMockData<TMock> {
+pub trait ISharedMockData {
     fn get_shared_fn_data<
         'a,
+        TMock,
         const HAS_RETURN_VALUE: bool,
         const SUPPORTS_BASE_CALLING: bool,
         const PASSES_MOCK_TO_CALLBACK: bool,
@@ -14,11 +15,12 @@ pub trait ISharedMockData<TMock> {
     ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, PASSES_MOCK_TO_CALLBACK>;
 }
 
-pub type SharedMockData<TMock> = Rc<RefCell<MockData<TMock>>>;
+pub type SharedMockData = Rc<RefCell<MockData>>;
 
-impl<TMock> ISharedMockData<TMock> for SharedMockData<TMock> {
+impl ISharedMockData for SharedMockData {
     fn get_shared_fn_data<
         'a,
+        TMock,
         const HAS_RETURN_VALUE: bool,
         const SUPPORTS_BASE_CALLING: bool,
         const PASSES_MOCK_TO_CALLBACK: bool,
@@ -31,12 +33,12 @@ impl<TMock> ISharedMockData<TMock> for SharedMockData<TMock> {
     }
 }
 
-impl<TMock> IMockData for SharedMockData<TMock> {
-    fn get_received_nothing_else_error_msgs<const N: usize>(
+impl IMockData for SharedMockData {
+    fn get_received_nothing_else_error_msgs<TMock, const N: usize>(
         &self,
         fn_idents: [&'static str; N],
     ) -> Vec<Vec<String>> {
         self.borrow()
-            .get_received_nothing_else_error_msgs(fn_idents)
+            .get_received_nothing_else_error_msgs::<TMock, N>(fn_idents)
     }
 }
