@@ -199,8 +199,7 @@ mod __rsubstitute_generated_TraitMock {
             FnVerifier::new(self.clone())
         }
         pub fn no_other_calls(&self) {
-            self.data
-                .verify_received_nothing_else::<TraitMock<'a, T1, B>, 1>(["work"])
+            self.data.verify_received_nothing_else(["work"])
         }
     }
 }

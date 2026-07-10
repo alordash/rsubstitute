@@ -77,7 +77,7 @@ const IRRELEVANT_SUPPORTS_BASE_CALLING: bool = false;
 const IRRELEVANT_PASSES_MOCK_TO_CALLBACK: bool = false;
 
 impl IMockData for MockData {
-    fn get_received_nothing_else_error_msgs<TMock, const N: usize>(
+    fn get_received_nothing_else_error_msgs<const N: usize>(
         &self,
         fn_idents: [&'static str; N],
     ) -> Vec<Vec<String>> {
@@ -88,7 +88,7 @@ impl IMockData for MockData {
             .map(
                 Self::cast_ptr_to_ref::<
                     'static,
-                    TMock,
+                    (),
                     IRRELEVANT_HAS_RETURN_VALUE,
                     IRRELEVANT_SUPPORTS_BASE_CALLING,
                     IRRELEVANT_PASSES_MOCK_TO_CALLBACK,

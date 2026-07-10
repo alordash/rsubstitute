@@ -34,11 +34,11 @@ impl ISharedMockData for SharedMockData {
 }
 
 impl IMockData for SharedMockData {
-    fn get_received_nothing_else_error_msgs<TMock, const N: usize>(
+    fn get_received_nothing_else_error_msgs<const N: usize>(
         &self,
         fn_idents: [&'static str; N],
     ) -> Vec<Vec<String>> {
         self.borrow()
-            .get_received_nothing_else_error_msgs::<TMock, N>(fn_idents)
+            .get_received_nothing_else_error_msgs(fn_idents)
     }
 }

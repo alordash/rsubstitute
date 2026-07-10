@@ -249,7 +249,7 @@ impl<
 > IMockData
     for FnData<'rs, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, PASSES_MOCK_TO_CALLBACK>
 {
-    fn get_received_nothing_else_error_msgs<TMockInner, const N: usize>(
+    fn get_received_nothing_else_error_msgs<const N: usize>(
         &self,
         fn_idents: [&'static str; N],
     ) -> Vec<Vec<String>> {
