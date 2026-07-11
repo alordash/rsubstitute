@@ -298,6 +298,14 @@ Received no non-matching calls";
         let second_returned_value = [4; 3];
         const SECOND_N: usize = 200;
         // TODO - add test that verifies that subsequent `setup` or `static_setup` calls on static fn mock lead to fn data clearing
+        // TODO - use code below to show in docs how to call `static_setup` once but then reuse it in different places (if branches, iterators, etc)
+        // let setup = TraitMock::<i32, false>::static_setup();
+        // setup
+        //     .static_work::<f32, FIRST_N>(&first_value)
+        //     .returns(first_returned_value);
+        // setup
+        //     .static_work::<_, SECOND_N>(&second_value)
+        //     .returns(second_returned_value);
         TraitMock::<i32, false>::static_setup()
             .static_work::<f32, FIRST_N>(&first_value)
             .returns(first_returned_value)
