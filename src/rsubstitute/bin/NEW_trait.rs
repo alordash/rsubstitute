@@ -2,8 +2,8 @@
 #![allow(non_snake_case)]
 #![allow(unused)]
 
-use rsubstitute_core::Times;
 use rsubstitute_core::args::Arg;
+use rsubstitute_core::Times;
 #[allow(unused_imports)]
 use rsubstitute_proc_macro::mock;
 
@@ -27,7 +27,7 @@ trait Trait<T1: Clone> {
 
 fn main() {
     let mut mock = TraitMock::<u8>::new();
-    
+
     mock.setup()
         .ok()
         .returns_many([9, 8, 7])
@@ -62,7 +62,7 @@ fn main() {
     TraitMock::<i32>::f_static(22);
     TraitMock::<&[u8]>::f_static(22);
     TraitMock::<i32>::f_static(33);
-    
+
     mock.received().f(1, Times::Once);
 
     println!("Done");

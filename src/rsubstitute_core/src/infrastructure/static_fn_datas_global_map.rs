@@ -3,16 +3,25 @@ use std::any::TypeId;
 use std::cell::UnsafeCell;
 use std::collections::HashMap;
 
-#[derive(Hash, Eq, PartialEq)]
-struct StaticFnDataKey(TypeId, &'static str);
+type Map = HashMap<TypeId, HashMap<&'static str, *const ()>>;
 
 // Used for storing static functions' mock data.
 #[derive(Default)]
 struct StaticFnDatasGlobalMap {
-    pub map: UnsafeCell<HashMap<TypeId, HashMap<&'static str, *const ()>>>,
+    pub map: UnsafeCell<Map>,
 }
 
 impl StaticFnDatasGlobalMap {
+    fn get_mut_map(&self) -> &mut Map {
+        // SAFETY: static functions data is stored in global TLS, which guarantees that there can't
+        // be more than one mutable reference to given static function data at the same time.
+        // This is why `UnsafeCell` can be safely used here.
+        let maybe_map = unsafe { self.map.get().as_mut() };
+        // SAFETY: `UnsafeCell::get` can not return null pointer.
+        let map = unsafe { maybe_map.unwrap_unchecked() };
+        return map;
+    }
+
     pub fn get_specific_fn_data<
         'a,
         TMock,
@@ -22,21 +31,18 @@ impl StaticFnDatasGlobalMap {
         &'_ self,
         fn_ident: &'static str,
     ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, false> {
-        // SAFETY: static functions data is stored in global TLS, which guarantees that there can't
-        // be more than one mutable reference to given static function data at the same time.
-        // This is why `UnsafeCell` can be safely used here.  
-        let maybe_map = unsafe { self.map.get().as_mut() };
-        // SAFETY: `UnsafeCell::get` can not return null pointer.
-        let map = unsafe { maybe_map.unwrap_unchecked() };
         let type_id = typeid::of::<TMock>();
-        let key = StaticFnDataKey(type_id, fn_ident);
-        let raw_ptr = map.entry(key).or_insert(Box::leak(Box::new(FnData::<
-            TMock,
-            HAS_RETURN_VALUE,
-            SUPPORTS_BASE_CALLING,
-            false,
-        >::new(fn_ident))) as *mut _
-            as *const _);
+        let map = self.get_mut_map();
+        let raw_ptr = map
+            .entry(type_id)
+            .or_insert(HashMap::new())
+            .entry(fn_ident)
+            .or_insert(Box::leak(Box::new(FnData::<
+                TMock,
+                HAS_RETURN_VALUE,
+                SUPPORTS_BASE_CALLING,
+                false,
+            >::new(fn_ident))) as *mut _ as *const _);
 
         // SAFETY: `raw_ptr` is obtained from `Box::<T>::leak`, which means that it is safe to cast
         // a pointer to `T` and treat it as reference. `as_ref` could also be replaced with `as_ref_unchecked`
@@ -55,6 +61,12 @@ impl StaticFnDatasGlobalMap {
             })
         };
         return fn_data_ref;
+    }
+
+    pub fn clear_mock_fn_datas<TMock>(&self) {
+        let type_id = typeid::of::<TMock>();
+        let map = self.get_mut_map();
+        map.remove_entry(&type_id);
     }
 }
 
@@ -77,4 +89,18 @@ pub fn get_static_fn_data<
     return result;
 }
 
-pub fn clear_static_fn_data<TMock>(fn_iden)
+pub fn clear_static_fn_data<TMock>() {
+    STATIC_FN_DATAS_GLOBAL_MAP.with(|this| this.clear_mock_fn_datas::<TMock>());
+}
+
+pub fn get_clean_static_fn_data<
+    'a,
+    TMock,
+    const HAS_RETURN_VALUE: bool,
+    const SUPPORTS_BASE_CALLING: bool,
+>(
+    fn_ident: &'static str,
+) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, false> {
+    clear_static_fn_data::<TMock>();
+    return get_static_fn_data(fn_ident);
+}

@@ -243,12 +243,17 @@ fn generate_inner_impl(
             control_creation_fn::generate_static(
                 span,
                 static_controls.static_setup_struct.path.clone(),
-                ControlType::Setup,
+                StaticControlType::Setup {
+                    mock_generic_argument: GenericArgument::Type(Type::Path(TypePath {
+                        qself: None,
+                        path: mock_struct_path.clone(),
+                    })),
+                },
             ),
             control_creation_fn::generate_static(
                 span,
                 static_controls.static_received_struct.path.clone(),
-                ControlType::Received,
+                StaticControlType::Received,
             ),
         ]
     });

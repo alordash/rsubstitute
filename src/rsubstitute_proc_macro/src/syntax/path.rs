@@ -41,6 +41,16 @@ pub(crate) fn new_generics<const N: usize>(
     return result;
 }
 
+pub(crate) fn new_generics_global<const N: usize>(
+    span: Span,
+    path_parts: [&str; N],
+    generic_argument: GenericArgument,
+) -> Path {
+    let mut result = new_generics(span, path_parts, generic_argument);
+    result.leading_colon = Some(Token![::](span));
+    return result;
+}
+
 pub(crate) fn from_ident(ident: Ident) -> Path {
     let result = Path {
         leading_colon: None,

@@ -1,5 +1,5 @@
-use crate::common::generics_field;
-use crate::generation::common::data_field;
+use crate::common::*;
+use crate::generation::common::*;
 use crate::generation::mock_controls::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
@@ -65,11 +65,11 @@ pub(crate) fn generate_associated(
 pub(crate) fn generate_static(
     span: Span,
     control_path: Path,
-    control_type: ControlType,
+    static_control_type: StaticControlType,
 ) -> ImplItemFn {
-    let ident_str = match control_type {
-        ControlType::Setup => "static_setup",
-        ControlType::Received => "static_received",
+    let ident_str = match static_control_type {
+        StaticControlType::Setup { .. } => "static_setup",
+        StaticControlType::Received => "static_received",
     };
     let sig = Signature {
         constness: None,
@@ -99,9 +99,21 @@ pub(crate) fn generate_static(
         dot2_token: None,
         rest: None,
     });
+    let stmts = match static_control_type {
+        StaticControlType::Setup {
+            mock_generic_argument,
+        } => {
+            let reset_fn_data_stmt = reset_fn_data_stmt::new(span, mock_generic_argument);
+            vec![
+                Stmt::Expr(Expr::Call(reset_fn_data_stmt), Some(Token![;](span))),
+                Stmt::Expr(constructor_stmt, None),
+            ]
+        }
+        StaticControlType::Received => vec![Stmt::Expr(constructor_stmt, None)],
+    };
     let block = Block {
         brace_token: token::Brace(span),
-        stmts: vec![Stmt::Expr(constructor_stmt, None)],
+        stmts,
     };
 
     let result = ImplItemFn {

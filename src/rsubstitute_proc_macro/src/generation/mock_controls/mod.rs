@@ -1,11 +1,13 @@
 pub mod models {
     mod control_type;
+    mod static_control_type;
     mod received;
     mod setup;
     mod static_received;
     mod static_setup;
 
     pub(crate) use control_type::*;
+    pub(crate) use static_control_type::*;
     pub(crate) use received::*;
     pub(crate) use setup::*;
     pub(crate) use static_received::*;

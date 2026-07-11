@@ -53,14 +53,7 @@ pub(crate) fn generate(
         ),
     };
 
-    let (fn_data_var_path, fn_data_stmt) =
-        fn_data_stmt::new_static(span, fn_info, generic_arguments);
-    let data_reset_stmt = expr::method_call::new(
-        span,
-        Expr::Path(fn_data_var_path),
-        Ident::new("reset", span),
-        [],
-    );
+    let reset_fn_data_stmt = reset_fn_data_stmt::new(span, generic_arguments.mock_generic_argument);
     let setup_stmt = ExprMethodCall {
         attrs: Vec::new(),
         receiver: Box::new(Expr::Struct(ExprStruct {
@@ -92,8 +85,7 @@ pub(crate) fn generate(
     let block = Block {
         brace_token: token::Brace(span),
         stmts: vec![
-            Stmt::Local(fn_data_stmt),
-            Stmt::Expr(Expr::MethodCall(data_reset_stmt), Some(Token![;](span))),
+            Stmt::Expr(Expr::Call(reset_fn_data_stmt), Some(Token![;](span))),
             Stmt::Expr(Expr::MethodCall(setup_stmt), None),
         ],
     };
