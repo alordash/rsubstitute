@@ -62,14 +62,14 @@ fn generate_control_fn_arg(span: Span, pat: Box<Pat>, ref_style_type: Box<Type>)
                 path: path::new_generics(
                     span,
                     ["Into"],
-                    GenericArgument::Type(Type::Path(TypePath {
+                    [GenericArgument::Type(Type::Path(TypePath {
                         qself: None,
                         path: path::new_generics(
                             span,
                             ["Arg"],
-                            GenericArgument::Type(*ref_style_type),
+                            [GenericArgument::Type(*ref_style_type)],
                         ),
-                    })),
+                    }))],
                 ),
             })]),
         })),

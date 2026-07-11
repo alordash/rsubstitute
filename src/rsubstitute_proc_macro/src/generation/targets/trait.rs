@@ -153,6 +153,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockM
                     Item::Struct(associated_controls.setup_struct.item_struct),
                     Item::Impl(associated_controls.setup_struct.item_impl),
                     Item::Struct(associated_controls.received_struct.item_struct),
+                    Item::Impl(associated_controls.received_struct.clone_impl),
                     Item::Impl(associated_controls.received_struct.item_impl),
                 ]
             }),
@@ -166,6 +167,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockM
                     Item::Struct(static_controls.static_setup_struct.item_struct),
                     Item::Impl(static_controls.static_setup_struct.item_impl),
                     Item::Struct(static_controls.static_received_struct.item_struct),
+                    Item::Impl(static_controls.static_received_struct.clone_impl),
                     Item::Impl(static_controls.static_received_struct.item_impl),
                 ]
             }),

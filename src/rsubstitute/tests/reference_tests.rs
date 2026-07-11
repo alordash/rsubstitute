@@ -177,7 +177,7 @@ mod tests {
     #[test]
     fn trait_work_Ok() {
         // Arrange
-        let mock = TraitMock::new();
+        let mut mock = TraitMock::new();
         let return_value = &&&&&&&&&&&&&&&&&55;
         let a = &1;
         {
@@ -209,8 +209,7 @@ mod tests {
                                                 let t2_ref = &true;
                                                 let xaxbxcxdx_t2_ref = &&&&&&&&&true;
                                                 let xapx = &&(&(&188) as *const _);
-                                                mock.setup
-                                                    .work(
+                                                mock.setup().work(
                                                         a,
                                                         b,
                                                         c,
@@ -257,8 +256,7 @@ mod tests {
                                                 // Assert
                                                 assert_eq!(return_value, actual_return_value);
 
-                                                mock.received
-                                                    .work(
+                                                mock.received().work(
                                                         a,
                                                         b,
                                                         c,
@@ -409,7 +407,7 @@ mod tests {
     #[test]
     fn struct_work_Ok() {
         // Arrange
-        let mock = Struct::new();
+        let mut mock = Struct::new();
         let return_value = &&&&&&&&&&&&&&&&&55;
         let a = &1;
         {
@@ -486,7 +484,7 @@ mod tests {
                                                         xapx,
                                                     )
                                                     .call_base();
-
+    
                                                 // Act
                                                 let actual_return_value = mock.work(
                                                     a,
@@ -508,11 +506,11 @@ mod tests {
                                                     xaxbxcxdx_t2_ref,
                                                     xapx,
                                                 );
-
+    
                                                 // Assert
                                                 assert_eq!(return_value, actual_return_value);
-
-                                                mock.received.as_Trait.work(
+    
+                                                mock.received().as_Trait.work(
                                                     a,
                                                     b,
                                                     c,

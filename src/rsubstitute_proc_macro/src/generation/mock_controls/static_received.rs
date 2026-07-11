@@ -6,6 +6,7 @@ use crate::syntax::*;
 use proc_macro2::Span;
 use std::borrow::Borrow;
 use syn::*;
+use crate::generation::common::*;
 
 pub(crate) struct Params<'a, T: Borrow<FnInfo>> {
     pub ident: Ident,
@@ -35,6 +36,7 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
         ControlType::Received,
     );
     let path = path::from_ident_with_generics(item_struct.ident.clone(), &item_struct.generics);
+    let clone_impl = clone_impl::generate(source_span, generics.clone(), path.clone(), &item_struct.fields);
     let item_impl = received_impl::generate(
         ctx,
         source_span,
@@ -51,6 +53,7 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
     let result = StaticReceivedStruct {
         path,
         item_struct,
+        clone_impl,
         item_impl,
     };
     return result;

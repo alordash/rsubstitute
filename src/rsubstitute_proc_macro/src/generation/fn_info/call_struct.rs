@@ -1,7 +1,7 @@
 mod call_impl;
-mod clone_impl;
 
 use crate::common::models::*;
+use crate::generation::common::*;
 use crate::generation::fn_info::models::*;
 use crate::generation::fn_info::*;
 use crate::preparation::r#fn::models::*;
@@ -16,16 +16,6 @@ pub(crate) fn generate(ctx: &Context, fn_syntax: &FnSyntax) -> CallStruct {
     let struct_ident = format_ident!("{}_Call", fn_syntax.fn_ident);
     let generics = fn_syntax.merged_generics.clone();
     let path = path::from_ident_with_generics(struct_ident.clone(), &generics);
-    let maybe_clone_impl = if ctx.support_base_calling && fn_syntax.maybe_base_impl.is_some() {
-        Some(clone_impl::generate(
-            span,
-            fn_syntax.merged_generics.clone(),
-            path.clone(),
-            &fields_named,
-        ))
-    } else {
-        None
-    };
 
     let item_struct = ItemStruct {
         attrs: Vec::new(),
@@ -35,6 +25,16 @@ pub(crate) fn generate(ctx: &Context, fn_syntax: &FnSyntax) -> CallStruct {
         generics,
         fields: Fields::Named(fields_named),
         semi_token: None,
+    };
+    let maybe_clone_impl = if ctx.support_base_calling && fn_syntax.maybe_base_impl.is_some() {
+        Some(clone_impl::generate(
+            span,
+            fn_syntax.merged_generics.clone(),
+            path.clone(),
+            &item_struct.fields,
+        ))
+    } else {
+        None
     };
 
     let r#type = Type::Path(TypePath {

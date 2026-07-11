@@ -93,16 +93,17 @@ fn generate_received_fn(
     } else {
         ref_self_fn_arg(span)
     };
-    let output_type = if for_static_fn {
-        Type::Path(self_type(span))
-    } else {
-        Type::Reference(TypeReference {
-            and_token: Token![&](span),
-            lifetime: Some(rsubstitute_lifetime::new(span)),
-            mutability: None,
-            elem: Box::new(Type::Path(self_type(span))),
-        })
-    };
+    let output_type = Type::Path(TypePath {
+        qself: None,
+        path: path::new_generics_global(
+            span,
+            ["rsubstitute", "for_generated", "ArgRefsBinder"],
+            [
+                GenericArgument::Type(Type::Path(self_type(span))),
+                GenericArgument::Type(Type::Tuple(fn_info.arg_refs_tuple.clone())),
+            ],
+        ),
+    });
     let sig = Signature {
         constness: None,
         asyncness: None,
@@ -139,13 +140,23 @@ fn generate_received_fn(
             Expr::Path(times_arg_path),
         ],
     ));
-    let return_stmt = if for_static_fn {
-        Expr::Path(self_expr_path(span))
-    } else {
-        Expr::Macro(transmute_lifetime_expr::new(Expr::Path(self_expr_path(
+    let return_stmt = Expr::Call(expr::call::new(
+        span,
+        Expr::Path(expr::path::new(
             span,
-        ))))
-    };
+            ["rsubstitute", "for_generated", "ArgRefsBinder", "new"],
+        )),
+        [if for_static_fn {
+            Expr::Path(self_expr_path(span))
+        } else {
+            Expr::MethodCall(expr::method_call::new(
+                span,
+                Expr::Path(self_expr_path(span)),
+                Ident::new("clone", span),
+                [],
+            ))
+        }],
+    ));
 
     let block = Block {
         brace_token: token::Brace(span),

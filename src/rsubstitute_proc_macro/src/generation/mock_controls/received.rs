@@ -1,4 +1,5 @@
 use crate::common::models::*;
+use crate::generation::common::*;
 use crate::generation::fn_info::models::*;
 use crate::generation::mock_controls::models::*;
 use crate::generation::mock_controls::*;
@@ -23,8 +24,9 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
         fn_infos,
     }: Params<T>,
 ) -> ReceivedStruct {
-    let item_struct = control_struct::new(span, ident, generics, ControlType::Received);
+    let item_struct = control_struct::new(span, ident, generics.clone(), ControlType::Received);
     let path = path::from_ident_with_generics(item_struct.ident.clone(), &item_struct.generics);
+    let clone_impl = clone_impl::generate(span, generics, path.clone(), &item_struct.fields);
     let item_impl = received_impl::generate(
         ctx,
         span,
@@ -41,6 +43,7 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
     let result = ReceivedStruct {
         path,
         item_struct,
+        clone_impl,
         item_impl,
     };
     return result;

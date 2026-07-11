@@ -6,6 +6,7 @@ pub mod targets;
 pub mod trait_info;
 
 mod common {
+    pub(crate) mod clone_impl;
     pub(crate) mod data_field;
     pub(crate) mod fn_data_stmt;
     pub(crate) mod generic_arguments;

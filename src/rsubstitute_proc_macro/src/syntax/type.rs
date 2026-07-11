@@ -19,7 +19,7 @@ pub(crate) fn arc_of(span: Span, vec_t: Type) -> TypePath {
 fn wrap(span: Span, wrapper: &'static str, wrapped: Type) -> TypePath {
     let result = TypePath {
         qself: None,
-        path: syntax::path::new_generics(span, [wrapper], GenericArgument::Type(wrapped)),
+        path: syntax::path::new_generics(span, [wrapper], [GenericArgument::Type(wrapped)]),
     };
 
     return result;

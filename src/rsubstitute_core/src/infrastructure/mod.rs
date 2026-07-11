@@ -1,3 +1,4 @@
+mod arg_refs_binder;
 mod error_printing;
 mod fn_callback_configurator;
 mod fn_config;
@@ -9,6 +10,7 @@ mod mock_data;
 mod shared_mock_data;
 mod static_fn_datas_global_map;
 
+pub use arg_refs_binder::*;
 pub use fn_callback_configurator::*;
 pub(crate) use fn_config::*;
 pub use fn_configurator::*;

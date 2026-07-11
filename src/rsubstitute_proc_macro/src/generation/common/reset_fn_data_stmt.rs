@@ -11,7 +11,7 @@ pub(crate) fn new(span: Span, mock_generic_argument: GenericArgument) -> ExprCal
             path: path::new_generics_global(
                 span,
                 ["rsubstitute", "for_generated", "clear_static_fn_data"],
-                mock_generic_argument,
+                [mock_generic_argument],
             ),
         }),
         [],

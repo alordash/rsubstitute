@@ -18,7 +18,7 @@ pub(crate) fn new_field(
             path: path::new_generics(
                 span,
                 ["PhantomData"],
-                GenericArgument::Type(Type::Tuple(TypeTuple {
+                [GenericArgument::Type(Type::Tuple(TypeTuple {
                     paren_token: token::Paren(span),
                     elems: generics
                         .params
@@ -44,7 +44,7 @@ pub(crate) fn new_field(
                                 .flat_map(|arguments| arguments.into_iter()),
                         )
                         .collect(),
-                })),
+                }))],
             ),
         }),
     };

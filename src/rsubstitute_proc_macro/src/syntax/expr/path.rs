@@ -20,7 +20,7 @@ pub(crate) fn new_generics<const N: usize>(
     let result = ExprPath {
         attrs: Vec::new(),
         qself: None,
-        path: path::new_generics(span, path_parts, generic_argument),
+        path: path::new_generics(span, path_parts, [generic_argument]),
     };
 
     return result;

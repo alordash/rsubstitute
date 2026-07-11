@@ -22,10 +22,10 @@ pub(crate) fn new_global<const N: usize>(span: Span, path_parts: [&str; N]) -> P
     return result;
 }
 
-pub(crate) fn new_generics<const N: usize>(
+pub(crate) fn new_generics<const N_PATH: usize, const N_GENERICS: usize>(
     span: Span,
-    path_parts: [&str; N],
-    generic_argument: GenericArgument,
+    path_parts: [&str; N_PATH],
+    generic_arguments: [GenericArgument; N_GENERICS],
 ) -> Path {
     let mut result = new(span, path_parts);
     result
@@ -35,18 +35,18 @@ pub(crate) fn new_generics<const N: usize>(
         .arguments = PathArguments::AngleBracketed(AngleBracketedGenericArguments {
         colon2_token: Some(Token![::](span)),
         lt_token: Token![<](span),
-        args: punctuated([generic_argument]),
+        args: generic_arguments.into_iter().collect(),
         gt_token: Token![>](span),
     });
     return result;
 }
 
-pub(crate) fn new_generics_global<const N: usize>(
+pub(crate) fn new_generics_global<const N: usize, const N_GENERICS: usize>(
     span: Span,
     path_parts: [&str; N],
-    generic_argument: GenericArgument,
+    generic_arguments: [GenericArgument; N_GENERICS],
 ) -> Path {
-    let mut result = new_generics(span, path_parts, generic_argument);
+    let mut result = new_generics(span, path_parts, generic_arguments);
     result.leading_colon = Some(Token![::](span));
     return result;
 }

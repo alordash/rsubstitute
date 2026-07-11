@@ -1,4 +1,4 @@
-use crate::common::{generics_field, rsubstitute_lifetime};
+use crate::common::*;
 use crate::generation::fn_info::models::*;
 use crate::generation::mock_controls::common::*;
 use crate::syntax::*;
@@ -8,6 +8,20 @@ use syn::*;
 pub(crate) fn generate(span: Span, static_received_path: Path, fn_info: &FnInfo) -> ItemFn {
     let (times_arg_path, times_arg) = times_arg::new(span);
     let rsubstitute_lifetime = rsubstitute_lifetime::new(span);
+    let output_type = Type::Path(TypePath {
+        qself: None,
+        path: path::new_generics_global(
+            span,
+            ["rsubstitute", "for_generated", "ArgRefsBinder"],
+            [
+                GenericArgument::Type(Type::Path(TypePath {
+                    qself: None,
+                    path: static_received_path.clone(),
+                })),
+                GenericArgument::Type(Type::Tuple(fn_info.arg_refs_tuple.clone())),
+            ],
+        ),
+    });
     let sig = Signature {
         constness: None,
         asyncness: None,
@@ -31,13 +45,7 @@ pub(crate) fn generate(span: Span, static_received_path: Path, fn_info: &FnInfo)
             .chain(core::iter::once(FnArg::Typed(times_arg)))
             .collect(),
         variadic: None,
-        output: ReturnType::Type(
-            Token![->](span),
-            Box::new(Type::Path(TypePath {
-                qself: None,
-                path: static_received_path.clone(),
-            })),
-        ),
+        output: ReturnType::Type(Token![->](span), Box::new(output_type)),
     };
 
     let received_stmt = ExprMethodCall {

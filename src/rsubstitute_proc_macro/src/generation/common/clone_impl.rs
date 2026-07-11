@@ -5,12 +5,15 @@ use syn::*;
 pub(crate) fn generate(
     span: Span,
     generics: Generics,
-    call_struct_path: Path,
-    fields_named: &FieldsNamed,
+    struct_path: Path,
+    fields: &Fields,
 ) -> ItemImpl {
+    let Fields::Named(fields_named) = fields else {
+        panic!("`fields` for `Clone` implementation generation must be named.")
+    };
     let target_type = TypePath {
         qself: None,
-        path: call_struct_path.clone(),
+        path: struct_path.clone(),
     };
     let sig = Signature {
         constness: None,
@@ -28,7 +31,7 @@ pub(crate) fn generate(
     let target_stmt = ExprStruct {
         attrs: Vec::new(),
         qself: None,
-        path: call_struct_path,
+        path: struct_path,
         brace_token: token::Brace(span),
         fields: fields_named
             .named
