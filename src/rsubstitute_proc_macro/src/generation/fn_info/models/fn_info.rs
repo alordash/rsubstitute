@@ -9,7 +9,6 @@ pub(crate) struct FnInfo {
     pub source_signature: Box<Signature>,
     pub visibility: Visibility,
     pub merged_generics: Generics,
-    pub generics_field: Field,
     pub fn_ident: Ident,
     pub maybe_self_type: Option<Receiver>,
     pub arguments: Vec<Argument>,

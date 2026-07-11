@@ -8,6 +8,7 @@ pub(crate) fn new_associated(
     span: Span,
     fn_info: &FnInfo,
     generic_arguments: generic_arguments::Result,
+    generics_info_provider_var_path: ExprPath,
 ) -> (ExprPath, Local) {
     let fn_data_var_path = expr::path::new(span, ["fn_data"]);
     let fn_data_stmt = Local {
@@ -20,7 +21,15 @@ pub(crate) fn new_associated(
                 span,
                 Expr::Field(expr::field::new_self(Ident::new("data", span))),
                 Ident::new("get_shared_fn_data", span),
-                [fn_info_ident_to_expr_lit(span, fn_info)],
+                [
+                    fn_info_ident_to_expr_lit(span, fn_info),
+                    Expr::MethodCall(expr::method_call::new(
+                        span,
+                        Expr::Path(generics_info_provider_var_path),
+                        Ident::new("get_generics_hash_key", span),
+                        [],
+                    )),
+                ],
             ))),
             diverge: None,
         }),

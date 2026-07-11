@@ -117,12 +117,17 @@ fn generate_setup_fn(
     };
     fn_configurator_path_for_var_args.args[0] =
         GenericArgument::Lifetime(placeholder_lifetime(span));
+    let (args_checker_var_path, args_checker_stmt) = args_checker_stmt::new(span, fn_info);
     let (fn_data_var_path, fn_data_stmt) = if is_static {
         fn_data_stmt::new_static(span, fn_info, generic_arguments)
     } else {
-        fn_data_stmt::new_associated(span, fn_info, generic_arguments)
+        fn_data_stmt::new_associated(
+            span,
+            fn_info,
+            generic_arguments,
+            args_checker_var_path.clone(),
+        )
     };
-    let (args_checker_var_path, args_checker_stmt) = args_checker_stmt::new(span, fn_info);
     let fn_configurator_var_path = path::new(span, ["fn_configurator"]);
     let fn_configurator_stmt = Local {
         attrs: Vec::new(),
@@ -164,8 +169,8 @@ fn generate_setup_fn(
     let block = Block {
         brace_token: token::Brace(span),
         stmts: vec![
-            Stmt::Local(fn_data_stmt),
             Stmt::Local(args_checker_stmt),
+            Stmt::Local(fn_data_stmt),
             Stmt::Local(fn_configurator_stmt),
             Stmt::Expr(return_stmt, None),
         ],

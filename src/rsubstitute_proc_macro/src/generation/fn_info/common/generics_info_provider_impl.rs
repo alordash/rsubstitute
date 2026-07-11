@@ -156,7 +156,13 @@ fn generate_fn_hash_generics_type_ids<'a>(
             bracket_token: token::Bracket(span),
             elems: tids,
         });
-        let stmt = Stmt::Expr(tids_array, Some(Token![;](span)));
+        let hash_expr = expr::method_call::new(
+            span,
+            tids_array,
+            Ident::new("hash", span),
+            [Expr::Path(expr::path::new(span, ["hasher"]))],
+        );
+        let stmt = Stmt::Expr(Expr::MethodCall(hash_expr), Some(Token![;](span)));
         vec![stmt]
     } else {
         Vec::new()

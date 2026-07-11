@@ -126,6 +126,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
         Item::Struct(static_setup_struct.item_struct),
         Item::Impl(static_setup_struct.item_impl),
         Item::Struct(static_received_struct.item_struct),
+        Item::Impl(static_received_struct.clone_impl),
         Item::Impl(static_received_struct.item_impl),
     ])
     .collect();

@@ -14,6 +14,7 @@ pub(crate) fn generate(
     base_fn_kind: BaseFnKind,
 ) -> Block {
     let generic_arguments = generic_arguments::new(ctx, span, mock_struct_path.clone(), fn_info);
+    let (call_var_path, call_stmt) = call_stmt::new(span, fn_info);
     let (fn_data_var_path, fn_data_stmt) =
         fn_data_stmt::new_static(span, fn_info, generic_arguments);
     let fn_handle_stmt = fn_handle_stmt::generate(
@@ -23,6 +24,7 @@ pub(crate) fn generate(
             mock_struct_path,
             fn_info,
             base_fn_kind,
+            call_var_path,
             fn_data_var_path,
             is_static: true,
         },
@@ -31,6 +33,7 @@ pub(crate) fn generate(
     let result = Block {
         brace_token: token::Brace(span),
         stmts: vec![
+            Stmt::Local(call_stmt),
             Stmt::Local(fn_data_stmt),
             Stmt::Expr(Expr::MethodCall(fn_handle_stmt), None),
         ],

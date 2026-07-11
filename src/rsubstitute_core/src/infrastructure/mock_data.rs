@@ -1,8 +1,11 @@
+use crate::args::*;
 use crate::infrastructure::*;
 use std::collections::HashMap;
 
+type Map = HashMap<&'static str, HashMap<GenericsHashKey, *const ()>>;
+
 pub struct MockData {
-    map: HashMap<&'static str, *const ()>,
+    map: Map,
 }
 
 impl Default for MockData {
@@ -23,17 +26,23 @@ impl MockData {
     >(
         &'_ mut self,
         fn_ident: &'static str,
+        generics_hash_key: GenericsHashKey,
     ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, PASSES_MOCK_TO_CALLBACK>
     {
-        let fn_data_ptr = self.map.entry(fn_ident).or_insert_with(|| {
-            Box::leak(Box::new(FnData::<
-                '_,
-                TMock,
-                HAS_RETURN_VALUE,
-                SUPPORTS_BASE_CALLING,
-                PASSES_MOCK_TO_CALLBACK,
-            >::new(fn_ident))) as *const _ as *const ()
-        });
+        let fn_data_ptr = self
+            .map
+            .entry(fn_ident)
+            .or_insert_with(|| HashMap::new())
+            .entry(generics_hash_key)
+            .or_insert_with(|| {
+                Box::leak(Box::new(FnData::<
+                    '_,
+                    TMock,
+                    HAS_RETURN_VALUE,
+                    SUPPORTS_BASE_CALLING,
+                    PASSES_MOCK_TO_CALLBACK,
+                >::new(fn_ident))) as *const _ as *const ()
+            });
 
         let fn_data_ref = Self::cast_ptr_to_ref(*fn_data_ptr);
         return fn_data_ref;
@@ -84,6 +93,7 @@ impl IMockData for MockData {
         let result = fn_idents
             .iter()
             .filter_map(|x| self.map.get(x))
+            .flat_map(|y| y.values())
             .cloned()
             .map(
                 Self::cast_ptr_to_ref::<
@@ -102,7 +112,7 @@ impl IMockData for MockData {
 
 impl Drop for MockData {
     fn drop(&mut self) {
-        for fn_data_ptr in self.map.values() {
+        for fn_data_ptr in self.map.values().flat_map(|x| x.values()) {
             let boxed_fn_data = unsafe {
                 Box::from_raw(
                     (*fn_data_ptr) as *const _

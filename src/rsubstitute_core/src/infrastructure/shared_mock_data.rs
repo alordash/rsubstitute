@@ -1,3 +1,4 @@
+use crate::args::*;
 use crate::infrastructure::*;
 use std::cell::RefCell;
 use std::rc::Rc;
@@ -12,6 +13,7 @@ pub trait ISharedMockData {
     >(
         &'_ self,
         fn_ident: &'static str,
+        generics_hash_key: GenericsHashKey,
     ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, PASSES_MOCK_TO_CALLBACK>;
 }
 
@@ -27,9 +29,10 @@ impl ISharedMockData for SharedMockData {
     >(
         &'_ self,
         fn_ident: &'static str,
+        generics_hash_key: GenericsHashKey,
     ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, PASSES_MOCK_TO_CALLBACK>
     {
-        self.borrow_mut().get_fn_data(fn_ident)
+        self.borrow_mut().get_fn_data(fn_ident, generics_hash_key)
     }
 }
 

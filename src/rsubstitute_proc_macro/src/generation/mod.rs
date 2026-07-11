@@ -11,6 +11,7 @@ mod common {
     pub(crate) mod fn_data_stmt;
     pub(crate) mod generic_arguments;
     pub(crate) mod reset_fn_data_stmt;
+    pub(crate) mod call_stmt;
 
     pub mod models {
         mod associated_items_info;

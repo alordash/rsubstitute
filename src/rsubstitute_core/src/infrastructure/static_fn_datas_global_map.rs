@@ -1,4 +1,4 @@
-use crate::infrastructure::FnData;
+use crate::infrastructure::{FnData, IMockData};
 use std::any::TypeId;
 use std::cell::UnsafeCell;
 use std::collections::HashMap;
@@ -22,6 +22,33 @@ impl StaticFnDatasGlobalMap {
         return map;
     }
 
+    fn get_fn_data_ref<
+        'a,
+        TMock,
+        const HAS_RETURN_VALUE: bool,
+        const SUPPORTS_BASE_CALLING: bool,
+    >(
+        fn_data_raw_ptr: *const (),
+    ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, false> {
+        // SAFETY: `raw_ptr` is obtained from `Box::<T>::leak`, which means that it is safe to cast
+        // a pointer to `T` and treat it as reference. `as_ref` could also be replaced with `as_ref_unchecked`
+        // since `Box::leak` returns a reference, which after casting to pointer can not be null.
+        let result = unsafe {
+            (fn_data_raw_ptr as *const FnData<
+                TMock,
+                HAS_RETURN_VALUE,
+                SUPPORTS_BASE_CALLING,
+                false,
+            >).as_ref().unwrap_or_else(|| {
+                panic!(
+                    "Pointer to global static mock of type '{}' obtained from `Box::leak` should not be null.",
+                    std::any::type_name::<TMock>()
+                )
+            })
+        };
+        return result;
+    }
+
     pub fn get_specific_fn_data<
         'a,
         TMock,
@@ -35,31 +62,19 @@ impl StaticFnDatasGlobalMap {
         let map = self.get_mut_map();
         let raw_ptr = map
             .entry(type_id)
-            .or_insert(HashMap::new())
+            .or_insert_with(|| HashMap::new())
             .entry(fn_ident)
-            .or_insert(Box::leak(Box::new(FnData::<
-                TMock,
-                HAS_RETURN_VALUE,
-                SUPPORTS_BASE_CALLING,
-                false,
-            >::new(fn_ident))) as *mut _ as *const _);
+            .or_insert_with(|| {
+                Box::leak(Box::new(FnData::<
+                    TMock,
+                    HAS_RETURN_VALUE,
+                    SUPPORTS_BASE_CALLING,
+                    false,
+                >::new(fn_ident))) as *mut _ as *const _
+            });
 
-        // SAFETY: `raw_ptr` is obtained from `Box::<T>::leak`, which means that it is safe to cast
-        // a pointer to `T` and treat it as reference. `as_ref` could also be replaced with `as_ref_unchecked`
-        // since `Box::leak` returns a reference, which after casting to pointer can not be null.
-        let fn_data_ref = unsafe {
-            ((*raw_ptr) as *const FnData<
-                TMock,
-                HAS_RETURN_VALUE,
-                SUPPORTS_BASE_CALLING,
-                false,
-            >).as_ref().unwrap_or_else(|| {
-                panic!(
-                    "Pointer to global static mock of type '{}' obtained from `Box::leak` should not be null.",
-                    std::any::type_name::<TMock>()
-                )
-            })
-        };
+        let fn_data_ref =
+            Self::get_fn_data_ref::<'a, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING>(*raw_ptr);
         return fn_data_ref;
     }
 
@@ -67,6 +82,25 @@ impl StaticFnDatasGlobalMap {
         let type_id = typeid::of::<TMock>();
         let map = self.get_mut_map();
         map.remove_entry(&type_id);
+    }
+
+    pub fn verify_received_nothing_else<TMock>(&self, fn_ident: &'static str) {
+        let type_id = typeid::of::<TMock>();
+        let map = self.get_mut_map();
+        let Some(fn_datas_raw_ptrs) = map.get(&type_id) else {
+            return;
+        };
+        let fn_idents = [fn_ident];
+        for fn_data_raw_ptr in fn_datas_raw_ptrs.values() {
+            const IRRELEVANT_HAS_RETURN_VALUE: bool = false;
+            const IRRELEVANT_SUPPORTS_BASE_CALLING: bool = false;
+            let fn_data = Self::get_fn_data_ref::<
+                TMock,
+                IRRELEVANT_HAS_RETURN_VALUE,
+                IRRELEVANT_SUPPORTS_BASE_CALLING,
+            >(*fn_data_raw_ptr);
+            fn_data.verify_received_nothing_else(fn_idents);
+        }
     }
 }
 
@@ -103,4 +137,8 @@ pub fn get_clean_static_fn_data<
 ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, false> {
     clear_static_fn_data::<TMock>();
     return get_static_fn_data(fn_ident);
+}
+
+pub fn verify_static_fn_received_nothing_else<TMock>(fn_ident: &'static str) {
+    STATIC_FN_DATAS_GLOBAL_MAP.with(|this| this.verify_received_nothing_else::<TMock>(fn_ident));
 }

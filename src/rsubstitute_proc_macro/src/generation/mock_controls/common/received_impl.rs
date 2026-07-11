@@ -6,7 +6,6 @@ use crate::generation::mock_controls::common::*;
 use crate::syntax::*;
 use proc_macro2::{Ident, Span};
 use std::borrow::Borrow;
-use syn::punctuated::Punctuated;
 use syn::*;
 
 pub(crate) struct Params<'a, T: Borrow<FnInfo>> {
@@ -42,7 +41,7 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
             )
         })
         .chain(core::iter::once(if is_static {
-            generate_fn_no_other_calls_for_static_fn(ctx, span, mock_struct_path.clone(), fn_infos)
+            generate_fn_no_other_calls_for_static_fn(span, fn_infos, mock_struct_path.clone())
         } else {
             generate_regular_fn_no_other_calls(span, fn_infos)
         }))
@@ -88,11 +87,7 @@ fn generate_received_fn(
     if !for_static_fn {
         generics = generics::combine(generics, &fn_info.source_signature.generics);
     }
-    let self_arg = if for_static_fn {
-        self_fn_arg(span)
-    } else {
-        ref_self_fn_arg(span)
-    };
+    let self_arg = ref_self_fn_arg(span);
     let output_type = Type::Path(TypePath {
         qself: None,
         path: path::new_generics_global(
@@ -125,12 +120,17 @@ fn generate_received_fn(
         variadic: None,
         output: ReturnType::Type(Token![->](span), Box::new(output_type)),
     };
+    let (args_checker_var_path, args_checker_stmt) = args_checker_stmt::new(span, fn_info);
     let (fn_data_var_path, fn_data_stmt) = if is_static {
         fn_data_stmt::new_static(span, fn_info, generic_arguments)
     } else {
-        fn_data_stmt::new_associated(span, fn_info, generic_arguments)
+        fn_data_stmt::new_associated(
+            span,
+            fn_info,
+            generic_arguments,
+            args_checker_var_path.clone(),
+        )
     };
-    let (args_checker_var_path, args_checker_stmt) = args_checker_stmt::new(span, fn_info);
     let verify_received_stmt = Expr::MethodCall(expr::method_call::new(
         span,
         Expr::Path(fn_data_var_path),
@@ -146,23 +146,19 @@ fn generate_received_fn(
             span,
             ["rsubstitute", "for_generated", "ArgRefsBinder", "new"],
         )),
-        [if for_static_fn {
-            Expr::Path(self_expr_path(span))
-        } else {
-            Expr::MethodCall(expr::method_call::new(
-                span,
-                Expr::Path(self_expr_path(span)),
-                Ident::new("clone", span),
-                [],
-            ))
-        }],
+        [Expr::MethodCall(expr::method_call::new(
+            span,
+            Expr::Path(self_expr_path(span)),
+            Ident::new("clone", span),
+            [],
+        ))],
     ));
 
     let block = Block {
         brace_token: token::Brace(span),
         stmts: vec![
-            Stmt::Local(fn_data_stmt),
             Stmt::Local(args_checker_stmt),
+            Stmt::Local(fn_data_stmt),
             Stmt::Expr(verify_received_stmt, Some(Token![;](span))),
             Stmt::Expr(return_stmt, None),
         ],
@@ -179,37 +175,42 @@ fn generate_received_fn(
 }
 
 fn generate_fn_no_other_calls_for_static_fn<T: Borrow<FnInfo>>(
-    ctx: &Context,
     span: Span,
-    mock_struct_path: Path,
     fn_infos: &[T],
+    mock_struct_path: Path,
 ) -> ImplItemFn {
     let sig = fn_no_other_calls_signature(span);
     let fn_info = &fn_infos[0];
-    let generic_arguments =
-        generic_arguments::new(ctx, span, mock_struct_path.clone(), fn_info.borrow());
-    let (fn_data_var_path, fn_data_stmt) =
-        fn_data_stmt::new_static(span, fn_info.borrow(), generic_arguments);
-    let verify_received_nothing_else_stmt = Expr::MethodCall(ExprMethodCall {
-        attrs: Vec::new(),
-        receiver: Box::new(Expr::Path(fn_data_var_path)),
-        dot_token: Token![.](span),
-        method: Ident::new("verify_received_nothing_else", span),
-        turbofish: None,
-        paren_token: token::Paren(span),
-        args: punctuated([Expr::Array(ExprArray {
+    let verify_static_fn_received_nothing_else_stmt = Expr::Call(expr::call::new(
+        span,
+        Expr::Path(ExprPath {
             attrs: Vec::new(),
-            bracket_token: token::Bracket(span),
-            elems: Punctuated::new(),
-        })]),
-    });
+            qself: None,
+            path: path::new_generics_global(
+                span,
+                [
+                    "rsubstitute",
+                    "for_generated",
+                    "verify_static_fn_received_nothing_else",
+                ],
+                [GenericArgument::Type(Type::Path(TypePath {
+                    qself: None,
+                    path: mock_struct_path,
+                }))],
+            ),
+        }),
+        [Expr::Lit(ExprLit {
+            attrs: Vec::new(),
+            lit: Lit::Str(LitStr::new(&fn_info.borrow().fn_ident.to_string(), span)),
+        })],
+    ));
 
     let block = Block {
         brace_token: token::Brace(span),
-        stmts: vec![
-            Stmt::Local(fn_data_stmt),
-            Stmt::Expr(verify_received_nothing_else_stmt, None),
-        ],
+        stmts: vec![Stmt::Expr(
+            verify_static_fn_received_nothing_else_stmt,
+            None,
+        )],
     };
 
     let result = ImplItemFn {

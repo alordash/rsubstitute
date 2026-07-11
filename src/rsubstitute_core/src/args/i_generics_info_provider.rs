@@ -11,7 +11,7 @@ pub trait IGenericsInfoProvider {
     fn hash_generics_type_ids(&self, #[allow(unused_variables)] hasher: &mut GenericsHasher);
 
     // TODO - add #[allow(unused_args)] on hasher in generated impl
-    fn hash_const_values(&self, #[allow(unused_variables)] hasher: &mut GenericsHasher) {}
+    fn hash_const_values(&self, #[allow(unused_variables)] hasher: &mut GenericsHasher);
 
     fn get_generics_hash_key(&self) -> GenericsHashKey {
         let mut hasher = GenericsHasher::new();
