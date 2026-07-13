@@ -13,6 +13,9 @@ trait Gen<G1> {
     fn gstatic<G5>();
 }
 
+// TODO - write tests for case when mocked parts are located in different mods
+// #[mock] struct S;
+// #[mock] impl a::b::c::S {}
 mod source {
     use super::*;
 
@@ -113,6 +116,9 @@ mod result {
         }
 
         impl<S1> StructMock<S1> {
+            pub fn unmock(self) -> Struct<S1> {
+                *self.mockable
+            }
             pub fn setup(&mut self) -> StructSetup<S1> {
                 StructSetup {
                     _generics: PhantomData,
