@@ -88,6 +88,10 @@ mod result {
             fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {
                 todo!()
             }
+
+            fn hash_const_values(&self, hasher: &mut GenericsHasher) {
+                todo!()
+            }
         }
         impl<T> ICall for fCall<T> {
             fn get_arg_infos(&self) -> Vec<ArgInfo> {
@@ -112,6 +116,10 @@ mod result {
                 todo!()
             }
             fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {
+                todo!()
+            }
+
+            fn hash_const_values(&self, hasher: &mut GenericsHasher) {
                 todo!()
             }
         }

@@ -99,13 +99,14 @@ mod result {
         pub struct StructMock<S1> {
             _generics: PhantomData<(S1,)>,
             #[doc(hidden)]
-            pub data: SharedMockData<StructMock<S1>>,
+            pub data: SharedMockData,
             mockable: Box<Struct<S1>>,
         }
 
         pub struct StructSetup<S1> {
+            _generics: PhantomData<(S1,)>,
             #[doc(hidden)]
-            pub data: SharedMockData<StructMock<S1>>,
+            pub data: SharedMockData,
         }
         pub struct StructStaticSetup<S1> {
             _generics: PhantomData<(S1,)>,
@@ -114,6 +115,7 @@ mod result {
         impl<S1> StructMock<S1> {
             pub fn setup(&mut self) -> StructSetup<S1> {
                 StructSetup {
+                    _generics: PhantomData,
                     data: self.data.clone(),
                 }
             }
@@ -158,8 +160,9 @@ mod result {
                 true,
                 true,
             > {
-                let fn_data: &FnData<StructMock<S1>, false, true, false> =
-                    self.data.get_shared_fn_data("f");
+                let fn_data: &FnData<StructMock<S1>, false, true, false> = self
+                    .data
+                    .get_shared_fn_data("f", todo!("generics hash key"));
                 todo!()
             }
         }
@@ -188,8 +191,9 @@ mod result {
         // (and optionally base impl is called)
         impl<S1> StructMock<S1> {
             pub fn f<S2>(&self) {
-                let fn_data: &FnData<StructMock<S1>, false, true, false> =
-                    self.data.get_shared_fn_data("f");
+                let fn_data: &FnData<StructMock<S1>, false, true, false> = self
+                    .data
+                    .get_shared_fn_data("f", todo!("generics hash key"));
             }
             pub fn g<S3>() {
                 let fn_data: &FnData<StructMock<S1>, false, true, false> = get_static_fn_data("g");
@@ -221,8 +225,9 @@ mod result {
                 true,
                 true,
             > {
-                let fn_data: &FnData<StructMock<i8>, false, true, false> =
-                    self.data.get_shared_fn_data("sself");
+                let fn_data: &FnData<StructMock<i8>, false, true, false> = self
+                    .data
+                    .get_shared_fn_data("sself", todo!("generics hash key"));
                 todo!()
             }
         }
@@ -250,8 +255,9 @@ mod result {
 
         impl<'__rs> StructMock<i8> {
             pub fn sself<S4>(&self) {
-                let fn_data: &FnData<StructMock<i8>, false, true, false> =
-                    self.data.get_shared_fn_data("sself");
+                let fn_data: &FnData<StructMock<i8>, false, true, false> = self
+                    .data
+                    .get_shared_fn_data("sself", todo!("generics hash key"));
             }
             pub fn sstatic<S5>() {
                 let fn_data: &FnData<StructMock<i8>, false, true, false> =
@@ -301,7 +307,7 @@ mod result {
 
         pub struct StructTraitSetup<T1> {
             #[doc(hidden)]
-            pub data: SharedMockData<StructMock<i16>>,
+            pub data: SharedMockData,
             _generics: PhantomData<(T1,)>,
         }
         pub struct StructTraitStaticSetup<T1> {
@@ -323,8 +329,9 @@ mod result {
                 true,
                 true,
             > {
-                let fn_data: &FnData<StructMock<i16>, true, true, false> =
-                    self.data.get_shared_fn_data("Trait::f");
+                let fn_data: &FnData<StructMock<i16>, true, true, false> = self
+                    .data
+                    .get_shared_fn_data("Trait::f", todo!("generics hash key"));
                 todo!()
             }
             pub fn tself<'__rsa, T4>(
@@ -341,8 +348,9 @@ mod result {
                 true,
                 true,
             > {
-                let fn_data: &FnData<StructMock<i16>, false, true, false> =
-                    self.data.get_shared_fn_data("Trait::tself");
+                let fn_data: &FnData<StructMock<i16>, false, true, false> = self
+                    .data
+                    .get_shared_fn_data("Trait::tself", todo!("generics hash key"));
                 todo!()
             }
         }
@@ -405,8 +413,9 @@ mod result {
 
         impl<T1> Trait<T1> for StructMock<i16> {
             fn f<T2>(&self) -> T1 {
-                let fn_data: &FnData<StructMock<i16>, false, true, false> =
-                    self.data.get_shared_fn_data("Trait::f");
+                let fn_data: &FnData<StructMock<i16>, false, true, false> = self
+                    .data
+                    .get_shared_fn_data("Trait::f", todo!("generics hash key"));
                 todo!()
             }
             fn g<T3>() {
@@ -414,8 +423,9 @@ mod result {
                     get_static_fn_data("Trait::g");
             }
             fn tself<T4>(&self) {
-                let fn_data: &FnData<StructMock<i16>, false, true, false> =
-                    self.data.get_shared_fn_data("Trait::tself");
+                let fn_data: &FnData<StructMock<i16>, false, true, false> = self
+                    .data
+                    .get_shared_fn_data("Trait::tself", todo!("generics hash key"));
             }
             fn tstatic<T5>() {
                 let fn_data: &FnData<StructMock<i16>, false, true, false> =
@@ -441,7 +451,7 @@ mod result {
 
         pub struct StructTraitSetup {
             #[doc(hidden)]
-            pub data: SharedMockData<StructMock<i128>>,
+            pub data: SharedMockData,
             _generics: PhantomData<()>,
         }
         pub struct StructTraitStaticSetup {
@@ -463,8 +473,9 @@ mod result {
                 true,
                 true,
             > {
-                let fn_data: &FnData<StructMock<i128>, false, true, false> =
-                    self.data.get_shared_fn_data("Trait::f");
+                let fn_data: &FnData<StructMock<i128>, false, true, false> = self
+                    .data
+                    .get_shared_fn_data("Trait::f", todo!("generics hash key"));
                 todo!()
             }
             pub fn tself<'__rsa, T4>(
@@ -481,8 +492,9 @@ mod result {
                 true,
                 true,
             > {
-                let fn_data: &FnData<StructMock<i128>, false, true, false> =
-                    self.data.get_shared_fn_data("Trait::tself");
+                let fn_data: &FnData<StructMock<i128>, false, true, false> = self
+                    .data
+                    .get_shared_fn_data("Trait::tself", todo!("generics hash key"));
                 todo!()
             }
         }
@@ -549,8 +561,9 @@ mod result {
 
         impl<'__rs> Trait<i64> for StructMock<i128> {
             fn f<T2>(&self) -> i64 {
-                let fn_data: &FnData<StructMock<i128>, false, true, false> =
-                    self.data.get_shared_fn_data("Trait::f");
+                let fn_data: &FnData<StructMock<i128>, false, true, false> = self
+                    .data
+                    .get_shared_fn_data("Trait::f", todo!("generics hash key"));
                 todo!()
             }
             fn g<T3>() {
@@ -558,8 +571,9 @@ mod result {
                     get_static_fn_data("Trait::g");
             }
             fn tself<T4>(&self) {
-                let fn_data: &FnData<StructMock<i128>, false, true, false> =
-                    self.data.get_shared_fn_data("Trait::tself");
+                let fn_data: &FnData<StructMock<i128>, false, true, false> = self
+                    .data
+                    .get_shared_fn_data("Trait::tself", todo!("generics hash key"));
             }
             fn tstatic<T5>() {
                 let fn_data: &FnData<StructMock<i128>, false, true, false> =
@@ -583,7 +597,7 @@ mod result {
 
         pub struct StructGenSetup<G1, S1> {
             #[doc(hidden)]
-            pub data: SharedMockData<StructMock<S1>>,
+            pub data: SharedMockData,
             _generics: PhantomData<(G1, S1)>,
         }
         pub struct StructGenStaticSetup<G1, S1> {
@@ -605,8 +619,9 @@ mod result {
                 true,
                 true,
             > {
-                let fn_data: &FnData<StructMock<S1>, false, true, false> =
-                    self.data.get_shared_fn_data("Gen::f");
+                let fn_data: &FnData<StructMock<S1>, false, true, false> = self
+                    .data
+                    .get_shared_fn_data("Gen::f", todo!("generics hash key"));
                 todo!()
             }
             pub fn gself<'__rsa, T4>(
@@ -623,8 +638,9 @@ mod result {
                 true,
                 true,
             > {
-                let fn_data: &FnData<StructMock<S1>, false, true, false> =
-                    self.data.get_shared_fn_data("Gen::tself");
+                let fn_data: &FnData<StructMock<S1>, false, true, false> = self
+                    .data
+                    .get_shared_fn_data("Gen::tself", todo!("generics hash key"));
                 todo!()
             }
         }
@@ -687,16 +703,18 @@ mod result {
 
         impl<G1, S1> Gen<G1> for StructMock<S1> {
             fn f<T2>(&self) {
-                let fn_data: &FnData<StructMock<S1>, false, true, false> =
-                    self.data.get_shared_fn_data("Gen::f");
+                let fn_data: &FnData<StructMock<S1>, false, true, false> = self
+                    .data
+                    .get_shared_fn_data("Gen::f", todo!("generics hash key"));
             }
             fn g<T3>() {
                 let fn_data: &FnData<StructMock<S1>, false, true, false> =
                     get_static_fn_data("Gen::g");
             }
             fn gself<T4>(&self) {
-                let fn_data: &FnData<StructMock<S1>, false, true, false> =
-                    self.data.get_shared_fn_data("Gen::tself");
+                let fn_data: &FnData<StructMock<S1>, false, true, false> = self
+                    .data
+                    .get_shared_fn_data("Gen::tself", todo!("generics hash key"));
             }
             fn gstatic<T5>() {
                 let fn_data: &FnData<StructMock<i16>, false, true, false> =
