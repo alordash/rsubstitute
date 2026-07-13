@@ -49,6 +49,12 @@ pub(crate) fn generate(
         }),
         semi_token: None,
     };
+    let clone_impl = clone_impl::generate(
+        span,
+        item_struct.generics.clone(),
+        path.clone(),
+        &item_struct.fields,
+    );
     let trait_impl = generate_trait_impl(ctx, span, trait_info, path.clone());
     let inner_impl = generate_inner_impl(
         ctx,
@@ -62,6 +68,7 @@ pub(crate) fn generate(
     let result = TraitMockStruct {
         path,
         item_struct,
+        clone_impl,
         trait_impl,
         inner_impl,
         maybe_associated_controls,

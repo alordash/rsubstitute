@@ -141,6 +141,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockM
     }))
     .chain([
         Item::Struct(trait_mock_struct.item_struct),
+        Item::Impl(trait_mock_struct.clone_impl),
         Item::Impl(trait_mock_struct.trait_impl),
         Item::Impl(trait_mock_struct.inner_impl),
     ])
