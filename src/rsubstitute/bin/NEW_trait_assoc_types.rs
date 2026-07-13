@@ -12,14 +12,11 @@ trait Trait {
     const CONST: usize = 43;
 
     type InputType<TAmogus: Clone>: Clone + Debug
-    = i32
-    where
-        Self: Clone;
+        = i32;
 
     type OutputType<TT>: Clone + Sized + Default
-    = u8
+        = u8
     where
-        Self: Sized,
         TT: Clone;
 
     fn get_const(&self) -> usize {
@@ -28,7 +25,6 @@ trait Trait {
 
     fn get_my_type<TT: Clone>(&self, input: Self::InputType<i32>) -> Self::OutputType<TT>
     where
-        Self: Clone + Sized,
         TT: ToString;
 }
 
