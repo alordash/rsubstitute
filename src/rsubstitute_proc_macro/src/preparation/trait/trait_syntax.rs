@@ -145,35 +145,42 @@ fn merge_generics_with_assoc_generics(
     assoc_types: &[Ordered<TraitItemTypeSyntax>],
     assoc_constants: &[Ordered<TraitItemConstSyntax>],
 ) -> Generics {
-    let assoc_types_as_generic_parameters = assoc_types.iter().map(|x| {
-        let result = TypeParam {
-            attrs: Vec::new(),
-            ident: format_ident!("{}_{}", trait_ident, x.item.ident),
-            colon_token: None,
-            bounds: x.item.bounds.clone(),
-            eq_token: None,
-            default: None,
-        };
-        return GenericParam::Type(result);
+    let assoc_types_as_generic_parameters = assoc_types.iter().map(|ordered| {
+        ordered.clone_map(|x| {
+            let result = TypeParam {
+                attrs: Vec::new(),
+                ident: format_ident!("{}_{}", trait_ident, x.item.ident),
+                colon_token: None,
+                bounds: x.item.bounds.clone(),
+                eq_token: None,
+                default: None,
+            };
+            return GenericParam::Type(result);
+        })
     });
-    let assoc_constants_as_generic_parameters = assoc_constants.iter().map(|x| {
-        let const_ident = format_ident!("{}_{}", trait_ident, x.item.ident);
-        let span = const_ident.span();
-        let result = ConstParam {
-            attrs: Vec::new(),
-            const_token: Token![const](span),
-            ident: const_ident,
-            colon_token: Token![:](span),
-            ty: x.item.ty.clone(),
-            eq_token: None,
-            default: None,
-        };
-        return GenericParam::Const(result);
+    let assoc_constants_as_generic_parameters = assoc_constants.iter().map(|ordered| {
+        ordered.clone_map(|x| {
+            let const_ident = format_ident!("{}_{}", trait_ident, x.item.ident);
+            let span = const_ident.span();
+            let result = ConstParam {
+                attrs: Vec::new(),
+                const_token: Token![const](span),
+                ident: const_ident,
+                colon_token: Token![:](span),
+                ty: x.item.ty.clone(),
+                eq_token: None,
+                default: None,
+            };
+            return GenericParam::Const(result);
+        })
     });
-    generics.params.extend(assoc_types_as_generic_parameters);
+    let mut generic_parameters: Vec<_> = assoc_types_as_generic_parameters
+        .chain(assoc_constants_as_generic_parameters)
+        .collect();
+    generic_parameters.sort_by(|a, b| a.order_number.cmp(&b.order_number));
     generics
         .params
-        .extend(assoc_constants_as_generic_parameters);
+        .extend(generic_parameters.into_iter().map(|x| x.value));
     return generics;
 }
 
