@@ -1,8 +1,8 @@
+use indexmap::IndexMap;
 use crate::args::*;
 use crate::infrastructure::*;
-use std::collections::HashMap;
 
-type Map = HashMap<&'static str, HashMap<GenericsHashKey, *const ()>>;
+type Map = IndexMap<&'static str, IndexMap<GenericsHashKey, *const ()>>;
 
 pub struct MockData {
     map: Map,
@@ -32,7 +32,7 @@ impl MockData {
         let fn_data_ptr = self
             .map
             .entry(fn_ident)
-            .or_insert_with(|| HashMap::new())
+            .or_insert_with(|| IndexMap::new())
             .entry(generics_hash_key)
             .or_insert_with(|| {
                 Box::leak(Box::new(FnData::<

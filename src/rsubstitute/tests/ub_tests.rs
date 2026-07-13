@@ -70,9 +70,6 @@ mod tests {
 
         // Act
         let temporary_value = 5;
-        mock.setup()
-            .work(&temporary_value)
-            .does(|_| println!("amogus"));
         mock.work(&temporary_value);
 
         // Assert
