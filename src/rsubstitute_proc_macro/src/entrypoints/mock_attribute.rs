@@ -13,7 +13,7 @@ pub(crate) fn handle(
     let mock_mod = match item {
         Item::Fn(item_fn) => targets::r#fn::generate_module(&ctx, item_fn),
         Item::Impl(item_impl) => todo!(),
-        Item::Struct(item_struct) => todo!(),
+        Item::Struct(item_struct) => targets::r#struct::generate_module(&ctx, item_struct),
         Item::Trait(item_trait) => targets::r#trait::generate_module(&ctx, item_trait),
         _ => todo!(
             "PANIC HERE AND WRITE CORRECT ERROR MSG. Can automock only `fn`, `trait`, `impl` or `use`."

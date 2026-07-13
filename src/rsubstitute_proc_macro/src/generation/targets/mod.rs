@@ -8,6 +8,7 @@ pub(crate) mod models {
 
 pub mod r#fn;
 pub mod r#trait;
+pub mod r#struct;
 
 mod common {
     pub(crate) mod mod_usage;

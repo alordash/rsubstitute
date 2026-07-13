@@ -75,14 +75,14 @@ mod result {
         // source
         pub struct Struct<S1>(pub S1);
 
-        pub trait IMockable {
+        pub trait Mockable {
             type Mock;
             fn mock(self) -> Self::Mock;
             type StaticSetup;
             fn static_setup() -> Self::StaticSetup;
         }
 
-        impl<S1> IMockable for Struct<S1> {
+        impl<S1> Mockable for Struct<S1> {
             type Mock = StructMock<S1>;
             fn mock(self) -> StructMock<S1> {
                 StructMock {
