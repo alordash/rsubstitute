@@ -9,6 +9,7 @@ pub(crate) struct TraitInfo {
     pub unsafety: Option<Token![unsafe]>,
     pub visibility: Visibility,
     pub ident: Ident,
+    pub source_generics: Generics,
     pub merged_generics: Generics,
     pub constants: Vec<Ordered<TraitItemConstSyntax>>,
     pub assoc_types: Vec<Ordered<TraitItemTypeSyntax>>,

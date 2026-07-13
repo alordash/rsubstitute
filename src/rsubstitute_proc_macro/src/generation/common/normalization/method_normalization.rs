@@ -1,7 +1,7 @@
-use crate::generation::base_fn::common::rsubstitute_self;
 use syn::spanned::Spanned;
 use syn::visit_mut::VisitMut;
 use syn::*;
+use crate::generation::common::rsubstitute_self::rsubstitute_self;
 
 pub(crate) fn normalize_method(mut signature: Signature, mut block: Block) -> (Signature, Block) {
     let mut self_keyword_normalizer = SelfKeywordNormalizer;

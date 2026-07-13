@@ -26,9 +26,16 @@ pub(crate) fn prepare(
     }: Params,
 ) -> TraitSyntax {
     let split_items = split_items(items, &ident);
+    let source_generics = generics.clone();
+    let merged_generics = merge_generics_with_assoc_generics(
+        &ident,
+        generics,
+        &split_items.assoc_types,
+        &split_items.assoc_constants,
+    );
     let trait_syntax_as_fn_owner = TraitSyntaxAsFnOwner {
         ident: &ident,
-        generics: &generics,
+        generics: &merged_generics,
     };
     let static_fns = split_items
         .static_fns
@@ -44,16 +51,16 @@ pub(crate) fn prepare(
             ordered.map(|x| map_trait_item_fn_to_fn_syntax(x, &trait_syntax_as_fn_owner))
         })
         .collect();
-    let merged_generics = merge_generics_with_assoc_types(generics, &split_items.assoc_types);
-    let path = path::from_ident_with_generics(ident.clone(), &merged_generics);
+    let path = path::from_ident_with_generics(ident.clone(), &source_generics);
 
     let result = TraitSyntax {
         attributes,
         unsafety,
         visibility,
         ident,
+        source_generics,
         merged_generics,
-        constants: split_items.constants,
+        constants: split_items.assoc_constants,
         assoc_types: split_items.assoc_types,
         path,
         static_fns,
@@ -64,7 +71,7 @@ pub(crate) fn prepare(
 
 #[derive(Default)]
 struct SplitItems {
-    pub constants: Vec<Ordered<TraitItemConstSyntax>>,
+    pub assoc_constants: Vec<Ordered<TraitItemConstSyntax>>,
     pub assoc_types: Vec<Ordered<TraitItemTypeSyntax>>,
     pub static_fns: Vec<Ordered<TraitItemFn>>,
     pub associated_fns: Vec<Ordered<TraitItemFn>>,
@@ -73,7 +80,7 @@ fn split_items(items: Vec<TraitItem>, trait_ident: &Ident) -> SplitItems {
     let mut split_items = SplitItems::default();
     for (order_number, item) in items.into_iter().enumerate() {
         match item {
-            TraitItem::Const(trait_item_const) => split_items.constants.push(Ordered::new(
+            TraitItem::Const(trait_item_const) => split_items.assoc_constants.push(Ordered::new(
                 order_number,
                 TraitItemConstSyntax {
                     corresponding_generic_param_path: path::from_ident(format_ident!(
@@ -132,16 +139,48 @@ fn map_trait_item_fn_to_fn_syntax(
     return result;
 }
 
-fn merge_generics_with_assoc_types(
+fn merge_generics_with_assoc_generics(
+    trait_ident: &Ident,
     mut generics: Generics,
     assoc_types: &[Ordered<TraitItemTypeSyntax>],
+    assoc_constants: &[Ordered<TraitItemConstSyntax>],
 ) -> Generics {
-    let assoc_types_as_generic_parameters = assoc_types
-        .iter()
-        .map(|x| generic_param::from_type_ident(x.item.ident.clone()));
+    let assoc_types_as_generic_parameters = assoc_types.iter().map(|x| {
+        let result = TypeParam {
+            attrs: Vec::new(),
+            ident: format_ident!("{}_{}", trait_ident, x.item.ident),
+            colon_token: None,
+            bounds: x.item.bounds.clone(),
+            eq_token: None,
+            default: None,
+        };
+        return GenericParam::Type(result);
+    });
+    let assoc_constants_as_generic_parameters = assoc_constants.iter().map(|x| {
+        let const_ident = format_ident!("{}_{}", trait_ident, x.item.ident);
+        let span = const_ident.span();
+        let result = ConstParam {
+            attrs: Vec::new(),
+            const_token: Token![const](span),
+            ident: const_ident,
+            colon_token: Token![:](span),
+            ty: x.item.ty.clone(),
+            eq_token: None,
+            default: None,
+        };
+        return GenericParam::Const(result);
+    });
     generics.params.extend(assoc_types_as_generic_parameters);
+    generics
+        .params
+        .extend(assoc_constants_as_generic_parameters);
     return generics;
 }
+
+// TODO - write test for that (optional generic constants and their order)
+trait Trait<TA, const TB: usize, TC, const TD: usize = 3> {}
+struct S<SA, const SB: usize, SC, const SD: usize = 2>([SA; SB], [SC; SD]);
+impl<TA, const TB: usize, TC, SA, const SB: usize, SC> Trait<TA, TB, TC> for S<SA, SB, SC> {}
 
 struct TraitSyntaxAsFnOwner<'a> {
     pub ident: &'a Ident,

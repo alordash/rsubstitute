@@ -1,5 +1,6 @@
 use crate::common::models::*;
 use crate::generation::common::models::*;
+use crate::generation::common::*;
 use crate::generation::fn_info;
 use crate::generation::fn_info::models::*;
 use crate::generation::trait_info::models::*;
@@ -44,22 +45,50 @@ pub(crate) fn generate(ctx: &Context, trait_syntax: TraitSyntax) -> TraitInfo {
         attributes: trait_syntax.attributes,
         unsafety: trait_syntax.unsafety,
         visibility: trait_syntax.visibility,
-        ident: trait_syntax.ident,
+        source_generics: trait_syntax.source_generics,
         merged_generics: trait_syntax.merged_generics,
         constants: trait_syntax.constants,
         assoc_types: trait_syntax.assoc_types,
         path: trait_syntax.path,
-        static_fns: convert_fns(ctx, trait_syntax.static_fns),
-        associated_fns: convert_fns(ctx, trait_syntax.associated_fns),
+        static_fns: convert_fns(
+            ctx,
+            &trait_syntax.ident,
+            &associated_items_info,
+            trait_syntax.static_fns,
+        ),
+        associated_fns: convert_fns(
+            ctx,
+            &trait_syntax.ident,
+            &associated_items_info,
+            trait_syntax.associated_fns,
+        ),
+        ident: trait_syntax.ident,
         mock_struct_ident,
         associated_items_info,
     };
     return result;
 }
 
-fn convert_fns(ctx: &Context, fn_syntaxes: Vec<Ordered<FnSyntax>>) -> Vec<Ordered<FnInfo>> {
+fn convert_fns(
+    ctx: &Context,
+    trait_ident: &Ident,
+    associated_items_info: &AssociatedItemsInfo,
+    fn_syntaxes: Vec<Ordered<FnSyntax>>,
+) -> Vec<Ordered<FnInfo>> {
     fn_syntaxes
         .into_iter()
-        .map(|ordered_fn_syntax| ordered_fn_syntax.map(|x| fn_info::generate(ctx, x)))
+        .map(|ordered_fn_syntax| {
+            ordered_fn_syntax.map(|fn_syntax| {
+                // PERF - instead of normalizing results of `fn_syntax::generate` it could be faster
+                // to normalize inputs to `fn_syntax::generate` first, i.e. build assoc items info
+                // in `TraitSyntax` instead of `TraitInfo` and use it in `IFnOwner`
+                let normalized_fn_syntax = normalization::normalize_associated_items_in_fn_syntax(
+                    trait_ident,
+                    associated_items_info,
+                    fn_syntax,
+                );
+                return fn_info::generate(ctx, normalized_fn_syntax);
+            })
+        })
         .collect()
 }

@@ -1,7 +1,6 @@
 use crate::common::*;
-use crate::generation::base_fn::common::*;
-use crate::generation::base_fn::normalization;
-use crate::generation::common::models::AssociatedItemsInfo;
+use crate::generation::common::models::*;
+use crate::generation::common::*;
 use crate::generation::fn_info::models::*;
 use crate::preparation::r#fn::models::*;
 use crate::syntax::*;
