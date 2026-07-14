@@ -22,3 +22,4 @@ pub mod associated_method_block;
 pub mod static_fn_block;
 pub mod static_fn_mock_struct;
 pub mod trait_mock_struct;
+pub mod struct_mock_struct;

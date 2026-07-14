@@ -93,7 +93,7 @@ mod result {
             }
             type StaticSetup = StructStaticSetup<S1>;
             fn static_setup() -> Self::StaticSetup {
-                StructStaticSetup {
+                Self::StaticSetup {
                     _generics: PhantomData,
                 }
             }
