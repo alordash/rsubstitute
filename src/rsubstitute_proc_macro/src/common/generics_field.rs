@@ -15,9 +15,9 @@ pub(crate) fn new_field(
         colon_token: Some(Token![:](span)),
         ty: Type::Path(TypePath {
             qself: None,
-            path: path::new_generics(
+            path: path::new_generics_global(
                 span,
-                ["PhantomData"],
+                ["core", "marker", "PhantomData"],
                 [GenericArgument::Type(Type::Tuple(TypeTuple {
                     paren_token: token::Paren(span),
                     elems: generics

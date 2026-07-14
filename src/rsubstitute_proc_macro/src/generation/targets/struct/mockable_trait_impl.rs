@@ -3,6 +3,7 @@ use crate::generation::common::*;
 use crate::generation::mock_controls::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
+use syn::punctuated::Punctuated;
 use syn::*;
 
 pub(crate) struct Params {
@@ -26,7 +27,7 @@ pub(crate) fn generate(
         qself: None,
         path: path::from_ident_with_generics(struct_ident, &generics),
     });
-    let struct_mock_path = path::from_ident_with_generics(struct_mock_ident, &generics);
+    let struct_mock_path = path::from_ident_with_generics(struct_mock_ident.clone(), &generics);
     let static_setup_struct_type = Type::Path(TypePath {
         qself: None,
         path: path::from_ident_with_generics(static_setup_struct_ident, &generics),
@@ -35,13 +36,17 @@ pub(crate) fn generate(
         qself: None,
         path: path::from_ident_with_generics(static_received_struct_ident, &generics),
     });
-    let type_mock = associated_type_impl(span, "Mock", struct_type.clone());
+    let struct_mock_type = Type::Path(TypePath {
+        qself: None,
+        path: path::from_ident_with_generics(struct_mock_ident, &generics),
+    });
+    let type_mock = associated_type_impl(span, "Mock", struct_mock_type);
     let fn_mock = fn_mock(span, struct_mock_path);
     let type_static_setup = associated_type_impl(span, "StaticSetup", static_setup_struct_type);
     let fn_static_setup = fn_static_control(span, ControlType::Setup);
     let type_static_received =
         associated_type_impl(span, "StaticReceived", static_received_struct_type);
-    let fn_static_received = fn_static_control(span, ControlType::Setup);
+    let fn_static_received = fn_static_control(span, ControlType::Received);
     let result = ItemImpl {
         attrs: Vec::new(),
         defaultness: None,
@@ -79,10 +84,6 @@ fn associated_type_impl(span: Span, name: &'static str, ty: Type) -> ImplItemTyp
 }
 
 fn fn_mock(span: Span, struct_mock_path: Path) -> ImplItemFn {
-    let struct_mock_type = Type::Path(TypePath {
-        qself: None,
-        path: struct_mock_path.clone(),
-    });
     let result = ImplItemFn {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
@@ -98,7 +99,13 @@ fn fn_mock(span: Span, struct_mock_path: Path) -> ImplItemFn {
             paren_token: token::Paren(span),
             inputs: punctuated([self_fn_arg(span)]),
             variadic: None,
-            output: ReturnType::Type(Token![->](span), Box::new(struct_mock_type)),
+            output: ReturnType::Type(
+                Token![->](span),
+                Box::new(Type::Path(TypePath {
+                    qself: None,
+                    path: path::new(span, ["Self", "Mock"]),
+                })),
+            ),
         },
         block: Block {
             brace_token: token::Brace(span),
@@ -120,7 +127,7 @@ fn fn_mock(span: Span, struct_mock_path: Path) -> ImplItemFn {
                                 Expr::Path(ExprPath {
                                     attrs: Vec::new(),
                                     qself: None,
-                                    path: path::new_global(span, ["alloc", "boxed", "Box", "new"]),
+                                    path: path::new(span, ["Box", "new"]),
                                 }),
                                 [Expr::Path(self_expr_path(span))],
                             )),
@@ -137,9 +144,9 @@ fn fn_mock(span: Span, struct_mock_path: Path) -> ImplItemFn {
 }
 
 fn fn_static_control(span: Span, control_type: ControlType) -> ImplItemFn {
-    let static_control_name = match control_type {
-        ControlType::Setup => "StaticSetup",
-        ControlType::Received => "StaticReceived",
+    let (fn_name, static_control_name) = match control_type {
+        ControlType::Setup => ("static_setup", "StaticSetup"),
+        ControlType::Received => ("static_received", "StaticReceived"),
     };
     let static_control_path = path::new(span, ["Self", static_control_name]);
     let result = ImplItemFn {
@@ -152,10 +159,10 @@ fn fn_static_control(span: Span, control_type: ControlType) -> ImplItemFn {
             unsafety: None,
             abi: None,
             fn_token: Token![fn](span),
-            ident: Ident::new("static_setup", span),
+            ident: Ident::new(fn_name, span),
             generics: Generics::default(),
             paren_token: token::Paren(span),
-            inputs: punctuated([self_fn_arg(span)]),
+            inputs: Punctuated::new(),
             variadic: None,
             output: ReturnType::Type(
                 Token![->](span),
