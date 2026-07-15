@@ -315,7 +315,7 @@ fn try_extract_base_fn(
             span,
             base_fn::AssociatedParams {
                 fn_info,
-                mock_struct_path: mock_struct_path.clone(),
+                target_struct_path: mock_struct_path.clone(),
                 base_impl,
                 maybe_associated_items_info: Some(&trait_info.associated_items_info),
                 is_static,

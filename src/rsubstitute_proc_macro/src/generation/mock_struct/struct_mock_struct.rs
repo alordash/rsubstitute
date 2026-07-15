@@ -36,7 +36,7 @@ pub(crate) fn generate(
                 data_field::new_field(span, data_field::Params { public: true }),
                 Field {
                     attrs: Vec::new(),
-                    vis: Visibility::Inherited,
+                    vis: Visibility::Public(Token![pub](span)),
                     mutability: FieldMutability::None,
                     ident: Some(Ident::new("mockable", span)),
                     colon_token: Some(Token![:](span)),

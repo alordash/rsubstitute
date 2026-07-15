@@ -35,7 +35,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
             source_span,
             base_fn::StaticFnParams {
                 fn_info: &fn_info,
-                mock_struct_path: static_fn_mock_struct.path.clone(),
+                target_struct_path: static_fn_mock_struct.path.clone(),
                 base_impl,
             },
         ))

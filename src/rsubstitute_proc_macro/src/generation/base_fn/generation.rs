@@ -14,18 +14,18 @@ pub(crate) fn get_base_fn_ident(fn_ident: &Ident) -> Ident {
 
 pub(crate) struct StaticFnParams<'a> {
     pub fn_info: &'a FnInfo,
-    pub mock_struct_path: Path,
+    pub target_struct_path: Path,
     pub base_impl: Box<Block>,
 }
 pub(crate) fn generate_static_fn(
     span: Span,
     StaticFnParams {
         fn_info,
-        mock_struct_path,
+        target_struct_path,
         base_impl,
     }: StaticFnParams,
 ) -> ItemFn {
-    let (sig, block) = generate_core(span, fn_info, mock_struct_path, base_impl, true);
+    let (sig, block) = generate_core(span, fn_info, target_struct_path, base_impl, true);
     let result = ItemFn {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
@@ -37,7 +37,7 @@ pub(crate) fn generate_static_fn(
 
 pub(crate) struct AssociatedParams<'a> {
     pub fn_info: &'a FnInfo,
-    pub mock_struct_path: Path,
+    pub target_struct_path: Path,
     pub base_impl: Box<Block>,
     pub maybe_associated_items_info: Option<&'a AssociatedItemsInfo>, // `Some` for trait impls, `None` for struct impls
     pub is_static: bool,
@@ -46,13 +46,13 @@ pub(crate) fn generate_associated(
     span: Span,
     AssociatedParams {
         fn_info,
-        mock_struct_path,
+        target_struct_path,
         base_impl,
         maybe_associated_items_info,
         is_static,
     }: AssociatedParams,
 ) -> ImplItemFn {
-    let (mut sig, mut block) = generate_core(span, fn_info, mock_struct_path, base_impl, is_static);
+    let (mut sig, mut block) = generate_core(span, fn_info, target_struct_path, base_impl, is_static);
     (sig, block) = normalization::normalize_method(sig, block);
     if let Some(associated_items_info) = maybe_associated_items_info {
         (sig, block) = normalization::normalize_associated_items(associated_items_info, sig, block);
@@ -70,7 +70,7 @@ pub(crate) fn generate_associated(
 fn generate_core(
     span: Span,
     fn_info: &FnInfo,
-    mock_struct_path: Path,
+    target_struct_path: Path,
     base_impl: Box<Block>,
     is_static: bool,
 ) -> (Signature, Block) {
@@ -101,7 +101,7 @@ fn generate_core(
                 mutability: None,
                 elem: Box::new(Type::Path(TypePath {
                     qself: None,
-                    path: mock_struct_path,
+                    path: target_struct_path,
                 })),
             })),
         }

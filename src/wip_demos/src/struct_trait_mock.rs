@@ -103,7 +103,7 @@ mod result {
             _generics: PhantomData<(S1,)>,
             #[doc(hidden)]
             pub data: SharedMockData,
-            mockable: Box<Struct<S1>>,
+            pub mockable: Box<Struct<S1>>,
         }
 
         pub struct StructSetup<S1> {
@@ -143,12 +143,39 @@ mod result {
     }
 
     mod struct_impl_line22_col4 {
+        use rsubstitute_core::args::{ArgInfo, GenericParameterInfo, GenericsHasher, IGenericsInfoProvider};
+        use rsubstitute_core::fn_parameters::ICall;
         use super::*;
 
         // source
         impl<S1> Struct<S1> {
             pub fn f<S2>(&self) {}
             pub fn g<S3>() {}
+        }
+        
+        #[derive(Clone)]
+        struct fCall;
+        impl IGenericsInfoProvider for fCall {
+            fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
+                todo!()
+            }
+
+            fn hash_generics_type_ids(&self, hasher: &mut GenericsHasher) {
+                todo!()
+            }
+
+            fn hash_const_values(&self, hasher: &mut GenericsHasher) {
+                todo!()
+            }
+        }
+        impl ICall for fCall {
+            fn get_arg_infos(&self) -> Vec<ArgInfo> {
+                todo!()
+            }
+
+            fn get_ptr_to_boxed_tuple_of_refs(&self) -> *mut () {
+                todo!()
+            }
         }
 
         impl<S1> StructSetup<S1> {
@@ -200,9 +227,14 @@ mod result {
                 let fn_data: &FnData<StructMock<S1>, false, true, false> = self
                     .data
                     .get_shared_fn_data("f", todo!("generics hash key"));
+                    let q = fn_data.handle(self, fCall, Self::__base_f::<S2>);
             }
             pub fn g<S3>() {
                 let fn_data: &FnData<StructMock<S1>, false, true, false> = get_static_fn_data("g");
+            }
+            
+            pub fn __base_f<S2>(&self, f_call: fCall) {
+                self.mockable.f::<S2>();
             }
         }
     }
