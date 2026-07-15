@@ -4,6 +4,7 @@ pub mod mock_controls;
 pub mod mock_struct;
 pub mod targets;
 pub mod trait_info;
+pub mod impl_struct_info;
 
 mod common {
     pub(crate) mod call_stmt;

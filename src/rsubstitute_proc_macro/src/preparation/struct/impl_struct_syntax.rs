@@ -1,7 +1,8 @@
 use super::models::*;
-use crate::preparation::r#fn::models::IFnOwner;
+use crate::preparation::r#fn::models::{FnSyntax, IFnOwner};
 use crate::preparation::r#fn::*;
 use crate::preparation::models::*;
+use crate::syntax::signature;
 use proc_macro2::Ident;
 use quote::ToTokens;
 use syn::*;
@@ -21,7 +22,7 @@ pub(crate) fn prepare(
         impl_items,
     }: Params,
 ) -> ImplStructSyntax {
-    let SplitItems { constants, fns } = split_items(impl_items);
+    let split_items = split_items(impl_items);
     let SplitTargetType {
         modules,
         target_ident,
@@ -29,18 +30,18 @@ pub(crate) fn prepare(
     let impl_struct_syntax_as_fn_owner = ImplStructSyntaxAsFnOwner {
         generics: &generics,
     };
-    let methods = fns
+    let static_fns = split_items
+        .static_fns
         .into_iter()
         .map(|ordered| {
-            ordered.map(|x| {
-                fn_syntax::prepare(fn_syntax::Params {
-                    attributes: x.attrs,
-                    visibility: Visibility::Inherited,
-                    signature: x.sig,
-                    maybe_base_impl: None,
-                    maybe_owner: Some(&impl_struct_syntax_as_fn_owner),
-                })
-            })
+            ordered.map(|x| map_impl_item_fn_to_fn_syntax(x, &impl_struct_syntax_as_fn_owner))
+        })
+        .collect();
+    let associated_fns = split_items
+        .associated_fns
+        .into_iter()
+        .map(|ordered| {
+            ordered.map(|x| map_impl_item_fn_to_fn_syntax(x, &impl_struct_syntax_as_fn_owner))
         })
         .collect();
 
@@ -50,8 +51,9 @@ pub(crate) fn prepare(
         target_ident,
         generics,
         target_type: *target_type,
-        constants,
-        methods,
+        constants: split_items.constants,
+        static_fns,
+        associated_fns,
     };
     return result;
 }
@@ -59,7 +61,8 @@ pub(crate) fn prepare(
 #[derive(Default)]
 struct SplitItems {
     pub constants: Vec<Ordered<ImplItemConst>>,
-    pub fns: Vec<Ordered<ImplItemFn>>,
+    pub static_fns: Vec<Ordered<ImplItemFn>>,
+    pub associated_fns: Vec<Ordered<ImplItemFn>>,
 }
 fn split_items(items: Vec<ImplItem>) -> SplitItems {
     let mut split_items = SplitItems::default();
@@ -68,9 +71,17 @@ fn split_items(items: Vec<ImplItem>) -> SplitItems {
             ImplItem::Const(impl_item_const) => split_items
                 .constants
                 .push(Ordered::new(order_number, impl_item_const)),
-            ImplItem::Fn(impl_item_fn) => split_items
-                .fns
-                .push(Ordered::new(order_number, impl_item_fn)),
+            ImplItem::Fn(impl_item_fn) => {
+                if signature::is_associated(&impl_item_fn.sig) {
+                    split_items
+                        .associated_fns
+                        .push(Ordered::new(order_number, impl_item_fn))
+                } else {
+                    split_items
+                        .static_fns
+                        .push(Ordered::new(order_number, impl_item_fn))
+                }
+            }
             ImplItem::Type(_) => panic!("Inherent associated types are not supported"), // feature `inherent_associated_types`
             ImplItem::Macro(_) => panic!("Macro invocations inside impl blocks are not supported"),
             _ => panic!(
@@ -81,6 +92,20 @@ fn split_items(items: Vec<ImplItem>) -> SplitItems {
     }
 
     return split_items;
+}
+
+fn map_impl_item_fn_to_fn_syntax(
+    impl_item_fn: ImplItemFn,
+    impl_struct_syntax_as_fn_owner: &ImplStructSyntaxAsFnOwner,
+) -> FnSyntax {
+    let result = fn_syntax::prepare(fn_syntax::Params {
+        attributes: impl_item_fn.attrs,
+        visibility: Visibility::Inherited,
+        signature: impl_item_fn.sig,
+        maybe_base_impl: Some(Box::new(impl_item_fn.block)),
+        maybe_owner: Some(impl_struct_syntax_as_fn_owner),
+    });
+    return result;
 }
 
 struct SplitTargetType {
