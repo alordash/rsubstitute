@@ -8,7 +8,7 @@ use crate::generation::mock_struct::common::*;
 use crate::generation::mock_struct::models::*;
 use crate::generation::mock_struct::*;
 use crate::generation::trait_info::models::*;
-use crate::preparation::common::models::*;
+use crate::preparation::models::*;
 use crate::preparation::r#trait::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;

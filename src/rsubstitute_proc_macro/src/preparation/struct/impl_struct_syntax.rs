@@ -1,6 +1,7 @@
 use super::models::*;
 use crate::preparation::r#fn::models::IFnOwner;
 use crate::preparation::r#fn::*;
+use crate::preparation::models::*;
 use proc_macro2::Ident;
 use quote::ToTokens;
 use syn::*;
@@ -20,28 +21,25 @@ pub(crate) fn prepare(
         impl_items,
     }: Params,
 ) -> ImplStructSyntax {
-    let SplitItems {
-        constants,
-        assoc_types,
-        fns,
-    } = split_items(impl_items);
+    let SplitItems { constants, fns } = split_items(impl_items);
     let SplitTargetType {
         modules,
         target_ident,
     } = split_target_type(&target_type);
     let impl_struct_syntax_as_fn_owner = ImplStructSyntaxAsFnOwner {
-        ident: &target_ident,
         generics: &generics,
     };
     let methods = fns
         .into_iter()
-        .map(|x| {
-            fn_syntax::prepare(fn_syntax::Params {
-                attributes: x.attrs,
-                visibility: Visibility::Inherited,
-                signature: x.sig,
-                maybe_base_impl: None,
-                maybe_owner: Some(&impl_struct_syntax_as_fn_owner),
+        .map(|ordered| {
+            ordered.map(|x| {
+                fn_syntax::prepare(fn_syntax::Params {
+                    attributes: x.attrs,
+                    visibility: Visibility::Inherited,
+                    signature: x.sig,
+                    maybe_base_impl: None,
+                    maybe_owner: Some(&impl_struct_syntax_as_fn_owner),
+                })
             })
         })
         .collect();
@@ -53,7 +51,6 @@ pub(crate) fn prepare(
         generics,
         target_type: *target_type,
         constants,
-        assoc_types,
         methods,
     };
     return result;
@@ -61,19 +58,21 @@ pub(crate) fn prepare(
 
 #[derive(Default)]
 struct SplitItems {
-    pub constants: Vec<ImplItemConst>,
-    pub assoc_types: Vec<ImplItemType>,
-    pub fns: Vec<ImplItemFn>,
+    pub constants: Vec<Ordered<ImplItemConst>>,
+    pub fns: Vec<Ordered<ImplItemFn>>,
 }
 fn split_items(items: Vec<ImplItem>) -> SplitItems {
     let mut split_items = SplitItems::default();
-    for item in items.into_iter() {
+    for (order_number, item) in items.into_iter().enumerate() {
         match item {
-            ImplItem::Const(trait_item_const) => split_items.constants.push(trait_item_const),
-            ImplItem::Fn(trait_item_fn) => split_items.fns.push(trait_item_fn),
-            ImplItem::Type(trait_item_type) => split_items.assoc_types.push(trait_item_type),
-            ImplItem::Macro(_) => todo!("macro invocations inside impl blocks are not supported"),
-            ImplItem::Verbatim(_) => todo!("verbatim impl items are not supported"),
+            ImplItem::Const(impl_item_const) => split_items
+                .constants
+                .push(Ordered::new(order_number, impl_item_const)),
+            ImplItem::Fn(impl_item_fn) => split_items
+                .fns
+                .push(Ordered::new(order_number, impl_item_fn)),
+            ImplItem::Type(_) => panic!("Inherent associated types are not supported"), // feature `inherent_associated_types`
+            ImplItem::Macro(_) => panic!("Macro invocations inside impl blocks are not supported"),
             _ => panic!(
                 "Unexpected impl item: {}",
                 item.to_token_stream().to_string()
@@ -118,12 +117,11 @@ fn split_target_type(target_type: &Type) -> SplitTargetType {
 }
 
 struct ImplStructSyntaxAsFnOwner<'a> {
-    pub ident: &'a Ident,
     pub generics: &'a Generics,
 }
 impl<'a> IFnOwner for ImplStructSyntaxAsFnOwner<'a> {
     fn maybe_ident(&self) -> Option<&Ident> {
-        Some(self.ident)
+        None
     }
 
     fn generics(&self) -> &Generics {

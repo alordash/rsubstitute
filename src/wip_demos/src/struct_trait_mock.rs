@@ -319,30 +319,6 @@ mod result {
             fn tstatic<T5>() {}
         }
 
-        trait Q {
-            type W;
-            fn flex(&self) -> Self::W;
-        }
-
-        impl Q for Struct<i16> {
-            type W = String;
-            fn flex(&self) -> Self::W {
-                "asd".to_string()
-            }
-        }
-
-        impl Struct<i16> {
-            fn base_flex(&self) -> <Self as Q>::W {
-                "qwe".to_string()
-            }
-        }
-
-        impl Struct<i16> {
-            fn use_q_trait_assoc_type(&self) -> <Struct<i16> as Q>::W {
-                "quo vadis".to_string()
-            }
-        }
-
         pub struct StructTraitSetup<T1> {
             #[doc(hidden)]
             pub data: SharedMockData,

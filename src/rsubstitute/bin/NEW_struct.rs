@@ -16,3 +16,15 @@ fn main() {
 
     println!("Done");
 }
+
+#[mock(base)]
+trait Trait {
+    fn f(v: i32) -> i32;
+}
+use __rsubstitute_generated_TraitMock::*;
+
+#[mock(base)]
+fn f(v: i32) -> i32 {
+    v + 10
+}
+use f::*;

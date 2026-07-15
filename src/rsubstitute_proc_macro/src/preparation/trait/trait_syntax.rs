@@ -1,5 +1,5 @@
 use super::models::*;
-use crate::preparation::common::models::*;
+use crate::preparation::models::*;
 use crate::preparation::r#fn::fn_syntax;
 use crate::preparation::r#fn::models::*;
 use crate::syntax::*;
@@ -34,7 +34,6 @@ pub(crate) fn prepare(
         &split_items.assoc_constants,
     );
     let trait_syntax_as_fn_owner = TraitSyntaxAsFnOwner {
-        ident: &ident,
         generics: &merged_generics,
     };
     let static_fns = split_items
@@ -190,7 +189,6 @@ struct S<SA, const SB: usize, SC, const SD: usize = 2>([SA; SB], [SC; SD]);
 impl<TA, const TB: usize, TC, SA, const SB: usize, SC> Trait<TA, TB, TC> for S<SA, SB, SC> {}
 
 struct TraitSyntaxAsFnOwner<'a> {
-    pub ident: &'a Ident,
     pub generics: &'a Generics,
 }
 impl<'a> IFnOwner for TraitSyntaxAsFnOwner<'a> {

@@ -1,6 +1,6 @@
 use crate::generation::common::models::*;
 use crate::generation::fn_info::models::*;
-use crate::preparation::common::models::*;
+use crate::preparation::models::*;
 use crate::preparation::r#trait::models::*;
 use syn::*;
 
