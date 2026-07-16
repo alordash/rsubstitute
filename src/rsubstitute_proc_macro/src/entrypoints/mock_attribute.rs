@@ -14,7 +14,14 @@ pub(crate) fn handle(
             let ctx = context::create_for_mock_macro(proc_macro_attribute);
             targets::r#fn::generate_module(&ctx, item_fn)
         }
-        Item::Impl(item_impl) => todo!(),
+        Item::Impl(item_impl) => {
+            if item_impl.trait_.is_some() {
+                todo!()
+            } else {
+                let ctx = context::create_for_mock_macro(proc_macro_attribute);
+                targets::impl_struct::generate_module(&ctx, item_impl)
+            }
+        }
         Item::Struct(item_struct) => targets::r#struct::generate_module(item_struct),
         Item::Trait(item_trait) => {
             let ctx = context::create_for_mock_macro(proc_macro_attribute);

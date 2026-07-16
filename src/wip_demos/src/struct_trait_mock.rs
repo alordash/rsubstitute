@@ -178,6 +178,24 @@ mod result {
             }
         }
 
+        // Applying impl to StructMock because that's where fn_info config is used
+        // (and optionally base impl is called)
+        impl<S1> StructMock<S1> {
+            pub fn f<S2>(&self) {
+                let fn_data: &FnData<StructMock<S1>, false, true, false> = self
+                    .data
+                    .get_shared_fn_data("f", todo!("generics hash key"));
+                let q = fn_data.handle(self, fCall, Self::__base_f::<S2>);
+            }
+            pub fn g<S3>() {
+                let fn_data: &FnData<StructMock<S1>, false, true, false> = get_static_fn_data("g");
+            }
+
+            pub fn __base_f<S2>(&self, f_call: fCall) {
+                self.mockable.f::<S2>();
+            }
+        }
+
         impl<S1> StructSetup<S1> {
             pub fn f<'__rsa, S2>(
                 &mut self,
@@ -217,24 +235,6 @@ mod result {
             > {
                 let fn_data: &FnData<StructMock<S1>, false, true, false> = get_static_fn_data("g");
                 todo!()
-            }
-        }
-
-        // Applying impl to StructMock because that's where fn_info config is used
-        // (and optionally base impl is called)
-        impl<S1> StructMock<S1> {
-            pub fn f<S2>(&self) {
-                let fn_data: &FnData<StructMock<S1>, false, true, false> = self
-                    .data
-                    .get_shared_fn_data("f", todo!("generics hash key"));
-                    let q = fn_data.handle(self, fCall, Self::__base_f::<S2>);
-            }
-            pub fn g<S3>() {
-                let fn_data: &FnData<StructMock<S1>, false, true, false> = get_static_fn_data("g");
-            }
-            
-            pub fn __base_f<S2>(&self, f_call: fCall) {
-                self.mockable.f::<S2>();
             }
         }
     }

@@ -9,7 +9,7 @@ pub(crate) fn new_field(
 ) -> Field {
     let result = Field {
         attrs: Vec::new(),
-        vis: Visibility::Inherited,
+        vis: Visibility::Public(Token![pub](span)),
         mutability: FieldMutability::None,
         ident: Some(generics_field_ident(span)),
         colon_token: Some(Token![:](span)),

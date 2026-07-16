@@ -104,9 +104,9 @@ pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockM
     let items = [
         Item::Use(mock_mod_usages.use_rsubstitute_for_generated),
         Item::Use(mock_mod_usages.use_super),
+        Item::Trait(item_trait),
     ]
     .into_iter()
-    .chain(core::iter::once(Item::Trait(item_trait)))
     .chain(trait_info.associated_fns.into_iter().flat_map(|x| {
         let call_struct = x.value.call_struct;
         let args_checker = x.value.args_checker_struct;

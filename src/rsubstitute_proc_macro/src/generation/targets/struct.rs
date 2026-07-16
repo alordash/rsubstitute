@@ -73,7 +73,13 @@ pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
 
     let mod_visibility = item_struct.vis.clone();
     let mod_ident = format_ident!("__rsubstitute_generated_{}Mock", item_struct.ident);
-    let usage = mod_usage::new(mod_ident.clone(), [item_struct.ident.clone()]);
+    let usage = mod_usage::new(
+        mod_ident.clone(),
+        [
+            item_struct.ident.clone(),
+            struct_mock_struct.item_struct.ident.clone(),
+        ],
+    );
     item_struct.vis = Visibility::Public(Token![pub](source_span));
     let items = vec![
         Item::Struct(item_struct),

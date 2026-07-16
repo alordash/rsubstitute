@@ -1,11 +1,12 @@
+mod mock_impl;
+
 use crate::common::models::*;
 use crate::generation::targets::common::*;
 use crate::generation::targets::models::*;
 use crate::generation::targets::*;
 use crate::generation::*;
-use crate::preparation::r#struct::models::*;
 use crate::preparation::r#struct::*;
-use crate::syntax::attributes;
+use crate::syntax::{attributes, path};
 use quote::format_ident;
 use syn::spanned::Spanned;
 use syn::*;
@@ -19,6 +20,11 @@ pub(crate) fn generate_module(ctx: &Context, item_impl: ItemImpl) -> MockMod {
         impl_items: item_impl.items.clone(),
     });
     let impl_struct_info = impl_struct_info::generate(ctx, impl_struct_syntax);
+    let mock_struct_path = path::from_ident_with_generics(
+        format_ident!("{}Mock", impl_struct_info.target_ident),
+        &impl_struct_info.generics,
+    );
+    let mock_impl = mock_impl::generate(ctx, source_span, mock_struct_path, &impl_struct_info);
 
     let mock_mod_usages = mock_mod_usages::new(source_span);
     let items = [
@@ -27,12 +33,51 @@ pub(crate) fn generate_module(ctx: &Context, item_impl: ItemImpl) -> MockMod {
         Item::Impl(item_impl),
     ]
     .into_iter()
+    .chain(impl_struct_info.associated_fns.into_iter().flat_map(|x| {
+        let call_struct = x.value.call_struct;
+        let args_checker = x.value.args_checker_struct;
+        [
+            Item::Struct(call_struct.item_struct),
+            Item::Impl(call_struct.generics_info_provider_impl),
+            Item::Impl(call_struct.call_impl),
+        ]
+        .into_iter()
+        .chain(call_struct.maybe_clone_impl.map(Item::Impl).into_iter())
+        .chain([
+            Item::Struct(args_checker.item_struct),
+            Item::Impl(args_checker.generics_info_provider_impl),
+            Item::Impl(args_checker.args_checker_impl),
+        ])
+    }))
+    .chain(impl_struct_info.static_fns.into_iter().flat_map(|x| {
+        let call_struct = x.value.call_struct;
+        let args_checker = x.value.args_checker_struct;
+        [
+            Item::Struct(call_struct.item_struct),
+            Item::Impl(call_struct.generics_info_provider_impl),
+            Item::Impl(call_struct.call_impl),
+        ]
+        .into_iter()
+        .chain(call_struct.maybe_clone_impl.map(Item::Impl).into_iter())
+        .chain([
+            Item::Struct(args_checker.item_struct),
+            Item::Impl(args_checker.generics_info_provider_impl),
+            Item::Impl(args_checker.args_checker_impl),
+        ])
+    }))
+    .chain(core::iter::once(Item::Impl(mock_impl)))
     .collect();
+    let call_site = proc_macro::Span::call_site();
+    let line = call_site.line();
+    let column = call_site.column();
+    dbg!(line, column);
     let mod_ident = format_ident!(
-        "__rsubstitute_generated_{}Mock",
-        impl_struct_info.target_ident
+        "__rsubstitute_generated_{}_{}_{}",
+        impl_struct_info.target_ident,
+        line,
+        column
     );
-    let usage = mod_usage::new(mod_ident.clone(), [impl_struct_info.target_ident.clone()]);
+    let usage = mod_usage::new_all(mod_ident.clone());
     let item_mod = ItemMod {
         attrs: vec![attributes::allow_non_camel_case_types(source_span)],
         vis: Visibility::Public(Token![pub](source_span)),

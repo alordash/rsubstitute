@@ -92,13 +92,13 @@ fn generate_trait_impl(
             trait_info
                 .associated_fns
                 .iter()
-                .map(|x| map_method(ctx, mock_struct_path.clone(), x)),
+                .map(|x| map_fn(ctx, mock_struct_path.clone(), x, false)),
         )
         .chain(
             trait_info
                 .static_fns
                 .iter()
-                .map(|x| map_fn(ctx, mock_struct_path.clone(), x)),
+                .map(|x| map_fn(ctx, mock_struct_path.clone(), x, true)),
         )
         .collect();
     items_with_order.sort_by(|a, b| a.order_number.cmp(&b.order_number));
@@ -165,56 +165,44 @@ fn map_assoc_type(ordered_assoc_type: &Ordered<TraitItemTypeSyntax>) -> Ordered<
     })
 }
 
-fn map_method(
-    ctx: &Context,
-    mock_struct_path: Path,
-    ordered_method: &Ordered<FnInfo>,
-) -> Ordered<ImplItem> {
-    ordered_method.clone_map(|x| {
-        let span = x.spans.inputs;
-        ImplItem::Fn(ImplItemFn {
-            attrs: x.attributes.clone(),
-            vis: Visibility::Inherited,
-            defaultness: None, // TODO - verify that it's always None, IIRC you can trait Trait { default fn f() {} }
-            sig: *x.source_signature.clone(),
-            block: associated_method_block::generate(
-                ctx,
-                span,
-                mock_struct_path,
-                x,
-                if x.maybe_base_impl.is_some() {
-                    Some(base_fn::get_base_fn_ident(&x.fn_ident))
-                } else {
-                    None
-                },
-            ),
-        })
-    })
-}
-
 fn map_fn(
     ctx: &Context,
     mock_struct_path: Path,
-    ordered_method: &Ordered<FnInfo>,
+    ordered_fn_info: &Ordered<FnInfo>,
+    is_static: bool,
 ) -> Ordered<ImplItem> {
-    ordered_method.clone_map(|x| {
+    ordered_fn_info.clone_map(|x| {
         let span = x.spans.inputs;
         ImplItem::Fn(ImplItemFn {
             attrs: x.attributes.clone(),
             vis: Visibility::Inherited,
             defaultness: None, // TODO - verify that it's always None, IIRC you can trait Trait { default fn f() {} }
             sig: *x.source_signature.clone(),
-            block: static_fn_block::generate(
-                ctx,
-                span,
-                mock_struct_path,
-                x,
-                if x.maybe_base_impl.is_some() {
-                    BaseFnKind::Associated(base_fn::get_base_fn_ident(&x.fn_ident))
-                } else {
-                    BaseFnKind::None
-                },
-            ),
+            block: if is_static {
+                static_fn_block::generate(
+                    ctx,
+                    span,
+                    mock_struct_path,
+                    x,
+                    if x.maybe_base_impl.is_some() {
+                        BaseFnKind::Associated(base_fn::get_base_fn_ident(&x.fn_ident))
+                    } else {
+                        BaseFnKind::None
+                    },
+                )
+            } else {
+                associated_method_block::generate(
+                    ctx,
+                    span,
+                    mock_struct_path,
+                    x,
+                    if x.maybe_base_impl.is_some() {
+                        Some(base_fn::get_base_fn_ident(&x.fn_ident))
+                    } else {
+                        None
+                    },
+                )
+            },
         })
     })
 }

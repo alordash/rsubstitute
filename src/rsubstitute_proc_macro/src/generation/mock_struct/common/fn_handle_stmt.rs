@@ -30,25 +30,26 @@ pub(crate) fn generate(
     let mock_arg = if is_static {
         void_tuple(span)
     } else {
-        Expr::Reference(ExprReference {
-            attrs: Vec::new(),
-            and_token: Token![&](span),
-            mutability: None,
-            expr: Box::new(Expr::Struct(ExprStruct {
-                attrs: Vec::new(),
-                qself: None,
-                path: mock_struct_path,
-                brace_token: token::Brace(span),
-                fields: [
-                    generics_field::new_value(span),
-                    data_field::new_clone_value(span),
-                ]
-                .into_iter()
-                .collect(),
-                dot2_token: None,
-                rest: None,
-            })),
-        })
+        Expr::Path(self_expr_path(span))
+        // Expr::Reference(ExprReference {
+        //     attrs: Vec::new(),
+        //     and_token: Token![&](span),
+        //     mutability: None,
+        //     expr: Box::new(Expr::Struct(ExprStruct {
+        //         attrs: Vec::new(),
+        //         qself: None,
+        //         path: mock_struct_path,
+        //         brace_token: token::Brace(span),
+        //         fields: [
+        //             generics_field::new_value(span),
+        //             data_field::new_clone_value(span),
+        //         ]
+        //         .into_iter()
+        //         .collect(),
+        //         dot2_token: None,
+        //         rest: None,
+        //     })),
+        // })
     };
     let maybe_base_fn_path = match (ctx.support_base_calling, base_fn_kind) {
         (true, BaseFnKind::StaticFn(base_fn_ident)) => {

@@ -52,7 +52,8 @@ pub(crate) fn generate_associated(
         is_static,
     }: AssociatedParams,
 ) -> ImplItemFn {
-    let (mut sig, mut block) = generate_core(span, fn_info, target_struct_path, base_impl, is_static);
+    let (mut sig, mut block) =
+        generate_core(span, fn_info, target_struct_path, base_impl, is_static);
     (sig, block) = normalization::normalize_method(sig, block);
     if let Some(associated_items_info) = maybe_associated_items_info {
         (sig, block) = normalization::normalize_associated_items(associated_items_info, sig, block);
@@ -76,6 +77,14 @@ fn generate_core(
 ) -> (Signature, Block) {
     let source_signature = &fn_info.source_signature;
     let call_path = path::new(span, ["call"]);
+    let mutability = source_signature
+        .inputs
+        .first()
+        .map(|x| match x {
+            FnArg::Receiver(receiver) => receiver.mutability,
+            _ => None,
+        })
+        .flatten();
     let mock_pat = if is_static {
         PatType {
             attrs: Vec::new(),
@@ -95,10 +104,12 @@ fn generate_core(
                 path: path::from_ident(rsubstitute_self(span)),
             })),
             colon_token: Token![:](span),
+            // TODO - It is not always reference, it should match source signature
+            // maybe use mut visitor to replace first path segment with mock struct path!
             ty: Box::new(Type::Reference(TypeReference {
                 and_token: Token![&](span),
                 lifetime: None,
-                mutability: None,
+                mutability,
                 elem: Box::new(Type::Path(TypePath {
                     qself: None,
                     path: target_struct_path,
