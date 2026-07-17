@@ -257,12 +257,10 @@ fn generate_inner_impl(
             trait_info
                 .associated_fns
                 .iter()
+                .chain(trait_info.static_fns.iter())
                 .filter_map(|fn_info| {
-                    try_extract_base_fn(span, &mock_struct_path, trait_info, fn_info, false)
-                })
-                .chain(trait_info.static_fns.iter().filter_map(|fn_info| {
-                    try_extract_base_fn(span, &mock_struct_path, trait_info, fn_info, true)
-                })),
+                    try_extract_base_fn(span, &mock_struct_path, trait_info, fn_info)
+                }),
         )
     } else {
         None
@@ -296,7 +294,6 @@ fn try_extract_base_fn(
     mock_struct_path: &Path,
     trait_info: &TraitInfo,
     fn_info: &FnInfo,
-    is_static: bool,
 ) -> Option<ImplItemFn> {
     fn_info.maybe_base_impl.clone().map(|base_impl| {
         base_fn::generate_associated(
@@ -306,7 +303,6 @@ fn try_extract_base_fn(
                 target_struct_path: mock_struct_path.clone(),
                 base_impl,
                 maybe_associated_items_info: Some(&trait_info.associated_items_info),
-                is_static,
             },
         )
     })
