@@ -1,4 +1,4 @@
-use rsubstitute::macros::mock;
+use rsubstitute::mock;
 
 #[mock(base)]
 trait Trait {

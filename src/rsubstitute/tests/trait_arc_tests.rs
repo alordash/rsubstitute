@@ -1,4 +1,4 @@
-use rsubstitute::macros::mock;
+use rsubstitute::mock;
 use std::sync::Arc;
 
 #[mock]

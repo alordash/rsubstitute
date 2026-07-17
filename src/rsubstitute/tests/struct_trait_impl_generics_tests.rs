@@ -1,4 +1,4 @@
-use rsubstitute::prelude::*;
+use rsubstitute::*;
 
 trait Trait<T> {
     fn work(&self, t: T) -> T;

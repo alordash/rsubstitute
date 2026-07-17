@@ -1,6 +1,6 @@
 mod test_utils;
 
-use rsubstitute::prelude::*;
+use rsubstitute::*;
 use std::pin::Pin;
 use std::rc::Rc;
 use std::sync::Arc;

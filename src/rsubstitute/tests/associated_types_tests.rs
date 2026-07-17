@@ -1,7 +1,7 @@
 // TODO - write in docs that this is supported only using feature
 #![feature(associated_type_defaults)]
 
-use rsubstitute::prelude::*;
+use rsubstitute::*;
 use std::fmt::Debug;
 
 // TODO - test how TraitA : TraitB behaves

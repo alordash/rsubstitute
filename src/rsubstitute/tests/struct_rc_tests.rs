@@ -1,4 +1,4 @@
-use rsubstitute::macros::*;
+use rsubstitute::*;
 use std::rc::Rc;
 
 mocked! {

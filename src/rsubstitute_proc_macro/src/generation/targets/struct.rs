@@ -1,4 +1,3 @@
-mod mockable_trait;
 mod mockable_trait_impl;
 mod struct_control_struct;
 
@@ -12,7 +11,6 @@ use syn::*;
 
 pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
     let source_span = item_struct.span();
-    let mockable_trait = mockable_trait::generate(source_span);
     let struct_setup_struct = struct_control_struct::generate(
         source_span,
         struct_control_struct::Params {
@@ -83,7 +81,6 @@ pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
     item_struct.vis = Visibility::Public(Token![pub](source_span));
     let items = vec![
         Item::Struct(item_struct),
-        Item::Trait(mockable_trait),
         Item::Impl(mockable_trait_impl),
         Item::Struct(struct_mock_struct.item_struct),
         Item::Impl(struct_mock_struct.item_impl),

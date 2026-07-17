@@ -2,9 +2,9 @@
 #![allow(non_snake_case)]
 #![allow(unused)]
 
-use crate::__rsubstitute_generated_StructMock::Mockable;
 #[allow(unused_imports)]
 use rsubstitute_proc_macro::mock;
+use rsubstitute::*;
 
 #[mock]
 struct Struct<S1>(pub S1);

@@ -53,7 +53,11 @@ pub(crate) fn generate(
         unsafety: None,
         impl_token: Token![impl](span),
         generics,
-        trait_: Some((None, path::new(span, ["Mockable"]), Token![for](span))),
+        trait_: Some((
+            None,
+            path::new_global(span, ["rsubstitute", "Mockable"]),
+            Token![for](span),
+        )),
         self_ty: Box::new(struct_type),
         brace_token: token::Brace(span),
         items: vec![

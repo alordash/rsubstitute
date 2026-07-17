@@ -1,6 +1,6 @@
 mod test_utils;
 
-use rsubstitute::prelude::*;
+use rsubstitute::*;
 
 #[rustfmt::skip]
 #[allow(unused)]

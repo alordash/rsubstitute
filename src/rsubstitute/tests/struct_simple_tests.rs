@@ -1,4 +1,4 @@
-use rsubstitute::macros::*;
+use rsubstitute::*;
 
 trait Trait {
     fn f(&self);

@@ -1,5 +1,5 @@
 #![allow(unused)]
-use rsubstitute::macros::mock;
+use rsubstitute::mock;
 
 // TODO - write more tests where arg is passed as wildcard
 #[mock(base)]

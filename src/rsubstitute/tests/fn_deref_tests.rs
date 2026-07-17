@@ -1,7 +1,7 @@
 #![allow(unused)]
 mod test_utils;
 
-use rsubstitute::macros::mock;
+use rsubstitute::mock;
 use std::ops::Deref;
 use std::rc::Rc;
 use std::sync::Arc;

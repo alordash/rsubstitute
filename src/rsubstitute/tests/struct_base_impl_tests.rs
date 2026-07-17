@@ -1,4 +1,4 @@
-use rsubstitute::macros::*;
+use rsubstitute::*;
 
 trait FirstTrait {
     fn get(&self) -> i32;

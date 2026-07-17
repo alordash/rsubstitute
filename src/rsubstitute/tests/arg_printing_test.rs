@@ -1,4 +1,4 @@
-use rsubstitute::prelude::*;
+use rsubstitute::*;
 
 #[mock]
 trait Trait<'a, T0> {

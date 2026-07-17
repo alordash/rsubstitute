@@ -62,7 +62,7 @@ mod source {
 
 mod result {
     use super::*;
-    // TODO - replace this `use` with `use rsubstitute::prelude::*`
+    // TODO - replace this `use` with `use rsubstitute::*`
     use rsubstitute_core::infrastructure::*;
 
     // mod visibility is same as targets or public if target doesn't have visibility (like `impl`)

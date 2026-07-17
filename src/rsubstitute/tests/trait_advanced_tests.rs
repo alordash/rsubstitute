@@ -1,4 +1,4 @@
-use rsubstitute::macros::mock;
+use rsubstitute::mock;
 
 #[derive(Clone, Debug, PartialOrd, PartialEq)]
 struct Foo {

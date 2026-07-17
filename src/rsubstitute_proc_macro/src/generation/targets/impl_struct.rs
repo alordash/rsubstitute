@@ -70,7 +70,6 @@ pub(crate) fn generate_module(ctx: &Context, item_impl: ItemImpl) -> MockMod {
     let call_site = proc_macro::Span::call_site();
     let line = call_site.line();
     let column = call_site.column();
-    dbg!(line, column);
     let mod_ident = format_ident!(
         "__rsubstitute_generated_{}_{}_{}",
         impl_struct_info.target_ident,

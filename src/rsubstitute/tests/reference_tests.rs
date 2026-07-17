@@ -1,4 +1,4 @@
-use rsubstitute::prelude::*;
+use rsubstitute::*;
 use std::marker::PhantomData;
 
 #[derive(Default, Debug, PartialEq, Clone)]

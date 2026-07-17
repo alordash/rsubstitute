@@ -1,4 +1,4 @@
-use rsubstitute::macros::*;
+use rsubstitute::*;
 
 #[derive(Clone, Debug, PartialOrd, PartialEq)]
 struct Foo {

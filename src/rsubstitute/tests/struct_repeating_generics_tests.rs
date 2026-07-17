@@ -1,4 +1,4 @@
-use rsubstitute::prelude::*;
+use rsubstitute::*;
 use std::marker::PhantomData;
 
 macro_rules! define_marker_traits {

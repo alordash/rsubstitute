@@ -1,6 +1,6 @@
 #![feature(rwlock_downgrade)]
 
-use rsubstitute::macros::mock;
+use rsubstitute::mock;
 
 #[mock]
 trait Trait {
