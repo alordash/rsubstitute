@@ -10,6 +10,7 @@ pub mod r#fn;
 pub mod r#trait;
 pub mod r#struct;
 pub mod impl_struct;
+pub mod impl_trait_for_struct;
 
 mod common {
     pub(crate) mod mod_usage;

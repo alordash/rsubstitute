@@ -2,7 +2,7 @@ use super::models::*;
 use crate::preparation::models::*;
 use crate::preparation::r#fn::models::*;
 use crate::preparation::r#fn::*;
-use crate::syntax::*;
+use crate::syntax::signature;
 use proc_macro2::Ident;
 use quote::ToTokens;
 use syn::*;
@@ -11,6 +11,7 @@ pub(crate) struct Params {
     pub attributes: Vec<Attribute>,
     pub generics: Generics,
     pub target_type: Box<Type>,
+    pub trait_path: Path,
     pub impl_items: Vec<ImplItem>,
 }
 
@@ -19,9 +20,10 @@ pub(crate) fn prepare(
         attributes,
         generics,
         target_type,
+        trait_path,
         impl_items,
     }: Params,
-) -> ImplStructSyntax {
+) -> ImplTraitForStructSyntax {
     let split_items = split_items(impl_items);
     let SplitTargetType {
         modules,
@@ -45,12 +47,13 @@ pub(crate) fn prepare(
         })
         .collect();
 
-    let result = ImplStructSyntax {
+    let result = ImplTraitForStructSyntax {
         attributes,
         modules,
         target_ident,
         generics,
         target_type: *target_type,
+        trait_path,
         constants: split_items.constants,
         static_fns,
         associated_fns,
