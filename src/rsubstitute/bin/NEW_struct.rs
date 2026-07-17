@@ -10,7 +10,7 @@ use std::ops::Deref;
 #[mock]
 struct Struct<S1>(pub S1);
 
-#[mock]
+#[mock(base)]
 impl<S1> Struct<S1> {
     pub fn f(&self, v: i32) -> f32
     where
@@ -32,6 +32,8 @@ fn main() {
         .f(4)
         .returns(22f32)
         .and_does(|(v,)| println!("mocked for 4, v = {v}"))
+        .f(3)
+        .call_base()
         .f(Arg::Any)
         .returns_with(|(v,)| *v as f32 + 1f32)
         .and_does(|(v,)| println!("mocked for any, v = {v}"));
@@ -41,6 +43,11 @@ fn main() {
     dbg!(s_mock.f(3));
     dbg!(s_mock.f(4));
     dbg!(s_mock.f(5));
+    Struct::<i32>::static_setup()
+        .f_static(2)
+        .returns_many([5f32, 1112f32])
+        .and_does(|(v,)| println!("Mocked static, v = {v}"));
+    dbg!(Struct::<i32>::f_static(2));
     let s = s_mock.unmock();
 
     println!("Done");

@@ -1,4 +1,5 @@
 mod mock_impl;
+mod source_static_fn_block;
 
 use crate::common::models::*;
 use crate::generation::mock_controls::*;
@@ -7,12 +8,12 @@ use crate::generation::targets::models::*;
 use crate::generation::targets::*;
 use crate::generation::*;
 use crate::preparation::r#struct::*;
-use crate::syntax::{attributes, path};
+use crate::syntax::*;
 use quote::format_ident;
 use syn::spanned::Spanned;
 use syn::*;
 
-pub(crate) fn generate_module(ctx: &Context, item_impl: ItemImpl) -> MockMod {
+pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod {
     let source_span = item_impl.span();
     let impl_struct_syntax = impl_struct_syntax::prepare(impl_struct_syntax::Params {
         attributes: item_impl.attrs.clone(),
@@ -76,7 +77,7 @@ pub(crate) fn generate_module(ctx: &Context, item_impl: ItemImpl) -> MockMod {
                 ),
                 generics: impl_struct_info.generics.clone(),
                 mock_struct_path: &mock_struct_path,
-                fn_infos: &impl_struct_info.associated_fns,
+                fn_infos: &impl_struct_info.static_fns,
                 for_static_fn: false,
                 is_static: true,
             },
@@ -91,13 +92,14 @@ pub(crate) fn generate_module(ctx: &Context, item_impl: ItemImpl) -> MockMod {
                 ),
                 generics: impl_struct_info.generics.clone(),
                 mock_struct_path: &mock_struct_path,
-                fn_infos: &impl_struct_info.associated_fns,
+                fn_infos: &impl_struct_info.static_fns,
                 for_static_fn: false,
                 is_static: true,
             },
         );
         (static_setup_impl, static_received_impl)
     });
+    source_static_fn_block::replace(source_span, mock_struct_path, &mut item_impl);
 
     let use_struct_mod = ItemUse {
         attrs: Vec::new(),
@@ -108,7 +110,10 @@ pub(crate) fn generate_module(ctx: &Context, item_impl: ItemImpl) -> MockMod {
             ident: Ident::new("super", source_span),
             colon2_token: Token![::](source_span),
             tree: Box::new(UseTree::Path(UsePath {
-                ident: format_ident!("__rsubstitute_generated_{}Mock", impl_struct_info.target_ident),
+                ident: format_ident!(
+                    "__rsubstitute_generated_{}Mock",
+                    impl_struct_info.target_ident
+                ),
                 colon2_token: Token![::](source_span),
                 tree: Box::new(UseTree::Glob(UseGlob {
                     star_token: Token![*](source_span),
