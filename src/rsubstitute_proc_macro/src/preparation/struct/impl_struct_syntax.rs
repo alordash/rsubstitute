@@ -1,7 +1,7 @@
 use super::models::*;
+use crate::preparation::models::*;
 use crate::preparation::r#fn::models::{FnSyntax, IFnOwner};
 use crate::preparation::r#fn::*;
-use crate::preparation::models::*;
 use crate::syntax::signature;
 use proc_macro2::Ident;
 use quote::ToTokens;
@@ -100,7 +100,7 @@ fn map_impl_item_fn_to_fn_syntax(
 ) -> FnSyntax {
     let result = fn_syntax::prepare(fn_syntax::Params {
         attributes: impl_item_fn.attrs,
-        visibility: Visibility::Inherited,
+        visibility: impl_item_fn.vis,
         signature: impl_item_fn.sig,
         maybe_base_impl: Some(Box::new(impl_item_fn.block)),
         maybe_owner: Some(impl_struct_syntax_as_fn_owner),

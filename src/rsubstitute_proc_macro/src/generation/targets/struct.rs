@@ -1,10 +1,12 @@
 mod mockable_trait_impl;
 mod struct_control_struct;
 
+use crate::generation::common::clone_impl;
 use crate::generation::mock_controls::models::ControlType;
 use crate::generation::mock_struct::struct_mock_struct;
 use crate::generation::targets::common::*;
 use crate::generation::targets::models::*;
+use crate::syntax::path;
 use quote::format_ident;
 use syn::spanned::Spanned;
 use syn::*;
@@ -20,6 +22,15 @@ pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
             is_static: false,
         },
     );
+    let struct_setup_struct_clone_impl = clone_impl::generate(
+        source_span,
+        struct_setup_struct.generics.clone(),
+        path::from_ident_with_generics(
+            struct_setup_struct.ident.clone(),
+            &struct_setup_struct.generics,
+        ),
+        &struct_setup_struct.fields,
+    );
     let struct_received_struct = struct_control_struct::generate(
         source_span,
         struct_control_struct::Params {
@@ -28,6 +39,15 @@ pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
             control_type: ControlType::Received,
             is_static: false,
         },
+    );
+    let struct_received_struct_clone_impl = clone_impl::generate(
+        source_span,
+        struct_received_struct.generics.clone(),
+        path::from_ident_with_generics(
+            struct_received_struct.ident.clone(),
+            &struct_received_struct.generics,
+        ),
+        &struct_received_struct.fields,
     );
     let struct_static_setup_struct = struct_control_struct::generate(
         source_span,
@@ -38,6 +58,15 @@ pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
             is_static: true,
         },
     );
+    let struct_static_setup_struct_clone_impl = clone_impl::generate(
+        source_span,
+        struct_static_setup_struct.generics.clone(),
+        path::from_ident_with_generics(
+            struct_static_setup_struct.ident.clone(),
+            &struct_static_setup_struct.generics,
+        ),
+        &struct_static_setup_struct.fields,
+    );
     let struct_static_received_struct = struct_control_struct::generate(
         source_span,
         struct_control_struct::Params {
@@ -46,6 +75,15 @@ pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
             control_type: ControlType::Received,
             is_static: true,
         },
+    );
+    let struct_static_received_struct_clone_impl = clone_impl::generate(
+        source_span,
+        struct_static_received_struct.generics.clone(),
+        path::from_ident_with_generics(
+            struct_static_received_struct.ident.clone(),
+            &struct_static_received_struct.generics,
+        ),
+        &struct_static_received_struct.fields,
     );
     let struct_mock_ident = format_ident!("{}Mock", item_struct.ident);
     let struct_mock_struct = struct_mock_struct::generate(
@@ -87,9 +125,13 @@ pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
         Item::Impl(struct_mock_struct.deref_impl),
         Item::Impl(struct_mock_struct.deref_mut_impl),
         Item::Struct(struct_setup_struct),
+        Item::Impl(struct_setup_struct_clone_impl),
         Item::Struct(struct_received_struct),
+        Item::Impl(struct_received_struct_clone_impl),
         Item::Struct(struct_static_setup_struct),
+        Item::Impl(struct_static_setup_struct_clone_impl),
         Item::Struct(struct_static_received_struct),
+        Item::Impl(struct_static_received_struct_clone_impl),
     ];
     let item_mod = ItemMod {
         attrs: Vec::new(),

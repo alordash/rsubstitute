@@ -1,6 +1,7 @@
 mod mock_impl;
 
 use crate::common::models::*;
+use crate::generation::mock_controls::*;
 use crate::generation::targets::common::*;
 use crate::generation::targets::models::*;
 use crate::generation::targets::*;
@@ -24,12 +25,103 @@ pub(crate) fn generate_module(ctx: &Context, item_impl: ItemImpl) -> MockMod {
         format_ident!("{}Mock", impl_struct_info.target_ident),
         &impl_struct_info.generics,
     );
-    let mock_impl = mock_impl::generate(ctx, source_span, mock_struct_path, &impl_struct_info);
+    let mock_impl = mock_impl::generate(
+        ctx,
+        source_span,
+        mock_struct_path.clone(),
+        &impl_struct_info,
+    );
+    let maybe_associated_controls_impls =
+        (!impl_struct_info.associated_fns.is_empty()).then(|| {
+            let setup_impl = setup_impl::generate(
+                ctx,
+                source_span,
+                setup_impl::Params {
+                    setup_struct_path: path::from_ident_with_generics(
+                        format_ident!("{}Setup", impl_struct_info.target_ident),
+                        &impl_struct_info.generics,
+                    ),
+                    generics: impl_struct_info.generics.clone(),
+                    mock_struct_path: &mock_struct_path,
+                    fn_infos: &impl_struct_info.associated_fns,
+                    for_static_fn: false,
+                    is_static: false,
+                },
+            );
+            let received_impl = received_impl::generate(
+                ctx,
+                source_span,
+                received_impl::Params {
+                    received_struct_path: path::from_ident_with_generics(
+                        format_ident!("{}Received", impl_struct_info.target_ident),
+                        &impl_struct_info.generics,
+                    ),
+                    generics: impl_struct_info.generics.clone(),
+                    mock_struct_path: &mock_struct_path,
+                    fn_infos: &impl_struct_info.associated_fns,
+                    for_static_fn: false,
+                    is_static: false,
+                },
+            );
+            (setup_impl, received_impl)
+        });
+    let maybe_static_controls_impls = (!impl_struct_info.static_fns.is_empty()).then(|| {
+        let static_setup_impl = setup_impl::generate(
+            ctx,
+            source_span,
+            setup_impl::Params {
+                setup_struct_path: path::from_ident_with_generics(
+                    format_ident!("{}StaticSetup", impl_struct_info.target_ident),
+                    &impl_struct_info.generics,
+                ),
+                generics: impl_struct_info.generics.clone(),
+                mock_struct_path: &mock_struct_path,
+                fn_infos: &impl_struct_info.associated_fns,
+                for_static_fn: false,
+                is_static: true,
+            },
+        );
+        let static_received_impl = received_impl::generate(
+            ctx,
+            source_span,
+            received_impl::Params {
+                received_struct_path: path::from_ident_with_generics(
+                    format_ident!("{}StaticReceived", impl_struct_info.target_ident),
+                    &impl_struct_info.generics,
+                ),
+                generics: impl_struct_info.generics.clone(),
+                mock_struct_path: &mock_struct_path,
+                fn_infos: &impl_struct_info.associated_fns,
+                for_static_fn: false,
+                is_static: true,
+            },
+        );
+        (static_setup_impl, static_received_impl)
+    });
 
+    let use_struct_mod = ItemUse {
+        attrs: Vec::new(),
+        vis: Visibility::Inherited,
+        use_token: Token![use](source_span),
+        leading_colon: None,
+        tree: UseTree::Path(UsePath {
+            ident: Ident::new("super", source_span),
+            colon2_token: Token![::](source_span),
+            tree: Box::new(UseTree::Path(UsePath {
+                ident: format_ident!("__rsubstitute_generated_{}Mock", impl_struct_info.target_ident),
+                colon2_token: Token![::](source_span),
+                tree: Box::new(UseTree::Glob(UseGlob {
+                    star_token: Token![*](source_span),
+                })),
+            })),
+        }),
+        semi_token: Token![;](source_span),
+    };
     let mock_mod_usages = mock_mod_usages::new(source_span);
     let items = [
         Item::Use(mock_mod_usages.use_rsubstitute_for_generated),
         Item::Use(mock_mod_usages.use_super),
+        Item::Use(use_struct_mod),
         Item::Impl(item_impl),
     ]
     .into_iter()
@@ -66,6 +158,16 @@ pub(crate) fn generate_module(ctx: &Context, item_impl: ItemImpl) -> MockMod {
         ])
     }))
     .chain(core::iter::once(Item::Impl(mock_impl)))
+    .chain(
+        maybe_associated_controls_impls
+            .into_iter()
+            .flat_map(|x| [Item::Impl(x.0), Item::Impl(x.1)]),
+    )
+    .chain(
+        maybe_static_controls_impls
+            .into_iter()
+            .flat_map(|x| [Item::Impl(x.0), Item::Impl(x.1)]),
+    )
     .collect();
     let call_site = proc_macro::Span::call_site();
     let line = call_site.line();

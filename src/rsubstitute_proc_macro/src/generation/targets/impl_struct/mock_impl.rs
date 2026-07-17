@@ -74,7 +74,7 @@ fn map_fn(
         let span = x.spans.inputs;
         ImplItemFn {
             attrs: x.attributes.clone(),
-            vis: Visibility::Inherited,
+            vis: x.visibility.clone(),
             defaultness: None, // TODO - verify that it's always None, IIRC you can trait Trait { default fn f() {} }
             sig: *x.source_signature.clone(),
             block: if is_static {

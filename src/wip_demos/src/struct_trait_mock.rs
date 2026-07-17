@@ -206,7 +206,7 @@ mod result {
                 StructSetup<S1>,
                 (),
                 (),
-                &mut Struct<S1>,
+                &mut StructMock<S1>,
                 false,
                 true,
                 true,

@@ -73,43 +73,42 @@ fn generate_core(
 ) -> (Signature, Block) {
     let source_signature = &fn_info.source_signature;
     let call_path = path::new(span, ["call"]);
-    let mock_pat = match source_signature.inputs.first() {
-        Some(FnArg::Receiver(receiver)) => {
-            let (type_is_reference, type_mutability) = match receiver.ty.as_ref() {
-                Type::Reference(reference) => (true, reference.mutability),
-                _ => (false, None),
-            };
-            let is_reference = type_is_reference || receiver.reference.is_some();
-            let mutability = type_mutability.or_else(|| receiver.mutability);
-            PatType {
+    let mock_pat = if let Some(receiver) = &fn_info.maybe_self_type {
+        let (type_is_reference, type_mutability) = match receiver.ty.as_ref() {
+            Type::Reference(reference) => (true, reference.mutability),
+            _ => (false, None),
+        };
+        let is_reference = type_is_reference || receiver.reference.is_some();
+        let mutability = type_mutability.or_else(|| receiver.mutability);
+        PatType {
+            attrs: Vec::new(),
+            pat: Box::new(Pat::Path(PatPath {
                 attrs: Vec::new(),
-                pat: Box::new(Pat::Path(PatPath {
-                    attrs: Vec::new(),
-                    qself: None,
-                    path: path::from_ident(rsubstitute_self(span)),
-                })),
-                colon_token: Token![:](span),
-                // TODO - It is not always reference, it should match source signature
-                // maybe use mut visitor to replace first path segment with mock struct path!
-                ty: Box::new(if is_reference {
-                    Type::Reference(TypeReference {
-                        and_token: Token![&](span),
-                        lifetime: None,
-                        mutability,
-                        elem: Box::new(Type::Path(TypePath {
-                            qself: None,
-                            path: target_struct_path,
-                        })),
-                    })
-                } else {
-                    Type::Path(TypePath {
+                qself: None,
+                path: path::from_ident(rsubstitute_self(span)),
+            })),
+            colon_token: Token![:](span),
+            // TODO - It is not always reference, it should match source signature
+            // maybe use mut visitor to replace first path segment with mock struct path!
+            ty: Box::new(if is_reference {
+                Type::Reference(TypeReference {
+                    and_token: Token![&](span),
+                    lifetime: None,
+                    mutability,
+                    elem: Box::new(Type::Path(TypePath {
                         qself: None,
                         path: target_struct_path,
-                    })
-                }),
-            }
+                    })),
+                })
+            } else {
+                Type::Path(TypePath {
+                    qself: None,
+                    path: target_struct_path,
+                })
+            }),
         }
-        _ => PatType {
+    } else {
+        PatType {
             attrs: Vec::new(),
             pat: Box::new(Pat::Wild(PatWild {
                 attrs: Vec::new(),
@@ -117,7 +116,7 @@ fn generate_core(
             })),
             colon_token: Token![:](span),
             ty: Box::new(void_type(span)),
-        },
+        }
     };
     let sig = Signature {
         constness: source_signature.constness.clone(),

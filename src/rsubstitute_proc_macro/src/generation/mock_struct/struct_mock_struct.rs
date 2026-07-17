@@ -192,7 +192,7 @@ fn fn_control(span: Span, control_target: ControlTarget) -> ImplItemFn {
             ident: Ident::new(fn_name, span),
             generics: Generics::default(),
             paren_token: token::Paren(span),
-            inputs: punctuated([self_fn_arg(span)]),
+            inputs: punctuated([mut_ref_self_fn_arg(span)]),
             variadic: None,
             output: ReturnType::Type(
                 Token![->](span),

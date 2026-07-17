@@ -2,9 +2,10 @@
 #![allow(non_snake_case)]
 #![allow(unused)]
 
+use rsubstitute::*;
 #[allow(unused_imports)]
 use rsubstitute_proc_macro::mock;
-use rsubstitute::*;
+use std::ops::Deref;
 
 #[mock]
 struct Struct<S1>(pub S1);
@@ -24,8 +25,22 @@ impl<S1> Struct<S1> {
 }
 
 fn main() {
-    let s = Struct(1);
-    let s_mock = s.mock();
+    let s = Struct(10);
+    let mut s_mock = s.mock();
+    s_mock
+        .setup()
+        .f(4)
+        .returns(22f32)
+        .and_does(|(v,)| println!("mocked for 4, v = {v}"))
+        .f(Arg::Any)
+        .returns_with(|(v,)| *v as f32 + 1f32)
+        .and_does(|(v,)| println!("mocked for any, v = {v}"));
+    dbg!(s_mock.deref().f(1));
+    dbg!(s_mock.f(1));
+    dbg!(s_mock.f(2));
+    dbg!(s_mock.f(3));
+    dbg!(s_mock.f(4));
+    dbg!(s_mock.f(5));
     let s = s_mock.unmock();
 
     println!("Done");
