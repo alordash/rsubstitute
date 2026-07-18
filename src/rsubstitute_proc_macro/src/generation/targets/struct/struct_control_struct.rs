@@ -16,7 +16,7 @@ pub(crate) fn generate(
     span: Span,
     Params {
         struct_ident,
-        generics,
+        mut generics,
         control_type,
         is_static,
     }: Params,
@@ -27,6 +27,7 @@ pub(crate) fn generate(
         (true, ControlType::Setup) => "StaticSetup",
         (true, ControlType::Received) => "StaticReceived",
     };
+    generics.where_clause = None;
     let generics_field = generics_field::new_field(span, generics.clone(), None);
     let result = ItemStruct {
         attrs: Vec::new(),

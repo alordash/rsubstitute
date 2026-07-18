@@ -6,7 +6,7 @@ use crate::preparation::r#struct::models::*;
 pub(crate) fn generate(ctx: &Context, impl_struct_syntax: ImplStructSyntax) -> ImplStructInfo {
     let result = ImplStructInfo {
         attributes: impl_struct_syntax.attributes,
-        target_ident: impl_struct_syntax.target_ident,
+        target_path: impl_struct_syntax.target_path,
         target_type: impl_struct_syntax.target_type,
         generics: impl_struct_syntax.generics,
         constants: impl_struct_syntax.constants,

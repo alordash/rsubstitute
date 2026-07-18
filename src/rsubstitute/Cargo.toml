@@ -106,6 +106,12 @@ path = "bin/NEW_struct.rs"
 test = false
 doctest = false
 
+[[bin]]
+name = "NEW_struct_from_wip"
+path = "bin/NEW_struct_from_wip.rs"
+test = false
+doctest = false
+
 [dependencies]
 rsubstitute_core = { workspace = true }
 rsubstitute_proc_macro = { workspace = true }

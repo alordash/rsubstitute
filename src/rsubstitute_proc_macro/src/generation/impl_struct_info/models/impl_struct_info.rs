@@ -5,7 +5,7 @@ use syn::*;
 
 pub(crate) struct ImplStructInfo {
     pub attributes: Vec<Attribute>,
-    pub target_ident: Ident,
+    pub target_path: Path,
     pub target_type: Type,
     pub generics: Generics,
     pub constants: Vec<Ordered<ImplItemConst>>,

@@ -39,6 +39,10 @@ pub(crate) fn allow_non_camel_case_types(span: Span) -> Attribute {
     allow(span, "non_camel_case_types")
 }
 
+pub(crate) fn allow_non_snake_case(span: Span) -> Attribute {
+    allow(span, "non_snake_case")
+}
+
 fn allow(span: Span, allowed: &'static str) -> Attribute {
     let result = Attribute {
         pound_token: Token![#](span),

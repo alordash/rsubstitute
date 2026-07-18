@@ -13,6 +13,7 @@ pub mod r#struct;
 pub mod r#trait;
 
 mod common {
+    pub(crate) mod mock_struct_impl;
     pub(crate) mod mod_usage;
     pub(crate) mod source_static_fn_block;
 }

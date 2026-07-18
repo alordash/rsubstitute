@@ -1,6 +1,5 @@
 use crate::common::models::*;
 use crate::generation::fn_info::models::*;
-use crate::generation::impl_struct_info::models::*;
 use crate::generation::mock_struct::models::*;
 use crate::generation::mock_struct::*;
 use crate::generation::*;
@@ -8,17 +7,26 @@ use crate::preparation::models::*;
 use proc_macro2::Span;
 use syn::*;
 
+pub(crate) struct Params<'a> {
+    pub mock_struct_path: Path,
+    pub associated_fns: &'a [Ordered<FnInfo>],
+    pub static_fns: &'a [Ordered<FnInfo>],
+    pub generics: Generics,
+}
 pub(crate) fn generate(
     ctx: &Context,
     span: Span,
-    mock_struct_path: Path,
-    impl_struct_info: &ImplStructInfo,
+    Params {
+        mock_struct_path,
+        associated_fns,
+        static_fns,
+        generics,
+    }: Params,
 ) -> ItemImpl {
     let base_fns = if ctx.support_base_calling {
-        impl_struct_info
-            .associated_fns
+        associated_fns
             .iter()
-            .chain(impl_struct_info.static_fns.iter())
+            .chain(static_fns.iter())
             .map(|ordered| {
                 ordered.clone_map(|x| try_extract_base_fn(span, mock_struct_path.clone(), &x))
             })
@@ -30,13 +38,11 @@ pub(crate) fn generate(
     } else {
         Vec::new()
     };
-    let mut fns: Vec<_> = impl_struct_info
-        .associated_fns
+    let mut fns: Vec<_> = associated_fns
         .iter()
         .map(|ordered| map_fn(ctx, mock_struct_path.clone(), ordered, false))
         .chain(
-            impl_struct_info
-                .static_fns
+            static_fns
                 .iter()
                 .map(|ordered| map_fn(ctx, mock_struct_path.clone(), ordered, true)),
         )
@@ -52,7 +58,7 @@ pub(crate) fn generate(
         defaultness: None,
         unsafety: None,
         impl_token: Token![impl](span),
-        generics: impl_struct_info.generics.clone(),
+        generics,
         trait_: None,
         self_ty: Box::new(Type::Path(TypePath {
             qself: None,

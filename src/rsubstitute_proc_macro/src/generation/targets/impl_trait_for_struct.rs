@@ -63,6 +63,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                     struct_generics: impl_trait_for_struct_info.target_simple_generics.clone(),
                     trait_ident: &impl_trait_for_struct_info.trait_ident,
                     trait_generics: impl_trait_for_struct_info.trait_simple_generics.clone(),
+                    merged_generics: impl_trait_for_struct_info.merged_generics.clone(),
                     maybe_common_where_clause: impl_trait_for_struct_info
                         .merged_generics
                         .where_clause
@@ -78,6 +79,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                     struct_generics: impl_trait_for_struct_info.target_simple_generics.clone(),
                     trait_ident: &impl_trait_for_struct_info.trait_ident,
                     trait_generics: impl_trait_for_struct_info.trait_simple_generics.clone(),
+                    merged_generics: impl_trait_for_struct_info.merged_generics.clone(),
                     maybe_common_where_clause: impl_trait_for_struct_info
                         .merged_generics
                         .where_clause
@@ -126,6 +128,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                 struct_generics: impl_trait_for_struct_info.target_simple_generics.clone(),
                 trait_ident: &impl_trait_for_struct_info.trait_ident,
                 trait_generics: impl_trait_for_struct_info.trait_simple_generics.clone(),
+                merged_generics: impl_trait_for_struct_info.merged_generics.clone(),
                 maybe_common_where_clause: impl_trait_for_struct_info
                     .merged_generics
                     .where_clause
@@ -141,6 +144,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                 struct_generics: impl_trait_for_struct_info.target_simple_generics.clone(),
                 trait_ident: &impl_trait_for_struct_info.trait_ident,
                 trait_generics: impl_trait_for_struct_info.trait_simple_generics.clone(),
+                merged_generics: impl_trait_for_struct_info.merged_generics.clone(),
                 maybe_common_where_clause: impl_trait_for_struct_info
                     .merged_generics
                     .where_clause
@@ -157,15 +161,48 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
         };
         return static_controls;
     });
-    source_static_fn_block::replace(source_span, mock_struct_path, &mut item_impl);
+    source_static_fn_block::replace(source_span, mock_struct_path.clone(), &mut item_impl);
+    let mock_struct_impl = mock_struct_impl::generate(
+        ctx,
+        source_span,
+        mock_struct_impl::Params {
+            mock_struct_path: mock_struct_path.clone(),
+            associated_fns: &impl_trait_for_struct_info.associated_fns,
+            static_fns: &impl_trait_for_struct_info.static_fns,
+            generics: impl_trait_for_struct_info.merged_generics,
+        },
+    );
 
     let mock_mod_usages = mock_mod_usages::new(source_span);
     let items = [
         Item::Use(mock_mod_usages.use_rsubstitute_for_generated),
         Item::Use(mock_mod_usages.use_super),
         Item::Impl(item_impl),
+        Item::Impl(mock_struct_impl),
     ]
     .into_iter()
+    .chain(maybe_associated_controls.into_iter().flat_map(|x| {
+        [
+            Item::Struct(x.trait_setup_struct.item_struct),
+            Item::Impl(x.trait_setup_struct.item_impl),
+            Item::Struct(x.trait_received_struct.item_struct),
+            Item::Impl(x.trait_received_struct.clone_impl),
+            Item::Impl(x.trait_received_struct.item_impl),
+            Item::Impl(x.setup_struct_impl),
+            Item::Impl(x.received_struct_impl),
+        ]
+    }))
+    .chain(maybe_static_controls.into_iter().flat_map(|x| {
+        [
+            Item::Struct(x.trait_static_setup_struct.item_struct),
+            Item::Impl(x.trait_static_setup_struct.item_impl),
+            Item::Struct(x.trait_static_received_struct.item_struct),
+            Item::Impl(x.trait_static_received_struct.clone_impl),
+            Item::Impl(x.trait_static_received_struct.item_impl),
+            Item::Impl(x.static_setup_struct_impl),
+            Item::Impl(x.static_received_struct_impl),
+        ]
+    }))
     .collect();
     let call_site = proc_macro::Span::call_site();
     let line = call_site.line();

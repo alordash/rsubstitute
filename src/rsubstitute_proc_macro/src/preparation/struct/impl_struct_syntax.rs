@@ -23,7 +23,7 @@ pub(crate) fn prepare(
     }: Params,
 ) -> ImplStructSyntax {
     let split_items = split_items(impl_items);
-    let target_ident = parse_target_type(&target_type);
+    let target_path = parse_target_type(&target_type);
     let impl_struct_syntax_as_fn_owner = ImplStructSyntaxAsFnOwner {
         generics: &generics,
     };
@@ -44,7 +44,7 @@ pub(crate) fn prepare(
 
     let result = ImplStructSyntax {
         attributes,
-        target_ident,
+        target_path,
         generics,
         target_type: *target_type,
         constants: split_items.constants,
@@ -104,7 +104,7 @@ fn map_impl_item_fn_to_fn_syntax(
     return result;
 }
 
-fn parse_target_type(target_type: &Type) -> Ident {
+fn parse_target_type(target_type: &Type) -> Path {
     let Type::Path(type_path) = target_type else {
         panic!("Can mock only `impl`s of structs.");
     };
@@ -112,7 +112,15 @@ fn parse_target_type(target_type: &Type) -> Ident {
         panic!("Can not mock structs qualified with self-type.");
     }
 
-    let result = ident::combine_path_segments(&type_path.path);
+    let flat_ident = ident::combine_path_segments(&type_path.path);
+    let mut result = type_path.path.clone();
+    let segments_len = result.segments.len();
+    result
+        .segments
+        .last_mut()
+        .expect("Path must contain at least one segment")
+        .ident = flat_ident;
+    result.segments = result.segments.into_iter().skip(segments_len - 1).collect();
     return result;
 }
 
