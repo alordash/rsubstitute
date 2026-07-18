@@ -12,8 +12,11 @@ pub(crate) fn generate(
         modules: impl_trait_for_struct_syntax.modules,
         target_ident: impl_trait_for_struct_syntax.target_ident,
         target_type: impl_trait_for_struct_syntax.target_type,
+        trait_ident: impl_trait_for_struct_syntax.trait_ident,
         trait_path: impl_trait_for_struct_syntax.trait_path,
-        generics: impl_trait_for_struct_syntax.generics,
+        merged_generics: impl_trait_for_struct_syntax.merged_generics,
+        target_simple_generics: impl_trait_for_struct_syntax.target_simple_generics,
+        trait_simple_generics: impl_trait_for_struct_syntax.trait_simple_generics,
         constants: impl_trait_for_struct_syntax.constants,
         static_fns: impl_trait_for_struct_syntax
             .static_fns

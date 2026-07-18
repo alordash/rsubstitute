@@ -2,14 +2,14 @@ use super::models::*;
 use crate::preparation::models::*;
 use crate::preparation::r#fn::models::*;
 use crate::preparation::r#fn::*;
-use crate::syntax::signature;
+use crate::syntax::*;
 use proc_macro2::Ident;
 use quote::ToTokens;
 use syn::*;
 
 pub(crate) struct Params {
     pub attributes: Vec<Attribute>,
-    pub generics: Generics,
+    pub merged_generics: Generics,
     pub target_type: Box<Type>,
     pub trait_path: Path,
     pub impl_items: Vec<ImplItem>,
@@ -18,19 +18,20 @@ pub(crate) struct Params {
 pub(crate) fn prepare(
     Params {
         attributes,
-        generics,
+        merged_generics,
         target_type,
         trait_path,
         impl_items,
     }: Params,
 ) -> ImplTraitForStructSyntax {
+    let trait_ident = ident::combine_path_segments(&trait_path);
     let split_items = split_items(impl_items);
     let SplitTargetType {
         modules,
         target_ident,
     } = split_target_type(&target_type);
     let impl_struct_syntax_as_fn_owner = ImplStructSyntaxAsFnOwner {
-        generics: &generics,
+        generics: &merged_generics,
     };
     let static_fns = split_items
         .static_fns
@@ -46,14 +47,18 @@ pub(crate) fn prepare(
             ordered.map(|x| map_impl_item_fn_to_fn_syntax(x, &impl_struct_syntax_as_fn_owner))
         })
         .collect();
+    let split_generics = item_impl::split_generics(&merged_generics, &trait_path, &target_type);
 
     let result = ImplTraitForStructSyntax {
         attributes,
         modules,
         target_ident,
-        generics,
         target_type: *target_type,
+        trait_ident,
         trait_path,
+        merged_generics,
+        trait_simple_generics: split_generics.trait_generics,
+        target_simple_generics: split_generics.target_generics,
         constants: split_items.constants,
         static_fns,
         associated_fns,

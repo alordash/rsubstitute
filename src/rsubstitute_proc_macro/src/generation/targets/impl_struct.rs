@@ -1,5 +1,4 @@
 mod mock_impl;
-mod source_static_fn_block;
 
 use crate::common::models::*;
 use crate::generation::mock_controls::*;

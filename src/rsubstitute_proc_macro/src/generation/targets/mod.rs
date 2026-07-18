@@ -7,13 +7,14 @@ pub(crate) mod models {
 }
 
 pub mod r#fn;
-pub mod r#trait;
-pub mod r#struct;
 pub mod impl_struct;
 pub mod impl_trait_for_struct;
+pub mod r#struct;
+pub mod r#trait;
 
 mod common {
     pub(crate) mod mod_usage;
+    pub(crate) mod source_static_fn_block;
 }
 
 mod mock_mod_usages;

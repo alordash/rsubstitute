@@ -1,4 +1,5 @@
 use proc_macro2::*;
+use syn::*;
 
 pub(crate) fn join<TIdents: Iterator<Item = Ident>>(idents: TIdents, separator: &str) -> Ident {
     let (idents_strings, idents_spans): (Vec<_>, Vec<_>) =
@@ -10,4 +11,9 @@ pub(crate) fn join<TIdents: Iterator<Item = Ident>>(idents: TIdents, separator: 
         .unwrap_or_else(|| Span::call_site());
     let ident = Ident::new(&ident_string, ident_span);
     return ident;
+}
+
+pub(crate) fn combine_path_segments(path: &Path) -> Ident {
+    let result = join(path.segments.iter().map(|x| x.ident.clone()), "_");
+    return result;
 }

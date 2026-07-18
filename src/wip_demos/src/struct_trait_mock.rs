@@ -52,7 +52,11 @@ mod source {
         fn tstatic<T5>() {}
     }
     // #[mock]
-    impl<G1, S1> Gen<G1> for Struct<S1> {
+    impl<G1, S1> Gen<G1> for Struct<S1>
+    where
+        G1: Clone,
+        S1: Default,
+    {
         fn f<G2>(&self) {}
         fn g<G3>() {}
         fn gself<G4>(&self) {}
@@ -143,16 +147,18 @@ mod result {
     }
 
     mod struct_impl_line22_col4 {
-        use rsubstitute_core::args::{ArgInfo, GenericParameterInfo, GenericsHasher, IGenericsInfoProvider};
-        use rsubstitute_core::fn_parameters::ICall;
         use super::*;
+        use rsubstitute_core::args::{
+            ArgInfo, GenericParameterInfo, GenericsHasher, IGenericsInfoProvider,
+        };
+        use rsubstitute_core::fn_parameters::ICall;
 
         // source
         impl<S1> Struct<S1> {
             pub fn f<S2>(&self) {}
             pub fn g<S3>() {}
         }
-        
+
         #[derive(Clone)]
         struct fCall;
         impl IGenericsInfoProvider for fCall {
@@ -699,7 +705,11 @@ mod result {
         }
 
         impl<S1> StructSetup<S1> {
-            pub fn as_Gen<G1>(&self) -> StructGenSetup<G1, S1> {
+            pub fn as_Gen<G1>(&self) -> StructGenSetup<G1, S1>
+            where
+                G1: Clone,
+                S1: Default,
+            {
                 StructGenSetup {
                     data: self.data.clone(),
                     _generics: PhantomData,
@@ -708,7 +718,11 @@ mod result {
         }
 
         impl<S1> StructStaticSetup<S1> {
-            pub fn as_Gen<G1>(&self) -> StructGenStaticSetup<G1, S1> {
+            pub fn as_Gen<G1>(&self) -> StructGenStaticSetup<G1, S1>
+            where
+                G1: Clone,
+                S1: Default,
+            {
                 StructGenStaticSetup {
                     _generics: PhantomData,
                 }

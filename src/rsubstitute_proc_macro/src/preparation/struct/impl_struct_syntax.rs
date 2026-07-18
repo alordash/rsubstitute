@@ -23,10 +23,7 @@ pub(crate) fn prepare(
     }: Params,
 ) -> ImplStructSyntax {
     let split_items = split_items(impl_items);
-    let SplitTargetType {
-        modules,
-        target_ident,
-    } = split_target_type(&target_type);
+    let target_ident = parse_target_type(&target_type);
     let impl_struct_syntax_as_fn_owner = ImplStructSyntaxAsFnOwner {
         generics: &generics,
     };
@@ -47,7 +44,6 @@ pub(crate) fn prepare(
 
     let result = ImplStructSyntax {
         attributes,
-        modules,
         target_ident,
         generics,
         target_type: *target_type,
@@ -108,11 +104,7 @@ fn map_impl_item_fn_to_fn_syntax(
     return result;
 }
 
-struct SplitTargetType {
-    pub modules: Vec<Ident>,
-    pub target_ident: Ident,
-}
-fn split_target_type(target_type: &Type) -> SplitTargetType {
+fn parse_target_type(target_type: &Type) -> Ident {
     let Type::Path(type_path) = target_type else {
         panic!("Can mock only `impl`s of structs.");
     };
@@ -120,24 +112,7 @@ fn split_target_type(target_type: &Type) -> SplitTargetType {
         panic!("Can not mock structs qualified with self-type.");
     }
 
-    let modules: Vec<_> = type_path
-        .path
-        .segments
-        .iter()
-        .take(type_path.path.segments.len() - 1)
-        .map(|x| x.ident.clone())
-        .collect();
-    let target_ident = type_path
-        .path
-        .segments
-        .last()
-        .expect("`impl` struct target type path should not be empty.")
-        .ident
-        .clone();
-    let result = SplitTargetType {
-        modules,
-        target_ident,
-    };
+    let result = ident::combine_path_segments(&type_path.path);
     return result;
 }
 

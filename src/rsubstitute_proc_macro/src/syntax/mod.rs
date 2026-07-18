@@ -5,6 +5,8 @@ pub mod generics;
 pub mod ident;
 pub mod r#macro;
 pub mod path;
+pub mod item_impl;
+pub mod generic_param;
 pub mod r#type;
 pub mod signature;
 
