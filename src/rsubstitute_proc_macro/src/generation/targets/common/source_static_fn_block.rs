@@ -3,7 +3,12 @@ use proc_macro2::Span;
 use quote::format_ident;
 use syn::*;
 
-pub(crate) fn replace(span: Span, mock_struct_path: Path, item_impl: &mut ItemImpl) {
+pub(crate) fn replace(
+    span: Span,
+    mock_struct_path: Path,
+    item_impl: &mut ItemImpl,
+    maybe_trait_path: Option<Path>,
+) {
     let static_fns = item_impl
         .items
         .iter_mut()
@@ -12,6 +17,16 @@ pub(crate) fn replace(span: Span, mock_struct_path: Path, item_impl: &mut ItemIm
             _ => None,
         })
         .filter(|x| !signature::is_associated(&x.sig));
+    let qself = maybe_trait_path.as_ref().map(|trait_path| QSelf {
+        lt_token: Token![<](span),
+        ty: Box::new(Type::Path(TypePath {
+            qself: None,
+            path: mock_struct_path.clone(),
+        })),
+        position: trait_path.segments.len(),
+        as_token: Some(Token![as](span)),
+        gt_token: Token![>](span),
+    });
     for static_fn in static_fns {
         let args = static_fn
             .sig
@@ -35,13 +50,13 @@ pub(crate) fn replace(span: Span, mock_struct_path: Path, item_impl: &mut ItemIm
             .collect();
         let func = ExprPath {
             attrs: Vec::new(),
-            qself: None,
+            qself: qself.clone(),
             path: Path {
                 leading_colon: None,
-                segments: mock_struct_path
-                    .segments
-                    .iter()
-                    .cloned()
+                segments: maybe_trait_path
+                    .clone()
+                    .map(|x| x.segments.into_iter())
+                    .unwrap_or_else(|| mock_struct_path.segments.clone().into_iter())
                     .chain(core::iter::once(PathSegment {
                         ident: static_fn.sig.ident.clone(),
                         arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {

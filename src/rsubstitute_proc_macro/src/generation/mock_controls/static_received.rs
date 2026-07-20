@@ -1,4 +1,5 @@
 use crate::common::models::*;
+use crate::generation::common::*;
 use crate::generation::fn_info::models::*;
 use crate::generation::mock_controls::models::*;
 use crate::generation::mock_controls::*;
@@ -6,7 +7,6 @@ use crate::syntax::*;
 use proc_macro2::Span;
 use std::borrow::Borrow;
 use syn::*;
-use crate::generation::common::*;
 
 pub(crate) struct Params<'a, T: Borrow<FnInfo>> {
     pub ident: Ident,
@@ -15,6 +15,7 @@ pub(crate) struct Params<'a, T: Borrow<FnInfo>> {
     pub mock_struct_path: &'a Path,
     pub fn_infos: &'a [T],
     pub for_static_fn: bool,
+    pub maybe_trait_ident: Option<Ident>,
 }
 pub(crate) fn generate<T: Borrow<FnInfo>>(
     ctx: &Context,
@@ -26,6 +27,7 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
         mock_struct_path,
         fn_infos,
         for_static_fn,
+        maybe_trait_ident,
     }: Params<T>,
 ) -> StaticReceivedStruct {
     let item_struct = control_struct::new_static(
@@ -34,9 +36,15 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
         generics.clone(),
         maybe_argument_types,
         ControlType::Received,
+        maybe_trait_ident,
     );
     let path = path::from_ident_with_generics(item_struct.ident.clone(), &item_struct.generics);
-    let clone_impl = clone_impl::generate(source_span, generics.clone(), path.clone(), &item_struct.fields);
+    let clone_impl = clone_impl::generate(
+        source_span,
+        generics.clone(),
+        path.clone(),
+        &item_struct.fields,
+    );
     let item_impl = received_impl::generate(
         ctx,
         source_span,

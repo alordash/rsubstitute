@@ -13,6 +13,7 @@ pub(crate) struct Params<'a, T: Borrow<FnInfo>> {
     pub generics: Generics,
     pub mock_struct_path: &'a Path,
     pub fn_infos: &'a [T],
+    pub maybe_trait_ident: Option<Ident>,
 }
 pub(crate) fn generate<T: Borrow<FnInfo>>(
     ctx: &Context,
@@ -22,9 +23,11 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
         generics,
         mock_struct_path,
         fn_infos,
+        maybe_trait_ident,
     }: Params<T>,
 ) -> SetupStruct {
-    let item_struct = control_struct::new(span, ident, generics, ControlType::Setup);
+    let item_struct =
+        control_struct::new(span, ident, generics, ControlType::Setup, maybe_trait_ident);
     let path = path::from_ident_with_generics(item_struct.ident.clone(), &item_struct.generics);
     let item_impl = setup_impl::generate(
         ctx,

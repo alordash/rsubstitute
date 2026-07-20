@@ -1,4 +1,3 @@
-use std::ops::Deref;
 use crate::common::models::*;
 use crate::generation::mock_controls::*;
 use crate::generation::mock_struct::models::*;
@@ -39,6 +38,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockM
                 generics: trait_info.merged_generics.clone(),
                 mock_struct_path: &trait_mock_struct_path,
                 fn_infos: &trait_info.associated_fns,
+                maybe_trait_ident: None,
             },
         );
         let received_struct = received::generate(
@@ -49,6 +49,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockM
                 generics: trait_info.merged_generics.clone(),
                 mock_struct_path: &trait_mock_struct_path,
                 fn_infos: &trait_info.associated_fns,
+                maybe_trait_ident: None,
             },
         );
         let associated_controls = AssociatedControls {
@@ -68,6 +69,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockM
                 mock_struct_path: &trait_mock_struct_path,
                 fn_infos: &trait_info.static_fns,
                 for_static_fn: false,
+                maybe_trait_ident: None,
             },
         );
         let static_received_struct = static_received::generate(
@@ -80,6 +82,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockM
                 mock_struct_path: &trait_mock_struct_path,
                 fn_infos: &trait_info.static_fns,
                 for_static_fn: false,
+                maybe_trait_ident: None,
             },
         );
         let static_controls = StaticControls {

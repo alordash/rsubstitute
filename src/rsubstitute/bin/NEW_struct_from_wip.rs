@@ -33,7 +33,7 @@ impl Struct<i8> {
 }
 
 // this `<T1>` in `impl<T1>` dictates which generics should be in `as_Trait<T1>()`
-// #[mock]
+#[mock]
 impl<T1> Trait<T1> for Struct<i16> {
     fn f<T2>(&self) -> T1 {
         todo!()

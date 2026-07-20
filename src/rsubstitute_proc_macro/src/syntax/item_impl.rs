@@ -5,6 +5,7 @@ use syn::spanned::Spanned;
 use syn::visit::Visit;
 use syn::*;
 
+// TODO - this is apparently not needed because generics for trait and struct should be extracted from their path
 pub(crate) struct SplitGenerics {
     pub target_generics: Generics,
     pub trait_generics: Generics,

@@ -11,13 +11,19 @@ pub(crate) fn new(
     ident: Ident,
     generics: Generics,
     control_type: ControlType,
+    maybe_trait_ident: Option<Ident>,
 ) -> ItemStruct {
     let ident_suffix = get_control_ident_suffix(control_type);
+    let result_ident = if let Some(trait_ident) = maybe_trait_ident {
+        format_ident!("{ident}{trait_ident}{ident_suffix}")
+    } else {
+        format_ident!("{ident}{ident_suffix}")
+    };
     let result = ItemStruct {
         attrs: Vec::new(),
         vis: Visibility::Public(Token![pub](span)),
         struct_token: Token![struct](span),
-        ident: format_ident!("{ident}{ident_suffix}"),
+        ident: result_ident,
         generics: generics.clone(),
         fields: Fields::Named(FieldsNamed {
             brace_token: token::Brace(span),
@@ -37,13 +43,19 @@ pub(crate) fn new_static(
     generics: Generics,
     maybe_argument_types: Option<Vec<Type>>,
     control_type: ControlType,
+    maybe_trait_ident: Option<Ident>,
 ) -> ItemStruct {
     let ident_suffix = get_control_ident_suffix(control_type);
+    let result_ident = if let Some(trait_ident) = maybe_trait_ident {
+        format_ident!("{ident}{trait_ident}Static{ident_suffix}")
+    } else {
+        format_ident!("{ident}Static{ident_suffix}")
+    };
     let result = ItemStruct {
         attrs: Vec::new(),
         vis: Visibility::Public(Token![pub](span)),
         struct_token: Token![struct](span),
-        ident: format_ident!("{ident}Static{ident_suffix}"),
+        ident: result_ident,
         generics: generics.clone(),
         fields: Fields::Named(FieldsNamed {
             brace_token: token::Brace(span),

@@ -10,7 +10,7 @@ use crate::generation::targets::*;
 use crate::generation::*;
 use crate::preparation::r#struct::*;
 use crate::syntax::*;
-use quote::format_ident;
+use quote::{format_ident, ToTokens};
 use syn::spanned::Spanned;
 use syn::*;
 
@@ -47,6 +47,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                     generics: impl_trait_for_struct_info.merged_generics.clone(),
                     mock_struct_path: &mock_struct_path,
                     fn_infos: &impl_trait_for_struct_info.associated_fns,
+                    maybe_trait_ident: Some(impl_trait_for_struct_info.trait_ident.clone()),
                 },
             );
             let trait_received_struct = received::generate(
@@ -57,6 +58,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                     generics: impl_trait_for_struct_info.merged_generics.clone(),
                     mock_struct_path: &mock_struct_path,
                     fn_infos: &impl_trait_for_struct_info.associated_fns,
+                    maybe_trait_ident: Some(impl_trait_for_struct_info.trait_ident.clone()),
                 },
             );
             let setup_struct_impl = as_trait_control_impl::generate(
@@ -64,6 +66,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                 as_trait_control_impl::Params {
                     struct_path: &impl_trait_for_struct_info.target_path,
                     struct_generics: impl_trait_for_struct_info.target_simple_generics.clone(),
+                    trait_control_struct_path: &trait_setup_struct.path,
                     trait_ident: &impl_trait_for_struct_info.trait_ident,
                     trait_generics: impl_trait_for_struct_info.trait_simple_generics.clone(),
                     maybe_common_where_clause: impl_trait_for_struct_info
@@ -79,6 +82,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                 as_trait_control_impl::Params {
                     struct_path: &impl_trait_for_struct_info.target_path,
                     struct_generics: impl_trait_for_struct_info.target_simple_generics.clone(),
+                    trait_control_struct_path: &trait_received_struct.path,
                     trait_ident: &impl_trait_for_struct_info.trait_ident,
                     trait_generics: impl_trait_for_struct_info.trait_simple_generics.clone(),
                     maybe_common_where_clause: impl_trait_for_struct_info
@@ -108,6 +112,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                 mock_struct_path: &mock_struct_path,
                 fn_infos: &impl_trait_for_struct_info.static_fns,
                 for_static_fn: false,
+                maybe_trait_ident: Some(impl_trait_for_struct_info.trait_ident.clone()),
             },
         );
         let trait_static_received_struct = static_received::generate(
@@ -120,6 +125,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                 mock_struct_path: &mock_struct_path,
                 fn_infos: &impl_trait_for_struct_info.static_fns,
                 for_static_fn: false,
+                maybe_trait_ident: Some(impl_trait_for_struct_info.trait_ident.clone()),
             },
         );
         let static_setup_struct_impl = as_trait_control_impl::generate(
@@ -127,6 +133,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
             as_trait_control_impl::Params {
                 struct_path: &impl_trait_for_struct_info.target_path,
                 struct_generics: impl_trait_for_struct_info.target_simple_generics.clone(),
+                trait_control_struct_path: &trait_static_setup_struct.path,
                 trait_ident: &impl_trait_for_struct_info.trait_ident,
                 trait_generics: impl_trait_for_struct_info.trait_simple_generics.clone(),
                 maybe_common_where_clause: impl_trait_for_struct_info
@@ -142,6 +149,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
             as_trait_control_impl::Params {
                 struct_path: &impl_trait_for_struct_info.target_path,
                 struct_generics: impl_trait_for_struct_info.target_simple_generics.clone(),
+                trait_control_struct_path: &trait_static_received_struct.path,
                 trait_ident: &impl_trait_for_struct_info.trait_ident,
                 trait_generics: impl_trait_for_struct_info.trait_simple_generics.clone(),
                 maybe_common_where_clause: impl_trait_for_struct_info
@@ -160,7 +168,12 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
         };
         return static_controls;
     });
-    source_static_fn_block::replace(source_span, mock_struct_path.clone(), &mut item_impl);
+    source_static_fn_block::replace(
+        source_span,
+        mock_struct_path.clone(),
+        &mut item_impl,
+        Some(impl_trait_for_struct_info.trait_path.clone()),
+    );
     let mock_struct_impl = mock_struct_impl::generate(
         ctx,
         source_span,
@@ -169,17 +182,63 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
             associated_fns: &impl_trait_for_struct_info.associated_fns,
             static_fns: &impl_trait_for_struct_info.static_fns,
             generics: impl_trait_for_struct_info.merged_generics,
+            maybe_trait_path: Some(impl_trait_for_struct_info.trait_path.clone()),
         },
     );
 
+    let use_struct_mod =
+        use_struct_mod::generate(source_span, &impl_trait_for_struct_info.target_path);
     let mock_mod_usages = mock_mod_usages::new(source_span);
     let items = [
         Item::Use(mock_mod_usages.use_rsubstitute_for_generated),
         Item::Use(mock_mod_usages.use_super),
+        Item::Use(use_struct_mod),
         Item::Impl(item_impl),
         Item::Impl(mock_struct_impl),
     ]
     .into_iter()
+    .chain(
+        impl_trait_for_struct_info
+            .associated_fns
+            .into_iter()
+            .flat_map(|x| {
+                let call_struct = x.value.call_struct;
+                let args_checker = x.value.args_checker_struct;
+                [
+                    Item::Struct(call_struct.item_struct),
+                    Item::Impl(call_struct.generics_info_provider_impl),
+                    Item::Impl(call_struct.call_impl),
+                ]
+                .into_iter()
+                .chain(call_struct.maybe_clone_impl.map(Item::Impl).into_iter())
+                .chain([
+                    Item::Struct(args_checker.item_struct),
+                    Item::Impl(args_checker.generics_info_provider_impl),
+                    Item::Impl(args_checker.args_checker_impl),
+                ])
+            }),
+    )
+    .chain(
+        impl_trait_for_struct_info
+            .static_fns
+            .into_iter()
+            .flat_map(|x| {
+                let call_struct = x.value.call_struct;
+                let args_checker = x.value.args_checker_struct;
+                [
+                    Item::Struct(call_struct.item_struct),
+                    Item::Impl(call_struct.generics_info_provider_impl),
+                    Item::Impl(call_struct.call_impl),
+                ]
+                .into_iter()
+                .chain(call_struct.maybe_clone_impl.map(Item::Impl).into_iter())
+                .chain([
+                    Item::Struct(args_checker.item_struct),
+                    Item::Impl(args_checker.generics_info_provider_impl),
+                    Item::Impl(args_checker.args_checker_impl),
+                ])
+            }),
+    )
     .chain(maybe_associated_controls.into_iter().flat_map(|x| {
         [
             Item::Struct(x.trait_setup_struct.item_struct),

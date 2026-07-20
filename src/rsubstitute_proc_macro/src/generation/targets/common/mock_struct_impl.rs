@@ -12,6 +12,7 @@ pub(crate) struct Params<'a> {
     pub associated_fns: &'a [Ordered<FnInfo>],
     pub static_fns: &'a [Ordered<FnInfo>],
     pub generics: Generics,
+    pub maybe_trait_path: Option<Path>,
 }
 pub(crate) fn generate(
     ctx: &Context,
@@ -21,6 +22,7 @@ pub(crate) fn generate(
         associated_fns,
         static_fns,
         generics,
+        maybe_trait_path,
     }: Params,
 ) -> ItemImpl {
     let base_fns = if ctx.support_base_calling {
@@ -59,7 +61,7 @@ pub(crate) fn generate(
         unsafety: None,
         impl_token: Token![impl](span),
         generics,
-        trait_: None,
+        trait_: maybe_trait_path.map(|trait_path| (None, trait_path, Token![for](span))),
         self_ty: Box::new(Type::Path(TypePath {
             qself: None,
             path: mock_struct_path,

@@ -11,7 +11,6 @@ use syn::spanned::Spanned;
 use syn::*;
 
 pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod {
-    dbg!(item_impl.generics.to_token_stream()).to_string();
     let source_span = item_impl.span();
     let impl_struct_syntax = impl_struct_syntax::prepare(impl_struct_syntax::Params {
         attributes: item_impl.attrs.clone(),
@@ -32,6 +31,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
             associated_fns: &impl_struct_info.associated_fns,
             static_fns: &impl_struct_info.static_fns,
             generics: impl_struct_info.generics.clone(),
+            maybe_trait_path: None,
         },
     );
     let maybe_associated_controls_impls =
@@ -110,29 +110,9 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
         );
         (static_setup_impl, static_received_impl)
     });
-    source_static_fn_block::replace(source_span, mock_struct_path, &mut item_impl);
+    source_static_fn_block::replace(source_span, mock_struct_path, &mut item_impl, None);
 
-    let use_struct_mod = ItemUse {
-        attrs: Vec::new(),
-        vis: Visibility::Inherited,
-        use_token: Token![use](source_span),
-        leading_colon: None,
-        tree: UseTree::Path(UsePath {
-            ident: Ident::new("super", source_span),
-            colon2_token: Token![::](source_span),
-            tree: Box::new(UseTree::Path(UsePath {
-                ident: format_ident!(
-                    "__rsubstitute_generated_{}Mock",
-                    path::last_ident(&impl_struct_info.target_path)
-                ),
-                colon2_token: Token![::](source_span),
-                tree: Box::new(UseTree::Glob(UseGlob {
-                    star_token: Token![*](source_span),
-                })),
-            })),
-        }),
-        semi_token: Token![;](source_span),
-    };
+    let use_struct_mod = use_struct_mod::generate(source_span, &impl_struct_info.target_path);
     let mock_mod_usages = mock_mod_usages::new(source_span);
     let items = [
         Item::Use(mock_mod_usages.use_rsubstitute_for_generated),

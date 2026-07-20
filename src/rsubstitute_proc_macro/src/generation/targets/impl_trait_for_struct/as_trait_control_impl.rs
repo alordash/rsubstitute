@@ -9,6 +9,7 @@ use syn::*;
 pub(crate) struct Params<'a> {
     pub struct_path: &'a Path,
     pub struct_generics: Generics,
+    pub trait_control_struct_path: &'a Path,
     pub trait_ident: &'a Ident,
     pub trait_generics: Generics,
     pub maybe_common_where_clause: Option<WhereClause>,
@@ -20,6 +21,7 @@ pub(crate) fn generate(
     Params {
         struct_path,
         struct_generics,
+        trait_control_struct_path,
         trait_ident,
         mut trait_generics,
         maybe_common_where_clause,
@@ -49,9 +51,8 @@ pub(crate) fn generate(
     trait_generics.where_clause = maybe_common_where_clause;
     let fn_as_trait = generate_fn_as_trait(
         span,
-        struct_path,
+        trait_control_struct_path,
         trait_ident,
-        &control_struct_ident_suffix,
         trait_generics,
         is_static,
     );
@@ -71,19 +72,12 @@ pub(crate) fn generate(
 
 fn generate_fn_as_trait(
     span: Span,
-    struct_path: &Path,
+    trait_control_struct_path: &Path,
     trait_ident: &Ident,
-    control_struct_ident_suffix: &str,
     trait_generics: Generics,
     is_static: bool,
 ) -> ImplItemFn {
-    let trait_control_struct_path = path::from_base_path_with_ident(
-        struct_path,
-        format_ident!(
-            "{}{trait_ident}{control_struct_ident_suffix}",
-            path::last_ident(struct_path)
-        ),
-    );
+    // TODO - generics should be equal to `trait_control_struct_path` path generics
     let result = ImplItemFn {
         attrs: vec![attributes::allow_non_snake_case(span)],
         vis: Visibility::Public(Token![pub](span)),
@@ -113,7 +107,7 @@ fn generate_fn_as_trait(
                 Expr::Struct(ExprStruct {
                     attrs: Vec::new(),
                     qself: None,
-                    path: trait_control_struct_path,
+                    path: trait_control_struct_path.clone(),
                     brace_token: token::Brace(span),
                     fields: if is_static {
                         punctuated([generics_field::new_value(span)])
