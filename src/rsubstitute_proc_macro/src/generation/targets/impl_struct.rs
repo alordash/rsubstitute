@@ -20,9 +20,9 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
         impl_items: item_impl.items.clone(),
     });
     let impl_struct_info = impl_struct_info::generate(ctx, impl_struct_syntax);
-    let mock_struct_path = path::from_ident_with_generics(
-        format_ident!("{}Mock", impl_struct_info.target_path),
-        &impl_struct_info.generics,
+    let mock_struct_path = path::from_base_path_with_ident(
+        &impl_struct_info.target_path,
+        format_ident!("{}Mock", path::last_ident(&impl_struct_info.target_path)),
     );
     let mock_struct_impl = mock_struct_impl::generate(
         ctx,
@@ -40,9 +40,9 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                 ctx,
                 source_span,
                 setup_impl::Params {
-                    setup_struct_path: path::from_ident_with_generics(
-                        format_ident!("{}Setup", impl_struct_info.target_path),
-                        &impl_struct_info.generics,
+                    setup_struct_path: path::from_base_path_with_ident(
+                        &impl_struct_info.target_path,
+                        format_ident!("{}Setup", path::last_ident(&impl_struct_info.target_path)),
                     ),
                     generics: impl_struct_info.generics.clone(),
                     mock_struct_path: &mock_struct_path,
@@ -55,9 +55,12 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                 ctx,
                 source_span,
                 received_impl::Params {
-                    received_struct_path: path::from_ident_with_generics(
-                        format_ident!("{}Received", impl_struct_info.target_path),
-                        &impl_struct_info.generics,
+                    received_struct_path: path::from_base_path_with_ident(
+                        &impl_struct_info.target_path,
+                        format_ident!(
+                            "{}Received",
+                            path::last_ident(&impl_struct_info.target_path)
+                        ),
                     ),
                     generics: impl_struct_info.generics.clone(),
                     mock_struct_path: &mock_struct_path,
@@ -73,9 +76,12 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
             ctx,
             source_span,
             setup_impl::Params {
-                setup_struct_path: path::from_ident_with_generics(
-                    format_ident!("{}StaticSetup", impl_struct_info.target_path),
-                    &impl_struct_info.generics,
+                setup_struct_path: path::from_base_path_with_ident(
+                    &impl_struct_info.target_path,
+                    format_ident!(
+                        "{}StaticSetup",
+                        path::last_ident(&impl_struct_info.target_path)
+                    ),
                 ),
                 generics: impl_struct_info.generics.clone(),
                 mock_struct_path: &mock_struct_path,
@@ -88,9 +94,12 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
             ctx,
             source_span,
             received_impl::Params {
-                received_struct_path: path::from_ident_with_generics(
-                    format_ident!("{}StaticReceived", impl_struct_info.target_path),
-                    &impl_struct_info.generics,
+                received_struct_path: path::from_base_path_with_ident(
+                    &impl_struct_info.target_path,
+                    format_ident!(
+                        "{}StaticReceived",
+                        path::last_ident(&impl_struct_info.target_path)
+                    ),
                 ),
                 generics: impl_struct_info.generics.clone(),
                 mock_struct_path: &mock_struct_path,
@@ -114,7 +123,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
             tree: Box::new(UseTree::Path(UsePath {
                 ident: format_ident!(
                     "__rsubstitute_generated_{}Mock",
-                    impl_struct_info.target_path
+                    path::last_ident(&impl_struct_info.target_path)
                 ),
                 colon2_token: Token![::](source_span),
                 tree: Box::new(UseTree::Glob(UseGlob {
@@ -181,7 +190,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
     let column = call_site.column();
     let mod_ident = format_ident!(
         "__rsubstitute_generated_{}_{}_{}",
-        impl_struct_info.target_path,
+        path::last_ident(&impl_struct_info.target_path),
         line,
         column
     );

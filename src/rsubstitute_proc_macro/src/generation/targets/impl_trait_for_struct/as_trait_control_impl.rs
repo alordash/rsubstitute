@@ -7,11 +7,10 @@ use quote::format_ident;
 use syn::*;
 
 pub(crate) struct Params<'a> {
-    pub struct_ident: &'a Ident,
+    pub struct_path: &'a Path,
     pub struct_generics: Generics,
     pub trait_ident: &'a Ident,
     pub trait_generics: Generics,
-    pub merged_generics: Generics,
     pub maybe_common_where_clause: Option<WhereClause>,
     pub control_type: ControlType,
     pub is_static: bool,
@@ -19,11 +18,10 @@ pub(crate) struct Params<'a> {
 pub(crate) fn generate(
     span: Span,
     Params {
-        struct_ident,
+        struct_path,
         struct_generics,
         trait_ident,
         mut trait_generics,
-        merged_generics,
         maybe_common_where_clause,
         control_type,
         is_static,
@@ -39,19 +37,22 @@ pub(crate) fn generate(
     };
     let self_ty_path = TypePath {
         qself: None,
-        path: path::from_ident_with_generics(
-            format_ident!("{struct_ident}{control_struct_ident_suffix}"),
-            &struct_generics,
+        path: path::from_base_path_with_ident(
+            struct_path,
+            format_ident!(
+                "{}{}",
+                path::last_ident(struct_path),
+                control_struct_ident_suffix
+            ),
         ),
     };
     trait_generics.where_clause = maybe_common_where_clause;
     let fn_as_trait = generate_fn_as_trait(
         span,
-        struct_ident,
+        struct_path,
         trait_ident,
         &control_struct_ident_suffix,
         trait_generics,
-        merged_generics,
         is_static,
     );
     let result = ItemImpl {
@@ -70,16 +71,18 @@ pub(crate) fn generate(
 
 fn generate_fn_as_trait(
     span: Span,
-    struct_ident: &Ident,
+    struct_path: &Path,
     trait_ident: &Ident,
     control_struct_ident_suffix: &str,
     trait_generics: Generics,
-    merged_generics: Generics,
     is_static: bool,
 ) -> ImplItemFn {
-    let trait_control_struct_path = path::from_ident_with_generics(
-        format_ident!("{struct_ident}{trait_ident}{control_struct_ident_suffix}"),
-        &merged_generics,
+    let trait_control_struct_path = path::from_base_path_with_ident(
+        struct_path,
+        format_ident!(
+            "{}{trait_ident}{control_struct_ident_suffix}",
+            path::last_ident(struct_path)
+        ),
     );
     let result = ImplItemFn {
         attrs: vec![attributes::allow_non_snake_case(span)],

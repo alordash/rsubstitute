@@ -83,3 +83,21 @@ pub(crate) fn from_ident_with_generics(ident: Ident, generics: &Generics) -> Pat
     };
     return result;
 }
+
+pub(crate) fn from_base_path_with_ident(base: &Path, ident: Ident) -> Path {
+    let mut result = base.clone();
+    if let Some(last_segment) = result.segments.last_mut() {
+        last_segment.ident = ident;
+    }
+    return result;
+}
+
+pub(crate) fn last_ident(path: &Path) -> Ident {
+    let result = path
+        .segments
+        .last()
+        .expect("`path::last` expects given path to have at least one segment.")
+        .ident
+        .clone();
+    return result;
+}
