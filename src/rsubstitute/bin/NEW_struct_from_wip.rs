@@ -44,7 +44,7 @@ impl<T1> Trait<T1> for Struct<i16> {
     fn tself<T4>(&self) {}
     fn tstatic<T5>() {}
 }
-// #[mock]
+#[mock]
 impl Trait<i64> for Struct<i128> {
     fn f<T2>(&self) -> i64 {
         todo!()
@@ -53,7 +53,7 @@ impl Trait<i64> for Struct<i128> {
     fn tself<T4>(&self) {}
     fn tstatic<T5>() {}
 }
-// #[mock]
+#[mock]
 impl<G1, S1> Gen<G1> for Struct<S1>
 where
     G1: Clone,
