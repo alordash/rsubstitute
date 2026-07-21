@@ -6,7 +6,7 @@ use crate::generation::targets::*;
 use crate::generation::*;
 use crate::preparation::r#struct::*;
 use crate::syntax::*;
-use quote::{format_ident, ToTokens};
+use quote::format_ident;
 use syn::spanned::Spanned;
 use syn::*;
 
@@ -67,6 +67,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                     fn_infos: &impl_struct_info.associated_fns,
                     for_static_fn: false,
                     is_static: false,
+                    generate_fn_no_other_calls: false,
                 },
             );
             (setup_impl, received_impl)
@@ -106,6 +107,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                 fn_infos: &impl_struct_info.static_fns,
                 for_static_fn: false,
                 is_static: true,
+                generate_fn_no_other_calls: false,
             },
         );
         (static_setup_impl, static_received_impl)

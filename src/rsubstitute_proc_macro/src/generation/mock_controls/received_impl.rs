@@ -15,6 +15,7 @@ pub(crate) struct Params<'a, T: Borrow<FnInfo>> {
     pub fn_infos: &'a [T],
     pub for_static_fn: bool,
     pub is_static: bool,
+    pub generate_fn_no_other_calls: bool,
 }
 pub(crate) fn generate<T: Borrow<FnInfo>>(
     ctx: &Context,
@@ -26,9 +27,10 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
         fn_infos,
         for_static_fn,
         is_static,
+        generate_fn_no_other_calls,
     }: Params<T>,
 ) -> ItemImpl {
-    let items = fn_infos
+    let mut items: Vec<_> = fn_infos
         .iter()
         .map(|fn_info| {
             generate_received_fn(
@@ -40,13 +42,17 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
                 is_static,
             )
         })
-        .chain(core::iter::once(if is_static {
+        .map(ImplItem::Fn)
+        .collect();
+
+    if generate_fn_no_other_calls {
+        let fn_no_other_calls = if is_static {
             generate_fn_no_other_calls_for_static_fn(span, fn_infos, mock_struct_path.clone())
         } else {
             generate_regular_fn_no_other_calls(span, fn_infos)
-        }))
-        .map(ImplItem::Fn)
-        .collect();
+        };
+        items.push(ImplItem::Fn(fn_no_other_calls));
+    }
 
     let result = ItemImpl {
         attrs: Vec::new(),

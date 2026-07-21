@@ -1,5 +1,5 @@
 use crate::syntax::*;
-use std::collections::HashSet;
+use std::collections::HashMap;
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::visit::Visit;
@@ -19,8 +19,7 @@ pub(crate) fn split_generics(
     let searched_generics_ident = generics
         .params
         .iter()
-        .map(generic_param::get_ident)
-        .cloned()
+        .map(|x| (generic_param::get_ident(x).clone(), x))
         .collect();
     let mut target_generics_searcher = GenericsSearcher::new(&searched_generics_ident);
     target_generics_searcher.visit_type(target_type);
@@ -52,12 +51,12 @@ pub(crate) fn split_generics(
 }
 
 struct GenericsSearcher<'a> {
-    searched_generics_idents: &'a HashSet<Ident>,
+    searched_generics_idents: &'a HashMap<Ident, &'a GenericParam>,
     found_generic_params: Punctuated<GenericParam, Token![,]>,
 }
 
 impl<'a> GenericsSearcher<'a> {
-    pub fn new(searched_generics_idents: &'a HashSet<Ident>) -> GenericsSearcher {
+    pub fn new(searched_generics_idents: &'a HashMap<Ident, &'a GenericParam>) -> GenericsSearcher {
         Self {
             searched_generics_idents,
             found_generic_params: Punctuated::new(),
@@ -66,10 +65,10 @@ impl<'a> GenericsSearcher<'a> {
 }
 
 impl Visit<'_> for GenericsSearcher<'_> {
-    fn visit_generic_param(&mut self, i: &'_ GenericParam) {
-        let ident = generic_param::get_ident(i);
-        if self.searched_generics_idents.contains(ident) {
-            self.found_generic_params.push(i.clone())
+    fn visit_ident(&mut self, i: &'_ Ident) {
+        if let Some(target_generic_param) = self.searched_generics_idents.get(i) {
+            self.found_generic_params
+                .push((*target_generic_param).clone());
         }
     }
 }

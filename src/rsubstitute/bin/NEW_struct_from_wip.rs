@@ -19,13 +19,15 @@ trait Gen<G1> {
     fn gstatic<G5>();
 }
 
+// TODO - need to implement StructReceived::no_other_calls in this module, not in each `impl Struct`
+// modules (same for StaticStructReceived)
 #[mock]
 struct Struct<S1>(pub S1);
-// #[mock]
-// impl<S1> Struct<S1> {
-//     pub fn f<S2>(&self) {}
-//     pub fn g<S3>() {}
-// }
+#[mock]
+impl<S1> Struct<S1> {
+    pub fn f<S2>(&self) {}
+    pub fn g<S3>() {}
+}
 #[mock]
 impl Struct<i8> {
     pub fn sself<S4>(&self) {}

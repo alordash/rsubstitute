@@ -45,7 +45,6 @@ pub(crate) fn prepare(
         })
         .collect();
     let split_generics = item_impl::split_generics(&merged_generics, &trait_path, &target_type);
-    dbg!(split_generics.trait_generics.to_token_stream());
     let result = ImplTraitForStructSyntax {
         attributes,
         target_path,

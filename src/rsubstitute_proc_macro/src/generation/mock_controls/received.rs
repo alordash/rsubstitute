@@ -45,6 +45,7 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
             fn_infos,
             for_static_fn: false,
             is_static: false,
+            generate_fn_no_other_calls: true,
         },
     );
 
