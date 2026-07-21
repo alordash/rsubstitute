@@ -69,7 +69,7 @@ fn main() {
     let s = Struct(10);
     let mut s_mock = s.mock();
     // TODO - need to split `as_Trait` methods
-    s_mock.received().as_Trait::<T1>();
+    s_mock.received().as_Trait::<i32>();
 
     println!("Done");
 }
