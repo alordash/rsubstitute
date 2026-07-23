@@ -45,8 +45,8 @@ impl<T1> Trait<T1> for Struct<i16> {
     fn tstatic<T5>() {}
 }
 #[mock]
-impl Trait<i64> for Struct<i128> {
-    fn f<T2>(&self) -> i64 {
+impl Trait<Box<[i64]>> for Struct<i128> {
+    fn f<T2>(&self) -> Box<[i64]> {
         todo!()
     }
     fn g<T3>() {}
@@ -66,10 +66,11 @@ where
 }
 
 fn main() {
-    let s = Struct(10);
+    let s = Struct(10i16);
     let mut s_mock = s.mock();
     // TODO - need to split `as_Trait` methods
     s_mock.received().as_Trait::<i32>();
+    s_mock.setup().as_Gen::<[u8; 3]>();
 
     println!("Done");
 }
