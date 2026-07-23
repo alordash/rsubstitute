@@ -9,6 +9,7 @@ pub(crate) struct Params {
     pub struct_ident: Ident,
     pub struct_mock_ident: Ident,
     pub generics: Generics,
+    pub generics_for_impl: Generics,
     pub struct_setup_ident: Ident,
     pub struct_received_ident: Ident,
 }
@@ -18,6 +19,7 @@ pub(crate) fn generate(
         struct_ident,
         struct_mock_ident,
         generics,
+        generics_for_impl,
         struct_setup_ident,
         struct_received_ident,
     }: Params,
@@ -64,14 +66,14 @@ pub(crate) fn generate(
         span,
         struct_type.clone(),
         struct_mock_type.clone(),
-        item_struct.generics.clone(),
+        generics_for_impl.clone(),
         true,
     );
     let deref_impl = deref_impl(
         span,
         struct_type,
         struct_mock_type,
-        item_struct.generics.clone(),
+        generics_for_impl.clone(),
         false,
     );
     let item_impl = item_impl(
@@ -84,7 +86,7 @@ pub(crate) fn generate(
             qself: None,
             path: path::from_ident_with_generics(item_struct.ident.clone(), &item_struct.generics),
         }),
-        item_struct.generics.clone(),
+        generics_for_impl,
         struct_setup_ident,
         struct_received_ident,
     );

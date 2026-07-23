@@ -65,3 +65,20 @@ pub(crate) fn with_lifetimes_tied_to(
 
     return target_generics;
 }
+
+pub(crate) fn remove_defaults(mut generics: Generics) -> Generics {
+    for param in generics.params.iter_mut() {
+        match param {
+            GenericParam::Type(type_param) => {
+                type_param.eq_token = None;
+                type_param.default = None;
+            }
+            GenericParam::Const(const_param) => {
+                const_param.eq_token = None;
+                const_param.default = None;
+            }
+            _ => {}
+        }
+    }
+    return generics;
+}

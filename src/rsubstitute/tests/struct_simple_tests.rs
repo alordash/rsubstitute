@@ -4,24 +4,21 @@ trait Trait {
     fn f(&self);
 }
 
-mocked! {
-    struct Struct<Q = i32> {
-        pub _phantom_Q: core::marker::PhantomData<Q>,
-        pub value: i32
-    }
+// TODO - write tests for all targets (fn, trait and struct) with default generic values
+#[mock]
+struct Struct<Q = i32> {
+    pub _phantom_Q: core::marker::PhantomData<Q>,
+    pub value: i32,
+}
 
-    impl Struct {
-        pub fn new(value: i32) -> Self {
-            Self { _phantom_Q: core::marker::PhantomData, value }
-        }
+#[mock]
+impl Struct {
+    pub fn f(&self) {}
+}
 
-        pub fn f(&self) {}
-    }
-
-    impl Trait for Struct {
-        fn f(&self) { }
-    }
-
+#[mock]
+impl Trait for Struct {
+    fn f(&self) {}
 }
 
 impl Struct {

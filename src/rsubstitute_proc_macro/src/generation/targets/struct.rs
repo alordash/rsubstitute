@@ -6,7 +6,7 @@ use crate::generation::mock_controls::models::ControlType;
 use crate::generation::mock_struct::struct_mock_struct;
 use crate::generation::targets::common::*;
 use crate::generation::targets::models::*;
-use crate::syntax::path;
+use crate::syntax::{generics, path};
 use quote::format_ident;
 use syn::spanned::Spanned;
 use syn::*;
@@ -22,13 +22,11 @@ pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
             is_static: false,
         },
     );
+    let generics_for_impl = generics::remove_defaults(struct_setup_struct.generics.clone());
     let struct_setup_struct_clone_impl = clone_impl::generate(
         source_span,
-        struct_setup_struct.generics.clone(),
-        path::from_ident_with_generics(
-            struct_setup_struct.ident.clone(),
-            &struct_setup_struct.generics,
-        ),
+        generics_for_impl.clone(),
+        path::from_ident_with_generics(struct_setup_struct.ident.clone(), &generics_for_impl),
         &struct_setup_struct.fields,
     );
     let struct_received_struct = struct_control_struct::generate(
@@ -42,11 +40,8 @@ pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
     );
     let struct_received_struct_clone_impl = clone_impl::generate(
         source_span,
-        struct_received_struct.generics.clone(),
-        path::from_ident_with_generics(
-            struct_received_struct.ident.clone(),
-            &struct_received_struct.generics,
-        ),
+        generics_for_impl.clone(),
+        path::from_ident_with_generics(struct_received_struct.ident.clone(), &generics_for_impl),
         &struct_received_struct.fields,
     );
     let struct_static_setup_struct = struct_control_struct::generate(
@@ -60,10 +55,10 @@ pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
     );
     let struct_static_setup_struct_clone_impl = clone_impl::generate(
         source_span,
-        struct_static_setup_struct.generics.clone(),
+        generics_for_impl.clone(),
         path::from_ident_with_generics(
             struct_static_setup_struct.ident.clone(),
-            &struct_static_setup_struct.generics,
+            &generics_for_impl,
         ),
         &struct_static_setup_struct.fields,
     );
@@ -78,10 +73,10 @@ pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
     );
     let struct_static_received_struct_clone_impl = clone_impl::generate(
         source_span,
-        struct_static_received_struct.generics.clone(),
+        generics_for_impl.clone(),
         path::from_ident_with_generics(
             struct_static_received_struct.ident.clone(),
-            &struct_static_received_struct.generics,
+            &generics_for_impl,
         ),
         &struct_static_received_struct.fields,
     );
@@ -92,6 +87,7 @@ pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
             struct_ident: item_struct.ident.clone(),
             struct_mock_ident: struct_mock_ident.clone(),
             generics: item_struct.generics.clone(),
+            generics_for_impl: generics_for_impl.clone(),
             struct_setup_ident: struct_setup_struct.ident.clone(),
             struct_received_ident: struct_received_struct.ident.clone(),
         },
@@ -100,7 +96,7 @@ pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
         source_span,
         mockable_trait_impl::Params {
             struct_ident: item_struct.ident.clone(),
-            generics: item_struct.generics.clone(),
+            generics: generics_for_impl.clone(),
             struct_mock_ident: struct_mock_struct.item_struct.ident.clone(),
             static_setup_struct_ident: struct_static_setup_struct.ident.clone(),
             static_received_struct_ident: struct_static_received_struct.ident.clone(),
