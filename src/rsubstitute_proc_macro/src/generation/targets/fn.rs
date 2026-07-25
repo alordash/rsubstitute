@@ -52,6 +52,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
         static_setup::Params {
             ident: target_ident.clone(),
             generics: target_generics.clone(),
+            generics_for_impl: target_generics.clone(),
             maybe_argument_types: Some(target_argument_types.clone()),
             mock_struct_path: &static_fn_mock_struct.path,
             fn_infos: &fn_infos,
@@ -64,7 +65,8 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
         source_span,
         static_received::Params {
             ident: target_ident,
-            generics: target_generics,
+            generics: target_generics.clone(),
+            generics_for_impl: target_generics,
             maybe_argument_types: Some(target_argument_types),
             mock_struct_path: &static_fn_mock_struct.path,
             fn_infos: &fn_infos,

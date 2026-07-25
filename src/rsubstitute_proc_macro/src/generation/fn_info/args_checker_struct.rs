@@ -8,7 +8,11 @@ use quote::format_ident;
 use syn::spanned::Spanned;
 use syn::*;
 
-pub(crate) fn generate(fn_syntax: &FnSyntax, call_struct_type: Type) -> ArgsCheckerStruct {
+pub(crate) fn generate(
+    fn_syntax: &FnSyntax,
+    call_struct_type: Type,
+    generics_for_impl: Generics,
+) -> ArgsCheckerStruct {
     let span = fn_syntax.spans.inputs;
     let fields_named = generate_fields(fn_syntax);
     let item_struct = ItemStruct {
@@ -27,13 +31,13 @@ pub(crate) fn generate(fn_syntax: &FnSyntax, call_struct_type: Type) -> ArgsChec
         path: path.clone(),
     });
     let generics_info_provider_impl = generics_info_provider_impl::generate(
-        fn_syntax.merged_generics.clone(),
+        generics_for_impl.clone(),
         fn_syntax.source_signature.generics.clone(),
         r#type.clone(),
     );
     let args_checker_impl = args_checker_impl::generate(
         span,
-        fn_syntax.merged_generics.clone(),
+        generics_for_impl,
         &fn_syntax.arguments,
         r#type,
         call_struct_type,

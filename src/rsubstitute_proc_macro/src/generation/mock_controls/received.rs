@@ -11,6 +11,7 @@ use syn::*;
 pub(crate) struct Params<'a, T: Borrow<FnInfo>> {
     pub ident: Ident,
     pub generics: Generics,
+    pub generics_for_impl: Generics,
     pub mock_struct_path: &'a Path,
     pub fn_infos: &'a [T],
     pub maybe_trait_ident: Option<Ident>,
@@ -21,6 +22,7 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
     Params {
         ident,
         generics,
+        generics_for_impl,
         mock_struct_path,
         fn_infos,
         maybe_trait_ident,
@@ -29,18 +31,18 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
     let item_struct = control_struct::new(
         span,
         ident,
-        generics.clone(),
+        generics,
         ControlType::Received,
         maybe_trait_ident,
     );
     let path = path::from_ident_with_generics(item_struct.ident.clone(), &item_struct.generics);
-    let clone_impl = clone_impl::generate(span, generics, path.clone(), &item_struct.fields);
+    let clone_impl = clone_impl::generate(span, generics_for_impl.clone(), path.clone(), &item_struct.fields);
     let item_impl = received_impl::generate(
         ctx,
         span,
         received_impl::Params {
             received_struct_path: path.clone(),
-            generics: item_struct.generics.clone(),
+            generics: generics_for_impl,
             mock_struct_path,
             fn_infos,
             for_static_fn: false,

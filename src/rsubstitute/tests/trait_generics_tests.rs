@@ -1,7 +1,7 @@
 use rsubstitute::mock;
 
 #[mock]
-trait Trait<T1, T2> {
+trait Trait<T1, T2 = u16> {
     fn get_return(&self, value: T1) -> T1;
 
     fn return_where_constraint(&self) -> T1
@@ -23,7 +23,7 @@ mod trait_generic_tests {
         #[test]
         fn get_return_first_type_i32_Ok() {
             // Arrange
-            let mut mock = TraitMock::<_, String>::new();
+            let mut mock = TraitMock::<_>::new();
             let accepted_value = 10;
             let returned_value = 200;
             mock.setup()

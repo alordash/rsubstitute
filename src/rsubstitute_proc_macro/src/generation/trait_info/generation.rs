@@ -7,7 +7,7 @@ use crate::generation::trait_info::models::*;
 use crate::preparation::models::*;
 use crate::preparation::r#fn::models::*;
 use crate::preparation::r#trait::models::*;
-use crate::syntax::generic_argument;
+use crate::syntax::{generic_argument, generics};
 use quote::format_ident;
 use syn::*;
 
@@ -79,6 +79,8 @@ fn convert_fns(
         .into_iter()
         .map(|ordered_fn_syntax| {
             ordered_fn_syntax.map(|fn_syntax| {
+                let generics_for_impl =
+                    generics::remove_defaults(fn_syntax.merged_generics.clone());
                 // PERF - instead of normalizing results of `fn_syntax::generate` it could be faster
                 // to normalize inputs to `fn_syntax::generate` first, i.e. build assoc items info
                 // in `TraitSyntax` instead of `TraitInfo` and use it in `IFnOwner`
@@ -87,7 +89,11 @@ fn convert_fns(
                     associated_items_info,
                     fn_syntax,
                 );
-                return fn_info::generate(ctx, normalized_fn_syntax);
+                return fn_info::generate_with_impl_generics(
+                    ctx,
+                    normalized_fn_syntax,
+                    generics_for_impl.clone(),
+                );
             })
         })
         .collect()

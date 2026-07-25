@@ -23,12 +23,11 @@ pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockM
         items: item_trait.items.clone(),
     });
     let trait_info = trait_info::generate(ctx, trait_syntax);
+    let generics_for_impl = generics::remove_defaults(trait_info.merged_generics.clone());
 
     let trait_mock_struct_ident = format_ident!("{}Mock", trait_info.ident);
-    let trait_mock_struct_path = path::from_ident_with_generics(
-        trait_mock_struct_ident.clone(),
-        &trait_info.merged_generics,
-    );
+    let trait_mock_struct_path =
+        path::from_ident_with_generics(trait_mock_struct_ident.clone(), &generics_for_impl);
     let maybe_associated_controls = (!trait_info.associated_fns.is_empty()).then(|| {
         let setup_struct = setup::generate(
             ctx,
@@ -36,6 +35,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockM
             setup::Params {
                 ident: trait_info.ident.clone(),
                 generics: trait_info.merged_generics.clone(),
+                generics_for_impl: generics_for_impl.clone(),
                 mock_struct_path: &trait_mock_struct_path,
                 fn_infos: &trait_info.associated_fns,
                 maybe_trait_ident: None,
@@ -47,6 +47,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockM
             received::Params {
                 ident: trait_info.ident.clone(),
                 generics: trait_info.merged_generics.clone(),
+                generics_for_impl: generics_for_impl.clone(),
                 mock_struct_path: &trait_mock_struct_path,
                 fn_infos: &trait_info.associated_fns,
                 maybe_trait_ident: None,
@@ -65,6 +66,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockM
             static_setup::Params {
                 ident: trait_info.ident.clone(),
                 generics: trait_info.merged_generics.clone(),
+                generics_for_impl: generics_for_impl.clone(),
                 maybe_argument_types: None,
                 mock_struct_path: &trait_mock_struct_path,
                 fn_infos: &trait_info.static_fns,
@@ -78,6 +80,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockM
             static_received::Params {
                 ident: trait_info.ident.clone(),
                 generics: trait_info.merged_generics.clone(),
+                generics_for_impl: generics_for_impl.clone(),
                 maybe_argument_types: None,
                 mock_struct_path: &trait_mock_struct_path,
                 fn_infos: &trait_info.static_fns,
@@ -97,6 +100,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockM
         trait_mock_struct::Params {
             mock_struct_ident: trait_mock_struct_ident.clone(),
             trait_info: &trait_info,
+            generics_for_impl,
             maybe_associated_controls,
             maybe_static_controls,
         },

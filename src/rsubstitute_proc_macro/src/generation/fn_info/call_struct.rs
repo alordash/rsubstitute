@@ -10,7 +10,7 @@ use quote::format_ident;
 use syn::spanned::Spanned;
 use syn::*;
 
-pub(crate) fn generate(ctx: &Context, fn_syntax: &FnSyntax) -> CallStruct {
+pub(crate) fn generate(ctx: &Context, fn_syntax: &FnSyntax, generics_for_impl: Generics) -> CallStruct {
     let span = fn_syntax.spans.inputs;
     let fields_named = generate_fields(fn_syntax);
     let struct_ident = format_ident!("{}_Call", fn_syntax.fn_ident);
@@ -29,7 +29,7 @@ pub(crate) fn generate(ctx: &Context, fn_syntax: &FnSyntax) -> CallStruct {
     let maybe_clone_impl = if ctx.support_base_calling && fn_syntax.maybe_base_impl.is_some() {
         Some(clone_impl::generate(
             span,
-            fn_syntax.merged_generics.clone(),
+            generics_for_impl.clone(),
             path.clone(),
             &item_struct.fields,
         ))
@@ -42,13 +42,13 @@ pub(crate) fn generate(ctx: &Context, fn_syntax: &FnSyntax) -> CallStruct {
         path: path.clone(),
     });
     let generics_info_provider_impl = generics_info_provider_impl::generate(
-        fn_syntax.merged_generics.clone(),
+        generics_for_impl.clone(),
         fn_syntax.source_signature.generics.clone(),
         r#type.clone(),
     );
     let call_impl = call_impl::generate(
         span,
-        fn_syntax.merged_generics.clone(),
+        generics_for_impl.clone(),
         &fn_syntax.arguments,
         r#type.clone(),
     );

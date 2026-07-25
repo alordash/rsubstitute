@@ -45,6 +45,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                 setup::Params {
                     ident: path::last_ident(&impl_trait_for_struct_info.target_path),
                     generics: impl_trait_for_struct_info.merged_generics.clone(),
+                    generics_for_impl: impl_trait_for_struct_info.merged_generics.clone(),
                     mock_struct_path: &mock_struct_path,
                     fn_infos: &impl_trait_for_struct_info.associated_fns,
                     maybe_trait_ident: Some(impl_trait_for_struct_info.trait_ident.clone()),
@@ -56,6 +57,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                 received::Params {
                     ident: path::last_ident(&impl_trait_for_struct_info.target_path),
                     generics: impl_trait_for_struct_info.merged_generics.clone(),
+                    generics_for_impl: impl_trait_for_struct_info.merged_generics.clone(),
                     mock_struct_path: &mock_struct_path,
                     fn_infos: &impl_trait_for_struct_info.associated_fns,
                     maybe_trait_ident: Some(impl_trait_for_struct_info.trait_ident.clone()),
@@ -108,6 +110,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
             static_setup::Params {
                 ident: path::last_ident(&impl_trait_for_struct_info.target_path),
                 generics: impl_trait_for_struct_info.merged_generics.clone(),
+                generics_for_impl: impl_trait_for_struct_info.merged_generics.clone(),
                 maybe_argument_types: None,
                 mock_struct_path: &mock_struct_path,
                 fn_infos: &impl_trait_for_struct_info.static_fns,
@@ -121,6 +124,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
             static_received::Params {
                 ident: path::last_ident(&impl_trait_for_struct_info.target_path),
                 generics: impl_trait_for_struct_info.merged_generics.clone(),
+                generics_for_impl: impl_trait_for_struct_info.merged_generics.clone(),
                 maybe_argument_types: None,
                 mock_struct_path: &mock_struct_path,
                 fn_infos: &impl_trait_for_struct_info.static_fns,

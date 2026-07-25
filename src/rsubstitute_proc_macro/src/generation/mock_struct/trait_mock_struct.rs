@@ -18,6 +18,7 @@ use syn::*;
 pub(crate) struct Params<'a> {
     pub mock_struct_ident: Ident,
     pub trait_info: &'a TraitInfo,
+    pub generics_for_impl: Generics,
     pub maybe_associated_controls: Option<AssociatedControls>,
     pub maybe_static_controls: Option<StaticControls>,
 }
@@ -28,6 +29,7 @@ pub(crate) fn generate(
     Params {
         mock_struct_ident,
         trait_info,
+        generics_for_impl,
         maybe_associated_controls,
         maybe_static_controls,
     }: Params,
@@ -51,15 +53,22 @@ pub(crate) fn generate(
     };
     let clone_impl = clone_impl::generate(
         span,
-        item_struct.generics.clone(),
+        generics_for_impl.clone(),
         path.clone(),
         &item_struct.fields,
     );
-    let trait_impl = generate_trait_impl(ctx, span, trait_info, path.clone());
+    let trait_impl = generate_trait_impl(
+        ctx,
+        span,
+        trait_info,
+        generics_for_impl.clone(),
+        path.clone(),
+    );
     let inner_impl = generate_inner_impl(
         ctx,
         span,
         trait_info,
+        generics_for_impl,
         path.clone(),
         &maybe_associated_controls,
         &maybe_static_controls,
@@ -81,6 +90,7 @@ fn generate_trait_impl(
     ctx: &Context,
     span: Span,
     trait_info: &TraitInfo,
+    generics_for_impl: Generics,
     mock_struct_path: Path,
 ) -> ItemImpl {
     let mut items_with_order: Vec<_> = trait_info
@@ -110,7 +120,7 @@ fn generate_trait_impl(
         defaultness: None,
         unsafety: trait_info.unsafety,
         impl_token: Token![impl](span),
-        generics: trait_info.merged_generics.clone(),
+        generics: generics_for_impl,
         trait_: Some((None, trait_info.path.clone(), Token![for](span))),
         self_ty: Box::new(Type::Path(TypePath {
             qself: None,
@@ -211,6 +221,7 @@ fn generate_inner_impl(
     ctx: &Context,
     span: Span,
     trait_info: &TraitInfo,
+    generics_for_impl: Generics,
     mock_struct_path: Path,
     maybe_associated_controls: &Option<AssociatedControls>,
     maybe_static_controls: &Option<StaticControls>,
@@ -277,7 +288,7 @@ fn generate_inner_impl(
         defaultness: None,
         unsafety: None,
         impl_token: Token![impl](span),
-        generics: trait_info.merged_generics.clone(),
+        generics: generics_for_impl,
         trait_: None,
         self_ty: Box::new(Type::Path(TypePath {
             qself: None,

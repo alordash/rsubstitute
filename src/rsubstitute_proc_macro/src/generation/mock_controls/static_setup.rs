@@ -10,6 +10,7 @@ use syn::*;
 pub(crate) struct Params<'a, T: Borrow<FnInfo>> {
     pub ident: Ident,
     pub generics: Generics,
+    pub generics_for_impl: Generics,
     pub maybe_argument_types: Option<Vec<Type>>,
     pub mock_struct_path: &'a Path,
     pub fn_infos: &'a [T],
@@ -22,6 +23,7 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
     Params {
         ident,
         generics,
+        generics_for_impl,
         maybe_argument_types,
         mock_struct_path,
         fn_infos,
@@ -32,7 +34,7 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
     let item_struct = control_struct::new_static(
         source_span,
         ident,
-        generics.clone(),
+        generics,
         maybe_argument_types,
         ControlType::Setup,
         maybe_trait_ident,
@@ -44,7 +46,7 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
         source_span,
         setup_impl::Params {
             setup_struct_path: path.clone(),
-            generics,
+            generics: generics_for_impl,
             mock_struct_path,
             fn_infos,
             for_static_fn,
