@@ -139,7 +139,9 @@ pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
         ],
     );
     item_struct.vis = Visibility::Public(Token![pub](source_span));
+    let use_super = use_super::new(source_span);
     let items = vec![
+        Item::Use(use_super),
         Item::Struct(item_struct),
         Item::Impl(mockable_trait_impl),
         Item::Struct(struct_mock_struct.item_struct),
