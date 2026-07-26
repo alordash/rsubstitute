@@ -107,6 +107,12 @@ test = false
 doctest = false
 
 [[bin]]
+name = "NEW_struct_ref"
+path = "bin/NEW_struct_ref.rs"
+test = false
+doctest = false
+
+[[bin]]
 name = "NEW_struct_from_wip"
 path = "bin/NEW_struct_from_wip.rs"
 test = false

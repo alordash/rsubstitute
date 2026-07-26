@@ -2,7 +2,6 @@ use crate::common::*;
 use crate::generation::common::models::*;
 use crate::generation::common::*;
 use crate::generation::fn_info::models::*;
-use crate::preparation::r#fn::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
 use quote::format_ident;
@@ -193,66 +192,44 @@ fn generate_core(
         }),
         semi_token: Token![;](span),
     };
-    let cast_args_stmt = Local {
+    let cast_args_stmts = fn_info.arguments.iter().map(|x| Local {
         attrs: Vec::new(),
         let_token: Token![let](span),
         modifiers: LocalModifiers::default(),
         pat: Pat::Type(PatType {
             attrs: Vec::new(),
-            pat: Box::new(Pat::Tuple(PatTuple {
-                attrs: Vec::new(),
-                paren_token: token::Paren(span),
-                elems: fn_info
-                    .arguments
-                    .iter()
-                    .map(|x| *x.source_pat_type.pat.clone())
-                    .collect(),
-            })),
+            pat: x.source_pat_type.pat.clone(),
             colon_token: Token![:](span),
-            ty: Box::new(Type::Tuple(TypeTuple {
-                attrs: Vec::new(),
-                paren_token: token::Paren(span),
-                elems: fn_info.arguments.iter_generics_style_types().collect(),
-            })),
+            ty: x.source_pat_type.ty.clone(),
         }),
         init: Some(LocalInit {
             eq_token: Token![=](span),
-            expr: Box::new(Expr::Macro(transmute_lifetime_expr::new(Expr::Tuple(
-                ExprTuple {
+            expr: Box::new(Expr::Macro(transmute_lifetime_expr::new(Expr::Path(
+                ExprPath {
                     attrs: Vec::new(),
-                    paren_token: token::Paren(span),
-                    elems: fn_info
-                        .arguments
-                        .iter()
-                        .map(|x| {
-                            Expr::Path(ExprPath {
-                                attrs: Vec::new(),
-                                qself: None,
-                                path: path::from_ident(x.ident.clone()),
-                            })
-                        })
-                        .collect(),
+                    qself: None,
+                    path: path::from_ident(x.ident.clone()),
                 },
             )))),
             diverge: None,
         }),
         semi_token: Token![;](span),
-    };
+    });
 
+    let stmts = core::iter::once(Stmt::Local(deconstruct_call_stmt))
+        .chain(cast_args_stmts.map(Stmt::Local))
+        .chain(core::iter::once(Stmt::Expr(
+            Expr::Block(ExprBlock {
+                attrs: Vec::new(),
+                label: None,
+                block: *base_impl,
+            }),
+            None,
+        )))
+        .collect();
     let block = Block {
         brace_token: token::Brace(span),
-        stmts: vec![
-            Stmt::Local(deconstruct_call_stmt),
-            Stmt::Local(cast_args_stmt),
-            Stmt::Expr(
-                Expr::Block(ExprBlock {
-                    attrs: Vec::new(),
-                    label: None,
-                    block: *base_impl,
-                }),
-                None,
-            ),
-        ],
+        stmts,
     };
 
     let result = (sig, block);
