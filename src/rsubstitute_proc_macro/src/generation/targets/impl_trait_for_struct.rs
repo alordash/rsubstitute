@@ -198,7 +198,6 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
         Item::Use(mock_mod_usages.use_super),
         Item::Use(use_struct_mod),
         Item::Impl(item_impl),
-        Item::Impl(mock_struct_impl),
     ]
     .into_iter()
     .chain(
@@ -243,6 +242,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                 ])
             }),
     )
+    .chain(core::iter::once(Item::Impl(mock_struct_impl)))
     .chain(maybe_associated_controls.into_iter().flat_map(|x| {
         [
             Item::Struct(x.trait_setup_struct.item_struct),

@@ -10,7 +10,7 @@ pub(crate) struct FnSyntax {
     pub merged_generics: Generics,
     pub generics_field: Field,
     pub fn_ident: Ident,
-    //    pub is_default: bool,   // TODO - what is this for, I forgor💀
+    pub fn_data_name: String,
     pub maybe_self_type: Option<Receiver>,
     pub arguments: Vec<Argument>,
     pub arg_refs_tuple: TypeTuple,

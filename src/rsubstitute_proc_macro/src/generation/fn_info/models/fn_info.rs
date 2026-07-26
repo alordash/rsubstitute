@@ -10,6 +10,7 @@ pub(crate) struct FnInfo {
     pub visibility: Visibility,
     pub merged_generics: Generics,
     pub fn_ident: Ident,
+    pub fn_data_name: String,
     pub maybe_self_type: Option<Receiver>,
     pub arguments: Vec<Argument>,
     pub arg_refs_tuple: TypeTuple,

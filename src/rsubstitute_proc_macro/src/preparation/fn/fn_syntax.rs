@@ -4,7 +4,6 @@ use super::models::*;
 use crate::common::*;
 use crate::preparation::*;
 use crate::syntax::*;
-use crate::*;
 use proc_macro2::Span;
 use quote::ToTokens;
 use syn::punctuated::Punctuated;
@@ -29,7 +28,8 @@ pub(crate) fn prepare(
     }: Params,
 ) -> FnSyntax {
     let merged_generics = combine_generics(signature.generics.clone(), maybe_owner);
-    let fn_ident = format_fn_ident(signature.ident.clone(), maybe_owner, &merged_generics);
+    let fn_ident = signature.ident.clone();
+    let fn_data_name = format_fn_data_name(signature.ident.clone(), maybe_owner);
     let spans = Spans {
         inputs: signature.inputs.span(),
     };
@@ -62,6 +62,7 @@ pub(crate) fn prepare(
         merged_generics,
         generics_field,
         fn_ident,
+        fn_data_name,
         maybe_self_type,
         arguments,
         arg_refs_tuple,
@@ -71,26 +72,14 @@ pub(crate) fn prepare(
     return result;
 }
 
-fn format_fn_ident(
-    fn_ident: Ident,
-    maybe_owner: Option<&dyn IFnOwner>,
-    generics: &Generics,
-) -> Ident {
-    #[allow(unused_variables)]
-    let generics_suffixes = generics.params.iter().map(|x| match x {
-        GenericParam::Lifetime(l) => l.lifetime.ident.clone(),
-        GenericParam::Type(t) => t.ident.clone(),
-        GenericParam::Const(c) => c.ident.clone(),
-    });
-    let ident_parts = maybe_owner
-        .map(|x| x.maybe_ident().cloned())
+fn format_fn_data_name(fn_ident: Ident, maybe_owner: Option<&dyn IFnOwner>) -> String {
+    let fn_data_name_parts: Vec<_> = maybe_owner
+        .map(|owner| owner.maybe_ident().map(|ident| ident.to_string()))
         .into_iter()
         .flatten()
-        .chain(core::iter::once(fn_ident))
-    // TODO: is this needed?
-    // .chain(generics_suffixes)
-        ;
-    let result = ident::join(ident_parts, constants::IDENTS_SEPARATOR);
+        .chain(core::iter::once(fn_ident.to_string()))
+        .collect();
+    let result = fn_data_name_parts.join("::");
     return result;
 }
 

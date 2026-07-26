@@ -37,6 +37,7 @@ fn generate_core(ctx: &Context, fn_syntax: FnSyntax, generics_for_impl: Generics
         visibility: fn_syntax.visibility,
         merged_generics: fn_syntax.merged_generics,
         fn_ident: fn_syntax.fn_ident,
+        fn_data_name: fn_syntax.fn_data_name,
         maybe_self_type: fn_syntax.maybe_self_type,
         arguments: fn_syntax.arguments,
         arg_refs_tuple: fn_syntax.arg_refs_tuple,

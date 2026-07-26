@@ -65,7 +65,7 @@ pub(crate) fn new_static(
 fn fn_info_ident_to_expr_lit(span: Span, fn_info: &FnInfo) -> Expr {
     Expr::Lit(ExprLit {
         attrs: Vec::new(),
-        lit: Lit::Str(LitStr::new(&fn_info.fn_ident.to_string(), span)),
+        lit: Lit::Str(LitStr::new(&fn_info.fn_data_name, span)),
     })
 }
 

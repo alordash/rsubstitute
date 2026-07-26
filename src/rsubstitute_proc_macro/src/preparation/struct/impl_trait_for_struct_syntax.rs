@@ -27,7 +27,8 @@ pub(crate) fn prepare(
     let trait_ident = ident::combine_path_segments(&trait_path);
     let split_items = split_items(impl_items);
     let target_path = prase_target_type(&target_type);
-    let impl_struct_syntax_as_fn_owner = ImplStructSyntaxAsFnOwner {
+    let impl_struct_syntax_as_fn_owner = ImplTraitForStructSyntaxAsFnOwner {
+        ident: &trait_ident,
         generics: &merged_generics,
     };
     let static_fns = split_items
@@ -99,7 +100,7 @@ fn split_items(items: Vec<ImplItem>) -> SplitItems {
 
 fn map_impl_item_fn_to_fn_syntax(
     impl_item_fn: ImplItemFn,
-    impl_struct_syntax_as_fn_owner: &ImplStructSyntaxAsFnOwner,
+    impl_struct_syntax_as_fn_owner: &ImplTraitForStructSyntaxAsFnOwner,
 ) -> FnSyntax {
     let result = fn_syntax::prepare(fn_syntax::Params {
         attributes: impl_item_fn.attrs,
@@ -122,12 +123,13 @@ fn prase_target_type(target_type: &Type) -> Path {
     return result.path.clone();
 }
 
-struct ImplStructSyntaxAsFnOwner<'a> {
+struct ImplTraitForStructSyntaxAsFnOwner<'a> {
+    pub ident: &'a Ident,
     pub generics: &'a Generics,
 }
-impl<'a> IFnOwner for ImplStructSyntaxAsFnOwner<'a> {
+impl<'a> IFnOwner for ImplTraitForStructSyntaxAsFnOwner<'a> {
     fn maybe_ident(&self) -> Option<&Ident> {
-        None
+        Some(self.ident)
     }
 
     fn generics(&self) -> &Generics {

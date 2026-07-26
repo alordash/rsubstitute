@@ -68,10 +68,11 @@ mod tests {
         #[test]
         fn f_NoConfig_Ok() {
             // Arrange
-            let mock = Struct {
+            let mut mock = Struct {
                 value: 1,
-                phantom: PhantomData::<u8>,
-            };
+                phantom: PhantomData::<i32>,
+            }
+            .mock();
 
             // Act
             let result = mock.f();
@@ -84,7 +85,11 @@ mod tests {
         #[test]
         fn f_MultipleTimes_Ok() {
             // Arrange
-            let mock = Struct::<u8>::new(1);
+            let mut mock = Struct {
+                value: 1,
+                phantom: PhantomData,
+            }
+            .mock();
 
             // Act
             let result1 = mock.f();
@@ -102,7 +107,11 @@ mod tests {
         #[test]
         fn f_MultipleTimes_Panics() {
             // Arrange
-            let mock = Struct::<u8>::new(1);
+            let mut mock = Struct {
+                value: 1,
+                phantom: PhantomData,
+            }
+            .mock();
 
             // Act
             mock.f();
@@ -158,20 +167,23 @@ Received no non-matching calls"#,
 
     mod trait_tests {
         use super::*;
+        use std::marker::PhantomData;
 
         #[test]
         fn Trait_f_Ok() {
             // Arrange
             let value = 22;
-            let mock = Struct::<u8>::new(value);
+            let mut mock = Struct {
+                value,
+                phantom: PhantomData,
+            }
+            .mock();
             let callback_flag = Arc::new(RefCell::new(false));
             let callback_flag_clone = callback_flag.clone();
-            let return_value = ();
             mock.setup()
-                .as_Trait
+                .as_Trait()
                 .f()
-                .returns(return_value)
-                .and_does(move |_, _| *callback_flag_clone.borrow_mut() = true);
+                .does(move |_| *callback_flag_clone.borrow_mut() = true);
 
             // Act
             Struct::non_associative();
@@ -181,28 +193,36 @@ Received no non-matching calls"#,
             assert_eq!(value, mock.value);
             assert_eq!((), result);
             assert!(*callback_flag.borrow());
-            mock.received().as_Trait.f(Times::Once);
+            mock.received().as_Trait().f(Times::Once);
             mock.received().no_other_calls()
         }
 
         #[test]
         fn Trait_f_NoConfig_Ok() {
             // Arrange
-            let mock = Struct::<u8>::new(1);
+            let mut mock = Struct {
+                value: 1,
+                phantom: PhantomData,
+            }
+            .mock();
 
             // Act
             let result = Trait::f(&mock);
 
             // Assert
             assert_eq!((), result);
-            mock.received().as_Trait.f(Times::Once);
+            mock.received().as_Trait().f(Times::Once);
             mock.received().no_other_calls();
         }
 
         #[test]
         fn Trait_f_MultipleTimes_Ok() {
             // Arrange
-            let mock = Struct::<u8>::new(1);
+            let mut mock = Struct {
+                value: 1,
+                phantom: PhantomData,
+            }
+            .mock();
 
             // Act
             let result1 = Trait::f(&mock);
@@ -214,14 +234,18 @@ Received no non-matching calls"#,
             assert_eq!((), result2);
             assert_eq!((), result3);
 
-            mock.received().as_Trait.f(Times::Exactly(3));
+            mock.received().as_Trait().f(Times::Exactly(3));
             mock.received().no_other_calls();
         }
 
         #[test]
         fn Trait_f_MultipleTimes_Panics() {
             // Arrange
-            let mock = Struct::<u8>::new(1);
+            let mut mock = Struct {
+                value: 1,
+                phantom: PhantomData,
+            }
+            .mock();
 
             // Act
             Trait::f(&mock);
@@ -230,7 +254,7 @@ Received no non-matching calls"#,
 
             // Assert
             assert_panics(
-                || mock.received().as_Trait.f(Times::Once),
+                || mock.received().as_Trait().f(Times::Once),
                 r#"Expected to receive a call exactly once matching:
 	Trait::f()
 Actually received 3 matching calls:
@@ -241,7 +265,7 @@ Received no non-matching calls"#,
             );
 
             assert_panics(
-                || mock.received().as_Trait.f(Times::Exactly(1)),
+                || mock.received().as_Trait().f(Times::Exactly(1)),
                 r#"Expected to receive a call exactly once matching:
 	Trait::f()
 Actually received 3 matching calls:
@@ -252,7 +276,7 @@ Received no non-matching calls"#,
             );
 
             assert_panics(
-                || mock.received().as_Trait.f(Times::Exactly(2)),
+                || mock.received().as_Trait().f(Times::Exactly(2)),
                 r#"Expected to receive a call 2 times matching:
 	Trait::f()
 Actually received 3 matching calls:
@@ -263,7 +287,7 @@ Received no non-matching calls"#,
             );
 
             assert_panics(
-                || mock.received().as_Trait.f(Times::Exactly(4)),
+                || mock.received().as_Trait().f(Times::Exactly(4)),
                 r#"Expected to receive a call 4 times matching:
 	Trait::f()
 Actually received 3 matching calls:
