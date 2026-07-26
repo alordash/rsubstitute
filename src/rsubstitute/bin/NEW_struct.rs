@@ -48,6 +48,9 @@ fn main() {
         .returns_many([5f32, 1112f32])
         .and_does(|(v,)| println!("Mocked static, v = {v}"));
     dbg!(Struct::<i32>::f_static(2));
+    Struct::<i32>::static_received()
+        .f_static(2, Times::Once)
+        .no_other_calls();
     let s = s_mock.unmock();
 
     println!("Done");

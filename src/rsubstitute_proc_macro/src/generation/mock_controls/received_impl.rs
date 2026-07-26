@@ -47,9 +47,9 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
 
     if generate_fn_no_other_calls {
         let fn_no_other_calls = if is_static {
-            generate_fn_no_other_calls_for_static_fn(span, fn_infos, mock_struct_path.clone())
+            generate_fn_no_other_calls_for_static_fn(span, mock_struct_path.clone())
         } else {
-            generate_regular_fn_no_other_calls(span, fn_infos)
+            generate_regular_fn_no_other_calls(span)
         };
         items.push(ImplItem::Fn(fn_no_other_calls));
     }
@@ -67,6 +67,47 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
         })),
         brace_token: token::Brace(span),
         items,
+    };
+    return result;
+}
+
+pub(crate) enum FnNoOtherCallsKind {
+    Regular,
+    ForStaticFn { mock_struct_path: Path },
+}
+pub(crate) struct ForStructParams {
+    pub received_struct_path: Path,
+    pub generics_for_impl: Generics,
+    pub fn_no_other_calls_kind: FnNoOtherCallsKind,
+}
+pub(crate) fn generate_for_struct_with_fn_no_other_calls(
+    span: Span,
+    ForStructParams {
+        received_struct_path,
+        generics_for_impl,
+        fn_no_other_calls_kind,
+    }: ForStructParams,
+) -> ItemImpl {
+    let fn_no_other_calls = match fn_no_other_calls_kind {
+        FnNoOtherCallsKind::Regular => generate_regular_fn_no_other_calls(span),
+        FnNoOtherCallsKind::ForStaticFn { mock_struct_path } => {
+            generate_fn_no_other_calls_for_static_fn(span, mock_struct_path)
+        }
+    };
+
+    let result = ItemImpl {
+        attrs: Vec::new(),
+        defaultness: None,
+        unsafety: None,
+        impl_token: Token![impl](span),
+        generics: generics_for_impl,
+        trait_: None,
+        self_ty: Box::new(Type::Path(TypePath {
+            qself: None,
+            path: received_struct_path,
+        })),
+        brace_token: token::Brace(span),
+        items: vec![ImplItem::Fn(fn_no_other_calls)],
     };
     return result;
 }
@@ -180,13 +221,8 @@ fn generate_received_fn(
     return result;
 }
 
-fn generate_fn_no_other_calls_for_static_fn<T: Borrow<FnInfo>>(
-    span: Span,
-    fn_infos: &[T],
-    mock_struct_path: Path,
-) -> ImplItemFn {
+fn generate_fn_no_other_calls_for_static_fn(span: Span, mock_struct_path: Path) -> ImplItemFn {
     let sig = fn_no_other_calls_signature(span);
-    let fn_info = &fn_infos[0];
     let verify_static_fn_received_nothing_else_stmt = Expr::Call(expr::call::new(
         span,
         Expr::Path(ExprPath {
@@ -205,10 +241,7 @@ fn generate_fn_no_other_calls_for_static_fn<T: Borrow<FnInfo>>(
                 }))],
             ),
         }),
-        [Expr::Lit(ExprLit {
-            attrs: Vec::new(),
-            lit: Lit::Str(LitStr::new(&fn_info.borrow().fn_ident.to_string(), span)),
-        })],
+        [],
     ));
 
     let block = Block {
@@ -229,33 +262,33 @@ fn generate_fn_no_other_calls_for_static_fn<T: Borrow<FnInfo>>(
     return result;
 }
 
-fn generate_regular_fn_no_other_calls<T: Borrow<FnInfo>>(span: Span, fn_infos: &[T]) -> ImplItemFn {
+fn generate_regular_fn_no_other_calls(span: Span) -> ImplItemFn {
     let sig = fn_no_other_calls_signature(span);
-    let verify_received_nothing_else_stmt = Expr::MethodCall(ExprMethodCall {
-        attrs: Vec::new(),
-        receiver: Box::new(Expr::Field(expr::field::new_self(Ident::new("data", span)))),
-        dot_token: Token![.](span),
-        method: Ident::new("verify_received_nothing_else", span),
-        turbofish: None,
-        paren_token: token::Paren(span),
-        args: punctuated([Expr::Array(ExprArray {
+    let verify_received_nothing_else_stmt = expr::call::new(
+        span,
+        Expr::Path(expr::path::new(
+            span,
+            [
+                "rsubstitute",
+                "for_generated",
+                "IMockData",
+                "verify_received_nothing_else",
+            ],
+        )),
+        [Expr::Reference(ExprReference {
             attrs: Vec::new(),
-            bracket_token: token::Bracket(span),
-            elems: fn_infos
-                .iter()
-                .map(|x| {
-                    Expr::Lit(ExprLit {
-                        attrs: Vec::new(),
-                        lit: Lit::Str(LitStr::new(&x.borrow().fn_ident.to_string(), span)),
-                    })
-                })
-                .collect(),
-        })]),
-    });
+            and_token: Token![&](span),
+            mutability: None,
+            expr: Box::new(Expr::Field(expr::field::new_self(Ident::new("data", span)))),
+        })],
+    );
 
     let block = Block {
         brace_token: token::Brace(span),
-        stmts: vec![Stmt::Expr(verify_received_nothing_else_stmt, None)],
+        stmts: vec![Stmt::Expr(
+            Expr::Call(verify_received_nothing_else_stmt),
+            None,
+        )],
     };
 
     let result = ImplItemFn {

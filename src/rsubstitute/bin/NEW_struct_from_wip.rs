@@ -68,9 +68,13 @@ where
 fn main() {
     let s = Struct(10i16);
     let mut s_mock = s.mock();
-    // TODO - need to split `as_Trait` methods
-    s_mock.received().as_Trait::<i32>();
+    s_mock.received().as_Trait::<i32>().no_other_calls();
     s_mock.setup().as_Gen::<[u8; 3]>();
+    s_mock.received().no_other_calls();
+    Struct::<i128>::static_setup().as_Gen::<[[u8; 2]; 1]>();
+    Struct::<i128>::static_received()
+        .as_Gen::<[[u8; 2]; 1]>()
+        .no_other_calls();
 
     println!("Done");
 }

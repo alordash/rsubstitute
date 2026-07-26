@@ -1,7 +1,8 @@
-use indexmap::IndexMap;
 use crate::args::*;
 use crate::infrastructure::*;
+use indexmap::IndexMap;
 
+// Two layer map: fn name + fn generics
 type Map = IndexMap<&'static str, IndexMap<GenericsHashKey, *const ()>>;
 
 pub struct MockData {
@@ -86,13 +87,10 @@ const IRRELEVANT_SUPPORTS_BASE_CALLING: bool = false;
 const IRRELEVANT_PASSES_MOCK_TO_CALLBACK: bool = false;
 
 impl IMockData for MockData {
-    fn get_received_nothing_else_error_msgs<const N: usize>(
-        &self,
-        fn_idents: [&'static str; N],
-    ) -> Vec<Vec<String>> {
-        let result = fn_idents
-            .iter()
-            .filter_map(|x| self.map.get(x))
+    fn get_received_nothing_else_error_msgs(&self) -> Vec<Vec<String>> {
+        let result = self
+            .map
+            .values()
             .flat_map(|y| y.values())
             .cloned()
             .map(

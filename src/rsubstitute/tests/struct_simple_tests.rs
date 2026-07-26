@@ -7,7 +7,7 @@ trait Trait {
 // TODO - write tests for all targets (fn, trait and struct) with default generic values
 #[mock]
 struct Struct<Q = i32> {
-    pub _phantom_Q: core::marker::PhantomData<Q>,
+    pub phantom: core::marker::PhantomData<Q>,
     pub value: i32,
 }
 
@@ -37,19 +37,22 @@ mod tests {
 
     mod struct_tests {
         use super::*;
+        use std::marker::PhantomData;
 
         #[test]
         fn f_Ok() {
             // Arrange
             let value = 22;
-            let mock = Struct::<u8>::new(value);
+            let mut mock = Struct {
+                phantom: PhantomData,
+                value,
+            }
+            .mock();
             let callback_flag = Arc::new(RefCell::new(false));
             let callback_flag_clone = callback_flag.clone();
-            let return_value = ();
-            mock.setup
+            mock.setup()
                 .f()
-                .returns(return_value)
-                .and_does(move |_, _| *callback_flag_clone.borrow_mut() = true);
+                .does(move |_| *callback_flag_clone.borrow_mut() = true);
 
             // Act
             Struct::non_associative();
@@ -59,20 +62,23 @@ mod tests {
             assert_eq!(value, mock.value);
             assert_eq!((), result);
             assert!(*callback_flag.borrow());
-            mock.received.f(Times::Once).no_other_calls();
+            mock.received().f(Times::Once).no_other_calls();
         }
 
         #[test]
         fn f_NoConfig_Ok() {
             // Arrange
-            let mock = Struct::<u8>::new(1);
+            let mock = Struct {
+                value: 1,
+                phantom: PhantomData::<u8>,
+            };
 
             // Act
             let result = mock.f();
 
             // Assert
             assert_eq!((), result);
-            mock.received.f(Times::Once).no_other_calls();
+            mock.received().f(Times::Once).no_other_calls();
         }
 
         #[test]
@@ -90,7 +96,7 @@ mod tests {
             assert_eq!((), result2);
             assert_eq!((), result3);
 
-            mock.received.f(Times::Exactly(3)).no_other_calls();
+            mock.received().f(Times::Exactly(3)).no_other_calls();
         }
 
         #[test]
@@ -105,7 +111,7 @@ mod tests {
 
             // Assert
             assert_panics(
-                || mock.received.f(Times::Once),
+                || mock.received().f(Times::Once),
                 r#"Expected to receive a call exactly once matching:
 	f()
 Actually received 3 matching calls:
@@ -116,7 +122,7 @@ Received no non-matching calls"#,
             );
 
             assert_panics(
-                || mock.received.f(Times::Exactly(1)),
+                || mock.received().f(Times::Exactly(1)),
                 r#"Expected to receive a call exactly once matching:
 	f()
 Actually received 3 matching calls:
@@ -127,7 +133,7 @@ Received no non-matching calls"#,
             );
 
             assert_panics(
-                || mock.received.f(Times::Exactly(2)),
+                || mock.received().f(Times::Exactly(2)),
                 r#"Expected to receive a call 2 times matching:
 	f()
 Actually received 3 matching calls:
@@ -138,7 +144,7 @@ Received no non-matching calls"#,
             );
 
             assert_panics(
-                || mock.received.f(Times::Exactly(4)),
+                || mock.received().f(Times::Exactly(4)),
                 r#"Expected to receive a call 4 times matching:
 	f()
 Actually received 3 matching calls:
@@ -161,7 +167,7 @@ Received no non-matching calls"#,
             let callback_flag = Arc::new(RefCell::new(false));
             let callback_flag_clone = callback_flag.clone();
             let return_value = ();
-            mock.setup
+            mock.setup()
                 .as_Trait
                 .f()
                 .returns(return_value)
@@ -175,8 +181,8 @@ Received no non-matching calls"#,
             assert_eq!(value, mock.value);
             assert_eq!((), result);
             assert!(*callback_flag.borrow());
-            mock.received.as_Trait.f(Times::Once);
-            mock.received.no_other_calls()
+            mock.received().as_Trait.f(Times::Once);
+            mock.received().no_other_calls()
         }
 
         #[test]
@@ -189,8 +195,8 @@ Received no non-matching calls"#,
 
             // Assert
             assert_eq!((), result);
-            mock.received.as_Trait.f(Times::Once);
-            mock.received.no_other_calls();
+            mock.received().as_Trait.f(Times::Once);
+            mock.received().no_other_calls();
         }
 
         #[test]
@@ -208,8 +214,8 @@ Received no non-matching calls"#,
             assert_eq!((), result2);
             assert_eq!((), result3);
 
-            mock.received.as_Trait.f(Times::Exactly(3));
-            mock.received.no_other_calls();
+            mock.received().as_Trait.f(Times::Exactly(3));
+            mock.received().no_other_calls();
         }
 
         #[test]
@@ -224,7 +230,7 @@ Received no non-matching calls"#,
 
             // Assert
             assert_panics(
-                || mock.received.as_Trait.f(Times::Once),
+                || mock.received().as_Trait.f(Times::Once),
                 r#"Expected to receive a call exactly once matching:
 	Trait::f()
 Actually received 3 matching calls:
@@ -235,7 +241,7 @@ Received no non-matching calls"#,
             );
 
             assert_panics(
-                || mock.received.as_Trait.f(Times::Exactly(1)),
+                || mock.received().as_Trait.f(Times::Exactly(1)),
                 r#"Expected to receive a call exactly once matching:
 	Trait::f()
 Actually received 3 matching calls:
@@ -246,7 +252,7 @@ Received no non-matching calls"#,
             );
 
             assert_panics(
-                || mock.received.as_Trait.f(Times::Exactly(2)),
+                || mock.received().as_Trait.f(Times::Exactly(2)),
                 r#"Expected to receive a call 2 times matching:
 	Trait::f()
 Actually received 3 matching calls:
@@ -257,7 +263,7 @@ Received no non-matching calls"#,
             );
 
             assert_panics(
-                || mock.received.as_Trait.f(Times::Exactly(4)),
+                || mock.received().as_Trait.f(Times::Exactly(4)),
                 r#"Expected to receive a call 4 times matching:
 	Trait::f()
 Actually received 3 matching calls:
