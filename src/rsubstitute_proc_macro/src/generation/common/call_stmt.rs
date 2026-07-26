@@ -9,6 +9,7 @@ pub(crate) fn new(span: Span, fn_info: &FnInfo) -> (ExprPath, Local) {
     let fn_data_stmt = Local {
         attrs: Vec::new(),
         let_token: Token![let](span),
+        modifiers: LocalModifiers::default(),
         pat: Pat::Path(fn_data_var_path.clone()),
         init: Some(LocalInit {
             eq_token: Token![=](span),

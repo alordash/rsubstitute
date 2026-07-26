@@ -19,7 +19,7 @@ pub(crate) fn generate_associated(
     let sig = Signature {
         constness: None,
         asyncness: None,
-        unsafety: None,
+        safety: Safety::Default,
         abi: None,
         fn_token: Token![fn](span),
         ident: Ident::new(ident_str, span),
@@ -30,6 +30,7 @@ pub(crate) fn generate_associated(
         output: ReturnType::Type(
             Token![->](span),
             Box::new(Type::Path(TypePath {
+                attrs: Vec::new(),
                 qself: None,
                 path: control_path.clone(),
             })),
@@ -55,7 +56,7 @@ pub(crate) fn generate_associated(
     let result = ImplItemFn {
         attrs: Vec::new(),
         vis: Visibility::Public(Token![pub](span)),
-        defaultness: None,
+        modifiers: FnModifiers::default(),
         sig,
         block,
     };
@@ -74,7 +75,7 @@ pub(crate) fn generate_static(
     let sig = Signature {
         constness: None,
         asyncness: None,
-        unsafety: None,
+        safety: Safety::Default,
         abi: None,
         fn_token: Token![fn](span),
         ident: Ident::new(ident_str, span),
@@ -85,6 +86,7 @@ pub(crate) fn generate_static(
         output: ReturnType::Type(
             Token![->](span),
             Box::new(Type::Path(TypePath {
+                attrs: Vec::new(),
                 qself: None,
                 path: control_path.clone(),
             })),
@@ -119,7 +121,7 @@ pub(crate) fn generate_static(
     let result = ImplItemFn {
         attrs: Vec::new(),
         vis: Visibility::Public(Token![pub](span)),
-        defaultness: None,
+        modifiers: FnModifiers::default(),
         sig,
         block,
     };

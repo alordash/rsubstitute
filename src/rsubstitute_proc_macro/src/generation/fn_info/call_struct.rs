@@ -10,7 +10,11 @@ use quote::format_ident;
 use syn::spanned::Spanned;
 use syn::*;
 
-pub(crate) fn generate(ctx: &Context, fn_syntax: &FnSyntax, generics_for_impl: Generics) -> CallStruct {
+pub(crate) fn generate(
+    ctx: &Context,
+    fn_syntax: &FnSyntax,
+    generics_for_impl: Generics,
+) -> CallStruct {
     let span = fn_syntax.spans.inputs;
     let fields_named = generate_fields(fn_syntax);
     let struct_ident = format_ident!("{}_Call", fn_syntax.fn_ident);
@@ -38,6 +42,7 @@ pub(crate) fn generate(ctx: &Context, fn_syntax: &FnSyntax, generics_for_impl: G
     };
 
     let r#type = Type::Path(TypePath {
+        attrs: Vec::new(),
         qself: None,
         path: path.clone(),
     });
@@ -73,10 +78,11 @@ fn generate_fields(fn_syntax: &FnSyntax) -> FieldsNamed {
                 let result = Field {
                     attrs: Vec::new(),
                     vis: Visibility::Inherited,
-                    mutability: FieldMutability::None,
+                    modifiers: FieldModifiers::default(),
                     ident: Some(argument.ident.clone()),
                     colon_token: Some(Token![:](span)),
                     ty: *argument.ptr_style_type.clone(),
+                    default: None,
                 };
 
                 return result;

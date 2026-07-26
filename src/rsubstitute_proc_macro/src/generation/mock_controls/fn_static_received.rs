@@ -9,12 +9,14 @@ pub(crate) fn generate(span: Span, static_received_path: Path, fn_info: &FnInfo)
     let (times_arg_path, times_arg) = times_arg::new(span);
     let rsubstitute_lifetime = rsubstitute_lifetime::new(span);
     let output_type = Type::Path(TypePath {
+        attrs: Vec::new(),
         qself: None,
         path: path::new_generics_global(
             span,
             ["rsubstitute", "for_generated", "ArgRefsBinder"],
             [
                 GenericArgument::Type(Type::Path(TypePath {
+                    attrs: Vec::new(),
                     qself: None,
                     path: static_received_path.clone(),
                 })),
@@ -25,7 +27,7 @@ pub(crate) fn generate(span: Span, static_received_path: Path, fn_info: &FnInfo)
     let sig = Signature {
         constness: None,
         asyncness: None,
-        unsafety: None,
+        safety: Safety::Default,
         abi: None,
         fn_token: Token![fn](span),
         ident: Ident::new("received", span),
@@ -85,6 +87,7 @@ pub(crate) fn generate(span: Span, static_received_path: Path, fn_info: &FnInfo)
     let result = ItemFn {
         attrs: Vec::new(),
         vis: Visibility::Public(Token![pub](span)),
+        modifiers: FnModifiers::default(),
         sig,
         block: Box::new(block),
     };

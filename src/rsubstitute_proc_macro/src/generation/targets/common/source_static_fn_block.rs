@@ -20,6 +20,7 @@ pub(crate) fn replace(
     let qself = maybe_trait_path.as_ref().map(|trait_path| QSelf {
         lt_token: Token![<](span),
         ty: Box::new(Type::Path(TypePath {
+            attrs: Vec::new(),
             qself: None,
             path: mock_struct_path.clone(),
         })),

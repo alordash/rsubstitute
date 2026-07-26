@@ -39,17 +39,16 @@ impl VisitMut for ReferenceToPointerConverter {
             visit_mut::visit_type_mut(self, i);
             return;
         };
-        let (const_token, mutability) = match i_ref.mutability {
-            Some(x) => (None, Some(x)),
-            None => (Some(Token![const](Span::call_site())), None),
-        };
 
         let void_elem = Box::new(void_type(i_ref.span()));
         let elem = core::mem::replace(&mut i_ref.elem, void_elem);
         let mut i_ptr = TypePtr {
+            attrs: Vec::new(),
             star_token: Token![*](i_ref.and_token.span),
-            const_token,
-            mutability,
+            mutability: i_ref.mutability.map_or(
+                PointerMutability::Const(Token![const](Span::call_site())),
+                |mutability| PointerMutability::Mut(mutability.clone()),
+            ),
             elem,
         };
         visit_mut::visit_type_ptr_mut(self, &mut i_ptr);
@@ -77,17 +76,15 @@ impl VisitMut for AnonymousReferenceToPointerConverter {
             return;
         }
 
-        let (const_token, mutability) = match i_ref.mutability {
-            Some(x) => (None, Some(x)),
-            None => (Some(Token![const](Span::call_site())), None),
-        };
-
         let void_elem = Box::new(void_type(i_ref.span()));
         let elem = core::mem::replace(&mut i_ref.elem, void_elem);
         let mut i_ptr = TypePtr {
+            attrs: Vec::new(),
             star_token: Token![*](i_ref.and_token.span),
-            const_token,
-            mutability,
+            mutability: i_ref.mutability.map_or(
+                PointerMutability::Const(Token![const](Span::call_site())),
+                |mutability| PointerMutability::Mut(mutability.clone()),
+            ),
             elem,
         };
         visit_mut::visit_type_ptr_mut(self, &mut i_ptr);

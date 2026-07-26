@@ -13,10 +13,11 @@ pub(crate) fn new_field(span: Span, Params { public }: Params) -> Field {
         } else {
             Visibility::Inherited
         },
-        mutability: FieldMutability::None,
+        modifiers: FieldModifiers::default(),
         ident: Some(Ident::new("data", span)),
         colon_token: Some(Token![:](span)),
         ty: Type::Path(TypePath {
+            attrs: Vec::new(),
             qself: None,
             path: Path {
                 leading_colon: Some(Token![::](span)),
@@ -29,6 +30,7 @@ pub(crate) fn new_field(span: Span, Params { public }: Params) -> Field {
                 ),
             },
         }),
+        default: None,
     };
     return result;
 }

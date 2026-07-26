@@ -46,12 +46,13 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
 
     let result = ItemImpl {
         attrs: Vec::new(),
-        defaultness: None,
+        modifiers: ImplModifiers::default(),
         unsafety: None,
         impl_token: Token![impl](span),
         generics,
         trait_: None,
         self_ty: Box::new(Type::Path(TypePath {
+            attrs: Vec::new(),
             qself: None,
             path: setup_struct_path,
         })),
@@ -85,7 +86,7 @@ fn generate_setup_fn(
     let sig = Signature {
         constness: None,
         asyncness: None,
-        unsafety: None,
+        safety: Safety::Default,
         abi: None,
         fn_token: Token![fn](span),
         ident: if for_static_fn {
@@ -103,6 +104,7 @@ fn generate_setup_fn(
         output: ReturnType::Type(
             Token![->](span),
             Box::new(Type::Path(TypePath {
+                attrs: Vec::new(),
                 qself: None,
                 path: fn_configurator_path.clone(),
             })),
@@ -132,6 +134,7 @@ fn generate_setup_fn(
     let fn_configurator_stmt = Local {
         attrs: Vec::new(),
         let_token: Token![let](span),
+        modifiers: LocalModifiers::default(),
         pat: Pat::Type(PatType {
             attrs: Vec::new(),
             pat: Box::new(Pat::Path(ExprPath {
@@ -141,6 +144,7 @@ fn generate_setup_fn(
             })),
             colon_token: Token![:](span),
             ty: Box::new(Type::Path(TypePath {
+                attrs: Vec::new(),
                 qself: None,
                 path: fn_configurator_path_for_var,
             })),
@@ -179,7 +183,7 @@ fn generate_setup_fn(
     let result = ImplItemFn {
         attrs: Vec::new(),
         vis: Visibility::Public(Token![pub](span)),
-        defaultness: None,
+        modifiers: FnModifiers::default(),
         sig,
         block,
     };

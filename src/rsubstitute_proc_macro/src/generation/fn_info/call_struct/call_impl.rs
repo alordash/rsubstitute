@@ -23,11 +23,11 @@ pub(crate) fn generate(
 
     let result = ItemImpl {
         attrs: Vec::new(),
-        defaultness: None,
+        modifiers: ImplModifiers::default(),
         unsafety: None,
         impl_token: Token![impl](span),
         generics,
-        trait_: Some((None, path::new(span, ["ICall"]), Token![for](span))),
+        trait_: Some((path::new(span, ["ICall"]), Token![for](span))),
         self_ty: Box::new(target_type),
         brace_token: token::Brace(span),
         items,
@@ -40,7 +40,7 @@ fn generate_fn_get_args_infos(span: Span, arguments: &[Argument]) -> ImplItemFn 
     let sig = Signature {
         constness: None,
         asyncness: None,
-        unsafety: None,
+        safety: Safety::Default,
         abi: None,
         fn_token: Token![fn](span),
         ident: Ident::new("get_arg_infos", span),
@@ -74,7 +74,7 @@ fn generate_fn_get_args_infos(span: Span, arguments: &[Argument]) -> ImplItemFn 
     let result = ImplItemFn {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
-        defaultness: None,
+        modifiers: FnModifiers::default(),
         sig,
         block,
     };
@@ -118,7 +118,7 @@ fn generate_fn_get_ptr_to_boxed_tuple_of_refs(span: Span, arguments: &[Argument]
     let sig = Signature {
         constness: None,
         asyncness: None,
-        unsafety: None,
+        safety: Safety::Default,
         abi: None,
         fn_token: Token![fn](span),
         ident: Ident::new("get_ptr_to_boxed_tuple_of_refs", span),
@@ -176,7 +176,7 @@ fn generate_fn_get_ptr_to_boxed_tuple_of_refs(span: Span, arguments: &[Argument]
     let result = ImplItemFn {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
-        defaultness: None,
+        modifiers: FnModifiers::default(),
         sig,
         block,
     };

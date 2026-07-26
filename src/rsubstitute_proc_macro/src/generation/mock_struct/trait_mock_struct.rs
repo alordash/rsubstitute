@@ -117,12 +117,13 @@ fn generate_trait_impl(
 
     let result = ItemImpl {
         attrs: Vec::new(),
-        defaultness: None,
+        modifiers: ImplModifiers::default(),
         unsafety: trait_info.unsafety,
         impl_token: Token![impl](span),
         generics: generics_for_impl,
-        trait_: Some((None, trait_info.path.clone(), Token![for](span))),
+        trait_: Some((trait_info.path.clone(), Token![for](span))),
         self_ty: Box::new(Type::Path(TypePath {
+            attrs: Vec::new(),
             qself: None,
             path: mock_struct_path,
         })),
@@ -138,7 +139,7 @@ fn map_const(ordered_const: &Ordered<TraitItemConstSyntax>) -> Ordered<ImplItem>
         ImplItem::Const(ImplItemConst {
             attrs: x.item.attrs.clone(),
             vis: Visibility::Inherited,
-            defaultness: None,
+            modifiers: ConstModifiers::default(),
             const_token: x.item.const_token.clone(),
             ident: x.item.ident.clone(),
             generics: x.item.generics.clone(),
@@ -161,12 +162,13 @@ fn map_assoc_type(ordered_assoc_type: &Ordered<TraitItemTypeSyntax>) -> Ordered<
         ImplItem::Type(ImplItemType {
             attrs: x.item.attrs.clone(),
             vis: Visibility::Inherited,
-            defaultness: None,
+            modifiers: TypeModifiers::default(),
             type_token: x.item.type_token.clone(),
             ident: x.item.ident.clone(),
             generics: x.item.generics.clone(),
             eq_token: Token![=](span),
             ty: Type::Path(TypePath {
+                attrs: Vec::new(),
                 qself: None,
                 path: x.corresponding_generic_param_path.clone(),
             }),
@@ -186,7 +188,7 @@ fn map_fn(
         ImplItem::Fn(ImplItemFn {
             attrs: x.attributes.clone(),
             vis: Visibility::Inherited,
-            defaultness: None, // TODO - verify that it's always None, IIRC you can trait Trait { default fn f() {} }
+            modifiers: FnModifiers::default(),
             sig: *x.source_signature.clone(),
             block: if is_static {
                 static_fn_block::generate(
@@ -251,6 +253,7 @@ fn generate_inner_impl(
                 static_controls.static_setup_struct.path.clone(),
                 StaticControlType::Setup {
                     mock_generic_argument: GenericArgument::Type(Type::Path(TypePath {
+                        attrs: Vec::new(),
                         qself: None,
                         path: mock_struct_path.clone(),
                     })),
@@ -285,12 +288,13 @@ fn generate_inner_impl(
 
     let result = ItemImpl {
         attrs: Vec::new(),
-        defaultness: None,
+        modifiers: ImplModifiers::default(),
         unsafety: None,
         impl_token: Token![impl](span),
         generics: generics_for_impl,
         trait_: None,
         self_ty: Box::new(Type::Path(TypePath {
+            attrs: Vec::new(),
             qself: None,
             path: mock_struct_path,
         })),

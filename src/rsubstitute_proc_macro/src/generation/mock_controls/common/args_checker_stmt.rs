@@ -9,6 +9,7 @@ pub(crate) fn new(span: Span, fn_info: &FnInfo) -> (ExprPath, Local) {
     let args_checker_stmt = Local {
         attrs: Vec::new(),
         let_token: Token![let](span),
+        modifiers: LocalModifiers::default(),
         pat: Pat::Path(args_checker_var_path.clone()),
         init: Some(LocalInit {
             eq_token: Token![=](span),

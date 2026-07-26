@@ -22,6 +22,7 @@ pub(crate) fn box_of(span: Span, box_t: Type) -> TypePath {
 
 fn wrap(span: Span, wrapper: &'static str, wrapped: Type) -> TypePath {
     let result = TypePath {
+        attrs: Vec::new(),
         qself: None,
         path: syntax::path::new_generics(span, [wrapper], [GenericArgument::Type(wrapped)]),
     };

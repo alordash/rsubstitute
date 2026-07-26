@@ -20,13 +20,11 @@ pub(crate) fn generate(impl_generics: Generics, generics: Generics, target_type:
 
     let result = ItemImpl {
         attrs: Vec::new(),
-        defaultness: None,
+        modifiers: ImplModifiers::default(),
         unsafety: None,
         impl_token: Token![impl](span),
         generics: impl_generics,
         trait_: Some((
-            None,
-            // todo - maybe somehow test that it's equal to real trait
             path::new(span, ["IGenericsInfoProvider"]),
             Token![for](span),
         )),
@@ -44,7 +42,7 @@ fn generate_fn_get_generic_parameter_infos<'a>(
     let sig = Signature {
         constness: None,
         asyncness: None,
-        unsafety: None,
+        safety: Safety::Default,
         abi: None,
         fn_token: Token![fn](span),
         ident: Ident::new("get_generic_parameter_infos", span),
@@ -77,6 +75,7 @@ fn generate_fn_get_generic_parameter_infos<'a>(
                             span,
                             ["core", "any", "type_name"],
                             GenericArgument::Type(Type::Path(TypePath {
+                                attrs: Vec::new(),
                                 qself: None,
                                 path: path::from_ident(type_param.ident.clone()),
                             })),
@@ -115,7 +114,7 @@ fn generate_fn_get_generic_parameter_infos<'a>(
     let result = ImplItemFn {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
-        defaultness: None,
+        modifiers: FnModifiers::default(),
         sig,
         block,
     };
@@ -136,6 +135,7 @@ fn generate_fn_hash_generics_type_ids<'a>(
                     span,
                     ["tid"],
                     GenericArgument::Type(Type::Path(TypePath {
+                        attrs: Vec::new(),
                         qself: None,
                         path: Path {
                             leading_colon: None,
@@ -171,7 +171,7 @@ fn generate_fn_hash_generics_type_ids<'a>(
     let result = ImplItemFn {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
-        defaultness: None,
+        modifiers: FnModifiers::default(),
         sig,
         block: Block {
             brace_token: token::Brace(span),
@@ -219,7 +219,7 @@ fn generate_fn_hash_const_values<'a>(
     let result = ImplItemFn {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
-        defaultness: None,
+        modifiers: FnModifiers::default(),
         sig,
         block: Block {
             brace_token: token::Brace(span),
@@ -243,6 +243,7 @@ fn generate_hash_fn_sig(span: Span, fn_name: &'static str) -> Signature {
             })),
             colon_token: Token![:](span),
             ty: Box::new(Type::Reference(TypeReference {
+                attrs: Vec::new(),
                 and_token: Token![&](span),
                 lifetime: None,
                 mutability: Some(Token![mut](span)),
@@ -254,7 +255,7 @@ fn generate_hash_fn_sig(span: Span, fn_name: &'static str) -> Signature {
     let result = Signature {
         constness: None,
         asyncness: None,
-        unsafety: None,
+        safety: Safety::Default,
         abi: None,
         fn_token: Token![fn](span),
         ident: Ident::new(fn_name, span),

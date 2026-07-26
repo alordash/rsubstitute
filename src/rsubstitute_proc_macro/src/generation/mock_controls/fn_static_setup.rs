@@ -21,6 +21,7 @@ pub(crate) fn generate(
         &generic_arguments,
         rsubstitute_lifetime::new(span),
         Some(Type::Path(TypePath {
+            attrs: Vec::new(),
             qself: None,
             path: static_setup_path.clone(),
         })),
@@ -29,7 +30,7 @@ pub(crate) fn generate(
     let sig = Signature {
         constness: None,
         asyncness: None,
-        unsafety: None,
+        safety: Safety::Default,
         abi: None,
         fn_token: Token![fn](span),
         ident: Ident::new("setup", span),
@@ -47,6 +48,7 @@ pub(crate) fn generate(
         output: ReturnType::Type(
             Token![->](span),
             Box::new(Type::Path(TypePath {
+                attrs: Vec::new(),
                 qself: None,
                 path: fn_configurator_path,
             })),
@@ -93,6 +95,7 @@ pub(crate) fn generate(
     let result = ItemFn {
         attrs: Vec::new(),
         vis: Visibility::Public(Token![pub](span)),
+        modifiers: FnModifiers::default(),
         sig,
         block: Box::new(block),
     };

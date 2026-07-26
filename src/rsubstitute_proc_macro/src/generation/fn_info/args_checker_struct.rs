@@ -27,6 +27,7 @@ pub(crate) fn generate(
 
     let path = path::from_ident_with_generics(item_struct.ident.clone(), &item_struct.generics);
     let r#type = Type::Path(TypePath {
+        attrs: Vec::new(),
         qself: None,
         path: path.clone(),
     });
@@ -64,10 +65,11 @@ fn generate_fields(fn_syntax: &FnSyntax) -> FieldsNamed {
                 let result = Field {
                     attrs: Vec::new(),
                     vis: Visibility::Inherited,
-                    mutability: FieldMutability::None,
+                    modifiers: FieldModifiers::default(),
                     ident: Some(argument.ident.clone()),
                     colon_token: Some(Token![:](argument.ident.span())),
                     ty: Type::Path(ty),
+                    default: None,
                 };
 
                 return result;

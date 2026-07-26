@@ -16,7 +16,7 @@ use syn::*;
 
 pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod {
     let source_span = item_impl.span();
-    let Some((_, trait_path, _)) = &item_impl.trait_ else {
+    let Some((trait_path, _)) = &item_impl.trait_ else {
         panic!("When mocking trait implementation `item_impl` must have trait field.")
     };
     let impl_trait_for_struct_syntax =

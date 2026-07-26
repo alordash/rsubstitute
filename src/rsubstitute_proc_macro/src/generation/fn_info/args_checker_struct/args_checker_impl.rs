@@ -22,11 +22,11 @@ pub(crate) fn generate(
 
     let result = ItemImpl {
         attrs: Vec::new(),
-        defaultness: None,
+        modifiers: ImplModifiers::default(),
         unsafety: None,
         impl_token: Token![impl](span),
         generics,
-        trait_: Some((None, path::new(span, ["IArgsChecker"]), Token![for](span))),
+        trait_: Some((path::new(span, ["IArgsChecker"]), Token![for](span))),
         self_ty: Box::new(target_type),
         brace_token: token::Brace(span),
         items,
@@ -40,7 +40,7 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
     let sig = Signature {
         constness: None,
         asyncness: None,
-        unsafety: None,
+        safety: Safety::Default,
         abi: None,
         fn_token: Token![fn](span),
         ident: Ident::new("check", span),
@@ -57,6 +57,7 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
                 })),
                 colon_token: Token![:](span),
                 ty: Box::new(Type::Reference(TypeReference {
+                    attrs: Vec::new(),
                     and_token: Token![&](span),
                     lifetime: None,
                     mutability: None,
@@ -78,6 +79,7 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
     let call_stmt = Stmt::Local(Local {
         attrs: vec![allow_unused_variables(span)],
         let_token: Token![let](span),
+        modifiers: LocalModifiers::default(),
         pat: Pat::Type(PatType {
             attrs: Vec::new(),
             pat: Box::new(Pat::Path(PatPath {
@@ -87,6 +89,7 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
             })),
             colon_token: Token![:](span),
             ty: Box::new(Type::Reference(TypeReference {
+                attrs: Vec::new(),
                 and_token: Token![&](span),
                 lifetime: None,
                 mutability: None,
@@ -132,6 +135,7 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
                         expr: Box::new(Expr::Field(expr::field::new_self(argument.ident.clone()))),
                     }),
                     Type::Reference(TypeReference {
+                        attrs: Vec::new(),
                         and_token: Token![&](span),
                         lifetime: None,
                         mutability: None,
@@ -176,7 +180,7 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
     let result = ImplItemFn {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
-        defaultness: None,
+        modifiers: FnModifiers::default(),
         sig,
         block,
     };
@@ -188,7 +192,7 @@ fn generate_fn_fmt_args(span: Span, arguments: &[Argument]) -> ImplItemFn {
     let sig = Signature {
         constness: None,
         asyncness: None,
-        unsafety: None,
+        safety: Safety::Default,
         abi: None,
         fn_token: Token![fn](span),
         ident: Ident::new("fmt_args", span),
@@ -216,6 +220,7 @@ fn generate_fn_fmt_args(span: Span, arguments: &[Argument]) -> ImplItemFn {
                 expr: Box::new(Expr::Field(expr::field::new_self(argument.ident.clone()))),
             }),
             Type::Reference(TypeReference {
+                attrs: Vec::new(),
                 and_token: Token![&](span),
                 lifetime: None,
                 mutability: None,
@@ -247,7 +252,7 @@ fn generate_fn_fmt_args(span: Span, arguments: &[Argument]) -> ImplItemFn {
     let result = ImplItemFn {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
-        defaultness: None,
+        modifiers: FnModifiers::default(),
         sig,
         block,
     };

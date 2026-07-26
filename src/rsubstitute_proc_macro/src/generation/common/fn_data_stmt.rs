@@ -14,6 +14,7 @@ pub(crate) fn new_associated(
     let fn_data_stmt = Local {
         attrs: Vec::new(),
         let_token: Token![let](span),
+        modifiers: LocalModifiers::default(),
         pat: fn_data_pat(span, fn_data_var_path.clone(), generic_arguments),
         init: Some(LocalInit {
             eq_token: Token![=](span),
@@ -47,6 +48,7 @@ pub(crate) fn new_static(
     let fn_data_stmt = Local {
         attrs: Vec::new(),
         let_token: Token![let](span),
+        modifiers: LocalModifiers::default(),
         pat: fn_data_pat(span, fn_data_var_path.clone(), generic_arguments),
         init: Some(LocalInit {
             eq_token: Token![=](span),
@@ -79,10 +81,12 @@ fn fn_data_pat(
         pat: Box::new(Pat::Path(data_var_path.clone())),
         colon_token: Token![:](span),
         ty: Box::new(Type::Reference(TypeReference {
+            attrs: Vec::new(),
             and_token: Token![&](span),
             lifetime: None,
             mutability: None,
             elem: Box::new(Type::Path(TypePath {
+                attrs: Vec::new(),
                 qself: None,
                 path: Path {
                     leading_colon: None,

@@ -16,6 +16,7 @@ pub(crate) fn from_param(generic_param: GenericParam) -> GenericArgument {
             GenericArgument::Lifetime(lifetime_param.lifetime)
         }
         GenericParam::Type(type_param) => GenericArgument::Type(Type::Path(TypePath {
+            attrs: Vec::new(),
             qself: None,
             path: path::from_ident(type_param.ident),
         })),

@@ -57,12 +57,13 @@ pub(crate) fn generate(
         .collect();
     let result = ItemImpl {
         attrs: Vec::new(),
-        defaultness: None,
+        modifiers: ImplModifiers::default(),
         unsafety: None,
         impl_token: Token![impl](span),
         generics,
-        trait_: maybe_trait_path.map(|trait_path| (None, trait_path, Token![for](span))),
+        trait_: maybe_trait_path.map(|trait_path| (trait_path, Token![for](span))),
         self_ty: Box::new(Type::Path(TypePath {
+            attrs: Vec::new(),
             qself: None,
             path: mock_struct_path,
         })),
@@ -87,7 +88,7 @@ fn map_fn(
             } else {
                 x.visibility.clone()
             },
-            defaultness: None, // TODO - verify that it's always None, IIRC you can trait Trait { default fn f() {} }
+            modifiers: FnModifiers::default(),
             sig: *x.source_signature.clone(),
             block: if is_static {
                 static_fn_block::generate(

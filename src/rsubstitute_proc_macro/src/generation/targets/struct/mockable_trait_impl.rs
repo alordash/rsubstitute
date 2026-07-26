@@ -24,19 +24,23 @@ pub(crate) fn generate(
     }: Params,
 ) -> ItemImpl {
     let struct_type = Type::Path(TypePath {
+        attrs: Vec::new(),
         qself: None,
         path: path::from_ident_with_generics(struct_ident, &generics),
     });
     let struct_mock_path = path::from_ident_with_generics(struct_mock_ident.clone(), &generics);
     let static_setup_struct_type = Type::Path(TypePath {
+        attrs: Vec::new(),
         qself: None,
         path: path::from_ident_with_generics(static_setup_struct_ident, &generics),
     });
     let static_received_struct_type = Type::Path(TypePath {
+        attrs: Vec::new(),
         qself: None,
         path: path::from_ident_with_generics(static_received_struct_ident, &generics),
     });
     let struct_mock_type = Type::Path(TypePath {
+        attrs: Vec::new(),
         qself: None,
         path: path::from_ident_with_generics(struct_mock_ident, &generics),
     });
@@ -49,12 +53,11 @@ pub(crate) fn generate(
     let fn_static_received = fn_static_control(span, ControlType::Received);
     let result = ItemImpl {
         attrs: Vec::new(),
-        defaultness: None,
+        modifiers: ImplModifiers::default(),
         unsafety: None,
         impl_token: Token![impl](span),
         generics,
         trait_: Some((
-            None,
             path::new_global(span, ["rsubstitute", "Mockable"]),
             Token![for](span),
         )),
@@ -76,7 +79,7 @@ fn associated_type_impl(span: Span, name: &'static str, ty: Type) -> ImplItemTyp
     let result = ImplItemType {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
-        defaultness: None,
+        modifiers: TypeModifiers::default(),
         type_token: Token![type](span),
         ident: Ident::new(name, span),
         generics: Generics::default(),
@@ -91,21 +94,22 @@ fn fn_mock(span: Span, struct_mock_path: Path) -> ImplItemFn {
     let result = ImplItemFn {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
-        defaultness: None,
+        modifiers: FnModifiers::default(),
         sig: Signature {
             constness: None,
             asyncness: None,
-            unsafety: None,
+            safety: Safety::Default,
             abi: None,
             fn_token: Token![fn](span),
             ident: Ident::new("mock", span),
             generics: Generics::default(),
             paren_token: token::Paren(span),
-            inputs: punctuated([self_fn_arg(span)]),
+            inputs: punctuated([self_fn_arg()]),
             variadic: None,
             output: ReturnType::Type(
                 Token![->](span),
                 Box::new(Type::Path(TypePath {
+                    attrs: Vec::new(),
                     qself: None,
                     path: path::new(span, ["Self", "Mock"]),
                 })),
@@ -156,11 +160,11 @@ fn fn_static_control(span: Span, control_type: ControlType) -> ImplItemFn {
     let result = ImplItemFn {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
-        defaultness: None,
+        modifiers: FnModifiers::default(),
         sig: Signature {
             constness: None,
             asyncness: None,
-            unsafety: None,
+            safety: Safety::Default,
             abi: None,
             fn_token: Token![fn](span),
             ident: Ident::new(fn_name, span),
@@ -171,6 +175,7 @@ fn fn_static_control(span: Span, control_type: ControlType) -> ImplItemFn {
             output: ReturnType::Type(
                 Token![->](span),
                 Box::new(Type::Path(TypePath {
+                    attrs: Vec::new(),
                     qself: None,
                     path: static_control_path.clone(),
                 })),

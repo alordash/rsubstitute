@@ -54,15 +54,18 @@ fn generate_control_fn_arg(span: Span, pat: Box<Pat>, ref_style_type: Box<Type>)
         pat,
         colon_token: Token![:](span),
         ty: Box::new(Type::ImplTrait(TypeImplTrait {
+            attrs: Vec::new(),
             impl_token: Token![impl](span),
             bounds: punctuated([TypeParamBound::Trait(TraitBound {
                 paren_token: None,
-                modifier: TraitBoundModifier::None,
+                modifiers: TraitBoundModifiers::default(),
+                maybe: None,
                 lifetimes: None,
                 path: path::new_generics(
                     span,
                     ["Into"],
                     [GenericArgument::Type(Type::Path(TypePath {
+                        attrs: Vec::new(),
                         qself: None,
                         path: path::new_generics(
                             span,

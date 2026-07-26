@@ -14,7 +14,7 @@ pub(crate) fn new(span: Span, expr: Expr, target_type: Type) -> Expr {
                 mutability: None,
                 expr: Box::new(expr),
             }),
-            Type::Reference(TypeReference {
+            Type::Reference(TypeReference {attrs: Vec::new(),
                 and_token: Token![&](span),
                 lifetime: None,
                 mutability: None,

@@ -29,6 +29,7 @@ pub(crate) fn generate_static_fn(
     let result = ItemFn {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
+        modifiers: FnModifiers::default(),
         sig,
         block: Box::new(block),
     };
@@ -58,7 +59,7 @@ pub(crate) fn generate_associated(
     let result = ImplItemFn {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
-        defaultness: None,
+        modifiers: FnModifiers::default(),
         sig,
         block,
     };
@@ -74,11 +75,13 @@ fn generate_core(
     let source_signature = &fn_info.source_signature;
     let call_path = path::new(span, ["call"]);
     let mock_pat = if let Some(receiver) = &fn_info.maybe_self_type {
-        let (type_is_reference, type_mutability) = match receiver.ty.as_ref() {
-            Type::Reference(reference) => (true, reference.mutability),
+        let (is_reference, type_mutability) = match &receiver.kind {
+            ReceiverKind::Reference(_, _, mutability) => (true, mutability.clone()),
+            ReceiverKind::Typed(_, ty) if let Type::Reference(reference) = ty.as_ref() => {
+                (true, reference.mutability)
+            }
             _ => (false, None),
         };
-        let is_reference = type_is_reference || receiver.reference.is_some();
         let mutability = type_mutability.or_else(|| receiver.mutability);
         PatType {
             attrs: Vec::new(),
@@ -92,16 +95,19 @@ fn generate_core(
             // maybe use mut visitor to replace first path segment with mock struct path!
             ty: Box::new(if is_reference {
                 Type::Reference(TypeReference {
+                    attrs: Vec::new(),
                     and_token: Token![&](span),
                     lifetime: None,
                     mutability,
                     elem: Box::new(Type::Path(TypePath {
+                        attrs: Vec::new(),
                         qself: None,
                         path: target_struct_path,
                     })),
                 })
             } else {
                 Type::Path(TypePath {
+                    attrs: Vec::new(),
                     qself: None,
                     path: target_struct_path,
                 })
@@ -121,7 +127,7 @@ fn generate_core(
     let sig = Signature {
         constness: source_signature.constness.clone(),
         asyncness: source_signature.asyncness.clone(),
-        unsafety: source_signature.unsafety.clone(),
+        safety: source_signature.safety.clone(),
         abi: source_signature.abi.clone(),
         fn_token: Token![fn](span),
         ident: get_base_fn_ident(&fn_info.fn_ident),
@@ -138,6 +144,7 @@ fn generate_core(
                 })),
                 colon_token: Token![:](span),
                 ty: Box::new(Type::Path(TypePath {
+                    attrs: Vec::new(),
                     qself: None,
                     path: fn_info.call_struct.path.clone(),
                 })),
@@ -150,6 +157,7 @@ fn generate_core(
     let deconstruct_call_stmt = Local {
         attrs: Vec::new(),
         let_token: Token![let](span),
+        modifiers: LocalModifiers::default(),
         pat: Pat::Struct(PatStruct {
             attrs: Vec::new(),
             qself: None,
@@ -188,6 +196,7 @@ fn generate_core(
     let cast_args_stmt = Local {
         attrs: Vec::new(),
         let_token: Token![let](span),
+        modifiers: LocalModifiers::default(),
         pat: Pat::Type(PatType {
             attrs: Vec::new(),
             pat: Box::new(Pat::Tuple(PatTuple {
@@ -201,6 +210,7 @@ fn generate_core(
             })),
             colon_token: Token![:](span),
             ty: Box::new(Type::Tuple(TypeTuple {
+                attrs: Vec::new(),
                 paren_token: token::Paren(span),
                 elems: fn_info.arguments.iter_generics_style_types().collect(),
             })),

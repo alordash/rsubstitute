@@ -28,6 +28,7 @@ pub(crate) fn self_type(span: Span) -> TypePath {
 
 pub(crate) fn ref_self_type(span: Span) -> TypeReference {
     TypeReference {
+        attrs: Vec::new(),
         and_token: Token![&](span),
         lifetime: None,
         mutability: None,
@@ -37,6 +38,7 @@ pub(crate) fn ref_self_type(span: Span) -> TypeReference {
 
 pub(crate) fn mut_ref_self_type(span: Span) -> TypeReference {
     TypeReference {
+        attrs: Vec::new(),
         and_token: Token![&](span),
         lifetime: None,
         mutability: Some(Token![mut](span)),
@@ -44,41 +46,36 @@ pub(crate) fn mut_ref_self_type(span: Span) -> TypeReference {
     }
 }
 
-pub(crate) fn self_fn_arg(span: Span) -> FnArg {
+pub(crate) fn self_fn_arg() -> FnArg {
     FnArg::Receiver(Receiver {
         attrs: Vec::new(),
-        reference: None,
         mutability: None,
         self_token: Token![self](Span::call_site()),
-        colon_token: None,
-        ty: Box::new(Type::Path(self_type(span))),
+        kind: ReceiverKind::Value,
     })
 }
 
 pub(crate) fn ref_self_fn_arg(span: Span) -> FnArg {
     FnArg::Receiver(Receiver {
         attrs: Vec::new(),
-        reference: Some((Token![&](Span::call_site()), None)),
         mutability: None,
         self_token: Token![self](Span::call_site()),
-        colon_token: None,
-        ty: Box::new(Type::Reference(ref_self_type(span))),
+        kind: ReceiverKind::Reference(Token![&](span), None, None),
     })
 }
 
 pub(crate) fn mut_ref_self_fn_arg(span: Span) -> FnArg {
     FnArg::Receiver(Receiver {
         attrs: Vec::new(),
-        reference: Some((Token![&](Span::call_site()), None)),
         mutability: Some(Token![mut](span)),
         self_token: Token![self](Span::call_site()),
-        colon_token: None,
-        ty: Box::new(Type::Reference(mut_ref_self_type(span))),
+        kind: ReceiverKind::Reference(Token![&](span), None, Some(Token![mut](span))),
     })
 }
 
 pub(crate) fn void_type(span: Span) -> Type {
     Type::Tuple(TypeTuple {
+        attrs: Vec::new(),
         paren_token: token::Paren(span),
         elems: Punctuated::new(),
     })
@@ -94,10 +91,11 @@ pub(crate) fn void_tuple(span: Span) -> Expr {
 
 pub(crate) fn mut_ptr_infer_type(span: Span) -> Type {
     Type::Ptr(TypePtr {
+        attrs: Vec::new(),
         star_token: Token![*](span),
-        const_token: None,
-        mutability: Some(Token![mut](span)),
+        mutability: PointerMutability::Mut(Token![mut](span)),
         elem: Box::new(Type::Infer(TypeInfer {
+            attrs: Vec::new(),
             underscore_token: Token![_](span),
         })),
     })
@@ -105,9 +103,9 @@ pub(crate) fn mut_ptr_infer_type(span: Span) -> Type {
 
 pub(crate) fn mut_ptr_void_type(span: Span) -> Type {
     Type::Ptr(TypePtr {
+        attrs: Vec::new(),
         star_token: Token![*](span),
-        const_token: None,
-        mutability: Some(Token![mut](span)),
+        mutability: PointerMutability::Mut(Token![mut](span)),
         elem: Box::new(void_type(span)),
     })
 }

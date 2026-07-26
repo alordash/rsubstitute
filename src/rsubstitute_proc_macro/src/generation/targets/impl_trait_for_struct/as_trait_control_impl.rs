@@ -38,6 +38,7 @@ pub(crate) fn generate(
         control_struct_ident_suffix = format!("Static{control_struct_ident_suffix}")
     };
     let self_ty_path = TypePath {
+        attrs: Vec::new(),
         qself: None,
         path: path::from_base_path_with_ident(
             struct_path,
@@ -58,7 +59,7 @@ pub(crate) fn generate(
     );
     let result = ItemImpl {
         attrs: Vec::new(),
-        defaultness: None,
+        modifiers: ImplModifiers::default(),
         unsafety: None,
         impl_token: Token![impl](span),
         generics: struct_generics,
@@ -81,11 +82,11 @@ fn generate_fn_as_trait(
     let result = ImplItemFn {
         attrs: vec![attributes::allow_non_snake_case(span)],
         vis: Visibility::Public(Token![pub](span)),
-        defaultness: None,
+        modifiers: FnModifiers::default(),
         sig: Signature {
             constness: None,
             asyncness: None,
-            unsafety: None,
+            safety: Safety::Default,
             abi: None,
             fn_token: Token![fn](span),
             ident: format_ident!("as_{trait_ident}"),
@@ -96,6 +97,7 @@ fn generate_fn_as_trait(
             output: ReturnType::Type(
                 Token![->](span),
                 Box::new(Type::Path(TypePath {
+                    attrs: Vec::new(),
                     qself: None,
                     path: trait_control_struct_path.clone(),
                 })),

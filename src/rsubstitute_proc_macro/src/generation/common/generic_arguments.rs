@@ -14,6 +14,7 @@ pub(crate) struct Result {
 pub(crate) fn new(ctx: &Context, span: Span, mock_struct_path: Path, fn_info: &FnInfo) -> Result {
     let result = Result {
         mock_generic_argument: GenericArgument::Type(Type::Path(TypePath {
+            attrs: Vec::new(),
             qself: None,
             path: mock_struct_path,
         })),

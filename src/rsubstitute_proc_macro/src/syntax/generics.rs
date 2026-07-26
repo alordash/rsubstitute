@@ -38,6 +38,7 @@ pub(crate) fn with_lifetimes_tied_to(
         .lifetimes()
         .map(|x| {
             WherePredicate::Lifetime(PredicateLifetime {
+                attrs: Vec::new(),
                 lifetime: x.lifetime.clone(),
                 colon_token: Token![:](span),
                 bounds: punctuated([tying_lifetime.clone()]),
@@ -49,6 +50,7 @@ pub(crate) fn with_lifetimes_tied_to(
     }
     let where_predicates_with_tying_lifetime_iter = where_predicates_iter.chain(core::iter::once(
         WherePredicate::Lifetime(PredicateLifetime {
+            attrs: Vec::new(),
             lifetime: tying_lifetime.clone(),
             colon_token: Token![:](span),
             bounds: source_generics
@@ -70,11 +72,9 @@ pub(crate) fn remove_defaults(mut generics: Generics) -> Generics {
     for param in generics.params.iter_mut() {
         match param {
             GenericParam::Type(type_param) => {
-                type_param.eq_token = None;
                 type_param.default = None;
             }
             GenericParam::Const(const_param) => {
-                const_param.eq_token = None;
                 const_param.default = None;
             }
             _ => {}

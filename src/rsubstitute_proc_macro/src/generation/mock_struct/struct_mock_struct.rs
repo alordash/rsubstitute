@@ -39,26 +39,30 @@ pub(crate) fn generate(
                 Field {
                     attrs: Vec::new(),
                     vis: Visibility::Public(Token![pub](span)),
-                    mutability: FieldMutability::None,
+                    modifiers: FieldModifiers::default(),
                     ident: Some(Ident::new("mockable", span)),
                     colon_token: Some(Token![:](span)),
                     ty: Type::Path(r#type::box_of(
                         span,
                         Type::Path(TypePath {
+                            attrs: Vec::new(),
                             qself: None,
                             path: path.clone(),
                         }),
                     )),
+                    default: None,
                 },
             ]),
         }),
         semi_token: None,
     };
     let struct_type = Type::Path(TypePath {
+        attrs: Vec::new(),
         qself: None,
         path: path::from_ident_with_generics(struct_ident, &item_struct.generics),
     });
     let struct_mock_type = Type::Path(TypePath {
+        attrs: Vec::new(),
         qself: None,
         path: path::from_ident_with_generics(item_struct.ident.clone(), &item_struct.generics),
     });
@@ -79,10 +83,12 @@ pub(crate) fn generate(
     let item_impl = item_impl(
         span,
         Type::Path(TypePath {
+            attrs: Vec::new(),
             qself: None,
             path: path.clone(),
         }),
         Type::Path(TypePath {
+            attrs: Vec::new(),
             qself: None,
             path: path::from_ident_with_generics(item_struct.ident.clone(), &item_struct.generics),
         }),
@@ -111,17 +117,17 @@ fn item_impl(
     let fn_unmock = ImplItemFn {
         attrs: Vec::new(),
         vis: Visibility::Public(Token![pub](span)),
-        defaultness: None,
+        modifiers: FnModifiers::default(),
         sig: Signature {
             constness: None,
             asyncness: None,
-            unsafety: None,
+            safety: Safety::Default,
             abi: None,
             fn_token: Token![fn](span),
             ident: Ident::new("unmock", span),
             generics: Generics::default(),
             paren_token: token::Paren(span),
-            inputs: punctuated([self_fn_arg(span)]),
+            inputs: punctuated([self_fn_arg()]),
             variadic: None,
             output: ReturnType::Type(Token![->](span), Box::new(struct_type)),
         },
@@ -155,7 +161,7 @@ fn item_impl(
     );
     let result = ItemImpl {
         attrs: Vec::new(),
-        defaultness: None,
+        modifiers: ImplModifiers::default(),
         unsafety: None,
         impl_token: Token![impl](span),
         generics: generics.clone(),
@@ -184,11 +190,11 @@ fn fn_control(span: Span, control_target: ControlTarget) -> ImplItemFn {
     let result = ImplItemFn {
         attrs: Vec::new(),
         vis: Visibility::Public(Token![pub](span)),
-        defaultness: None,
+        modifiers: FnModifiers::default(),
         sig: Signature {
             constness: None,
             asyncness: None,
-            unsafety: None,
+            safety: Safety::Default,
             abi: None,
             fn_token: Token![fn](span),
             ident: Ident::new(fn_name, span),
@@ -199,6 +205,7 @@ fn fn_control(span: Span, control_target: ControlTarget) -> ImplItemFn {
             output: ReturnType::Type(
                 Token![->](span),
                 Box::new(Type::Path(TypePath {
+                    attrs: Vec::new(),
                     qself: None,
                     path: return_type_path.clone(),
                 })),
@@ -241,11 +248,11 @@ fn deref_impl(
     let fn_deref = ImplItemFn {
         attrs: Vec::new(),
         vis: Visibility::Inherited,
-        defaultness: None,
+        modifiers: FnModifiers::default(),
         sig: Signature {
             constness: None,
             asyncness: None,
-            unsafety: None,
+            safety: Safety::Default,
             abi: None,
             fn_token: Token![fn](span),
             ident: Ident::new(fn_name, span),
@@ -260,6 +267,7 @@ fn deref_impl(
             output: ReturnType::Type(
                 Token![->](span),
                 Box::new(Type::Reference(TypeReference {
+                    attrs: Vec::new(),
                     and_token: Token![&](span),
                     lifetime: None,
                     mutability: r#mut.then(|| Token![mut](span)),
@@ -287,7 +295,7 @@ fn deref_impl(
             ImplItem::Type(ImplItemType {
                 attrs: Vec::new(),
                 vis: Visibility::Inherited,
-                defaultness: None,
+                modifiers: TypeModifiers::default(),
                 type_token: Token![type](span),
                 ident: Ident::new("Target", span),
                 generics: Generics::default(),
@@ -300,12 +308,11 @@ fn deref_impl(
     };
     let result = ItemImpl {
         attrs: Vec::new(),
-        defaultness: None,
+        modifiers: ImplModifiers::default(),
         unsafety: None,
         impl_token: Token![impl](span),
         generics: generics.clone(),
         trait_: Some((
-            None,
             path::new(span, ["core", "ops", trait_name]),
             Token![for](span),
         )),

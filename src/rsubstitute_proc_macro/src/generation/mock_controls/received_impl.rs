@@ -56,12 +56,13 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
 
     let result = ItemImpl {
         attrs: Vec::new(),
-        defaultness: None,
+        modifiers: ImplModifiers::default(),
         unsafety: None,
         impl_token: Token![impl](span),
         generics,
         trait_: None,
         self_ty: Box::new(Type::Path(TypePath {
+            attrs: Vec::new(),
             qself: None,
             path: received_struct_path,
         })),
@@ -97,12 +98,13 @@ pub(crate) fn generate_for_struct_with_fn_no_other_calls(
 
     let result = ItemImpl {
         attrs: Vec::new(),
-        defaultness: None,
+        modifiers: ImplModifiers::default(),
         unsafety: None,
         impl_token: Token![impl](span),
         generics: generics_for_impl,
         trait_: None,
         self_ty: Box::new(Type::Path(TypePath {
+            attrs: Vec::new(),
             qself: None,
             path: received_struct_path,
         })),
@@ -136,6 +138,7 @@ fn generate_received_fn(
     }
     let self_arg = ref_self_fn_arg(span);
     let output_type = Type::Path(TypePath {
+        attrs: Vec::new(),
         qself: None,
         path: path::new_generics_global(
             span,
@@ -149,7 +152,7 @@ fn generate_received_fn(
     let sig = Signature {
         constness: None,
         asyncness: None,
-        unsafety: None,
+        safety: Safety::Default,
         abi: None,
         fn_token: Token![fn](span),
         ident: if for_static_fn {
@@ -214,7 +217,7 @@ fn generate_received_fn(
     let result = ImplItemFn {
         attrs: Vec::new(),
         vis: Visibility::Public(Token![pub](span)),
-        defaultness: None,
+        modifiers: FnModifiers::default(),
         sig,
         block,
     };
@@ -236,6 +239,7 @@ fn generate_fn_no_other_calls_for_static_fn(span: Span, mock_struct_path: Path) 
                     "verify_static_fn_received_nothing_else",
                 ],
                 [GenericArgument::Type(Type::Path(TypePath {
+                    attrs: Vec::new(),
                     qself: None,
                     path: mock_struct_path,
                 }))],
@@ -255,7 +259,7 @@ fn generate_fn_no_other_calls_for_static_fn(span: Span, mock_struct_path: Path) 
     let result = ImplItemFn {
         attrs: Vec::new(),
         vis: Visibility::Public(Token![pub](span)),
-        defaultness: None,
+        modifiers: FnModifiers::default(),
         sig,
         block,
     };
@@ -294,7 +298,7 @@ fn generate_regular_fn_no_other_calls(span: Span) -> ImplItemFn {
     let result = ImplItemFn {
         attrs: Vec::new(),
         vis: Visibility::Public(Token![pub](span)),
-        defaultness: None,
+        modifiers: FnModifiers::default(),
         sig,
         block,
     };
@@ -305,7 +309,7 @@ fn fn_no_other_calls_signature(span: Span) -> Signature {
     let result = Signature {
         constness: None,
         asyncness: None,
-        unsafety: None,
+        safety: Safety::Default,
         abi: None,
         fn_token: Token![fn](span),
         ident: Ident::new("no_other_calls", span),

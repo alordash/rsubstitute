@@ -12,13 +12,14 @@ pub(crate) fn generate(
         panic!("`fields` for `Clone` implementation generation must be named.")
     };
     let target_type = TypePath {
+        attrs: Vec::new(),
         qself: None,
         path: struct_path.clone(),
     };
     let sig = Signature {
         constness: None,
         asyncness: None,
-        unsafety: None,
+        safety: Safety::Default,
         abi: None,
         fn_token: Token![fn](span),
         ident: Ident::new("clone", span),
@@ -73,19 +74,18 @@ pub(crate) fn generate(
     let fn_clone = ImplItemFn {
         attrs: vec![attributes::inline(span)],
         vis: Visibility::Inherited,
-        defaultness: None,
+        modifiers: FnModifiers::default(),
         sig,
         block,
     };
 
     let result = ItemImpl {
         attrs: Vec::new(),
-        defaultness: None,
+        modifiers: ImplModifiers::default(),
         unsafety: None,
         impl_token: Token![impl](span),
         generics,
         trait_: Some((
-            None,
             path::new_global(span, ["core", "clone", "Clone"]),
             Token![for](span),
         )),

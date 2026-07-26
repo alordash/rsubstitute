@@ -10,15 +10,17 @@ pub(crate) fn new_field(
     let result = Field {
         attrs: Vec::new(),
         vis: Visibility::Public(Token![pub](span)),
-        mutability: FieldMutability::None,
+        modifiers: FieldModifiers::default(),
         ident: Some(generics_field_ident(span)),
         colon_token: Some(Token![:](span)),
         ty: Type::Path(TypePath {
+            attrs: Vec::new(),
             qself: None,
             path: path::new_generics_global(
                 span,
                 ["core", "marker", "PhantomData"],
                 [GenericArgument::Type(Type::Tuple(TypeTuple {
+                    attrs: Vec::new(),
                     paren_token: token::Paren(span),
                     elems: generics
                         .params
@@ -26,6 +28,7 @@ pub(crate) fn new_field(
                         .filter_map(|x| match x {
                             GenericParam::Lifetime(lifetime) => {
                                 Some(Type::Reference(TypeReference {
+                                    attrs: Vec::new(),
                                     and_token: Token![&](span),
                                     lifetime: Some(lifetime.lifetime),
                                     mutability: None,
@@ -33,6 +36,7 @@ pub(crate) fn new_field(
                                 }))
                             }
                             GenericParam::Type(ty) => Some(Type::Path(TypePath {
+                                attrs: Vec::new(),
                                 qself: None,
                                 path: path::from_ident(ty.ident.clone()),
                             })),
@@ -47,6 +51,7 @@ pub(crate) fn new_field(
                 }))],
             ),
         }),
+        default: None,
     };
     return result;
 }

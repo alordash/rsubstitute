@@ -3,7 +3,7 @@ use proc_macro2::Span;
 use syn::*;
 
 pub(crate) fn of(span: Span, r#type: Type) -> TypePath {
-    let result = TypePath {
+    let result = TypePath {attrs: Vec::new(),
         qself: None,
         path: Path {
             leading_colon: None,

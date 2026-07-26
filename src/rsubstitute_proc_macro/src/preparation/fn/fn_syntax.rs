@@ -134,11 +134,13 @@ fn split_inputs_into_maybe_self_type_and_arguments(
 
 fn generate_arg_refs_tuple(span: Span, arguments: &[Argument]) -> TypeTuple {
     let result = TypeTuple {
+        attrs: Vec::new(),
         paren_token: token::Paren(span),
         elems: arguments
             .iter()
             .map(|x| {
                 Type::Reference(TypeReference {
+                    attrs: Vec::new(),
                     and_token: Token![&](span),
                     lifetime: Some(rsubstitute_lifetime::new(span)),
                     mutability: None,

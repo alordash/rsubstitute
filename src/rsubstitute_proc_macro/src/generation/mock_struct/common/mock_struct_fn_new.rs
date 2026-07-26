@@ -9,7 +9,7 @@ pub(crate) fn new(span: Span) -> ImplItemFn {
     let sig = Signature {
         constness: None,
         asyncness: None,
-        unsafety: None,
+        safety: Safety::Default,
         abi: None,
         fn_token: Token![fn](span),
         ident: Ident::new("new", span),
@@ -39,7 +39,7 @@ pub(crate) fn new(span: Span) -> ImplItemFn {
     let result = ImplItemFn {
         attrs: Vec::new(),
         vis: Visibility::Public(Token![pub](span)),
-        defaultness: None,
+        modifiers: FnModifiers::default(),
         sig,
         block,
     };
