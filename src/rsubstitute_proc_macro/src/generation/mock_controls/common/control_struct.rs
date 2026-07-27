@@ -1,5 +1,4 @@
-use crate::common::generics_field;
-use crate::generation::common::*;
+use crate::common::*;
 use crate::generation::mock_controls::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;

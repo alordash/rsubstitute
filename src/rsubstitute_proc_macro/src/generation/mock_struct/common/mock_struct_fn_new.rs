@@ -1,5 +1,4 @@
-use crate::common::generics_field;
-use crate::generation::common::*;
+use crate::common::*;
 use crate::syntax::*;
 use proc_macro2::Span;
 use syn::punctuated::Punctuated;

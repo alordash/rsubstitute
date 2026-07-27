@@ -81,14 +81,6 @@ struct Struct<'a, 'b: 'a, T1: Clone> {
 #[mock(base)]
 #[allow(unused)]
 impl<'a, 'b: 'a, T1: Clone> Struct<'a, 'b, T1> {
-    pub fn new() -> Struct<'a, 'b, T1> {
-        Struct {
-            _phantom_a: PhantomData,
-            _phantom_b: PhantomData,
-            _phantom_t1: PhantomData,
-        }
-    }
-
     #[allow(unused)]
     pub fn work<'c, 'd: 'a, T2: Clone>(
         &self,
@@ -413,8 +405,12 @@ mod tests {
     #[test]
     fn struct_work_Ok() {
         // Arrange
-        Struct::<[i32; 2]>::static_setup().new().call_base();
-        let mut mock = Struct::new().mock();
+        let mut mock = Struct::<[i32; 2]> {
+            _phantom_a: PhantomData,
+            _phantom_b: PhantomData,
+            _phantom_t1: PhantomData,
+        }
+        .mock();
         let return_value = &&&&&&&&&&&&&&&&&55;
         let a = &1;
         {

@@ -1,4 +1,3 @@
-use crate::common::{data_field, generics_field, mockable_field};
 use crate::syntax::*;
 use quote::format_ident;
 use syn::spanned::Spanned;
@@ -75,45 +74,9 @@ impl<'a> StructTypeReferencesNormalizer<'a> {
 }
 
 impl<'a> VisitMut for StructTypeReferencesNormalizer<'a> {
-    fn visit_expr_struct_mut(&mut self, i: &mut ExprStruct) {
-        if let Some(source_path) = self.try_replace_path(&mut i.path) {
-            let mut source_expr_struct = i.clone();
-            let span = source_expr_struct.span();
-            source_expr_struct.path = source_path;
-            i.fields = punctuated([
-                generics_field::new_value(span),
-                data_field::new_clone_value(span),
-                mockable_field::new_value(span, Expr::Struct(source_expr_struct)),
-            ]);
-        }
-
-        visit_mut::visit_expr_struct_mut(self, i);
-    }
-
-    fn visit_pat_struct_mut(&mut self, i: &mut PatStruct) {
-        if let Some(source_path) = self.try_replace_path(&mut i.path) {
-            // TODO - limitation: can not deconstruct mocked struct in mocked impls
-            // because deconstructed value can either be `Struct` or `StructMock`
-            // and there is no way to distinguish them without running code analysis
-        }
-
-        visit_mut::visit_pat_struct_mut(self, i);
-    }
-
     fn visit_path_mut(&mut self, i: &mut Path) {
         self.try_replace_path(i);
 
         visit_mut::visit_path_mut(self, i);
     }
-}
-
-struct SHolder {
-    pub sb: Box<S>,
-}
-struct S {
-    pub n: i32,
-}
-
-fn q(sholder: SHolder) {
-    let SHolder { sb: S { n } } = sholder;
 }
