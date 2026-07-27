@@ -5,6 +5,7 @@ use crate::generation::fn_info::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
 use quote::format_ident;
+use syn::punctuated::Punctuated;
 use syn::*;
 
 pub(crate) fn get_base_fn_ident(fn_ident: &Ident) -> Ident {
@@ -73,6 +74,8 @@ fn generate_core(
 ) -> (Signature, Block) {
     let source_signature = &fn_info.source_signature;
     let call_path = path::new(span, ["call"]);
+    let mut generics = source_signature.generics.clone();
+    let mut output = source_signature.output.clone();
     let mock_pat = if let Some(receiver) = &fn_info.maybe_self_type {
         let (is_reference, type_mutability) = match &receiver.kind {
             ReceiverKind::Reference(_, _, mutability) => (true, mutability.clone()),
@@ -82,6 +85,27 @@ fn generate_core(
             _ => (false, None),
         };
         let mutability = type_mutability.or_else(|| receiver.mutability);
+        let mut self_lifetime = None;
+        if is_reference && let ReturnType::Type(_, return_type) = &mut output {
+            let anonymous_lifetime_substitute = Lifetime {
+                apostrophe: span,
+                ident: Ident::new("__rs_ret", span),
+            };
+            r#type::replace_anonymous_lifetimes_in_references(
+                return_type.as_mut(),
+                &anonymous_lifetime_substitute,
+            );
+            self_lifetime = Some(anonymous_lifetime_substitute.clone());
+            generics.params.insert(
+                0,
+                GenericParam::Lifetime(LifetimeParam {
+                    attrs: Vec::new(),
+                    lifetime: anonymous_lifetime_substitute,
+                    colon_token: None,
+                    bounds: Punctuated::new(),
+                }),
+            );
+        }
         PatType {
             attrs: Vec::new(),
             pat: Box::new(Pat::Path(PatPath {
@@ -90,13 +114,11 @@ fn generate_core(
                 path: path::from_ident(rsubstitute_self(span)),
             })),
             colon_token: Token![:](span),
-            // TODO - It is not always reference, it should match source signature
-            // maybe use mut visitor to replace first path segment with mock struct path!
             ty: Box::new(if is_reference {
                 Type::Reference(TypeReference {
                     attrs: Vec::new(),
                     and_token: Token![&](span),
-                    lifetime: None,
+                    lifetime: self_lifetime,
                     mutability,
                     elem: Box::new(Type::Path(TypePath {
                         attrs: Vec::new(),
@@ -130,7 +152,7 @@ fn generate_core(
         abi: source_signature.abi.clone(),
         fn_token: Token![fn](span),
         ident: get_base_fn_ident(&fn_info.fn_ident),
-        generics: source_signature.generics.clone(),
+        generics,
         paren_token: token::Paren(span),
         inputs: punctuated([
             FnArg::Typed(mock_pat),
@@ -150,7 +172,7 @@ fn generate_core(
             }),
         ]),
         variadic: None,
-        output: source_signature.output.clone(),
+        output,
     };
 
     let deconstruct_call_stmt = Local {

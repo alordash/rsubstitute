@@ -18,6 +18,10 @@ impl<'a, T1: Clone> Struct<'a, T1> {
     pub fn f<'r>(&'r self, a: &i32, t1: T1) {
         todo!()
     }
+
+    pub fn ret(&self) -> &i32 {
+        todo!()
+    }
 }
 
 fn main() {
