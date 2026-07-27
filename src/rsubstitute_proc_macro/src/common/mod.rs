@@ -1,11 +1,18 @@
-pub mod models {
+pub(crate) mod models {
+    mod associated_items_info;
     mod context;
 
-    pub use context::*;
+    pub(crate) use associated_items_info::*;
+    pub(crate) use context::*;
 }
 
-pub mod generics_field;
-pub mod rsubstitute_lifetime;
-pub mod transmute_lifetime_expr;
+pub(crate) mod context;
+pub(crate) mod data_field;
+pub(crate) mod generics_field;
+pub(crate) mod mockable_field;
+pub(crate) mod normalization;
+pub(crate) mod rsubstitute_lifetime;
+pub(crate) mod transmute_lifetime_expr;
 
-pub mod context;
+mod rsubstitute_self;
+pub(crate) use rsubstitute_self::*;

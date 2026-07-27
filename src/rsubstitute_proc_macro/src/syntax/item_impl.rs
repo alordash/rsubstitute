@@ -16,14 +16,15 @@ pub(crate) fn split_generics(
     target_type: &Type,
 ) -> SplitGenerics {
     let span = generics.span();
-    let searched_generics_ident = generics
+    let mut searched_generics_idents_map = generics
         .params
         .iter()
         .map(|x| (generic_param::get_ident(x).clone(), x))
         .collect();
-    let mut target_generics_searcher = GenericsSearcher::new(&searched_generics_ident);
+    let mut target_generics_searcher = GenericsSearcher::new(&mut searched_generics_idents_map);
     target_generics_searcher.visit_type(target_type);
-    let mut trait_generics_searcher = GenericsSearcher::new(&searched_generics_ident);
+    let mut trait_generics_searcher =
+        GenericsSearcher::new(&mut target_generics_searcher.searched_generics_idents_map);
     trait_generics_searcher.visit_path(trait_path);
     let result = SplitGenerics {
         target_generics: if target_generics_searcher.found_generic_params.is_empty() {
@@ -51,14 +52,16 @@ pub(crate) fn split_generics(
 }
 
 struct GenericsSearcher<'a> {
-    searched_generics_idents: &'a HashMap<Ident, &'a GenericParam>,
+    searched_generics_idents_map: &'a mut HashMap<Ident, &'a GenericParam>,
     found_generic_params: Punctuated<GenericParam, Token![,]>,
 }
 
 impl<'a> GenericsSearcher<'a> {
-    pub fn new(searched_generics_idents: &'a HashMap<Ident, &'a GenericParam>) -> GenericsSearcher {
+    pub fn new(
+        searched_generics_idents: &'a mut HashMap<Ident, &'a GenericParam>,
+    ) -> GenericsSearcher<'a> {
         Self {
-            searched_generics_idents,
+            searched_generics_idents_map: searched_generics_idents,
             found_generic_params: Punctuated::new(),
         }
     }
@@ -66,9 +69,10 @@ impl<'a> GenericsSearcher<'a> {
 
 impl Visit<'_> for GenericsSearcher<'_> {
     fn visit_ident(&mut self, i: &'_ Ident) {
-        if let Some(target_generic_param) = self.searched_generics_idents.get(i) {
+        if let Some(target_generic_param_entry) = self.searched_generics_idents_map.remove_entry(i)
+        {
             self.found_generic_params
-                .push((*target_generic_param).clone());
+                .push((*target_generic_param_entry.1).clone());
         }
     }
 }

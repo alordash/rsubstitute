@@ -1,5 +1,4 @@
 use crate::common::*;
-use crate::generation::common::*;
 use crate::generation::mock_controls::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
@@ -126,20 +125,7 @@ fn fn_mock(span: Span, struct_mock_path: Path) -> ImplItemFn {
                     fields: punctuated([
                         generics_field::new_value(span),
                         data_field::new_default_value(span),
-                        FieldValue {
-                            attrs: Vec::new(),
-                            member: Member::Named(Ident::new("mockable", span)),
-                            colon_token: Some(Token![:](span)),
-                            expr: Expr::Call(expr::call::new(
-                                span,
-                                Expr::Path(ExprPath {
-                                    attrs: Vec::new(),
-                                    qself: None,
-                                    path: path::new(span, ["Box", "new"]),
-                                }),
-                                [Expr::Path(self_expr_path(span))],
-                            )),
-                        },
+                        mockable_field::new_value(span, Expr::Path(self_expr_path(span))),
                     ]),
                     dot2_token: None,
                     rest: None,

@@ -1,5 +1,4 @@
-use crate::common::generics_field;
-use crate::generation::common::data_field;
+use crate::common::*;
 use crate::generation::mock_controls::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
@@ -78,7 +77,6 @@ fn generate_fn_as_trait(
     trait_generics: Generics,
     is_static: bool,
 ) -> ImplItemFn {
-    // TODO - generics should be equal to `trait_control_struct_path` path generics
     let result = ImplItemFn {
         attrs: vec![attributes::allow_non_snake_case(span)],
         vis: Visibility::Public(Token![pub](span)),

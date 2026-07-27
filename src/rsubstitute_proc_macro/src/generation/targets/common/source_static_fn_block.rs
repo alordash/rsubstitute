@@ -1,3 +1,4 @@
+use crate::common::*;
 use crate::syntax::*;
 use proc_macro2::Span;
 use quote::format_ident;
@@ -5,6 +6,7 @@ use syn::*;
 
 pub(crate) fn replace(
     span: Span,
+    struct_path: &Path,
     mock_struct_path: Path,
     item_impl: &mut ItemImpl,
     maybe_trait_path: Option<Path>,
@@ -29,6 +31,11 @@ pub(crate) fn replace(
         gt_token: Token![>](span),
     });
     for static_fn in static_fns {
+        normalization::normalize_struct_type_references_in_impl_item_fn(
+            static_fn,
+            struct_path,
+            mock_struct_path.clone(),
+        );
         let args = static_fn
             .sig
             .inputs

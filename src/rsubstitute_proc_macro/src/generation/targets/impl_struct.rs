@@ -31,7 +31,6 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
             associated_fns: &impl_struct_info.associated_fns,
             static_fns: &impl_struct_info.static_fns,
             generics: impl_struct_info.generics.clone(),
-            maybe_trait_path: None,
         },
     );
     let maybe_associated_controls_impls =
@@ -112,7 +111,13 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
         );
         (static_setup_impl, static_received_impl)
     });
-    source_static_fn_block::replace(source_span, mock_struct_path, &mut item_impl, None);
+    source_static_fn_block::replace(
+        source_span,
+        &impl_struct_info.target_path,
+        mock_struct_path,
+        &mut item_impl,
+        None,
+    );
 
     let use_struct_mod = use_struct_mod::generate(source_span, &impl_struct_info.target_path);
     let mock_mod_usages = mock_mod_usages::new(source_span);

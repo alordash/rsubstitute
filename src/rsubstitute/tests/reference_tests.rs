@@ -14,7 +14,7 @@ pub struct Data<'a, 'b, T1, T2> {
 #[mock]
 #[allow(unused)]
 trait Trait<'a, 'b: 'a, T1: Clone> {
-    fn work<'c, 'd: 'a, T2: Clone>(
+    fn worko<'c, 'd: 'a, T2: Clone>(
         &self,
         a: &'a i32,
         b: &'b i32,
@@ -120,58 +120,58 @@ impl<'a, 'b: 'a, T1: Clone> Struct<'a, 'b, T1> {
     }
 }
 
-// #[mock(base)]
-// #[allow(unused)]
-// impl<'a, 'b: 'a, T1: Clone> Trait<'a, 'b, T1> for Struct<'a, 'b, T1> {
-//     fn work<'c, 'd: 'a, T2: Clone>(
-//         &self,
-//         a: &'a i32,
-//         b: &'b i32,
-//         c: &'c i32,
-//         d: &'d i32,
-//         axb: &'a &&'b i32,
-//         cxd: &'c &&'d i32,
-//         abxbax: &'a &'b &&'b &'a &i32,
-//         cdxdcx: &'c &'d &&'d &'c &i32,
-//         abcd: &'a &'b &'c &'d i32,
-//         xaxbxcxdx: &&'a &&'b &&'c &&'d &i32,
-//         data: Data<
-//             'a,
-//             'b,
-//             &&i32,
-//             &&'a &&'b &[&'c &&'b &Data<'c, 'a, &&&'c &i32, Vec<&'d &'b &()>>],
-//         >,
-//         t1: T1,
-//         t1_ref: &T1,
-//         xaxbxcxdx_t1_ref: &&'a &&'b &&'c &&'d &T1,
-//         t2: T2,
-//         t2_ref: &T2,
-//         xaxbxcxdx_t2_ref: &&'a &&'b &&'c &&'d &T2,
-//         xapx: &&'a *const &i32,
-//     ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 {
-//         Struct::<'a, 'b, T1>::work(
-//             self,
-//             a,
-//             b,
-//             c,
-//             d,
-//             axb,
-//             cxd,
-//             abxbax,
-//             cdxdcx,
-//             abcd,
-//             xaxbxcxdx,
-//             data,
-//             t1,
-//             t1_ref,
-//             xaxbxcxdx_t1_ref,
-//             t2,
-//             t2_ref,
-//             xaxbxcxdx_t2_ref,
-//             xapx,
-//         )
-//     }
-// }
+#[mock(base)]
+#[allow(unused)]
+impl<'a, 'b: 'a, T1: Clone> Trait<'a, 'b, T1> for Struct<'a, 'b, T1> {
+    fn worko<'c, 'd: 'a, T2: Clone>(
+        &self,
+        a: &'a i32,
+        b: &'b i32,
+        c: &'c i32,
+        d: &'d i32,
+        axb: &'a &&'b i32,
+        cxd: &'c &&'d i32,
+        abxbax: &'a &'b &&'b &'a &i32,
+        cdxdcx: &'c &'d &&'d &'c &i32,
+        abcd: &'a &'b &'c &'d i32,
+        xaxbxcxdx: &&'a &&'b &&'c &&'d &i32,
+        data: Data<
+            'a,
+            'b,
+            &&i32,
+            &&'a &&'b &[&'c &&'b &Data<'c, 'a, &&&'c &i32, Vec<&'d &'b &()>>],
+        >,
+        t1: T1,
+        t1_ref: &T1,
+        xaxbxcxdx_t1_ref: &&'a &&'b &&'c &&'d &T1,
+        t2: T2,
+        t2_ref: &T2,
+        xaxbxcxdx_t2_ref: &&'a &&'b &&'c &&'d &T2,
+        xapx: &&'a *const &i32,
+    ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 {
+        Struct::<'a, 'b, T1>::work(
+            self,
+            a,
+            b,
+            c,
+            d,
+            axb,
+            cxd,
+            abxbax,
+            cdxdcx,
+            abcd,
+            xaxbxcxdx,
+            data,
+            t1,
+            t1_ref,
+            xaxbxcxdx_t1_ref,
+            t2,
+            t2_ref,
+            xaxbxcxdx_t2_ref,
+            xapx,
+        )
+    }
+}
 
 #[cfg(test)]
 mod tests {
@@ -214,7 +214,7 @@ mod tests {
                                                 let xaxbxcxdx_t2_ref = &&&&&&&&&true;
                                                 let xapx = &&(&(&188) as *const _);
                                                 mock.setup()
-                                                    .work(
+                                                    .worko(
                                                         a,
                                                         b,
                                                         c,
@@ -237,7 +237,7 @@ mod tests {
                                                     .returns(return_value);
 
                                                 // Act
-                                                let actual_return_value = mock.work(
+                                                let actual_return_value = mock.worko(
                                                     a,
                                                     b,
                                                     c,
@@ -262,7 +262,7 @@ mod tests {
                                                 assert_eq!(return_value, actual_return_value);
 
                                                 mock.received()
-                                                    .work(
+                                                    .worko(
                                                         a,
                                                         b,
                                                         c,
@@ -468,32 +468,33 @@ mod tests {
                                                         xapx,
                                                     )
                                                     .returns(return_value);
-                                                // mock.setup
-                                                //     .as_Trait
-                                                //     .work(
-                                                //         a,
-                                                //         b,
-                                                //         c,
-                                                //         d,
-                                                //         axb,
-                                                //         cxd,
-                                                //         abxbax,
-                                                //         cdxdcx,
-                                                //         abcd,
-                                                //         xaxbxcxdx,
-                                                //         data.clone(),
-                                                //         t1,
-                                                //         t1_ref,
-                                                //         xaxbxcxdx_t1_ref,
-                                                //         t2,
-                                                //         t2_ref,
-                                                //         xaxbxcxdx_t2_ref,
-                                                //         xapx,
-                                                //     )
-                                                //     .call_base();
+                                                mock.setup()
+                                                    .as_Trait()
+                                                    .worko(
+                                                        a,
+                                                        b,
+                                                        c,
+                                                        d,
+                                                        axb,
+                                                        cxd,
+                                                        abxbax,
+                                                        cdxdcx,
+                                                        abcd,
+                                                        xaxbxcxdx,
+                                                        data.clone(),
+                                                        t1,
+                                                        t1_ref,
+                                                        xaxbxcxdx_t1_ref,
+                                                        t2,
+                                                        t2_ref,
+                                                        xaxbxcxdx_t2_ref,
+                                                        xapx,
+                                                    )
+                                                    .call_base();
 
                                                 // Act
-                                                let actual_return_value = mock.work(
+                                                use Trait;
+                                                let actual_return_value = mock.worko(
                                                     a,
                                                     b,
                                                     c,
@@ -517,27 +518,27 @@ mod tests {
                                                 // Assert
                                                 assert_eq!(return_value, actual_return_value);
 
-                                                // mock.received().as_Trait.work(
-                                                //     a,
-                                                //     b,
-                                                //     c,
-                                                //     d,
-                                                //     axb,
-                                                //     cxd,
-                                                //     abxbax,
-                                                //     cdxdcx,
-                                                //     abcd,
-                                                //     xaxbxcxdx,
-                                                //     data.clone(),
-                                                //     t1,
-                                                //     t1_ref,
-                                                //     xaxbxcxdx_t1_ref,
-                                                //     t2,
-                                                //     t2_ref,
-                                                //     xaxbxcxdx_t2_ref,
-                                                //     xapx,
-                                                //     Times::Once,
-                                                // );
+                                                mock.received().as_Trait().worko(
+                                                    a,
+                                                    b,
+                                                    c,
+                                                    d,
+                                                    axb,
+                                                    cxd,
+                                                    abxbax,
+                                                    cdxdcx,
+                                                    abcd,
+                                                    xaxbxcxdx,
+                                                    data.clone(),
+                                                    t1,
+                                                    t1_ref,
+                                                    xaxbxcxdx_t1_ref,
+                                                    t2,
+                                                    t2_ref,
+                                                    xaxbxcxdx_t2_ref,
+                                                    xapx,
+                                                    Times::Once,
+                                                );
 
                                                 mock.received()
                                                     .work(

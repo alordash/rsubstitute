@@ -5,7 +5,7 @@ use crate::common::*;
 use crate::preparation::*;
 use crate::syntax::*;
 use proc_macro2::Span;
-use quote::ToTokens;
+use quote::{format_ident, ToTokens};
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::*;
@@ -28,7 +28,7 @@ pub(crate) fn prepare(
     }: Params,
 ) -> FnSyntax {
     let merged_generics = combine_generics(signature.generics.clone(), maybe_owner);
-    let fn_ident = signature.ident.clone();
+    let fn_ident = format_fn_ident(signature.ident.clone(), maybe_owner);
     let fn_data_name = format_fn_data_name(signature.ident.clone(), maybe_owner);
     let spans = Spans {
         inputs: signature.inputs.span(),
@@ -70,6 +70,13 @@ pub(crate) fn prepare(
         return_type,
     };
     return result;
+}
+
+fn format_fn_ident(fn_ident: Ident, maybe_owner: Option<&dyn IFnOwner>) -> Ident {
+    if let Some(owner_ident) = maybe_owner.map(|x| x.maybe_ident()).flatten() {
+        return format_ident!("{owner_ident}_{fn_ident}");
+    }
+    return fn_ident;
 }
 
 fn format_fn_data_name(fn_ident: Ident, maybe_owner: Option<&dyn IFnOwner>) -> String {

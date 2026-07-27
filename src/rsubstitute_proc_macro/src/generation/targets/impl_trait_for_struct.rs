@@ -174,19 +174,20 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
     });
     source_static_fn_block::replace(
         source_span,
+        &impl_trait_for_struct_info.target_path,
         mock_struct_path.clone(),
         &mut item_impl,
         Some(impl_trait_for_struct_info.trait_path.clone()),
     );
-    let mock_struct_impl = mock_struct_impl::generate(
+    let mock_struct_impls = mock_struct_impl::generate_for_trait(
         ctx,
         source_span,
-        mock_struct_impl::Params {
+        mock_struct_impl::ParamsForTrait {
             mock_struct_path: mock_struct_path.clone(),
             associated_fns: &impl_trait_for_struct_info.associated_fns,
             static_fns: &impl_trait_for_struct_info.static_fns,
             generics: impl_trait_for_struct_info.merged_generics,
-            maybe_trait_path: Some(impl_trait_for_struct_info.trait_path.clone()),
+            trait_path: impl_trait_for_struct_info.trait_path.clone(),
         },
     );
 
@@ -242,7 +243,13 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                 ])
             }),
     )
-    .chain(core::iter::once(Item::Impl(mock_struct_impl)))
+    .chain(core::iter::once(Item::Impl(mock_struct_impls.trait_impl)))
+    .chain(
+        mock_struct_impls
+            .maybe_base_fns_impl
+            .map(Item::Impl)
+            .into_iter(),
+    )
     .chain(maybe_associated_controls.into_iter().flat_map(|x| {
         [
             Item::Struct(x.trait_setup_struct.item_struct),

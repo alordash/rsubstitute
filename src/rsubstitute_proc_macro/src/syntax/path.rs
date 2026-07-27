@@ -101,3 +101,16 @@ pub(crate) fn last_ident(path: &Path) -> Ident {
         .clone();
     return result;
 }
+
+pub(crate) fn starts_with(path: &Path, start: &Path) -> bool {
+    if path.segments.len() < start.segments.len() {
+        return false;
+    }
+
+    let result = start
+        .segments
+        .iter()
+        .zip(path.segments.iter())
+        .all(|(left, right)| left.ident == right.ident);
+    return result;
+}

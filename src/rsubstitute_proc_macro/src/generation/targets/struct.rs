@@ -110,6 +110,7 @@ pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
     let struct_mock_struct = struct_mock_struct::generate(
         source_span,
         struct_mock_struct::Params {
+            attrs: item_struct.attrs.clone(),
             struct_ident: item_struct.ident.clone(),
             struct_mock_ident: struct_mock_ident.clone(),
             generics: item_struct.generics.clone(),

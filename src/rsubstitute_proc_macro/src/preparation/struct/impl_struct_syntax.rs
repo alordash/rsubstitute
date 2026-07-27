@@ -1,4 +1,5 @@
 use super::models::*;
+use crate::common::normalization;
 use crate::preparation::models::*;
 use crate::preparation::r#fn::models::*;
 use crate::preparation::r#fn::*;
@@ -19,11 +20,15 @@ pub(crate) fn prepare(
         attributes,
         generics,
         target_type,
-        impl_items,
+        mut impl_items,
     }: Params,
 ) -> ImplStructSyntax {
-    let split_items = split_items(impl_items);
     let target_path = parse_target_type(&target_type);
+    impl_items = impl_items
+        .into_iter()
+        .map(|x| normalization::normalize_struct_type_references(x, &target_path))
+        .collect();
+    let split_items = split_items(impl_items);
     let impl_struct_syntax_as_fn_owner = ImplStructSyntaxAsFnOwner {
         generics: &generics,
     };

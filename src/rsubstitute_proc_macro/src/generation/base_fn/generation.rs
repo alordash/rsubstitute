@@ -1,12 +1,11 @@
 use crate::common::*;
-use crate::generation::common::models::*;
-use crate::generation::common::*;
 use crate::generation::fn_info::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
 use quote::format_ident;
 use syn::punctuated::Punctuated;
 use syn::*;
+use crate::common::models::*;
 
 pub(crate) fn get_base_fn_ident(fn_ident: &Ident) -> Ident {
     format_ident!("__rs_base_{}", fn_ident)

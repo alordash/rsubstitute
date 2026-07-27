@@ -1,11 +1,11 @@
-use crate::common::generics_field;
-use crate::generation::common::data_field;
+use crate::common::*;
 use crate::generation::mock_struct::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
 use syn::*;
 
 pub(crate) struct Params {
+    pub attrs: Vec<Attribute>,
     pub struct_ident: Ident,
     pub struct_mock_ident: Ident,
     pub generics: Generics,
@@ -16,6 +16,7 @@ pub(crate) struct Params {
 pub(crate) fn generate(
     span: Span,
     Params {
+        attrs,
         struct_ident,
         struct_mock_ident,
         generics,
@@ -26,7 +27,7 @@ pub(crate) fn generate(
 ) -> StructMockStruct {
     let path = path::from_ident_with_generics(struct_ident.clone(), &generics);
     let item_struct = ItemStruct {
-        attrs: Vec::new(),
+        attrs,
         vis: Visibility::Public(Token![pub](span)),
         struct_token: Token![struct](span),
         ident: struct_mock_ident,
@@ -36,22 +37,7 @@ pub(crate) fn generate(
             named: punctuated([
                 generics_field::new_field(span, generics, None),
                 data_field::new_field(span, data_field::Params { public: true }),
-                Field {
-                    attrs: Vec::new(),
-                    vis: Visibility::Public(Token![pub](span)),
-                    modifiers: FieldModifiers::default(),
-                    ident: Some(Ident::new("mockable", span)),
-                    colon_token: Some(Token![:](span)),
-                    ty: Type::Path(r#type::box_of(
-                        span,
-                        Type::Path(TypePath {
-                            attrs: Vec::new(),
-                            qself: None,
-                            path: path.clone(),
-                        }),
-                    )),
-                    default: None,
-                },
+                mockable_field::new_field(span, path.clone()),
             ]),
         }),
         semi_token: None,

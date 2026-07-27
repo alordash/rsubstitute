@@ -1,4 +1,4 @@
-use crate::generation::common::models::*;
+use crate::common::models::*;
 use crate::preparation::r#fn::models::*;
 use crate::syntax::*;
 use quote::format_ident;
