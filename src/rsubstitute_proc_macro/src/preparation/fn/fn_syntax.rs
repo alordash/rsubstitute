@@ -39,7 +39,7 @@ pub(crate) fn prepare(
     } = split_inputs_into_maybe_self_type_and_arguments(signature.inputs.clone());
     let generics_field = generics_field::new_field(
         signature.generics.span(),
-        merged_generics.clone(),
+        &merged_generics,
         Some(arguments.iter_generics_style_types().collect()),
     );
     let arg_refs_tuple = generate_arg_refs_tuple(spans.inputs, &arguments);

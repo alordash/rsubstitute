@@ -1,10 +1,14 @@
 use crate::common::models::*;
+use crate::common::*;
 use crate::generation::fn_info::models::*;
 use crate::generation::mock_struct::models::*;
 use crate::generation::mock_struct::*;
 use crate::generation::*;
 use crate::preparation::models::*;
+use crate::syntax::*;
 use proc_macro2::Span;
+use quote::format_ident;
+use syn::punctuated::Punctuated;
 use syn::*;
 
 pub(crate) struct Params<'a> {
@@ -61,12 +65,12 @@ pub(crate) struct ParamsForTrait<'a> {
     pub mock_struct_path: Path,
     pub associated_fns: &'a [Ordered<FnInfo>],
     pub static_fns: &'a [Ordered<FnInfo>],
-    pub generics: Generics,
+    pub merged_generics: Generics,
     pub trait_path: Path,
 }
 pub(crate) struct ResultForTrait {
     pub trait_impl: ItemImpl,
-    pub maybe_base_fns_impl: Option<ItemImpl>,
+    pub maybe_base_trait_and_fns_impl: Option<(ItemTrait, ItemImpl)>,
 }
 pub(crate) fn generate_for_trait(
     ctx: &Context,
@@ -75,12 +79,12 @@ pub(crate) fn generate_for_trait(
         mock_struct_path,
         associated_fns,
         static_fns,
-        generics,
+        merged_generics,
         trait_path,
     }: ParamsForTrait,
 ) -> ResultForTrait {
-    let maybe_base_fns_impl = ctx.support_base_calling.then(|| {
-        let base_fn_items = associated_fns
+    let maybe_base_trait_and_fns_impl = ctx.support_base_calling.then(|| {
+        let base_fns: Vec<_> = associated_fns
             .iter()
             .chain(static_fns.iter())
             .map(|ordered| {
@@ -90,16 +94,86 @@ pub(crate) fn generate_for_trait(
                 Some(x) => Some(Ordered::new(ordered.order_number, x)),
                 _ => None,
             })
+            .collect();
+        let fn_generics = TraitItemFn {
+            attrs: Vec::new(),
+            modifiers: FnModifiers::default(),
+            sig: Signature {
+                constness: None,
+                asyncness: None,
+                safety: Safety::Default,
+                abi: None,
+                fn_token: Token![fn](span),
+                ident: Ident::new("__generics", span),
+                generics: Generics::default(),
+                paren_token: token::Paren(span),
+                inputs: Punctuated::new(),
+                variadic: None,
+                output: ReturnType::Type(
+                    Token![->](span),
+                    Box::new(generics_phantom_data::new(
+                        span,
+                        generics_phantom_data::Params {
+                            generics: &merged_generics,
+                            maybe_argument_types: None,
+                        },
+                    )),
+                ),
+            },
+            default: Some(Block {
+                brace_token: token::Brace(span),
+                stmts: vec![Stmt::Expr(
+                    Expr::Path(ExprPath {
+                        attrs: Vec::new(),
+                        qself: None,
+                        path: path::new_global(span, ["core", "marker", "PhantomData"]),
+                    }),
+                    None,
+                )],
+            }),
+            semi_token: None,
+        };
+        let trait_base_fns: Vec<TraitItemFn> = base_fns
+            .iter()
+            .map(|x| TraitItemFn {
+                attrs: Vec::new(),
+                modifiers: FnModifiers::default(),
+                sig: x.sig.clone(),
+                default: None,
+                semi_token: Some(Token![;](span)),
+            })
+            .collect();
+        let base_fn_trait = ItemTrait {
+            attrs: Vec::new(),
+            vis: Visibility::Inherited,
+            modifiers: TraitModifiers::default(),
+            unsafety: None,
+            trait_token: Token![trait](span),
+            ident: format_ident!("__rs_base_{}", path::last_ident(&trait_path)),
+            generics: merged_generics.clone(),
+            colon_token: None,
+            supertraits: Punctuated::new(),
+            brace_token: token::Brace(span),
+            items: core::iter::once(fn_generics)
+                .chain(trait_base_fns)
+                .map(TraitItem::Fn)
+                .collect(),
+        };
+        let base_fn_items = base_fns
+            .into_iter()
             .map(|x| ImplItem::Fn(x.value))
             .collect();
         let base_fns_impl = generate_item_impl(
             span,
-            generics.clone(),
+            merged_generics.clone(),
             mock_struct_path.clone(),
             base_fn_items,
-            None,
+            Some(path::from_ident_with_generics(
+                base_fn_trait.ident.clone(),
+                &base_fn_trait.generics,
+            )),
         );
-        return base_fns_impl;
+        return (base_fn_trait, base_fns_impl);
     });
     let mut fns: Vec<_> = associated_fns
         .iter()
@@ -112,10 +186,16 @@ pub(crate) fn generate_for_trait(
         .collect();
     fns.sort_by(|a, b| a.order_number.cmp(&b.order_number));
     let items = fns.into_iter().map(|x| ImplItem::Fn(x.value)).collect();
-    let trait_impl = generate_item_impl(span, generics, mock_struct_path, items, Some(trait_path));
+    let trait_impl = generate_item_impl(
+        span,
+        merged_generics,
+        mock_struct_path,
+        items,
+        Some(trait_path),
+    );
     let result = ResultForTrait {
         trait_impl,
-        maybe_base_fns_impl,
+        maybe_base_trait_and_fns_impl,
     };
     return result;
 }

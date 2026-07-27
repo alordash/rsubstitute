@@ -4,11 +4,11 @@ use crate::syntax::*;
 use proc_macro2::Span;
 use syn::*;
 
-pub(crate) struct Params {
+pub(crate) struct Params<'a> {
     pub attrs: Vec<Attribute>,
     pub struct_ident: Ident,
     pub struct_mock_ident: Ident,
-    pub generics: Generics,
+    pub generics: &'a Generics,
     pub generics_for_impl: Generics,
     pub struct_setup_ident: Ident,
     pub struct_received_ident: Ident,
@@ -25,7 +25,7 @@ pub(crate) fn generate(
         struct_received_ident,
     }: Params,
 ) -> StructMockStruct {
-    let path = path::from_ident_with_generics(struct_ident.clone(), &generics);
+    let path = path::from_ident_with_generics(struct_ident.clone(), generics);
     let item_struct = ItemStruct {
         attrs,
         vis: Visibility::Public(Token![pub](span)),

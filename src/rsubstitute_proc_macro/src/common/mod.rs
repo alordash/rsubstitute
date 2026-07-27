@@ -13,6 +13,7 @@ pub(crate) mod mockable_field;
 pub(crate) mod normalization;
 pub(crate) mod rsubstitute_lifetime;
 pub(crate) mod transmute_lifetime_expr;
+pub(crate) mod generics_phantom_data;
 
 mod rsubstitute_self;
 pub(crate) use rsubstitute_self::*;

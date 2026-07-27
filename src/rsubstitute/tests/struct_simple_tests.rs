@@ -52,7 +52,7 @@ mod tests {
             let callback_flag_clone = callback_flag.clone();
             mock.setup()
                 .f()
-                .does(move |_| *callback_flag_clone.borrow_mut() = true);
+                .does(move |_, _| *callback_flag_clone.borrow_mut() = true);
 
             // Act
             Struct::non_associative();
@@ -183,7 +183,7 @@ Received no non-matching calls"#,
             mock.setup()
                 .as_Trait()
                 .f()
-                .does(move |_| *callback_flag_clone.borrow_mut() = true);
+                .does(move |_, _| *callback_flag_clone.borrow_mut() = true);
 
             // Act
             Struct::non_associative();

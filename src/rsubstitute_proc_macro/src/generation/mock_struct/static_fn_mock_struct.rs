@@ -18,7 +18,7 @@ pub(crate) fn generate(span: Span, fn_info: &FnInfo) -> StaticFnMockStruct {
             brace_token: token::Brace(span),
             named: punctuated([generics_field::new_field(
                 span,
-                fn_info.merged_generics.clone(),
+                &fn_info.merged_generics,
                 Some(fn_info.arguments.iter_generics_style_types().collect()),
             )]),
         }),

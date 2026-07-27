@@ -28,7 +28,7 @@ pub(crate) fn generate(
         (true, ControlType::Received) => "StaticReceived",
     };
     generics.where_clause = None;
-    let generics_field = generics_field::new_field(span, generics.clone(), None);
+    let generics_field = generics_field::new_field(span, &generics, None);
     let result = ItemStruct {
         attrs: Vec::new(),
         vis: Visibility::Public(Token![pub](span)),

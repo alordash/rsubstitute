@@ -186,7 +186,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
             mock_struct_path: mock_struct_path.clone(),
             associated_fns: &impl_trait_for_struct_info.associated_fns,
             static_fns: &impl_trait_for_struct_info.static_fns,
-            generics: impl_trait_for_struct_info.merged_generics,
+            merged_generics: impl_trait_for_struct_info.merged_generics,
             trait_path: impl_trait_for_struct_info.trait_path.clone(),
         },
     );
@@ -246,9 +246,10 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
     .chain(core::iter::once(Item::Impl(mock_struct_impls.trait_impl)))
     .chain(
         mock_struct_impls
-            .maybe_base_fns_impl
-            .map(Item::Impl)
-            .into_iter(),
+            .maybe_base_trait_and_fns_impl
+            .map(|(base_trait, base_fns_impl)| [Item::Trait(base_trait), Item::Impl(base_fns_impl)])
+            .into_iter()
+            .flatten(),
     )
     .chain(maybe_associated_controls.into_iter().flat_map(|x| {
         [

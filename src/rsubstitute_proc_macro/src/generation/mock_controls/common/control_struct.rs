@@ -27,7 +27,7 @@ pub(crate) fn new(
         fields: Fields::Named(FieldsNamed {
             brace_token: token::Brace(span),
             named: punctuated([
-                generics_field::new_field(span, generics, None),
+                generics_field::new_field(span, &generics, None),
                 data_field::new_field(span, data_field::Params { public: false }),
             ]),
         }),
@@ -60,7 +60,7 @@ pub(crate) fn new_static(
             brace_token: token::Brace(span),
             named: punctuated([generics_field::new_field(
                 span,
-                generics.clone(),
+                &generics,
                 maybe_argument_types,
             )]),
         }),

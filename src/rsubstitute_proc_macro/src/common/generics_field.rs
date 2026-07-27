@@ -1,10 +1,11 @@
+use crate::common::generics_phantom_data;
 use crate::syntax::*;
 use proc_macro2::Span;
 use syn::*;
 
 pub(crate) fn new_field(
     span: Span,
-    generics: Generics,
+    generics: &Generics,
     maybe_argument_types: Option<Vec<Type>>,
 ) -> Field {
     let result = Field {
@@ -13,44 +14,13 @@ pub(crate) fn new_field(
         modifiers: FieldModifiers::default(),
         ident: Some(generics_field_ident(span)),
         colon_token: Some(Token![:](span)),
-        ty: Type::Path(TypePath {
-            attrs: Vec::new(),
-            qself: None,
-            path: path::new_generics_global(
-                span,
-                ["core", "marker", "PhantomData"],
-                [GenericArgument::Type(Type::Tuple(TypeTuple {
-                    attrs: Vec::new(),
-                    paren_token: token::Paren(span),
-                    elems: generics
-                        .params
-                        .into_iter()
-                        .filter_map(|x| match x {
-                            GenericParam::Lifetime(lifetime) => {
-                                Some(Type::Reference(TypeReference {
-                                    attrs: Vec::new(),
-                                    and_token: Token![&](span),
-                                    lifetime: Some(lifetime.lifetime),
-                                    mutability: None,
-                                    elem: Box::new(void_type(span)),
-                                }))
-                            }
-                            GenericParam::Type(ty) => Some(Type::Path(TypePath {
-                                attrs: Vec::new(),
-                                qself: None,
-                                path: path::from_ident(ty.ident.clone()),
-                            })),
-                            _ => None,
-                        })
-                        .chain(
-                            maybe_argument_types
-                                .into_iter()
-                                .flat_map(|arguments| arguments.into_iter()),
-                        )
-                        .collect(),
-                }))],
-            ),
-        }),
+        ty: generics_phantom_data::new(
+            span,
+            generics_phantom_data::Params {
+                generics,
+                maybe_argument_types,
+            },
+        ),
         default: None,
     };
     return result;
