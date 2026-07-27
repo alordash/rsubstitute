@@ -12,32 +12,32 @@ pub const DEFAULT_STRUCT_GET_VALUE: i32 = 200;
 pub const DEFAULT_FIRST_TRAIT_GET_VALUE: i32 = 500;
 pub const DEFAULT_SECOND_TRAIT_GET_VALUE: &'static str = "quo vadis";
 
-mock_base! {
-    struct Struct;
+#[mock]
+struct Struct;
 
-    impl Struct {
-        pub fn new() -> Self { Self }
-
-        pub fn get(&self) -> i32 {
-            DEFAULT_STRUCT_GET_VALUE
-        }
-
-        pub fn get_plus_one(&self) -> i32 {
-            let value = self.get() + FirstTrait::get(self);
-            return value;
-        }
+#[mock(base)]
+impl Struct {
+    pub fn get(&self) -> i32 {
+        DEFAULT_STRUCT_GET_VALUE
     }
 
-    impl FirstTrait for Struct {
-        fn get(&self) -> i32 {
-            DEFAULT_FIRST_TRAIT_GET_VALUE
-        }
+    pub fn get_plus_one(&self) -> i32 {
+        let value = self.get() + FirstTrait::get(self);
+        return value;
     }
+}
 
-    impl SecondTrait for Struct {
-        fn get(&self) -> &str {
-            DEFAULT_SECOND_TRAIT_GET_VALUE
-        }
+#[mock(base)]
+impl FirstTrait for Struct {
+    fn get(&self) -> i32 {
+        DEFAULT_FIRST_TRAIT_GET_VALUE
+    }
+}
+
+#[mock(base)]
+impl SecondTrait for Struct {
+    fn get(&self) -> &str {
+        DEFAULT_SECOND_TRAIT_GET_VALUE
     }
 }
 
@@ -50,10 +50,10 @@ mod tests {
     #[test]
     fn get_plus_one_Ok() {
         // Arrange
-        let mock = Struct::new();
+        let mut mock = Struct.mock();
 
         let value = 302;
-        mock.setup.get_plus_one().returns(value);
+        mock.setup().get_plus_one().returns(value);
 
         // Act
         let actual_value = mock.get_plus_one();
@@ -61,17 +61,17 @@ mod tests {
         // Assert
         assert_eq!(value, actual_value);
 
-        mock.received.get_plus_one(Times::Once).no_other_calls();
+        mock.received().get_plus_one(Times::Once).no_other_calls();
     }
 
     #[test]
     fn get_plus_one_CallBase_Ok() {
         // Arrange
-        let mock = Struct::new();
+        let mut mock = Struct.mock();
 
         let struct_value = 302;
         let trait_value = 33;
-        mock.setup
+        mock.setup()
             .get()
             .returns(struct_value)
             .get_plus_one()
@@ -82,7 +82,7 @@ mod tests {
                     core::any::type_name_of_val(mock)
                 )
             })
-            .as_FirstTrait
+            .as_FirstTrait()
             .get()
             .returns(trait_value);
 
@@ -93,26 +93,26 @@ mod tests {
         let expected_value = struct_value + trait_value;
         assert_eq!(expected_value, actual_value);
 
-        mock.received
+        mock.received()
             .get(Times::Once)
             .get_plus_one(Times::Once)
-            .as_FirstTrait
+            .as_FirstTrait()
             .get(Times::Once);
-        mock.received.no_other_calls();
+        mock.received().no_other_calls();
     }
 
     #[test]
     fn get_plus_one_StructCallBase_Ok() {
         // Arrange
-        let mock = Struct::new();
+        let mut mock = Struct.mock();
 
         let trait_value = 33;
-        mock.setup
+        mock.setup()
             .get()
             .call_base()
             .get_plus_one()
             .call_base()
-            .as_FirstTrait
+            .as_FirstTrait()
             .get()
             .returns(trait_value);
 
@@ -123,25 +123,25 @@ mod tests {
         let expected_value = DEFAULT_STRUCT_GET_VALUE + trait_value;
         assert_eq!(expected_value, actual_value);
 
-        mock.received
+        mock.received()
             .get(Times::Once)
             .get_plus_one(Times::Once)
-            .as_FirstTrait
+            .as_FirstTrait()
             .get(Times::Once);
-        mock.received.no_other_calls();
+        mock.received().no_other_calls();
     }
 
     #[test]
     fn get_plus_one_StructAndTraitCallBase_Ok() {
         // Arrange
-        let mock = Struct::new();
+        let mut mock = Struct.mock();
 
-        mock.setup
+        mock.setup()
             .get()
             .call_base()
             .get_plus_one()
             .call_base()
-            .as_FirstTrait
+            .as_FirstTrait()
             .get()
             .call_base();
 
@@ -152,26 +152,26 @@ mod tests {
         let expected_value = DEFAULT_STRUCT_GET_VALUE + DEFAULT_FIRST_TRAIT_GET_VALUE;
         assert_eq!(expected_value, actual_value);
 
-        mock.received
+        mock.received()
             .get(Times::Once)
             .get_plus_one(Times::Once)
-            .as_FirstTrait
+            .as_FirstTrait()
             .get(Times::Once);
-        mock.received.no_other_calls();
+        mock.received().no_other_calls();
     }
 
     #[test]
     fn get_SelfAndBothTraits_Ok() {
         // Arrange
-        let mock = Struct::new();
+        let mut mock = Struct.mock();
 
         let self_value = 5;
         let first_trait_value = 15;
         let second_trait_value = "veridis quo";
-        let setup = &mock.setup;
+        let setup = &mock.setup();
         setup.get().returns(self_value);
-        setup.as_FirstTrait.get().returns(first_trait_value);
-        setup.as_SecondTrait.get().returns(second_trait_value);
+        setup.as_FirstTrait().get().returns(first_trait_value);
+        setup.as_SecondTrait().get().returns(second_trait_value);
 
         // Act
         let actual_self_value = mock.get();
@@ -183,10 +183,10 @@ mod tests {
         assert_eq!(first_trait_value, actual_first_trait_value);
         assert_eq!(second_trait_value, actual_second_trait_value);
 
-        let received = &mock.received;
+        let received = &mock.received();
         received.get(Times::Once);
-        received.as_FirstTrait.get(Times::Once);
-        received.as_SecondTrait.get(Times::Once);
+        received.as_FirstTrait().get(Times::Once);
+        received.as_SecondTrait().get(Times::Once);
         received.no_other_calls();
     }
 }

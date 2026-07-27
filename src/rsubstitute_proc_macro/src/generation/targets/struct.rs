@@ -15,6 +15,7 @@ use syn::*;
 pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
     let source_span = item_struct.span();
     let struct_mock_ident = format_ident!("{}Mock", item_struct.ident);
+    let generics_for_impl = generics::remove_defaults(item_struct.generics.clone());
     let struct_setup_struct = struct_control_struct::generate(
         source_span,
         struct_control_struct::Params {
@@ -24,7 +25,6 @@ pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
             is_static: false,
         },
     );
-    let generics_for_impl = generics::remove_defaults(struct_setup_struct.generics.clone());
     let struct_setup_struct_clone_impl = clone_impl::generate(
         source_span,
         generics_for_impl.clone(),

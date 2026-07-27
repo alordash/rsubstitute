@@ -32,7 +32,7 @@ mod tests {
         let flag_copy = flag.clone();
         let mut mock = TraitMock::new();
         {
-            mock.setup().mutate().does(move |_| flag_copy.set(true));
+            mock.setup().mutate().does(move |_, _| flag_copy.set(true));
             mock.setup().consume().returns(33);
         }
 
@@ -51,7 +51,7 @@ mod tests {
         let callback_flag_clone = callback_flag.clone();
         mock.setup()
             .f()
-            .does(move |_| *callback_flag_clone.borrow_mut() = true);
+            .does(move |_, _| *callback_flag_clone.borrow_mut() = true);
 
         // Act
         let result = mock.f();

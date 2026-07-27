@@ -21,21 +21,18 @@ where
 
 trait IConst<const C: usize> {}
 
-mock_base! {
-    struct Lifetime<'x: 'a, 'a, 'b, 'c, 'd>(PhantomData<&'x &'a &'b &'c &'d ()>)
-    where
-        'x: 'b;
+#[mock]
+pub struct Lifetime<'x: 'a, 'a, 'b, 'c, 'd>(PhantomData<&'x &'a &'b &'c &'d ()>)
+where
+    'x: 'b;
 
-    impl<'x: 'a + 'c, 'a, 'b, 'c, 'd> Lifetime<'x, 'a, 'b, 'c, 'd > where 'x: 'b + 'd  {
-        pub fn new() -> Self {
-            Self(PhantomData)
-        }
-    }
+#[mock(base)]
+impl<'x: 'a + 'c, 'a, 'b, 'c, 'd> Lifetime<'x, 'a, 'b, 'c, 'd> where 'x: 'b + 'd {}
 
-    impl<'x: 'a + 'c, 'a, 'b, 'c, 'd> ILifetime<'x, 'a, 'b, 'c, 'd> for Lifetime<'x, 'a, 'b, 'c, 'd>
-    where
-        'x: 'b + 'd
-    {}
+#[mock(base)]
+impl<'x: 'a + 'c, 'a, 'b, 'c, 'd> ILifetime<'x, 'a, 'b, 'c, 'd> for Lifetime<'x, 'a, 'b, 'c, 'd> where
+    'x: 'b + 'd
+{
 }
 
 struct Type<T: M1>(PhantomData<T>)
@@ -45,8 +42,6 @@ struct Const<const C: usize>;
 
 #[cfg(test)]
 mod tests {
-    use super::*;
-
     #[test]
     fn compile() {}
 }

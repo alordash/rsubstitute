@@ -13,7 +13,15 @@ pub(crate) fn generate(
     fn_info: &FnInfo,
     maybe_base_fn_ident: Option<Ident>,
 ) -> Block {
-    let generic_arguments = generic_arguments::new(ctx, span, mock_struct_path.clone(), fn_info);
+    let generic_arguments = generic_arguments::new(
+        ctx,
+        span,
+        generic_arguments::Params {
+            mock_struct_path: mock_struct_path.clone(),
+            fn_info,
+            remove_lifetime_generic_arguments: true,
+        },
+    );
     let (call_var_path, call_stmt) = call_stmt::new(span, fn_info);
     let (fn_data_var_path, fn_data_stmt) =
         fn_data_stmt::new_associated(span, fn_info, generic_arguments, call_var_path.clone());

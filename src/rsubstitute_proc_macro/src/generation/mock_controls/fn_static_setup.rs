@@ -14,7 +14,15 @@ pub(crate) fn generate(
     static_setup_path: Path,
     fn_info: &FnInfo,
 ) -> ItemFn {
-    let generic_arguments = generic_arguments::new(ctx, span, mock_path, fn_info);
+    let generic_arguments = generic_arguments::new(
+        ctx,
+        span,
+        generic_arguments::Params {
+            mock_struct_path: mock_path,
+            fn_info,
+            remove_lifetime_generic_arguments: false,
+        },
+    );
     let fn_configurator_path = fn_configurator_path::new(
         span,
         fn_info,

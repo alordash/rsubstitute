@@ -114,3 +114,20 @@ pub(crate) fn starts_with(path: &Path, start: &Path) -> bool {
         .all(|(left, right)| left.ident == right.ident);
     return result;
 }
+
+pub(crate) fn remove_lifetime_generic_arguments(mut path: Path) -> Path {
+    if let Some(last_segment) = path.segments.last_mut()
+        && let PathArguments::AngleBracketed(angle_bracketed_path_arguments) =
+            &mut last_segment.arguments
+    {
+        angle_bracketed_path_arguments.args =
+            core::mem::take(&mut angle_bracketed_path_arguments.args)
+                .into_iter()
+                .filter(|x| match x {
+                    GenericArgument::Lifetime(_) => false,
+                    _ => true,
+                })
+                .collect();
+    }
+    return path;
+}

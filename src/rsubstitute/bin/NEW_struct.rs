@@ -36,12 +36,12 @@ fn main() {
         .setup()
         .f(4)
         .returns(22f32)
-        .and_does(|(v,)| println!("mocked for 4, v = {v}"))
+        .and_does(|_, (v,)| println!("mocked for 4, v = {v}"))
         .f(3)
         .call_base()
         .f(Arg::Any)
         .returns_with(|(v,)| *v as f32 + 1f32)
-        .and_does(|(v,)| println!("mocked for any, v = {v}"));
+        .and_does(|_, (v,)| println!("mocked for any, v = {v}"));
     dbg!(s_mock.deref().f(1));
     dbg!(s_mock.f(1));
     dbg!(s_mock.f(2));

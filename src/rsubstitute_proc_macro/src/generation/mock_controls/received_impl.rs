@@ -123,7 +123,15 @@ fn generate_received_fn(
     is_static: bool,
 ) -> ImplItemFn {
     let (times_arg_path, times_arg) = times_arg::new(span);
-    let generic_arguments = generic_arguments::new(ctx, span, mock_struct_path.clone(), fn_info);
+    let generic_arguments = generic_arguments::new(
+        ctx,
+        span,
+        generic_arguments::Params {
+            mock_struct_path: mock_struct_path.clone(),
+            fn_info,
+            remove_lifetime_generic_arguments: true,
+        },
+    );
     let rsubstitute_lifetime = rsubstitute_lifetime::new(span);
     let mut generics = generics::with_prefix_lifetime(
         generics::with_lifetimes_tied_to(
@@ -241,7 +249,7 @@ fn generate_fn_no_other_calls_for_static_fn(span: Span, mock_struct_path: Path) 
                 [GenericArgument::Type(Type::Path(TypePath {
                     attrs: Vec::new(),
                     qself: None,
-                    path: mock_struct_path,
+                    path: path::remove_lifetime_generic_arguments(mock_struct_path),
                 }))],
             ),
         }),

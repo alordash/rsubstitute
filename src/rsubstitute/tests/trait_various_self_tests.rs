@@ -70,11 +70,11 @@ mod tests {
             // Arrange
             let mut mock = TraitMock::new();
             let counter = Counter::new();
-            mock.setup().by_value().does(move |_| counter.inc());
+            mock.setup().by_value().does(move |_, _| counter.inc());
             mock.setup()
                 .by_value()
                 .call_base()
-                .and_does(move |_| counter.double_inc());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             mock.clone().by_value();
@@ -90,11 +90,13 @@ mod tests {
             // Arrange
             let mut mock = TraitMock::new();
             let counter = Counter::new();
-            mock.setup().by_value_colon().does(move |_| counter.inc());
+            mock.setup()
+                .by_value_colon()
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_value_colon()
                 .call_base()
-                .and_does(move |_| counter.double_inc());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             // TODO - test and write in doc about the ability to clone mocks and what does it mean
@@ -113,11 +115,11 @@ mod tests {
             // Arrange
             let mut mock = TraitMock::new();
             let counter = Counter::new();
-            mock.setup().by_mut_value().does(move |_| counter.inc());
+            mock.setup().by_mut_value().does(move |_, _| counter.inc());
             mock.setup()
                 .by_mut_value()
                 .call_base()
-                .and_does(move |_| counter.double_inc());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             mock.clone().by_mut_value();
@@ -137,11 +139,11 @@ mod tests {
             let counter = Counter::new();
             mock.setup()
                 .by_mut_value_colon()
-                .does(move |_| counter.inc());
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_mut_value_colon()
                 .call_base()
-                .and_does(move |_| counter.double_inc());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             mock.clone().by_mut_value_colon();
@@ -159,11 +161,11 @@ mod tests {
             // Arrange
             let mut mock = TraitMock::new();
             let counter = Counter::new();
-            mock.setup().by_ref().does(move |_| counter.inc());
+            mock.setup().by_ref().does(move |_, _| counter.inc());
             mock.setup()
                 .by_ref()
                 .call_base()
-                .and_does(move |_| counter.double_inc());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             mock.by_ref();
@@ -179,11 +181,11 @@ mod tests {
             // Arrange
             let mut mock = TraitMock::new();
             let counter = Counter::new();
-            mock.setup().by_ref_colon().does(move |_| counter.inc());
+            mock.setup().by_ref_colon().does(move |_, _| counter.inc());
             mock.setup()
                 .by_ref_colon()
                 .call_base()
-                .and_does(move |_| counter.double_inc());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             mock.by_ref_colon();
@@ -203,11 +205,11 @@ mod tests {
             let counter = Counter::new();
             mock.setup()
                 .by_ref_with_lifetime()
-                .does(move |_| counter.inc());
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_ref_with_lifetime()
                 .call_base()
-                .and_does(move |_| counter.double_inc());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             mock.by_ref_with_lifetime();
@@ -227,11 +229,11 @@ mod tests {
             let counter = Counter::new();
             mock.setup()
                 .by_ref_colon_with_lifetime()
-                .does(move |_| counter.inc());
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_ref_colon_with_lifetime()
                 .call_base()
-                .and_does(move |_| counter.double_inc());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             mock.by_ref_colon_with_lifetime();
@@ -249,11 +251,11 @@ mod tests {
             // Arrange
             let mut mock = TraitMock::new();
             let counter = Counter::new();
-            mock.setup().by_ref_mut().does(move |_| counter.inc());
+            mock.setup().by_ref_mut().does(move |_, _| counter.inc());
             mock.setup()
                 .by_ref_mut()
                 .call_base()
-                .and_does(move |_| counter.double_inc());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             mock.by_ref_mut();
@@ -271,11 +273,13 @@ mod tests {
             // Arrange
             let mut mock = TraitMock::new();
             let counter = Counter::new();
-            mock.setup().by_ref_mut_colon().does(move |_| counter.inc());
+            mock.setup()
+                .by_ref_mut_colon()
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_ref_mut_colon()
                 .call_base()
-                .and_does(move |_| counter.double_inc());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             mock.by_ref_mut_colon();
@@ -295,11 +299,11 @@ mod tests {
             let counter = Counter::new();
             mock.setup()
                 .by_ref_mut_with_lifetime()
-                .does(move |_| counter.inc());
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_ref_mut_with_lifetime()
                 .call_base()
-                .and_does(move |_| counter.double_inc());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             mock.by_ref_mut_with_lifetime();
@@ -319,11 +323,11 @@ mod tests {
             let counter = Counter::new();
             mock.setup()
                 .by_ref_mut_colon_with_lifetime()
-                .does(move |_| counter.inc());
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_ref_mut_colon_with_lifetime()
                 .call_base()
-                .and_does(move |_| counter.double_inc());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             mock.by_ref_mut_colon_with_lifetime();
@@ -349,11 +353,11 @@ mod tests {
             mock.setup()
                 .return_by_value()
                 .returns(first_value)
-                .and_does(move |_| counter.inc());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_value()
                 .call_base()
-                .and_does(move |_| counter.double_inc());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = mock.clone().return_by_value();
@@ -377,11 +381,11 @@ mod tests {
             mock.setup()
                 .return_by_value_colon()
                 .returns(first_value)
-                .and_does(move |_| counter.inc());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_value_colon()
                 .call_base()
-                .and_does(move |_| counter.double_inc());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = mock.clone().return_by_value_colon();
@@ -405,11 +409,11 @@ mod tests {
             mock.setup()
                 .return_by_mut_value()
                 .returns(first_value)
-                .and_does(move |_| counter.inc());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_mut_value()
                 .call_base()
-                .and_does(move |_| counter.double_inc());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = mock.clone().return_by_mut_value();
@@ -433,11 +437,11 @@ mod tests {
             mock.setup()
                 .return_by_mut_value_colon()
                 .returns(first_value)
-                .and_does(move |_| counter.inc());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_mut_value_colon()
                 .call_base()
-                .and_does(move |_| counter.double_inc());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = mock.clone().return_by_mut_value_colon();
@@ -461,11 +465,11 @@ mod tests {
             mock.setup()
                 .return_by_ref()
                 .returns(first_value)
-                .and_does(move |_| counter.inc());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_ref()
                 .call_base()
-                .and_does(move |_| counter.double_inc());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = mock.clone().return_by_ref();
@@ -489,11 +493,11 @@ mod tests {
             mock.setup()
                 .return_by_ref_colon()
                 .returns(first_value)
-                .and_does(move |_| counter.inc());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_ref_colon()
                 .call_base()
-                .and_does(move |_| counter.double_inc());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = mock.clone().return_by_ref_colon();
@@ -517,11 +521,11 @@ mod tests {
             mock.setup()
                 .return_by_ref_with_lifetime()
                 .returns(first_value)
-                .and_does(move |_| counter.inc());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_ref_with_lifetime()
                 .call_base()
-                .and_does(move |_| counter.double_inc());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = mock.clone().return_by_ref_with_lifetime();
@@ -545,11 +549,11 @@ mod tests {
             mock.setup()
                 .return_by_ref_colon_with_lifetime()
                 .returns(first_value)
-                .and_does(move |_| counter.inc());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_ref_colon_with_lifetime()
                 .call_base()
-                .and_does(move |_| counter.double_inc());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = mock.clone().return_by_ref_colon_with_lifetime();
@@ -573,11 +577,11 @@ mod tests {
             mock.setup()
                 .return_by_ref_mut()
                 .returns(first_value)
-                .and_does(move |_| counter.inc());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_ref_mut()
                 .call_base()
-                .and_does(move |_| counter.double_inc());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = mock.return_by_ref_mut();
@@ -601,11 +605,11 @@ mod tests {
             mock.setup()
                 .return_by_ref_mut_colon()
                 .returns(first_value)
-                .and_does(move |_| counter.inc());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_ref_mut_colon()
                 .call_base()
-                .and_does(move |_| counter.double_inc());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = mock.return_by_ref_mut_colon();
@@ -629,11 +633,11 @@ mod tests {
             mock.setup()
                 .return_by_ref_mut_with_lifetime()
                 .returns(first_value)
-                .and_does(move |_| counter.inc());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_ref_mut_with_lifetime()
                 .call_base()
-                .and_does(move |_| counter.double_inc());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = mock.return_by_ref_mut_with_lifetime();
@@ -657,11 +661,11 @@ mod tests {
             mock.setup()
                 .return_by_ref_mut_colon_with_lifetime()
                 .returns(first_value)
-                .and_does(move |_| counter.inc());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_ref_mut_colon_with_lifetime()
                 .call_base()
-                .and_does(move |_| counter.double_inc());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = mock.return_by_ref_mut_colon_with_lifetime();

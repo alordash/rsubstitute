@@ -32,12 +32,12 @@ fn main() {
         .ok()
         .returns_many([9, 8, 7])
         .f(1)
-        .does(|_| println!("first mocked callback"))
+        .does(|_, _| println!("first mocked callback"))
         .f(2)
         .call_base()
-        .and_does(|(v,)| println!("little extra BEFORE base call, v = {v}")) // TODO - write in docs/limitations that `and_does` is called before base call
+        .and_does(|_, (v,)| println!("little extra BEFORE base call, v = {v}")) // TODO - write in docs/limitations that `and_does` is called before base call
         .f(Arg::Any)
-        .does(|(v,)| println!("any v = {v}"));
+        .does(|_, (v,)| println!("any v = {v}"));
     mock.f(1);
     mock.f(2);
     mock.f(2);
