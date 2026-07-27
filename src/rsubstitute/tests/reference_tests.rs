@@ -2,7 +2,7 @@ use rsubstitute::*;
 use std::marker::PhantomData;
 
 #[derive(Default, Debug, PartialEq, Clone)]
-struct Data<'a, 'b, T1, T2> {
+pub struct Data<'a, 'b, T1, T2> {
     _phantoms: (
         PhantomData<&'a ()>,
         PhantomData<&'b ()>,
@@ -82,7 +82,11 @@ struct Struct<'a, 'b: 'a, T1: Clone> {
 #[allow(unused)]
 impl<'a, 'b: 'a, T1: Clone> Struct<'a, 'b, T1> {
     pub fn new() -> Struct<'a, 'b, T1> {
-        StructMock::<'a, 'b, T1>::new()
+        Struct {
+            _phantom_a: PhantomData,
+            _phantom_b: PhantomData,
+            _phantom_t1: PhantomData,
+        }
     }
 
     #[allow(unused)]
