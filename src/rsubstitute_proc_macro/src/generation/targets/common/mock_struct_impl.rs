@@ -277,7 +277,7 @@ fn map_fn(
             } else {
                 x.attributes.clone()
             },
-            vis: if !for_trait && is_static {
+            vis: if !for_trait {
                 visibility::pub_super(span)
             } else {
                 x.visibility.clone()
