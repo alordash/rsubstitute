@@ -1,9 +1,19 @@
-use quote::format_ident;
+use proc_macro2::*;
 use syn::*;
 
-pub(crate) fn flatten_path_to_ident(path: &Path) -> Ident {
-    let parent_trait_path_idents: Vec<_> =
-        path.segments.iter().map(|x| x.ident.to_string()).collect();
-    let joined_parent_trait_path_idents = parent_trait_path_idents.join("_");
-    return format_ident!("{joined_parent_trait_path_idents}");
+pub(crate) fn join<TIdents: Iterator<Item = Ident>>(idents: TIdents, separator: &str) -> Ident {
+    let (idents_strings, idents_spans): (Vec<_>, Vec<_>) =
+        idents.map(|x| (x.to_string(), x.span())).unzip();
+    let ident_string = idents_strings.join(separator);
+    let ident_span = idents_spans
+        .into_iter()
+        .reduce(|a, b| a.join(b).unwrap_or(a))
+        .unwrap_or_else(|| Span::call_site());
+    let ident = Ident::new(&ident_string, ident_span);
+    return ident;
+}
+
+pub(crate) fn combine_path_segments(path: &Path) -> Ident {
+    let result = join(path.segments.iter().map(|x| x.ident.clone()), "_");
+    return result;
 }

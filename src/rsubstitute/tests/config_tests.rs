@@ -1,6 +1,6 @@
 #![feature(rwlock_downgrade)]
 
-use rsubstitute::macros::mock;
+use rsubstitute::mock;
 
 #[mock]
 trait Trait {
@@ -21,7 +21,9 @@ mod max_invalid_calls_listed_count_tests {
     static TESTS_SEQ_SYNCER: LazyLock<Mutex<()>> = LazyLock::new(|| Default::default());
 
     fn seq_sync<'a>() -> MutexGuard<'a, ()> {
-        TESTS_SEQ_SYNCER.lock().expect("Unable to lock `TESTS_SYNCER`.")
+        TESTS_SEQ_SYNCER
+            .lock()
+            .expect("Unable to lock `TESTS_SYNCER`.")
     }
 
     mod default {
@@ -31,7 +33,7 @@ mod max_invalid_calls_listed_count_tests {
             let _lock = seq_sync();
 
             // Arrange
-            let mock = TraitMock::new();
+            let mut mock = TraitMock::new();
             let max_invalid_calls_listed_count = 4;
             let calls_count = max_invalid_calls_listed_count - 1;
 
@@ -46,7 +48,7 @@ mod max_invalid_calls_listed_count_tests {
             for _ in 0..calls_count {
                 mock.work(unexpected_v);
             }
-            let actual_error_msg = record_panic(|| mock.received.work(expected_v, Times::Once));
+            let actual_error_msg = record_panic(|| mock.received().work(expected_v, Times::Once));
 
             // Assert
             let calls_error_msgs = format!(
@@ -71,7 +73,7 @@ Received {calls_count} non-matching calls (non-matching arguments indicated with
             let _lock = seq_sync();
 
             // Arrange
-            let mock = TraitMock::new();
+            let mut mock = TraitMock::new();
             let max_invalid_calls_listed_count = 4;
             let calls_count = max_invalid_calls_listed_count + 1;
 
@@ -86,7 +88,7 @@ Received {calls_count} non-matching calls (non-matching arguments indicated with
             for _ in 0..calls_count {
                 mock.work(unexpected_v);
             }
-            let actual_error_msg = record_panic(|| mock.received.work(expected_v, Times::Once));
+            let actual_error_msg = record_panic(|| mock.received().work(expected_v, Times::Once));
 
             // Assert
             let calls_error_msgs = format!(

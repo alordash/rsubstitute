@@ -5,12 +5,6 @@ pub struct DynArgsChecker<'rs> {
     inner: Box<dyn IArgsChecker + 'rs>,
 }
 
-impl<'rs> IArgsFormatter for DynArgsChecker<'rs> {
-    fn fmt_args(&self) -> String {
-        self.inner.fmt_args()
-    }
-}
-
 impl<'rs> IGenericsInfoProvider for DynArgsChecker<'rs> {
     fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
         self.inner.get_generic_parameter_infos()
@@ -28,6 +22,10 @@ impl<'rs> IGenericsInfoProvider for DynArgsChecker<'rs> {
 impl<'rs> IArgsChecker for DynArgsChecker<'rs> {
     fn check(&self, dyn_call: &DynCall) -> Vec<ArgCheckResult> {
         self.inner.check(dyn_call)
+    }
+
+    fn fmt_args(&self) -> String {
+        self.inner.fmt_args()
     }
 }
 

@@ -1,10 +1,10 @@
 #![allow(clippy::needless_return)]
-use crate::mock_generation::parameters::*;
-use crate::mock_generation::*;
 
+mod common;
 mod constants;
-mod derive_mock_data_macro;
-mod mock_generation;
+mod entrypoints;
+mod generation;
+mod preparation;
 mod syntax;
 
 // TODO - make it work only in test mode.
@@ -14,27 +14,33 @@ pub fn mock(
     proc_macro_attribute: proc_macro::TokenStream,
     proc_macro_item: proc_macro::TokenStream,
 ) -> proc_macro::TokenStream {
-    mock_macro::handle_attribute_macro(proc_macro_attribute, proc_macro_item)
+    entrypoints::mock_attribute::handle(proc_macro_attribute, proc_macro_item)
 }
 
-#[proc_macro]
-pub fn mocked(proc_macro_item: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    mock_macro::handle_macro_mocked(proc_macro_item, MockedMacroMode::Unspecified)
-}
+// #[proc_macro]
+// pub fn mock(proc_macro_item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+//     entrypoints::mock_macro::handle(proc_macro_item, MockMacroUsage::Simple)
+// }
+//
+// #[cfg(not(feature = "mock_base_by_default"))]
+// #[proc_macro]
+// pub fn mock_base(proc_macro_item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+//     entrypoints::mock_macro::handle(proc_macro_item, MockMacroUsage::WithBase)
+// }
+//
+// #[cfg(feature = "mock_base_by_default")]
+// #[proc_macro]
+// pub fn mock_without_base(proc_macro_item: proc_macro::TokenStream) -> proc_macro::TokenStream {
+//     entrypoints::mock_macro::handle(proc_macro_item, MockMacroUsage::WithoutBase)
+// }
 
-#[cfg(not(feature = "mock_base_by_default"))]
-#[proc_macro]
-pub fn mocked_base(proc_macro_item: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    mock_macro::handle_macro_mocked(proc_macro_item, MockedMacroMode::WithBase)
-}
+// TODO - write test for this:
+// mod a { pub trait Trait {} }
+// mod b { pub trait Trait {} }
+// mod c { #[mock] pub struct S; }
+// #[mock]
+// impl a::Trait for c::S {}
+// #[mock]
+// impl b::Trait for c::S {}
 
-#[cfg(feature = "mock_base_by_default")]
-#[proc_macro]
-pub fn mocked_no_base(proc_macro_item: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    mock_macro_handler.handle_macro_mocked(proc_macro_item, MockedMacroMode::WithoutBase)
-}
-
-#[proc_macro_derive(IMockData)]
-pub fn derive_mock_data(item: proc_macro::TokenStream) -> proc_macro::TokenStream {
-    derive_mock_data_macro::handle(item)
-}
+// TODO - write warning (?) if applying `#[mock(base)]` instead of just `#[mock]` on `struct`

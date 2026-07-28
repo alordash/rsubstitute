@@ -1,21 +1,17 @@
-use rsubstitute::macros::*;
+use rsubstitute::*;
 
 #[derive(Clone, Debug, PartialOrd, PartialEq)]
 struct Foo {
     pub number: Vec<i32>,
 }
 
-mocked! {
-    struct Struct;
+#[mock]
+struct Struct;
 
-    impl Struct {
-        pub fn new() -> Self {
-            Self
-        }
-
-        fn fooo(&mut self, Foo { mut number }: Foo, mut qq: &mut &mut &&& &mut i32) {
-            println!("number: {number:?}")
-        }
+#[mock(base)]
+impl Struct {
+    fn fooo(&mut self, Foo { mut number }: Foo, mut qq: &mut &mut &&&&mut i32) {
+        println!("number: {number:?}")
     }
 }
 

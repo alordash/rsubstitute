@@ -1,6 +1,6 @@
 #![allow(unused)]
 
-use rsubstitute::macros::mock;
+use rsubstitute::mock;
 use std::cell::{Cell, RefCell};
 use std::sync::Arc;
 

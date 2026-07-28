@@ -1,20 +1,28 @@
-use rsubstitute::macros::*;
+use rsubstitute::*;
 
-mocked! {
-    struct Struct;
+#[mock]
+struct Struct;
 
-    impl Struct {
-        pub fn new() -> Self { Self }
+#[mock(base)]
+impl Struct {
+    pub fn accept_ref(&self, r: &i32) {
+        unreachable!()
+    }
 
-        pub fn accept_ref(&self, r: &i32) { unreachable!() }
+    pub fn return_ref(&self) -> &'static i32 {
+        unreachable!()
+    }
 
-        pub fn return_ref(&self) -> &'static i32 { unreachable!() }
+    pub fn accept_ref_return_ref(&self, r: &i32) -> &'static i32 {
+        unreachable!()
+    }
 
-        pub fn accept_ref_return_ref(&self, r: &i32) -> &'static i32 { unreachable!() }
+    pub fn accept_two_refs(&self, r1: &i32, r2: &f32) {
+        unreachable!()
+    }
 
-        pub fn accept_two_refs(&self, r1: &i32, r2: &f32) { unreachable!() }
-
-        pub fn accept_two_refs_return_ref(&self, r1: &i32, r2: &f32) -> &'static str { unreachable!() }
+    pub fn accept_two_refs_return_ref(&self, r1: &i32, r2: &f32) -> &'static str {
+        unreachable!()
     }
 }
 
@@ -31,20 +39,20 @@ mod tests {
         #[test]
         fn accept_ref_Ok() {
             // Arrange
-            let mock = Struct::new();
+            let mut mock = Struct.mock();
             let r = &1;
 
             // Act
             mock.accept_ref(r);
 
             // Assert
-            mock.received.accept_ref(r, Times::Once).no_other_calls();
+            mock.received().accept_ref(r, Times::Once).no_other_calls();
         }
 
         #[test]
         fn accept_rc_Panics() {
             // Arrange
-            let mock = Struct::new();
+            let mut mock = Struct.mock();
             let r = &11;
             let r_ptr = core::ptr::from_ref(r);
 
@@ -53,7 +61,7 @@ mod tests {
 
             // Assert
             assert_panics(
-                || mock.received.accept_ref(Arg::Any, Times::Never),
+                || mock.received().accept_ref(Arg::Any, Times::Never),
                 format!(
                     "Expected to never receive a call matching:
 	accept_ref((&i32): any)
@@ -64,7 +72,7 @@ Received no non-matching calls"
             );
 
             assert_panics(
-                || mock.received.accept_ref(Arg::Any, Times::Exactly(3)),
+                || mock.received().accept_ref(Arg::Any, Times::Exactly(3)),
                 format!(
                     "Expected to receive a call 3 times matching:
 	accept_ref((&i32): any)
@@ -77,7 +85,7 @@ Received no non-matching calls"
             let invalid_r = &22;
             let invalid_r_ptr = core::ptr::from_ref(invalid_r);
             assert_panics(
-                || mock.received.accept_ref(invalid_r, Times::Once),
+                || mock.received().accept_ref(invalid_r, Times::Once),
                 format!(
                     "Expected to receive a call exactly once matching:
 	accept_ref((&i32): equal to {invalid_r})
@@ -88,7 +96,26 @@ accept_ref(*{r}*)
 		Expected reference (ptr: {invalid_r_ptr:?}): {invalid_r}
 		Actual reference   (ptr: {r_ptr:?}): {r}"
                 ),
-            )
+            );
+
+            let invalid_r = &22;
+            let invalid_r_ptr = core::ptr::from_ref(invalid_r);
+            assert_panics(
+                || {
+                    mock.received()
+                        .accept_ref(Arg::ref_eq(invalid_r), Times::Once)
+                },
+                format!(
+                    "Expected to receive a call exactly once matching:
+	accept_ref((&i32): equal to {invalid_r})
+Actually received no matching calls
+Received 1 non-matching call (non-matching arguments indicated with '*' characters):
+accept_ref(*{r}*)
+	1. r (&i32):
+		Expected reference (ptr: {invalid_r_ptr:?}): {invalid_r}
+		Actual reference   (ptr: {r_ptr:?}): {r}"
+                ),
+            );
         }
     }
 
@@ -98,9 +125,9 @@ accept_ref(*{r}*)
         #[test]
         fn return_ref_Ok() {
             // Arrange
-            let mock = Struct::new();
+            let mut mock = Struct.mock();
             let r = Box::leak(Box::new(11));
-            mock.setup.return_ref().returns(r);
+            mock.setup().return_ref().returns(r);
 
             // Act
             let actual_r = mock.return_ref();
@@ -116,10 +143,10 @@ accept_ref(*{r}*)
         #[test]
         fn accept_ref_return_ref_Ok() {
             // Arrange
-            let mock = Struct::new();
+            let mut mock = Struct.mock();
             let accepted_r = &10;
             let returned_r = &20;
-            mock.setup
+            mock.setup()
                 .accept_ref_return_ref(accepted_r)
                 .returns(returned_r);
 
@@ -129,7 +156,7 @@ accept_ref(*{r}*)
             // Assert
             assert_eq!(returned_r, actual_returned_r);
 
-            mock.received
+            mock.received()
                 .accept_ref_return_ref(accepted_r, Times::Once)
                 .accept_ref_return_ref(Arg::not_eq(accepted_r), Times::Never)
                 .no_other_calls();
@@ -142,7 +169,7 @@ accept_ref(*{r}*)
         #[test]
         fn accept_two_refs_Ok() {
             // Arrange
-            let mock = Struct::new();
+            let mut mock = Struct.mock();
             let r1 = &10;
             let r2 = &20.2;
 
@@ -150,7 +177,7 @@ accept_ref(*{r}*)
             mock.accept_two_refs(r1, r2);
 
             // Assert
-            mock.received
+            mock.received()
                 .accept_two_refs(r1, r2, Times::Once)
                 .accept_two_refs(Arg::not_eq(r1), Arg::not_eq(r2), Times::Never)
                 .no_other_calls();
@@ -163,11 +190,11 @@ accept_ref(*{r}*)
         #[test]
         fn accept_two_refs_return_ref_Ok() {
             // Arrange
-            let mock = Struct::new();
+            let mut mock = Struct.mock();
             let r1 = &10;
             let r2 = &20.2;
             let returned_r = "veridis quo";
-            mock.setup
+            mock.setup()
                 .accept_two_refs_return_ref(r1, r2)
                 .returns(returned_r);
 
@@ -177,7 +204,7 @@ accept_ref(*{r}*)
             // Assert
             assert_eq!(returned_r, actual_returned_r);
 
-            mock.received
+            mock.received()
                 .accept_two_refs_return_ref(r1, r2, Times::Once)
                 .no_other_calls();
         }

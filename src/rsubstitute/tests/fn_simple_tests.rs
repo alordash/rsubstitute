@@ -5,6 +5,9 @@ use std::sync::Arc;
 #[mock]
 fn f() {}
 
+#[mock(base)]
+fn f_base() {}
+
 #[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
@@ -12,108 +15,217 @@ mod tests {
     use not_enough_asserts::*;
     use rsubstitute::*;
 
-    #[test]
-    fn f_Ok() {
-        // Arrange
-        let callback_flag = Arc::new(RefCell::new(false));
-        let callback_flag_clone = callback_flag.clone();
-        f::setup()
-            .returns(())
-            .and_does(move |_| *callback_flag_clone.borrow_mut() = true);
+    mod simple {
+        use super::*;
 
-        // Act
-        let result = f();
+        #[test]
+        fn f_Ok() {
+            // Arrange
+            let callback_flag = Arc::new(RefCell::new(false));
+            let callback_flag_clone = callback_flag.clone();
+            f::setup().does(move |_| *callback_flag_clone.borrow_mut() = true);
 
-        // Assert
-        assert_eq!((), result);
-        assert!(*callback_flag.borrow());
-        f::received(Times::Once).no_other_calls();
+            // Act
+            let result = f();
+
+            // Assert
+            assert_eq!((), result);
+            assert!(*callback_flag.borrow());
+            f::received(Times::Once).no_other_calls();
+        }
+
+        #[test]
+        fn f_NoConfig_Ok() {
+            // Arrange
+            f::setup();
+
+            // Act
+            let result = f();
+
+            // Assert
+            assert_eq!((), result);
+            f::received(Times::Once).no_other_calls();
+        }
+
+        #[test]
+        fn f_MultipleTime_Ok() {
+            // Arrange
+            f::setup();
+
+            // Act
+            let result1 = f();
+            let result2 = f();
+            let result3 = f();
+
+            // Assert
+            assert_eq!((), result1);
+            assert_eq!((), result2);
+            assert_eq!((), result3);
+
+            f::received(Times::Exactly(3)).no_other_calls();
+        }
+
+        #[test]
+        fn f_MultipleTimes_Panics() {
+            // Arrange
+            f::setup();
+
+            // Act
+            f();
+            f();
+            f();
+
+            // Assert
+            assert_panics(
+                || f::received(Times::Once),
+                r#"Expected to receive a call exactly once matching:
+	f()
+Actually received 3 matching calls:
+	f()
+	f()
+	f()
+Received no non-matching calls"#,
+            );
+
+            assert_panics(
+                || f::received(Times::Exactly(1)),
+                r#"Expected to receive a call exactly once matching:
+	f()
+Actually received 3 matching calls:
+	f()
+	f()
+	f()
+Received no non-matching calls"#,
+            );
+
+            assert_panics(
+                || f::received(Times::Exactly(2)),
+                r#"Expected to receive a call 2 times matching:
+	f()
+Actually received 3 matching calls:
+	f()
+	f()
+	f()
+Received no non-matching calls"#,
+            );
+
+            assert_panics(
+                || f::received(Times::Exactly(4)),
+                r#"Expected to receive a call 4 times matching:
+	f()
+Actually received 3 matching calls:
+	f()
+	f()
+	f()
+Received no non-matching calls"#,
+            );
+        }
     }
 
-    #[test]
-    fn f_NoConfig_Ok() {
-        // Arrange
-        f::setup();
+    mod base {
+        use super::*;
 
-        // Act
-        let result = f();
+        #[test]
+        fn f_base_Ok() {
+            // Arrange
+            let callback_flag = Arc::new(RefCell::new(false));
+            let callback_flag_clone = callback_flag.clone();
+            f_base::setup().does(move |_| *callback_flag_clone.borrow_mut() = true);
 
-        // Assert
-        assert_eq!((), result);
-        f::received(Times::Once).no_other_calls();
-    }
+            // Act
+            let result = f_base();
 
-    #[test]
-    fn f_MultipleTime_Ok() {
-        // Arrange
-        f::setup();
+            // Assert
+            assert_eq!((), result);
+            assert!(*callback_flag.borrow());
+            f_base::received(Times::Once).no_other_calls();
+        }
 
-        // Act
-        let result1 = f();
-        let result2 = f();
-        let result3 = f();
+        #[test]
+        fn f_base_NoConfig_Ok() {
+            // Arrange
+            f_base::setup();
 
-        // Assert
-        assert_eq!((), result1);
-        assert_eq!((), result2);
-        assert_eq!((), result3);
+            // Act
+            let result = f_base();
 
-        f::received(Times::Exactly(3)).no_other_calls();
-    }
+            // Assert
+            assert_eq!((), result);
+            f_base::received(Times::Once).no_other_calls();
+        }
 
-    #[test]
-    fn f_MultipleTimes_Panics() {
-        // Arrange
-        f::setup();
+        #[test]
+        fn f_base_MultipleTime_Ok() {
+            // Arrange
+            f_base::setup();
 
-        // Act
-        f();
-        f();
-        f();
+            // Act
+            let result1 = f_base();
+            let result2 = f_base();
+            let result3 = f_base();
 
-        // Assert
-        assert_panics(
-            || f::received(Times::Once),
-            r#"Expected to receive a call exactly once matching:
-	f()
+            // Assert
+            assert_eq!((), result1);
+            assert_eq!((), result2);
+            assert_eq!((), result3);
+
+            f_base::received(Times::Exactly(3)).no_other_calls();
+        }
+
+        #[test]
+        fn f_base_MultipleTimes_Panics() {
+            // Arrange
+            f_base::setup();
+
+            // Act
+            f_base();
+            f_base();
+            f_base();
+
+            // Assert
+            assert_panics(
+                || f_base::received(Times::Once),
+                r#"Expected to receive a call exactly once matching:
+	f_base()
 Actually received 3 matching calls:
-	f()
-	f()
-	f()
+	f_base()
+	f_base()
+	f_base()
 Received no non-matching calls"#,
-        );
+            );
 
-        assert_panics(
-            || f::received(Times::Exactly(1)),
-            r#"Expected to receive a call exactly once matching:
-	f()
+            assert_panics(
+                || f_base::received(Times::Exactly(1)),
+                r#"Expected to receive a call exactly once matching:
+	f_base()
 Actually received 3 matching calls:
-	f()
-	f()
-	f()
+	f_base()
+	f_base()
+	f_base()
 Received no non-matching calls"#,
-        );
+            );
 
-        assert_panics(
-            || f::received(Times::Exactly(2)),
-            r#"Expected to receive a call 2 times matching:
-	f()
+            assert_panics(
+                || f_base::received(Times::Exactly(2)),
+                r#"Expected to receive a call 2 times matching:
+	f_base()
 Actually received 3 matching calls:
-	f()
-	f()
-	f()
+	f_base()
+	f_base()
+	f_base()
 Received no non-matching calls"#,
-        );
+            );
 
-        assert_panics(
-            || f::received(Times::Exactly(4)),
-            r#"Expected to receive a call 4 times matching:
-	f()
+            assert_panics(
+                || f_base::received(Times::Exactly(4)),
+                r#"Expected to receive a call 4 times matching:
+	f_base()
 Actually received 3 matching calls:
-	f()
-	f()
-	f()
+	f_base()
+	f_base()
+	f_base()
 Received no non-matching calls"#,
-        );
+            );
+        }
     }
 }

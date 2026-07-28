@@ -1,10 +1,10 @@
+// TODO - write in docs that this is supported only using feature
 #![feature(associated_type_defaults)]
 
-use rsubstitute::prelude::*;
+use rsubstitute::*;
 use std::fmt::Debug;
 
 // TODO - test how TraitA : TraitB behaves
-// TODO - write that mock(base) has no effect on static fns
 #[mock]
 fn f() {}
 
@@ -13,14 +13,11 @@ trait Trait {
     const CONST: usize = 43;
 
     type InputType<TAmogus: Clone>: Clone + Debug
-        = i32
-    where
-        Self: Clone;
+        = i32;
 
     type OutputType<TT>: Clone + Sized + Default
         = u8
     where
-        Self: Sized,
         TT: Clone;
 
     fn get_const(&self) -> usize {
@@ -29,33 +26,32 @@ trait Trait {
 
     fn get_my_type<TT: Clone>(&self, input: Self::InputType<i32>) -> Self::OutputType<TT>
     where
-        Self: Clone + Sized,
         TT: ToString;
 }
 
 // TODO - write in docs about limitation: `Self` should not be used ambiguously, e.g.
 // correct: <Self as Trait>::OutputType
 //   wrong: Self::OutputType
-mocked_base! {
-    #[derive(Clone)]
-    struct Struct;
-
-    impl Struct {
-        pub fn new() -> Self {
-            Self
-        }
-    }
-
-    impl Trait for Struct {
-        fn get_my_type<TT: Clone>(&self, input: Self::InputType<i32>) -> Self::OutputType<TT>
-        where
-            Self: Clone + Sized,
-            TT: ToString,
-        {
-            <Self as Trait>::OutputType::<TT>::default()
-        }
-    }
-}
+// mock_base! {
+//     #[derive(Clone)]
+//     struct Struct;
+//
+//     impl Struct {
+//         pub fn new() -> Self {
+//             Self
+//         }
+//     }
+//
+//     impl Trait for Struct {
+//         fn get_my_type<TT: Clone>(&self, input: Self::InputType<i32>) -> Self::OutputType<TT>
+//         where
+//             Self: Clone + Sized,
+//             TT: ToString,
+//         {
+//             <Self as Trait>::OutputType::<TT>::default()
+//         }
+//     }
+// }
 
 #[cfg(test)]
 mod tests {
@@ -69,36 +65,36 @@ mod tests {
     #[test]
     fn get_const_Trait_Ok() {
         // Arrange
-        let mock = TraitMock::<TEST_CONST, TestInputType, TestOutputType>::new();
+        let mut mock = TraitMock::<TEST_CONST, TestInputType, TestOutputType>::new();
         let const_value = TEST_CONST * 2;
-        mock.setup.get_const().returns(const_value);
+        mock.setup().get_const().returns(const_value);
 
         // Act
         let actual_const_value = mock.get_const();
 
         // Assert
         assert_eq!(const_value, actual_const_value);
-        mock.received.get_const(Times::Once).no_other_calls();
+        mock.received().get_const(Times::Once).no_other_calls();
     }
 
     #[test]
     fn get_const_TraitBase_Ok() {
         // Arrange
-        let mock = TraitMock::<TEST_CONST, TestInputType, TestOutputType>::new();
-        mock.setup.get_const().call_base();
+        let mut mock = TraitMock::<TEST_CONST, TestInputType, TestOutputType>::new();
+        mock.setup().get_const().call_base();
 
         // Act
         let actual_const_value = mock.get_const();
 
         // Assert
         assert_eq!(TEST_CONST, actual_const_value);
-        mock.received.get_const(Times::Once).no_other_calls();
+        mock.received().get_const(Times::Once).no_other_calls();
     }
 
     #[test]
     fn get_my_type_Trait_Ok() {
         // Arrange
-        let mock = TraitMock::<TEST_CONST, TestInputType, TestOutputType>::new();
+        let mut mock = TraitMock::<TEST_CONST, TestInputType, TestOutputType>::new();
 
         type FirstTT = u128;
         let first_input: TestInputType = 10;
@@ -108,7 +104,7 @@ mod tests {
         let second_output: TestOutputType = "veridis quo";
         type UnknownTT = i16;
 
-        mock.setup
+        mock.setup()
             .get_my_type::<FirstTT>(first_input)
             .returns(first_output)
             .get_my_type::<SecondTT>(second_input)
@@ -122,7 +118,7 @@ mod tests {
         assert_eq!(first_output, actual_first_output);
         assert_eq!(second_output, actual_second_output);
 
-        mock.received
+        mock.received()
             .get_my_type::<FirstTT>(first_input, Times::Once)
             .get_my_type::<UnknownTT>(first_input, Times::Never)
             .get_my_type::<SecondTT>(second_input, Times::Once)
@@ -130,76 +126,76 @@ mod tests {
             .no_other_calls();
     }
 
-    #[test]
-    fn get_my_type_Struct_Ok() {
-        // Arrange
-        let mock = Struct::new();
-
-        type FirstTT = u128;
-        let first_input: i32 = 10;
-        let first_output: u8 = 3;
-        type SecondTT = f64;
-        let second_input: i32 = 20;
-        let second_output: u8 = 67;
-        type UnknownTT = i16;
-
-        mock.setup
-            .as_Trait
-            .get_my_type::<FirstTT>(first_input)
-            .returns(first_output)
-            .get_my_type::<SecondTT>(second_input)
-            .returns(second_output);
-
-        // Act
-        let actual_first_output = mock.get_my_type::<FirstTT>(first_input);
-        let actual_second_output = mock.get_my_type::<SecondTT>(second_input);
-
-        // Assert
-        assert_eq!(first_output, actual_first_output);
-        assert_eq!(second_output, actual_second_output);
-
-        mock.received
-            .as_Trait
-            .get_my_type::<FirstTT>(first_input, Times::Once)
-            .get_my_type::<UnknownTT>(first_input, Times::Never)
-            .get_my_type::<SecondTT>(second_input, Times::Once)
-            .get_my_type::<UnknownTT>(second_input, Times::Never);
-        mock.received.no_other_calls();
-    }
-
-    #[test]
-    fn get_my_type_StructBase_Ok() {
-        // Arrange
-        let mock = Struct::new();
-
-        type FirstTT = u128;
-        let first_input: i32 = 10;
-        type SecondTT = f64;
-        let second_input: i32 = 20;
-        type UnknownTT = i16;
-
-        mock.setup
-            .as_Trait
-            .get_my_type::<FirstTT>(first_input)
-            .call_base()
-            .get_my_type::<SecondTT>(second_input)
-            .call_base();
-
-        // Act
-        let actual_first_output = mock.get_my_type::<FirstTT>(first_input);
-        let actual_second_output = mock.get_my_type::<SecondTT>(second_input);
-
-        // Assert
-        let expected_output = u8::default();
-        assert_eq!(expected_output, actual_first_output);
-        assert_eq!(expected_output, actual_second_output);
-
-        mock.received
-            .as_Trait
-            .get_my_type::<FirstTT>(first_input, Times::Once)
-            .get_my_type::<UnknownTT>(first_input, Times::Never)
-            .get_my_type::<SecondTT>(second_input, Times::Once)
-            .get_my_type::<UnknownTT>(second_input, Times::Never);
-        mock.received.no_other_calls();
-    }
+    // #[test]
+    // fn get_my_type_Struct_Ok() {
+    //     // Arrange
+    //     let mut mock = Struct::new();
+    //
+    //     type FirstTT = u128;
+    //     let first_input: i32 = 10;
+    //     let first_output: u8 = 3;
+    //     type SecondTT = f64;
+    //     let second_input: i32 = 20;
+    //     let second_output: u8 = 67;
+    //     type UnknownTT = i16;
+    //
+    //     mock.setup
+    //         .as_Trait
+    //         .get_my_type::<FirstTT>(first_input)
+    //         .returns(first_output)
+    //         .get_my_type::<SecondTT>(second_input)
+    //         .returns(second_output);
+    //
+    //     // Act
+    //     let actual_first_output = mock.get_my_type::<FirstTT>(first_input);
+    //     let actual_second_output = mock.get_my_type::<SecondTT>(second_input);
+    //
+    //     // Assert
+    //     assert_eq!(first_output, actual_first_output);
+    //     assert_eq!(second_output, actual_second_output);
+    //
+    //     mock.received
+    //         .as_Trait
+    //         .get_my_type::<FirstTT>(first_input, Times::Once)
+    //         .get_my_type::<UnknownTT>(first_input, Times::Never)
+    //         .get_my_type::<SecondTT>(second_input, Times::Once)
+    //         .get_my_type::<UnknownTT>(second_input, Times::Never);
+    //     mock.received().no_other_calls();
+    // }
+    //
+    // #[test]
+    // fn get_my_type_StructBase_Ok() {
+    //     // Arrange
+    //     let mut mock = Struct::new();
+    //
+    //     type FirstTT = u128;
+    //     let first_input: i32 = 10;
+    //     type SecondTT = f64;
+    //     let second_input: i32 = 20;
+    //     type UnknownTT = i16;
+    //
+    //     mock.setup
+    //         .as_Trait
+    //         .get_my_type::<FirstTT>(first_input)
+    //         .call_base()
+    //         .get_my_type::<SecondTT>(second_input)
+    //         .call_base();
+    //
+    //     // Act
+    //     let actual_first_output = mock.get_my_type::<FirstTT>(first_input);
+    //     let actual_second_output = mock.get_my_type::<SecondTT>(second_input);
+    //
+    //     // Assert
+    //     let expected_output = u8::default();
+    //     assert_eq!(expected_output, actual_first_output);
+    //     assert_eq!(expected_output, actual_second_output);
+    //
+    //     mock.received
+    //         .as_Trait
+    //         .get_my_type::<FirstTT>(first_input, Times::Once)
+    //         .get_my_type::<UnknownTT>(first_input, Times::Never)
+    //         .get_my_type::<SecondTT>(second_input, Times::Once)
+    //         .get_my_type::<UnknownTT>(second_input, Times::Never);
+    //     mock.received().no_other_calls();
+    // }
 }

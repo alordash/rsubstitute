@@ -1,8 +1,8 @@
-use rsubstitute::prelude::*;
+use rsubstitute::*;
 use std::marker::PhantomData;
 
 #[derive(Default, Debug, PartialEq, Clone)]
-struct Data<'a, 'b, T1, T2> {
+pub struct Data<'a, 'b, T1, T2> {
     _phantoms: (
         PhantomData<&'a ()>,
         PhantomData<&'b ()>,
@@ -13,8 +13,8 @@ struct Data<'a, 'b, T1, T2> {
 
 #[mock]
 #[allow(unused)]
-trait Trait<'a, 'b: 'a, T1> {
-    fn work<'c, 'd: 'a, T2: Clone>(
+trait Trait<'a, 'b: 'a, T1: Clone> {
+    fn worko<'c, 'd: 'a, T2: Clone>(
         &self,
         a: &'a i32,
         b: &'b i32,
@@ -39,7 +39,10 @@ trait Trait<'a, 'b: 'a, T1> {
         t2_ref: &T2,
         xaxbxcxdx_t2_ref: &&'a &&'b &&'c &&'d &T2,
         xapx: &&'a *const &i32,
-    ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32;
+    ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 {
+        // TODO - mock(base) to verify that anonymous lifetiems are correct
+        unreachable!()
+    }
 }
 
 #[mock]
@@ -67,105 +70,98 @@ fn work<'x, 'a, 'b: 'a, 'c, 'd: 'a, T1, T2>(
     unreachable!()
 }
 
-mocked_base! {
+#[mock]
+#[allow(unused)]
+struct Struct<'a, 'b: 'a, T1: Clone> {
+    pub(super) _phantom_a: PhantomData<&'a ()>,
+    pub(super) _phantom_b: PhantomData<&'b ()>,
+    pub(super) _phantom_t1: PhantomData<T1>,
+}
+
+#[mock(base)]
+#[allow(unused)]
+impl<'a, 'b: 'a, T1: Clone> Struct<'a, 'b, T1> {
     #[allow(unused)]
-    struct Struct<'a, 'b: 'a, T1: Clone> {
-        _phantom_a: PhantomData<&'a ()>,
-        _phantom_b: PhantomData<&'b ()>,
-        _phantom_t1: PhantomData<T1>,
+    pub fn work<'c, 'd: 'a, T2: Clone>(
+        &self,
+        a: &'a i32,
+        b: &'b i32,
+        c: &'c i32,
+        d: &'d i32,
+        axb: &'a &&'b i32,
+        cxd: &'c &&'d i32,
+        abxbax: &'a &'b &&'b &'a &i32,
+        cdxdcx: &'c &'d &&'d &'c &i32,
+        abcd: &'a &'b &'c &'d i32,
+        xaxbxcxdx: &&'a &&'b &&'c &&'d &i32,
+        data: Data<
+            'a,
+            'b,
+            &&i32,
+            &&'a &&'b &[&'c &&'b &Data<'c, 'a, &&&'c &i32, Vec<&'d &'b &()>>],
+        >,
+        t1: T1,
+        t1_ref: &T1,
+        xaxbxcxdx_t1_ref: &&'a &&'b &&'c &&'d &T1,
+        t2: T2,
+        t2_ref: &T2,
+        xaxbxcxdx_t2_ref: &&'a &&'b &&'c &&'d &T2,
+        xapx: &&'a *const &i32,
+    ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 {
+        unreachable!()
     }
+}
 
-    #[allow(unused)]
-    impl<'a, 'b: 'a, T1: Clone> Struct<'a, 'b, T1> {
-        pub fn new() -> Self {
-            Self {
-                _phantom_a: PhantomData,
-                _phantom_b: PhantomData,
-                _phantom_t1: PhantomData,
-            }
-        }
-
-        #[allow(unused)]
-        fn work<'c, 'd: 'a, T2: Clone>(
-            &self,
-            a: &'a i32,
-            b: &'b i32,
-            c: &'c i32,
-            d: &'d i32,
-            axb: &'a &&'b i32,
-            cxd: &'c &&'d i32,
-            abxbax: &'a &'b &&'b &'a &i32,
-            cdxdcx: &'c &'d &&'d &'c &i32,
-            abcd: &'a &'b &'c &'d i32,
-            xaxbxcxdx: &&'a &&'b &&'c &&'d &i32,
-            data: Data<
-                'a,
-                'b,
-                &&i32,
-                &&'a &&'b &[&'c &&'b &Data<'c, 'a, &&&'c &i32, Vec<&'d &'b &()>>],
-            >,
-            t1: T1,
-            t1_ref: &T1,
-            xaxbxcxdx_t1_ref: &&'a &&'b &&'c &&'d &T1,
-            t2: T2,
-            t2_ref: &T2,
-            xaxbxcxdx_t2_ref: &&'a &&'b &&'c &&'d &T2,
-            xapx: &&'a *const &i32,
-        ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 {
-            unreachable!()
-        }
-    }
-
-    #[allow(unused)]
-    impl<'a, 'b: 'a, T1: Clone> Trait<'a, 'b, T1> for Struct<'a, 'b, T1> {
-        fn work<'c, 'd: 'a, T2: Clone>(
-            &self,
-            a: &'a i32,
-            b: &'b i32,
-            c: &'c i32,
-            d: &'d i32,
-            axb: &'a &&'b i32,
-            cxd: &'c &&'d i32,
-            abxbax: &'a &'b &&'b &'a &i32,
-            cdxdcx: &'c &'d &&'d &'c &i32,
-            abcd: &'a &'b &'c &'d i32,
-            xaxbxcxdx: &&'a &&'b &&'c &&'d &i32,
-            data: Data<
-                'a,
-                'b,
-                &&i32,
-                &&'a &&'b &[&'c &&'b &Data<'c, 'a, &&&'c &i32, Vec<&'d &'b &()>>],
-            >,
-            t1: T1,
-            t1_ref: &T1,
-            xaxbxcxdx_t1_ref: &&'a &&'b &&'c &&'d &T1,
-            t2: T2,
-            t2_ref: &T2,
-            xaxbxcxdx_t2_ref: &&'a &&'b &&'c &&'d &T2,
-            xapx: &&'a *const &i32,
-        ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 {
-            Self::work(
-                self,
-                a,
-                b,
-                c,
-                d,
-                axb,
-                cxd,
-                abxbax,
-                cdxdcx,
-                abcd,
-                xaxbxcxdx,
-                data,
-                t1,
-                t1_ref,
-                xaxbxcxdx_t1_ref,
-                t2,
-                t2_ref,
-                xaxbxcxdx_t2_ref,
-                xapx,
-            )
-        }
+#[mock(base)]
+#[allow(unused)]
+impl<'a, 'b: 'a, T1: Clone> Trait<'a, 'b, T1> for Struct<'a, 'b, T1> {
+    fn worko<'c, 'd: 'a, T2: Clone>(
+        &self,
+        a: &'a i32,
+        b: &'b i32,
+        c: &'c i32,
+        d: &'d i32,
+        axb: &'a &&'b i32,
+        cxd: &'c &&'d i32,
+        abxbax: &'a &'b &&'b &'a &i32,
+        cdxdcx: &'c &'d &&'d &'c &i32,
+        abcd: &'a &'b &'c &'d i32,
+        xaxbxcxdx: &&'a &&'b &&'c &&'d &i32,
+        data: Data<
+            'a,
+            'b,
+            &&i32,
+            &&'a &&'b &[&'c &&'b &Data<'c, 'a, &&&'c &i32, Vec<&'d &'b &()>>],
+        >,
+        t1: T1,
+        t1_ref: &T1,
+        xaxbxcxdx_t1_ref: &&'a &&'b &&'c &&'d &T1,
+        t2: T2,
+        t2_ref: &T2,
+        xaxbxcxdx_t2_ref: &&'a &&'b &&'c &&'d &T2,
+        xapx: &&'a *const &i32,
+    ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 {
+        Struct::<'a, 'b, T1>::work(
+            self,
+            a,
+            b,
+            c,
+            d,
+            axb,
+            cxd,
+            abxbax,
+            cdxdcx,
+            abcd,
+            xaxbxcxdx,
+            data,
+            t1,
+            t1_ref,
+            xaxbxcxdx_t1_ref,
+            t2,
+            t2_ref,
+            xaxbxcxdx_t2_ref,
+            xapx,
+        )
     }
 }
 
@@ -177,7 +173,7 @@ mod tests {
     #[test]
     fn trait_work_Ok() {
         // Arrange
-        let mock = TraitMock::new();
+        let mut mock = TraitMock::new();
         let return_value = &&&&&&&&&&&&&&&&&55;
         let a = &1;
         {
@@ -209,8 +205,8 @@ mod tests {
                                                 let t2_ref = &true;
                                                 let xaxbxcxdx_t2_ref = &&&&&&&&&true;
                                                 let xapx = &&(&(&188) as *const _);
-                                                mock.setup
-                                                    .work(
+                                                mock.setup()
+                                                    .worko(
                                                         a,
                                                         b,
                                                         c,
@@ -233,7 +229,7 @@ mod tests {
                                                     .returns(return_value);
 
                                                 // Act
-                                                let actual_return_value = mock.work(
+                                                let actual_return_value = mock.worko(
                                                     a,
                                                     b,
                                                     c,
@@ -257,8 +253,8 @@ mod tests {
                                                 // Assert
                                                 assert_eq!(return_value, actual_return_value);
 
-                                                mock.received
-                                                    .work(
+                                                mock.received()
+                                                    .worko(
                                                         a,
                                                         b,
                                                         c,
@@ -409,7 +405,12 @@ mod tests {
     #[test]
     fn struct_work_Ok() {
         // Arrange
-        let mock = Struct::new();
+        let mut mock = Struct::<[i32; 2]> {
+            _phantom_a: PhantomData,
+            _phantom_b: PhantomData,
+            _phantom_t1: PhantomData,
+        }
+        .mock();
         let return_value = &&&&&&&&&&&&&&&&&55;
         let a = &1;
         {
@@ -441,7 +442,7 @@ mod tests {
                                                 let t2_ref = &true;
                                                 let xaxbxcxdx_t2_ref = &&&&&&&&&true;
                                                 let xapx = &&(&(&188) as *const _);
-                                                mock.setup
+                                                mock.setup()
                                                     .work(
                                                         a,
                                                         b,
@@ -463,9 +464,9 @@ mod tests {
                                                         xapx,
                                                     )
                                                     .returns(return_value);
-                                                mock.setup
-                                                    .as_Trait
-                                                    .work(
+                                                mock.setup()
+                                                    .as_Trait()
+                                                    .worko(
                                                         a,
                                                         b,
                                                         c,
@@ -488,7 +489,8 @@ mod tests {
                                                     .call_base();
 
                                                 // Act
-                                                let actual_return_value = mock.work(
+                                                use Trait;
+                                                let actual_return_value = mock.worko(
                                                     a,
                                                     b,
                                                     c,
@@ -512,7 +514,7 @@ mod tests {
                                                 // Assert
                                                 assert_eq!(return_value, actual_return_value);
 
-                                                mock.received.as_Trait.work(
+                                                mock.received().as_Trait().worko(
                                                     a,
                                                     b,
                                                     c,
@@ -533,7 +535,8 @@ mod tests {
                                                     xapx,
                                                     Times::Once,
                                                 );
-                                                mock.received
+
+                                                mock.received()
                                                     .work(
                                                         a,
                                                         b,

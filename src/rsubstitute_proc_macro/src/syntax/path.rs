@@ -1,40 +1,14 @@
-use crate::syntax::*;
-use proc_macro2::Ident;
+use crate::syntax::{generic_argument, punctuated};
+use proc_macro2::Span;
 use syn::*;
 
-pub(crate) fn create(ident: Ident) -> Path {
+pub(crate) fn new<const N: usize>(span: Span, path_parts: [&str; N]) -> Path {
     let result = Path {
         leading_colon: None,
-        segments: [PathSegment {
-            ident,
-            arguments: PathArguments::None,
-        }]
-        .into_iter()
-        .collect(),
-    };
-    return result;
-}
-
-pub(crate) fn create_with_generics(ident: Ident, generics: Generics) -> Path {
-    let arguments = generics_to_path_arguments(generics);
-    let result = Path {
-        leading_colon: None,
-        segments: [PathSegment { ident, arguments }].into_iter().collect(),
-    };
-    return result;
-}
-
-pub(crate) fn create_expr_with_generics(ident: Ident, generics: Generics) -> Expr {
-    to_expr(create_with_generics(ident, generics))
-}
-
-pub(crate) fn create_from_parts(idents: Vec<Ident>) -> Path {
-    let result = Path {
-        leading_colon: None,
-        segments: idents
+        segments: path_parts
             .into_iter()
-            .map(|ident| PathSegment {
-                ident,
+            .map(|path_part| PathSegment {
+                ident: Ident::new(path_part, span),
                 arguments: PathArguments::None,
             })
             .collect(),
@@ -42,74 +16,118 @@ pub(crate) fn create_from_parts(idents: Vec<Ident>) -> Path {
     return result;
 }
 
-pub(crate) fn create_expr_from_parts_with_generics(idents: Vec<Ident>, generics: Generics) -> Expr {
-    let arguments = generics_to_path_arguments(generics);
-    let mut result = Path {
-        leading_colon: None,
-        segments: idents
-            .into_iter()
-            .map(|ident| PathSegment {
-                ident,
-                arguments: PathArguments::None,
-            })
-            .collect(),
-    };
-    if let Some(ref mut last_segment) = result.segments.last_mut() {
-        last_segment.arguments = arguments;
-    }
-    return to_expr(result);
+pub(crate) fn new_global<const N: usize>(span: Span, path_parts: [&str; N]) -> Path {
+    let mut result = new(span, path_parts);
+    result.leading_colon = Some(Token![::](span));
+    return result;
 }
 
-pub(crate) fn create_with_generic_type(ident: Ident, generic_type: Type) -> Path {
-    let mut result = create(ident);
+pub(crate) fn new_generics<const N_PATH: usize, const N_GENERICS: usize>(
+    span: Span,
+    path_parts: [&str; N_PATH],
+    generic_arguments: [GenericArgument; N_GENERICS],
+) -> Path {
+    let mut result = new(span, path_parts);
     result
         .segments
         .last_mut()
-        .expect("Last segment of expr shouldn't be empty.")
+        .expect("`Path` should not be empty.")
         .arguments = PathArguments::AngleBracketed(AngleBracketedGenericArguments {
-        colon2_token: Some(Default::default()),
-        lt_token: Default::default(),
-        args: [GenericArgument::Type(generic_type)].into_iter().collect(),
-        gt_token: Default::default(),
+        colon2_token: Some(Token![::](span)),
+        lt_token: Token![<](span),
+        args: generic_arguments.into_iter().collect(),
+        gt_token: Token![>](span),
     });
     return result;
 }
 
-pub(crate) fn create_expr_with_generic_type(ident: Ident, generic_type: Type) -> Expr {
-    to_expr(create_with_generic_type(ident, generic_type))
+pub(crate) fn new_generics_global<const N: usize, const N_GENERICS: usize>(
+    span: Span,
+    path_parts: [&str; N],
+    generic_arguments: [GenericArgument; N_GENERICS],
+) -> Path {
+    let mut result = new_generics(span, path_parts, generic_arguments);
+    result.leading_colon = Some(Token![::](span));
+    return result;
 }
 
-pub(crate) fn create_expr(ident: Ident) -> Expr {
-    to_expr(create(ident))
-}
-
-pub(crate) fn create_expr_from_parts(idents: Vec<Ident>) -> Expr {
-    to_expr(create_from_parts(idents))
-}
-
-fn to_expr(path: Path) -> Expr {
-    let expr = Expr::Path(ExprPath {
-        attrs: Vec::new(),
-        qself: None,
-        path,
-    });
-    return expr;
-}
-
-fn generics_to_path_arguments(generics: Generics) -> PathArguments {
-    let arguments = if generics.params.is_empty() {
-        PathArguments::None
-    } else {
-        PathArguments::AngleBracketed(AngleBracketedGenericArguments {
-            colon2_token: None,
-            lt_token: Default::default(),
-            args: generics
-                .params
-                .iter()
-                .map(|x| generic_argument::create(x.clone()))
-                .collect(),
-            gt_token: Default::default(),
-        })
+pub(crate) fn from_ident(ident: Ident) -> Path {
+    let result = Path {
+        leading_colon: None,
+        segments: punctuated([PathSegment {
+            ident,
+            arguments: PathArguments::None,
+        }]),
     };
-    return arguments;
+    return result;
+}
+
+pub(crate) fn from_ident_with_generics(ident: Ident, generics: &Generics) -> Path {
+    let span = ident.span();
+    let result = Path {
+        leading_colon: None,
+        segments: punctuated([PathSegment {
+            ident,
+            arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {
+                colon2_token: Some(Token![::](span)),
+                lt_token: Token![<](span),
+                args: generics
+                    .params
+                    .iter()
+                    .cloned()
+                    .map(generic_argument::from_param)
+                    .collect(),
+                gt_token: Token![>](span),
+            }),
+        }]),
+    };
+    return result;
+}
+
+pub(crate) fn from_base_path_with_ident(base: &Path, ident: Ident) -> Path {
+    let mut result = base.clone();
+    if let Some(last_segment) = result.segments.last_mut() {
+        last_segment.ident = ident;
+    }
+    return result;
+}
+
+pub(crate) fn last_ident(path: &Path) -> Ident {
+    let result = path
+        .segments
+        .last()
+        .expect("`path::last` expects given path to have at least one segment.")
+        .ident
+        .clone();
+    return result;
+}
+
+pub(crate) fn starts_with(path: &Path, start: &Path) -> bool {
+    if path.segments.len() < start.segments.len() {
+        return false;
+    }
+
+    let result = start
+        .segments
+        .iter()
+        .zip(path.segments.iter())
+        .all(|(left, right)| left.ident == right.ident);
+    return result;
+}
+
+pub(crate) fn remove_lifetime_generic_arguments(mut path: Path) -> Path {
+    if let Some(last_segment) = path.segments.last_mut()
+        && let PathArguments::AngleBracketed(angle_bracketed_path_arguments) =
+            &mut last_segment.arguments
+    {
+        angle_bracketed_path_arguments.args =
+            core::mem::take(&mut angle_bracketed_path_arguments.args)
+                .into_iter()
+                .filter(|x| match x {
+                    GenericArgument::Lifetime(_) => false,
+                    _ => true,
+                })
+                .collect();
+    }
+    return path;
 }

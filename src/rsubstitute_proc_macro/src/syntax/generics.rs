@@ -1,76 +1,84 @@
-mod generics_merging;
-
-use crate::constants;
-use generics_merging::*;
-use syn::visit::Visit;
+use crate::syntax::*;
+use syn::punctuated::Punctuated;
+use syn::spanned::Spanned;
 use syn::*;
 
-pub(crate) fn merge(first: Generics, second: &Generics) -> Generics {
-    let where_clause = merge_where_clause(first.where_clause, second.where_clause.clone());
-    let params = merge_params(first.params, second.params.clone());
-    let result = Generics {
-        lt_token: Some(Default::default()),
-        params,
-        gt_token: Some(Default::default()),
-        where_clause,
-    };
-    return result;
-}
-
-pub(crate) fn remove_default_values(mut generics: Generics) -> Generics {
-    for param in generics.params.iter_mut() {
-        match param {
-            GenericParam::Type(type_param) => {
-                type_param.eq_token = None;
-                type_param.default = None;
-            }
-            GenericParam::Const(const_param) => {
-                const_param.eq_token = None;
-                const_param.default = None;
-            }
-            _ => (),
-        }
+pub(crate) fn combine(mut generics: Generics, extension: &Generics) -> Generics {
+    generics.params.extend(extension.params.clone());
+    if let Some(owner_generics_where_clause) = &extension.where_clause {
+        generics
+            .make_where_clause()
+            .predicates
+            .extend(owner_generics_where_clause.predicates.clone());
     }
     return generics;
 }
 
-struct SelfIdentSearcher {
-    pub references_self: bool,
-    self_type_ident: Ident,
+pub(crate) fn with_prefix_lifetime(mut generics: Generics, prefix_lifetime: Lifetime) -> Generics {
+    generics.params.insert(
+        0,
+        GenericParam::Lifetime(LifetimeParam {
+            attrs: Vec::new(),
+            lifetime: prefix_lifetime,
+            colon_token: None,
+            bounds: Punctuated::new(),
+        }),
+    );
+    return generics;
 }
 
-impl SelfIdentSearcher {
-    pub fn new() -> Self {
-        Self {
-            references_self: false,
-            self_type_ident: constants::SELF_TYPE_IDENT.clone(),
-        }
+pub(crate) fn with_lifetimes_tied_to(
+    mut target_generics: Generics,
+    source_generics: &Generics,
+    tying_lifetime: Lifetime,
+) -> Generics {
+    let span = target_generics.span();
+
+    let mut where_predicates_iter = source_generics
+        .lifetimes()
+        .map(|x| {
+            WherePredicate::Lifetime(PredicateLifetime {
+                attrs: Vec::new(),
+                lifetime: x.lifetime.clone(),
+                colon_token: Token![:](span),
+                bounds: punctuated([tying_lifetime.clone()]),
+            })
+        })
+        .peekable();
+    if where_predicates_iter.peek().is_none() {
+        return target_generics;
     }
+    let where_predicates_with_tying_lifetime_iter = where_predicates_iter.chain(core::iter::once(
+        WherePredicate::Lifetime(PredicateLifetime {
+            attrs: Vec::new(),
+            lifetime: tying_lifetime.clone(),
+            colon_token: Token![:](span),
+            bounds: source_generics
+                .lifetimes()
+                .map(|x| x.lifetime.clone())
+                .collect(),
+        }),
+    ));
+    let where_predicates: Vec<_> = where_predicates_with_tying_lifetime_iter.collect();
+    target_generics
+        .make_where_clause()
+        .predicates
+        .extend(where_predicates);
+
+    return target_generics;
 }
 
-impl Visit<'_> for SelfIdentSearcher {
-    fn visit_type(&mut self, i: &'_ Type) {
-        if self.references_self {
-            return;
+pub(crate) fn remove_defaults(mut generics: Generics) -> Generics {
+    for param in generics.params.iter_mut() {
+        match param {
+            GenericParam::Type(type_param) => {
+                type_param.default = None;
+            }
+            GenericParam::Const(const_param) => {
+                const_param.default = None;
+            }
+            _ => {}
         }
-        visit::visit_type(self, i);
     }
-
-    fn visit_expr(&mut self, i: &'_ Expr) {
-        if self.references_self {
-            return;
-        }
-        visit::visit_expr(self, i);
-    }
-
-    fn visit_ident(&mut self, i: &'_ Ident) {
-        if self.references_self {
-            return;
-        }
-        if *i == self.self_type_ident {
-            self.references_self = true;
-            return;
-        }
-        visit::visit_ident(self, i);
-    }
+    return generics;
 }

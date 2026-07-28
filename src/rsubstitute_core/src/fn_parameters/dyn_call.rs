@@ -6,9 +6,13 @@ pub struct DynCall<'rs> {
     inner: Box<dyn ICall + 'rs>,
 }
 
-impl<'rs> IArgsInfosProvider for DynCall<'rs> {
+impl<'rs> ICall for DynCall<'rs> {
     fn get_arg_infos(&self) -> Vec<ArgInfo> {
         self.inner.get_arg_infos()
+    }
+
+    fn get_ptr_to_boxed_tuple_of_refs(&self) -> *mut () {
+        self.inner.get_ptr_to_boxed_tuple_of_refs()
     }
 }
 
@@ -23,12 +27,6 @@ impl<'rs> IGenericsInfoProvider for DynCall<'rs> {
 
     fn hash_const_values(&self, hasher: &mut GenericsHasher) {
         self.inner.hash_const_values(hasher)
-    }
-}
-
-impl<'rs> IArgsTupleProvider for DynCall<'rs> {
-    fn get_ptr_to_boxed_tuple_of_refs(&self) -> *mut () {
-        self.inner.get_ptr_to_boxed_tuple_of_refs()
     }
 }
 

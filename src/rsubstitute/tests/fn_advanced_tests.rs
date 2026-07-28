@@ -1,5 +1,5 @@
 #![allow(unused)]
-use rsubstitute::macros::mock;
+use rsubstitute::mock;
 
 #[mock]
 fn accept_ref<'a>(r: &'a i32) -> &'a i32 {

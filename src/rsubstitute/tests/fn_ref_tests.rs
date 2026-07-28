@@ -1,16 +1,18 @@
 #![allow(unused)]
-use rsubstitute::macros::mock;
+use rsubstitute::mock;
 
+// TODO - write more tests where arg is passed as wildcard
 #[mock(base)]
-fn accept_ref(r: &i32) {}
+fn accept_ref(_: &i32) {}
 
-// TODO - do not forget to specify in docs that calling `setup` on static fn clears all existing configurations (this is done because otherwise configs would interrupt each other in tests)
+// TODO - do not forget to specify in docs that calling `setup` on static fn_info clears all existing configurations (this is done because otherwise configs would interrupt each other in tests)
 const BASE_RETURN_REF: &'static i32 = &1000;
 #[mock(base)]
 fn return_ref() -> &'static i32 {
     BASE_RETURN_REF
 }
 
+// TODO - write test with passing `Deref` and checking that it's compared with `Arg::ref_eq`
 const BASE_ACCEPT_REF_RETURN_REF: &'static i32 = &2000;
 #[mock(base)]
 fn accept_ref_return_ref(r: &i32) -> &'static i32 {
@@ -132,7 +134,7 @@ Received no non-matching calls"
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
 accept_ref(*{r}*)
-	1. r (&i32):
+	1. __pat_arg0 (&i32):
 		Expected reference (ptr: {invalid_r_ptr:?}): {invalid_r}
 		Actual reference   (ptr: {r_ptr:?}): {r}"
                 ),

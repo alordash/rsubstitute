@@ -1,8 +1,7 @@
 use crate::args::*;
 use crate::transmute_lifetime;
 use std::fmt::{Debug, Formatter};
-use std::rc::Rc;
-use std::sync::Arc;
+use std::ops::Deref;
 
 struct Private;
 
@@ -25,15 +24,22 @@ impl<T: PartialEq> From<T> for Arg<T> {
     }
 }
 
-impl<'a, T> From<&'a T> for Arg<*const T> {
-    fn from(value: &'a T) -> Self {
-        Arg::eq(value as *const T)
-    }
-}
+// TODO - is this needed?
+// impl<'a, T> From<&'a T> for Arg<*const T> {
+//     fn from(value: &'a T) -> Self {
+//         Arg::eq(value as *const T)
+//     }
+// }
+//
+// impl<'a, T> From<&'a mut T> for Arg<*mut T> {
+//     fn from(value: &'a mut T) -> Self {
+//         Arg::eq(value as *mut T)
+//     }
+// }
 
 impl<T: Debug> Debug for Arg<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        // TODO - extract to const field when std::any::type_name becomes stabilized as const fn
+        // TODO - extract to const field when std::any::type_name becomes stabilized as const fn_info
         // https://github.com/rust-lang/rust/issues/63084
         let arg_type_name = std::any::type_name::<T>();
         match self {
@@ -74,6 +80,7 @@ impl<T> Arg<T> {
         let arg_cmp = ArgCmp {
             value,
             comparator: PartialEq::eq,
+            maybe_deref_info: None,
         };
         return Self::PrivateEq(arg_cmp, Private);
     }
@@ -85,6 +92,34 @@ impl<T> Arg<T> {
         let arg_cmp = ArgCmp {
             value,
             comparator: PartialEq::eq,
+            maybe_deref_info: None,
+        };
+        return Self::PrivateNotEq(arg_cmp, Private);
+    }
+
+    pub fn ref_eq<U>(value: T) -> Self
+    where
+        T: Deref<Target = U>,
+    {
+        let deref_info = DerefInfo::new(&value);
+        let arg_cmp = ArgCmp {
+            value,
+            comparator: |a, b| core::ptr::eq(a.deref(), b.deref()),
+            maybe_deref_info: Some(deref_info),
+        };
+        return Self::PrivateEq(arg_cmp, Private);
+    }
+
+    // TODO - write tests for that
+    pub fn ref_not_eq<U>(value: T) -> Self
+    where
+        T: Deref<Target = U>,
+    {
+        let deref_info = DerefInfo::new(&value);
+        let arg_cmp = ArgCmp {
+            value,
+            comparator: |a, b| core::ptr::eq(a.deref(), b.deref()),
+            maybe_deref_info: Some(deref_info),
         };
         return Self::PrivateNotEq(arg_cmp, Private);
     }
@@ -105,10 +140,14 @@ impl<T> Arg<T> {
             Arg::PrivateEq(arg_cmp, _) => {
                 if !arg_cmp.is_arg_equal_to(actual_value) {
                     let expected_value_str = print_arg(&arg_cmp.value);
+                    let PtrInfo {
+                        expected_ptr_info_suffix,
+                        actual_ptr_info_suffix,
+                    } = arg_cmp.get_ptrs_info_suffix(actual_value);
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
-                            "\t\tExpected: {expected_value_str}\n\t\tActual:   {actual_value_str}"
+                            "\t\tExpected{expected_ptr_info_suffix}: {expected_value_str}\n\t\tActual{actual_ptr_info_suffix} {actual_value_str}"
                         ),
                     });
                 }
@@ -116,9 +155,15 @@ impl<T> Arg<T> {
             Arg::PrivateNotEq(arg_cmp, _) => {
                 if arg_cmp.is_arg_equal_to(actual_value) {
                     let not_expected_value_str = print_arg(&arg_cmp.value);
+                    let PtrInfo {
+                        expected_ptr_info_suffix,
+                        ..
+                    } = arg_cmp.get_ptrs_info_suffix(actual_value);
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
-                        error_msg: format!("\t\tDid not expect to be {not_expected_value_str}"),
+                        error_msg: format!(
+                            "\t\tDid not expect to be {expected_ptr_info_suffix}{not_expected_value_str}"
+                        ),
                     });
                 }
             }
@@ -188,19 +233,8 @@ impl<'rs, 'a, T: ?Sized> Arg<&'a T> {
     }
 }
 
-impl<T: ?Sized> Arg<*mut T> {
-    pub fn check_mut(
-        &self,
-        arg_name: &'static str,
-        actual_value: &*mut T,
-        actual_value_str: String,
-    ) -> ArgCheckResult {
-        self.check(arg_name, actual_value, actual_value_str)
-    }
-}
-
 impl<'a, T: ?Sized> Arg<&'a mut T> {
-    pub fn check_mut(
+    pub fn check_mut_ref(
         &self,
         arg_name: &'static str,
         actual_value_ptr: &*mut T,
@@ -255,112 +289,6 @@ impl<'a, T: ?Sized> Arg<&'a mut T> {
             }
             Arg::Any => {}
         };
-        return ArgCheckResult::Ok(ArgCheckResultOk { arg_info });
-    }
-}
-
-impl<T: ?Sized> Arg<Rc<T>> {
-    pub fn check_rc<'a>(
-        &self,
-        arg_name: &'static str,
-        actual_value: &Rc<T>,
-        actual_value_str: String,
-    ) -> ArgCheckResult
-    where
-        T: 'a,
-    {
-        let arg_info = ArgInfo::new(arg_name, actual_value, actual_value_str.clone());
-        let actual_ptr = Rc::as_ptr(&actual_value);
-        match self {
-            Arg::PrivateEq(arg_cmp, _) => {
-                let expected_ptr = Rc::as_ptr(&arg_cmp.value);
-                if !core::ptr::eq(actual_ptr, expected_ptr) {
-                    let expected_value_str = print_arg(&arg_cmp.value);
-                    return ArgCheckResult::Err(ArgCheckResultErr {
-                        arg_info,
-                        error_msg: format!(
-                            "\t\tExpected Rc (ptr: {expected_ptr:?}): {expected_value_str}\n\t\tActual Rc   (ptr: {actual_ptr:?}): {actual_value_str}"
-                        ),
-                    });
-                }
-            }
-            Arg::PrivateNotEq(arg_cmp, _) => {
-                let not_expected_ptr = Rc::as_ptr(&arg_cmp.value);
-                if core::ptr::eq(actual_ptr, not_expected_ptr) {
-                    let not_expected_value_str = print_arg(&arg_cmp.value);
-                    return ArgCheckResult::Err(ArgCheckResultErr {
-                        arg_info,
-                        error_msg: format!(
-                            "\t\tDid not expect Rc (ptr: {not_expected_ptr:?}): {not_expected_value_str}"
-                        ),
-                    });
-                }
-            }
-            Arg::PrivateIs(predicate, _) => {
-                if !predicate(actual_value as *const _ as *const ()) {
-                    return ArgCheckResult::Err(ArgCheckResultErr {
-                        arg_info,
-                        error_msg: format!(
-                            "\t\tCustom predicate didn't match passed Rc. Received value (ptr: {actual_ptr:?}): {actual_value_str}"
-                        ),
-                    });
-                }
-            }
-            Arg::Any => {}
-        };
-        return ArgCheckResult::Ok(ArgCheckResultOk { arg_info });
-    }
-}
-
-impl<T: ?Sized> Arg<Arc<T>> {
-    pub fn check_arc<'a>(
-        &self,
-        arg_name: &'static str,
-        actual_value: &Arc<T>,
-        actual_value_str: String,
-    ) -> ArgCheckResult
-    where
-        T: 'a,
-    {
-        let arg_info = ArgInfo::new(arg_name, actual_value, actual_value_str.clone());
-        let actual_ptr = Arc::as_ptr(&actual_value);
-        match self {
-            Arg::PrivateEq(arg_cmp, _) => {
-                let expected_ptr = Arc::as_ptr(&arg_cmp.value);
-                if !core::ptr::eq(actual_ptr, expected_ptr) {
-                    let expected_value_str = print_arg(&arg_cmp.value);
-                    return ArgCheckResult::Err(ArgCheckResultErr {
-                        arg_info,
-                        error_msg: format!(
-                            "\t\tExpected Arc (ptr: {expected_ptr:?}): {expected_value_str}\n\t\tActual Arc   (ptr: {actual_ptr:?}): {actual_value_str}"
-                        ),
-                    });
-                }
-            }
-            Arg::PrivateNotEq(arg_cmp, _) => {
-                let not_expected_ptr = Arc::as_ptr(&arg_cmp.value);
-                if core::ptr::eq(actual_ptr, not_expected_ptr) {
-                    let not_expected_value_str = print_arg(&arg_cmp.value);
-                    return ArgCheckResult::Err(ArgCheckResultErr {
-                        arg_info,
-                        error_msg: format!(
-                            "\t\tDid not expect Arc (ptr: {not_expected_ptr:?}): {not_expected_value_str}"
-                        ),
-                    });
-                }
-            }
-            Arg::PrivateIs(predicate, _) => {
-                if !predicate(actual_value as *const _ as *const ()) {
-                    return ArgCheckResult::Err(ArgCheckResultErr {
-                        arg_info,
-                        error_msg: format!(
-                            "\t\tCustom predicate didn't match passed Arc. Received value (ptr: {actual_ptr:?}): {actual_value_str}"
-                        ),
-                    });
-                }
-            }
-            Arg::Any => {}
-        }
         return ArgCheckResult::Ok(ArgCheckResultOk { arg_info });
     }
 }

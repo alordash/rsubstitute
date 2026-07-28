@@ -12,8 +12,8 @@
 ///
 /// In order to keep source lifetime constraints as is in mocked traits/structs/functions and to use
 /// [`DEFAULT_ARG_LIFETIME`] internally, lifetimes transmutation is used. Without it a trait
-/// `trait Trait { fn work<'a>(&'a self) -> &'a i32; }` will have in its mock extra generic
-/// constraint: `trait Trait<'rs> { fn work<'a: 'rs>(&'a self) -> &'a i32; }`
+/// `trait Trait { fn_info work<'a>(&'a self) -> &'a i32; }` will have in its mock extra generic
+/// constraint: `trait Trait<'rs> { fn_info work<'a: 'rs>(&'a self) -> &'a i32; }`
 ///
 /// For user it means that you just should keep your arguments alive for the duration of mock object.
 /// Not doing so will result in Undefined Behaviour as mock object will try to check whether given
@@ -57,6 +57,9 @@ macro_rules! transmute_lifetime {
     // If `$ty` is used as generic param in `core::mem::transmute` then source type is highlighted
     // as being part of unsafe block. Using `let` binding to circumvent that.
     ($expr:expr, $ty:ty) => {{
-        unsafe { let result: $ty = core::mem::transmute($expr); result }
+        unsafe {
+            let result: $ty = core::mem::transmute($expr);
+            result
+        }
     }};
 }

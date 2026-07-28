@@ -1,15 +1,15 @@
-use std::cell::Cell;
-use std::sync::Arc;
 use crate::fn_parameters::DynCall;
+use std::cell::Cell;
+use std::rc::Rc;
 
 pub struct CallCheck<'rs> {
     pub number: usize,
     verified: Cell<bool>,
-    call: Arc<DynCall<'rs>>,
+    call: Rc<DynCall<'rs>>,
 }
 
 impl<'rs> CallCheck<'rs> {
-    pub fn new(number: usize, call: Arc<DynCall<'rs>>) -> Self {
+    pub fn new(number: usize, call: Rc<DynCall<'rs>>) -> Self {
         Self {
             number,
             verified: Cell::new(false),

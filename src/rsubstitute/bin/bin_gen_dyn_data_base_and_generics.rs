@@ -1,6 +1,6 @@
 use std::fmt::Debug;
 
-use rsubstitute::macros::*;
+use rsubstitute::*;
 #[mock(base)]
 #[allow(unused)]
 trait Trait<'a, T1> {

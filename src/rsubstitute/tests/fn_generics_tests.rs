@@ -1,4 +1,4 @@
-use rsubstitute::macros::mock;
+use rsubstitute::mock;
 use std::fmt::{Debug, Display};
 
 #[mock(base)]
