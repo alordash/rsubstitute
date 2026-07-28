@@ -1,4 +1,5 @@
 use rsubstitute::*;
+use std::marker::PhantomData;
 
 #[mock]
 trait Trait<'a, T0> {
@@ -9,42 +10,39 @@ trait Trait<'a, T0> {
     fn generic<T1, T2>(&self, t1: T1) -> T2;
 }
 
-// mocked_base! {
-//     #[derive(Clone)]
-//     trait Struct<'s, TS>(PhantomData<&'s TS>);
-//
-//     impl<'s, TS> Struct<'s, TS> {
-//         pub fn_info new() -> Self {
-//             Self(PhantomData)
-//         }
-//
-//         fn_info accept_ref<'b>(&self, r: &'s &&'b i32) -> i32 {
-//             unreachable!()
-//         }
-//
-//         fn_info accept_ref_ptr<'b>(&self, r: &'s &*const &&'b i32) -> i32 {
-//             unreachable!()
-//         }
-//
-//         fn_info generic<T1, T2>(&self, t1: T1) -> T2 {
-//             unreachable!()
-//         }
-//     }
-//
-//     impl<'s, 'a, TS, T0> Trait<'a, T0> for Struct<'s, TS> {
-//         fn_info accept_ref<'b>(&self, r: &'a &&'b i32) -> i32 {
-//             Self::accept_ref(self, transmute_lifetime!(r))
-//         }
-//
-//         fn_info accept_ref_ptr<'b>(&self, r: &'a &*const &&'b i32) -> i32 {
-//             Self::accept_ref_ptr(self, transmute_lifetime!(r))
-//         }
-//
-//         fn_info generic<T1, T2>(&self, t1: T1) -> T2 {
-//             Self::generic(self, t1)
-//         }
-//     }
-// }
+#[mock]
+#[derive(Clone)]
+struct Struct<'s, TS>(PhantomData<&'s TS>);
+
+#[mock]
+impl<'s, TS> Struct<'s, TS> {
+    fn accept_ref<'b>(&self, r: &'s &&'b i32) -> i32 {
+        unreachable!()
+    }
+
+    fn accept_ref_ptr<'b>(&self, r: &'s &*const &&'b i32) -> i32 {
+        unreachable!()
+    }
+
+    fn generic<T1, T2>(&self, t1: T1) -> T2 {
+        unreachable!()
+    }
+}
+
+#[mock]
+impl<'s, 'a, TS, T0> Trait<'a, T0> for Struct<'s, TS> {
+    fn accept_ref<'b>(&self, r: &'a &&'b i32) -> i32 {
+        Struct::<'s, TS>::accept_ref(self, transmute_lifetime!(r))
+    }
+
+    fn accept_ref_ptr<'b>(&self, r: &'a &*const &&'b i32) -> i32 {
+        Struct::<'s, TS>::accept_ref_ptr(self, transmute_lifetime!(r))
+    }
+
+    fn generic<T1, T2>(&self, t1: T1) -> T2 {
+        Struct::<'s, TS>::generic(self, t1)
+    }
+}
 
 #[cfg(test)]
 mod tests {

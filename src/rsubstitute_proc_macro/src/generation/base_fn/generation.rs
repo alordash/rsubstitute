@@ -26,8 +26,8 @@ pub(crate) fn generate_static_fn(
 ) -> ItemFn {
     let (sig, block) = generate_core(span, fn_info, target_struct_path, base_impl);
     let result = ItemFn {
-        attrs: Vec::new(),
-        vis: Visibility::Inherited,
+        attrs: vec![attributes::doc_hidden(span)],
+        vis: Visibility::Public(Token![pub](span)),
         modifiers: FnModifiers::default(),
         sig,
         block: Box::new(block),

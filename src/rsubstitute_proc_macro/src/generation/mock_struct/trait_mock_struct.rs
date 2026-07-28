@@ -19,6 +19,7 @@ pub(crate) struct Params<'a> {
     pub mock_struct_ident: Ident,
     pub trait_info: &'a TraitInfo,
     pub generics_for_impl: Generics,
+    pub mod_ident: &'a Ident,
     pub maybe_associated_controls: Option<AssociatedControls>,
     pub maybe_static_controls: Option<StaticControls>,
 }
@@ -30,6 +31,7 @@ pub(crate) fn generate(
         mock_struct_ident,
         trait_info,
         generics_for_impl,
+        mod_ident,
         maybe_associated_controls,
         maybe_static_controls,
     }: Params,
@@ -63,6 +65,7 @@ pub(crate) fn generate(
         trait_info,
         generics_for_impl.clone(),
         path.clone(),
+        mod_ident,
     );
     let inner_impl = generate_inner_impl(
         ctx,
@@ -92,6 +95,7 @@ fn generate_trait_impl(
     trait_info: &TraitInfo,
     generics_for_impl: Generics,
     mock_struct_path: Path,
+    mod_ident: &Ident,
 ) -> ItemImpl {
     let mut items_with_order: Vec<_> = trait_info
         .constants
@@ -102,13 +106,13 @@ fn generate_trait_impl(
             trait_info
                 .associated_fns
                 .iter()
-                .map(|x| map_fn(ctx, mock_struct_path.clone(), x, false)),
+                .map(|x| map_fn(ctx, mock_struct_path.clone(), x, mod_ident.clone(), false)),
         )
         .chain(
             trait_info
                 .static_fns
                 .iter()
-                .map(|x| map_fn(ctx, mock_struct_path.clone(), x, true)),
+                .map(|x| map_fn(ctx, mock_struct_path.clone(), x, mod_ident.clone(), true)),
         )
         .collect();
     items_with_order.sort_by(|a, b| a.order_number.cmp(&b.order_number));
@@ -181,6 +185,7 @@ fn map_fn(
     ctx: &Context,
     mock_struct_path: Path,
     ordered_fn_info: &Ordered<FnInfo>,
+    mod_ident: Ident,
     is_static: bool,
 ) -> Ordered<ImplItem> {
     ordered_fn_info.clone_map(|x| {
@@ -201,6 +206,7 @@ fn map_fn(
                     } else {
                         BaseFnKind::None
                     },
+                    mod_ident,
                 )
             } else {
                 associated_method_block::generate(

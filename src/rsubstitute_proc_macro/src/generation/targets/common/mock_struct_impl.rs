@@ -16,6 +16,7 @@ pub(crate) struct Params<'a> {
     pub associated_fns: &'a [Ordered<FnInfo>],
     pub static_fns: &'a [Ordered<FnInfo>],
     pub generics: Generics,
+    pub mod_ident: &'a Ident,
 }
 pub(crate) fn generate(
     ctx: &Context,
@@ -25,6 +26,7 @@ pub(crate) fn generate(
         associated_fns,
         static_fns,
         generics,
+        mod_ident,
     }: Params,
 ) -> ItemImpl {
     let base_fns = if ctx.support_base_calling {
@@ -44,12 +46,26 @@ pub(crate) fn generate(
     };
     let mut fns: Vec<_> = associated_fns
         .iter()
-        .map(|ordered| map_fn(ctx, mock_struct_path.clone(), ordered, false))
-        .chain(
-            static_fns
-                .iter()
-                .map(|ordered| map_fn(ctx, mock_struct_path.clone(), ordered, true)),
-        )
+        .map(|ordered| {
+            map_fn(
+                ctx,
+                mock_struct_path.clone(),
+                ordered,
+                mod_ident.clone(),
+                false,
+                false,
+            )
+        })
+        .chain(static_fns.iter().map(|ordered| {
+            map_fn(
+                ctx,
+                mock_struct_path.clone(),
+                ordered,
+                mod_ident.clone(),
+                true,
+                false,
+            )
+        }))
         .collect();
     fns.sort_by(|a, b| a.order_number.cmp(&b.order_number));
     let items = fns
@@ -67,6 +83,7 @@ pub(crate) struct ParamsForTrait<'a> {
     pub static_fns: &'a [Ordered<FnInfo>],
     pub merged_generics: Generics,
     pub trait_path: Path,
+    pub mod_ident: &'a Ident,
 }
 pub(crate) struct ResultForTrait {
     pub trait_impl: ItemImpl,
@@ -81,6 +98,7 @@ pub(crate) fn generate_for_trait(
         static_fns,
         merged_generics,
         trait_path,
+        mod_ident,
     }: ParamsForTrait,
 ) -> ResultForTrait {
     let maybe_base_trait_and_fns_impl = ctx.support_base_calling.then(|| {
@@ -177,12 +195,26 @@ pub(crate) fn generate_for_trait(
     });
     let mut fns: Vec<_> = associated_fns
         .iter()
-        .map(|ordered| map_fn(ctx, mock_struct_path.clone(), ordered, false))
-        .chain(
-            static_fns
-                .iter()
-                .map(|ordered| map_fn(ctx, mock_struct_path.clone(), ordered, true)),
-        )
+        .map(|ordered| {
+            map_fn(
+                ctx,
+                mock_struct_path.clone(),
+                ordered,
+                mod_ident.clone(),
+                false,
+                true,
+            )
+        })
+        .chain(static_fns.iter().map(|ordered| {
+            map_fn(
+                ctx,
+                mock_struct_path.clone(),
+                ordered,
+                mod_ident.clone(),
+                true,
+                true,
+            )
+        }))
         .collect();
     fns.sort_by(|a, b| a.order_number.cmp(&b.order_number));
     let items = fns.into_iter().map(|x| ImplItem::Fn(x.value)).collect();
@@ -229,14 +261,24 @@ fn map_fn(
     ctx: &Context,
     mock_struct_path: Path,
     ordered_fn_info: &Ordered<FnInfo>,
+    mod_ident: Ident,
     is_static: bool,
+    for_trait: bool,
 ) -> Ordered<ImplItemFn> {
     ordered_fn_info.clone_map(|x| {
         let span = x.spans.inputs;
         ImplItemFn {
-            attrs: x.attributes.clone(),
-            vis: if is_static {
-                Visibility::Inherited
+            attrs: if !for_trait && is_static {
+                x.attributes
+                    .iter()
+                    .cloned()
+                    .chain(core::iter::once(attributes::doc_hidden(span)))
+                    .collect()
+            } else {
+                x.attributes.clone()
+            },
+            vis: if !for_trait && is_static {
+                visibility::pub_super(span)
             } else {
                 x.visibility.clone()
             },
@@ -253,6 +295,7 @@ fn map_fn(
                     } else {
                         BaseFnKind::None
                     },
+                    mod_ident,
                 )
             } else {
                 associated_method_block::generate(

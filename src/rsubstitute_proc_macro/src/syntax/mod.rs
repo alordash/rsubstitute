@@ -9,6 +9,7 @@ pub mod item_impl;
 pub mod generic_param;
 pub mod r#type;
 pub mod signature;
+pub mod visibility;
 
 mod common;
 

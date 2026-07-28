@@ -10,6 +10,7 @@ pub(crate) fn generate(
     source_span: Span,
     fn_info: &FnInfo,
     mock_struct_path: Path,
+    mod_ident: Ident,
     maybe_base_fn_ident: Option<Ident>,
 ) -> ItemFn {
     let block = static_fn_block::generate(
@@ -21,6 +22,7 @@ pub(crate) fn generate(
             Some(x) => BaseFnKind::StaticFn(x),
             None => BaseFnKind::None,
         },
+        mod_ident,
     );
 
     let result = ItemFn {

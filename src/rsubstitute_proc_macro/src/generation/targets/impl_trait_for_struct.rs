@@ -1,7 +1,8 @@
 mod as_trait_control_impl;
 
 use crate::common::models::*;
-use crate::generation::mock_controls::models::ControlType;
+use crate::generation::common::*;
+use crate::generation::mock_controls::models::*;
 use crate::generation::mock_controls::*;
 use crate::generation::mock_struct::models::*;
 use crate::generation::targets::common::*;
@@ -179,6 +180,15 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
         &mut item_impl,
         Some(impl_trait_for_struct_info.trait_path.clone()),
     );
+    let call_site = proc_macro::Span::call_site();
+    let line = call_site.line();
+    let column = call_site.column();
+    let mod_ident = format_ident!(
+        "__rsubstitute_generated_{}_{}_{}",
+        path::last_ident(&impl_trait_for_struct_info.target_path),
+        line,
+        column
+    );
     let mock_struct_impls = mock_struct_impl::generate_for_trait(
         ctx,
         source_span,
@@ -188,6 +198,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
             static_fns: &impl_trait_for_struct_info.static_fns,
             merged_generics: impl_trait_for_struct_info.merged_generics,
             trait_path: impl_trait_for_struct_info.trait_path.clone(),
+            mod_ident: &mod_ident,
         },
     );
 
@@ -198,7 +209,6 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
         Item::Use(mock_mod_usages.use_rsubstitute_for_generated),
         Item::Use(mock_mod_usages.use_super),
         Item::Use(use_struct_mod),
-        Item::Impl(item_impl),
     ]
     .into_iter()
     .chain(
@@ -274,15 +284,6 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
         ]
     }))
     .collect();
-    let call_site = proc_macro::Span::call_site();
-    let line = call_site.line();
-    let column = call_site.column();
-    let mod_ident = format_ident!(
-        "__rsubstitute_generated_{}_{}_{}",
-        path::last_ident(&impl_trait_for_struct_info.target_path),
-        line,
-        column
-    );
     let usage = mod_usage::new_all(mod_ident.clone());
     let item_mod = ItemMod {
         attrs: vec![attributes::allow_non_camel_case_types(source_span)],
@@ -293,6 +294,10 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
         content: Some((token::Brace(source_span), items)),
         semi: None,
     };
-    let result = MockMod { usage, item_mod };
+    let result = MockMod {
+        source_item: Item::Impl(item_impl),
+        maybe_usage: Some(usage),
+        item_mod,
+    };
     return result;
 }

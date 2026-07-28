@@ -77,7 +77,7 @@ fn generate_fields(fn_syntax: &FnSyntax) -> FieldsNamed {
                 let span = argument.ident.span();
                 let result = Field {
                     attrs: Vec::new(),
-                    vis: Visibility::Inherited,
+                    vis: visibility::pub_super(span),
                     modifiers: FieldModifiers::default(),
                     ident: Some(argument.ident.clone()),
                     colon_token: Some(Token![:](span)),

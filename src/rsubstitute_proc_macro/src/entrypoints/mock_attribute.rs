@@ -28,18 +28,18 @@ pub(crate) fn handle(
             let ctx = context::create_for_mock_macro(proc_macro_attribute);
             targets::r#trait::generate_module(&ctx, item_trait)
         }
-        _ => todo!(
-            "PANIC HERE AND WRITE CORRECT ERROR MSG. Can automock only `fn`, `trait`, `impl` or `use`."
-        ),
+        _ => panic!("Can mock only `fn`, `trait`, `struct` or `impl`."),
     };
 
-    let MockMod { usage, item_mod } = mock_mod;
+    let MockMod {
+        source_item,
+        maybe_usage,
+        item_mod,
+    } = mock_mod;
     let result = quote! {
-        #usage
+        #source_item
+        #maybe_usage
         #item_mod
     };
     return result.into();
-
-    // TODO - move `use` to `mock!` (or should I? maybe just support Item::Block for that)
-    // Should be used as `mock! { core::char::from_u32(i: u32) }
 }

@@ -9,7 +9,7 @@ pub(crate) fn new(expr: Expr) -> ExprMacro {
     let result = ExprMacro {
         attrs: Vec::new(),
         mac: Macro {
-            path: path::new(span, ["transmute_lifetime"]),
+            path: path::new_global(span, ["rsubstitute", "transmute_lifetime"]),
             bang_token: Token![!](span),
             delimiter: MacroDelimiter::Paren(token::Paren(span)),
             tokens: expr.to_token_stream(),
@@ -26,7 +26,7 @@ pub(crate) fn new_with_target(expr: Expr, target_type: Type) -> ExprMacro {
     let result = ExprMacro {
         attrs: Vec::new(),
         mac: Macro {
-            path: path::new(span, ["transmute_lifetime"]),
+            path: path::new_global(span, ["rsubstitute", "transmute_lifetime"]),
             bang_token: Token![!](span),
             delimiter: MacroDelimiter::Paren(token::Paren(span)),
             tokens: args.to_token_stream(),

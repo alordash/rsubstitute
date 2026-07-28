@@ -1,13 +1,13 @@
 mod mockable_trait_impl;
 mod struct_control_struct;
 
-use crate::generation::common::clone_impl;
-use crate::generation::mock_controls::models::ControlType;
+use crate::generation::common::*;
+use crate::generation::mock_controls::models::*;
 use crate::generation::mock_controls::*;
-use crate::generation::mock_struct::struct_mock_struct;
+use crate::generation::mock_struct::*;
 use crate::generation::targets::common::*;
 use crate::generation::targets::models::*;
-use crate::syntax::{generics, path};
+use crate::syntax::*;
 use quote::format_ident;
 use syn::spanned::Spanned;
 use syn::*;
@@ -134,16 +134,12 @@ pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
     let mod_ident = format_ident!("__rsubstitute_generated_{}Mock", item_struct.ident);
     let usage = mod_usage::new(
         mod_ident.clone(),
-        [
-            item_struct.ident.clone(),
-            struct_mock_struct.item_struct.ident.clone(),
-        ],
+        [struct_mock_struct.item_struct.ident.clone()],
     );
     item_struct.vis = Visibility::Public(Token![pub](source_span));
     let use_super = use_super::new(source_span);
     let items = vec![
         Item::Use(use_super),
-        Item::Struct(item_struct),
         Item::Impl(mockable_trait_impl),
         Item::Struct(struct_mock_struct.item_struct),
         Item::Impl(struct_mock_struct.item_impl),
@@ -169,6 +165,10 @@ pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
         content: Some((token::Brace(source_span), items)),
         semi: None,
     };
-    let result = MockMod { usage, item_mod };
+    let result = MockMod {
+        source_item: Item::Struct(item_struct),
+        maybe_usage: Some(usage),
+        item_mod,
+    };
     return result;
 }

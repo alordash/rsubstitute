@@ -3,7 +3,6 @@ mod mocked_fn;
 use crate::common::models::*;
 use crate::generation::mock_controls::*;
 use crate::generation::mock_struct::*;
-use crate::generation::targets::common::*;
 use crate::generation::targets::models::*;
 use crate::generation::targets::*;
 use crate::generation::*;
@@ -91,23 +90,17 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
         source_span,
         &fn_info,
         static_fn_mock_struct.path,
+        mod_ident.clone(),
         maybe_base_fn.as_ref().map(|x| x.sig.ident.clone()),
     );
-    let fn_ident = mocked_fn.sig.ident.clone();
-    let fn_items = if let Some(base_fn) = maybe_base_fn {
-        vec![Item::Fn(mocked_fn), Item::Fn(base_fn)]
-    } else {
-        vec![Item::Fn(mocked_fn)]
-    };
 
     let mock_mod_usages = mock_mod_usages::new(source_span);
-
     let items = [
         Item::Use(mock_mod_usages.use_rsubstitute_for_generated),
         Item::Use(mock_mod_usages.use_super),
     ]
     .into_iter()
-    .chain(fn_items)
+    .chain(maybe_base_fn.map(Item::Fn).into_iter())
     .chain([
         Item::Fn(fn_static_setup),
         Item::Fn(fn_static_received),
@@ -135,7 +128,6 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
     ])
     .collect();
 
-    let usage = mod_usage::new(mod_ident.clone(), [fn_ident]);
     let item_mod = ItemMod {
         attrs: vec![attributes::allow_non_camel_case_types(source_span)],
         vis: fn_info.visibility.clone(),
@@ -145,6 +137,10 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
         content: Some((token::Brace(source_span), items)),
         semi: None,
     };
-    let result = MockMod { usage, item_mod };
+    let result = MockMod {
+        source_item: Item::Fn(mocked_fn),
+        maybe_usage: None,
+        item_mod,
+    };
     return result;
 }

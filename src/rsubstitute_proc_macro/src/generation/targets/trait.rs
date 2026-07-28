@@ -1,10 +1,10 @@
 use crate::common::models::*;
+use crate::generation::common::*;
 use crate::generation::mock_controls::*;
 use crate::generation::mock_struct::models::*;
 use crate::generation::mock_struct::*;
-use crate::generation::targets::common::mod_usage;
-use crate::generation::targets::mock_mod_usages;
 use crate::generation::targets::models::*;
+use crate::generation::targets::*;
 use crate::generation::*;
 use crate::preparation::r#trait::*;
 use crate::syntax::*;
@@ -94,6 +94,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockM
         };
         return static_controls;
     });
+    let mod_ident = format_ident!("__rsubstitute_generated_{}Mock", trait_info.ident);
     let trait_mock_struct = trait_mock_struct::generate(
         ctx,
         source_span,
@@ -103,6 +104,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockM
             generics_for_impl,
             maybe_associated_controls,
             maybe_static_controls,
+            mod_ident: &mod_ident,
         },
     );
 
@@ -112,7 +114,6 @@ pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockM
     let items = [
         Item::Use(mock_mod_usages.use_rsubstitute_for_generated),
         Item::Use(mock_mod_usages.use_super),
-        Item::Trait(item_trait),
     ]
     .into_iter()
     .chain(trait_info.associated_fns.into_iter().flat_map(|x| {
@@ -183,12 +184,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockM
     )
     .collect();
 
-    // TODO - add to all targets generated mods `__rsubstitute_generated` prefix
-    let mod_ident = format_ident!("__rsubstitute_generated_{}Mock", trait_info.ident);
-    let usage = mod_usage::new(
-        mod_ident.clone(),
-        [trait_info.ident.clone(), trait_mock_struct_ident],
-    );
+    let usage = mod_usage::new(mod_ident.clone(), [trait_mock_struct_ident]);
     let item_mod = ItemMod {
         attrs: vec![attributes::allow_non_camel_case_types(source_span)],
         vis: mod_visibility,
@@ -198,6 +194,10 @@ pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockM
         content: Some((token::Brace(source_span), items)),
         semi: None,
     };
-    let result = MockMod { usage, item_mod };
+    let result = MockMod {
+        source_item: Item::Trait(item_trait),
+        maybe_usage: Some(usage),
+        item_mod,
+    };
     return result;
 }

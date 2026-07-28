@@ -73,9 +73,9 @@ fn work<'x, 'a, 'b: 'a, 'c, 'd: 'a, T1, T2>(
 #[mock]
 #[allow(unused)]
 struct Struct<'a, 'b: 'a, T1: Clone> {
-    pub(super) _phantom_a: PhantomData<&'a ()>,
-    pub(super) _phantom_b: PhantomData<&'b ()>,
-    pub(super) _phantom_t1: PhantomData<T1>,
+    _phantom_a: PhantomData<&'a ()>,
+    _phantom_b: PhantomData<&'b ()>,
+    _phantom_t1: PhantomData<T1>,
 }
 
 #[mock(base)]
