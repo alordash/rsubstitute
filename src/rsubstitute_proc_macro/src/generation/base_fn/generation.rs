@@ -1,3 +1,4 @@
+use crate::common::models::*;
 use crate::common::*;
 use crate::generation::fn_info::models::*;
 use crate::syntax::*;
@@ -5,7 +6,6 @@ use proc_macro2::Span;
 use quote::format_ident;
 use syn::punctuated::Punctuated;
 use syn::*;
-use crate::common::models::*;
 
 pub(crate) fn get_base_fn_ident(fn_ident: &Ident) -> Ident {
     format_ident!("__rs_base_{}", fn_ident)
@@ -78,8 +78,12 @@ fn generate_core(
     let mock_pat = if let Some(receiver) = &fn_info.maybe_self_type {
         let (is_reference, type_mutability) = match &receiver.kind {
             ReceiverKind::Reference(_, _, mutability) => (true, mutability.clone()),
-            ReceiverKind::Typed(_, ty) if let Type::Reference(reference) = ty.as_ref() => {
-                (true, reference.mutability)
+            ReceiverKind::Typed(_, ty) => {
+                if let Type::Reference(reference) = ty.as_ref() {
+                    (true, reference.mutability)
+                } else {
+                    (false, None)
+                }
             }
             _ => (false, None),
         };

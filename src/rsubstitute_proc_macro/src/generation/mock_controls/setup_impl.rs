@@ -81,6 +81,7 @@ fn generate_setup_fn(
     );
     let fn_configurator_path = fn_configurator_path::new(
         span,
+        mock_struct_path.clone(),
         fn_info,
         &generic_arguments,
         placeholder_lifetime(span),

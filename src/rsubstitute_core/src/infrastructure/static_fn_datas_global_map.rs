@@ -35,7 +35,8 @@ impl StaticFnDatasGlobalMap {
         let result = unsafe {
             (fn_data_raw_ptr
                 as *const FnData<TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, false>)
-                .as_ref_unchecked()
+                .as_ref()
+                .unwrap_unchecked()
         };
         return result;
     }
