@@ -49,6 +49,7 @@ impl StaticFnDatasGlobalMap {
     >(
         &'_ self,
         fn_ident: &'static str,
+        for_struct: bool,
     ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, false> {
         let type_id = typeid::of::<TMock>();
         let map = self.get_mut_map();
@@ -62,7 +63,7 @@ impl StaticFnDatasGlobalMap {
                     HAS_RETURN_VALUE,
                     SUPPORTS_BASE_CALLING,
                     false,
-                >::new(fn_ident))) as *mut _ as *const _
+                >::new(fn_ident, for_struct))) as *mut _ as *const _
             });
 
         let fn_data_ref =
@@ -110,15 +111,11 @@ pub fn get_static_fn_data<
 >(
     fn_ident: &'static str,
 ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, false> {
-    let result = STATIC_FN_DATAS_GLOBAL_MAP.with(|this| this.get_specific_fn_data(fn_ident));
+    let result = STATIC_FN_DATAS_GLOBAL_MAP.with(|this| this.get_specific_fn_data(fn_ident, false));
     return result;
 }
 
-pub fn clear_static_fn_data<TMock>() {
-    STATIC_FN_DATAS_GLOBAL_MAP.with(|this| this.clear_mock_fn_datas::<TMock>());
-}
-
-pub fn get_clean_static_fn_data<
+pub fn get_struct_static_fn_data<
     'a,
     TMock,
     const HAS_RETURN_VALUE: bool,
@@ -126,8 +123,12 @@ pub fn get_clean_static_fn_data<
 >(
     fn_ident: &'static str,
 ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, false> {
-    clear_static_fn_data::<TMock>();
-    return get_static_fn_data(fn_ident);
+    let result = STATIC_FN_DATAS_GLOBAL_MAP.with(|this| this.get_specific_fn_data(fn_ident, true));
+    return result;
+}
+
+pub fn clear_static_fn_data<TMock>() {
+    STATIC_FN_DATAS_GLOBAL_MAP.with(|this| this.clear_mock_fn_datas::<TMock>());
 }
 
 pub fn verify_static_fn_received_nothing_else<TMock>() {

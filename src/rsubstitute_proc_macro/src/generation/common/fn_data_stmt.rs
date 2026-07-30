@@ -4,6 +4,12 @@ use crate::syntax::*;
 use proc_macro2::Span;
 use syn::*;
 
+pub(crate) struct AssociatedParams<'a> {
+    fn_info: &'a FnInfo,
+    generic_arguments: generic_arguments::Result,
+    generics_info_provider_var_path: ExprPath,
+    for_struct: bool,
+}
 pub(crate) fn new_associated(
     span: Span,
     fn_info: &FnInfo,
@@ -39,6 +45,11 @@ pub(crate) fn new_associated(
     return (fn_data_var_path, fn_data_stmt);
 }
 
+pub(crate) struct StaticParams<'a> {
+    fn_info: &'a FnInfo,
+    generic_arguments: generic_arguments::Result,
+    for_struct: bool,
+}
 pub(crate) fn new_static(
     span: Span,
     fn_info: &FnInfo,

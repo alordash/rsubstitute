@@ -19,6 +19,7 @@ pub struct FnData<
     pub call_infos: RefCell<HashMap<GenericsHashKey, Vec<CallCheck<'rs>>>>,
     pub configs: RefCell<HashMap<GenericsHashKey, Vec<Rc<RefCell<FnConfig<'rs, TMock>>>>>>,
     next_call_number: AtomicUsize,
+    force_call_base: bool,
 }
 
 impl<
@@ -29,12 +30,13 @@ impl<
     const PASSES_MOCK_TO_CALLBACK: bool,
 > FnData<'rs, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, PASSES_MOCK_TO_CALLBACK>
 {
-    pub fn new(fn_name: &'static str) -> Self {
+    pub fn new(fn_name: &'static str, for_struct: bool) -> Self {
         Self {
             fn_name,
             call_infos: RefCell::new(HashMap::new()),
             configs: RefCell::new(HashMap::new()),
             next_call_number: AtomicUsize::new(1),
+            force_call_base: for_struct,
         }
     }
 
@@ -195,6 +197,8 @@ impl<'rs, TMock, const PASSES_MOCK_TO_CALLBACK: bool>
             if fn_config_ref.should_call_base() {
                 base_call(mock_arg, call_for_base_call);
             }
+        } else if self.force_call_base {
+            base_call(mock_arg, call_for_base_call)
         }
     }
 }
@@ -217,7 +221,22 @@ impl<'rs, TMock, const PASSES_MOCK_TO_CALLBACK: bool>
         let call_for_base_call = the_call.clone();
         let dyn_call = DynCall::new(the_call);
         let call = Rc::new(dyn_call);
-        let fn_config = self.get_required_matching_config(&call);
+        let with_return_value = true;
+        let fn_config = match self.try_get_matching_config(&call, with_return_value) {
+            MatchingConfigSearchResult::Ok(x) => x,
+            MatchingConfigSearchResult::Err(matching_config_search_err) => {
+                if self.force_call_base {
+                    let base_return_value = base_call(mock_arg, call_for_base_call);
+                    return base_return_value;
+                }
+                error_printing::panic_no_suitable_fn_configuration_found(
+                    self.fn_name,
+                    call.get_arg_infos(),
+                    call.get_generic_parameter_infos(),
+                    matching_config_search_err,
+                )
+            }
+        };
         self.register_call(call.clone());
         fn_config.borrow_mut().register_call(call.clone());
         let fn_config_ref = fn_config.borrow();
@@ -333,7 +352,7 @@ mod internal {
             return fn_config;
         }
 
-        fn try_get_matching_config(
+        pub(super) fn try_get_matching_config(
             &self,
             dyn_call: &DynCall<'rs>,
             with_return_value: bool,

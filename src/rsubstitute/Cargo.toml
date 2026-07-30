@@ -89,6 +89,12 @@ test = false
 doctest = false
 
 [[bin]]
+name = "NEW_impl_Trait"
+path = "bin/NEW_impl_Trait.rs"
+test = false
+doctest = false
+
+[[bin]]
 name = "NEW_trait"
 path = "bin/NEW_trait.rs"
 test = false

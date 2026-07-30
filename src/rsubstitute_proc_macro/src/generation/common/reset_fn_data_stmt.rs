@@ -2,6 +2,8 @@ use crate::syntax::*;
 use proc_macro2::Span;
 use syn::*;
 
+// TODO - write in documentation guideline: you should call `setup` or `static_setup` on static fns
+// only once in a single unit test, because each `setup` call clears all previous configurations.
 pub(crate) fn new(span: Span, mock_generic_argument: GenericArgument) -> ExprCall {
     let result = expr::call::new(
         span,
