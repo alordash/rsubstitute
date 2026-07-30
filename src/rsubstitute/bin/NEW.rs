@@ -6,6 +6,7 @@ use rsubstitute::Mockable;
 #[allow(unused_imports)]
 use rsubstitute_proc_macro::mock;
 use std::ops::Deref;
+use std::thread;
 
 #[mock]
 trait Trait {
@@ -34,11 +35,24 @@ fn main() {
         .work()
         .does(|_| println!("new Trait::work mocked!"));
     f::<TraitMock>();
-    
-    Struct::static_setup().work().does(|_| println!("static Struct::work mocked!"));
+
+    Struct::static_setup()
+        .work()
+        .does(|_| println!("static Struct::work mocked!"));
     Struct::work();
     Struct::work();
-    Struct::static_setup().work().does(|_| println!("new Struct::work mocked!"));
+    Struct::static_setup()
+        .work()
+        .does(|_| println!("new Struct::work mocked!"));
+    Struct::work();
+
+    thread::spawn(|| {
+        Struct::static_setup()
+            .work()
+            .does(|_| println!("thread Struct::work mocked!"));
+        Struct::work()
+    })
+    .join();
     Struct::work();
 
     println!("Done");
