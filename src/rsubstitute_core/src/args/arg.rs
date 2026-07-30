@@ -24,7 +24,7 @@ impl<T: PartialEq> From<T> for Arg<T> {
     }
 }
 
-// TODO - is this needed?
+// TODO - is this needed? write tests that operate on pointers
 // impl<'a, T> From<&'a T> for Arg<*const T> {
 //     fn from(value: &'a T) -> Self {
 //         Arg::eq(value as *const T)
