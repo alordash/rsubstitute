@@ -57,6 +57,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
             fn_infos: &fn_infos,
             for_static_fn: true,
             maybe_trait_ident: None,
+            for_struct: false,
         },
     );
     let static_received_struct = static_received::generate(
@@ -71,6 +72,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
             fn_infos: &fn_infos,
             for_static_fn: true,
             maybe_trait_ident: None,
+            for_struct: false,
         },
     );
     let [fn_info] = fn_infos;

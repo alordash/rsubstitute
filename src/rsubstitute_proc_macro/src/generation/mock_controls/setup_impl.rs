@@ -15,6 +15,7 @@ pub(crate) struct Params<'a, T: Borrow<FnInfo>> {
     pub fn_infos: &'a [T],
     pub for_static_fn: bool,
     pub is_static: bool,
+    pub for_struct: bool,
 }
 
 pub(crate) fn generate<T: Borrow<FnInfo>>(
@@ -27,6 +28,7 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
         fn_infos,
         for_static_fn,
         is_static,
+        for_struct,
     }: Params<T>,
 ) -> ItemImpl {
     let items = fn_infos
@@ -39,6 +41,7 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
                 fn_info.borrow(),
                 for_static_fn,
                 is_static,
+                for_struct,
             )
         })
         .map(ImplItem::Fn)
@@ -69,6 +72,7 @@ fn generate_setup_fn(
     fn_info: &FnInfo,
     for_static_fn: bool,
     is_static: bool,
+    for_struct: bool,
 ) -> ImplItemFn {
     let generic_arguments = generic_arguments::new(
         ctx,
@@ -130,13 +134,23 @@ fn generate_setup_fn(
         GenericArgument::Lifetime(placeholder_lifetime(span));
     let (args_checker_var_path, args_checker_stmt) = args_checker_stmt::new(span, fn_info);
     let (fn_data_var_path, fn_data_stmt) = if is_static {
-        fn_data_stmt::new_static(span, fn_info, generic_arguments)
+        fn_data_stmt::new_static(
+            span,
+            fn_data_stmt::StaticParams {
+                fn_info,
+                generic_arguments,
+                for_struct,
+            },
+        )
     } else {
         fn_data_stmt::new_associated(
             span,
-            fn_info,
-            generic_arguments,
-            args_checker_var_path.clone(),
+            fn_data_stmt::AssociatedParams {
+                fn_info,
+                generic_arguments,
+                generics_info_provider_var_path: args_checker_var_path.clone(),
+                for_struct,
+            },
         )
     };
     let fn_configurator_var_path = path::new(span, ["fn_configurator"]);

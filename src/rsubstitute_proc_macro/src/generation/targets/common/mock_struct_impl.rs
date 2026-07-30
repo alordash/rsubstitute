@@ -265,48 +265,55 @@ fn map_fn(
     is_static: bool,
     for_trait: bool,
 ) -> Ordered<ImplItemFn> {
-    ordered_fn_info.clone_map(|x| {
-        let span = x.spans.inputs;
+    ordered_fn_info.clone_map(|fn_info| {
+        let span = fn_info.spans.inputs;
         ImplItemFn {
             attrs: if !for_trait && is_static {
-                x.attributes
+                fn_info
+                    .attributes
                     .iter()
                     .cloned()
                     .chain(core::iter::once(attributes::doc_hidden(span)))
                     .collect()
             } else {
-                x.attributes.clone()
+                fn_info.attributes.clone()
             },
             vis: if !for_trait {
                 visibility::pub_super(span)
             } else {
-                x.visibility.clone()
+                fn_info.visibility.clone()
             },
             modifiers: FnModifiers::default(),
-            sig: *x.source_signature.clone(),
+            sig: *fn_info.source_signature.clone(),
             block: if is_static {
                 static_fn_block::generate(
                     ctx,
                     span,
-                    mock_struct_path,
-                    &x,
-                    if x.maybe_base_impl.is_some() {
-                        BaseFnKind::Associated(base_fn::get_base_fn_ident(&x.fn_ident))
-                    } else {
-                        BaseFnKind::None
+                    static_fn_block::Params {
+                        mock_struct_path,
+                        fn_info,
+                        base_fn_kind: if fn_info.maybe_base_impl.is_some() {
+                            BaseFnKind::Associated(base_fn::get_base_fn_ident(&fn_info.fn_ident))
+                        } else {
+                            BaseFnKind::None
+                        },
+                        mod_ident,
+                        for_struct: true,
                     },
-                    mod_ident,
                 )
             } else {
                 associated_method_block::generate(
                     ctx,
                     span,
-                    mock_struct_path,
-                    &x,
-                    if x.maybe_base_impl.is_some() {
-                        Some(base_fn::get_base_fn_ident(&x.fn_ident))
-                    } else {
-                        None
+                    associated_method_block::Params {
+                        mock_struct_path,
+                        fn_info,
+                        maybe_base_fn_ident: if fn_info.maybe_base_impl.is_some() {
+                            Some(base_fn::get_base_fn_ident(&fn_info.fn_ident))
+                        } else {
+                            None
+                        },
+                        for_struct: true,
                     },
                 )
             },

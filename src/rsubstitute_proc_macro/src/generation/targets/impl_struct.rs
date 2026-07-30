@@ -59,6 +59,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                     fn_infos: &impl_struct_info.associated_fns,
                     for_static_fn: false,
                     is_static: false,
+                    for_struct: true,
                 },
             );
             let received_impl = received_impl::generate(
@@ -78,6 +79,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                     for_static_fn: false,
                     is_static: false,
                     generate_fn_no_other_calls: false,
+                    for_struct: true,
                 },
             );
             (setup_impl, received_impl)
@@ -99,6 +101,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                 fn_infos: &impl_struct_info.static_fns,
                 for_static_fn: false,
                 is_static: true,
+                for_struct: true,
             },
         );
         let static_received_impl = received_impl::generate(
@@ -118,6 +121,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                 for_static_fn: false,
                 is_static: true,
                 generate_fn_no_other_calls: false,
+                for_struct: true,
             },
         );
         (static_setup_impl, static_received_impl)

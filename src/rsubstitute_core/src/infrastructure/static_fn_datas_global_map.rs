@@ -115,7 +115,7 @@ pub fn get_static_fn_data<
     return result;
 }
 
-pub fn get_struct_static_fn_data<
+pub fn get_static_fn_data_for_struct<
     'a,
     TMock,
     const HAS_RETURN_VALUE: bool,

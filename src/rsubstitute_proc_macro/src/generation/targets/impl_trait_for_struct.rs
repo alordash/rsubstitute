@@ -50,6 +50,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                     mock_struct_path: &mock_struct_path,
                     fn_infos: &impl_trait_for_struct_info.associated_fns,
                     maybe_trait_ident: Some(impl_trait_for_struct_info.trait_ident.clone()),
+                    for_struct: true,
                 },
             );
             let trait_received_struct = received::generate(
@@ -62,6 +63,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                     mock_struct_path: &mock_struct_path,
                     fn_infos: &impl_trait_for_struct_info.associated_fns,
                     maybe_trait_ident: Some(impl_trait_for_struct_info.trait_ident.clone()),
+                    for_struct: true,
                 },
             );
             let setup_struct_impl = as_trait_control_impl::generate(
@@ -117,6 +119,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                 fn_infos: &impl_trait_for_struct_info.static_fns,
                 for_static_fn: false,
                 maybe_trait_ident: Some(impl_trait_for_struct_info.trait_ident.clone()),
+                for_struct: true,
             },
         );
         let trait_static_received_struct = static_received::generate(
@@ -131,6 +134,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                 fn_infos: &impl_trait_for_struct_info.static_fns,
                 for_static_fn: false,
                 maybe_trait_ident: Some(impl_trait_for_struct_info.trait_ident.clone()),
+                for_struct: true,
             },
         );
         let static_setup_struct_impl = as_trait_control_impl::generate(

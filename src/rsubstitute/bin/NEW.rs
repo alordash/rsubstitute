@@ -10,7 +10,9 @@ use std::thread;
 
 #[mock]
 trait Trait {
-    fn work();
+    fn work() {
+        println!("Default trait work impl");
+    }
 }
 
 fn f<T: Trait>() {
@@ -20,12 +22,15 @@ fn f<T: Trait>() {
 #[mock]
 struct Struct;
 
-#[mock]
+#[mock(base)]
 impl Struct {
-    pub fn work() {}
+    pub fn work() {
+        println!("Default struct work impl");
+    }
 }
 
 fn main() {
+    f::<TraitMock>();
     TraitMock::static_setup()
         .work()
         .does(|_| println!("static Trait::work mocked!"));
@@ -36,6 +41,7 @@ fn main() {
         .does(|_| println!("new Trait::work mocked!"));
     f::<TraitMock>();
 
+    Struct::work();
     Struct::static_setup()
         .work()
         .does(|_| println!("static Struct::work mocked!"));
