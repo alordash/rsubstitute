@@ -20,10 +20,20 @@ fn f<T: Trait>() {
 }
 
 #[mock]
-struct Struct;
+struct Struct {
+    pub v: i32
+}
 
 #[mock(base)]
-impl Struct {
+impl crate::Struct {
+    fn struct_refs(&self) {
+        let s = Struct { v: 1 };
+        let Struct { v: a } = s;
+
+        let s = crate::Struct { v: 1 };
+        let crate::Struct { v: b } = s;
+    }
+
     pub fn f(&self) {
         println!("Default struct f impl");
     }
@@ -63,7 +73,7 @@ fn main() {
             .does(|_| println!("thread Struct::work mocked!"));
         Struct::work();
     })
-    .join();
+        .join();
     Struct::work();
 
     let mut s = Struct.mock();

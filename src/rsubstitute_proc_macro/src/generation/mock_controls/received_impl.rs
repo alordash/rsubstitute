@@ -305,7 +305,7 @@ fn generate_regular_fn_no_other_calls(span: Span) -> ImplItemFn {
             attrs: Vec::new(),
             and_token: Token![&](span),
             mutability: None,
-            expr: Box::new(Expr::Field(expr::field::new_self(Ident::new("data", span)))),
+            expr: Box::new(Expr::Field(expr::field::new_self(Ident::new("__rs_data", span)))),
         })],
     );
 

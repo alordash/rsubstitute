@@ -1,5 +1,6 @@
+use crate::common::data_field;
 use crate::syntax::*;
-use quote::format_ident;
+use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::visit_mut::VisitMut;
 use syn::*;
@@ -8,14 +9,7 @@ pub(crate) fn normalize_struct_type_references(
     mut impl_item: ImplItem,
     struct_path: &Path,
 ) -> ImplItem {
-    let mock_struct_path = path::from_base_path_with_ident(
-        &struct_path,
-        format_ident!("{}Mock", path::last_ident(&struct_path)),
-    );
-    let mut normalizer = StructTypeReferencesNormalizer {
-        struct_path,
-        mock_struct_path,
-    };
+    let mut normalizer = StructTypeReferencesNormalizer::new(struct_path);
     normalizer.visit_impl_item_mut(&mut impl_item);
     return impl_item;
 }
@@ -23,60 +17,126 @@ pub(crate) fn normalize_struct_type_references(
 pub(crate) fn normalize_struct_type_references_in_impl_item_fn(
     impl_item_fn: &mut ImplItemFn,
     struct_path: &Path,
-    mock_struct_path: Path,
 ) {
-    let mut normalizer = StructTypeReferencesNormalizer {
-        struct_path,
-        mock_struct_path,
-    };
+    let mut normalizer = StructTypeReferencesNormalizer::new(struct_path);
     normalizer.visit_impl_item_fn_mut(impl_item_fn);
 }
 
 struct StructTypeReferencesNormalizer<'a> {
-    pub struct_path: &'a Path,
-    mock_struct_path: Path,
+    struct_path: &'a Path,
+    maybe_struct_ident: Option<&'a Ident>,
 }
 
 impl<'a> StructTypeReferencesNormalizer<'a> {
-    fn try_replace_path(&self, path: &mut Path) -> Option<Path> {
-        if path
-            .segments
-            .first()
-            .is_some_and(|first| first.ident == "Self")
-        {
-            let source_path = path.clone();
-            let mut new_path = self.mock_struct_path.clone();
-            new_path.segments = new_path
-                .segments
-                .into_iter()
-                .chain(core::mem::take(&mut path.segments).into_iter().skip(1))
-                .collect();
-            *path = new_path;
-            return Some(source_path);
+    pub fn new(struct_path: &'a Path) -> Self {
+        Self {
+            struct_path,
+            maybe_struct_ident: if struct_path.segments.len() == 1 {
+                Some(&struct_path.segments[0].ident)
+            } else {
+                None
+            },
         }
-        if path::starts_with(path, self.struct_path) {
-            let source_path = path.clone();
-            let mut new_path = self.mock_struct_path.clone();
-            new_path.segments = new_path
-                .segments
-                .into_iter()
-                .chain(
-                    core::mem::take(&mut path.segments)
-                        .into_iter()
-                        .skip(self.mock_struct_path.segments.len()),
-                )
-                .collect();
-            *path = new_path;
-            return Some(source_path);
+    }
+
+    fn is_struct_path(&self, path: &Path) -> bool {
+        if path.segments.len() == 1 && path.segments[0].ident == "Self" {
+            return true;
         }
-        return None;
+
+        return path::equal(path, self.struct_path);
     }
 }
 
 impl<'a> VisitMut for StructTypeReferencesNormalizer<'a> {
-    fn visit_path_mut(&mut self, i: &mut Path) {
-        self.try_replace_path(i);
+    fn visit_expr_mut(&mut self, i: &mut Expr) {
+        if let Expr::Path(expr_path) = i
+            && self.is_struct_path(&expr_path.path)
+        {
+            let span = expr_path.span();
+            let mut expr_struct = ExprStruct {
+                attrs: Vec::new(),
+                qself: None,
+                path: Path {
+                    leading_colon: expr_path.path.leading_colon,
+                    segments: core::mem::take(&mut expr_path.path.segments),
+                },
+                brace_token: token::Brace(span),
+                fields: punctuated([data_field::new_default_value(span)]),
+                dot2_token: None,
+                rest: None,
+            };
 
-        visit_mut::visit_path_mut(self, i);
+            self.visit_path_mut(&mut expr_struct.path);
+            *i = Expr::Struct(expr_struct);
+        } else {
+            visit_mut::visit_expr_mut(self, i);
+        }
+    }
+
+    fn visit_expr_struct_mut(&mut self, i: &mut ExprStruct) {
+        if self.is_struct_path(&i.path) {
+            i.fields.push(data_field::new_default_value(i.span()));
+        }
+
+        visit_mut::visit_expr_struct_mut(self, i);
+    }
+
+    fn visit_pat_mut(&mut self, i: &mut Pat) {
+        match i {
+            Pat::Path(pat_path) if self.is_struct_path(&pat_path.path) => {
+                let span = pat_path.span();
+                let mut pat_struct = PatStruct {
+                    attrs: Vec::new(),
+                    qself: None,
+                    path: Path {
+                        leading_colon: pat_path.path.leading_colon,
+                        segments: core::mem::take(&mut pat_path.path.segments),
+                    },
+                    brace_token: token::Brace(span),
+                    fields: Punctuated::new(),
+                    rest: Some(PatRest {
+                        attrs: Vec::new(),
+                        dot2_token: Token![..](span),
+                    }),
+                };
+
+                self.visit_path_mut(&mut pat_struct.path);
+                *i = Pat::Struct(pat_struct);
+            }
+            Pat::Ident(pat_ident) => {
+                if let Some(struct_ident) = self.maybe_struct_ident
+                    && pat_ident.ident == *struct_ident
+                {
+                    let span = struct_ident.span();
+                    let pat_struct = PatStruct {
+                        attrs: Vec::new(),
+                        qself: None,
+                        path: path::from_ident(struct_ident.clone()),
+                        brace_token: token::Brace(span),
+                        fields: Punctuated::new(),
+                        rest: Some(PatRest {
+                            attrs: Vec::new(),
+                            dot2_token: Token![..](span),
+                        }),
+                    };
+                    *i = Pat::Struct(pat_struct);
+                } else {
+                    visit_mut::visit_pat_mut(self, i)
+                }
+            }
+            _ => visit_mut::visit_pat_mut(self, i),
+        }
+    }
+
+    fn visit_pat_struct_mut(&mut self, i: &mut PatStruct) {
+        if i.rest.is_none() && self.is_struct_path(&i.path) {
+            i.rest = Some(PatRest {
+                attrs: Vec::new(),
+                dot2_token: Token![..](i.span()),
+            })
+        }
+
+        visit_mut::visit_pat_struct_mut(self, i);
     }
 }

@@ -34,7 +34,7 @@ pub(crate) fn new_associated(
             eq_token: Token![=](span),
             expr: Box::new(Expr::MethodCall(expr::method_call::new(
                 span,
-                Expr::Field(expr::field::new_self(Ident::new("data", span))),
+                Expr::Field(expr::field::new_self(Ident::new("__rs_data", span))),
                 Ident::new(fn_name, span),
                 [
                     fn_info_ident_to_expr_lit(span, fn_info),

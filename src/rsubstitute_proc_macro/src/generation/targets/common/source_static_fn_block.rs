@@ -7,7 +7,6 @@ use syn::*;
 pub(crate) fn replace(
     span: Span,
     struct_path: &Path,
-    mock_struct_path: Path,
     item_impl: &mut ItemImpl,
     maybe_trait_path: Option<Path>,
 ) {
@@ -24,18 +23,14 @@ pub(crate) fn replace(
         ty: Box::new(Type::Path(TypePath {
             attrs: Vec::new(),
             qself: None,
-            path: mock_struct_path.clone(),
+            path: struct_path.clone(),
         })),
         position: trait_path.segments.len(),
         as_token: Some(Token![as](span)),
         gt_token: Token![>](span),
     });
     for static_fn in static_fns {
-        normalization::normalize_struct_type_references_in_impl_item_fn(
-            static_fn,
-            struct_path,
-            mock_struct_path.clone(),
-        );
+        normalization::normalize_struct_type_references_in_impl_item_fn(static_fn, struct_path);
         let args = static_fn
             .sig
             .inputs
@@ -64,7 +59,7 @@ pub(crate) fn replace(
                 segments: maybe_trait_path
                     .clone()
                     .map(|x| x.segments.into_iter())
-                    .unwrap_or_else(|| mock_struct_path.segments.clone().into_iter())
+                    .unwrap_or_else(|| struct_path.segments.clone().into_iter())
                     .chain(core::iter::once(PathSegment {
                         ident: static_fn.sig.ident.clone(),
                         arguments: PathArguments::AngleBracketed(AngleBracketedGenericArguments {

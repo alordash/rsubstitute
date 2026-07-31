@@ -116,6 +116,8 @@ fn parse_target_type(target_type: &Type) -> Path {
     if type_path.qself.is_some() {
         panic!("Can not mock structs qualified with self-type.");
     }
+    
+    return type_path.path.clone();
 
     let flat_ident = ident::combine_path_segments(&type_path.path);
     let mut result = type_path.path.clone();

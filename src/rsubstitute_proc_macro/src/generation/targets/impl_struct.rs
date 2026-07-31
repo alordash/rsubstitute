@@ -20,10 +20,6 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
         impl_items: item_impl.items.clone(),
     });
     let impl_struct_info = impl_struct_info::generate(ctx, impl_struct_syntax);
-    let mock_struct_path = path::from_base_path_with_ident(
-        &impl_struct_info.target_path,
-        format_ident!("{}Mock", path::last_ident(&impl_struct_info.target_path)),
-    );
     let call_site = proc_macro::Span::call_site();
     let line = call_site.line();
     let column = call_site.column();
@@ -37,7 +33,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
         ctx,
         source_span,
         mock_struct_impl::Params {
-            mock_struct_path: mock_struct_path.clone(),
+            mock_struct_path: impl_struct_info.target_path.clone(),
             associated_fns: &impl_struct_info.associated_fns,
             static_fns: &impl_struct_info.static_fns,
             generics: impl_struct_info.generics.clone(),
@@ -55,7 +51,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                         format_ident!("{}Setup", path::last_ident(&impl_struct_info.target_path)),
                     ),
                     generics: impl_struct_info.generics.clone(),
-                    mock_struct_path: &mock_struct_path,
+                    mock_struct_path: &impl_struct_info.target_path,
                     fn_infos: &impl_struct_info.associated_fns,
                     for_static_fn: false,
                     is_static: false,
@@ -74,7 +70,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                         ),
                     ),
                     generics: impl_struct_info.generics.clone(),
-                    mock_struct_path: &mock_struct_path,
+                    mock_struct_path: &impl_struct_info.target_path,
                     fn_infos: &impl_struct_info.associated_fns,
                     for_static_fn: false,
                     is_static: false,
@@ -97,7 +93,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                     ),
                 ),
                 generics: impl_struct_info.generics.clone(),
-                mock_struct_path: &mock_struct_path,
+                mock_struct_path: &impl_struct_info.target_path,
                 fn_infos: &impl_struct_info.static_fns,
                 for_static_fn: false,
                 is_static: true,
@@ -116,7 +112,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                     ),
                 ),
                 generics: impl_struct_info.generics.clone(),
-                mock_struct_path: &mock_struct_path,
+                mock_struct_path: &impl_struct_info.target_path,
                 fn_infos: &impl_struct_info.static_fns,
                 for_static_fn: false,
                 is_static: true,
@@ -129,7 +125,6 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
     source_static_fn_block::replace(
         source_span,
         &impl_struct_info.target_path,
-        mock_struct_path,
         &mut item_impl,
         None,
     );
@@ -174,7 +169,6 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
             Item::Impl(args_checker.args_checker_impl),
         ])
     }))
-    .chain(core::iter::once(Item::Impl(mock_struct_impl)))
     .chain(
         maybe_associated_controls_impls
             .into_iter()
@@ -197,7 +191,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
         semi: None,
     };
     let result = MockMod {
-        source_item: Item::Impl(item_impl),
+        source_item: Item::Impl(mock_struct_impl),
         maybe_usage: Some(usage),
         item_mod,
     };

@@ -2,6 +2,7 @@ use crate::syntax::{generic_argument, punctuated};
 use proc_macro2::Span;
 use syn::*;
 
+#[inline]
 pub(crate) fn new<const N: usize>(span: Span, path_parts: [&str; N]) -> Path {
     let result = Path {
         leading_colon: None,
@@ -16,12 +17,14 @@ pub(crate) fn new<const N: usize>(span: Span, path_parts: [&str; N]) -> Path {
     return result;
 }
 
+#[inline]
 pub(crate) fn new_global<const N: usize>(span: Span, path_parts: [&str; N]) -> Path {
     let mut result = new(span, path_parts);
     result.leading_colon = Some(Token![::](span));
     return result;
 }
 
+#[inline]
 pub(crate) fn new_generics<const N_PATH: usize, const N_GENERICS: usize>(
     span: Span,
     path_parts: [&str; N_PATH],
@@ -41,6 +44,7 @@ pub(crate) fn new_generics<const N_PATH: usize, const N_GENERICS: usize>(
     return result;
 }
 
+#[inline]
 pub(crate) fn new_generics_global<const N: usize, const N_GENERICS: usize>(
     span: Span,
     path_parts: [&str; N],
@@ -102,16 +106,16 @@ pub(crate) fn last_ident(path: &Path) -> Ident {
     return result;
 }
 
-pub(crate) fn starts_with(path: &Path, start: &Path) -> bool {
-    if path.segments.len() < start.segments.len() {
+pub(crate) fn equal(left: &Path, right: &Path) -> bool {
+    if left.segments.len() != right.segments.len() {
         return false;
     }
 
-    let result = start
+    let result = left
         .segments
         .iter()
-        .zip(path.segments.iter())
-        .all(|(left, right)| left.ident == right.ident);
+        .zip(right.segments.iter())
+        .all(|(left_segment, right_segment)| left_segment.ident == right_segment.ident);
     return result;
 }
 
