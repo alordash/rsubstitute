@@ -24,6 +24,10 @@ struct Struct;
 
 #[mock(base)]
 impl Struct {
+    pub fn f(&self) {
+        println!("Default struct f impl");
+    }
+
     pub fn work() {
         println!("Default struct work impl");
     }
@@ -53,13 +57,20 @@ fn main() {
     Struct::work();
 
     thread::spawn(|| {
+        Struct::work();
         Struct::static_setup()
             .work()
             .does(|_| println!("thread Struct::work mocked!"));
-        Struct::work()
+        Struct::work();
     })
     .join();
     Struct::work();
+
+    let mut s = Struct.mock();
+    s.f();
+    s.setup().f().does(|_, _| println!("mocked Struct::f!"));
+    // s.setup().f().does(|_| println!("not mock arg"));
+    s.f();
 
     println!("Done");
 }
