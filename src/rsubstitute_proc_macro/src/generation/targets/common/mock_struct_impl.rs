@@ -278,11 +278,7 @@ fn map_fn(
             } else {
                 fn_info.attributes.clone()
             },
-            vis: if !for_trait {
-                visibility::pub_super(span)
-            } else {
-                fn_info.visibility.clone()
-            },
+            vis: fn_info.visibility.clone(),
             modifiers: FnModifiers::default(),
             sig: *fn_info.source_signature.clone(),
             block: if is_static {

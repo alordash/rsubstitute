@@ -4,13 +4,8 @@ use syn::*;
 
 pub(crate) fn new_field(span: Span) -> Field {
     let result = Field {
-        attrs: Vec::new(),
-        vis: Visibility::Restricted(VisRestricted {
-            pub_token: Token![pub](span),
-            paren_token: token::Paren(span),
-            in_token: None,
-            path: Box::new(path::new(span, ["self"])),
-        }),
+        attrs: vec![attributes::doc_hidden(span)],
+        vis: Visibility::Public(Token![pub](span)),
         modifiers: FieldModifiers::default(),
         ident: Some(Ident::new("__rs_data", span)),
         colon_token: Some(Token![:](span)),

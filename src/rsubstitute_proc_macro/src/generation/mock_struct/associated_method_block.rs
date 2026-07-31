@@ -31,6 +31,24 @@ pub(crate) fn generate(
             remove_lifetime_generic_arguments: true,
         },
     );
+    let use_mod_stmt = ItemUse {
+        attrs: Vec::new(),
+        vis: Visibility::Public(Token![pub](span)),
+        use_token: Token![use](span),
+        leading_colon: None,
+        tree: UseTree::Path(UsePath {
+            ident: Ident::new("rsubstitute", span),
+            colon2_token: Token![::](span),
+            tree: Box::new(UseTree::Path(UsePath {
+                ident: Ident::new("for_generated", span),
+                colon2_token: Token![::](span),
+                tree: Box::new(UseTree::Name(UseName {
+                    ident: Ident::new("ISharedMockData", span),
+                })),
+            })),
+        }),
+        semi_token: Token![;](span),
+    };
     let (call_var_path, call_stmt) = call_stmt::new(span, fn_info);
     let (fn_data_var_path, fn_data_stmt) = fn_data_stmt::new_associated(
         span,
@@ -59,6 +77,7 @@ pub(crate) fn generate(
     let result = Block {
         brace_token: token::Brace(span),
         stmts: vec![
+            Stmt::Item(Item::Use(use_mod_stmt)),
             Stmt::Local(call_stmt),
             Stmt::Local(fn_data_stmt),
             Stmt::Expr(Expr::MethodCall(fn_handle_stmt), None),

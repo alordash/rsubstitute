@@ -180,7 +180,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
             .flat_map(|x| [Item::Impl(x.0), Item::Impl(x.1)]),
     )
     .collect();
-    let usage = mod_usage::new_all(mod_ident.clone());
+    let usage = mod_usage::new_pub_all(mod_ident.clone());
     let item_mod = ItemMod {
         attrs: vec![attributes::allow_non_camel_case_types(source_span)],
         vis: Visibility::Public(Token![pub](source_span)),
