@@ -36,6 +36,13 @@ trait Trait {
 struct Struct;
 
 #[mock(base)]
+impl Struct {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+#[mock(base)]
 impl Trait for Struct {
     fn get_my_type<TT: Clone>(
         &self,
@@ -125,7 +132,7 @@ mod tests {
     #[test]
     fn get_my_type_Struct_Ok() {
         // Arrange
-        let mut mock = Struct.mock();
+        let mut mock = Struct::new();
 
         type FirstTT = u128;
         let first_input: i32 = 10;
@@ -162,7 +169,7 @@ mod tests {
     #[test]
     fn get_my_type_StructBase_Ok() {
         // Arrange
-        let mut mock = Struct.mock();
+        let mut mock = Struct::new();
 
         type FirstTT = u128;
         let first_input: i32 = 10;
