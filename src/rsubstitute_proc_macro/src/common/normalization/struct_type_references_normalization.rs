@@ -22,6 +22,12 @@ pub(crate) fn normalize_struct_type_references_in_impl_item_fn(
     normalizer.visit_impl_item_fn_mut(impl_item_fn);
 }
 
+pub(crate) fn normalize_in_type(mut ty: Type, struct_path: &Path) -> Type {
+    let mut normalizer = StructTypeReferencesNormalizer::new(struct_path);
+    normalizer.visit_type_mut(&mut ty);
+    return ty;
+}
+
 struct StructTypeReferencesNormalizer<'a> {
     struct_path: &'a Path,
     maybe_struct_ident: Option<&'a Ident>,

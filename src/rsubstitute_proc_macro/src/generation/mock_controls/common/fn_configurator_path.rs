@@ -1,3 +1,4 @@
+use crate::common::*;
 use crate::generation::common::*;
 use crate::generation::fn_info::models::*;
 use crate::syntax::*;
@@ -15,32 +16,23 @@ pub(crate) fn new(
     let mock_struct_type = Type::Path(TypePath {
         attrs: Vec::new(),
         qself: None,
-        path: mock_struct_path,
+        path: mock_struct_path.clone(),
     });
-    let mock_arg = if let Some(first) = fn_info.source_signature.inputs.first()
-        && let FnArg::Receiver(receiver) = first
-        && let Some((and_token, mutability)) = match &receiver.kind {
-            ReceiverKind::Reference(and_token, _, mutability) => {
-                Some((and_token.clone(), mutability.clone()))
+    let mock_arg_type = match &fn_info.maybe_self_type {
+        Some(receiver) => match &receiver.kind {
+            ReceiverKind::Reference(and_token, _, mutability) => Type::Reference(TypeReference {
+                attrs: Vec::new(),
+                and_token: and_token.clone(),
+                lifetime: None,
+                mutability: mutability.clone(),
+                elem: Box::new(mock_struct_type),
+            }),
+            ReceiverKind::Typed(_, target_type) => {
+                normalization::normalize_in_type(*target_type.clone(), &mock_struct_path)
             }
-            ReceiverKind::Typed(_, boxed_type) => {
-                if let Type::Reference(reference) = boxed_type.as_ref() {
-                    Some((reference.and_token.clone(), reference.mutability.clone()))
-                } else {
-                    None
-                }
-            }
-            _ => None,
-        } {
-        GenericArgument::Type(Type::Reference(TypeReference {
-            attrs: Vec::new(),
-            and_token: and_token.clone(),
-            lifetime: None,
-            mutability: mutability.clone(),
-            elem: Box::new(mock_struct_type),
-        }))
-    } else {
-        GenericArgument::Type(mock_struct_type)
+            _ => mock_struct_type,
+        },
+        _ => mock_struct_type,
     };
     let result = Path {
         leading_colon: None,
@@ -60,7 +52,7 @@ pub(crate) fn new(
                         ReturnType::Default => void_type(span),
                         ReturnType::Type(_, return_type) => *return_type.clone(),
                     }),
-                    mock_arg,
+                    GenericArgument::Type(mock_arg_type),
                     generic_arguments.has_return_value_argument.clone(),
                     generic_arguments.supports_base_calling_argument.clone(),
                     generic_arguments.passes_mock_to_callback_argument.clone(),

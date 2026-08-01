@@ -8,6 +8,11 @@ use rsubstitute_proc_macro::mock;
 use std::ops::Deref;
 use std::thread;
 
+#[mock(base)]
+trait Kavo {
+    fn by_box(self: Box<Self>) {}
+}
+
 #[mock]
 trait Trait {
     fn work() {

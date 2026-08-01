@@ -3,7 +3,7 @@ use crate::common::*;
 use crate::generation::fn_info::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
-use quote::format_ident;
+use quote::{format_ident, ToTokens};
 use syn::punctuated::Punctuated;
 use syn::*;
 
@@ -85,18 +85,12 @@ fn generate_core(
     let mut generics = source_signature.generics.clone();
     let mut output = source_signature.output.clone();
     let mock_pat = if let Some(receiver) = &fn_info.maybe_self_type {
-        let (is_reference, type_mutability) = match &receiver.kind {
-            ReceiverKind::Reference(_, _, mutability) => (true, mutability.clone()),
-            ReceiverKind::Typed(_, ty) => {
-                if let Type::Reference(reference) = ty.as_ref() {
-                    (true, reference.mutability)
-                } else {
-                    (false, None)
-                }
-            }
-            _ => (false, None),
+        let (is_reference, maybe_target_type_mutability, maybe_target_type) = match &receiver.kind {
+            ReceiverKind::Reference(_, _, mutability) => (true, mutability.clone(), None),
+            ReceiverKind::Typed(_, ty) => (false, None, Some(*ty.clone())),
+            _ => (false, None, None),
         };
-        let mutability = type_mutability.or_else(|| receiver.mutability);
+        let reference_mutability = maybe_target_type_mutability.or_else(|| receiver.mutability);
         let mut self_lifetime = None;
         if is_reference && let ReturnType::Type(_, return_type) = &mut output {
             let anonymous_lifetime_substitute = Lifetime {
@@ -118,12 +112,23 @@ fn generate_core(
                 }),
             );
         }
+        let normalized_target_type = maybe_target_type
+            .map(|target_type| normalization::normalize_in_type(target_type, &target_struct_path))
+            .unwrap_or_else(|| {
+                Type::Path(TypePath {
+                    attrs: Vec::new(),
+                    qself: None,
+                    path: target_struct_path,
+                })
+            });
         PatType {
             attrs: Vec::new(),
-            pat: Box::new(Pat::Path(PatPath {
+            pat: Box::new(Pat::Ident(PatIdent {
                 attrs: Vec::new(),
-                qself: None,
-                path: path::from_ident(rsubstitute_self(span)),
+                by_ref: None,
+                mutability: receiver.mutability,
+                ident: rsubstitute_self(span),
+                subpat: None,
             })),
             colon_token: Token![:](span),
             ty: Box::new(if is_reference {
@@ -131,19 +136,11 @@ fn generate_core(
                     attrs: Vec::new(),
                     and_token: Token![&](span),
                     lifetime: self_lifetime,
-                    mutability,
-                    elem: Box::new(Type::Path(TypePath {
-                        attrs: Vec::new(),
-                        qself: None,
-                        path: target_struct_path,
-                    })),
+                    mutability: reference_mutability,
+                    elem: Box::new(normalized_target_type),
                 })
             } else {
-                Type::Path(TypePath {
-                    attrs: Vec::new(),
-                    qself: None,
-                    path: target_struct_path,
-                })
+                normalized_target_type
             }),
         }
     } else {
