@@ -24,7 +24,7 @@ impl DerefInfo {
         return result;
     }
 
-    pub fn get_actual_value_deref_ptr<T>(&self, actual_value: &T) -> *const () {
+    pub fn get_actual_value_deref_ptr<T: ?Sized>(&self, actual_value: &T) -> *const () {
         let raw_fat_pointer = FatPointer {
             data_pointer: actual_value as *const _ as *const (),
             metadata_pointer: self.deref_vtable_ptr,

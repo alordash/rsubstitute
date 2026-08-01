@@ -8,7 +8,7 @@ struct Private;
 #[allow(private_interfaces)]
 // TODO - remove  lifetime, it is no longer needed since accepting raw ptr in PrivateIs
 #[repr(C)]
-pub enum Arg<T> {
+pub enum Arg<T: ?Sized> {
     Any,
     #[doc(hidden)]
     PrivateEq(ArgCmp<T>, Private),
@@ -78,7 +78,7 @@ impl<T> Arg<T> {
         T: PartialEq,
     {
         let arg_cmp = ArgCmp {
-            value,
+            value: Box::new(value),
             comparator: PartialEq::eq,
             maybe_deref_info: None,
         };
@@ -90,7 +90,7 @@ impl<T> Arg<T> {
         T: PartialEq,
     {
         let arg_cmp = ArgCmp {
-            value,
+            value: Box::new(value),
             comparator: PartialEq::eq,
             maybe_deref_info: None,
         };
@@ -103,7 +103,7 @@ impl<T> Arg<T> {
     {
         let deref_info = DerefInfo::new(&value);
         let arg_cmp = ArgCmp {
-            value,
+            value: Box::new(value),
             comparator: |a, b| core::ptr::eq(a.deref(), b.deref()),
             maybe_deref_info: Some(deref_info),
         };
@@ -117,7 +117,7 @@ impl<T> Arg<T> {
     {
         let deref_info = DerefInfo::new(&value);
         let arg_cmp = ArgCmp {
-            value,
+            value: Box::new(value),
             comparator: |a, b| core::ptr::eq(a.deref(), b.deref()),
             maybe_deref_info: Some(deref_info),
         };
@@ -125,7 +125,7 @@ impl<T> Arg<T> {
     }
 }
 
-impl<T> Arg<T> {
+impl<T: ?Sized> Arg<T> {
     pub fn check<'a>(
         &self,
         arg_name: &'static str,
@@ -194,7 +194,7 @@ impl<'rs, 'a, T: ?Sized> Arg<&'a T> {
         let actual_ptr = core::ptr::from_ref(*actual_value);
         match self {
             Arg::PrivateEq(arg_cmp, _) => {
-                let expected_ptr = core::ptr::from_ref(arg_cmp.value);
+                let expected_ptr = core::ptr::from_ref(*arg_cmp.value);
                 if !core::ptr::eq(actual_ptr, expected_ptr) {
                     let expected_value_str = print_arg(&arg_cmp.value);
                     return ArgCheckResult::Err(ArgCheckResultErr {
@@ -206,7 +206,7 @@ impl<'rs, 'a, T: ?Sized> Arg<&'a T> {
                 }
             }
             Arg::PrivateNotEq(arg_cmp, _) => {
-                let not_expected_ptr = core::ptr::from_ref(arg_cmp.value);
+                let not_expected_ptr = core::ptr::from_ref(*arg_cmp.value);
                 if core::ptr::eq(actual_ptr, not_expected_ptr) {
                     let not_expected_value_str = print_arg(&arg_cmp.value);
                     return ArgCheckResult::Err(ArgCheckResultErr {
@@ -254,7 +254,7 @@ impl<'a, T: ?Sized> Arg<&'a mut T> {
         let actual_ptr = core::ptr::from_ref(*actual_value);
         match self {
             Arg::PrivateEq(arg_cmp, _) => {
-                let expected_ptr = core::ptr::from_ref(arg_cmp.value);
+                let expected_ptr = core::ptr::from_ref(*arg_cmp.value);
                 if !core::ptr::eq(actual_ptr, expected_ptr) {
                     let expected_value_str = print_arg(&arg_cmp.value);
                     return ArgCheckResult::Err(ArgCheckResultErr {
@@ -266,7 +266,7 @@ impl<'a, T: ?Sized> Arg<&'a mut T> {
                 }
             }
             Arg::PrivateNotEq(arg_cmp, _) => {
-                let not_expected_ptr = core::ptr::from_ref(arg_cmp.value);
+                let not_expected_ptr = core::ptr::from_ref(*arg_cmp.value);
                 if core::ptr::eq(actual_ptr, not_expected_ptr) {
                     let not_expected_value_str = print_arg(&arg_cmp.value);
                     return ArgCheckResult::Err(ArgCheckResultErr {

@@ -3,96 +3,208 @@
 #![allow(unused)]
 
 use rsubstitute::Mockable;
+use rsubstitute_core::args::Arg;
 #[allow(unused_imports)]
 use rsubstitute_proc_macro::mock;
 use std::ops::Deref;
-use std::thread;
 
-#[mock(base)]
-trait Kavo {
-    fn by_box(self: Box<Self>) {}
+fn _f(t: impl Trait) {
+    t.flex();
 }
 
-#[mock]
+pub fn f(t: impl Trait) {
+    use f::*;
+    let q: Box<dyn Trait> = Box::new(t);
+    let call = f::f_Call {
+        generics: ::core::marker::PhantomData,
+        t: ::rsubstitute::transmute_lifetime!(q),
+    };
+    let fn_data: &::rsubstitute::for_generated::FnData<fMock, false, false, false> =
+        ::rsubstitute::for_generated::get_static_fn_data("f");
+    fn_data.handle((), call)
+}
+#[allow(non_camel_case_types)]
+mod f {
+    #[allow(unused_imports)]
+    use super::*;
+    use rsubstitute::for_generated::*;
+    pub fn setup<'__rsa>(
+        t: impl Into<Arg<dyn Trait>> + '__rsa,
+    ) -> FnConfigurator<
+        '__rsa,
+        fMock,
+        fStaticSetup,
+        (&'__rsa Box<dyn Trait>,),
+        (),
+        fMock,
+        false,
+        false,
+        false,
+    > {
+        ::rsubstitute::for_generated::clear_static_fn_data::<fMock>();
+        fStaticSetup {
+            generics: ::core::marker::PhantomData,
+        }
+        .setup(t)
+    }
+    pub fn received<'__rsa>(
+        t: impl Into<Arg<dyn Trait>> + '__rsa,
+        times: Times,
+    ) -> ::rsubstitute::for_generated::ArgRefsBinder<fStaticReceived, (&'__rsa dyn Trait,)> {
+        fStaticReceived {
+            generics: ::core::marker::PhantomData,
+        }
+        .received(t, times)
+    }
+    pub struct f_Call {
+        pub generics: ::core::marker::PhantomData<(dyn Trait,)>,
+        pub(super) t: Box<dyn Trait>,
+    }
+    impl IGenericsInfoProvider for f_Call {
+        fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
+            vec![]
+        }
+        fn hash_generics_type_ids(&self, #[allow(unused_variables)] hasher: &mut GenericsHasher) {}
+        fn hash_const_values(&self, #[allow(unused_variables)] hasher: &mut GenericsHasher) {}
+    }
+    impl ICall for f_Call {
+        fn get_arg_infos(&self) -> Vec<ArgInfo> {
+            vec![ArgInfo::new(
+                "t",
+                &self.t,
+                (&ArgPrinter(::rsubstitute::transmute_lifetime!(&self.t, &Box<dyn Trait>)))
+                    .debug_string(),
+            )]
+        }
+        fn get_ptr_to_boxed_tuple_of_refs(&self) -> *mut () {
+            Box::leak(Box::new((&self.t,))) as *mut _ as *mut ()
+        }
+    }
+    struct f_ArgsChecker {
+        pub generics: ::core::marker::PhantomData<(dyn Trait,)>,
+        t: Arg<dyn Trait>,
+    }
+    impl IGenericsInfoProvider for f_ArgsChecker {
+        fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
+            vec![]
+        }
+        fn hash_generics_type_ids(&self, #[allow(unused_variables)] hasher: &mut GenericsHasher) {}
+        fn hash_const_values(&self, #[allow(unused_variables)] hasher: &mut GenericsHasher) {}
+    }
+    impl IArgsChecker for f_ArgsChecker {
+        fn check(&self, dyn_call: &DynCall) -> Vec<ArgCheckResult> {
+            #[allow(unused_variables)]
+            let call: &f_Call = dyn_call.downcast_ref();
+            vec![
+                ::rsubstitute::transmute_lifetime!(&self.t, &Arg<Box<dyn Trait>>).check(
+                    "t",
+                    ::rsubstitute::transmute_lifetime!(&call.t),
+                    (&ArgPrinter(::rsubstitute::transmute_lifetime!(&call.t, &Box<dyn Trait>)))
+                        .debug_string(),
+                ),
+            ]
+        }
+        fn fmt_args(&self) -> String {
+            format!(
+                "{}",
+                (&ArgPrinter(::rsubstitute::transmute_lifetime!(
+                    &&self.t,
+                    &&Arg<dyn Trait>
+                )))
+                    .debug_string()
+            )
+        }
+    }
+    pub struct fMock {
+        pub generics: ::core::marker::PhantomData<(dyn Trait,)>,
+    }
+    pub struct fStaticSetup {
+        pub generics: ::core::marker::PhantomData<(dyn Trait,)>,
+    }
+    impl fStaticSetup {
+        pub fn setup<'__rsa>(
+            &self,
+            t: impl Into<Arg<dyn Trait>>,
+        ) -> FnConfigurator<
+            '_,
+            fMock,
+            Self,
+            (&'__rsa Box<dyn Trait>,),
+            (),
+            fMock,
+            false,
+            false,
+            false,
+        > {
+            let args_checker = f_ArgsChecker {
+                generics: ::core::marker::PhantomData,
+                t: ::rsubstitute::transmute_lifetime!(t.into()),
+            };
+            let fn_data: &::rsubstitute::for_generated::FnData<fMock, false, false, false> =
+                ::rsubstitute::for_generated::get_static_fn_data("f");
+            let fn_configurator: FnConfigurator<
+                '_,
+                fMock,
+                Self,
+                (&'__rsa dyn Trait,),
+                (),
+                fMock,
+                false,
+                false,
+                false,
+            > = fn_data.add_config(args_checker, self);
+            ::rsubstitute::transmute_lifetime!(fn_configurator)
+        }
+    }
+    pub struct fStaticReceived {
+        pub generics: ::core::marker::PhantomData<(dyn Trait,)>,
+    }
+    impl ::core::clone::Clone for fStaticReceived {
+        #[inline]
+        fn clone(&self) -> fStaticReceived {
+            fStaticReceived {
+                generics: ::core::clone::Clone::clone(&self.generics),
+            }
+        }
+    }
+    impl fStaticReceived {
+        pub fn received<'__rsa>(
+            &self,
+            t: impl Into<Arg<dyn Trait>>,
+            times: Times,
+        ) -> ::rsubstitute::for_generated::ArgRefsBinder<Self, (&'__rsa dyn Trait,)> {
+            let args_checker = f_ArgsChecker {
+                generics: ::core::marker::PhantomData,
+                t: ::rsubstitute::transmute_lifetime!(t.into()),
+            };
+            let fn_data: &::rsubstitute::for_generated::FnData<fMock, false, false, false> =
+                ::rsubstitute::for_generated::get_static_fn_data("f");
+            fn_data.verify_received(args_checker, times);
+            rsubstitute::for_generated::ArgRefsBinder::new(self.clone())
+        }
+        pub fn no_other_calls(&self) {
+            ::rsubstitute::for_generated::verify_static_fn_received_nothing_else::<fMock>()
+        }
+    }
+}
+
 trait Trait {
-    fn work() {
-        println!("Default trait work impl");
-    }
+    fn flex(&self);
 }
 
-fn f<T: Trait>() {
-    T::work();
-}
-
-#[mock]
-struct Struct {
-    pub v: i32,
-}
-
-#[mock(base)]
-impl Struct {
-    pub fn new(v: i32) -> Self {
-        Self { v }
-    }
-
-    fn struct_refs(&self) {
-        let s = Struct { v: 1 };
-        let Struct { v: a } = s;
-
-        let s = Struct { v: 1 };
-        let Struct { v: b } = s;
-    }
-
-    pub fn f(&self) {
-        println!("Default struct f impl");
-    }
-
-    pub fn work() {
-        println!("Default struct work impl");
+struct Struct;
+impl Trait for Struct {
+    fn flex(&self) {
+        println!("base struct flex")
     }
 }
 
 fn main() {
-    f::<TraitMock>();
-    TraitMock::static_setup()
-        .work()
-        .does(|_| println!("static Trait::work mocked!"));
-    f::<TraitMock>();
-    f::<TraitMock>();
-    TraitMock::static_setup()
-        .work()
-        .does(|_| println!("new Trait::work mocked!"));
-    f::<TraitMock>();
-
-    Struct::work();
-    Struct::static_setup()
-        .work()
-        .does(|_| println!("static Struct::work mocked!"));
-    Struct::work();
-    Struct::work();
-    Struct::static_setup()
-        .work()
-        .does(|_| println!("new Struct::work mocked!"));
-    Struct::work();
-
-    thread::spawn(|| {
-        Struct::work();
-        Struct::static_setup()
-            .work()
-            .does(|_| println!("thread Struct::work mocked!"));
-        Struct::work();
-    })
-    .join();
-    Struct::work();
-
-    let mut s = Struct::new(32);
-    s.f();
-    s.setup()
-        .f()
-        .does(|s_ref, _| println!("mocked Struct::f! v = {}", s_ref.v));
-    // TODO - maybe it's possible to add `does` overload that accepts only args without mock itself
-    // s.setup().f().does(|_| println!("not mock arg"));
-    s.f();
+    f::setup(Arg::Any).does(|a| {
+        a.0.flex();
+    });
+    let s = Struct;
+    f(s);
 
     println!("Done");
 }
