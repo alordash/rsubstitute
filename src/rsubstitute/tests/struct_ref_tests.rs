@@ -5,21 +5,24 @@ struct Struct;
 
 #[mock(base)]
 impl Struct {
-    pub fn accept_ref(&self, r: &i32) {
-        unreachable!()
+    pub fn new() -> Self {
+        Self
     }
+}
+
+#[mock(base)]
+impl Struct {
+    pub fn accept_ref(&self, r: &i32) {}
 
     pub fn return_ref(&self) -> &'static i32 {
-        unreachable!()
+        todo!()
     }
 
     pub fn accept_ref_return_ref(&self, r: &i32) -> &'static i32 {
-        unreachable!()
+        todo!()
     }
 
-    pub fn accept_two_refs(&self, r1: &i32, r2: &f32) {
-        unreachable!()
-    }
+    pub fn accept_two_refs(&self, r1: &i32, r2: &f32) {}
 
     pub fn accept_two_refs_return_ref(&self, r1: &i32, r2: &f32) -> &'static str {
         unreachable!()
@@ -39,7 +42,7 @@ mod tests {
         #[test]
         fn accept_ref_Ok() {
             // Arrange
-            let mut mock = Struct.mock();
+            let mut mock = Struct::new();
             let r = &1;
 
             // Act
@@ -52,7 +55,7 @@ mod tests {
         #[test]
         fn accept_rc_Panics() {
             // Arrange
-            let mut mock = Struct.mock();
+            let mut mock = Struct::new();
             let r = &11;
             let r_ptr = core::ptr::from_ref(r);
 
@@ -125,7 +128,7 @@ accept_ref(*{r}*)
         #[test]
         fn return_ref_Ok() {
             // Arrange
-            let mut mock = Struct.mock();
+            let mut mock = Struct::new();
             let r = Box::leak(Box::new(11));
             mock.setup().return_ref().returns(r);
 
@@ -143,7 +146,7 @@ accept_ref(*{r}*)
         #[test]
         fn accept_ref_return_ref_Ok() {
             // Arrange
-            let mut mock = Struct.mock();
+            let mut mock = Struct::new();
             let accepted_r = &10;
             let returned_r = &20;
             mock.setup()
@@ -169,7 +172,7 @@ accept_ref(*{r}*)
         #[test]
         fn accept_two_refs_Ok() {
             // Arrange
-            let mut mock = Struct.mock();
+            let mut mock = Struct::new();
             let r1 = &10;
             let r2 = &20.2;
 
@@ -190,7 +193,7 @@ accept_ref(*{r}*)
         #[test]
         fn accept_two_refs_return_ref_Ok() {
             // Arrange
-            let mut mock = Struct.mock();
+            let mut mock = Struct::new();
             let r1 = &10;
             let r2 = &20.2;
             let returned_r = "veridis quo";

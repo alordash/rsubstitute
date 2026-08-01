@@ -17,6 +17,13 @@ struct Struct;
 
 #[mock(base)]
 impl Struct {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
+#[mock(base)]
+impl Struct {
     pub fn get(&self) -> i32 {
         DEFAULT_STRUCT_GET_VALUE
     }
@@ -50,7 +57,7 @@ mod tests {
     #[test]
     fn get_plus_one_Ok() {
         // Arrange
-        let mut mock = Struct.mock();
+        let mut mock = Struct::new();
 
         let value = 302;
         mock.setup().get_plus_one().returns(value);
@@ -67,7 +74,7 @@ mod tests {
     #[test]
     fn get_plus_one_CallBase_Ok() {
         // Arrange
-        let mut mock = Struct.mock();
+        let mut mock = Struct::new();
 
         let struct_value = 302;
         let trait_value = 33;
@@ -104,7 +111,7 @@ mod tests {
     #[test]
     fn get_plus_one_StructCallBase_Ok() {
         // Arrange
-        let mut mock = Struct.mock();
+        let mut mock = Struct::new();
 
         let trait_value = 33;
         mock.setup()
@@ -134,7 +141,7 @@ mod tests {
     #[test]
     fn get_plus_one_StructAndTraitCallBase_Ok() {
         // Arrange
-        let mut mock = Struct.mock();
+        let mut mock = Struct::new();
 
         mock.setup()
             .get()
@@ -163,7 +170,7 @@ mod tests {
     #[test]
     fn get_SelfAndBothTraits_Ok() {
         // Arrange
-        let mut mock = Struct.mock();
+        let mut mock = Struct::new();
 
         let self_value = 5;
         let first_trait_value = 15;

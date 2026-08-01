@@ -8,27 +8,30 @@ struct Struct {
 }
 
 #[mock(base)]
+impl Struct {
+    pub fn new(number: i32) -> Self {
+        Self { number }
+    }
+}
+
+#[mock(base)]
 #[allow(unused)]
 impl Struct {
     #[allow(unused)]
-    pub(crate) fn accept_arc(&self, r: Arc<i32>) {
-        unreachable!()
-    }
+    pub(crate) fn accept_arc(&self, r: Arc<i32>) {}
 
     pub(crate) fn return_arc(&self) -> Arc<i32> {
-        unreachable!()
+        todo!()
     }
 
     pub(crate) fn accept_arc_return_arc(&self, r: Arc<i32>) -> Arc<i32> {
-        unreachable!()
+        todo!()
     }
 
-    pub(crate) fn accept_two_arcs(&self, r1: Arc<i32>, r2: Arc<f32>) {
-        unreachable!()
-    }
+    pub(crate) fn accept_two_arcs(&self, r1: Arc<i32>, r2: Arc<f32>) {}
 
     pub(crate) fn accept_two_arcs_return_arc(&self, r1: Arc<i32>, r2: Arc<f32>) -> Arc<String> {
-        unreachable!()
+        todo!()
     }
 }
 
@@ -45,7 +48,7 @@ mod tests {
         #[test]
         fn accept_arc_Ok() {
             // Arrange
-            let mut mock = Struct { number: 3 }.mock();
+            let mut mock = Struct::new(3);
             let r = Arc::new(1);
 
             // Act
@@ -58,7 +61,7 @@ mod tests {
         #[test]
         fn accept_arc_Panics() {
             // Arrange
-            let mut mock = Struct { number: 3 }.mock();
+            let mut mock = Struct::new(3);
             let r = Arc::new(11);
             let r_ptr = Arc::as_ptr(&r);
 
@@ -115,7 +118,7 @@ accept_arc(*{r}*)
         #[test]
         fn return_arc_Ok() {
             // Arrange
-            let mut mock = Struct { number: 3 }.mock();
+            let mut mock = Struct::new(3);
             let r = Arc::new(10);
             mock.setup().return_arc().returns(r.clone());
 
@@ -133,7 +136,7 @@ accept_arc(*{r}*)
         #[test]
         fn accept_arc_return_arc_Ok() {
             // Arrange
-            let mut mock = Struct { number: 3 }.mock();
+            let mut mock = Struct::new(3);
             let accepted_r = Arc::new(10);
             let returned_r = Arc::new(20);
             mock.setup()
@@ -159,7 +162,7 @@ accept_arc(*{r}*)
         #[test]
         fn accept_two_arcs_Ok() {
             // Arrange
-            let mut mock = Struct { number: 3 }.mock();
+            let mut mock = Struct::new(3);
             let r1 = Arc::new(10);
             let r2 = Arc::new(20.2);
 
@@ -180,7 +183,7 @@ accept_arc(*{r}*)
         #[test]
         fn accept_two_arcs_return_arc_Ok() {
             // Arrange
-            let mut mock = Struct { number: 3 }.mock();
+            let mut mock = Struct::new(3);
             let r1 = Arc::new(10);
             let r2 = Arc::new(20.2);
             let returned_r = Arc::new(String::from("veridis quo"));

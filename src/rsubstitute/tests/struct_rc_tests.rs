@@ -6,24 +6,27 @@ struct Struct;
 
 #[mock(base)]
 impl Struct {
-    pub(crate) fn accept_rc(&self, r: Rc<i32>) {
-        unreachable!()
+    pub fn new() -> Self {
+        Self
     }
+}
+
+#[mock(base)]
+impl Struct {
+    pub(crate) fn accept_rc(&self, r: Rc<i32>) {}
 
     pub(crate) fn return_rc(&self) -> Rc<i32> {
-        unreachable!()
+        todo!()
     }
 
     pub(crate) fn accept_rc_return_rc(&self, r: Rc<i32>) -> Rc<i32> {
-        unreachable!()
+        todo!()
     }
 
-    pub(crate) fn accept_two_rcs(&self, r1: Rc<i32>, r2: Rc<f32>) {
-        unreachable!()
-    }
+    pub(crate) fn accept_two_rcs(&self, r1: Rc<i32>, r2: Rc<f32>) {}
 
     pub(crate) fn accept_two_rcs_return_rc(&self, r1: Rc<i32>, r2: Rc<f32>) -> Rc<String> {
-        unreachable!()
+        todo!()
     }
 }
 
@@ -40,7 +43,7 @@ mod tests {
         #[test]
         fn accept_rc_Ok() {
             // Arrange
-            let mut mock = Struct.mock();
+            let mut mock = Struct::new();
             let r = Rc::new(1);
 
             // Act
@@ -53,7 +56,7 @@ mod tests {
         #[test]
         fn accept_rc_Panics() {
             // Arrange
-            let mut mock = Struct.mock();
+            let mut mock = Struct::new();
             let r = Rc::new(11);
             let r_ptr = Rc::as_ptr(&r);
 
@@ -86,7 +89,10 @@ Received no non-matching calls"
             let invalid_r = Rc::new(22);
             let invalid_r_ptr = Rc::as_ptr(&invalid_r);
             assert_panics(
-                || mock.received().accept_rc(Arg::ref_eq(invalid_r.clone()), Times::Once),
+                || {
+                    mock.received()
+                        .accept_rc(Arg::ref_eq(invalid_r.clone()), Times::Once)
+                },
                 format!(
                     "Expected to receive a call exactly once matching:
 	accept_rc((alloc::rc::Rc<i32>): equal to {invalid_r})
@@ -107,7 +113,7 @@ accept_rc(*{r}*)
         #[test]
         fn return_rc_Ok() {
             // Arrange
-            let mut mock = Struct.mock();
+            let mut mock = Struct::new();
             let r = Rc::new(10);
             mock.setup().return_rc().returns(r.clone());
 
@@ -125,7 +131,7 @@ accept_rc(*{r}*)
         #[test]
         fn accept_rc_return_rc_Ok() {
             // Arrange
-            let mut mock = Struct.mock();
+            let mut mock = Struct::new();
             let accepted_r = Rc::new(10);
             let returned_r = Rc::new(20);
             mock.setup()
@@ -151,7 +157,7 @@ accept_rc(*{r}*)
         #[test]
         fn accept_two_rcs_Ok() {
             // Arrange
-            let mut mock = Struct.mock();
+            let mut mock = Struct::new();
             let r1 = Rc::new(10);
             let r2 = Rc::new(20.2);
 
@@ -172,7 +178,7 @@ accept_rc(*{r}*)
         #[test]
         fn accept_two_rcs_return_rc_Ok() {
             // Arrange
-            let mut mock = Struct.mock();
+            let mut mock = Struct::new();
             let r1 = Rc::new(10);
             let r2 = Rc::new(20.2);
             let returned_r = Rc::new(String::from("veridis quo"));
