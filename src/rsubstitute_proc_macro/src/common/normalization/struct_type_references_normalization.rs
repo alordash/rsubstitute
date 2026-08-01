@@ -49,6 +49,14 @@ impl<'a> StructTypeReferencesNormalizer<'a> {
 }
 
 impl<'a> VisitMut for StructTypeReferencesNormalizer<'a> {
+    fn visit_path_mut(&mut self, i: &mut Path) {
+        if i.segments.len() == 1 && i.segments[0].ident == "Self" {
+            *i = self.struct_path.clone();
+        }
+
+        visit_mut::visit_path_mut(self, i);
+    }
+
     fn visit_expr_mut(&mut self, i: &mut Expr) {
         if let Expr::Path(expr_path) = i
             && self.is_struct_path(&expr_path.path)

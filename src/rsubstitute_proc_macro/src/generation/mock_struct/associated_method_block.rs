@@ -44,8 +44,8 @@ pub(crate) fn generate(
             tree: Box::new(UseTree::Path(UsePath {
                 ident: Ident::new("for_generated", span),
                 colon2_token: Token![::](span),
-                tree: Box::new(UseTree::Name(UseName {
-                    ident: Ident::new("ISharedMockData", span),
+                tree: Box::new(UseTree::Glob(UseGlob {
+                    star_token: Token![*](span),
                 })),
             })),
         }),

@@ -249,7 +249,6 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                 ])
             }),
     )
-    .chain(core::iter::once(Item::Impl(mock_struct_impls.trait_impl)))
     .chain(
         mock_struct_impls
             .maybe_base_trait_and_fns_impl
@@ -291,7 +290,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
         semi: None,
     };
     let result = MockMod {
-        source_item: Item::Impl(item_impl),
+        source_item: Item::Impl(mock_struct_impls.trait_impl),
         maybe_usage: Some(usage),
         item_mod,
     };
