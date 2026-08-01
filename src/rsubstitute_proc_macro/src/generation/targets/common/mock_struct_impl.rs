@@ -34,7 +34,9 @@ pub(crate) fn generate(
             .iter()
             .chain(static_fns.iter())
             .map(|ordered| {
-                ordered.clone_map(|x| try_extract_base_fn(span, mock_struct_path.clone(), &x))
+                ordered.clone_map(|x| {
+                    try_extract_base_fn(span, mock_struct_path.clone(), &x, mod_ident)
+                })
             })
             .filter_map(|ordered| match ordered.value {
                 Some(x) => Some(Ordered::new(ordered.order_number, x)),
@@ -106,7 +108,9 @@ pub(crate) fn generate_for_trait(
             .iter()
             .chain(static_fns.iter())
             .map(|ordered| {
-                ordered.clone_map(|x| try_extract_base_fn(span, mock_struct_path.clone(), &x))
+                ordered.clone_map(|x| {
+                    try_extract_base_fn(span, mock_struct_path.clone(), &x, mod_ident)
+                })
             })
             .filter_map(|ordered| match ordered.value {
                 Some(x) => Some(Ordered::new(ordered.order_number, x)),
@@ -309,6 +313,7 @@ fn map_fn(
                         } else {
                             None
                         },
+                        maybe_mod_ident: Some(mod_ident),
                         for_struct: true,
                     },
                 )
@@ -321,6 +326,7 @@ fn try_extract_base_fn(
     span: Span,
     target_struct_path: Path,
     fn_info: &FnInfo,
+    mod_ident: &Ident,
 ) -> Option<ImplItemFn> {
     fn_info.maybe_base_impl.clone().map(|base_impl| {
         base_fn::generate_associated(
@@ -330,6 +336,7 @@ fn try_extract_base_fn(
                 target_struct_path,
                 base_impl,
                 maybe_associated_items_info: None,
+                maybe_mod_ident: Some(mod_ident.clone()),
             },
         )
     })

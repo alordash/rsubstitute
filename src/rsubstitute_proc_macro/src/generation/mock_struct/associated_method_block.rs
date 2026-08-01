@@ -10,6 +10,7 @@ pub(crate) struct Params<'a> {
     pub mock_struct_path: Path,
     pub fn_info: &'a FnInfo,
     pub maybe_base_fn_ident: Option<Ident>,
+    pub maybe_mod_ident: Option<Ident>,
     pub for_struct: bool,
 }
 pub(crate) fn generate(
@@ -19,6 +20,7 @@ pub(crate) fn generate(
         mock_struct_path,
         fn_info,
         maybe_base_fn_ident,
+        maybe_mod_ident,
         for_struct,
     }: Params,
 ) -> Block {
@@ -49,7 +51,7 @@ pub(crate) fn generate(
         }),
         semi_token: Token![;](span),
     };
-    let (call_var_path, call_stmt) = call_stmt::new(span, fn_info);
+    let (call_var_path, call_stmt) = call_stmt::new(span, fn_info, maybe_mod_ident);
     let (fn_data_var_path, fn_data_stmt) = fn_data_stmt::new_associated(
         span,
         fn_data_stmt::AssociatedParams {

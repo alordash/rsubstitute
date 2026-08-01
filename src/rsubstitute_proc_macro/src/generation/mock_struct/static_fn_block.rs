@@ -33,8 +33,8 @@ pub(crate) fn generate(
             remove_lifetime_generic_arguments: true,
         },
     );
-    let use_mod_stmt = Item::Use(mod_usage::new_all(mod_ident));
-    let (call_var_path, call_stmt) = call_stmt::new(span, fn_info);
+    let use_mod_stmt = Item::Use(mod_usage::new_all(mod_ident.clone()));
+    let (call_var_path, call_stmt) = call_stmt::new(span, fn_info, Some(mod_ident));
     let (fn_data_var_path, fn_data_stmt) = fn_data_stmt::new_static(
         span,
         fn_data_stmt::StaticParams {

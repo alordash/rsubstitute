@@ -4,8 +4,26 @@ use crate::syntax::*;
 use proc_macro2::Span;
 use syn::*;
 
-pub(crate) fn new(span: Span, fn_info: &FnInfo) -> (ExprPath, Local) {
+pub(crate) fn new(
+    span: Span,
+    fn_info: &FnInfo,
+    maybe_mod_ident: Option<Ident>,
+) -> (ExprPath, Local) {
     let fn_data_var_path = expr::path::new(span, ["call"]);
+    let call_struct_path = maybe_mod_ident.map_or_else(
+        || fn_info.call_struct.path.clone(),
+        |mod_ident| {
+            let mut result = fn_info.call_struct.path.clone();
+            result.segments.insert(
+                0,
+                PathSegment {
+                    ident: mod_ident,
+                    arguments: PathArguments::None,
+                },
+            );
+            return result;
+        },
+    );
     let fn_data_stmt = Local {
         attrs: Vec::new(),
         let_token: Token![let](span),
@@ -16,7 +34,7 @@ pub(crate) fn new(span: Span, fn_info: &FnInfo) -> (ExprPath, Local) {
             expr: Box::new(Expr::Struct(ExprStruct {
                 attrs: Vec::new(),
                 qself: None,
-                path: fn_info.call_struct.path.clone(),
+                path: call_struct_path,
                 brace_token: token::Brace(span),
                 fields: [generics_field::new_value(span)]
                     .into_iter()

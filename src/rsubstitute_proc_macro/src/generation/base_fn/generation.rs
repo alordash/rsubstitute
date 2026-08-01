@@ -24,7 +24,7 @@ pub(crate) fn generate_static_fn(
         base_impl,
     }: StaticFnParams,
 ) -> ItemFn {
-    let (sig, block) = generate_core(span, fn_info, target_struct_path, base_impl);
+    let (sig, block) = generate_core(span, fn_info, target_struct_path, base_impl, None);
     let result = ItemFn {
         attrs: vec![attributes::doc_hidden(span)],
         vis: Visibility::Public(Token![pub](span)),
@@ -40,6 +40,7 @@ pub(crate) struct AssociatedParams<'a> {
     pub target_struct_path: Path,
     pub base_impl: Box<Block>,
     pub maybe_associated_items_info: Option<&'a AssociatedItemsInfo>, // `Some` for trait impls, `None` for struct impls
+    pub maybe_mod_ident: Option<Ident>,
 }
 pub(crate) fn generate_associated(
     span: Span,
@@ -48,9 +49,16 @@ pub(crate) fn generate_associated(
         target_struct_path,
         base_impl,
         maybe_associated_items_info,
+        maybe_mod_ident,
     }: AssociatedParams,
 ) -> ImplItemFn {
-    let (mut sig, mut block) = generate_core(span, fn_info, target_struct_path, base_impl);
+    let (mut sig, mut block) = generate_core(
+        span,
+        fn_info,
+        target_struct_path,
+        base_impl,
+        maybe_mod_ident,
+    );
     (sig, block) = normalization::normalize_method(sig, block);
     if let Some(associated_items_info) = maybe_associated_items_info {
         (sig, block) = normalization::normalize_associated_items(associated_items_info, sig, block);
@@ -70,6 +78,7 @@ fn generate_core(
     fn_info: &FnInfo,
     target_struct_path: Path,
     base_impl: Box<Block>,
+    maybe_mod_ident: Option<Ident>,
 ) -> (Signature, Block) {
     let source_signature = &fn_info.source_signature;
     let call_path = path::new(span, ["call"]);
@@ -148,6 +157,20 @@ fn generate_core(
             ty: Box::new(void_type(span)),
         }
     };
+    let call_struct_path = maybe_mod_ident.map_or_else(
+        || fn_info.call_struct.path.clone(),
+        |mod_ident| {
+            let mut result = fn_info.call_struct.path.clone();
+            result.segments.insert(
+                0,
+                PathSegment {
+                    ident: mod_ident,
+                    arguments: PathArguments::None,
+                },
+            );
+            return result;
+        },
+    );
     let sig = Signature {
         constness: source_signature.constness.clone(),
         asyncness: source_signature.asyncness.clone(),
@@ -170,7 +193,7 @@ fn generate_core(
                 ty: Box::new(Type::Path(TypePath {
                     attrs: Vec::new(),
                     qself: None,
-                    path: fn_info.call_struct.path.clone(),
+                    path: call_struct_path.clone(),
                 })),
             }),
         ]),
@@ -185,7 +208,7 @@ fn generate_core(
         pat: Pat::Struct(PatStruct {
             attrs: Vec::new(),
             qself: None,
-            path: fn_info.call_struct.path.clone(),
+            path: call_struct_path,
             brace_token: token::Brace(span),
             fields: fn_info
                 .arguments
