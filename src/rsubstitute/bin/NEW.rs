@@ -29,7 +29,7 @@ mod f {
     use super::*;
     use rsubstitute::for_generated::*;
     pub fn setup<'__rsa>(
-        t: impl Into<Arg<dyn Trait>> + '__rsa,
+        t: impl Into<Arg<Box<dyn Trait>>> + '__rsa,
     ) -> FnConfigurator<
         '__rsa,
         fMock,
@@ -48,7 +48,7 @@ mod f {
         .setup(t)
     }
     pub fn received<'__rsa>(
-        t: impl Into<Arg<dyn Trait>> + '__rsa,
+        t: impl Into<Arg<Box<dyn Trait>>> + '__rsa,
         times: Times,
     ) -> ::rsubstitute::for_generated::ArgRefsBinder<fStaticReceived, (&'__rsa dyn Trait,)> {
         fStaticReceived {
@@ -82,7 +82,7 @@ mod f {
     }
     struct f_ArgsChecker {
         pub generics: ::core::marker::PhantomData<(dyn Trait,)>,
-        t: Arg<dyn Trait>,
+        t: Arg<Box<dyn Trait>>,
     }
     impl IGenericsInfoProvider for f_ArgsChecker {
         fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
@@ -124,7 +124,7 @@ mod f {
     impl fStaticSetup {
         pub fn setup<'__rsa>(
             &self,
-            t: impl Into<Arg<dyn Trait>>,
+            t: impl Into<Arg<Box<dyn Trait>>>,
         ) -> FnConfigurator<
             '_,
             fMock,
@@ -170,7 +170,7 @@ mod f {
     impl fStaticReceived {
         pub fn received<'__rsa>(
             &self,
-            t: impl Into<Arg<dyn Trait>>,
+            t: impl Into<Arg<Box<dyn Trait>>>,
             times: Times,
         ) -> ::rsubstitute::for_generated::ArgRefsBinder<Self, (&'__rsa dyn Trait,)> {
             let args_checker = f_ArgsChecker {
@@ -190,20 +190,31 @@ mod f {
 
 trait Trait {
     fn flex(&self);
+    fn v(&self) -> i32;
 }
 
-struct Struct;
+#[derive(Clone)]
+struct Struct(i32);
 impl Trait for Struct {
     fn flex(&self) {
         println!("base struct flex")
     }
+
+    fn v(&self) -> i32 {
+        self.0
+    }
 }
 
 fn main() {
-    f::setup(Arg::Any).does(|a| {
+    let s = Struct(63);
+    f::setup(Arg::is(|p: &Box<dyn Trait>| {
+        dbg!(p.v(), s.0);
+        let result = p.v() == s.0;
+        return result;
+    }))
+    .does(|a| {
         a.0.flex();
     });
-    let s = Struct;
     f(s);
 
     println!("Done");
