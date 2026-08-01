@@ -24,6 +24,12 @@ pub(crate) fn prepare(
     }: Params,
 ) -> ImplStructSyntax {
     let target_path = parse_target_type(&target_type);
+    let target_ident = target_path
+        .segments
+        .last()
+        .expect("`impl` target path can not be empty")
+        .ident
+        .clone();
     impl_items = impl_items
         .into_iter()
         .map(|x| normalization::normalize_struct_type_references(x, &target_path))
@@ -49,6 +55,7 @@ pub(crate) fn prepare(
 
     let result = ImplStructSyntax {
         attributes,
+        target_ident,
         target_path,
         generics,
         target_type: *target_type,
@@ -117,16 +124,7 @@ fn parse_target_type(target_type: &Type) -> Path {
         panic!("Can not mock structs qualified with self-type.");
     }
 
-    let flat_ident = ident::combine_path_segments(&type_path.path);
-    let mut result = type_path.path.clone();
-    let segments_len = result.segments.len();
-    result
-        .segments
-        .last_mut()
-        .expect("Path must contain at least one segment")
-        .ident = flat_ident;
-    result.segments = result.segments.into_iter().skip(segments_len - 1).collect();
-    return result;
+    return type_path.path.clone();
 }
 
 struct ImplStructSyntaxAsFnOwner<'a> {

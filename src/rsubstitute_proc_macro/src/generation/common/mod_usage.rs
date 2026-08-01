@@ -24,10 +24,23 @@ pub(crate) fn new<const N: usize>(mod_ident: Ident, target_idents: [Ident; N]) -
 }
 
 pub(crate) fn new_all(mod_ident: Ident) -> ItemUse {
+    new_core(mod_ident, false)
+}
+
+pub(crate) fn new_pub_all(mod_ident: Ident) -> ItemUse {
+    new_core(mod_ident, true)
+}
+
+#[inline]
+fn new_core(mod_ident: Ident, public: bool) -> ItemUse {
     let span = mod_ident.span();
     let result = ItemUse {
         attrs: Vec::new(),
-        vis: Visibility::Public(Token![pub](span)),
+        vis: if public {
+            Visibility::Public(Token![pub](span))
+        } else {
+            Visibility::Inherited
+        },
         use_token: Token![use](span),
         leading_colon: None,
         tree: UseTree::Path(UsePath {

@@ -30,13 +30,6 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
         });
     let impl_trait_for_struct_info =
         impl_trait_for_struct_info::generate(ctx, impl_trait_for_struct_syntax);
-    let mock_struct_path = path::from_base_path_with_ident(
-        &impl_trait_for_struct_info.target_path,
-        format_ident!(
-            "{}Mock",
-            path::last_ident(&impl_trait_for_struct_info.target_path)
-        ),
-    );
 
     let maybe_associated_controls =
         (!impl_trait_for_struct_info.associated_fns.is_empty()).then(|| {
@@ -47,9 +40,10 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                     ident: path::last_ident(&impl_trait_for_struct_info.target_path),
                     generics: impl_trait_for_struct_info.merged_generics.clone(),
                     generics_for_impl: impl_trait_for_struct_info.merged_generics.clone(),
-                    mock_struct_path: &mock_struct_path,
+                    mock_struct_path: &impl_trait_for_struct_info.target_path,
                     fn_infos: &impl_trait_for_struct_info.associated_fns,
                     maybe_trait_ident: Some(impl_trait_for_struct_info.trait_ident.clone()),
+                    for_struct: true,
                 },
             );
             let trait_received_struct = received::generate(
@@ -59,9 +53,10 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                     ident: path::last_ident(&impl_trait_for_struct_info.target_path),
                     generics: impl_trait_for_struct_info.merged_generics.clone(),
                     generics_for_impl: impl_trait_for_struct_info.merged_generics.clone(),
-                    mock_struct_path: &mock_struct_path,
+                    mock_struct_path: &impl_trait_for_struct_info.target_path,
                     fn_infos: &impl_trait_for_struct_info.associated_fns,
                     maybe_trait_ident: Some(impl_trait_for_struct_info.trait_ident.clone()),
+                    for_struct: true,
                 },
             );
             let setup_struct_impl = as_trait_control_impl::generate(
@@ -113,10 +108,11 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                 generics: impl_trait_for_struct_info.merged_generics.clone(),
                 generics_for_impl: impl_trait_for_struct_info.merged_generics.clone(),
                 maybe_argument_types: None,
-                mock_struct_path: &mock_struct_path,
+                mock_struct_path: &impl_trait_for_struct_info.target_path,
                 fn_infos: &impl_trait_for_struct_info.static_fns,
                 for_static_fn: false,
                 maybe_trait_ident: Some(impl_trait_for_struct_info.trait_ident.clone()),
+                for_struct: true,
             },
         );
         let trait_static_received_struct = static_received::generate(
@@ -127,10 +123,11 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                 generics: impl_trait_for_struct_info.merged_generics.clone(),
                 generics_for_impl: impl_trait_for_struct_info.merged_generics.clone(),
                 maybe_argument_types: None,
-                mock_struct_path: &mock_struct_path,
+                mock_struct_path: &impl_trait_for_struct_info.target_path,
                 fn_infos: &impl_trait_for_struct_info.static_fns,
                 for_static_fn: false,
                 maybe_trait_ident: Some(impl_trait_for_struct_info.trait_ident.clone()),
+                for_struct: true,
             },
         );
         let static_setup_struct_impl = as_trait_control_impl::generate(
@@ -176,7 +173,6 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
     source_static_fn_block::replace(
         source_span,
         &impl_trait_for_struct_info.target_path,
-        mock_struct_path.clone(),
         &mut item_impl,
         Some(impl_trait_for_struct_info.trait_path.clone()),
     );
@@ -193,7 +189,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
         ctx,
         source_span,
         mock_struct_impl::ParamsForTrait {
-            mock_struct_path: mock_struct_path.clone(),
+            mock_struct_path: impl_trait_for_struct_info.target_path.clone(),
             associated_fns: &impl_trait_for_struct_info.associated_fns,
             static_fns: &impl_trait_for_struct_info.static_fns,
             merged_generics: impl_trait_for_struct_info.merged_generics,
@@ -253,7 +249,6 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                 ])
             }),
     )
-    .chain(core::iter::once(Item::Impl(mock_struct_impls.trait_impl)))
     .chain(
         mock_struct_impls
             .maybe_base_trait_and_fns_impl
@@ -284,7 +279,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
         ]
     }))
     .collect();
-    let usage = mod_usage::new_all(mod_ident.clone());
+    let usage = mod_usage::new_pub_all(mod_ident.clone());
     let item_mod = ItemMod {
         attrs: vec![attributes::allow_non_camel_case_types(source_span)],
         vis: Visibility::Public(Token![pub](source_span)),
@@ -295,7 +290,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
         semi: None,
     };
     let result = MockMod {
-        source_item: Item::Impl(item_impl),
+        source_item: Item::Impl(mock_struct_impls.trait_impl),
         maybe_usage: Some(usage),
         item_mod,
     };

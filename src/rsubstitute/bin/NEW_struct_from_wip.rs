@@ -22,9 +22,14 @@ trait Gen<G1> {
 // TODO - need to implement StructReceived::no_other_calls in this module, not in each `impl Struct`
 // modules (same for StaticStructReceived)
 #[mock]
-struct Struct<S1>(pub S1);
+struct Struct<S1> {
+    pub s1: S1,
+}
 #[mock]
 impl<S1> Struct<S1> {
+    pub fn new(s1: S1) -> Self {
+        Self { s1 }
+    }
     pub fn f<S2>(&self) {}
     pub fn g<S3>() {}
 }
@@ -66,11 +71,15 @@ where
 }
 
 fn main() {
-    let s = Struct(10i16);
-    let mut s_mock = s.mock();
-    s_mock.received().as_Trait::<i32>().no_other_calls();
-    s_mock.setup().as_Gen::<[u8; 3]>();
-    s_mock.received().no_other_calls();
+    Struct::static_setup().new(Arg::Any).returns(Struct {
+        s1: 3i16,
+        __rs_data: Default::default(),
+    });
+    let mut s = Struct::new(10i16);
+    println!("s.s1 = {}", s.s1);
+    s.received().as_Trait::<i32>().no_other_calls();
+    s.setup().as_Gen::<[u8; 3]>();
+    s.received().no_other_calls();
     Struct::<i128>::static_setup().as_Gen::<[[u8; 2]; 1]>();
     Struct::<i128>::static_received()
         .as_Gen::<[[u8; 2]; 1]>()

@@ -16,6 +16,7 @@ pub(crate) struct Params<'a, T: Borrow<FnInfo>> {
     pub for_static_fn: bool,
     pub is_static: bool,
     pub generate_fn_no_other_calls: bool,
+    pub for_struct: bool,
 }
 pub(crate) fn generate<T: Borrow<FnInfo>>(
     ctx: &Context,
@@ -28,6 +29,7 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
         for_static_fn,
         is_static,
         generate_fn_no_other_calls,
+        for_struct,
     }: Params<T>,
 ) -> ItemImpl {
     let mut items: Vec<_> = fn_infos
@@ -40,6 +42,7 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
                 fn_info.borrow(),
                 for_static_fn,
                 is_static,
+                for_struct,
             )
         })
         .map(ImplItem::Fn)
@@ -121,6 +124,7 @@ fn generate_received_fn(
     fn_info: &FnInfo,
     for_static_fn: bool,
     is_static: bool,
+    for_struct: bool,
 ) -> ImplItemFn {
     let (times_arg_path, times_arg) = times_arg::new(span);
     let generic_arguments = generic_arguments::new(
@@ -180,13 +184,23 @@ fn generate_received_fn(
     };
     let (args_checker_var_path, args_checker_stmt) = args_checker_stmt::new(span, fn_info);
     let (fn_data_var_path, fn_data_stmt) = if is_static {
-        fn_data_stmt::new_static(span, fn_info, generic_arguments)
+        fn_data_stmt::new_static(
+            span,
+            fn_data_stmt::StaticParams {
+                fn_info,
+                generic_arguments,
+                for_struct,
+            },
+        )
     } else {
         fn_data_stmt::new_associated(
             span,
-            fn_info,
-            generic_arguments,
-            args_checker_var_path.clone(),
+            fn_data_stmt::AssociatedParams {
+                fn_info,
+                generic_arguments,
+                generics_info_provider_var_path: args_checker_var_path.clone(),
+                for_struct,
+            },
         )
     };
     let verify_received_stmt = Expr::MethodCall(expr::method_call::new(
@@ -291,7 +305,7 @@ fn generate_regular_fn_no_other_calls(span: Span) -> ImplItemFn {
             attrs: Vec::new(),
             and_token: Token![&](span),
             mutability: None,
-            expr: Box::new(Expr::Field(expr::field::new_self(Ident::new("data", span)))),
+            expr: Box::new(Expr::Field(expr::field::new_self(Ident::new("__rs_data", span)))),
         })],
     );
 

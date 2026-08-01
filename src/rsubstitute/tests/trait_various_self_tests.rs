@@ -20,6 +20,7 @@ mod consts {
 }
 use consts::*;
 
+// TODO - why can't I mock methods that accept `Box<Self>` and etc?
 #[rustfmt::skip]
 #[mock(base)]
 #[allow(unused_mut)] // TODO - this should disable warnings

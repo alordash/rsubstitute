@@ -4,13 +4,27 @@ use crate::syntax::*;
 use proc_macro2::Span;
 use syn::*;
 
+pub(crate) struct AssociatedParams<'a> {
+    pub fn_info: &'a FnInfo,
+    pub generic_arguments: generic_arguments::Result,
+    pub generics_info_provider_var_path: ExprPath,
+    pub for_struct: bool,
+}
 pub(crate) fn new_associated(
     span: Span,
-    fn_info: &FnInfo,
-    generic_arguments: generic_arguments::Result,
-    generics_info_provider_var_path: ExprPath,
+    AssociatedParams {
+        fn_info,
+        generic_arguments,
+        generics_info_provider_var_path,
+        for_struct,
+    }: AssociatedParams,
 ) -> (ExprPath, Local) {
     let fn_data_var_path = expr::path::new(span, ["fn_data"]);
+    let fn_name = if for_struct {
+        "get_shared_fn_data_for_struct"
+    } else {
+        "get_shared_fn_data"
+    };
     let fn_data_stmt = Local {
         attrs: Vec::new(),
         let_token: Token![let](span),
@@ -20,8 +34,8 @@ pub(crate) fn new_associated(
             eq_token: Token![=](span),
             expr: Box::new(Expr::MethodCall(expr::method_call::new(
                 span,
-                Expr::Field(expr::field::new_self(Ident::new("data", span))),
-                Ident::new("get_shared_fn_data", span),
+                Expr::Field(expr::field::new_self(Ident::new("__rs_data", span))),
+                Ident::new(fn_name, span),
                 [
                     fn_info_ident_to_expr_lit(span, fn_info),
                     Expr::MethodCall(expr::method_call::new(
@@ -39,12 +53,25 @@ pub(crate) fn new_associated(
     return (fn_data_var_path, fn_data_stmt);
 }
 
+pub(crate) struct StaticParams<'a> {
+    pub fn_info: &'a FnInfo,
+    pub generic_arguments: generic_arguments::Result,
+    pub for_struct: bool,
+}
 pub(crate) fn new_static(
     span: Span,
-    fn_info: &FnInfo,
-    generic_arguments: generic_arguments::Result,
+    StaticParams {
+        fn_info,
+        generic_arguments,
+        for_struct,
+    }: StaticParams,
 ) -> (ExprPath, Local) {
     let fn_data_var_path = expr::path::new(span, ["fn_data"]);
+    let fn_name = if for_struct {
+        "get_static_fn_data_for_struct"
+    } else {
+        "get_static_fn_data"
+    };
     let fn_data_stmt = Local {
         attrs: Vec::new(),
         let_token: Token![let](span),
@@ -57,10 +84,7 @@ pub(crate) fn new_static(
                 Expr::Path(ExprPath {
                     attrs: Vec::new(),
                     qself: None,
-                    path: path::new_global(
-                        span,
-                        ["rsubstitute", "for_generated", "get_static_fn_data"],
-                    ),
+                    path: path::new_global(span, ["rsubstitute", "for_generated", fn_name]),
                 }),
                 [fn_info_ident_to_expr_lit(span, fn_info)],
             ))),

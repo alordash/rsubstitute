@@ -12,7 +12,18 @@ trait Trait<'a, T0> {
 
 #[mock]
 #[derive(Clone)]
-struct Struct<'s, TS>(PhantomData<&'s TS>);
+struct Struct<'s, TS> {
+    phantom: PhantomData<&'s TS>,
+}
+
+#[mock(base)]
+impl<'s, TS> Struct<'s, TS> {
+    pub fn new() -> Self {
+        Self {
+            phantom: PhantomData,
+        }
+    }
+}
 
 #[mock]
 impl<'s, TS> Struct<'s, TS> {
@@ -331,7 +342,7 @@ Received no non-matching calls"
         #[test]
         fn accept_ref_NoConfig_Ok() {
             // Arrange
-            let mock = Struct::<T0>(PhantomData).mock();
+            let mock = Struct::<T0>::new();
 
             let r = &&&5;
 
@@ -349,7 +360,7 @@ Received no non-matching calls"
         #[test]
         fn accept_ref_DidNotReceive_Ok() {
             // Arrange
-            let mut mock = Struct::<T0>(PhantomData).mock();
+            let mut mock = Struct::<T0>::new();
 
             let r = &&&5;
             let r_ptr = core::ptr::from_ref(r);
@@ -382,7 +393,7 @@ accept_ref(*{r}*)
         #[test]
         fn accept_ref_UnexpectedCall_Ok() {
             // Arrange
-            let mut mock = Struct::<T0>(PhantomData).mock();
+            let mut mock = Struct::<T0>::new();
 
             let r = &&&5;
             let return_value = 175;
@@ -406,7 +417,7 @@ accept_ref(*{r}*)
         #[test]
         fn accept_ref_ptr_NoConfig_Ok() {
             // Arrange
-            let mut mock = Struct::<T0>(PhantomData).mock();
+            let mut mock = Struct::<T0>::new();
 
             let r = &&(&&&5 as *const &&i32);
 
@@ -424,7 +435,7 @@ accept_ref(*{r}*)
         #[test]
         fn accept_ref_ptr_DidNotReceive_Ok() {
             // Arrange
-            let mut mock = Struct::<T0>(PhantomData).mock();
+            let mut mock = Struct::<T0>::new();
 
             let r = &&(&&&5 as *const &&i32);
             let r_ptr = core::ptr::from_ref(r);
@@ -458,7 +469,7 @@ accept_ref_ptr(*{r:?}*)
         #[test]
         fn accept_ref_ptr_UnexpectedCall_Ok() {
             // Arrange
-            let mut mock = Struct::<T0>(PhantomData).mock();
+            let mut mock = Struct::<T0>::new();
 
             let r = &&(&&&5 as *const &&i32);
             let return_value = 175;
@@ -482,7 +493,7 @@ accept_ref_ptr(*{r:?}*)
         #[test]
         fn generic_NoConfig_Ok() {
             // Arrange
-            let mut mock = Struct::<T0>(PhantomData).mock();
+            let mut mock = Struct::<T0>::new();
             type T1 = i32;
             type T2 = f64;
             let t1_name = core::any::type_name::<T1>();
@@ -503,7 +514,7 @@ accept_ref_ptr(*{r:?}*)
         #[test]
         fn generic_DidNotReceiveSameGenerics_Ok() {
             // Arrange
-            let mut mock = Struct::<T0>(PhantomData).mock();
+            let mut mock = Struct::<T0>::new();
             type T1 = i32;
             type T2 = f64;
             let t1_name = core::any::type_name::<T1>();
@@ -539,7 +550,7 @@ generic(*{t1}*)
         #[test]
         fn generic_DidNotReceiveDifferentGenerics_Ok() {
             // Arrange
-            let mut mock = Struct::<T0>(PhantomData).mock();
+            let mut mock = Struct::<T0>::new();
             type T1 = i32;
             type T2 = f64;
             type T3 = usize;
@@ -573,7 +584,7 @@ Received no non-matching calls"
         #[test]
         fn generic_ref_UnexpectedCall_Ok() {
             // Arrange
-            let mut mock = Struct::<T0>(PhantomData).mock();
+            let mut mock = Struct::<T0>::new();
             type T1 = i32;
             type T2 = f64;
             let t1_name = core::any::type_name::<T1>();

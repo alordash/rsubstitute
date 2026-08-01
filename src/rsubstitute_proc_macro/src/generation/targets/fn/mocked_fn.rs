@@ -16,13 +16,16 @@ pub(crate) fn generate(
     let block = static_fn_block::generate(
         ctx,
         source_span,
-        mock_struct_path,
-        fn_info,
-        match maybe_base_fn_ident {
-            Some(x) => BaseFnKind::StaticFn(x),
-            None => BaseFnKind::None,
+        static_fn_block::Params {
+            mock_struct_path,
+            fn_info,
+            base_fn_kind: match maybe_base_fn_ident {
+                Some(x) => BaseFnKind::StaticFn(x),
+                None => BaseFnKind::None,
+            },
+            mod_ident,
+            for_struct: false,
         },
-        mod_ident,
     );
 
     let result = ItemFn {

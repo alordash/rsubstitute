@@ -22,9 +22,12 @@ where
 trait IConst<const C: usize> {}
 
 #[mock]
-pub struct Lifetime<'x: 'a, 'a, 'b, 'c, 'd>(PhantomData<&'x &'a &'b &'c &'d ()>)
+pub struct Lifetime<'x: 'a, 'a, 'b, 'c, 'd>
 where
-    'x: 'b;
+    'x: 'b,
+{
+    phantom: PhantomData<&'x &'a &'b &'c &'d ()>,
+}
 
 #[mock(base)]
 impl<'x: 'a + 'c, 'a, 'b, 'c, 'd> Lifetime<'x, 'a, 'b, 'c, 'd> where 'x: 'b + 'd {}

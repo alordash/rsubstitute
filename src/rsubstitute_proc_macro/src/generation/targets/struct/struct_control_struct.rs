@@ -1,5 +1,4 @@
 use crate::common::*;
-use crate::generation::common::*;
 use crate::generation::mock_controls::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
@@ -40,10 +39,7 @@ pub(crate) fn generate(
             named: if is_static {
                 punctuated([generics_field])
             } else {
-                punctuated([
-                    generics_field,
-                    data_field::new_field(span, data_field::Params { public: true }),
-                ])
+                punctuated([generics_field, data_field::new_field(span)])
             },
         }),
         semi_token: None,

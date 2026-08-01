@@ -28,7 +28,7 @@ pub(crate) fn new(
             brace_token: token::Brace(span),
             named: punctuated([
                 generics_field::new_field(span, &generics, None),
-                data_field::new_field(span, data_field::Params { public: false }),
+                data_field::new_field(span),
             ]),
         }),
         semi_token: None,

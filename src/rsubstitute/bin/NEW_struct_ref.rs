@@ -25,10 +25,10 @@ impl<'a, T1: Clone> Struct<'a, T1> {
 }
 
 fn main() {
-    let s = Struct::<u8> {
+    let mut s = Struct::<u8> {
         phantom_data: PhantomData,
+        __rs_data: Default::default(),
     };
-    let mut s_mock = s.mock();
 
     println!("Done");
 }
@@ -37,7 +37,6 @@ fn main() {
 trait Trait {
     fn f(v: i32) -> i32;
 }
-use __rsubstitute_generated_TraitMock::*;
 
 #[mock(base)]
 fn f(v: i32) -> i32 {

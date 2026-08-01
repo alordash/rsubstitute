@@ -6,13 +6,23 @@ use crate::generation::mock_struct::models::*;
 use proc_macro2::Span;
 use syn::*;
 
+pub(crate) struct Params<'a> {
+    pub mock_struct_path: Path,
+    pub fn_info: &'a FnInfo,
+    pub base_fn_kind: BaseFnKind,
+    pub mod_ident: Ident,
+    pub for_struct: bool,
+}
 pub(crate) fn generate(
     ctx: &Context,
     span: Span,
-    mock_struct_path: Path,
-    fn_info: &FnInfo,
-    base_fn_kind: BaseFnKind,
-    mod_ident: Ident,
+    Params {
+        mock_struct_path,
+        fn_info,
+        base_fn_kind,
+        mod_ident,
+        for_struct,
+    }: Params,
 ) -> Block {
     let generic_arguments = generic_arguments::new(
         ctx,
@@ -23,10 +33,16 @@ pub(crate) fn generate(
             remove_lifetime_generic_arguments: true,
         },
     );
-    let use_mod_stmt = Item::Use(mod_usage::new_all(mod_ident));
-    let (call_var_path, call_stmt) = call_stmt::new(span, fn_info);
-    let (fn_data_var_path, fn_data_stmt) =
-        fn_data_stmt::new_static(span, fn_info, generic_arguments);
+    let use_mod_stmt = Item::Use(mod_usage::new_all(mod_ident.clone()));
+    let (call_var_path, call_stmt) = call_stmt::new(span, fn_info, Some(mod_ident));
+    let (fn_data_var_path, fn_data_stmt) = fn_data_stmt::new_static(
+        span,
+        fn_data_stmt::StaticParams {
+            fn_info,
+            generic_arguments,
+            for_struct,
+        },
+    );
     let fn_handle_stmt = fn_handle_stmt::generate(
         ctx,
         span,

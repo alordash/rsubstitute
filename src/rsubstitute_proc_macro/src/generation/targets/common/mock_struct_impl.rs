@@ -34,7 +34,9 @@ pub(crate) fn generate(
             .iter()
             .chain(static_fns.iter())
             .map(|ordered| {
-                ordered.clone_map(|x| try_extract_base_fn(span, mock_struct_path.clone(), &x))
+                ordered.clone_map(|x| {
+                    try_extract_base_fn(span, mock_struct_path.clone(), &x, mod_ident)
+                })
             })
             .filter_map(|ordered| match ordered.value {
                 Some(x) => Some(Ordered::new(ordered.order_number, x)),
@@ -106,7 +108,9 @@ pub(crate) fn generate_for_trait(
             .iter()
             .chain(static_fns.iter())
             .map(|ordered| {
-                ordered.clone_map(|x| try_extract_base_fn(span, mock_struct_path.clone(), &x))
+                ordered.clone_map(|x| {
+                    try_extract_base_fn(span, mock_struct_path.clone(), &x, mod_ident)
+                })
             })
             .filter_map(|ordered| match ordered.value {
                 Some(x) => Some(Ordered::new(ordered.order_number, x)),
@@ -163,7 +167,7 @@ pub(crate) fn generate_for_trait(
             .collect();
         let base_fn_trait = ItemTrait {
             attrs: Vec::new(),
-            vis: Visibility::Inherited,
+            vis: Visibility::Public(Token![pub](span)),
             modifiers: TraitModifiers::default(),
             unsafety: None,
             trait_token: Token![trait](span),
@@ -265,48 +269,52 @@ fn map_fn(
     is_static: bool,
     for_trait: bool,
 ) -> Ordered<ImplItemFn> {
-    ordered_fn_info.clone_map(|x| {
-        let span = x.spans.inputs;
+    ordered_fn_info.clone_map(|fn_info| {
+        let span = fn_info.spans.inputs;
         ImplItemFn {
             attrs: if !for_trait && is_static {
-                x.attributes
+                fn_info
+                    .attributes
                     .iter()
                     .cloned()
                     .chain(core::iter::once(attributes::doc_hidden(span)))
                     .collect()
             } else {
-                x.attributes.clone()
+                fn_info.attributes.clone()
             },
-            vis: if !for_trait {
-                visibility::pub_super(span)
-            } else {
-                x.visibility.clone()
-            },
+            vis: fn_info.visibility.clone(),
             modifiers: FnModifiers::default(),
-            sig: *x.source_signature.clone(),
+            sig: *fn_info.source_signature.clone(),
             block: if is_static {
                 static_fn_block::generate(
                     ctx,
                     span,
-                    mock_struct_path,
-                    &x,
-                    if x.maybe_base_impl.is_some() {
-                        BaseFnKind::Associated(base_fn::get_base_fn_ident(&x.fn_ident))
-                    } else {
-                        BaseFnKind::None
+                    static_fn_block::Params {
+                        mock_struct_path,
+                        fn_info,
+                        base_fn_kind: if fn_info.maybe_base_impl.is_some() {
+                            BaseFnKind::Associated(base_fn::get_base_fn_ident(&fn_info.fn_ident))
+                        } else {
+                            BaseFnKind::None
+                        },
+                        mod_ident,
+                        for_struct: true,
                     },
-                    mod_ident,
                 )
             } else {
                 associated_method_block::generate(
                     ctx,
                     span,
-                    mock_struct_path,
-                    &x,
-                    if x.maybe_base_impl.is_some() {
-                        Some(base_fn::get_base_fn_ident(&x.fn_ident))
-                    } else {
-                        None
+                    associated_method_block::Params {
+                        mock_struct_path,
+                        fn_info,
+                        maybe_base_fn_ident: if fn_info.maybe_base_impl.is_some() {
+                            Some(base_fn::get_base_fn_ident(&fn_info.fn_ident))
+                        } else {
+                            None
+                        },
+                        maybe_mod_ident: Some(mod_ident),
+                        for_struct: true,
                     },
                 )
             },
@@ -318,6 +326,7 @@ fn try_extract_base_fn(
     span: Span,
     target_struct_path: Path,
     fn_info: &FnInfo,
+    mod_ident: &Ident,
 ) -> Option<ImplItemFn> {
     fn_info.maybe_base_impl.clone().map(|base_impl| {
         base_fn::generate_associated(
@@ -327,6 +336,7 @@ fn try_extract_base_fn(
                 target_struct_path,
                 base_impl,
                 maybe_associated_items_info: None,
+                maybe_mod_ident: Some(mod_ident.clone()),
             },
         )
     })

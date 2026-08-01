@@ -48,7 +48,7 @@ pub(crate) fn generate(
             brace_token: token::Brace(span),
             named: punctuated([
                 generics_field::new_field(span, &trait_info.merged_generics, None),
-                data_field::new_field(span, data_field::Params { public: true }),
+                data_field::new_field(span),
             ]),
         }),
         semi_token: None,
@@ -73,6 +73,7 @@ pub(crate) fn generate(
         trait_info,
         generics_for_impl,
         path.clone(),
+        mod_ident,
         &maybe_associated_controls,
         &maybe_static_controls,
     );
@@ -188,36 +189,43 @@ fn map_fn(
     mod_ident: Ident,
     is_static: bool,
 ) -> Ordered<ImplItem> {
-    ordered_fn_info.clone_map(|x| {
-        let span = x.spans.inputs;
+    ordered_fn_info.clone_map(|fn_info| {
+        let span = fn_info.spans.inputs;
         ImplItem::Fn(ImplItemFn {
-            attrs: x.attributes.clone(),
+            attrs: fn_info.attributes.clone(),
             vis: Visibility::Inherited,
             modifiers: FnModifiers::default(),
-            sig: *x.source_signature.clone(),
+            sig: *fn_info.source_signature.clone(),
             block: if is_static {
                 static_fn_block::generate(
                     ctx,
                     span,
-                    mock_struct_path,
-                    x,
-                    if x.maybe_base_impl.is_some() {
-                        BaseFnKind::Associated(base_fn::get_base_fn_ident(&x.fn_ident))
-                    } else {
-                        BaseFnKind::None
+                    static_fn_block::Params {
+                        mock_struct_path,
+                        fn_info,
+                        base_fn_kind: if fn_info.maybe_base_impl.is_some() {
+                            BaseFnKind::Associated(base_fn::get_base_fn_ident(&fn_info.fn_ident))
+                        } else {
+                            BaseFnKind::None
+                        },
+                        mod_ident,
+                        for_struct: false,
                     },
-                    mod_ident,
                 )
             } else {
                 associated_method_block::generate(
                     ctx,
                     span,
-                    mock_struct_path,
-                    x,
-                    if x.maybe_base_impl.is_some() {
-                        Some(base_fn::get_base_fn_ident(&x.fn_ident))
-                    } else {
-                        None
+                    associated_method_block::Params {
+                        mock_struct_path,
+                        fn_info,
+                        maybe_base_fn_ident: if fn_info.maybe_base_impl.is_some() {
+                            Some(base_fn::get_base_fn_ident(&fn_info.fn_ident))
+                        } else {
+                            None
+                        },
+                        maybe_mod_ident: Some(mod_ident),
+                        for_struct: false,
                     },
                 )
             },
@@ -231,6 +239,7 @@ fn generate_inner_impl(
     trait_info: &TraitInfo,
     generics_for_impl: Generics,
     mock_struct_path: Path,
+    mod_ident: &Ident,
     maybe_associated_controls: &Option<AssociatedControls>,
     maybe_static_controls: &Option<StaticControls>,
 ) -> ItemImpl {
@@ -279,7 +288,7 @@ fn generate_inner_impl(
                 .iter()
                 .chain(trait_info.static_fns.iter())
                 .filter_map(|fn_info| {
-                    try_extract_base_fn(span, &mock_struct_path, trait_info, fn_info)
+                    try_extract_base_fn(span, &mock_struct_path, trait_info, fn_info, mod_ident)
                 }),
         )
     } else {
@@ -315,6 +324,7 @@ fn try_extract_base_fn(
     mock_struct_path: &Path,
     trait_info: &TraitInfo,
     fn_info: &FnInfo,
+    mod_ident: &Ident,
 ) -> Option<ImplItemFn> {
     fn_info.maybe_base_impl.clone().map(|base_impl| {
         base_fn::generate_associated(
@@ -324,6 +334,7 @@ fn try_extract_base_fn(
                 target_struct_path: mock_struct_path.clone(),
                 base_impl,
                 maybe_associated_items_info: Some(&trait_info.associated_items_info),
+                maybe_mod_ident: Some(mod_ident.clone()),
             },
         )
     })

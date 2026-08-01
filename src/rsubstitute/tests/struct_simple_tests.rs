@@ -1,4 +1,5 @@
 use rsubstitute::*;
+use std::marker::PhantomData;
 
 trait Trait {
     fn f(&self);
@@ -9,6 +10,16 @@ trait Trait {
 struct Struct<Q = i32> {
     pub phantom: core::marker::PhantomData<Q>,
     pub value: i32,
+}
+
+#[mock(base)]
+impl<Q> Struct<Q> {
+    pub fn new(value: i32) -> Self {
+        Self {
+            phantom: PhantomData,
+            value,
+        }
+    }
 }
 
 #[mock]
@@ -37,17 +48,12 @@ mod tests {
 
     mod struct_tests {
         use super::*;
-        use std::marker::PhantomData;
 
         #[test]
         fn f_Ok() {
             // Arrange
             let value = 22;
-            let mut mock = Struct {
-                phantom: PhantomData,
-                value,
-            }
-            .mock();
+            let mut mock = Struct::new(value);
             let callback_flag = Arc::new(RefCell::new(false));
             let callback_flag_clone = callback_flag.clone();
             mock.setup()
@@ -68,11 +74,7 @@ mod tests {
         #[test]
         fn f_NoConfig_Ok() {
             // Arrange
-            let mut mock = Struct {
-                value: 1,
-                phantom: PhantomData::<i32>,
-            }
-            .mock();
+            let mut mock = Struct::new(1);
 
             // Act
             let result = mock.f();
@@ -85,11 +87,7 @@ mod tests {
         #[test]
         fn f_MultipleTimes_Ok() {
             // Arrange
-            let mut mock = Struct {
-                value: 1,
-                phantom: PhantomData,
-            }
-            .mock();
+            let mut mock = Struct::new(1);
 
             // Act
             let result1 = mock.f();
@@ -107,11 +105,7 @@ mod tests {
         #[test]
         fn f_MultipleTimes_Panics() {
             // Arrange
-            let mut mock = Struct {
-                value: 1,
-                phantom: PhantomData,
-            }
-            .mock();
+            let mut mock = Struct::new(1);
 
             // Act
             mock.f();
@@ -167,17 +161,12 @@ Received no non-matching calls"#,
 
     mod trait_tests {
         use super::*;
-        use std::marker::PhantomData;
 
         #[test]
         fn Trait_f_Ok() {
             // Arrange
             let value = 22;
-            let mut mock = Struct {
-                value,
-                phantom: PhantomData,
-            }
-            .mock();
+            let mut mock = Struct::new(value);
             let callback_flag = Arc::new(RefCell::new(false));
             let callback_flag_clone = callback_flag.clone();
             mock.setup()
@@ -200,11 +189,7 @@ Received no non-matching calls"#,
         #[test]
         fn Trait_f_NoConfig_Ok() {
             // Arrange
-            let mut mock = Struct {
-                value: 1,
-                phantom: PhantomData,
-            }
-            .mock();
+            let mut mock = Struct::new(1);
 
             // Act
             let result = Trait::f(&mock);
@@ -218,11 +203,7 @@ Received no non-matching calls"#,
         #[test]
         fn Trait_f_MultipleTimes_Ok() {
             // Arrange
-            let mut mock = Struct {
-                value: 1,
-                phantom: PhantomData,
-            }
-            .mock();
+            let mut mock = Struct::new(1);
 
             // Act
             let result1 = Trait::f(&mock);
@@ -241,11 +222,7 @@ Received no non-matching calls"#,
         #[test]
         fn Trait_f_MultipleTimes_Panics() {
             // Arrange
-            let mut mock = Struct {
-                value: 1,
-                phantom: PhantomData,
-            }
-            .mock();
+            let mut mock = Struct::new(1);
 
             // Act
             Trait::f(&mock);

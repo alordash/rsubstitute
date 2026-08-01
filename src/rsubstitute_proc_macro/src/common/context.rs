@@ -20,20 +20,6 @@ pub(crate) fn create_for_mock_macro(proc_macro_attribute: proc_macro::TokenStrea
     return ctx;
 }
 
-// pub(crate) fn create_for_mock_macro(mock_macro_usage: MockMacroUsage) -> Context {
-//     let support_base_calling = match mock_macro_usage {
-//         MockMacroUsage::Simple => DEFAULT_SUPPORT_BASE_CALLING,
-//         #[cfg(not(feature = "mock_base_by_default"))]
-//         MockMacroUsage::WithBase => true,
-//         #[cfg(feature = "mock_base_by_default")]
-//         MockedMacroMode::WithoutBase => false,
-//     };
-//     let ctx = Context {
-//         support_base_calling,
-//     };
-//     return ctx;
-// }
-
 fn support_base_calling_from_parameters(parameters: &[&str]) -> bool {
     // TODO - throw if passed parameter is unknown (like #[mock(wtf)])
     #[cfg(not(feature = "mock_base_by_default"))]
@@ -46,9 +32,3 @@ fn support_base_calling_from_parameters(parameters: &[&str]) -> bool {
         .iter()
         .any(|parameter| *parameter == constants::DO_NOT_SUPPORT_BASE_PARAMETER);
 }
-
-// #[cfg(not(feature = "mock_base_by_default"))]
-// const DEFAULT_SUPPORT_BASE_CALLING: bool = false;
-//
-// #[cfg(feature = "mock_base_by_default")]
-// const DEFAULT_SUPPORT_BASE_CALLING: bool = true;

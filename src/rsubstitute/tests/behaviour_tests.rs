@@ -92,6 +92,13 @@ mod trait_tests {
 #[mock]
 struct Struct;
 
+#[mock(base)]
+impl Struct {
+    pub fn new() -> Self {
+        Self
+    }
+}
+
 #[mock]
 impl Struct {
     pub fn f(&self) -> i32 {
@@ -112,7 +119,7 @@ mod struct_tests {
         }
 
         let mocked_value = DEFAULT_VALUE + 1;
-        let mut mock = Struct.mock();
+        let mut mock = Struct::new();
         mock.setup().f().returns(mocked_value);
 
         // Act
