@@ -43,12 +43,12 @@ impl unit_mod::Unit {
 
 // mod named_mod {
 //     use rsubstitute_proc_macro::mock;
-// 
+//
 //     #[mock]
 //     pub struct Named {
 //         pub v: i32,
 //     }
-// 
+//
 //     #[mock(base)]
 //     impl Named {
 //         fn ident(&self) {
@@ -57,7 +57,7 @@ impl unit_mod::Unit {
 //             let s = Self;
 //             let Self = s;
 //         }
-// 
+//
 //         fn static_ident() {
 //             let unit = Named { v: 1 };
 //             let Named { v: a } = unit;
@@ -66,7 +66,7 @@ impl unit_mod::Unit {
 //         }
 //     }
 // }
-// 
+//
 // #[mock(base)]
 // impl named_mod::Named {
 //     fn path(&self) {
@@ -75,7 +75,7 @@ impl unit_mod::Unit {
 //         let s = Self;
 //         let Self = s;
 //     }
-// 
+//
 //     fn static_path() {
 //         let unit = named_mod::Named { v: 1 };
 //         let named_mod::Named { v: a } = unit;
@@ -87,6 +87,7 @@ impl unit_mod::Unit {
 #[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
+    use super::*;
 
     #[test]
     fn compile() {

@@ -25,7 +25,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
     let column = call_site.column();
     let mod_ident = format_ident!(
         "__rsubstitute_generated_{}_{}_{}",
-        path::last_ident(&impl_struct_info.target_path),
+        impl_struct_info.target_ident,
         line,
         column
     );

@@ -93,6 +93,7 @@ pub(crate) fn from_base_path_with_ident(base: &Path, ident: Ident) -> Path {
     if let Some(last_segment) = result.segments.last_mut() {
         last_segment.ident = ident;
     }
+    result.segments = result.segments.into_iter().last().into_iter().collect();
     return result;
 }
 
