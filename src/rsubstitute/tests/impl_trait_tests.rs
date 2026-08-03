@@ -61,7 +61,6 @@ mod tests {
     use super::*;
 
     const ACTUAL_VALUE: i32 = DUMMY_VALUE + 123;
-    const ACTUAL_STATIC_VALUE: i32 = ACTUAL_VALUE + 555;
 
     mod fn_tests {
         use super::*;
