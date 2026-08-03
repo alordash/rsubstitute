@@ -3,7 +3,7 @@ use crate::common::*;
 use crate::generation::fn_info::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
-use quote::{format_ident, ToTokens};
+use quote::format_ident;
 use syn::punctuated::Punctuated;
 use syn::*;
 
@@ -241,12 +241,7 @@ fn generate_core(
         attrs: Vec::new(),
         let_token: Token![let](span),
         modifiers: LocalModifiers::default(),
-        pat: Pat::Type(PatType {
-            attrs: Vec::new(),
-            pat: x.source_pat_type.pat.clone(),
-            colon_token: Token![:](span),
-            ty: x.source_pat_type.ty.clone(),
-        }),
+        pat: Pat::Type(x.source_pat_type.clone()),
         init: Some(LocalInit {
             eq_token: Token![=](span),
             expr: Box::new(Expr::Macro(transmute_lifetime_expr::new(Expr::Path(

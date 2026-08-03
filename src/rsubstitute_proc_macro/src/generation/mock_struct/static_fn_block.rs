@@ -34,7 +34,11 @@ pub(crate) fn generate(
         },
     );
     let use_mod_stmt = Item::Use(mod_usage::new_all(mod_ident.clone()));
-    let (call_var_path, call_stmt) = call_stmt::new(span, fn_info, Some(mod_ident));
+    let call_stmt::Result {
+        impl_trait_cast_stmts,
+        call_var_path,
+        call_stmt,
+    } = call_stmt::new(span, fn_info, Some(mod_ident));
     let (fn_data_var_path, fn_data_stmt) = fn_data_stmt::new_static(
         span,
         fn_data_stmt::StaticParams {
@@ -58,12 +62,16 @@ pub(crate) fn generate(
 
     let result = Block {
         brace_token: token::Brace(span),
-        stmts: vec![
-            Stmt::Item(use_mod_stmt),
-            Stmt::Local(call_stmt),
-            Stmt::Local(fn_data_stmt),
-            Stmt::Expr(Expr::MethodCall(fn_handle_stmt), None),
-        ],
+        stmts: impl_trait_cast_stmts
+            .into_iter()
+            .map(Stmt::Local)
+            .chain([
+                Stmt::Item(use_mod_stmt),
+                Stmt::Local(call_stmt),
+                Stmt::Local(fn_data_stmt),
+                Stmt::Expr(Expr::MethodCall(fn_handle_stmt), None),
+            ])
+            .collect(),
     };
     return result;
 }

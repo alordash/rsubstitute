@@ -31,7 +31,7 @@ pub(crate) fn normalize_associated_items_in_fn_syntax(
     associated_items_renamer.visit_generics_mut(&mut fn_syntax.merged_generics);
     associated_items_renamer.visit_field_mut(&mut fn_syntax.generics_field);
     for argument in fn_syntax.arguments.iter_mut() {
-        associated_items_renamer.visit_type_mut(&mut argument.source_pat_type.ty);
+        associated_items_renamer.visit_type_mut(&mut argument.ident_pat_type.ty);
         associated_items_renamer.visit_type_mut(&mut argument.ptr_style_type);
         associated_items_renamer.visit_type_mut(&mut argument.ref_style_type);
         associated_items_renamer.visit_type_mut(&mut argument.generic_arg_style_type);

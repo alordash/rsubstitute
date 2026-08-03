@@ -1,4 +1,4 @@
-use crate::common::rsubstitute_lifetime;
+use crate::common::*;
 use crate::preparation::r#fn::models::*;
 use crate::preparation::r#fn::*;
 use crate::syntax::*;
@@ -7,8 +7,13 @@ use syn::spanned::Spanned;
 use syn::*;
 
 pub(crate) fn new((number, source_pat_type): (usize, PatType)) -> Argument {
-    let ident = prepare_ident(number, &source_pat_type);
-    let ident_pat_type = common::replace_arg_pat_with_ident(source_pat_type.clone(), ident.clone());
+    let mut pat_ty = source_pat_type.clone();
+    let impl_trait_replacement_result =
+        normalization::replace_impl_trait_with_box_dyn_trait(*pat_ty.ty);
+    *pat_ty.ty = impl_trait_replacement_result.ty;
+    let is_impl_trait = impl_trait_replacement_result.is_impl_trait;
+    let ident = prepare_ident(number, &pat_ty);
+    let ident_pat_type = common::replace_arg_pat_with_ident(pat_ty.clone(), ident.clone());
 
     let ptr_style_type = r#type::replace_references_with_pointers(ident_pat_type.ty.clone());
 
@@ -29,11 +34,13 @@ pub(crate) fn new((number, source_pat_type): (usize, PatType)) -> Argument {
 
     let result = Argument {
         source_pat_type,
+        ident_pat_type,
         ident,
         ptr_style_type,
         ref_style_type,
         generic_arg_style_type,
         control_fn_arg,
+        is_impl_trait,
     };
     return result;
 }

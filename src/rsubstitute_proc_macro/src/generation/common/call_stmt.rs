@@ -2,13 +2,15 @@ use crate::common::*;
 use crate::generation::fn_info::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
+use syn::spanned::Spanned;
 use syn::*;
 
-pub(crate) fn new(
-    span: Span,
-    fn_info: &FnInfo,
-    maybe_mod_ident: Option<Ident>,
-) -> (ExprPath, Local) {
+pub(crate) struct Result {
+    pub impl_trait_cast_stmts: Vec<Local>,
+    pub call_var_path: ExprPath,
+    pub call_stmt: Local,
+}
+pub(crate) fn new(span: Span, fn_info: &FnInfo, maybe_mod_ident: Option<Ident>) -> Result {
     let fn_data_var_path = expr::path::new(span, ["call"]);
     let call_struct_path = maybe_mod_ident.map_or_else(
         || fn_info.call_struct.path.clone(),
@@ -24,6 +26,37 @@ pub(crate) fn new(
             return result;
         },
     );
+    let impl_trait_cast_stmts: Vec<_> = fn_info
+        .arguments
+        .iter()
+        .filter_map(|x| {
+            if x.is_impl_trait {
+                let span = x.source_pat_type.span();
+                Some(Local {
+                    attrs: Vec::new(),
+                    let_token: Token![let](span),
+                    modifiers: LocalModifiers::default(),
+                    pat: Pat::Type(x.ident_pat_type.clone()),
+                    init: Some(LocalInit {
+                        eq_token: Token![=](span),
+                        expr: Box::new(Expr::Call(expr::call::new(
+                            span,
+                            Expr::Path(expr::path::new(span, ["Box", "new"])),
+                            [Expr::Path(ExprPath {
+                                attrs: Vec::new(),
+                                qself: None,
+                                path: path::from_ident(x.ident.clone()),
+                            })],
+                        ))),
+                        diverge: None,
+                    }),
+                    semi_token: Token![;](span),
+                })
+            } else {
+                None
+            }
+        })
+        .collect();
     let fn_data_stmt = Local {
         attrs: Vec::new(),
         let_token: Token![let](span),
@@ -56,5 +89,10 @@ pub(crate) fn new(
         }),
         semi_token: Token![;](span),
     };
-    return (fn_data_var_path, fn_data_stmt);
+    let result = Result {
+        impl_trait_cast_stmts,
+        call_var_path: fn_data_var_path,
+        call_stmt: fn_data_stmt,
+    };
+    return result;
 }

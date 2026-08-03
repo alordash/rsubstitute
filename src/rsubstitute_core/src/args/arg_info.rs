@@ -5,7 +5,11 @@ pub struct ArgInfo {
 }
 
 impl ArgInfo {
-    pub fn new<T>(arg_name: &'static str, _arg_value: &T, arg_debug_string: String) -> Self {
+    pub fn new<T: ?Sized>(
+        arg_name: &'static str,
+        _arg_value: &T,
+        arg_debug_string: String,
+    ) -> Self {
         let arg_type_name = std::any::type_name::<T>();
         return Self {
             arg_name,
