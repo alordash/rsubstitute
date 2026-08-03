@@ -9,18 +9,23 @@ trait Dummy {
 }
 
 #[mock]
-fn f(dummy: impl Dummy) -> i32 {
+fn input(dummy: impl Dummy) -> i32 {
     dummy.work()
 }
 
 #[mock]
+fn output() -> impl Dummy {
+    unreachable!()
+}
+
+#[mock]
 trait Trait {
-    fn work(&self, dummy: impl Dummy) -> i32 {
-        dummy.work()
+    fn input(&self, dummy: impl Dummy) -> i32 {
+        unreachable!()
     }
 
-    fn static_work(dummy: impl Dummy) -> i32 {
-        dummy.work()
+    fn static_input(dummy: impl Dummy) -> i32 {
+        unreachable!()
     }
 }
 
@@ -35,23 +40,31 @@ impl Struct {
 
 #[mock]
 impl Struct {
-    pub fn work_self(&self, dummy: impl Dummy) -> i32 {
-        dummy.work()
+    pub fn input_self(&self, dummy: impl Dummy) -> i32 {
+        unreachable!()
     }
 
-    pub fn static_work_self(dummy: impl Dummy) -> i32 {
-        dummy.work()
+    pub fn static_input_self(dummy: impl Dummy) -> i32 {
+        unreachable!()
+    }
+
+    pub fn output_self(&self) -> impl Dummy {
+        unreachable!()
+    }
+
+    pub fn static_output_self() -> impl Dummy {
+        unreachable!()
     }
 }
 
 #[mock]
 impl Trait for Struct {
-    fn work(&self, dummy: impl Dummy) -> i32 {
-        dummy.work()
+    fn input(&self, dummy: impl Dummy) -> i32 {
+        unreachable!()
     }
 
-    fn static_work(dummy: impl Dummy) -> i32 {
-        dummy.work()
+    fn static_input(dummy: impl Dummy) -> i32 {
+        unreachable!()
     }
 }
 
@@ -65,23 +78,23 @@ mod tests {
     mod fn_tests {
         use super::*;
         #[test]
-        fn f_Ok() {
+        fn input_Ok() {
             // Arrange
             let mut dummy = DummyMock::new();
             dummy.setup().work().call_base();
 
-            f::setup(Arg::Any).returns(ACTUAL_VALUE);
+            input::setup(Arg::Any).returns(ACTUAL_VALUE);
 
             // Act
-            let result = f(dummy);
+            let result = input(dummy);
 
             // Assert
             assert_eq!(ACTUAL_VALUE, result);
-            f::received(Arg::Any, Times::Any).no_other_calls();
+            input::received(Arg::Any, Times::Any).no_other_calls();
         }
 
         #[test]
-        fn f_ArgPredicate_Ok() {
+        fn input_ArgPredicate_Ok() {
             // Arrange
             let dummy1_value = 1;
             let mut dummy1 = DummyMock::new();
@@ -93,20 +106,20 @@ mod tests {
 
             let mocked_dummy1_value = 10;
             let mocked_dummy2_value = 20;
-            f::setup(Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy1_value))
+            input::setup(Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy1_value))
                 .returns(mocked_dummy1_value)
                 .setup(Arg::Any)
                 .returns(mocked_dummy2_value);
 
             // Act
-            let result1 = f(dummy1);
-            let result2 = f(dummy2);
+            let result1 = input(dummy1);
+            let result2 = input(dummy2);
 
             // Assert
             assert_eq!(mocked_dummy1_value, result1);
             assert_eq!(mocked_dummy2_value, result2);
 
-            f::received(
+            input::received(
                 Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy1_value),
                 Times::Once,
             )
@@ -116,30 +129,47 @@ mod tests {
             )
             .no_other_calls();
         }
+
+        #[test]
+        fn output_Ok() {
+            // Arrange
+            let mut dummy = DummyMock::new();
+            dummy.setup().work().returns(ACTUAL_VALUE);
+
+            output::setup().returns(Box::new(dummy));
+
+            // Act
+            let result = output();
+            let result_value = result.work();
+
+            // Assert
+            assert_eq!(ACTUAL_VALUE, result_value);
+            output::received(Times::Once).no_other_calls();
+        }
     }
 
     mod trait_tests {
         use super::*;
 
         #[test]
-        fn trait_work_Ok() {
+        fn trait_input_Ok() {
             // Arrange
             let mut dummy = DummyMock::new();
             dummy.setup().work().call_base();
 
             let mut mock = TraitMock::new();
-            mock.setup().work(Arg::Any).returns(ACTUAL_VALUE);
+            mock.setup().input(Arg::Any).returns(ACTUAL_VALUE);
 
             // Act
-            let result = mock.work(dummy);
+            let result = mock.input(dummy);
 
             // Assert
             assert_eq!(ACTUAL_VALUE, result);
-            mock.received().work(Arg::Any, Times::Any).no_other_calls();
+            mock.received().input(Arg::Any, Times::Any).no_other_calls();
         }
 
         #[test]
-        fn trait_work_ArgPredicate_Ok() {
+        fn trait_input_ArgPredicate_Ok() {
             // Arrange
             let dummy1_value = 1;
             let mut dummy1 = DummyMock::new();
@@ -153,25 +183,25 @@ mod tests {
             let mocked_dummy2_value = 20;
             let mut mock = TraitMock::new();
             mock.setup()
-                .work(Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy1_value))
+                .input(Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy1_value))
                 .returns(mocked_dummy1_value)
-                .work(Arg::Any)
+                .input(Arg::Any)
                 .returns(mocked_dummy2_value);
 
             // Act
-            let result1 = mock.work(dummy1);
-            let result2 = mock.work(dummy2);
+            let result1 = mock.input(dummy1);
+            let result2 = mock.input(dummy2);
 
             // Assert
             assert_eq!(mocked_dummy1_value, result1);
             assert_eq!(mocked_dummy2_value, result2);
 
             mock.received()
-                .work(
+                .input(
                     Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy1_value),
                     Times::Once,
                 )
-                .work(
+                .input(
                     Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy2_value),
                     Times::Once,
                 )
@@ -179,27 +209,27 @@ mod tests {
         }
 
         #[test]
-        fn trait_static_work_Ok() {
+        fn trait_static_input_Ok() {
             // Arrange
             let mut dummy = DummyMock::new();
             dummy.setup().work().call_base();
 
             TraitMock::static_setup()
-                .static_work(Arg::Any)
+                .static_input(Arg::Any)
                 .returns(ACTUAL_VALUE);
 
             // Act
-            let result = TraitMock::static_work(dummy);
+            let result = TraitMock::static_input(dummy);
 
             // Assert
             assert_eq!(ACTUAL_VALUE, result);
             TraitMock::static_received()
-                .static_work(Arg::Any, Times::Any)
+                .static_input(Arg::Any, Times::Any)
                 .no_other_calls();
         }
 
         #[test]
-        fn trait_static_work_ArgPredicate_Ok() {
+        fn trait_static_input_ArgPredicate_Ok() {
             // Arrange
             let dummy1_value = 1;
             let mut dummy1 = DummyMock::new();
@@ -212,25 +242,25 @@ mod tests {
             let mocked_dummy1_value = 10;
             let mocked_dummy2_value = 20;
             TraitMock::static_setup()
-                .static_work(Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy1_value))
+                .static_input(Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy1_value))
                 .returns(mocked_dummy1_value)
-                .static_work(Arg::Any)
+                .static_input(Arg::Any)
                 .returns(mocked_dummy2_value);
 
             // Act
-            let result1 = TraitMock::static_work(dummy1);
-            let result2 = TraitMock::static_work(dummy2);
+            let result1 = TraitMock::static_input(dummy1);
+            let result2 = TraitMock::static_input(dummy2);
 
             // Assert
             assert_eq!(mocked_dummy1_value, result1);
             assert_eq!(mocked_dummy2_value, result2);
 
             TraitMock::static_received()
-                .static_work(
+                .static_input(
                     Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy1_value),
                     Times::Once,
                 )
-                .static_work(
+                .static_input(
                     Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy2_value),
                     Times::Once,
                 )
@@ -242,26 +272,26 @@ mod tests {
         use super::*;
 
         #[test]
-        fn struct_work_self_Ok() {
+        fn struct_input_self_Ok() {
             // Arrange
             let mut dummy = DummyMock::new();
             dummy.setup().work().call_base();
 
             let mut mock = Struct::new();
-            mock.setup().work_self(Arg::Any).returns(ACTUAL_VALUE);
+            mock.setup().input_self(Arg::Any).returns(ACTUAL_VALUE);
 
             // Act
-            let result = mock.work_self(dummy);
+            let result = mock.input_self(dummy);
 
             // Assert
             assert_eq!(ACTUAL_VALUE, result);
             mock.received()
-                .work_self(Arg::Any, Times::Any)
+                .input_self(Arg::Any, Times::Any)
                 .no_other_calls();
         }
 
         #[test]
-        fn struct_work_self_ArgPredicate_Ok() {
+        fn struct_input_self_ArgPredicate_Ok() {
             // Arrange
             let dummy1_value = 1;
             let mut dummy1 = DummyMock::new();
@@ -275,25 +305,25 @@ mod tests {
             let mocked_dummy2_value = 20;
             let mut mock = Struct::new();
             mock.setup()
-                .work_self(Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy1_value))
+                .input_self(Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy1_value))
                 .returns(mocked_dummy1_value)
-                .work_self(Arg::Any)
+                .input_self(Arg::Any)
                 .returns(mocked_dummy2_value);
 
             // Act
-            let result1 = mock.work_self(dummy1);
-            let result2 = mock.work_self(dummy2);
+            let result1 = mock.input_self(dummy1);
+            let result2 = mock.input_self(dummy2);
 
             // Assert
             assert_eq!(mocked_dummy1_value, result1);
             assert_eq!(mocked_dummy2_value, result2);
 
             mock.received()
-                .work_self(
+                .input_self(
                     Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy1_value),
                     Times::Once,
                 )
-                .work_self(
+                .input_self(
                     Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy2_value),
                     Times::Once,
                 )
@@ -301,27 +331,27 @@ mod tests {
         }
 
         #[test]
-        fn struct_static_work_self_Ok() {
+        fn struct_static_input_self_Ok() {
             // Arrange
             let mut dummy = DummyMock::new();
             dummy.setup().work().call_base();
 
             Struct::static_setup()
-                .static_work_self(Arg::Any)
+                .static_input_self(Arg::Any)
                 .returns(ACTUAL_VALUE);
 
             // Act
-            let result = Struct::static_work_self(dummy);
+            let result = Struct::static_input_self(dummy);
 
             // Assert
             assert_eq!(ACTUAL_VALUE, result);
             Struct::static_received()
-                .static_work_self(Arg::Any, Times::Any)
+                .static_input_self(Arg::Any, Times::Any)
                 .no_other_calls();
         }
 
         #[test]
-        fn struct_static_work_self_ArgPredicate_Ok() {
+        fn struct_static_input_self_ArgPredicate_Ok() {
             // Arrange
             let dummy1_value = 1;
             let mut dummy1 = DummyMock::new();
@@ -334,25 +364,25 @@ mod tests {
             let mocked_dummy1_value = 10;
             let mocked_dummy2_value = 20;
             Struct::static_setup()
-                .static_work_self(Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy1_value))
+                .static_input_self(Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy1_value))
                 .returns(mocked_dummy1_value)
-                .static_work_self(Arg::Any)
+                .static_input_self(Arg::Any)
                 .returns(mocked_dummy2_value);
 
             // Act
-            let result1 = Struct::static_work_self(dummy1);
-            let result2 = Struct::static_work_self(dummy2);
+            let result1 = Struct::static_input_self(dummy1);
+            let result2 = Struct::static_input_self(dummy2);
 
             // Assert
             assert_eq!(mocked_dummy1_value, result1);
             assert_eq!(mocked_dummy2_value, result2);
 
             Struct::static_received()
-                .static_work_self(
+                .static_input_self(
                     Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy1_value),
                     Times::Once,
                 )
-                .static_work_self(
+                .static_input_self(
                     Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy2_value),
                     Times::Once,
                 )
@@ -360,27 +390,30 @@ mod tests {
         }
 
         #[test]
-        fn struct_as_trait_work_Ok() {
+        fn struct_as_trait_input_Ok() {
             // Arrange
             let mut dummy = DummyMock::new();
             dummy.setup().work().call_base();
 
             let mut mock = Struct::new();
-            mock.setup().as_Trait().work(Arg::Any).returns(ACTUAL_VALUE);
+            mock.setup()
+                .as_Trait()
+                .input(Arg::Any)
+                .returns(ACTUAL_VALUE);
 
             // Act
-            let result = mock.work(dummy);
+            let result = mock.input(dummy);
 
             // Assert
             assert_eq!(ACTUAL_VALUE, result);
             mock.received()
                 .as_Trait()
-                .work(Arg::Any, Times::Any)
+                .input(Arg::Any, Times::Any)
                 .no_other_calls();
         }
 
         #[test]
-        fn struct_as_trait_work_ArgPredicate_Ok() {
+        fn struct_as_trait_input_ArgPredicate_Ok() {
             // Arrange
             let dummy1_value = 1;
             let mut dummy1 = DummyMock::new();
@@ -395,14 +428,14 @@ mod tests {
             let mut mock = Struct::new();
             mock.setup()
                 .as_Trait()
-                .work(Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy1_value))
+                .input(Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy1_value))
                 .returns(mocked_dummy1_value)
-                .work(Arg::Any)
+                .input(Arg::Any)
                 .returns(mocked_dummy2_value);
 
             // Act
-            let result1 = mock.work(dummy1);
-            let result2 = mock.work(dummy2);
+            let result1 = mock.input(dummy1);
+            let result2 = mock.input(dummy2);
 
             // Assert
             assert_eq!(mocked_dummy1_value, result1);
@@ -410,11 +443,11 @@ mod tests {
 
             mock.received()
                 .as_Trait()
-                .work(
+                .input(
                     Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy1_value),
                     Times::Once,
                 )
-                .work(
+                .input(
                     Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy2_value),
                     Times::Once,
                 )
@@ -422,29 +455,29 @@ mod tests {
         }
 
         #[test]
-        fn struct_static_as_trait_work_Ok() {
+        fn struct_static_as_trait_input_Ok() {
             // Arrange
             let mut dummy = DummyMock::new();
             dummy.setup().work().call_base();
 
             Struct::static_setup()
                 .as_Trait()
-                .static_work(Arg::Any)
+                .static_input(Arg::Any)
                 .returns(ACTUAL_VALUE);
 
             // Act
-            let result = Struct::static_work(dummy);
+            let result = Struct::static_input(dummy);
 
             // Assert
             assert_eq!(ACTUAL_VALUE, result);
             Struct::static_received()
                 .as_Trait()
-                .static_work(Arg::Any, Times::Any)
+                .static_input(Arg::Any, Times::Any)
                 .no_other_calls();
         }
 
         #[test]
-        fn struct_static_as_trait_work_ArgPredicate_Ok() {
+        fn struct_static_as_trait_input_ArgPredicate_Ok() {
             // Arrange
             let dummy1_value = 1;
             let mut dummy1 = DummyMock::new();
@@ -458,14 +491,14 @@ mod tests {
             let mocked_dummy2_value = 20;
             Struct::static_setup()
                 .as_Trait()
-                .static_work(Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy1_value))
+                .static_input(Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy1_value))
                 .returns(mocked_dummy1_value)
-                .static_work(Arg::Any)
+                .static_input(Arg::Any)
                 .returns(mocked_dummy2_value);
 
             // Act
-            let result1 = Struct::static_work(dummy1);
-            let result2 = Struct::static_work(dummy2);
+            let result1 = Struct::static_input(dummy1);
+            let result2 = Struct::static_input(dummy2);
 
             // Assert
             assert_eq!(mocked_dummy1_value, result1);
@@ -473,14 +506,55 @@ mod tests {
 
             Struct::static_received()
                 .as_Trait()
-                .static_work(
+                .static_input(
                     Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy1_value),
                     Times::Once,
                 )
-                .static_work(
+                .static_input(
                     Arg::is(|p: &Box<dyn Dummy>| p.work() == dummy2_value),
                     Times::Once,
                 )
+                .no_other_calls();
+        }
+
+        #[test]
+        fn struct_output_self_Ok() {
+            // Arrange
+            let mut dummy = DummyMock::new();
+            dummy.setup().work().returns(ACTUAL_VALUE);
+
+            let mut mock = Struct::new();
+            mock.setup().output_self().returns(Box::new(dummy));
+            // output::setup().returns(Box::new(dummy));
+
+            // Act
+            let result = mock.output_self();
+            let result_value = result.work();
+
+            // Assert
+            assert_eq!(ACTUAL_VALUE, result_value);
+            mock.received().output_self(Times::Once).no_other_calls();
+        }
+
+        #[test]
+        fn struct_static_output_self_Ok() {
+            // Arrange
+            let mut dummy = DummyMock::new();
+            dummy.setup().work().returns(ACTUAL_VALUE);
+
+            Struct::static_setup()
+                .static_output_self()
+                .returns(Box::new(dummy));
+            // output::setup().returns(Box::new(dummy));
+
+            // Act
+            let result = Struct::static_output_self();
+            let result_value = result.work();
+
+            // Assert
+            assert_eq!(ACTUAL_VALUE, result_value);
+            Struct::static_received()
+                .static_output_self(Times::Once)
                 .no_other_calls();
         }
     }

@@ -43,15 +43,20 @@ pub(crate) fn prepare(
         Some(arguments.iter_generics_style_types().collect()),
     );
     let arg_refs_tuple = generate_arg_refs_tuple(spans.inputs, &arguments);
-    let return_type = match &signature.output {
+    let return_type = match &mut signature.output {
         ReturnType::Default => ReturnType::Default,
-        ReturnType::Type(arrow_token, ty) => ReturnType::Type(
-            arrow_token.clone(),
-            r#type::replace_anonymous_lifetimes_in_references(
-                ty.clone(),
-                &rsubstitute_lifetime::new(spans.inputs),
-            ),
-        ),
+        ReturnType::Type(arrow_token, ty) => {
+            let replace_impl_trait_result = normalization::replace_impl_trait_with_box_dyn_trait(
+                r#type::replace_anonymous_lifetimes_in_references(
+                    *ty.clone(),
+                    &rsubstitute_lifetime::new(spans.inputs),
+                ),
+            );
+            if replace_impl_trait_result.is_impl_trait {
+                *ty = Box::new(replace_impl_trait_result.ty.clone());
+            }
+            ReturnType::Type(arrow_token.clone(), Box::new(replace_impl_trait_result.ty))
+        }
     };
     signature = r#fn::common::replace_arg_pats_with_idents(signature, &arguments);
     let result = FnSyntax {
