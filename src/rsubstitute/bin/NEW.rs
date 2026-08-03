@@ -7,6 +7,7 @@ use rsubstitute_core::args::Arg;
 #[allow(unused_imports)]
 use rsubstitute_proc_macro::mock;
 use std::ops::Deref;
+use rsubstitute_core::Times;
 
 fn _f(t: impl Trait) {
     t.flex();
@@ -50,14 +51,14 @@ mod f {
     pub fn received<'__rsa>(
         t: impl Into<Arg<Box<dyn Trait>>> + '__rsa,
         times: Times,
-    ) -> ::rsubstitute::for_generated::ArgRefsBinder<fStaticReceived, (&'__rsa dyn Trait,)> {
+    ) -> ::rsubstitute::for_generated::ArgRefsBinder<fStaticReceived, (&'__rsa Box<dyn Trait>,)> {
         fStaticReceived {
             generics: ::core::marker::PhantomData,
         }
         .received(t, times)
     }
     pub struct f_Call {
-        pub generics: ::core::marker::PhantomData<(dyn Trait,)>,
+        pub generics: ::core::marker::PhantomData<(Box<dyn Trait>,)>,
         pub(super) t: Box<dyn Trait>,
     }
     impl IGenericsInfoProvider for f_Call {
@@ -81,7 +82,7 @@ mod f {
         }
     }
     struct f_ArgsChecker {
-        pub generics: ::core::marker::PhantomData<(dyn Trait,)>,
+        pub generics: ::core::marker::PhantomData<(Box<dyn Trait>,)>,
         t: Arg<Box<dyn Trait>>,
     }
     impl IGenericsInfoProvider for f_ArgsChecker {
@@ -109,17 +110,17 @@ mod f {
                 "{}",
                 (&ArgPrinter(::rsubstitute::transmute_lifetime!(
                     &&self.t,
-                    &&Arg<dyn Trait>
+                    &&Arg<Box<dyn Trait>>
                 )))
                     .debug_string()
             )
         }
     }
     pub struct fMock {
-        pub generics: ::core::marker::PhantomData<(dyn Trait,)>,
+        pub generics: ::core::marker::PhantomData<(Box<dyn Trait>,)>,
     }
     pub struct fStaticSetup {
-        pub generics: ::core::marker::PhantomData<(dyn Trait,)>,
+        pub generics: ::core::marker::PhantomData<(Box<dyn Trait>,)>,
     }
     impl fStaticSetup {
         pub fn setup<'__rsa>(
@@ -146,7 +147,7 @@ mod f {
                 '_,
                 fMock,
                 Self,
-                (&'__rsa dyn Trait,),
+                (&'__rsa Box<dyn Trait>,),
                 (),
                 fMock,
                 false,
@@ -157,7 +158,7 @@ mod f {
         }
     }
     pub struct fStaticReceived {
-        pub generics: ::core::marker::PhantomData<(dyn Trait,)>,
+        pub generics: ::core::marker::PhantomData<(Box<dyn Trait>,)>,
     }
     impl ::core::clone::Clone for fStaticReceived {
         #[inline]
@@ -172,7 +173,7 @@ mod f {
             &self,
             t: impl Into<Arg<Box<dyn Trait>>>,
             times: Times,
-        ) -> ::rsubstitute::for_generated::ArgRefsBinder<Self, (&'__rsa dyn Trait,)> {
+        ) -> ::rsubstitute::for_generated::ArgRefsBinder<Self, (&'__rsa Box<dyn Trait>,)> {
             let args_checker = f_ArgsChecker {
                 generics: ::core::marker::PhantomData,
                 t: ::rsubstitute::transmute_lifetime!(t.into()),
@@ -193,7 +194,7 @@ trait Trait {
     fn v(&self) -> i32;
 }
 
-#[derive(Clone)]
+#[derive(Clone, Debug)]
 struct Struct(i32);
 impl Trait for Struct {
     fn flex(&self) {
@@ -216,6 +217,7 @@ fn main() {
         a.0.flex();
     });
     f(s);
+    f::received(Arg::Any, Times::Never);
 
     println!("Done");
 }
