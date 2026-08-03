@@ -99,7 +99,7 @@ fn generate_arg_info_new_expr(argument: &Argument) -> Expr {
     });
 
     let arg_debug_string_argument =
-        arg_printer_expr::new(span, arg_field_expr, *argument.source_pat_type.ty.clone());
+        arg_printer_expr::new(span, arg_field_expr, *argument.ident_pat_type.ty.clone());
 
     let result = Expr::Call(expr::call::new(
         span,

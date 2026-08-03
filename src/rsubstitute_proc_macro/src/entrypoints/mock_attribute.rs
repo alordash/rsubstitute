@@ -32,7 +32,7 @@ pub(crate) fn handle(
     };
 
     let MockMod {
-        source_item: source_item,
+        source_item,
         maybe_usage,
         item_mod,
     } = mock_mod;

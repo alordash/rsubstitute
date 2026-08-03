@@ -115,7 +115,7 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
     let vec_stmt_exprs: Punctuated<Expr, Token![,]> = arguments
         .iter()
         .map(|argument| {
-            let span = argument.source_pat_type.span();
+            let span = argument.ident_pat_type.span();
             let call_field = Expr::Field(expr::field::new(
                 Expr::Path(ExprPath {
                     attrs: Vec::new(),
@@ -124,7 +124,7 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
                 }),
                 argument.ident.clone(),
             ));
-            let arg_check_fn_name = get_matching_arg_check_fn_name(&argument.source_pat_type.ty);
+            let arg_check_fn_name = get_matching_arg_check_fn_name(&argument.ident_pat_type.ty);
             let result = expr::method_call::new(
                 span,
                 Expr::Macro(transmute_lifetime_expr::new_with_target(
@@ -141,7 +141,7 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
                         mutability: None,
                         elem: Box::new(Type::Path(arg_type::of(
                             span,
-                            *argument.source_pat_type.ty.clone(),
+                            *argument.ident_pat_type.ty.clone(),
                         ))),
                     }),
                 )),
@@ -159,7 +159,7 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
                             expr: Box::new(call_field.clone()),
                         },
                     ))),
-                    arg_printer_expr::new(span, call_field, *argument.source_pat_type.ty.clone()),
+                    arg_printer_expr::new(span, call_field, *argument.ident_pat_type.ty.clone()),
                 ],
             );
             return Expr::MethodCall(result);
@@ -226,7 +226,7 @@ fn generate_fn_fmt_args(span: Span, arguments: &[Argument]) -> ImplItemFn {
                 mutability: None,
                 elem: Box::new(Type::Path(arg_type::of(
                     span,
-                    *argument.source_pat_type.ty.clone(),
+                    *argument.ident_pat_type.ty.clone(),
                 ))),
             }),
         )
