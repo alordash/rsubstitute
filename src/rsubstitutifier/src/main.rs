@@ -1,4 +1,5 @@
 use clap::Parser;
+use std::collections::HashSet;
 use std::fs;
 use std::path::{Path, PathBuf};
 use walkdir::WalkDir;
@@ -24,11 +25,12 @@ fn main() -> Result<(), Box<dyn core::error::Error>> {
     );
 
     let mut processed_files_count = 0;
+    let mut valid_structs = HashSet::new();
     for maybe_dir_entry in WalkDir::new(args.source_code_dir_path) {
         let dir_entry = maybe_dir_entry?;
         let path = dir_entry.path();
         if path.extension().is_some_and(|s| s == "rs") {
-            process_file(path)?;
+            process_file(path, &mut valid_structs)?;
             processed_files_count += 1;
         }
     }
@@ -37,11 +39,14 @@ fn main() -> Result<(), Box<dyn core::error::Error>> {
     Ok(())
 }
 
-fn process_file(path: &Path) -> Result<(), Box<dyn core::error::Error>> {
+fn process_file(
+    path: &Path,
+    valid_structs: &mut HashSet<String>,
+) -> Result<(), Box<dyn core::error::Error>> {
     let src = fs::read_to_string(path)?;
     let mut file: syn::File = syn::parse_file(&src)?;
 
-    rewriter::rewrite(&mut file);
+    rewriter::rewrite(&mut file, valid_structs);
     let formatted = prettyplease::unparse(&file);
     fs::write(path, formatted)?;
 

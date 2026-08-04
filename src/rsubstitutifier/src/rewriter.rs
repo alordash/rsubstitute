@@ -1,21 +1,26 @@
 use crate::mock_attribute;
+use quote::ToTokens;
+use std::collections::HashSet;
 use syn::spanned::Spanned;
 use syn::visit_mut::VisitMut;
 use syn::*;
 
-pub fn rewrite(file: &mut File) {
-    Rewriter.visit_file_mut(file)
+pub fn rewrite(file: &mut File, valid_structs: &mut HashSet<String>) {
+    let mut rewriter = Rewriter { valid_structs };
+    rewriter.visit_file_mut(file)
 }
 
-struct Rewriter;
+struct Rewriter<'a> {
+    pub valid_structs: &'a mut HashSet<String>,
+}
 
-impl VisitMut for Rewriter {
+impl<'a> VisitMut for Rewriter<'a> {
     fn visit_item_fn_mut(&mut self, i: &mut ItemFn) {
         i.attrs.insert(0, mock_attribute::new_base(i.span()));
     }
 
     fn visit_item_impl_mut(&mut self, i: &mut ItemImpl) {
-        if !is_ok_impl(i) {
+        if !is_ok_impl(i, &self.valid_structs) {
             return;
         }
 
@@ -28,6 +33,8 @@ impl VisitMut for Rewriter {
         }
 
         i.attrs.insert(0, mock_attribute::new(i.span()));
+        let struct_name = i.ident.to_token_stream().to_token_stream().to_string();
+        self.valid_structs.insert(struct_name);
     }
 
     fn visit_item_trait_mut(&mut self, i: &mut ItemTrait) {
@@ -35,9 +42,18 @@ impl VisitMut for Rewriter {
     }
 }
 
-fn is_ok_impl(item_impl: &ItemImpl) -> bool {
+fn is_ok_impl(item_impl: &ItemImpl, valid_structs: &HashSet<String>) -> bool {
     match item_impl.self_ty.as_ref() {
-        Type::Path(_) => {}
+        Type::Path(p) => {
+            let maybe_struct_name = p
+                .path
+                .segments
+                .last()
+                .map(|x| x.ident.to_token_stream().to_string());
+            if !maybe_struct_name.is_some_and(|struct_name| valid_structs.contains(&struct_name)) {
+                return false;
+            }
+        }
         _ => return false,
     }
 
