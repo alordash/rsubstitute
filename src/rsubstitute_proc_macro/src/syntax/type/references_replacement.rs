@@ -19,7 +19,7 @@ struct AnonymousLifetimeReplacer<'a> {
 
 impl<'a> VisitMut for AnonymousLifetimeReplacer<'a> {
     fn visit_type_reference_mut(&mut self, i: &mut TypeReference) {
-        if i.lifetime.is_none() {
+        if i.lifetime.is_none() || i.lifetime.as_ref().is_some_and(|x| x.ident == "_") {
             i.lifetime = Some(self.replacement.clone());
         }
         visit_mut::visit_type_reference_mut(self, i);
@@ -71,7 +71,8 @@ impl VisitMut for AnonymousReferenceToPointerConverter {
             visit_mut::visit_type_mut(self, i);
             return;
         };
-        if i_ref.lifetime.is_some() {
+
+        if i_ref.lifetime.as_ref().is_some_and(|x| x.ident != "_") {
             visit_mut::visit_type_mut(self, i);
             return;
         }

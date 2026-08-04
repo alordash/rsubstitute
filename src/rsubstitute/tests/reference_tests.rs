@@ -14,7 +14,7 @@ pub struct Data<'a, 'b, T1, T2> {
 #[mock]
 #[allow(unused)]
 trait Trait<'a, 'b: 'a, T1: Clone> {
-    fn worko<'c, 'd: 'a, T2: Clone>(
+    fn work<'c, 'd: 'a, T2: Clone>(
         &self,
         a: &'a i32,
         b: &'b i32,
@@ -126,7 +126,7 @@ impl<'a, 'b: 'a, T1: Clone> Struct<'a, 'b, T1> {
 #[mock(base)]
 #[allow(unused)]
 impl<'a, 'b: 'a, T1: Clone> Trait<'a, 'b, T1> for Struct<'a, 'b, T1> {
-    fn worko<'c, 'd: 'a, T2: Clone>(
+    fn work<'c, 'd: 'a, T2: Clone>(
         &self,
         a: &'a i32,
         b: &'b i32,
@@ -217,7 +217,7 @@ mod tests {
                                                 let xaxbxcxdx_t2_ref = &&&&&&&&&true;
                                                 let xapx = &&(&(&188) as *const _);
                                                 mock.setup()
-                                                    .worko(
+                                                    .work(
                                                         a,
                                                         b,
                                                         c,
@@ -240,7 +240,7 @@ mod tests {
                                                     .returns(return_value);
 
                                                 // Act
-                                                let actual_return_value = mock.worko(
+                                                let actual_return_value = mock.work(
                                                     a,
                                                     b,
                                                     c,
@@ -265,7 +265,7 @@ mod tests {
                                                 assert_eq!(return_value, actual_return_value);
 
                                                 mock.received()
-                                                    .worko(
+                                                    .work(
                                                         a,
                                                         b,
                                                         c,
@@ -472,7 +472,7 @@ mod tests {
                                                     .returns(return_value);
                                                 mock.setup()
                                                     .as_Trait()
-                                                    .worko(
+                                                    .work(
                                                         a,
                                                         b,
                                                         c,
@@ -496,31 +496,33 @@ mod tests {
 
                                                 // Act
                                                 use Trait;
-                                                let actual_return_value = mock.worko(
-                                                    a,
-                                                    b,
-                                                    c,
-                                                    d,
-                                                    axb,
-                                                    cxd,
-                                                    abxbax,
-                                                    cdxdcx,
-                                                    abcd,
-                                                    xaxbxcxdx,
-                                                    data.clone(),
-                                                    t1,
-                                                    t1_ref,
-                                                    xaxbxcxdx_t1_ref,
-                                                    t2,
-                                                    t2_ref,
-                                                    xaxbxcxdx_t2_ref,
-                                                    xapx,
-                                                );
+                                                let actual_return_value =
+                                                    <Struct<_> as Trait<_>>::work(
+                                                        &mock,
+                                                        a,
+                                                        b,
+                                                        c,
+                                                        d,
+                                                        axb,
+                                                        cxd,
+                                                        abxbax,
+                                                        cdxdcx,
+                                                        abcd,
+                                                        xaxbxcxdx,
+                                                        data.clone(),
+                                                        t1,
+                                                        t1_ref,
+                                                        xaxbxcxdx_t1_ref,
+                                                        t2,
+                                                        t2_ref,
+                                                        xaxbxcxdx_t2_ref,
+                                                        xapx,
+                                                    );
 
                                                 // Assert
                                                 assert_eq!(return_value, actual_return_value);
 
-                                                mock.received().as_Trait().worko(
+                                                mock.received().as_Trait().work(
                                                     a,
                                                     b,
                                                     c,
