@@ -13,6 +13,7 @@ pub(crate) struct ImplTraitForStructInfo {
     pub trait_simple_generics: Generics,
     pub target_simple_generics: Generics,
     pub constants: Vec<Ordered<ImplItemConst>>,
+    pub types: Vec<Ordered<ImplItemType>>,
     pub static_fns: Vec<Ordered<FnInfo>>,
     pub associated_fns: Vec<Ordered<FnInfo>>,
 }

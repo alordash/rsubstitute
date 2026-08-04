@@ -61,6 +61,7 @@ pub(crate) fn prepare(
         trait_simple_generics: split_generics.trait_generics,
         target_simple_generics: split_generics.target_generics,
         constants: split_items.constants,
+        types: split_items.types,
         static_fns,
         associated_fns,
     };
@@ -70,6 +71,7 @@ pub(crate) fn prepare(
 #[derive(Default)]
 struct SplitItems {
     pub constants: Vec<Ordered<ImplItemConst>>,
+    pub types: Vec<Ordered<ImplItemType>>,
     pub static_fns: Vec<Ordered<ImplItemFn>>,
     pub associated_fns: Vec<Ordered<ImplItemFn>>,
 }
@@ -91,7 +93,7 @@ fn split_items(items: Vec<ImplItem>) -> SplitItems {
                         .push(Ordered::new(order_number, impl_item_fn))
                 }
             }
-            ImplItem::Type(_) => panic!("Inherent associated types are not supported"), // feature `inherent_associated_types`
+            ImplItem::Type(ty) => split_items.types.push(Ordered::new(order_number, ty)),
             ImplItem::Macro(_) => panic!("Macro invocations inside impl blocks are not supported"),
             _ => panic!(
                 "Unexpected impl item: {}",

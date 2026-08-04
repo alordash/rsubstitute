@@ -21,7 +21,7 @@ impl<T> Ordered<T> {
         }
     }
 
-    pub fn clone_map<U>(&self, mapping: impl FnOnce(&T) -> U) -> Ordered<U> {
+    pub fn ref_map<U>(&self, mapping: impl FnOnce(&T) -> U) -> Ordered<U> {
         Ordered {
             order_number: self.order_number,
             value: mapping(&self.value),

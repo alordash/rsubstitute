@@ -7,7 +7,7 @@ use rsubstitute::Mockable;
 use rsubstitute_proc_macro::mock;
 use std::ops::Deref;
 
-#[mock]
+#[rsubstitute::mock]
 fn f() -> impl Trait {
     Struct(123)
 }

@@ -190,6 +190,8 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
         source_span,
         mock_struct_impl::ParamsForTrait {
             mock_struct_path: impl_trait_for_struct_info.target_path.clone(),
+            constants: &impl_trait_for_struct_info.constants,
+            types: &impl_trait_for_struct_info.types,
             associated_fns: &impl_trait_for_struct_info.associated_fns,
             static_fns: &impl_trait_for_struct_info.static_fns,
             merged_generics: impl_trait_for_struct_info.merged_generics,

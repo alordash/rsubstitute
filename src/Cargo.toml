@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["rsubstitute", "rsubstitute_core", "rsubstitute_proc_macro", "wip_demos"]
+members = ["rsubstitute", "rsubstitute_core", "rsubstitute_proc_macro", "rsubstitutifier", "wip_demos"]
 
 [workspace.dependencies]
 rsubstitute_core = { version = "0.1.0", path = "rsubstitute_core" }
@@ -12,3 +12,7 @@ quote = "1.0.40"
 syn = { version = "3.0.3", features = ["full", "visit", "visit-mut"] }
 not_enough_asserts = "1.4.1"
 indexmap = "2.14.0"
+
+walkdir = "2.5.0"
+clap_derive = "4.6.4"
+clap = { version = "4.6.5", features = ["derive"] }

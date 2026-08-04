@@ -145,7 +145,7 @@ fn merge_generics_with_assoc_generics(
     assoc_constants: &[Ordered<TraitItemConstSyntax>],
 ) -> Generics {
     let assoc_types_as_generic_parameters = assoc_types.iter().map(|ordered| {
-        ordered.clone_map(|x| {
+        ordered.ref_map(|x| {
             let result = TypeParam {
                 attrs: Vec::new(),
                 ident: format_ident!("{}_{}", trait_ident, x.item.ident),
@@ -157,7 +157,7 @@ fn merge_generics_with_assoc_generics(
         })
     });
     let assoc_constants_as_generic_parameters = assoc_constants.iter().map(|ordered| {
-        ordered.clone_map(|x| {
+        ordered.ref_map(|x| {
             let const_ident = format_ident!("{}_{}", trait_ident, x.item.ident);
             let span = const_ident.span();
             let result = ConstParam {

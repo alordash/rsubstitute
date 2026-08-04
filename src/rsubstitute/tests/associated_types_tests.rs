@@ -12,7 +12,10 @@ fn f() {}
 trait Trait {
     const CONST: usize = 43;
 
-    type InputType<TAmogus: Clone>: Clone + Debug = i32;
+    type InputType<TAmogus: Clone>: Clone + Debug
+        = i32
+    where
+        TAmogus: Debug;
 
     type OutputType<TT>: Clone + Sized + Default
         = u8
@@ -44,6 +47,12 @@ impl Struct {
 
 #[mock(base)]
 impl Trait for Struct {
+    const CONST: usize = 4;
+    type InputType<TAmogus: Clone>
+        = [TAmogus; Self::CONST]
+    where
+        TAmogus: Debug;
+
     fn get_my_type<TT: Clone>(
         &self,
         input: <Self as Trait>::InputType<i32>,
@@ -135,10 +144,10 @@ mod tests {
         let mut mock = Struct::new();
 
         type FirstTT = u128;
-        let first_input: i32 = 10;
+        let first_input: [i32; 4] = [10, 11, 111, 12];
         let first_output: u8 = 3;
         type SecondTT = f64;
-        let second_input: i32 = 20;
+        let second_input: [i32; 4] = [20, 2, 3, 33];
         let second_output: u8 = 67;
         type UnknownTT = i16;
 
@@ -172,9 +181,9 @@ mod tests {
         let mut mock = Struct::new();
 
         type FirstTT = u128;
-        let first_input: i32 = 10;
+        let first_input: [i32; 4] = [10, 11, 111, 12];
         type SecondTT = f64;
-        let second_input: i32 = 20;
+        let second_input: [i32; 4] = [20, 2, 3, 33];
         type UnknownTT = i16;
 
         mock.setup()

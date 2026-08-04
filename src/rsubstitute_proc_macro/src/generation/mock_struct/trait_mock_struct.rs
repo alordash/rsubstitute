@@ -139,7 +139,7 @@ fn generate_trait_impl(
 }
 
 fn map_const(ordered_const: &Ordered<TraitItemConstSyntax>) -> Ordered<ImplItem> {
-    ordered_const.clone_map(|x| {
+    ordered_const.ref_map(|x| {
         let span = x.corresponding_generic_param_path.span();
         ImplItem::Const(ImplItemConst {
             attrs: x.item.attrs.clone(),
@@ -162,7 +162,7 @@ fn map_const(ordered_const: &Ordered<TraitItemConstSyntax>) -> Ordered<ImplItem>
 }
 
 fn map_assoc_type(ordered_assoc_type: &Ordered<TraitItemTypeSyntax>) -> Ordered<ImplItem> {
-    ordered_assoc_type.clone_map(|x| {
+    ordered_assoc_type.ref_map(|x| {
         let span = x.corresponding_generic_param_path.span();
         ImplItem::Type(ImplItemType {
             attrs: x.item.attrs.clone(),
@@ -189,7 +189,7 @@ fn map_fn(
     mod_ident: Ident,
     is_static: bool,
 ) -> Ordered<ImplItem> {
-    ordered_fn_info.clone_map(|fn_info| {
+    ordered_fn_info.ref_map(|fn_info| {
         let span = fn_info.spans.inputs;
         ImplItem::Fn(ImplItemFn {
             attrs: fn_info.attributes.clone(),

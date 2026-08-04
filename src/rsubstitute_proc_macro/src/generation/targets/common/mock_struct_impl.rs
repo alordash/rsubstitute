@@ -34,7 +34,7 @@ pub(crate) fn generate(
             .iter()
             .chain(static_fns.iter())
             .map(|ordered| {
-                ordered.clone_map(|x| {
+                ordered.ref_map(|x| {
                     try_extract_base_fn(span, mock_struct_path.clone(), &x, mod_ident)
                 })
             })
@@ -81,6 +81,8 @@ pub(crate) fn generate(
 
 pub(crate) struct ParamsForTrait<'a> {
     pub mock_struct_path: Path,
+    pub constants: &'a [Ordered<ImplItemConst>],
+    pub types: &'a [Ordered<ImplItemType>],
     pub associated_fns: &'a [Ordered<FnInfo>],
     pub static_fns: &'a [Ordered<FnInfo>],
     pub merged_generics: Generics,
@@ -96,6 +98,8 @@ pub(crate) fn generate_for_trait(
     span: Span,
     ParamsForTrait {
         mock_struct_path,
+        constants,
+        types,
         associated_fns,
         static_fns,
         merged_generics,
@@ -108,7 +112,7 @@ pub(crate) fn generate_for_trait(
             .iter()
             .chain(static_fns.iter())
             .map(|ordered| {
-                ordered.clone_map(|x| {
+                ordered.ref_map(|x| {
                     try_extract_base_fn(span, mock_struct_path.clone(), &x, mod_ident)
                 })
             })
@@ -220,8 +224,18 @@ pub(crate) fn generate_for_trait(
             )
         }))
         .collect();
-    fns.sort_by(|a, b| a.order_number.cmp(&b.order_number));
-    let items = fns.into_iter().map(|x| ImplItem::Fn(x.value)).collect();
+    let mut ordered_items: Vec<_> = constants
+        .iter()
+        .map(|ordered| ordered.ref_map(|x| ImplItem::Const(x.clone())))
+        .chain(
+            types
+                .iter()
+                .map(|ordered| ordered.ref_map(|x| ImplItem::Type(x.clone()))),
+        )
+        .chain(fns.into_iter().map(|ordered| ordered.map(ImplItem::Fn)))
+        .collect();
+    ordered_items.sort_by(|a, b| a.order_number.cmp(&b.order_number));
+    let items = ordered_items.into_iter().map(|x| x.value).collect();
     let trait_impl = generate_item_impl(
         span,
         merged_generics,
@@ -269,7 +283,7 @@ fn map_fn(
     is_static: bool,
     for_trait: bool,
 ) -> Ordered<ImplItemFn> {
-    ordered_fn_info.clone_map(|fn_info| {
+    ordered_fn_info.ref_map(|fn_info| {
         let span = fn_info.spans.inputs;
         ImplItemFn {
             attrs: if !for_trait && is_static {

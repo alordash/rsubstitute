@@ -17,6 +17,7 @@ pub(crate) fn generate(
         target_simple_generics: impl_trait_for_struct_syntax.target_simple_generics,
         trait_simple_generics: impl_trait_for_struct_syntax.trait_simple_generics,
         constants: impl_trait_for_struct_syntax.constants,
+        types: impl_trait_for_struct_syntax.types,
         static_fns: impl_trait_for_struct_syntax
             .static_fns
             .into_iter()
