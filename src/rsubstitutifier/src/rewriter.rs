@@ -15,6 +15,10 @@ impl VisitMut for Rewriter {
     }
 
     fn visit_item_impl_mut(&mut self, i: &mut ItemImpl) {
+        if !is_ok_impl(i) {
+            return;
+        }
+
         i.attrs.insert(0, mock_attribute::new_base(i.span()))
     }
 
@@ -29,4 +33,20 @@ impl VisitMut for Rewriter {
     fn visit_item_trait_mut(&mut self, i: &mut ItemTrait) {
         i.attrs.insert(0, mock_attribute::new_base(i.span()))
     }
+}
+
+fn is_ok_impl(item_impl: &ItemImpl) -> bool {
+    match item_impl.self_ty.as_ref() {
+        Type::Path(_) => {}
+        _ => return false,
+    }
+
+    for item in item_impl.items.iter() {
+        match item {
+            ImplItem::Macro(_) | ImplItem::Verbatim(_) => return false,
+            _ => {}
+        }
+    }
+
+    return true;
 }
