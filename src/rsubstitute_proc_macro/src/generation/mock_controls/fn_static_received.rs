@@ -31,13 +31,10 @@ pub(crate) fn generate(span: Span, static_received_path: Path, fn_info: &FnInfo)
         abi: None,
         fn_token: Token![fn](span),
         ident: Ident::new("received", span),
-        generics: generics::with_prefix_lifetime(
-            generics::with_lifetimes_tied_to(
-                fn_info.merged_generics.clone(),
-                &fn_info.merged_generics,
-                rsubstitute_lifetime.clone(),
-            ),
-            rsubstitute_lifetime,
+        generics: generics::with_lifetimes_tied_to(
+            fn_info.merged_generics.clone(),
+            &fn_info.merged_generics,
+            rsubstitute_lifetime.clone(),
         ),
         paren_token: token::Paren(span),
         inputs: fn_info

@@ -52,104 +52,10 @@ mod consts {
 }
 use consts::*;
 
+#[mock]
 #[derive(Clone)]
 pub struct Struct {
     v: i32,
-    #[doc(hidden)]
-    pub __rs_data: ::rsubstitute::for_generated::SharedMockData,
-}
-mod __rsubstitute_generated_StructMock {
-    #[allow(unused_imports)]
-    use super::*;
-    impl ::rsubstitute::Mockable for Struct {
-        type Setup = StructSetup;
-        fn setup(&mut self) -> Self::Setup {
-            Self::Setup {
-                generics: ::core::marker::PhantomData,
-                __rs_data: self.__rs_data.clone(),
-            }
-        }
-        type Received = StructReceived;
-        fn received(&mut self) -> Self::Received {
-            Self::Received {
-                generics: ::core::marker::PhantomData,
-                __rs_data: self.__rs_data.clone(),
-            }
-        }
-        type StaticSetup = StructStaticSetup;
-        fn static_setup() -> Self::StaticSetup {
-            ::rsubstitute::for_generated::clear_static_fn_data::<Struct>();
-            Self::StaticSetup {
-                generics: ::core::marker::PhantomData,
-            }
-        }
-        type StaticReceived = StructStaticReceived;
-        fn static_received() -> Self::StaticReceived {
-            Self::StaticReceived {
-                generics: ::core::marker::PhantomData,
-            }
-        }
-    }
-    pub struct StructSetup {
-        pub generics: ::core::marker::PhantomData<()>,
-        #[doc(hidden)]
-        pub __rs_data: ::rsubstitute::for_generated::SharedMockData,
-    }
-    impl ::core::clone::Clone for StructSetup {
-        #[inline]
-        fn clone(&self) -> StructSetup {
-            StructSetup {
-                generics: ::core::clone::Clone::clone(&self.generics),
-                __rs_data: ::core::clone::Clone::clone(&self.__rs_data),
-            }
-        }
-    }
-    pub struct StructReceived {
-        pub generics: ::core::marker::PhantomData<()>,
-        #[doc(hidden)]
-        pub __rs_data: ::rsubstitute::for_generated::SharedMockData,
-    }
-    impl ::core::clone::Clone for StructReceived {
-        #[inline]
-        fn clone(&self) -> StructReceived {
-            StructReceived {
-                generics: ::core::clone::Clone::clone(&self.generics),
-                __rs_data: ::core::clone::Clone::clone(&self.__rs_data),
-            }
-        }
-    }
-    impl StructReceived {
-        pub fn no_other_calls(&self) {
-            rsubstitute::for_generated::IMockData::verify_received_nothing_else(&self.__rs_data)
-        }
-    }
-    pub struct StructStaticSetup {
-        pub generics: ::core::marker::PhantomData<()>,
-    }
-    impl ::core::clone::Clone for StructStaticSetup {
-        #[inline]
-        fn clone(&self) -> StructStaticSetup {
-            StructStaticSetup {
-                generics: ::core::clone::Clone::clone(&self.generics),
-            }
-        }
-    }
-    pub struct StructStaticReceived {
-        pub generics: ::core::marker::PhantomData<()>,
-    }
-    impl ::core::clone::Clone for StructStaticReceived {
-        #[inline]
-        fn clone(&self) -> StructStaticReceived {
-            StructStaticReceived {
-                generics: ::core::clone::Clone::clone(&self.generics),
-            }
-        }
-    }
-    impl StructStaticReceived {
-        pub fn no_other_calls(&self) {
-            ::rsubstitute::for_generated::verify_static_fn_received_nothing_else::<Struct>()
-        }
-    }
 }
 
 #[mock(base)]

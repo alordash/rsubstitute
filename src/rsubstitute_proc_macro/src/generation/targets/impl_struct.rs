@@ -1,4 +1,5 @@
 use crate::common::models::*;
+use crate::common::*;
 use crate::generation::common::*;
 use crate::generation::mock_controls::*;
 use crate::generation::targets::common::*;
@@ -20,6 +21,8 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
         impl_items: item_impl.items.clone(),
     });
     let impl_struct_info = impl_struct_info::generate(ctx, impl_struct_syntax);
+    let generics_for_impl =
+        rsubstitute_lifetime::prepend_to_generics(impl_struct_info.generics.clone());
     let call_site = proc_macro::Span::call_site();
     let line = call_site.line();
     let column = call_site.column();
@@ -40,6 +43,8 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
             mod_ident: &mod_ident,
         },
     );
+    let control_struct_path_base =
+        rsubstitute_lifetime::prepend_to_path(impl_struct_info.target_path.clone());
     let maybe_associated_controls_impls =
         (!impl_struct_info.associated_fns.is_empty()).then(|| {
             let setup_impl = setup_impl::generate(
@@ -47,10 +52,10 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                 source_span,
                 setup_impl::Params {
                     setup_struct_path: path::from_base_path_with_ident(
-                        &impl_struct_info.target_path,
-                        format_ident!("{}Setup", path::last_ident(&impl_struct_info.target_path)),
+                        &control_struct_path_base,
+                        format_ident!("{}Setup", path::last_ident(&control_struct_path_base)),
                     ),
-                    generics: impl_struct_info.generics.clone(),
+                    generics: generics_for_impl.clone(),
                     mock_struct_path: &impl_struct_info.target_path,
                     fn_infos: &impl_struct_info.associated_fns,
                     for_static_fn: false,
@@ -63,13 +68,10 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                 source_span,
                 received_impl::Params {
                     received_struct_path: path::from_base_path_with_ident(
-                        &impl_struct_info.target_path,
-                        format_ident!(
-                            "{}Received",
-                            path::last_ident(&impl_struct_info.target_path)
-                        ),
+                        &control_struct_path_base,
+                        format_ident!("{}Received", path::last_ident(&control_struct_path_base)),
                     ),
-                    generics: impl_struct_info.generics.clone(),
+                    generics: generics_for_impl.clone(),
                     mock_struct_path: &impl_struct_info.target_path,
                     fn_infos: &impl_struct_info.associated_fns,
                     for_static_fn: false,
@@ -86,13 +88,10 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
             source_span,
             setup_impl::Params {
                 setup_struct_path: path::from_base_path_with_ident(
-                    &impl_struct_info.target_path,
-                    format_ident!(
-                        "{}StaticSetup",
-                        path::last_ident(&impl_struct_info.target_path)
-                    ),
+                    &control_struct_path_base,
+                    format_ident!("{}StaticSetup", path::last_ident(&control_struct_path_base)),
                 ),
-                generics: impl_struct_info.generics.clone(),
+                generics: generics_for_impl.clone(),
                 mock_struct_path: &impl_struct_info.target_path,
                 fn_infos: &impl_struct_info.static_fns,
                 for_static_fn: false,
@@ -105,13 +104,13 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
             source_span,
             received_impl::Params {
                 received_struct_path: path::from_base_path_with_ident(
-                    &impl_struct_info.target_path,
+                    &control_struct_path_base,
                     format_ident!(
                         "{}StaticReceived",
-                        path::last_ident(&impl_struct_info.target_path)
+                        path::last_ident(&control_struct_path_base)
                     ),
                 ),
-                generics: impl_struct_info.generics.clone(),
+                generics: generics_for_impl,
                 mock_struct_path: &impl_struct_info.target_path,
                 fn_infos: &impl_struct_info.static_fns,
                 for_static_fn: false,

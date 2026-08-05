@@ -1,5 +1,6 @@
 use crate::common::models::*;
 use crate::common::*;
+use crate::generation::common::*;
 use crate::generation::fn_info::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
@@ -154,7 +155,7 @@ fn generate_core(
             ty: Box::new(void_type(span)),
         }
     };
-    let call_struct_path = maybe_mod_ident.map_or_else(
+    let mut call_struct_path = maybe_mod_ident.map_or_else(
         || fn_info.call_struct.path.clone(),
         |mod_ident| {
             let mut result = fn_info.call_struct.path.clone();
@@ -168,6 +169,8 @@ fn generate_core(
             return result;
         },
     );
+    rsubstitute_lifetime::revert_in_first_generic_arg(&mut call_struct_path);
+
     let sig = Signature {
         constness: source_signature.constness.clone(),
         asyncness: source_signature.asyncness.clone(),

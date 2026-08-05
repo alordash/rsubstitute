@@ -1,4 +1,5 @@
 use crate::common::*;
+use crate::generation::common::*;
 use crate::generation::fn_info::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
@@ -12,7 +13,7 @@ pub(crate) struct Result {
 }
 pub(crate) fn new(span: Span, fn_info: &FnInfo, maybe_mod_ident: Option<Ident>) -> Result {
     let fn_data_var_path = expr::path::new(span, ["call"]);
-    let call_struct_path = maybe_mod_ident.map_or_else(
+    let mut call_struct_path = maybe_mod_ident.map_or_else(
         || fn_info.call_struct.path.clone(),
         |mod_ident| {
             let mut result = fn_info.call_struct.path.clone();
@@ -26,6 +27,7 @@ pub(crate) fn new(span: Span, fn_info: &FnInfo, maybe_mod_ident: Option<Ident>) 
             return result;
         },
     );
+    rsubstitute_lifetime::revert_in_first_generic_arg(&mut call_struct_path);
     let impl_trait_cast_stmts: Vec<_> = fn_info
         .arguments
         .iter()

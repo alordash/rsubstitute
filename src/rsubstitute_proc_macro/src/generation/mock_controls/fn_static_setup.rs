@@ -43,10 +43,7 @@ pub(crate) fn generate(
         abi: None,
         fn_token: Token![fn](span),
         ident: Ident::new("setup", span),
-        generics: generics::with_prefix_lifetime(
-            fn_info.merged_generics.clone(),
-            rsubstitute_lifetime::new(span),
-        ),
+        generics: fn_info.merged_generics.clone(),
         paren_token: token::Paren(span),
         inputs: fn_info
             .arguments

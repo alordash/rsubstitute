@@ -15,15 +15,15 @@ pub(crate) fn new((number, source_pat_type): (usize, PatType)) -> Argument {
     let ident = prepare_ident(number, &pat_ty);
     let ident_pat_type = common::replace_arg_pat_with_ident(pat_ty.clone(), ident.clone());
 
-    let ptr_style_type = r#type::replace_references_with_pointers(ident_pat_type.ty.clone());
-
     let ref_style_type = r#type::replace_anonymous_lifetimes_in_references(
         ident_pat_type.ty.clone(),
         &rsubstitute_lifetime::new(ident_pat_type.span()),
     );
 
+    let ptr_style_type = r#type::replace_references_with_pointers(ref_style_type.clone());
+
     let generic_arg_style_type =
-        r#type::replace_anonymous_references_with_pointers(ident_pat_type.ty.clone());
+        r#type::replace_anonymous_references_with_pointers(ref_style_type.clone());
 
     // TODO - perhaps need to pass here ptr_style_type
     let control_fn_arg = generate_control_fn_arg(

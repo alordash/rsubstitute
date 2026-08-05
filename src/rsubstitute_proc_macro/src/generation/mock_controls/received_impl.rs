@@ -137,13 +137,10 @@ fn generate_received_fn(
         },
     );
     let rsubstitute_lifetime = rsubstitute_lifetime::new(span);
-    let mut generics = generics::with_prefix_lifetime(
-        generics::with_lifetimes_tied_to(
-            Generics::default(),
-            &fn_info.merged_generics,
-            rsubstitute_lifetime.clone(),
-        ),
-        rsubstitute_lifetime,
+    let mut generics = generics::with_lifetimes_tied_to(
+        Generics::default(),
+        &fn_info.merged_generics,
+        rsubstitute_lifetime.clone(),
     );
     if !for_static_fn {
         generics = generics::combine(generics, &fn_info.source_signature.generics);
@@ -305,7 +302,10 @@ fn generate_regular_fn_no_other_calls(span: Span) -> ImplItemFn {
             attrs: Vec::new(),
             and_token: Token![&](span),
             mutability: None,
-            expr: Box::new(Expr::Field(expr::field::new_self(Ident::new("__rs_data", span)))),
+            expr: Box::new(Expr::Field(expr::field::new_self(Ident::new(
+                "__rs_data",
+                span,
+            )))),
         })],
     );
 

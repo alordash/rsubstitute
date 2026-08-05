@@ -91,8 +91,7 @@ fn generate_setup_fn(
         placeholder_lifetime(span),
         None,
     );
-    let mut generics =
-        generics::with_prefix_lifetime(Generics::default(), rsubstitute_lifetime::new(span));
+    let mut generics = Generics::default();
     if !for_static_fn {
         generics = generics::combine(generics, &fn_info.source_signature.generics);
     }

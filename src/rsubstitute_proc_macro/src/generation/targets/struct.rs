@@ -2,6 +2,7 @@ mod mockable_trait_impl;
 mod source_struct_fields;
 mod struct_control_struct;
 
+use crate::common::rsubstitute_lifetime;
 use crate::generation::common::*;
 use crate::generation::mock_controls::models::*;
 use crate::generation::mock_controls::*;
@@ -15,12 +16,14 @@ use syn::*;
 pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
     item_struct = source_struct_fields::modify(item_struct);
     let source_span = item_struct.span();
-    let generics_for_impl = generics::remove_defaults(item_struct.generics.clone());
+    let generics_for_control_structs =
+        rsubstitute_lifetime::prepend_to_generics(item_struct.generics.clone());
+    let generics_for_impl = generics::remove_defaults(generics_for_control_structs.clone());
     let struct_setup_struct = struct_control_struct::generate(
         source_span,
         struct_control_struct::Params {
             struct_ident: &item_struct.ident,
-            generics: item_struct.generics.clone(),
+            generics: generics_for_control_structs.clone(),
             control_type: ControlType::Setup,
             is_static: false,
         },
@@ -35,7 +38,7 @@ pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
         source_span,
         struct_control_struct::Params {
             struct_ident: &item_struct.ident,
-            generics: item_struct.generics.clone(),
+            generics: generics_for_control_structs.clone(),
             control_type: ControlType::Received,
             is_static: false,
         },
@@ -60,7 +63,7 @@ pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
         source_span,
         struct_control_struct::Params {
             struct_ident: &item_struct.ident,
-            generics: item_struct.generics.clone(),
+            generics: generics_for_control_structs.clone(),
             control_type: ControlType::Setup,
             is_static: true,
         },
@@ -78,7 +81,7 @@ pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
         source_span,
         struct_control_struct::Params {
             struct_ident: &item_struct.ident,
-            generics: item_struct.generics.clone(),
+            generics: generics_for_control_structs.clone(),
             control_type: ControlType::Received,
             is_static: true,
         },
@@ -111,7 +114,7 @@ pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
         source_span,
         mockable_trait_impl::Params {
             struct_ident: item_struct.ident.clone(),
-            generics: generics_for_impl.clone(),
+            generics: generics_for_impl,
             setup_struct_ident: struct_setup_struct.ident.clone(),
             received_struct_ident: struct_received_struct.ident.clone(),
             static_setup_struct_ident: struct_static_setup_struct.ident.clone(),

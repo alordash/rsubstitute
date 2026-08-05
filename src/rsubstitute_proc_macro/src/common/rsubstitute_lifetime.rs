@@ -1,3 +1,4 @@
+use crate::syntax::punctuated;
 use proc_macro2::Span;
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
@@ -20,4 +21,51 @@ pub(crate) fn prepend_to_generics(mut generics: Generics) -> Generics {
         }),
     );
     return generics;
+}
+
+pub(crate) fn prepend_to_path(mut path: Path) -> Path {
+    let span = path.span();
+    if let Some(last_segment) = path.segments.last_mut() {
+        let argument = GenericArgument::Lifetime(new(span));
+        if let PathArguments::AngleBracketed(existing) = &mut last_segment.arguments {
+            existing.args.insert(0, argument);
+        } else {
+            let new_arguments = AngleBracketedGenericArguments {
+                colon2_token: Some(Token![::](span)),
+                lt_token: Token![<](span),
+                args: punctuated([argument]),
+                gt_token: Token![>](span),
+            };
+            last_segment.arguments = PathArguments::AngleBracketed(new_arguments);
+        };
+    }
+    return path;
+}
+
+pub(crate) fn revert_in_first_generic_arg(path: &mut Path) {
+    if let Some(rsubstitute_anonymous_lifetime) = path
+        .segments
+        .last_mut()
+        .map(|x| match &mut x.arguments {
+            PathArguments::AngleBracketed(generics) => {
+                generics
+                    .args
+                    .first_mut()
+                    .map(|first_generic_arg| match first_generic_arg {
+                        GenericArgument::Lifetime(lifetime_param)
+                            if lifetime_param.ident == "__rsa" =>
+                        {
+                            Some(lifetime_param)
+                        }
+                        _ => None,
+                    })
+            }
+            _ => None,
+        })
+        .flatten()
+        .flatten()
+    {
+        rsubstitute_anonymous_lifetime.ident =
+            Ident::new("_", rsubstitute_anonymous_lifetime.span());
+    }
 }

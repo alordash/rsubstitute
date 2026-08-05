@@ -36,13 +36,17 @@ pub(crate) fn with_lifetimes_tied_to(
 
     let mut where_predicates_iter = source_generics
         .lifetimes()
-        .map(|x| {
-            WherePredicate::Lifetime(PredicateLifetime {
-                attrs: Vec::new(),
-                lifetime: x.lifetime.clone(),
-                colon_token: Token![:](span),
-                bounds: punctuated([tying_lifetime.clone()]),
-            })
+        .filter_map(|x| {
+            if x.lifetime.ident == tying_lifetime.ident {
+                None
+            } else {
+                Some(WherePredicate::Lifetime(PredicateLifetime {
+                    attrs: Vec::new(),
+                    lifetime: x.lifetime.clone(),
+                    colon_token: Token![:](span),
+                    bounds: punctuated([tying_lifetime.clone()]),
+                }))
+            }
         })
         .peekable();
     if where_predicates_iter.peek().is_none() {

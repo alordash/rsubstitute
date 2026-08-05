@@ -25,7 +25,9 @@ pub(crate) fn generate(
         static_received_struct_ident,
     }: Params,
 ) -> ItemImpl {
-    let struct_path = path::from_ident_with_generics(struct_ident, &generics);
+    let mut struct_generics = generics.clone();
+    struct_generics.params = struct_generics.params.into_iter().skip(1).collect(); // skipping '__rsa
+    let struct_path = path::from_ident_with_generics(struct_ident, &struct_generics);
     let struct_type = Type::Path(TypePath {
         attrs: Vec::new(),
         qself: None,
@@ -72,7 +74,11 @@ pub(crate) fn generate(
         impl_token: Token![impl](span),
         generics,
         trait_: Some((
-            path::new_global(span, ["rsubstitute", "Mockable"]),
+            path::new_generics_global(
+                span,
+                ["rsubstitute", "Mockable"],
+                [GenericArgument::Lifetime(rsubstitute_lifetime::new(span))],
+            ),
             Token![for](span),
         )),
         self_ty: Box::new(struct_type),

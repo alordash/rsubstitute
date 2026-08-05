@@ -1,4 +1,5 @@
 use super::models::*;
+use crate::common::rsubstitute_lifetime;
 use crate::preparation::models::*;
 use crate::preparation::r#fn::fn_syntax;
 use crate::preparation::r#fn::models::*;
@@ -27,7 +28,7 @@ pub(crate) fn prepare(
 ) -> TraitSyntax {
     let split_items = split_items(items, &ident);
     let source_generics = generics.clone();
-    let merged_generics = merge_generics_with_assoc_generics(
+    let mut merged_generics = merge_generics_with_assoc_generics(
         &ident,
         generics,
         &split_items.assoc_types,
@@ -50,6 +51,7 @@ pub(crate) fn prepare(
             ordered.map(|x| map_trait_item_fn_to_fn_syntax(x, &trait_syntax_as_fn_owner))
         })
         .collect();
+    merged_generics = rsubstitute_lifetime::prepend_to_generics(merged_generics);
     let path = path::from_ident_with_generics(ident.clone(), &source_generics);
 
     let result = TraitSyntax {

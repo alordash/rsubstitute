@@ -20,7 +20,7 @@ trait Trait<'a, 'b: 'a, T1: Clone> {
         b: &'b i32,
         c: &'c i32,
         d: &'d i32,
-        axb: &'a &&'b i32,
+        axb: &'a &'_ &'b i32,
         cxd: &'c &&'d i32,
         abxbax: &'a &'b &&'b &'a &i32,
         cdxdcx: &'c &'d &&'d &'c &i32,
@@ -30,7 +30,7 @@ trait Trait<'a, 'b: 'a, T1: Clone> {
             'a,
             'b,
             &&i32,
-            &&'a &&'b &[&'c &&'b &Data<'c, 'a, &&&'c &i32, Vec<&'d &'b &()>>],
+            &&'a &&'b &[&'c &&'b &Data<'c, 'a, &'_ &&'c &i32, Vec<&'d &'b &()>>],
         >,
         t1: T1,
         t1_ref: &T1,
@@ -52,13 +52,13 @@ fn work<'x, 'a, 'b: 'a, 'c, 'd: 'a, T1, T2>(
     b: &'b i32,
     c: &'c i32,
     d: &'d i32,
-    axb: &'a &&'b i32,
+    axb: &'a &'_ &'b i32,
     cxd: &'c &&'d i32,
     abxbax: &'a &'b &&'b &'a &i32,
     cdxdcx: &'c &'d &&'d &'c &i32,
     abcd: &'a &'b &'c &'d i32,
     xaxbxcxdx: &&'a &&'b &&'c &&'d &i32,
-    data: Data<'a, 'b, &&i32, &&'a &&'b &[&'c &&'b &Data<'c, 'a, &&&'c &i32, Vec<&'d &'b &()>>]>,
+    data: Data<'a, 'b, &&i32, &&'a &&'b &[&'c &&'b &Data<'c, 'a, &'_ &&'c &i32, Vec<&'d &'b &()>>]>,
     t1: T1,
     t1_ref: &T1,
     xaxbxcxdx_t1_ref: &&'a &&'b &&'c &&'d &T1,
@@ -99,7 +99,7 @@ impl<'a, 'b: 'a, T1: Clone> Struct<'a, 'b, T1> {
         b: &'b i32,
         c: &'c i32,
         d: &'d i32,
-        axb: &'a &&'b i32,
+        axb: &'a &'_ &'b i32,
         cxd: &'c &&'d i32,
         abxbax: &'a &'b &&'b &'a &i32,
         cdxdcx: &'c &'d &&'d &'c &i32,
@@ -109,7 +109,7 @@ impl<'a, 'b: 'a, T1: Clone> Struct<'a, 'b, T1> {
             'a,
             'b,
             &&i32,
-            &&'a &&'b &[&'c &&'b &Data<'c, 'a, &&&'c &i32, Vec<&'d &'b &()>>],
+            &&'a &&'b &[&'c &&'b &Data<'c, 'a, &'_ &&'c &i32, Vec<&'d &'b &()>>],
         >,
         t1: T1,
         t1_ref: &T1,
@@ -132,7 +132,7 @@ impl<'a, 'b: 'a, T1: Clone> Trait<'a, 'b, T1> for Struct<'a, 'b, T1> {
         b: &'b i32,
         c: &'c i32,
         d: &'d i32,
-        axb: &'a &&'b i32,
+        axb: &'a &'_ &'b i32,
         cxd: &'c &&'d i32,
         abxbax: &'a &'b &&'b &'a &i32,
         cdxdcx: &'c &'d &&'d &'c &i32,
@@ -142,7 +142,7 @@ impl<'a, 'b: 'a, T1: Clone> Trait<'a, 'b, T1> for Struct<'a, 'b, T1> {
             'a,
             'b,
             &&i32,
-            &&'a &&'b &[&'c &&'b &Data<'c, 'a, &&&'c &i32, Vec<&'d &'b &()>>],
+            &&'a &&'b &[&'c &&'b &Data<'c, 'a, &'_ &&'c &i32, Vec<&'d &'b &()>>],
         >,
         t1: T1,
         t1_ref: &T1,
@@ -175,6 +175,14 @@ impl<'a, 'b: 'a, T1: Clone> Trait<'a, 'b, T1> for Struct<'a, 'b, T1> {
         )
     }
 }
+
+#[derive(Clone)]
+struct Consumer<'a> {
+    phantom: PhantomData<&'a ()>,
+}
+
+#[mock(base)]
+fn consume(consumer: Consumer<'_>) {}
 
 #[cfg(test)]
 mod tests {
