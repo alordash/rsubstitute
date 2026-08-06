@@ -13,7 +13,7 @@ pub(crate) fn generate(span: Span, static_received_path: Path, fn_info: &FnInfo)
         qself: None,
         path: path::new_generics_global(
             span,
-            ["rsubstitute", "for_generated", "ArgRefsBinder"],
+            rsubstitute_for_generated::new("ArgRefsBinder"),
             [
                 GenericArgument::Type(Type::Path(TypePath {
                     attrs: Vec::new(),

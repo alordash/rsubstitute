@@ -1,3 +1,4 @@
+use crate::common::rsubstitute_for_generated;
 use crate::generation::common::*;
 use crate::generation::fn_info::models::*;
 use crate::syntax::*;
@@ -32,17 +33,52 @@ pub(crate) fn new_associated(
         pat: fn_data_pat(span, fn_data_var_path.clone(), generic_arguments),
         init: Some(LocalInit {
             eq_token: Token![=](span),
-            expr: Box::new(Expr::MethodCall(expr::method_call::new(
+            // expr: Box::new(Expr::MethodCall(expr::method_call::new(
+            //     span,
+            //     Expr::Field(expr::field::new_self(Ident::new("__rs_data", span))),
+            //     Ident::new(fn_name, span),
+            //     [
+            //         fn_info_ident_to_expr_lit(span, fn_info),
+            //         Expr::MethodCall(expr::method_call::new(
+            //             span,
+            //             Expr::Path(generics_info_provider_var_path),
+            //             Ident::new("get_generics_hash_key", span),
+            //             [],
+            //         )),
+            //     ],
+            // ))),
+            expr: Box::new(Expr::Call(expr::call::new(
                 span,
-                Expr::Field(expr::field::new_self(Ident::new("__rs_data", span))),
-                Ident::new(fn_name, span),
+                Expr::Path(expr::path::new_global(
+                    span,
+                    rsubstitute_for_generated::new2("ISharedMockData", "get_shared_fn_data"),
+                )),
                 [
+                    Expr::Reference(ExprReference {
+                        attrs: Vec::new(),
+                        and_token: Token![&](span),
+                        mutability: None,
+                        expr: Box::new(Expr::Field(expr::field::new_self(Ident::new(
+                            "__rs_data",
+                            span,
+                        )))),
+                    }),
                     fn_info_ident_to_expr_lit(span, fn_info),
-                    Expr::MethodCall(expr::method_call::new(
+                    Expr::Call(expr::call::new(
                         span,
-                        Expr::Path(generics_info_provider_var_path),
-                        Ident::new("get_generics_hash_key", span),
-                        [],
+                        Expr::Path(expr::path::new_global(
+                            span,
+                            rsubstitute_for_generated::new2(
+                                "IGenericsInfoProvider",
+                                "get_generics_hash_key",
+                            ),
+                        )),
+                        [Expr::Reference(ExprReference {
+                            attrs: Vec::new(),
+                            and_token: Token![&](span),
+                            mutability: None,
+                            expr: Box::new(Expr::Path(generics_info_provider_var_path)),
+                        })],
                     )),
                 ],
             ))),
@@ -84,7 +120,7 @@ pub(crate) fn new_static(
                 Expr::Path(ExprPath {
                     attrs: Vec::new(),
                     qself: None,
-                    path: path::new_global(span, ["rsubstitute", "for_generated", fn_name]),
+                    path: path::new_global(span, rsubstitute_for_generated::new(fn_name)),
                 }),
                 [fn_info_ident_to_expr_lit(span, fn_info)],
             ))),

@@ -124,8 +124,11 @@ fn generate_setup_fn(
     };
 
     let mut fn_configurator_path_for_var = fn_configurator_path;
-    let PathArguments::AngleBracketed(ref mut fn_configurator_path_for_var_args) =
-        fn_configurator_path_for_var.segments[0].arguments
+    let Some(PathArguments::AngleBracketed(fn_configurator_path_for_var_args)) =
+        fn_configurator_path_for_var
+            .segments
+            .last_mut()
+            .map(|x| &mut x.arguments)
     else {
         panic!("FnConfigurator should have angle bracketed arguments.");
     };

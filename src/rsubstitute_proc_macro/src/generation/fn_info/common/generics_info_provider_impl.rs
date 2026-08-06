@@ -1,3 +1,4 @@
+use crate::common::*;
 use crate::syntax::*;
 use proc_macro2::Span;
 use quote::ToTokens;
@@ -25,7 +26,10 @@ pub(crate) fn generate(impl_generics: Generics, generics: Generics, target_type:
         impl_token: Token![impl](span),
         generics: impl_generics,
         trait_: Some((
-            path::new(span, ["IGenericsInfoProvider"]),
+            path::new_global(
+                span,
+                rsubstitute_for_generated::new("IGenericsInfoProvider"),
+            ),
             Token![for](span),
         )),
         self_ty: Box::new(target_type),
@@ -54,7 +58,10 @@ fn generate_fn_get_generic_parameter_infos<'a>(
             Token![->](span),
             Box::new(Type::Path(r#type::vec_of(
                 span,
-                Type::Path(r#type::path::new(span, ["GenericParameterInfo"])),
+                Type::Path(r#type::path::new_global(
+                    span,
+                    rsubstitute_for_generated::new("GenericParameterInfo"),
+                )),
             ))),
         ),
     };
@@ -63,7 +70,10 @@ fn generate_fn_get_generic_parameter_infos<'a>(
         .filter_map(|generic_param| match generic_param {
             GenericParam::Type(type_param) => Some(Expr::Call(expr::call::new(
                 span,
-                Expr::Path(expr::path::new(span, ["generic_type_info"])),
+                Expr::Path(expr::path::new(
+                    span,
+                    rsubstitute_for_generated::new("generic_type_info"),
+                )),
                 [
                     Expr::Lit(ExprLit {
                         attrs: Vec::new(),
@@ -88,7 +98,10 @@ fn generate_fn_get_generic_parameter_infos<'a>(
                 let const_param_ident_string = const_param.ident.to_string();
                 Some(Expr::Call(expr::call::new(
                     span,
-                    Expr::Path(expr::path::new(span, ["generic_const_info"])),
+                    Expr::Path(expr::path::new(
+                        span,
+                        rsubstitute_for_generated::new("generic_const_info"),
+                    )),
                     [
                         Expr::Lit(ExprLit {
                             attrs: Vec::new(),
@@ -133,7 +146,7 @@ fn generate_fn_hash_generics_type_ids<'a>(
                 span,
                 Expr::Path(expr::path::new_generics(
                     span,
-                    ["tid"],
+                    rsubstitute_for_generated::new("tid"),
                     GenericArgument::Type(Type::Path(TypePath {
                         attrs: Vec::new(),
                         qself: None,
@@ -156,13 +169,23 @@ fn generate_fn_hash_generics_type_ids<'a>(
             bracket_token: token::Bracket(span),
             elems: tids,
         });
-        let hash_expr = expr::method_call::new(
+        let hash_expr = expr::call::new(
             span,
-            tids_array,
-            Ident::new("hash", span),
-            [Expr::Path(expr::path::new(span, ["hasher"]))],
+            Expr::Path(expr::path::new_global(
+                span,
+                ["core", "hash", "Hash", "hash"],
+            )),
+            [
+                Expr::Reference(ExprReference {
+                    attrs: Vec::new(),
+                    and_token: Token![&](span),
+                    mutability: None,
+                    expr: Box::new(tids_array),
+                }),
+                Expr::Path(expr::path::new(span, ["hasher"])),
+            ],
         );
-        let stmt = Stmt::Expr(Expr::MethodCall(hash_expr), Some(Token![;](span)));
+        let stmt = Stmt::Expr(Expr::Call(hash_expr), Some(Token![;](span)));
         vec![stmt]
     } else {
         Vec::new()
@@ -190,7 +213,10 @@ fn generate_fn_hash_const_values<'a>(
         .map(|const_param| {
             let const_hash_expr = Expr::Call(expr::call::new(
                 span,
-                Expr::Path(expr::path::new(span, ["const_hash"])),
+                Expr::Path(expr::path::new(
+                    span,
+                    rsubstitute_for_generated::new("const_hash"),
+                )),
                 [
                     Expr::Reference(ExprReference {
                         attrs: Vec::new(),
@@ -247,7 +273,10 @@ fn generate_hash_fn_sig(span: Span, fn_name: &'static str) -> Signature {
                 and_token: Token![&](span),
                 lifetime: None,
                 mutability: Some(Token![mut](span)),
-                elem: Box::new(Type::Path(r#type::path::new(span, ["GenericsHasher"]))),
+                elem: Box::new(Type::Path(r#type::path::new_global(
+                    span,
+                    rsubstitute_for_generated::new("GenericsHasher"),
+                ))),
             })),
         }),
     ]);

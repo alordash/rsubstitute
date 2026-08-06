@@ -97,38 +97,35 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
     );
 
     let mock_mod_usages = mock_mod_usages::new(source_span);
-    let items = [
-        Item::Use(mock_mod_usages.use_rsubstitute_for_generated),
-        Item::Use(mock_mod_usages.use_super),
-    ]
-    .into_iter()
-    .chain(maybe_base_fn.map(Item::Fn).into_iter())
-    .chain([
-        Item::Fn(fn_static_setup),
-        Item::Fn(fn_static_received),
-        Item::Struct(fn_info.call_struct.item_struct),
-        Item::Impl(fn_info.call_struct.generics_info_provider_impl),
-        Item::Impl(fn_info.call_struct.call_impl),
-    ])
-    .chain(
-        fn_info
-            .call_struct
-            .maybe_clone_impl
-            .map(Item::Impl)
-            .into_iter(),
-    )
-    .chain([
-        Item::Struct(fn_info.args_checker_struct.item_struct),
-        Item::Impl(fn_info.args_checker_struct.generics_info_provider_impl),
-        Item::Impl(fn_info.args_checker_struct.args_checker_impl),
-        Item::Struct(static_fn_mock_struct.item_struct),
-        Item::Struct(static_setup_struct.item_struct),
-        Item::Impl(static_setup_struct.item_impl),
-        Item::Struct(static_received_struct.item_struct),
-        Item::Impl(static_received_struct.clone_impl),
-        Item::Impl(static_received_struct.item_impl),
-    ])
-    .collect();
+    let items = [Item::Use(mock_mod_usages.use_super)]
+        .into_iter()
+        .chain(maybe_base_fn.map(Item::Fn).into_iter())
+        .chain([
+            Item::Fn(fn_static_setup),
+            Item::Fn(fn_static_received),
+            Item::Struct(fn_info.call_struct.item_struct),
+            Item::Impl(fn_info.call_struct.generics_info_provider_impl),
+            Item::Impl(fn_info.call_struct.call_impl),
+        ])
+        .chain(
+            fn_info
+                .call_struct
+                .maybe_clone_impl
+                .map(Item::Impl)
+                .into_iter(),
+        )
+        .chain([
+            Item::Struct(fn_info.args_checker_struct.item_struct),
+            Item::Impl(fn_info.args_checker_struct.generics_info_provider_impl),
+            Item::Impl(fn_info.args_checker_struct.args_checker_impl),
+            Item::Struct(static_fn_mock_struct.item_struct),
+            Item::Struct(static_setup_struct.item_struct),
+            Item::Impl(static_setup_struct.item_impl),
+            Item::Struct(static_received_struct.item_struct),
+            Item::Impl(static_received_struct.clone_impl),
+            Item::Impl(static_received_struct.item_impl),
+        ])
+        .collect();
 
     let item_mod = ItemMod {
         attrs: vec![attributes::allow_non_camel_case_types(source_span)],

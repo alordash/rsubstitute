@@ -151,7 +151,7 @@ fn generate_received_fn(
         qself: None,
         path: path::new_generics_global(
             span,
-            ["rsubstitute", "for_generated", "ArgRefsBinder"],
+            rsubstitute_for_generated::new("ArgRefsBinder"),
             [
                 GenericArgument::Type(Type::Path(self_type(span))),
                 GenericArgument::Type(Type::Tuple(fn_info.arg_refs_tuple.clone())),
@@ -213,7 +213,7 @@ fn generate_received_fn(
         span,
         Expr::Path(expr::path::new(
             span,
-            ["rsubstitute", "for_generated", "ArgRefsBinder", "new"],
+            rsubstitute_for_generated::new2("ArgRefsBinder", "new"),
         )),
         [Expr::MethodCall(expr::method_call::new(
             span,
@@ -252,11 +252,7 @@ fn generate_fn_no_other_calls_for_static_fn(span: Span, mock_struct_path: Path) 
             qself: None,
             path: path::new_generics_global(
                 span,
-                [
-                    "rsubstitute",
-                    "for_generated",
-                    "verify_static_fn_received_nothing_else",
-                ],
+                rsubstitute_for_generated::new("verify_static_fn_received_nothing_else"),
                 [GenericArgument::Type(Type::Path(TypePath {
                     attrs: Vec::new(),
                     qself: None,
@@ -291,12 +287,7 @@ fn generate_regular_fn_no_other_calls(span: Span) -> ImplItemFn {
         span,
         Expr::Path(expr::path::new(
             span,
-            [
-                "rsubstitute",
-                "for_generated",
-                "IMockData",
-                "verify_received_nothing_else",
-            ],
+            rsubstitute_for_generated::new2("IMockData", "verify_received_nothing_else"),
         )),
         [Expr::Reference(ExprReference {
             attrs: Vec::new(),

@@ -1,3 +1,4 @@
+use crate::common::*;
 use crate::syntax::*;
 use proc_macro2::Span;
 use syn::*;
@@ -8,7 +9,10 @@ pub(crate) fn new(span: Span) -> (ExprPath, PatType) {
         attrs: Vec::new(),
         pat: Box::new(Pat::Path(times_arg_path.clone())),
         colon_token: Token![:](span),
-        ty: Box::new(Type::Path(r#type::path::new(span, ["Times"]))),
+        ty: Box::new(Type::Path(r#type::path::new_global(
+            span,
+            rsubstitute_for_generated::new("Times"),
+        ))),
     };
     return (times_arg_path, times_arg);
 }

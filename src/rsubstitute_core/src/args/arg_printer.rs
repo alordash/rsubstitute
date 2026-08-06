@@ -1,3 +1,4 @@
+use crate::args::arg_printing::*;
 use std::fmt::Debug;
 
 const UNKNOWN_ARG_STRING: &'static str = "?";
@@ -11,52 +12,56 @@ pub(crate) fn print_arg<T: ?Sized>(value: &T) -> String {
     (&ArgPrinter(value)).debug_string()
 }
 
-#[cfg(not(feature = "debug_naming"))]
-pub use default_printing::*;
-#[cfg(not(feature = "debug_naming"))]
-mod default_printing {
+pub mod arg_printing {
     use super::*;
 
-    pub trait IDebugArgPrinter {
-        fn debug_string(&self) -> String;
-    }
+    #[cfg(not(feature = "debug_naming"))]
+    pub use default_printing::*;
+    #[cfg(not(feature = "debug_naming"))]
+    mod default_printing {
+        use super::*;
 
-    pub trait IUnknownArgPrinter {
-        fn debug_string(&self) -> String;
-    }
+        pub trait IDebugArgPrinter {
+            fn debug_string(&self) -> String;
+        }
 
-    impl<'a, T: Debug + ?Sized> IDebugArgPrinter for ArgPrinter<'a, T> {
-        fn debug_string(&self) -> String {
-            return format!("{:?}", self.0);
+        pub trait IUnknownArgPrinter {
+            fn debug_string(&self) -> String;
+        }
+
+        impl<'a, T: Debug + ?Sized> IDebugArgPrinter for ArgPrinter<'a, T> {
+            fn debug_string(&self) -> String {
+                return format!("{:?}", self.0);
+            }
+        }
+
+        impl<'a, T: ?Sized> IUnknownArgPrinter for &ArgPrinter<'a, T> {
+            fn debug_string(&self) -> String {
+                UNKNOWN_ARG_STRING.to_owned()
+            }
         }
     }
 
-    impl<'a, T: ?Sized> IUnknownArgPrinter for &ArgPrinter<'a, T> {
-        fn debug_string(&self) -> String {
-            UNKNOWN_ARG_STRING.to_owned()
+    #[cfg(feature = "debug_naming")]
+    pub use specialization_printing::*;
+    #[cfg(feature = "debug_naming")]
+    mod specialization_printing {
+        use super::*;
+
+        pub trait IDebugPrinter {
+            fn debug_string(&self) -> String;
         }
-    }
-}
 
-#[cfg(feature = "debug_naming")]
-pub use specialization_printing::*;
-#[cfg(feature = "debug_naming")]
-mod specialization_printing {
-    use super::*;
-
-    pub trait IDebugPrinter {
-        fn debug_string(&self) -> String;
-    }
-
-    impl<'a, T: ?Sized> IDebugPrinter for ArgPrinter<'a, T> {
-        default fn debug_string(&self) -> String {
-            UNKNOWN_ARG_STRING.to_owned()
+        impl<'a, T: ?Sized> IDebugPrinter for ArgPrinter<'a, T> {
+            default fn debug_string(&self) -> String {
+                UNKNOWN_ARG_STRING.to_owned()
+            }
         }
-    }
 
-    impl<'a, T: Debug + ?Sized> IDebugPrinter for ArgPrinter<'a, T> {
-        fn debug_string(&self) -> String {
-            return format!("{:?}", self.0);
+        impl<'a, T: Debug + ?Sized> IDebugPrinter for ArgPrinter<'a, T> {
+            fn debug_string(&self) -> String {
+                return format!("{:?}", self.0);
+            }
         }
     }
 }

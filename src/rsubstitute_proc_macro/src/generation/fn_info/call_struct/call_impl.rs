@@ -1,3 +1,4 @@
+use crate::common::*;
 use crate::generation::fn_info::*;
 use crate::preparation::r#fn::models::*;
 use crate::syntax::r#type::vec_of;
@@ -27,7 +28,10 @@ pub(crate) fn generate(
         unsafety: None,
         impl_token: Token![impl](span),
         generics,
-        trait_: Some((path::new(span, ["ICall"]), Token![for](span))),
+        trait_: Some((
+            path::new_global(span, rsubstitute_for_generated::new("ICall")),
+            Token![for](span),
+        )),
         self_ty: Box::new(target_type),
         brace_token: token::Brace(span),
         items,
@@ -52,11 +56,15 @@ fn generate_fn_get_args_infos(span: Span, arguments: &[Argument]) -> ImplItemFn 
             Token![->](span),
             Box::new(Type::Path(vec_of(
                 span,
-                Type::Path(r#type::path::new(span, ["ArgInfo"])),
+                Type::Path(r#type::path::new_global(
+                    span,
+                    rsubstitute_for_generated::new("ArgInfo"),
+                )),
             ))),
         ),
     };
 
+    let use_i_debug_printer_stmt = rsubstitute_for_generated::glob_usage(span, "arg_printing");
     let arg_info_new_exprs: Punctuated<Expr, Token![,]> =
         arguments.iter().map(generate_arg_info_new_expr).collect();
     let vec_stmt = Stmt::Expr(
@@ -68,7 +76,7 @@ fn generate_fn_get_args_infos(span: Span, arguments: &[Argument]) -> ImplItemFn 
     );
     let block = Block {
         brace_token: token::Brace(span),
-        stmts: vec![vec_stmt],
+        stmts: vec![Stmt::Item(Item::Use(use_i_debug_printer_stmt)), vec_stmt],
     };
 
     let result = ImplItemFn {
@@ -103,7 +111,10 @@ fn generate_arg_info_new_expr(argument: &Argument) -> Expr {
 
     let result = Expr::Call(expr::call::new(
         span,
-        Expr::Path(expr::path::new(span, ["ArgInfo", "new"])),
+        Expr::Path(expr::path::new_global(
+            span,
+            rsubstitute_for_generated::new2("ArgInfo", "new"),
+        )),
         [
             arg_name_argument,
             arg_value_argument,

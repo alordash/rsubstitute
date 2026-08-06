@@ -115,78 +115,75 @@ pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockM
     let mod_visibility = item_trait.vis.clone();
     let mock_mod_usages = mock_mod_usages::new(source_span);
     item_trait.vis = Visibility::Public(Token![pub](source_span));
-    let items = [
-        Item::Use(mock_mod_usages.use_rsubstitute_for_generated),
-        Item::Use(mock_mod_usages.use_super),
-    ]
-    .into_iter()
-    .chain(trait_info.associated_fns.into_iter().flat_map(|x| {
-        let call_struct = x.value.call_struct;
-        let args_checker = x.value.args_checker_struct;
-        [
-            Item::Struct(call_struct.item_struct),
-            Item::Impl(call_struct.generics_info_provider_impl),
-            Item::Impl(call_struct.call_impl),
-        ]
+    let items = [Item::Use(mock_mod_usages.use_super)]
         .into_iter()
-        .chain(call_struct.maybe_clone_impl.map(Item::Impl).into_iter())
-        .chain([
-            Item::Struct(args_checker.item_struct),
-            Item::Impl(args_checker.generics_info_provider_impl),
-            Item::Impl(args_checker.args_checker_impl),
-        ])
-    }))
-    .chain(trait_info.static_fns.into_iter().flat_map(|x| {
-        let call_struct = x.value.call_struct;
-        let args_checker = x.value.args_checker_struct;
-        [
-            Item::Struct(call_struct.item_struct),
-            Item::Impl(call_struct.generics_info_provider_impl),
-            Item::Impl(call_struct.call_impl),
-        ]
-        .into_iter()
-        .chain(call_struct.maybe_clone_impl.map(Item::Impl).into_iter())
-        .chain([
-            Item::Struct(args_checker.item_struct),
-            Item::Impl(args_checker.generics_info_provider_impl),
-            Item::Impl(args_checker.args_checker_impl),
-        ])
-    }))
-    .chain([
-        Item::Struct(trait_mock_struct.item_struct),
-        Item::Impl(trait_mock_struct.clone_impl),
-        Item::Impl(trait_mock_struct.trait_impl),
-        Item::Impl(trait_mock_struct.inner_impl),
-    ])
-    .chain(
-        trait_mock_struct
-            .maybe_associated_controls
+        .chain(trait_info.associated_fns.into_iter().flat_map(|x| {
+            let call_struct = x.value.call_struct;
+            let args_checker = x.value.args_checker_struct;
+            [
+                Item::Struct(call_struct.item_struct),
+                Item::Impl(call_struct.generics_info_provider_impl),
+                Item::Impl(call_struct.call_impl),
+            ]
             .into_iter()
-            .flat_map(|associated_controls| {
-                [
-                    Item::Struct(associated_controls.setup_struct.item_struct),
-                    Item::Impl(associated_controls.setup_struct.item_impl),
-                    Item::Struct(associated_controls.received_struct.item_struct),
-                    Item::Impl(associated_controls.received_struct.clone_impl),
-                    Item::Impl(associated_controls.received_struct.item_impl),
-                ]
-            }),
-    )
-    .chain(
-        trait_mock_struct
-            .maybe_static_controls
+            .chain(call_struct.maybe_clone_impl.map(Item::Impl).into_iter())
+            .chain([
+                Item::Struct(args_checker.item_struct),
+                Item::Impl(args_checker.generics_info_provider_impl),
+                Item::Impl(args_checker.args_checker_impl),
+            ])
+        }))
+        .chain(trait_info.static_fns.into_iter().flat_map(|x| {
+            let call_struct = x.value.call_struct;
+            let args_checker = x.value.args_checker_struct;
+            [
+                Item::Struct(call_struct.item_struct),
+                Item::Impl(call_struct.generics_info_provider_impl),
+                Item::Impl(call_struct.call_impl),
+            ]
             .into_iter()
-            .flat_map(|static_controls| {
-                [
-                    Item::Struct(static_controls.static_setup_struct.item_struct),
-                    Item::Impl(static_controls.static_setup_struct.item_impl),
-                    Item::Struct(static_controls.static_received_struct.item_struct),
-                    Item::Impl(static_controls.static_received_struct.clone_impl),
-                    Item::Impl(static_controls.static_received_struct.item_impl),
-                ]
-            }),
-    )
-    .collect();
+            .chain(call_struct.maybe_clone_impl.map(Item::Impl).into_iter())
+            .chain([
+                Item::Struct(args_checker.item_struct),
+                Item::Impl(args_checker.generics_info_provider_impl),
+                Item::Impl(args_checker.args_checker_impl),
+            ])
+        }))
+        .chain([
+            Item::Struct(trait_mock_struct.item_struct),
+            Item::Impl(trait_mock_struct.clone_impl),
+            Item::Impl(trait_mock_struct.trait_impl),
+            Item::Impl(trait_mock_struct.inner_impl),
+        ])
+        .chain(
+            trait_mock_struct
+                .maybe_associated_controls
+                .into_iter()
+                .flat_map(|associated_controls| {
+                    [
+                        Item::Struct(associated_controls.setup_struct.item_struct),
+                        Item::Impl(associated_controls.setup_struct.item_impl),
+                        Item::Struct(associated_controls.received_struct.item_struct),
+                        Item::Impl(associated_controls.received_struct.clone_impl),
+                        Item::Impl(associated_controls.received_struct.item_impl),
+                    ]
+                }),
+        )
+        .chain(
+            trait_mock_struct
+                .maybe_static_controls
+                .into_iter()
+                .flat_map(|static_controls| {
+                    [
+                        Item::Struct(static_controls.static_setup_struct.item_struct),
+                        Item::Impl(static_controls.static_setup_struct.item_impl),
+                        Item::Struct(static_controls.static_received_struct.item_struct),
+                        Item::Impl(static_controls.static_received_struct.clone_impl),
+                        Item::Impl(static_controls.static_received_struct.item_impl),
+                    ]
+                }),
+        )
+        .collect();
 
     let usage = mod_usage::new(mod_ident.clone(), [trait_mock_struct_ident]);
     let item_mod = ItemMod {

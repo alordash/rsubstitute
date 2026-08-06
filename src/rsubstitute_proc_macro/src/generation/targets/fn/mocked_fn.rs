@@ -30,7 +30,7 @@ pub(crate) fn generate(
 
     let result = ItemFn {
         attrs: fn_info.attributes.clone(),
-        vis: Visibility::Public(Token![pub](source_span)),
+        vis: fn_info.visibility.clone(),
         modifiers: FnModifiers::default(),
         sig: *fn_info.source_signature.clone(),
         block: Box::new(block),

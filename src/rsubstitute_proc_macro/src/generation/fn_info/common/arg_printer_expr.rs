@@ -6,7 +6,10 @@ use syn::*;
 pub(crate) fn new(span: Span, expr: Expr, target_type: Type) -> Expr {
     let arg_printer = Expr::Call(expr::call::new(
         span,
-        Expr::Path(expr::path::new(span, ["ArgPrinter"])),
+        Expr::Path(expr::path::new_global(
+            span,
+            rsubstitute_for_generated::new("ArgPrinter"),
+        )),
         [Expr::Macro(transmute_lifetime_expr::new_with_target(
             Expr::Reference(ExprReference {
                 attrs: Vec::new(),
@@ -14,7 +17,8 @@ pub(crate) fn new(span: Span, expr: Expr, target_type: Type) -> Expr {
                 mutability: None,
                 expr: Box::new(expr),
             }),
-            Type::Reference(TypeReference {attrs: Vec::new(),
+            Type::Reference(TypeReference {
+                attrs: Vec::new(),
                 and_token: Token![&](span),
                 lifetime: None,
                 mutability: None,

@@ -213,7 +213,6 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
         use_struct_mod::generate(source_span, &impl_trait_for_struct_info.target_path);
     let mock_mod_usages = mock_mod_usages::new(source_span);
     let items = [
-        Item::Use(mock_mod_usages.use_rsubstitute_for_generated),
         Item::Use(mock_mod_usages.use_super),
         Item::Use(use_struct_mod),
     ]

@@ -33,24 +33,6 @@ pub(crate) fn generate(
             remove_lifetime_generic_arguments: true,
         },
     );
-    let use_mod_stmt = ItemUse {
-        attrs: Vec::new(),
-        vis: Visibility::Public(Token![pub](span)),
-        use_token: Token![use](span),
-        leading_colon: None,
-        tree: UseTree::Path(UsePath {
-            ident: Ident::new("rsubstitute", span),
-            colon2_token: Token![::](span),
-            tree: Box::new(UseTree::Path(UsePath {
-                ident: Ident::new("for_generated", span),
-                colon2_token: Token![::](span),
-                tree: Box::new(UseTree::Glob(UseGlob {
-                    star_token: Token![*](span),
-                })),
-            })),
-        }),
-        semi_token: Token![;](span),
-    };
     let call_stmt::Result {
         impl_trait_cast_stmts,
         call_var_path,
@@ -86,7 +68,6 @@ pub(crate) fn generate(
             .into_iter()
             .map(Stmt::Local)
             .chain([
-                Stmt::Item(Item::Use(use_mod_stmt)),
                 Stmt::Local(call_stmt),
                 Stmt::Local(fn_data_stmt),
                 Stmt::Expr(Expr::MethodCall(fn_handle_stmt), None),

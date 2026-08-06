@@ -74,9 +74,9 @@ fn generate_control_fn_arg(span: Span, pat: Box<Pat>, ref_style_type: Box<Type>)
                     [GenericArgument::Type(Type::Path(TypePath {
                         attrs: Vec::new(),
                         qself: None,
-                        path: path::new_generics(
+                        path: path::new_generics_global(
                             span,
-                            ["Arg"],
+                            rsubstitute_for_generated::new("Arg"),
                             [GenericArgument::Type(*ref_style_type)],
                         ),
                     }))],

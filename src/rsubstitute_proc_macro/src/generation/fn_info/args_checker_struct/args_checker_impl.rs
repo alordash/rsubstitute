@@ -26,7 +26,10 @@ pub(crate) fn generate(
         unsafety: None,
         impl_token: Token![impl](span),
         generics,
-        trait_: Some((path::new(span, ["IArgsChecker"]), Token![for](span))),
+        trait_: Some((
+            path::new_global(span, rsubstitute_for_generated::new("IArgsChecker")),
+            Token![for](span),
+        )),
         self_ty: Box::new(target_type),
         brace_token: token::Brace(span),
         items,
@@ -61,7 +64,10 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
                     and_token: Token![&](span),
                     lifetime: None,
                     mutability: None,
-                    elem: Box::new(Type::Path(r#type::path::new(span, ["DynCall"]))),
+                    elem: Box::new(Type::Path(r#type::path::new_global(
+                        span,
+                        rsubstitute_for_generated::new("DynCall"),
+                    ))),
                 })),
             }),
         ]),
@@ -70,11 +76,15 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
             Token![->](span),
             Box::new(Type::Path(r#type::vec_of(
                 span,
-                Type::Path(r#type::path::new(span, ["ArgCheckResult"])),
+                Type::Path(r#type::path::new_global(
+                    span,
+                    rsubstitute_for_generated::new("ArgCheckResult"),
+                )),
             ))),
         ),
     };
 
+    let use_i_debug_printer_stmt = rsubstitute_for_generated::glob_usage(span, "arg_printing");
     let call_path = path::new(span, ["call"]);
     let call_stmt = Stmt::Local(Local {
         attrs: vec![allow_unused_variables(span)],
@@ -174,7 +184,11 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
     );
     let block = Block {
         brace_token: token::Brace(span),
-        stmts: vec![call_stmt, vec_stmt],
+        stmts: vec![
+            Stmt::Item(Item::Use(use_i_debug_printer_stmt)),
+            call_stmt,
+            vec_stmt,
+        ],
     };
 
     let result = ImplItemFn {
@@ -206,6 +220,7 @@ fn generate_fn_fmt_args(span: Span, arguments: &[Argument]) -> ImplItemFn {
         ),
     };
 
+    let use_i_debug_printer_stmt = rsubstitute_for_generated::glob_usage(span, "arg_printing");
     let format_template_lit = Expr::Lit(ExprLit {
         attrs: Vec::new(),
         lit: Lit::Str(LitStr::new(&vec!["{}"; arguments.len()].join(", "), span)),
@@ -246,7 +261,10 @@ fn generate_fn_fmt_args(span: Span, arguments: &[Argument]) -> ImplItemFn {
     };
     let block = Block {
         brace_token: token::Brace(span),
-        stmts: vec![Stmt::Expr(Expr::Macro(format_expr), None)],
+        stmts: vec![
+            Stmt::Item(Item::Use(use_i_debug_printer_stmt)),
+            Stmt::Expr(Expr::Macro(format_expr), None),
+        ],
     };
 
     let result = ImplItemFn {

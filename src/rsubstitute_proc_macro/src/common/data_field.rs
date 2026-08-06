@@ -1,3 +1,4 @@
+use crate::common::*;
 use crate::syntax::*;
 use proc_macro2::Span;
 use syn::*;
@@ -14,7 +15,7 @@ pub(crate) fn new_field(span: Span) -> Field {
             qself: None,
             path: Path {
                 leading_colon: Some(Token![::](span)),
-                segments: rsubstitute_punctuated(
+                segments: rsubstitute_for_generated::punctuated(
                     span,
                     [PathSegment {
                         ident: Ident::new("SharedMockData", span),
