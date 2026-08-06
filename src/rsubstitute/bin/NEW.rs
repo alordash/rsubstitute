@@ -44,6 +44,9 @@ struct Consumer<'a> {
 #[mock(base)]
 fn consume(consumer: Consumer<'_>) {}
 
+#[mock]
+fn option_ref(v: Option<&i32>) {}
+
 fn main() {
     // let s = Struct(63);
     // f::setup().returns(Box::new(s));

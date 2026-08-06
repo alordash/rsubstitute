@@ -184,6 +184,9 @@ struct Consumer<'a> {
 #[mock(base)]
 fn consume(consumer: Consumer<'_>) {}
 
+#[mock(base)]
+fn option_ref(_: Option<&i32>) {}
+
 #[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]

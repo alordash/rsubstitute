@@ -48,19 +48,20 @@ impl VisitMut for ReferenceToPointerConverter {
             return;
         };
 
-        let void_elem = Box::new(void_type(i_ref.span()));
-        let elem = core::mem::replace(&mut i_ref.elem, void_elem);
-        let mut i_ptr = TypePtr {
+        let span = i_ref.span();
+        let void_elem = Box::new(void_type(span));
+        let mut elem = core::mem::replace(&mut i_ref.elem, void_elem);
+        visit_mut::visit_type_mut(self, elem.as_mut());
+        let i_non_null = TypePath {
             attrs: Vec::new(),
-            star_token: Token![*](i_ref.and_token.span),
-            mutability: i_ref.mutability.map_or(
-                PointerMutability::Const(Token![const](Span::call_site())),
-                |mutability| PointerMutability::Mut(mutability.clone()),
+            qself: None,
+            path: path::new_generics_global(
+                span,
+                ["core", "ptr", "NonNull"],
+                [GenericArgument::Type(*elem)],
             ),
-            elem,
         };
-        visit_mut::visit_type_ptr_mut(self, &mut i_ptr);
-        *i = Type::Ptr(i_ptr);
+        *i = Type::Path(i_non_null);
     }
 }
 
