@@ -29,7 +29,7 @@ pub(crate) fn new_field(
 pub(crate) fn new_value(span: Span) -> FieldValue {
     let result = FieldValue {
         attrs: Vec::new(),
-        member: Member::Named(Ident::new("generics", span)),
+        member: Member::Named(generics_field_ident(span)),
         colon_token: Some(Token![:](span)),
         expr: Expr::Path(ExprPath {
             attrs: Vec::new(),

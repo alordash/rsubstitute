@@ -118,7 +118,7 @@ pub(crate) fn static_lifetime(span: Span) -> Lifetime {
 }
 
 pub(crate) fn generics_field_ident(span: Span) -> Ident {
-    Ident::new("generics", span)
+    Ident::new("__rs_generics", span)
 }
 
 pub(crate) fn placeholder_lifetime(span: Span) -> Lifetime {
