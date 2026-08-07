@@ -12,7 +12,7 @@ use crate::generation::targets::*;
 use crate::generation::*;
 use crate::preparation::r#struct::*;
 use crate::syntax::*;
-use quote::{format_ident, ToTokens};
+use quote::{ToTokens, format_ident};
 use syn::spanned::Spanned;
 use syn::*;
 
@@ -74,6 +74,9 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                     struct_path: &control_struct_path,
                     struct_generics: control_struct_impl_generics.clone(),
                     trait_control_struct_path: &trait_setup_struct.path,
+                    as_trait_where_predicates: impl_trait_for_struct_info
+                        .as_trait_where_predicates
+                        .as_ref(),
                     trait_ident: &impl_trait_for_struct_info.trait_ident,
                     trait_generics: impl_trait_for_struct_info.trait_simple_generics.clone(),
                     maybe_common_where_clause: impl_trait_for_struct_info
@@ -90,6 +93,9 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                     struct_path: &control_struct_path,
                     struct_generics: control_struct_impl_generics.clone(),
                     trait_control_struct_path: &trait_received_struct.path,
+                    as_trait_where_predicates: impl_trait_for_struct_info
+                        .as_trait_where_predicates
+                        .as_ref(),
                     trait_ident: &impl_trait_for_struct_info.trait_ident,
                     trait_generics: impl_trait_for_struct_info.trait_simple_generics.clone(),
                     maybe_common_where_clause: impl_trait_for_struct_info
@@ -145,6 +151,9 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                 struct_path: &control_struct_path,
                 struct_generics: control_struct_impl_generics.clone(),
                 trait_control_struct_path: &trait_static_setup_struct.path,
+                as_trait_where_predicates: impl_trait_for_struct_info
+                    .as_trait_where_predicates
+                    .as_ref(),
                 trait_ident: &impl_trait_for_struct_info.trait_ident,
                 trait_generics: impl_trait_for_struct_info.trait_simple_generics.clone(),
                 maybe_common_where_clause: impl_trait_for_struct_info
@@ -161,6 +170,9 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                 struct_path: &control_struct_path,
                 struct_generics: control_struct_impl_generics,
                 trait_control_struct_path: &trait_static_received_struct.path,
+                as_trait_where_predicates: impl_trait_for_struct_info
+                    .as_trait_where_predicates
+                    .as_ref(),
                 trait_ident: &impl_trait_for_struct_info.trait_ident,
                 trait_generics: impl_trait_for_struct_info.trait_simple_generics.clone(),
                 maybe_common_where_clause: impl_trait_for_struct_info

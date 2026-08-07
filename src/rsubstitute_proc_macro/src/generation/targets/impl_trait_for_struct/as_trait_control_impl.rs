@@ -9,6 +9,7 @@ pub(crate) struct Params<'a> {
     pub struct_path: &'a Path,
     pub struct_generics: Generics,
     pub trait_control_struct_path: &'a Path,
+    pub as_trait_where_predicates: &'a [WherePredicate],
     pub trait_ident: &'a Ident,
     pub trait_generics: Generics,
     pub maybe_common_where_clause: Option<WhereClause>,
@@ -21,6 +22,7 @@ pub(crate) fn generate(
         struct_path,
         mut struct_generics,
         trait_control_struct_path,
+        as_trait_where_predicates,
         trait_ident,
         mut trait_generics,
         maybe_common_where_clause,
@@ -49,12 +51,10 @@ pub(crate) fn generate(
         ),
     };
     trait_generics.where_clause = maybe_common_where_clause;
-    // let trait_generics_where_predicates = &mut trait_generics.make_where_clause().predicates;
-    // let extracted_where_predicates =
-    //     generics::extract_generics_into_where_predicates(&mut struct_generics);
-    // for extracted_where_predicate in extracted_where_predicates {
-    //     trait_generics_where_predicates.push(extracted_where_predicate);
-    // }
+    let trait_generics_where_predicates = &mut trait_generics.make_where_clause().predicates;
+    for extracted_where_predicate in as_trait_where_predicates {
+        trait_generics_where_predicates.push(extracted_where_predicate.clone());
+    }
     let fn_as_trait = generate_fn_as_trait(
         span,
         trait_control_struct_path,
