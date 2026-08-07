@@ -11,6 +11,7 @@ pub(crate) struct ImplTraitForStructInfo {
     pub trait_path: Path,
     pub merged_generics: Generics,
     pub trait_simple_generics: Generics,
+    pub as_trait_where_predicates: Vec<WherePredicate>,
     pub target_simple_generics: Generics,
     pub constants: Vec<Ordered<ImplItemConst>>,
     pub types: Vec<Ordered<ImplItemType>>,

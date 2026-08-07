@@ -5,10 +5,10 @@ use syn::spanned::Spanned;
 use syn::visit::Visit;
 use syn::*;
 
-// TODO - this is apparently not needed because generics for trait and struct should be extracted from their path
 pub(crate) struct SplitGenerics {
-    pub target_generics: Generics,
     pub trait_generics: Generics,
+    pub target_generics: Generics,
+    pub trait_where_predicates: Vec<WherePredicate>,
 }
 pub(crate) fn split_generics(
     generics: &Generics,
@@ -26,6 +26,15 @@ pub(crate) fn split_generics(
     let mut trait_generics_searcher =
         GenericsSearcher::new(&mut target_generics_searcher.searched_generics_idents_map);
     trait_generics_searcher.visit_path(trait_path);
+    for target_generic_param in target_generics_searcher.found_generic_params.iter() {
+        let i = generic_param::get_ident(target_generic_param);
+        // TODO - for bound in target_generic_param.bounds {
+        //    if !target_generics_searcher.found_generic_params.map(|x| x.ident).contains(bound.ident) {
+        //        trait_where_predicates.push(bound); and remove bound from target_generic_param.bounds
+        //    }
+        // }
+    }
+    // let trait_where_predicates 
     let result = SplitGenerics {
         target_generics: if target_generics_searcher.found_generic_params.is_empty() {
             Generics::default()
@@ -47,6 +56,7 @@ pub(crate) fn split_generics(
                 where_clause: None,
             }
         },
+        trait_where_predicates: Vec::new()
     };
     return result;
 }
@@ -76,3 +86,7 @@ impl Visit<'_> for GenericsSearcher<'_> {
         }
     }
 }
+
+// struct WherePredicatesSearcher<'a> {
+//     searched_generics_idents_map: &
+// }

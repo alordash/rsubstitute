@@ -1,12 +1,21 @@
 use crate::args::*;
 use crate::infrastructure::*;
 use indexmap::IndexMap;
+use std::fmt::Formatter;
 
 // Two layer map: fn name + fn generics
 type Map = IndexMap<&'static str, IndexMap<GenericsHashKey, *const ()>>;
 
 pub struct MockData {
     map: Map,
+}
+
+impl core::fmt::Debug for MockData {
+    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("MockData")
+            .field("map.len", &self.map.len())
+            .finish()
+    }
 }
 
 impl Default for MockData {
@@ -28,7 +37,7 @@ impl MockData {
         &'_ mut self,
         fn_ident: &'static str,
         generics_hash_key: GenericsHashKey,
-        for_struct: bool
+        for_struct: bool,
     ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, PASSES_MOCK_TO_CALLBACK>
     {
         let fn_data_ptr = self

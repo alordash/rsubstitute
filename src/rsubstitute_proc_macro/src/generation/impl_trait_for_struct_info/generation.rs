@@ -15,6 +15,7 @@ pub(crate) fn generate(
         trait_path: impl_trait_for_struct_syntax.trait_path,
         merged_generics: impl_trait_for_struct_syntax.merged_generics,
         target_simple_generics: impl_trait_for_struct_syntax.target_simple_generics,
+        as_trait_where_predicates: impl_trait_for_struct_syntax.as_trait_where_predicates,
         trait_simple_generics: impl_trait_for_struct_syntax.trait_simple_generics,
         constants: impl_trait_for_struct_syntax.constants,
         types: impl_trait_for_struct_syntax.types,

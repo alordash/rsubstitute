@@ -59,6 +59,7 @@ pub(crate) fn prepare(
         trait_path,
         merged_generics,
         trait_simple_generics: split_generics.trait_generics,
+        as_trait_where_predicates: split_generics.trait_where_predicates,
         target_simple_generics: split_generics.target_generics,
         constants: split_items.constants,
         types: split_items.types,

@@ -47,10 +47,45 @@ fn consume(consumer: Consumer<'_>) {}
 #[mock]
 fn option_ref(v: Option<&i32>) {}
 
-#[mock(base)]
+#[mock]
 fn arg_impl(v: impl IntoIterator<Item = i32, IntoIter = Vec<i32>>) {}
 
+#[mock]
+struct S<T> {
+    t: T,
+}
+
+#[mock]
+impl<T> S<T> {
+    pub(crate) fn new(t: T) -> Self {
+        S { t }
+    }
+}
+
+struct MyI32;
+impl PartialEq<MyI32> for i32 {
+    fn eq(&self, _: &MyI32) -> bool {
+        todo!()
+    }
+}
+
+#[mock(base)]
+impl<T: PartialEq<U>, U> PartialEq<U> for S<T> {
+    fn eq(&self, _: &U) -> bool {
+        todo!()
+    }
+}
+
 fn main() {
+    let mut s = S {
+        t: 3,
+        __rs_data: Default::default(),
+    };
+    s.setup()
+        .as_PartialEq()
+        .eq(rsubstitute::Arg::<&MyI32>::Any)
+        .returns(true);
+
     // let s = Struct(63);
     // f::setup().returns(Box::new(s));
     // let result = f();
