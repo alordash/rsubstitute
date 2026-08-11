@@ -1,4 +1,4 @@
-use crate::syntax::{path, void_type};
+use crate::syntax::*;
 use proc_macro2::Span;
 use syn::*;
 
@@ -33,11 +33,14 @@ pub(crate) fn new(
                             mutability: None,
                             elem: Box::new(void_type(span)),
                         })),
-                        GenericParam::Type(ty) => Some(Type::Path(TypePath {
-                            attrs: Vec::new(),
-                            qself: None,
-                            path: path::from_ident(ty.ident.clone()),
-                        })),
+                        GenericParam::Type(ty) => Some(Type::Path(r#type::box_of(
+                            span,
+                            Type::Path(TypePath {
+                                attrs: Vec::new(),
+                                qself: None,
+                                path: path::from_ident(ty.ident.clone()),
+                            }),
+                        ))),
                         _ => None,
                     })
                     .chain(

@@ -34,9 +34,8 @@ pub(crate) fn generate(
             .iter()
             .chain(static_fns.iter())
             .map(|ordered| {
-                ordered.ref_map(|x| {
-                    try_extract_base_fn(span, mock_struct_path.clone(), &x, mod_ident)
-                })
+                ordered
+                    .ref_map(|x| try_extract_base_fn(span, mock_struct_path.clone(), &x, mod_ident))
             })
             .filter_map(|ordered| match ordered.value {
                 Some(x) => Some(Ordered::new(ordered.order_number, x)),
@@ -112,9 +111,8 @@ pub(crate) fn generate_for_trait(
             .iter()
             .chain(static_fns.iter())
             .map(|ordered| {
-                ordered.ref_map(|x| {
-                    try_extract_base_fn(span, mock_struct_path.clone(), &x, mod_ident)
-                })
+                ordered
+                    .ref_map(|x| try_extract_base_fn(span, mock_struct_path.clone(), &x, mod_ident))
             })
             .filter_map(|ordered| match ordered.value {
                 Some(x) => Some(Ordered::new(ordered.order_number, x)),

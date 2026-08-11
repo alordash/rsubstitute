@@ -23,7 +23,7 @@ pub trait IGenericsInfoProvider {
 }
 
 // Helper method for clearer `IGenericsInfoProvider::hash_generics_type_ids` auto-generated implementation.
-pub fn tid<T>() -> TypeId {
+pub fn tid<T: ?Sized>() -> TypeId {
     typeid::of::<T>()
 }
 
