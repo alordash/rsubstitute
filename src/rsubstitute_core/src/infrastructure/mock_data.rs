@@ -10,6 +10,9 @@ pub struct MockData {
     map: Map,
 }
 
+unsafe impl Send for MockData {}
+unsafe impl Sync for MockData {}
+
 impl core::fmt::Debug for MockData {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
         f.debug_struct("MockData")
@@ -27,7 +30,7 @@ impl Default for MockData {
 }
 
 impl MockData {
-    pub(crate) fn get_fn_data<
+    pub(crate) fn get_or_create_fn_data<
         'a,
         TMock,
         const HAS_RETURN_VALUE: bool,
