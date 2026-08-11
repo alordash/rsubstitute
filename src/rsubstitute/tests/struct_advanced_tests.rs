@@ -32,6 +32,14 @@ impl From<f32> for Struct {
     }
 }
 
+#[mock]
+struct Selfish;
+
+#[mock(base)]
+impl Selfish {
+    fn work(&self, _: &Self) {}
+}
+
 #[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]

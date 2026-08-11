@@ -1,10 +1,10 @@
 use super::models::*;
-use crate::common::rsubstitute_lifetime;
-use crate::preparation::models::*;
+use crate::common::{normalization, rsubstitute_lifetime};
 use crate::preparation::r#fn::fn_syntax;
 use crate::preparation::r#fn::models::*;
+use crate::preparation::models::*;
 use crate::syntax::*;
-use quote::{format_ident, ToTokens};
+use quote::{ToTokens, format_ident};
 use syn::*;
 
 pub(crate) struct Params {
@@ -23,9 +23,17 @@ pub(crate) fn prepare(
         visibility,
         ident,
         generics,
-        items,
+        mut items,
     }: Params,
 ) -> TraitSyntax {
+    let trait_mock_path = path::from_ident_with_generics(
+        format_ident!("{}Mock", ident),
+        &rsubstitute_lifetime::prepend_to_generics(generics.clone()),
+    );
+    items = items
+        .into_iter()
+        .map(|x| normalization::normalize_struct_type_references_in_trait_item(x, &trait_mock_path))
+        .collect();
     let split_items = split_items(items, &ident);
     let source_generics = generics.clone();
     let mut merged_generics = merge_generics_with_assoc_generics(

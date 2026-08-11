@@ -14,6 +14,15 @@ pub(crate) fn normalize_struct_type_references(
     return impl_item;
 }
 
+pub(crate) fn normalize_struct_type_references_in_trait_item(
+    mut trait_item: TraitItem,
+    trait_mock_path: &Path,
+) -> TraitItem {
+    let mut normalizer = StructTypeReferencesNormalizer::new(trait_mock_path);
+    normalizer.visit_trait_item_mut(&mut trait_item);
+    return trait_item;
+}
+
 pub(crate) fn normalize_struct_type_references_in_impl_item_fn(
     impl_item_fn: &mut ImplItemFn,
     struct_path: &Path,
