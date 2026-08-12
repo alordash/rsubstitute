@@ -23,57 +23,7 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f847079f-511f-4600-8811-ffe4728519b1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/rsubstitute/tests/optional_generics_tests.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/vcs.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/vcs.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/common/mockable_field.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/common/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/common/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/common/normalization/method_normalization.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/common/normalization/method_normalization.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/common/normalization/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/common/normalization/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/constants.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/constants.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/entrypoints/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/entrypoints/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/entrypoints/models/mock_macro_usage.rs" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/common/call_stmt.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/common/call_stmt.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/common/fn_data_stmt.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/common/fn_data_stmt.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/fn_info/args_checker_struct.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/fn_info/args_checker_struct.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/fn_info/call_struct.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/fn_info/call_struct.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/fn_info/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/fn_info/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/impl_struct_info/generation.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/impl_struct_info/generation.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/impl_struct_info/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/impl_struct_info/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/impl_struct_info/models/impl_struct_info.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/impl_struct_info/models/impl_struct_info.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/impl_trait_for_struct_info/generation.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/impl_trait_for_struct_info/generation.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/impl_trait_for_struct_info/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/impl_trait_for_struct_info/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/impl_trait_for_struct_info/models/impl_trait_for_struct_info.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/impl_trait_for_struct_info/models/impl_trait_for_struct_info.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_controls/received_impl.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_controls/received_impl.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_controls/setup_impl.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_controls/setup_impl.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/associated_method_block.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/associated_method_block.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/common/fn_handle_stmt.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/common/fn_handle_stmt.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/models/trait_mock_struct.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/models/trait_mock_struct.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/static_fn_block.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/static_fn_block.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/trait_mock_struct.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/trait_mock_struct.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/common/mock_struct_impl.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/common/mock_struct_impl.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/impl_struct.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/impl_struct.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/impl_trait_for_struct.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/impl_trait_for_struct.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/impl_trait_for_struct/as_trait_control_impl.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/impl_trait_for_struct/as_trait_control_impl.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/trait.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/trait.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/trait_info/generation.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/trait_info/generation.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/trait_info/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/trait_info/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/trait_info/models/trait_info.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/trait_info/models/trait_info.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/fn/fn_syntax.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/fn/fn_syntax.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/fn/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/fn/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/models/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/models/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/struct/impl_struct_syntax.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/struct/impl_struct_syntax.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/struct/impl_trait_for_struct_syntax.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/struct/impl_trait_for_struct_syntax.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/struct/models/impl_struct_syntax.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/struct/models/impl_struct_syntax.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/struct/models/impl_trait_for_struct_syntax.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/struct/models/impl_trait_for_struct_syntax.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/trait/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/trait/mod.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/trait/models/trait_syntax.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/trait/models/trait_syntax.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/trait/trait_syntax.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/trait/trait_syntax.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/syntax/attributes.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/syntax/attributes.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/syntax/common.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/syntax/common.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/syntax/generics.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/syntax/generics.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/syntax/type.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/syntax/type.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/syntax/visibility.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/syntax/visibility.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -457,7 +407,25 @@
       <recent name="C:\_RS\rsubstitute\src\rsubstitute_proc_macro\src\generation\mock_controls\common" />
     </key>
   </component>
-  <component name="RunManager" selected="Cargo.Test optional_generics_tests::tests">
+  <component name="RunManager" selected="Cargo.Tests in 'tests'">
+    <configuration name="Run NEW_struct_from_wip" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="buildProfileId" value="dev" />
+      <option name="command" value="run --package rsubstitute --bin NEW_struct_from_wip" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Run sandbox" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="buildProfileId" value="test" />
       <option name="command" value="run --package rsubstitute --bin sandbox" />
@@ -528,23 +496,6 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Test unsized_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="test --package rsubstitute --test unsized_tests -- tests" />
-      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
-      <envs />
-      <option name="emulateTerminal" value="true" />
-      <option name="channel" value="DEFAULT" />
-      <option name="requiredFeatures" value="true" />
-      <option name="allFeatures" value="false" />
-      <option name="withSudo" value="false" />
-      <option name="buildTarget" value="REMOTE" />
-      <option name="backtrace" value="SHORT" />
-      <option name="isRedirectInput" value="false" />
-      <option name="redirectInputPath" value="" />
-      <method v="2">
-        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
-      </method>
-    </configuration>
     <configuration name="Tests in 'tests' (1)" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
       <option name="command" value="test --package rsubstitute --test arg_printing_test --test associated_types_tests --test behaviour_tests --test config_tests --test fn_advanced_tests --test fn_deref_tests --test fn_generics_tests --test fn_ref_tests --test fn_simple_tests --test fn_value_type_tests --test generics_info_in_logs_tests --test impl_trait_tests --test no_matching_config_tests --test reference_tests --test struct_advanced_tests --test struct_arc_tests --test struct_base_impl_tests --test struct_generics_tests --test struct_rc_tests --test struct_ref_tests --test struct_repeating_generics_tests --test struct_simple_tests --test struct_trait_impl_generics_tests --test struct_type_reference_normalization_tests --test struct_value_type_tests --test struct_various_self_tests --test trait_advanced_tests --test trait_arc_tests --test trait_base_impl_tests --test trait_generics_tests --test trait_rc_tests --test trait_ref_tests --test trait_simple_tests --test trait_value_type_tests --test trait_various_self_tests --test ub_tests --test unsized_tests" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
@@ -564,7 +515,7 @@
     </configuration>
     <configuration name="Tests in 'tests'" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
       <option name="buildProfileId" value="test" />
-      <option name="command" value="test --package rsubstitute --test arg_printing_test --test associated_types_tests --test behaviour_tests --test config_tests --test fn_advanced_tests --test fn_deref_tests --test fn_generics_tests --test fn_ref_tests --test fn_simple_tests --test fn_value_type_tests --test generics_info_in_logs_tests --test impl_trait_tests --test no_matching_config_tests --test reference_tests --test struct_advanced_tests --test struct_arc_tests --test struct_base_impl_tests --test struct_generics_tests --test struct_rc_tests --test struct_ref_tests --test struct_repeating_generics_tests --test struct_simple_tests --test struct_trait_impl_generics_tests --test struct_type_reference_normalization_tests --test struct_value_type_tests --test struct_various_self_tests --test trait_advanced_tests --test trait_arc_tests --test trait_base_impl_tests --test trait_generics_tests --test trait_rc_tests --test trait_ref_tests --test trait_simple_tests --test trait_value_type_tests --test trait_various_self_tests --test ub_tests" />
+      <option name="command" value="test --package rsubstitute --test arg_printing_test --test associated_types_tests --test behaviour_tests --test config_tests --test fn_advanced_tests --test fn_deref_tests --test fn_generics_tests --test fn_ref_tests --test fn_simple_tests --test fn_value_type_tests --test generics_info_in_logs_tests --test impl_trait_tests --test no_matching_config_tests --test optional_generics_tests --test reference_tests --test struct_advanced_tests --test struct_arc_tests --test struct_base_impl_tests --test struct_generics_tests --test struct_rc_tests --test struct_ref_tests --test struct_repeating_generics_tests --test struct_simple_tests --test struct_trait_impl_generics_tests --test struct_type_reference_normalization_tests --test struct_value_type_tests --test struct_various_self_tests --test trait_advanced_tests --test trait_arc_tests --test trait_base_impl_tests --test trait_generics_tests --test trait_rc_tests --test trait_ref_tests --test trait_simple_tests --test trait_value_type_tests --test trait_various_self_tests --test ub_tests --test unsized_tests" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -583,19 +534,19 @@
     <list>
       <item itemvalue="Cargo.Run sandbox" />
       <item itemvalue="Cargo.Test src" />
+      <item itemvalue="Cargo.Run NEW_struct_from_wip" />
       <item itemvalue="Cargo.Test optional_generics_tests::tests" />
       <item itemvalue="Cargo.Test trait_advanced_tests::tests" />
-      <item itemvalue="Cargo.Test unsized_tests::tests" />
       <item itemvalue="Cargo.Tests in 'tests' (1)" />
       <item itemvalue="Cargo.Tests in 'tests'" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Cargo.Tests in 'tests'" />
+        <item itemvalue="Cargo.Run NEW_struct_from_wip" />
         <item itemvalue="Cargo.Test optional_generics_tests::tests" />
         <item itemvalue="Cargo.Tests in 'tests' (1)" />
         <item itemvalue="Cargo.Test trait_advanced_tests::tests" />
-        <item itemvalue="Cargo.Test unsized_tests::tests" />
-        <item itemvalue="Cargo.Tests in 'tests'" />
       </list>
     </recent_temporary>
   </component>

@@ -319,7 +319,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
     };
     let result = MockMod {
         source_item: Item::Impl(mock_struct_impls.trait_impl),
-        maybe_usage: Some(usage),
+        maybe_usage: None,
         item_mod,
     };
     return result;
