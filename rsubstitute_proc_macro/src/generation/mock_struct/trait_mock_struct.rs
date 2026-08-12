@@ -72,14 +72,13 @@ pub(crate) fn generate(
         span,
         trait_info,
         generics_for_impl,
-        path.clone(),
+        path,
         mod_ident,
         &maybe_associated_controls,
         &maybe_static_controls,
     );
 
     let result = TraitMockStruct {
-        path,
         item_struct,
         clone_impl,
         trait_impl,
@@ -225,7 +224,6 @@ fn map_fn(
                             None
                         },
                         maybe_mod_ident: Some(mod_ident),
-                        for_struct: false,
                     },
                 )
             },

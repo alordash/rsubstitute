@@ -2,7 +2,6 @@ use crate::generation::mock_struct::models::*;
 use syn::*;
 
 pub(crate) struct TraitMockStruct {
-    pub path: Path,
     pub item_struct: ItemStruct,
     pub clone_impl: ItemImpl,
     pub trait_impl: ItemImpl,

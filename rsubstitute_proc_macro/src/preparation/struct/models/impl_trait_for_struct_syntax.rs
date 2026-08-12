@@ -5,7 +5,6 @@ use syn::*;
 pub(crate) struct ImplTraitForStructSyntax {
     pub attributes: Vec<Attribute>,
     pub target_path: Path,
-    pub target_type: Type,
     pub trait_ident: Ident,
     pub trait_path: Path,
     pub merged_generics: Generics,

@@ -20,7 +20,7 @@ pub(crate) fn generate(
     span: Span,
     Params {
         struct_path,
-        mut struct_generics,
+        struct_generics,
         trait_control_struct_path,
         as_trait_where_predicates,
         trait_ident,

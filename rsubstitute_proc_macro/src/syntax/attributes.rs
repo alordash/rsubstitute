@@ -47,6 +47,10 @@ pub(crate) fn allow_unreachable_pub(span: Span) -> Attribute {
     allow(span, "unreachable_pub")
 }
 
+pub(crate) fn allow_private_interfaces(span: Span) -> Attribute {
+    allow(span, "private_interfaces")
+}
+
 fn allow(span: Span, allowed: &'static str) -> Attribute {
     let result = Attribute {
         pound_token: Token![#](span),

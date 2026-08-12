@@ -1,6 +1,6 @@
 pub mod models {
     mod impl_struct_info;
-    
+
     pub(crate) use impl_struct_info::*;
 }
 

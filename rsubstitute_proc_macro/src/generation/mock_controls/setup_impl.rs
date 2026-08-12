@@ -151,7 +151,6 @@ fn generate_setup_fn(
                 fn_info,
                 generic_arguments,
                 generics_info_provider_var_path: args_checker_var_path.clone(),
-                for_struct,
             },
         )
     };

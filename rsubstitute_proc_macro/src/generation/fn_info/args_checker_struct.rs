@@ -5,7 +5,6 @@ use crate::generation::fn_info::*;
 use crate::preparation::r#fn::models::*;
 use crate::syntax::path;
 use quote::format_ident;
-use syn::spanned::Spanned;
 use syn::*;
 
 pub(crate) fn generate(

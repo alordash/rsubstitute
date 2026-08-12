@@ -9,7 +9,6 @@ pub(crate) struct AssociatedParams<'a> {
     pub fn_info: &'a FnInfo,
     pub generic_arguments: generic_arguments::Result,
     pub generics_info_provider_var_path: ExprPath,
-    pub for_struct: bool,
 }
 pub(crate) fn new_associated(
     span: Span,
@@ -17,15 +16,9 @@ pub(crate) fn new_associated(
         fn_info,
         generic_arguments,
         generics_info_provider_var_path,
-        for_struct,
     }: AssociatedParams,
 ) -> (ExprPath, Local) {
     let fn_data_var_path = expr::path::new(span, ["fn_data"]);
-    let fn_name = if for_struct {
-        "get_shared_fn_data_for_struct"
-    } else {
-        "get_shared_fn_data"
-    };
     let fn_data_stmt = Local {
         attrs: Vec::new(),
         let_token: Token![let](span),
@@ -33,20 +26,6 @@ pub(crate) fn new_associated(
         pat: fn_data_pat(span, fn_data_var_path.clone(), generic_arguments),
         init: Some(LocalInit {
             eq_token: Token![=](span),
-            // expr: Box::new(Expr::MethodCall(expr::method_call::new(
-            //     span,
-            //     Expr::Field(expr::field::new_self(Ident::new("__rs_data", span))),
-            //     Ident::new(fn_name, span),
-            //     [
-            //         fn_info_ident_to_expr_lit(span, fn_info),
-            //         Expr::MethodCall(expr::method_call::new(
-            //             span,
-            //             Expr::Path(generics_info_provider_var_path),
-            //             Ident::new("get_generics_hash_key", span),
-            //             [],
-            //         )),
-            //     ],
-            // ))),
             expr: Box::new(Expr::Call(expr::call::new(
                 span,
                 Expr::Path(expr::path::new_global(

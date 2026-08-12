@@ -10,7 +10,6 @@ pub(crate) fn generate(
     let result = ImplTraitForStructInfo {
         attributes: impl_trait_for_struct_syntax.attributes,
         target_path: impl_trait_for_struct_syntax.target_path,
-        target_type: impl_trait_for_struct_syntax.target_type,
         trait_ident: impl_trait_for_struct_syntax.trait_ident,
         trait_path: impl_trait_for_struct_syntax.trait_path,
         merged_generics: impl_trait_for_struct_syntax.merged_generics,

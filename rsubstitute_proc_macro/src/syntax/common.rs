@@ -6,10 +6,6 @@ use syn::*;
 const SELF: &'static str = "self";
 const SELF_TYPE: &'static str = "Self";
 
-pub(crate) fn self_path(span: Span) -> Path {
-    path::new(span, [SELF])
-}
-
 pub(crate) fn self_expr_path(span: Span) -> ExprPath {
     expr::path::new(span, [SELF])
 }
@@ -24,35 +20,6 @@ pub(crate) fn self_type_path(span: Span) -> Path {
 
 pub(crate) fn self_type(span: Span) -> TypePath {
     r#type::path::new(span, [SELF_TYPE])
-}
-
-pub(crate) fn ref_self_type(span: Span) -> TypeReference {
-    TypeReference {
-        attrs: Vec::new(),
-        and_token: Token![&](span),
-        lifetime: None,
-        mutability: None,
-        elem: Box::new(Type::Path(self_type(span))),
-    }
-}
-
-pub(crate) fn mut_ref_self_type(span: Span) -> TypeReference {
-    TypeReference {
-        attrs: Vec::new(),
-        and_token: Token![&](span),
-        lifetime: None,
-        mutability: Some(Token![mut](span)),
-        elem: Box::new(Type::Path(self_type(span))),
-    }
-}
-
-pub(crate) fn self_fn_arg() -> FnArg {
-    FnArg::Receiver(Receiver {
-        attrs: Vec::new(),
-        mutability: None,
-        self_token: Token![self](Span::call_site()),
-        kind: ReceiverKind::Value,
-    })
 }
 
 pub(crate) fn ref_self_fn_arg(span: Span) -> FnArg {
@@ -108,13 +75,6 @@ pub(crate) fn mut_ptr_void_type(span: Span) -> Type {
         mutability: PointerMutability::Mut(Token![mut](span)),
         elem: Box::new(void_type(span)),
     })
-}
-
-pub(crate) fn static_lifetime(span: Span) -> Lifetime {
-    Lifetime {
-        apostrophe: span,
-        ident: Ident::new("static", span),
-    }
 }
 
 pub(crate) fn generics_field_ident(span: Span) -> Ident {

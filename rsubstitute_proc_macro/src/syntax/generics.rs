@@ -1,5 +1,4 @@
 use crate::syntax::*;
-use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::*;
 
@@ -11,19 +10,6 @@ pub(crate) fn combine(mut generics: Generics, extension: &Generics) -> Generics 
             .predicates
             .extend(owner_generics_where_clause.predicates.clone());
     }
-    return generics;
-}
-
-pub(crate) fn with_prefix_lifetime(mut generics: Generics, prefix_lifetime: Lifetime) -> Generics {
-    generics.params.insert(
-        0,
-        GenericParam::Lifetime(LifetimeParam {
-            attrs: Vec::new(),
-            lifetime: prefix_lifetime,
-            colon_token: None,
-            bounds: Punctuated::new(),
-        }),
-    );
     return generics;
 }
 

@@ -1,3 +1,3 @@
 mod ordered;
 
-pub use ordered::*;
+pub(crate) use ordered::*;

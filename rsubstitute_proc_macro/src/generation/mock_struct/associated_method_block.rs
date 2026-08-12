@@ -11,7 +11,6 @@ pub(crate) struct Params<'a> {
     pub fn_info: &'a FnInfo,
     pub maybe_base_fn_ident: Option<Ident>,
     pub maybe_mod_ident: Option<Ident>,
-    pub for_struct: bool,
 }
 pub(crate) fn generate(
     ctx: &Context,
@@ -21,7 +20,6 @@ pub(crate) fn generate(
         fn_info,
         maybe_base_fn_ident,
         maybe_mod_ident,
-        for_struct,
     }: Params,
 ) -> Block {
     let generic_arguments = generic_arguments::new(
@@ -44,14 +42,12 @@ pub(crate) fn generate(
             fn_info,
             generic_arguments,
             generics_info_provider_var_path: call_var_path.clone(),
-            for_struct,
         },
     );
     let fn_handle_stmt = fn_handle_stmt::generate(
         ctx,
         span,
         fn_handle_stmt::Params {
-            mock_struct_path,
             fn_info,
             base_fn_kind: maybe_base_fn_ident
                 .map(BaseFnKind::Associated)

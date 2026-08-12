@@ -3,15 +3,13 @@ use crate::common::*;
 use crate::generation::fn_info;
 use crate::generation::fn_info::models::*;
 use crate::generation::trait_info::models::*;
-use crate::preparation::models::*;
 use crate::preparation::r#fn::models::*;
+use crate::preparation::models::*;
 use crate::preparation::r#trait::models::*;
 use crate::syntax::*;
-use quote::format_ident;
 use syn::*;
 
 pub(crate) fn generate(ctx: &Context, trait_syntax: TraitSyntax) -> TraitInfo {
-    let mock_struct_ident = format_ident!("{}Mock", trait_syntax.ident);
     let span = trait_syntax.ident.span();
     let associated_items_info = AssociatedItemsInfo {
         trait_path_segment: PathSegment {
@@ -41,10 +39,7 @@ pub(crate) fn generate(ctx: &Context, trait_syntax: TraitSyntax) -> TraitInfo {
             .collect(),
     };
     let result = TraitInfo {
-        attributes: trait_syntax.attributes,
         unsafety: trait_syntax.unsafety,
-        visibility: trait_syntax.visibility,
-        source_generics: trait_syntax.source_generics,
         merged_generics: trait_syntax.merged_generics,
         constants: trait_syntax.constants,
         assoc_types: trait_syntax.assoc_types,
@@ -62,7 +57,6 @@ pub(crate) fn generate(ctx: &Context, trait_syntax: TraitSyntax) -> TraitInfo {
             trait_syntax.associated_fns,
         ),
         ident: trait_syntax.ident,
-        mock_struct_ident,
         associated_items_info,
     };
     return result;

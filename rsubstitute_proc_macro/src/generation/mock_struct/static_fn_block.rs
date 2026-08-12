@@ -1,4 +1,3 @@
-use std::ops::Not;
 use crate::common::models::*;
 use crate::generation::common::*;
 use crate::generation::fn_info::models::*;
@@ -52,7 +51,6 @@ pub(crate) fn generate(
         ctx,
         span,
         fn_handle_stmt::Params {
-            mock_struct_path,
             fn_info,
             base_fn_kind,
             call_var_path,

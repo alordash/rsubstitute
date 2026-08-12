@@ -1,8 +1,8 @@
 use super::models::*;
 use crate::common::normalization;
-use crate::preparation::models::*;
 use crate::preparation::r#fn::models::*;
 use crate::preparation::r#fn::*;
+use crate::preparation::models::*;
 use crate::syntax::*;
 use proc_macro2::Ident;
 use quote::ToTokens;
@@ -23,7 +23,7 @@ pub(crate) fn prepare(
         mut impl_items,
     }: Params,
 ) -> ImplStructSyntax {
-    let target_path = parse_target_type(&target_type);
+    let target_path = parse_target_type(*target_type);
     let target_ident = target_path
         .segments
         .last()
@@ -58,8 +58,6 @@ pub(crate) fn prepare(
         target_ident,
         target_path,
         generics,
-        target_type: *target_type,
-        constants: split_items.constants,
         static_fns,
         associated_fns,
     };
@@ -68,7 +66,6 @@ pub(crate) fn prepare(
 
 #[derive(Default)]
 struct SplitItems {
-    pub constants: Vec<Ordered<ImplItemConst>>,
     pub static_fns: Vec<Ordered<ImplItemFn>>,
     pub associated_fns: Vec<Ordered<ImplItemFn>>,
 }
@@ -76,9 +73,7 @@ fn split_items(items: Vec<ImplItem>) -> SplitItems {
     let mut split_items = SplitItems::default();
     for (order_number, item) in items.into_iter().enumerate() {
         match item {
-            ImplItem::Const(impl_item_const) => split_items
-                .constants
-                .push(Ordered::new(order_number, impl_item_const)),
+            ImplItem::Const(_) => {}
             ImplItem::Fn(impl_item_fn) => {
                 if signature::is_associated(&impl_item_fn.sig) {
                     split_items
@@ -116,7 +111,7 @@ fn map_impl_item_fn_to_fn_syntax(
     return result;
 }
 
-fn parse_target_type(target_type: &Type) -> Path {
+fn parse_target_type(target_type: Type) -> Path {
     let Type::Path(type_path) = target_type else {
         panic!("Can mock only `impl`s of structs.");
     };
@@ -124,7 +119,7 @@ fn parse_target_type(target_type: &Type) -> Path {
         panic!("Can not mock structs qualified with self-type.");
     }
 
-    return type_path.path.clone();
+    return type_path.path;
 }
 
 struct ImplStructSyntaxAsFnOwner<'a> {

@@ -15,9 +15,7 @@ use syn::*;
 pub(crate) fn generate_module(ctx: &Context, item_trait: ItemTrait) -> MockMod {
     let source_span = item_trait.span();
     let trait_syntax = trait_syntax::prepare(trait_syntax::Params {
-        attributes: item_trait.attrs.clone(),
         unsafety: item_trait.unsafety.clone(),
-        visibility: item_trait.vis.clone(),
         ident: item_trait.ident.clone(),
         generics: item_trait.generics.clone(),
         items: item_trait.items.clone(),

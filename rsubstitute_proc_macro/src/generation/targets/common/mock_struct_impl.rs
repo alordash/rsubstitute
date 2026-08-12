@@ -12,6 +12,7 @@ use syn::punctuated::Punctuated;
 use syn::*;
 
 pub(crate) struct Params<'a> {
+    pub attributes: Vec<Attribute>,
     pub mock_struct_path: Path,
     pub associated_fns: &'a [Ordered<FnInfo>],
     pub static_fns: &'a [Ordered<FnInfo>],
@@ -22,6 +23,7 @@ pub(crate) fn generate(
     ctx: &Context,
     span: Span,
     Params {
+        attributes,
         mock_struct_path,
         associated_fns,
         static_fns,
@@ -72,11 +74,12 @@ pub(crate) fn generate(
         .chain(base_fns)
         .map(|x| ImplItem::Fn(x.value))
         .collect();
-    let result = generate_item_impl(span, generics, mock_struct_path, items, None);
+    let result = generate_item_impl(attributes, span, generics, mock_struct_path, items, None);
     return result;
 }
 
 pub(crate) struct ParamsForTrait<'a> {
+    pub attributes: Vec<Attribute>,
     pub mock_struct_path: Path,
     pub constants: &'a [Ordered<ImplItemConst>],
     pub types: &'a [Ordered<ImplItemType>],
@@ -94,6 +97,7 @@ pub(crate) fn generate_for_trait(
     ctx: &Context,
     span: Span,
     ParamsForTrait {
+        attributes,
         mock_struct_path,
         constants,
         types,
@@ -186,6 +190,7 @@ pub(crate) fn generate_for_trait(
             .map(|x| ImplItem::Fn(x.value))
             .collect();
         let base_fns_impl = generate_item_impl(
+            Vec::new(),
             span,
             merged_generics.clone(),
             mock_struct_path.clone(),
@@ -197,7 +202,7 @@ pub(crate) fn generate_for_trait(
         );
         return (base_fn_trait, base_fns_impl);
     });
-    let mut fns: Vec<_> = associated_fns
+    let fns: Vec<_> = associated_fns
         .iter()
         .map(|ordered| {
             map_fn(
@@ -231,6 +236,7 @@ pub(crate) fn generate_for_trait(
     ordered_items.sort_by(|a, b| a.order_number.cmp(&b.order_number));
     let items = ordered_items.into_iter().map(|x| x.value).collect();
     let trait_impl = generate_item_impl(
+        attributes,
         span,
         merged_generics,
         mock_struct_path,
@@ -245,6 +251,7 @@ pub(crate) fn generate_for_trait(
 }
 
 fn generate_item_impl(
+    attributes: Vec<Attribute>,
     span: Span,
     generics: Generics,
     mock_struct_path: Path,
@@ -252,7 +259,7 @@ fn generate_item_impl(
     maybe_trait_path: Option<Path>,
 ) -> ItemImpl {
     let result = ItemImpl {
-        attrs: Vec::new(),
+        attrs: attributes,
         modifiers: ImplModifiers::default(),
         unsafety: None,
         impl_token: Token![impl](span),
@@ -312,7 +319,6 @@ fn map_fn(
                             None
                         },
                         maybe_mod_ident: Some(mod_ident),
-                        for_struct: true,
                     },
                 )
             },

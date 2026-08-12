@@ -1,6 +1,6 @@
+use crate::syntax::*;
 use proc_macro2::Span;
 use syn::*;
-use crate::syntax::*;
 
 pub(crate) fn pub_super(span: Span) -> Visibility {
     let result = Visibility::Restricted(VisRestricted {

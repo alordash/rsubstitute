@@ -5,7 +5,7 @@ use crate::common::*;
 use crate::preparation::*;
 use crate::syntax::*;
 use proc_macro2::Span;
-use quote::{format_ident, ToTokens};
+use quote::{ToTokens, format_ident};
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::*;

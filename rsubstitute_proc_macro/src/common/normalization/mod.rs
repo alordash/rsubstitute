@@ -4,6 +4,6 @@ mod struct_type_references_normalization;
 mod impl_trait_normalization;
 
 pub(crate) use assoc_items_normalization::*;
+pub(crate) use impl_trait_normalization::*;
 pub(crate) use method_normalization::*;
 pub(crate) use struct_type_references_normalization::*;
-pub(crate) use impl_trait_normalization::*;

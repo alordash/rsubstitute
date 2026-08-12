@@ -8,9 +8,7 @@ use quote::{ToTokens, format_ident};
 use syn::*;
 
 pub(crate) struct Params {
-    pub attributes: Vec<Attribute>,
     pub unsafety: Option<Token![unsafe]>,
-    pub visibility: Visibility,
     pub ident: Ident,
     pub generics: Generics,
     pub items: Vec<TraitItem>,
@@ -18,9 +16,7 @@ pub(crate) struct Params {
 
 pub(crate) fn prepare(
     Params {
-        attributes,
         unsafety,
-        visibility,
         ident,
         generics,
         mut items,
@@ -35,7 +31,7 @@ pub(crate) fn prepare(
         .map(|x| normalization::normalize_struct_type_references_in_trait_item(x, &trait_mock_path))
         .collect();
     let split_items = split_items(items, &ident);
-    let source_generics = generics.clone();
+    let path = path::from_ident_with_generics(ident.clone(), &generics);
     let mut merged_generics = merge_generics_with_assoc_generics(
         &ident,
         generics,
@@ -60,14 +56,10 @@ pub(crate) fn prepare(
         })
         .collect();
     merged_generics = rsubstitute_lifetime::prepend_to_generics(merged_generics);
-    let path = path::from_ident_with_generics(ident.clone(), &source_generics);
 
     let result = TraitSyntax {
-        attributes,
         unsafety,
-        visibility,
         ident,
-        source_generics,
         merged_generics,
         constants: split_items.assoc_constants,
         assoc_types: split_items.assoc_types,
@@ -190,11 +182,6 @@ fn merge_generics_with_assoc_generics(
         .extend(generic_parameters.into_iter().map(|x| x.value));
     return generics;
 }
-
-// TODO - write test for that (optional generic constants and their order)
-trait Trait<TA, const TB: usize, TC, const TD: usize = 3> {}
-struct S<SA, const SB: usize, SC, const SD: usize = 2>([SA; SB], [SC; SD]);
-impl<TA, const TB: usize, TC, SA, const SB: usize, SC> Trait<TA, TB, TC> for S<SA, SB, SC> {}
 
 struct TraitSyntaxAsFnOwner<'a> {
     pub generics: &'a Generics,

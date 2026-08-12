@@ -1,6 +1,4 @@
 use crate::common::models::*;
-use crate::common::*;
-use crate::generation::common::*;
 use crate::generation::fn_info::models::*;
 use crate::generation::mock_struct::models::*;
 use crate::syntax::*;
@@ -8,7 +6,6 @@ use proc_macro2::Span;
 use syn::*;
 
 pub(crate) struct Params<'a> {
-    pub mock_struct_path: Path,
     pub fn_info: &'a FnInfo,
     pub base_fn_kind: BaseFnKind,
     pub call_var_path: ExprPath,
@@ -19,7 +16,6 @@ pub(crate) fn generate(
     ctx: &Context,
     span: Span,
     Params {
-        mock_struct_path,
         fn_info,
         base_fn_kind,
         call_var_path,
@@ -31,25 +27,6 @@ pub(crate) fn generate(
         void_tuple(span)
     } else {
         Expr::Path(self_expr_path(span))
-        // Expr::Reference(ExprReference {
-        //     attrs: Vec::new(),
-        //     and_token: Token![&](span),
-        //     mutability: None,
-        //     expr: Box::new(Expr::Struct(ExprStruct {
-        //         attrs: Vec::new(),
-        //         qself: None,
-        //         path: mock_struct_path,
-        //         brace_token: token::Brace(span),
-        //         fields: [
-        //             generics_field::new_value(span),
-        //             data_field::new_clone_value(span),
-        //         ]
-        //         .into_iter()
-        //         .collect(),
-        //         dot2_token: None,
-        //         rest: None,
-        //     })),
-        // })
     };
     let maybe_base_fn_path = match (ctx.support_base_calling, base_fn_kind) {
         (true, BaseFnKind::StaticFn(base_fn_ident)) => {

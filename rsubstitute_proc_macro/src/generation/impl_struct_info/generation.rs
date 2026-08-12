@@ -8,9 +8,7 @@ pub(crate) fn generate(ctx: &Context, impl_struct_syntax: ImplStructSyntax) -> I
         attributes: impl_struct_syntax.attributes,
         target_ident: impl_struct_syntax.target_ident,
         target_path: impl_struct_syntax.target_path,
-        target_type: impl_struct_syntax.target_type,
         generics: impl_struct_syntax.generics,
-        constants: impl_struct_syntax.constants,
         static_fns: impl_struct_syntax
             .static_fns
             .into_iter()

@@ -210,6 +210,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
         ctx,
         source_span,
         mock_struct_impl::ParamsForTrait {
+            attributes: impl_trait_for_struct_info.attributes,
             mock_struct_path: impl_trait_for_struct_info.target_path.clone(),
             constants: &impl_trait_for_struct_info.constants,
             types: &impl_trait_for_struct_info.types,
@@ -304,6 +305,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
     let usage = mod_usage::new_pub_all(mod_ident.clone());
     let item_mod = ItemMod {
         attrs: vec![
+            attributes::allow_private_interfaces(source_span),
             attributes::allow_unreachable_pub(source_span),
             attributes::allow_non_snake_case(source_span),
             attributes::allow_non_camel_case_types(source_span),

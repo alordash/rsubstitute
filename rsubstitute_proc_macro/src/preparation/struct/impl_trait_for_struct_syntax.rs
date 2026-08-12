@@ -54,7 +54,6 @@ pub(crate) fn prepare(
     let result = ImplTraitForStructSyntax {
         attributes,
         target_path,
-        target_type: *target_type,
         trait_ident,
         trait_path,
         merged_generics,
