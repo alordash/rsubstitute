@@ -5,69 +5,879 @@
   </component>
   <component name="CargoProjects">
     <cargoProject FILE="$PROJECT_DIR$/Cargo.toml">
+      <package file="$PROJECT_DIR$/rsubstitute">
+        <feature name="default" enabled="true" />
+      </package>
+      <package file="$PROJECT_DIR$/rsubstitute_core">
+        <feature name="default" enabled="true" />
+        <feature name="debug_naming" enabled="false" />
+        <feature name="sync_parking_lot" enabled="true" />
+      </package>
       <package file="$PROJECT_DIR$/rsubstitute_proc_macro">
+        <feature name="default" enabled="true" />
+      </package>
+      <package file="$PROJECT_DIR$/rsubstitutifier">
         <feature name="default" enabled="true" />
       </package>
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="9919b359-a78a-45c1-8d4b-5ce68a283f8b" name="Changes" comment="" />
+    <list default="true" id="f847079f-511f-4600-8811-ffe4728519b1" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
+  <component name="ExecutionTargetManager" SELECTED_TARGET="RsBuildProfile:test" />
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="Rust File" />
+      </list>
+    </option>
+  </component>
   <component name="Git.Settings">
-    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/.." value="main" />
+      </map>
+    </option>
+    <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/.." />
+    <option name="RESET_MODE" value="HARD" />
+  </component>
+  <component name="HighlightingSettingsPerFile">
+    <setting file="file://$USER_HOME$/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/syn-2.0.111/src/expr.rs" root0="SKIP_INSPECTION" />
+    <setting file="file://$USER_HOME$/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/syn-2.0.111/src/generics.rs" root0="SKIP_INSPECTION" />
+    <setting file="file://$USER_HOME$/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/syn-2.0.111/src/lifetime.rs" root0="SKIP_INSPECTION" />
+    <setting file="file://$USER_HOME$/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/syn-2.0.111/src/mac.rs" root0="SKIP_INSPECTION" />
+    <setting file="file://$USER_HOME$/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/syn-2.0.111/src/path.rs" root0="SKIP_INSPECTION" />
+    <setting file="file://$USER_HOME$/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/syn-2.0.111/src/punctuated.rs" root0="SKIP_INSPECTION" />
+    <setting file="file://$USER_HOME$/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/syn-2.0.111/src/stmt.rs" root0="SKIP_INSPECTION" />
+    <setting file="file://$USER_HOME$/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/syn-2.0.111/src/ty.rs" root0="SKIP_INSPECTION" />
+    <setting file="file://$USER_HOME$/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/syn-3.0.3/src/data.rs" root0="SKIP_INSPECTION" />
+    <setting file="file://$USER_HOME$/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/syn-3.0.3/src/expr.rs" root0="SKIP_INSPECTION" />
+    <setting file="file://$USER_HOME$/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/syn-3.0.3/src/pat.rs" root0="SKIP_INSPECTION" />
+    <setting file="file://$USER_HOME$/.cargo/registry/src/index.crates.io-1949cf8c6b5b557f/syn-3.0.3/src/stmt.rs" root0="SKIP_INSPECTION" />
   </component>
   <component name="MacroExpansionManager">
-    <option name="directoryName" value="brn1AW7k" />
+    <option name="directoryName" value="ImCZ1Dli" />
   </component>
-  <component name="ProjectColorInfo"><![CDATA[{
-  "associatedIndex": 1
-}]]></component>
-  <component name="ProjectId" id="36WBMN4EulEqkR3HGkBupe80Xmw" />
+  <component name="ProblemsViewState">
+    <option name="selectedTabId" value="CurrentFile" />
+  </component>
+  <component name="ProjectColorInfo">{
+  &quot;associatedIndex&quot;: 4
+}</component>
+  <component name="ProjectId" id="36hzz0ysJp1tgsR0BPS09Z1RxmQ" />
+  <component name="ProjectLevelVcsManager">
+    <ConfirmationsSetting value="2" id="Add" />
+  </component>
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent"><![CDATA[{
-  "keyToString": {
-    "ModuleVcsDetector.initialDetectionPerformed": "true",
-    "RunOnceActivity.ShowReadmeOnStart": "true",
-    "RunOnceActivity.git.unshallow": "true",
-    "RunOnceActivity.rust.reset.selective.auto.import": "true",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1": "true",
-    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
-    "git-widget-placeholder": "main",
-    "junie.onboarding.icon.badge.shown": "true",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "org.rust.cargo.project.model.PROJECT_DISCOVERY": "true",
-    "org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon": "",
-    "org.rust.first.attach.projects": "true",
-    "to.speed.mode.migration.done": "true",
-    "vue.rearranger.settings.migration": "true"
+  <component name="PropertiesComponent">{
+  &quot;keyToString&quot;: {
+    &quot;Cargo.Build `Test bin_struct::tests`.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand NEW.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand NEW_static_fn.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand NEW_struct.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand NEW_trait.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand actual_dyn_data.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand actual_dyn_data::sandbox.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand arg_printing_test.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand associated_types_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand dyn_data_generics::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand f.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand fn_advanced_ref_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand fn_simple_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand fn_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand fn_value_type_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand reference_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand rsubstitute_core::fn_parameters::generics_hash_key.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand rsubstitute_core::fn_parameters::i_raw_return_value.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand rsubstitute_proc_macro.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand rsubstitute_proc_macro::mock_generation::struct_mock_syntax::qwd.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand rsubstitute_proc_macro::syntax::expr_reference_factory.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand rsubstitute_proc_macro::syntax::generics::generics_merging.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand sandbox::generated.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand sandbox::single.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand struct.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand struct_advanced_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand struct_arc_type_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand struct_base_impl_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand struct_simple_generics_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand struct_simple_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand struct_various_self_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand trait_advanced_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand trait_various_self_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Expand trait_various_self_tests::__rsubstitute_generated_Trait.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run NEW.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run NEW_static_fn.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run NEW_struct.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run NEW_struct_from_wip.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run NEW_struct_ref.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run NEW_trait.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run NEW_trait_assoc_types.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run NEW_trait_ref.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run bin_struct_generics.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run bin_struct_trait_more.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run dyn_data.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run dyn_data_base_and_generics.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run fn.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run rsubstitutifier.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run sandbox.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run struct.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run trait.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Run trait_generics.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test accept_two_values.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test accept_value_ArgIs_OkPanics.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test accept_value_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test accept_value_OkPanics.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test accept_value_return_value_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test accept_value_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test another_work.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test arg_printing_test.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test arg_printing_test::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test associated_types_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test basic_tests (1).executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test basic_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test behaviour_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test bin_dyn_data::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test bin_dyn_data_base_and_generics::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test bin_dyn_data_generics::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test bin_dyn_data_ref::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test bin_fn::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test bin_gen_dyn_data_generics::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test bin_struct::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test cdcd::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test cdcd_gen::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test compile (1).executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test compile.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test default.executor&quot;: &quot;Debug&quot;,
+    &quot;Cargo.Test f::test.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test f_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test flex.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test fn_advanced_ref_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test fn_advanced_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test fn_deref_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test fn_deref_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test fn_generics_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test fn_ref_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test fn_simple_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test fn_value_type_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test generics_info_in_logs_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test get_CallBase_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test get_return_TwoTypes_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test get_return_different_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test get_return_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test impl_trait_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test max_invalid_calls_listed_count_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test max_invalid_calls_listed_count_tests::default::CallsCountLessThanLimit_PrintsAll.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test max_invalid_calls_listed_count_tests::default::CallsCountMoreThanLimit_PrintsTrimmed.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test max_invalid_calls_listed_count_tests::default::DefaultMaxInvalidCallsListedCount_LessThanLimit_PrintsAll.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test max_invalid_calls_listed_count_tests::default::DefaultMaxInvalidCallsListedCount_MoreThanLimit_PrintsTrimmed.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test max_invalid_calls_listed_count_tests::set::set_max_invalid_calls_listed_count_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test max_invalid_calls_listed_count_tests::set_local_max_invalid_calls_listed_count_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test multiple selected files (1).executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test multiple selected files (2).executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test multiple selected files (3).executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test multiple selected files.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test no_matching_config_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test no_return_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test received_nothing_else_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test received_nothing_else_PanicsOk.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test reference_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test reference_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test repeating_generics_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test return_constraint_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test return_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test return_where_constraint_tests (1).executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test return_where_constraint_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test struct.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test struct_advanced_ref_type_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test struct_advanced_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test struct_arc_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test struct_arc_type_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test struct_base_impl_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test struct_generics_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test struct_rc_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test struct_rc_type_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test struct_ref_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test struct_ref_type_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test struct_repeating_generics_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test struct_simple_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test struct_simple_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test struct_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test struct_trait_impl_generics_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test struct_type_reference_normalization_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test struct_type_reference_normalization_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test struct_value_type_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test struct_various_self_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test struct_various_self_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test test::compile.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::DefaultMaxInvalidCallsListedCount_LessThanLimit_PrintsAll.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::DefaultMaxInvalidCallsListedCount_MoreThanLimit_PrintsTrimmed.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::Trait_f_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::a.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::accept_arc_tests::accept_arc_Panics.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::accept_many_ref_test.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::accept_rc_tests::accept_rc_Panics.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::accept_ref_DidNotReceive_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::accept_ref_NoConfig_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::accept_ref_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::accept_ref_UnexpectedCall_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::accept_ref_ptr_DidNotReceive_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::accept_ref_ptr_NoConfig_Ok.executor&quot;: &quot;Debug&quot;,
+    &quot;Cargo.Test tests::accept_ref_ptr_UnexpectedCall_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::accept_ref_return_ref_tests::accept_ref_return_ref_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::accept_ref_tests::accept_ref_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::accept_two_values_return_value_tests::accept_two_values_return_value_NoReturnValueInFirstConfig_ReturnsValueFromSecondConfig.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::accept_two_values_return_value_tests::accept_two_values_return_value_NoReturnValue_Panics.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::accept_two_values_return_value_tests::accept_two_values_return_value_NoReturnValue_PanicsOk (1).executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::accept_two_values_return_value_tests::accept_two_values_return_value_NoReturnValue_PanicsOk.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::accept_two_values_return_value_tests::accept_two_values_return_value_Panics.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::accept_value_return_value_tests::accept_value_return_value_Many2_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::accept_value_return_value_tests::accept_value_return_value_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::accept_value_tests::accept_value_Callback_ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::accept_value_tests::accept_value_NoOtherCallsWithManyOtherCalls_Panics (1).executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::accept_value_tests::accept_value_NoOtherCallsWithManyOtherCalls_Panics.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::accept_value_tests::accept_value_NoOtherCallsWithOtherCalls_Panics (1).executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::accept_value_tests::accept_value_NoOtherCallsWithOtherCalls_Panics.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::accept_value_tests::accept_value_NoOtherCallsWithoutOtherCalls_Ok (1).executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::accept_value_tests::accept_value_NoOtherCallsWithoutOtherCalls_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::accept_value_tests::accept_value_Ok.executor&quot;: &quot;Debug&quot;,
+    &quot;Cargo.Test tests::basic_tests::by_box_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::basic_tests::by_box_ref_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::basic_tests::by_box_ref_mut_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::basic_tests::by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::basic_tests::by_ref_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::basic_tests::by_value_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::basic_tests::nested_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::by_ref_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::by_value_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::compile.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::compiles.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::f_ArgPredicate_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::f_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::flex (1).executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::flex.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::fn_tests::output_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::fn_work_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::fn_work_PanicsOk.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::foo_CallBase_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::foo_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::generic_DidNotReceiveDifferentGenerics_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::generic_DidNotReceiveSameGenerics_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::generic_NoConfig_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::generic_ref_UnexpectedCall_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::get_plus_one_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::get_return_CallBase_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::get_return_TwoTypes_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::get_return_different_tests::get_return_different_CallBase_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::get_return_tests::get_return_UnconfiguredType_PanicsOk.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::global_test.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::global_test2.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::my_test (1).executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::my_test (2).executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::my_test (3).executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::my_test.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::no_return_tests::by_arc_Ok.executor&quot;: &quot;Debug&quot;,
+    &quot;Cargo.Test tests::no_return_tests::by_box_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::no_return_tests::by_ref_Ok.executor&quot;: &quot;Debug&quot;,
+    &quot;Cargo.Test tests::no_return_tests::by_ref_colon_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::no_return_tests::by_value_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::no_return_tests::nested_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::no_support.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::r#trait::generic_DidNotReceiveDifferentGenerics_Ok.executor&quot;: &quot;Debug&quot;,
+    &quot;Cargo.Test tests::return_constraint_tests::return_constraint_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::return_mut_ref_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::return_mut_ref_with_base_CallBase_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::return_mut_ref_with_base_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::return_tests::return_by_value_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::return_value_tests::return_value_ManyToSingle_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::return_value_tests::return_value_ManyWithCallback_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::return_value_tests::return_value_NoMatchingConfiguration_PanicsOk.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::return_value_tests::return_value_Single_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::return_value_tests::return_value_UsesFirstConfiguration_Ok (1).executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::return_value_tests::return_value_UsesFirstConfiguration_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::return_value_tests::return_value_UsesLastConfiguration_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::static_work_ReceivedUnexpectedCalls_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::struct_test.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::struct_tests::f_MultipleTimes_Panics.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::struct_tests::struct_output_self_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::struct_tests::struct_static_output_self_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::struct_work_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::test (1).executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::test.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::trait_tests::Trait_f_MultipleTimes_Panics.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::trait_tests::Trait_f_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::trait_tests::trait_work_ArgPredicate_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::trait_work_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::trait_work_PanicsOk.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::work_DidNotReceiveDifferentGenerics_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::work_DidNotReceiveSameGenerics_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::work_DidNotReceive_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::work_FixByNotUsingTemporaryValue_ReceivesValidReference.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::work_NoConfigs_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::work_NoReturnValue_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::work_NoSuitableConfig_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::work_OnlyUnsuitableConfigs_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::work_ReceivedUnexpectedCalls_Ok.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::work_ReferenceDies_ReceviesRewroteReference.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::work_ReferenceToTemporaryValue_FixByReceivingBeforeDrop_ReceivesValidReference.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::work_ReferenceToTemporaryValue_ReceivesDanglingReference.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test tests::work_ReferenceToTemporaryValue_ReceviesDanglingReference.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test trait_advanced_ref_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test trait_advanced_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test trait_arc_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test trait_base_impl_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test trait_generic_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test trait_rc_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test trait_ref_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test trait_simple_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test trait_simple_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test trait_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test trait_value_type_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test trait_various_self_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test ub_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test unsized_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test unsupported_tests::tests (1).executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test unsupported_tests::tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test value_type_trait_tests.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Test work.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Tests in 'rsubstitute_core'.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Tests in 'rsubstitute_proc_macro'.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Tests in 'rsubstitutifier'.executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Tests in 'tests' (1).executor&quot;: &quot;Run&quot;,
+    &quot;Cargo.Tests in 'tests'.executor&quot;: &quot;Run&quot;,
+    &quot;CidrDebugProfileConversion&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.rust.reset.selective.auto.import&quot;: &quot;true&quot;,
+    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
+    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1&quot;: &quot;true&quot;,
+    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
+    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
+    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
+    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
+    &quot;last_opened_file_path&quot;: &quot;C:/_RS/rsubstitute/src/rsubstitute/tests&quot;,
+    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
+    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
+    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
+    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
+    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
+    &quot;org.rust.cargo.project.model.PROJECT_DISCOVERY&quot;: &quot;true&quot;,
+    &quot;org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon&quot;: &quot;&quot;,
+    &quot;org.rust.disableDetachedFileInspectionC:/_RS/rsubstitute/src/rsubstitute_core/src/arguments_matching/arg.rs&quot;: &quot;true&quot;,
+    &quot;org.rust.disableDetachedFileInspectionC:/_RS/rsubstitute/src/rsubstitute_core/src/arguments_matching/mod.rs&quot;: &quot;true&quot;,
+    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
+    &quot;settings.editor.selected.configurable&quot;: &quot;preferences.keymap&quot;,
+    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
+    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  },
+  &quot;keyToStringList&quot;: {
+    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
+      &quot;Rust&quot;
+    ]
   }
-}]]></component>
+}</component>
+  <component name="RecentsManager">
+    <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\_RS\rsubstitute\src\rsubstitute\tests" />
+      <recent name="C:\_RS\rsubstitute\src\rsubstitute\bin" />
+      <recent name="C:\_RS\rsubstitute\src\rsubstitute_proc_macro\src\generation\fn" />
+      <recent name="C:\_RS\rsubstitute\src\rsubstitute_proc_macro\src\mock_generation\fn_info_generation" />
+      <recent name="C:\_RS\rsubstitute\src\rsubstitute" />
+    </key>
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\_RS\rsubstitute\src\rsubstitute_proc_macro\src\generation\targets\struct" />
+      <recent name="C:\_RS\rsubstitute\src\rsubstitute_proc_macro\src\generation\common" />
+      <recent name="C:\_RS\rsubstitute\src\rsubstitute_proc_macro\src\generation\mock_controls" />
+      <recent name="C:\_RS\rsubstitute\src\rsubstitute_proc_macro\src\generation\mock_struct\common" />
+      <recent name="C:\_RS\rsubstitute\src\rsubstitute_proc_macro\src\generation\mock_controls\common" />
+    </key>
+  </component>
+  <component name="RunManager" selected="Cargo.Tests in 'tests' (1)">
+    <configuration name="Run sandbox" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+      <option name="buildProfileId" value="test" />
+      <option name="command" value="run --package rsubstitute --bin sandbox" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Test fn_advanced_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="buildProfileId" value="test" />
+      <option name="command" value="test --package rsubstitute --test fn_advanced_tests -- tests" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Test src" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
+      <option name="buildProfileId" value="test" />
+      <option name="command" value="test --workspace" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Test trait_advanced_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test trait_advanced_tests -- tests" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Test unsized_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test unsized_tests -- tests" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Tests in 'tests' (1)" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test arg_printing_test --test associated_types_tests --test behaviour_tests --test config_tests --test fn_advanced_tests --test fn_deref_tests --test fn_generics_tests --test fn_ref_tests --test fn_simple_tests --test fn_value_type_tests --test generics_info_in_logs_tests --test impl_trait_tests --test no_matching_config_tests --test reference_tests --test struct_advanced_tests --test struct_arc_tests --test struct_base_impl_tests --test struct_generics_tests --test struct_rc_tests --test struct_ref_tests --test struct_repeating_generics_tests --test struct_simple_tests --test struct_trait_impl_generics_tests --test struct_type_reference_normalization_tests --test struct_value_type_tests --test struct_various_self_tests --test trait_advanced_tests --test trait_arc_tests --test trait_base_impl_tests --test trait_generics_tests --test trait_rc_tests --test trait_ref_tests --test trait_simple_tests --test trait_value_type_tests --test trait_various_self_tests --test ub_tests --test unsized_tests" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Tests in 'tests'" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="buildProfileId" value="test" />
+      <option name="command" value="test --package rsubstitute --test arg_printing_test --test associated_types_tests --test behaviour_tests --test config_tests --test fn_advanced_tests --test fn_deref_tests --test fn_generics_tests --test fn_ref_tests --test fn_simple_tests --test fn_value_type_tests --test generics_info_in_logs_tests --test impl_trait_tests --test no_matching_config_tests --test reference_tests --test struct_advanced_tests --test struct_arc_tests --test struct_base_impl_tests --test struct_generics_tests --test struct_rc_tests --test struct_ref_tests --test struct_repeating_generics_tests --test struct_simple_tests --test struct_trait_impl_generics_tests --test struct_type_reference_normalization_tests --test struct_value_type_tests --test struct_various_self_tests --test trait_advanced_tests --test trait_arc_tests --test trait_base_impl_tests --test trait_generics_tests --test trait_rc_tests --test trait_ref_tests --test trait_simple_tests --test trait_value_type_tests --test trait_various_self_tests --test ub_tests" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <list>
+      <item itemvalue="Cargo.Run sandbox" />
+      <item itemvalue="Cargo.Test src" />
+      <item itemvalue="Cargo.Test fn_advanced_tests::tests" />
+      <item itemvalue="Cargo.Test trait_advanced_tests::tests" />
+      <item itemvalue="Cargo.Test unsized_tests::tests" />
+      <item itemvalue="Cargo.Tests in 'tests' (1)" />
+      <item itemvalue="Cargo.Tests in 'tests'" />
+    </list>
+    <recent_temporary>
+      <list>
+        <item itemvalue="Cargo.Tests in 'tests' (1)" />
+        <item itemvalue="Cargo.Test trait_advanced_tests::tests" />
+        <item itemvalue="Cargo.Test unsized_tests::tests" />
+        <item itemvalue="Cargo.Tests in 'tests'" />
+        <item itemvalue="Cargo.Test fn_advanced_tests::tests" />
+      </list>
+    </recent_temporary>
+  </component>
   <component name="RustProjectSettings">
     <option name="toolchainHomeDirectory" value="$USER_HOME$/.cargo/bin" />
   </component>
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
-      <changelist id="9919b359-a78a-45c1-8d4b-5ce68a283f8b" name="Changes" comment="" />
-      <created>1765112397716</created>
+      <changelist id="f847079f-511f-4600-8811-ffe4728519b1" name="Changes" comment="" />
+      <created>1765473850954</created>
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
-      <updated>1765112397716</updated>
-      <workItem from="1765112398760" duration="3797000" />
+      <updated>1765473850954</updated>
+      <workItem from="1765473852720" duration="2901000" />
+      <workItem from="1765543035982" duration="345000" />
+      <workItem from="1765545893360" duration="5605000" />
+      <workItem from="1765559853751" duration="305000" />
+      <workItem from="1765805168852" duration="5271000" />
+      <workItem from="1765883856345" duration="11215000" />
+      <workItem from="1765981706633" duration="369000" />
+      <workItem from="1765982303225" duration="23000" />
+      <workItem from="1766047078286" duration="481000" />
+      <workItem from="1766047794519" duration="4654000" />
+      <workItem from="1766067050900" duration="3773000" />
+      <workItem from="1766149397822" duration="2941000" />
+      <workItem from="1766228966108" duration="11688000" />
+      <workItem from="1766357900979" duration="1514000" />
+      <workItem from="1766374158208" duration="9488000" />
+      <workItem from="1766420290870" duration="2469000" />
+      <workItem from="1766483667112" duration="991000" />
+      <workItem from="1766486998271" duration="1134000" />
+      <workItem from="1766574412468" duration="104000" />
+      <workItem from="1766578257991" duration="1765000" />
+      <workItem from="1766659617210" duration="7483000" />
+      <workItem from="1766751732281" duration="21635000" />
+      <workItem from="1767186872013" duration="477000" />
+      <workItem from="1767461481755" duration="5799000" />
+      <workItem from="1767703842886" duration="119000" />
+      <workItem from="1767704282383" duration="579000" />
+      <workItem from="1767880101478" duration="4410000" />
+      <workItem from="1768060421187" duration="2257000" />
+      <workItem from="1768495096714" duration="10940000" />
+      <workItem from="1768736834423" duration="8217000" />
+      <workItem from="1768829819923" duration="27186000" />
+      <workItem from="1769100084661" duration="10257000" />
+      <workItem from="1769171595504" duration="14434000" />
+      <workItem from="1769202786872" duration="9650000" />
+      <workItem from="1769280504924" duration="4588000" />
+      <workItem from="1769431821393" duration="7832000" />
+      <workItem from="1769858934883" duration="3000" />
+      <workItem from="1769858954515" duration="1358000" />
+      <workItem from="1770016191915" duration="5449000" />
+      <workItem from="1770201592160" duration="1464000" />
+      <workItem from="1770297613079" duration="5322000" />
+      <workItem from="1770466649036" duration="1184000" />
+      <workItem from="1770627306723" duration="20615000" />
+      <workItem from="1770711012105" duration="2382000" />
+      <workItem from="1770716790329" duration="17350000" />
+      <workItem from="1770795397828" duration="12352000" />
+      <workItem from="1770817873038" duration="12316000" />
+      <workItem from="1770836565833" duration="1090000" />
+      <workItem from="1770882322664" duration="9732000" />
+      <workItem from="1770900289420" duration="1314000" />
+      <workItem from="1770901671887" duration="8530000" />
+      <workItem from="1770975732907" duration="7111000" />
+      <workItem from="1771061397898" duration="9897000" />
+      <workItem from="1771248643081" duration="5825000" />
+      <workItem from="1771256585167" duration="484000" />
+      <workItem from="1771317637824" duration="3259000" />
+      <workItem from="1771343098233" duration="926000" />
+      <workItem from="1771934487885" duration="9094000" />
+      <workItem from="1772012201090" duration="5459000" />
+      <workItem from="1772026220445" duration="1124000" />
+      <workItem from="1772028606414" duration="3839000" />
+      <workItem from="1772096729919" duration="18625000" />
+      <workItem from="1772194285984" duration="5524000" />
+      <workItem from="1772274835312" duration="11492000" />
+      <workItem from="1772437280632" duration="7242000" />
+      <workItem from="1772620788813" duration="1671000" />
+      <workItem from="1772702249386" duration="12958000" />
+      <workItem from="1772782097474" duration="5485000" />
+      <workItem from="1772893170428" duration="3122000" />
+      <workItem from="1773043700067" duration="7434000" />
+      <workItem from="1773061534278" duration="9587000" />
+      <workItem from="1773138233010" duration="6914000" />
+      <workItem from="1773215049124" duration="20482000" />
+      <workItem from="1773312631133" duration="581000" />
+      <workItem from="1773318331129" duration="9009000" />
+      <workItem from="1773385814849" duration="16589000" />
+      <workItem from="1773481359261" duration="20850000" />
+      <workItem from="1773664859780" duration="4461000" />
+      <workItem from="1773674356925" duration="15384000" />
+      <workItem from="1773819520707" duration="16549000" />
+      <workItem from="1773906328761" duration="16697000" />
+      <workItem from="1774000290497" duration="7683000" />
+      <workItem from="1774252028064" duration="23377000" />
+      <workItem from="1774363262572" duration="3527000" />
+      <workItem from="1774366902739" duration="355000" />
+      <workItem from="1774429263350" duration="19757000" />
+      <workItem from="1774511300317" duration="3172000" />
+      <workItem from="1774531694809" duration="6736000" />
+      <workItem from="1774598817051" duration="5316000" />
+      <workItem from="1774613596565" duration="1157000" />
+      <workItem from="1774692133509" duration="9402000" />
+      <workItem from="1774861204205" duration="174000" />
+      <workItem from="1774864103603" duration="1109000" />
+      <workItem from="1774871396676" duration="3248000" />
+      <workItem from="1774875795167" duration="163000" />
+      <workItem from="1774880575788" duration="168000" />
+      <workItem from="1774882012563" duration="4101000" />
+      <workItem from="1774886478352" duration="482000" />
+      <workItem from="1776524449945" duration="161000" />
     </task>
+    <task id="LOCAL-00001" summary="fix todo">
+      <option name="closed" value="true" />
+      <created>1766047884226</created>
+      <option name="number" value="00001" />
+      <option name="presentableId" value="LOCAL-00001" />
+      <option name="project" value="LOCAL" />
+      <updated>1766047884228</updated>
+    </task>
+    <task id="LOCAL-00002" summary="Added #[doc(hidden)]">
+      <option name="closed" value="true" />
+      <created>1770797131961</created>
+      <option name="number" value="00002" />
+      <option name="presentableId" value="LOCAL-00002" />
+      <option name="project" value="LOCAL" />
+      <updated>1770797131961</updated>
+    </task>
+    <task id="LOCAL-00003" summary="Fixed IArgsFormatter phantom fields filtering">
+      <option name="closed" value="true" />
+      <created>1770797154639</created>
+      <option name="number" value="00003" />
+      <option name="presentableId" value="LOCAL-00003" />
+      <option name="project" value="LOCAL" />
+      <updated>1770797154639</updated>
+    </task>
+    <task id="LOCAL-00004" summary="Fix MutRefClone">
+      <option name="closed" value="true" />
+      <created>1770883405948</created>
+      <option name="number" value="00004" />
+      <option name="presentableId" value="LOCAL-00004" />
+      <option name="project" value="LOCAL" />
+      <updated>1770883405948</updated>
+    </task>
+    <task id="LOCAL-00005" summary="Fixed Arg::is predicate">
+      <option name="closed" value="true" />
+      <created>1773667657758</created>
+      <option name="number" value="00005" />
+      <option name="presentableId" value="LOCAL-00005" />
+      <option name="project" value="LOCAL" />
+      <updated>1773667657758</updated>
+    </task>
+    <task id="LOCAL-00006" summary="Remove unused">
+      <option name="closed" value="true" />
+      <created>1773667825978</created>
+      <option name="number" value="00006" />
+      <option name="presentableId" value="LOCAL-00006" />
+      <option name="project" value="LOCAL" />
+      <updated>1773667825978</updated>
+    </task>
+    <task id="LOCAL-00007" summary="fix core">
+      <option name="closed" value="true" />
+      <created>1781214991775</created>
+      <option name="number" value="00007" />
+      <option name="presentableId" value="LOCAL-00007" />
+      <option name="project" value="LOCAL" />
+      <updated>1781214991775</updated>
+    </task>
+    <task id="LOCAL-00008" summary="demos fix">
+      <option name="closed" value="true" />
+      <created>1783957008826</created>
+      <option name="number" value="00008" />
+      <option name="presentableId" value="LOCAL-00008" />
+      <option name="project" value="LOCAL" />
+      <updated>1783957008826</updated>
+    </task>
+    <task id="LOCAL-00009" summary="unmock">
+      <option name="closed" value="true" />
+      <created>1783958498655</created>
+      <option name="number" value="00009" />
+      <option name="presentableId" value="LOCAL-00009" />
+      <option name="project" value="LOCAL" />
+      <updated>1783958498655</updated>
+    </task>
+    <task id="LOCAL-00010" summary="FIX-PLAN: base fn in struct">
+      <option name="closed" value="true" />
+      <created>1784130007098</created>
+      <option name="number" value="00010" />
+      <option name="presentableId" value="LOCAL-00010" />
+      <option name="project" value="LOCAL" />
+      <updated>1784130007099</updated>
+    </task>
+    <task id="LOCAL-00011" summary="fix base fn receiver">
+      <option name="closed" value="true" />
+      <created>1784285692091</created>
+      <option name="number" value="00011" />
+      <option name="presentableId" value="LOCAL-00011" />
+      <option name="project" value="LOCAL" />
+      <updated>1784285692091</updated>
+    </task>
+    <task id="LOCAL-00012" summary="namespaces fix`">
+      <option name="closed" value="true" />
+      <created>1784287083986</created>
+      <option name="number" value="00012" />
+      <option name="presentableId" value="LOCAL-00012" />
+      <option name="project" value="LOCAL" />
+      <updated>1784287083986</updated>
+    </task>
+    <task id="LOCAL-00013" summary="WIP: return `impl Trait`">
+      <option name="closed" value="true" />
+      <created>1785414241770</created>
+      <option name="number" value="00013" />
+      <option name="presentableId" value="LOCAL-00013" />
+      <option name="project" value="LOCAL" />
+      <updated>1785414241770</updated>
+    </task>
+    <option name="localTasksCounter" value="14" />
     <servers />
   </component>
   <component name="TypeScriptGeneratedFilesManager">
     <option name="version" value="3" />
+  </component>
+  <component name="Vcs.Log.Tabs.Properties">
+    <option name="TAB_STATES">
+      <map>
+        <entry key="MAIN">
+          <value>
+            <State />
+          </value>
+        </entry>
+      </map>
+    </option>
+  </component>
+  <component name="VcsManagerConfiguration">
+    <MESSAGE value="fix todo" />
+    <MESSAGE value="Added #[doc(hidden)]" />
+    <MESSAGE value="Fixed IArgsFormatter phantom fields filtering" />
+    <MESSAGE value="Fix MutRefClone" />
+    <MESSAGE value="Dynamic return value" />
+    <MESSAGE value="Fixed Arg::is predicate" />
+    <MESSAGE value="Remove unused" />
+    <MESSAGE value="mock genarecs" />
+    <MESSAGE value="fix core" />
+    <MESSAGE value="demos fix" />
+    <MESSAGE value="todo" />
+    <MESSAGE value="unmock" />
+    <MESSAGE value="FIX-PLAN: base fn in struct" />
+    <MESSAGE value="fix base fn receiver" />
+    <MESSAGE value="namespaces fix" />
+    <MESSAGE value="WIP: return `impl Trait`" />
+    <MESSAGE value="a" />
+    <option name="LAST_COMMIT_MESSAGE" value="a" />
+  </component>
+  <component name="XDebuggerManager">
+    <breakpoint-manager>
+      <breakpoints>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/rsubstitute/tests/config_tests.rs</url>
+          <line>111</line>
+          <option name="timeStamp" value="15" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/rsubstitute/bin/bin_trait.rs</url>
+          <line>400</line>
+          <option name="timeStamp" value="18" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/rsubstitute/tests/fn_value_type_tests.rs</url>
+          <line>365</line>
+          <option name="timeStamp" value="21" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/rsubstitute/bin/bin_fn.rs</url>
+          <line>181</line>
+          <option name="timeStamp" value="28" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/rsubstitute/bin/bin_fn.rs</url>
+          <line>34</line>
+          <option name="timeStamp" value="29" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/rsubstitute/bin/bin_fn.rs</url>
+          <line>80</line>
+          <option name="timeStamp" value="30" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/rsubstitute_core/src/mock_data/fn_config.rs</url>
+          <option name="timeStamp" value="45" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/rsubstitute_core/src/args/arg.rs</url>
+          <line>43</line>
+          <option name="timeStamp" value="56" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/wip_demos/src/trait_mock.rs</url>
+          <line>133</line>
+          <option name="timeStamp" value="57" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/rsubstitute/tests/arg_printing_test.rs</url>
+          <line>301</line>
+          <option name="timeStamp" value="66" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/rsubstitute_core/src/infrastructure/fn_data.rs</url>
+          <line>171</line>
+          <option name="timeStamp" value="78" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/rsubstitute/tests/struct_various_self_tests.rs</url>
+          <line>892</line>
+          <option name="timeStamp" value="84" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/rsubstitute/tests/struct_various_self_tests.rs</url>
+          <line>894</line>
+          <option name="timeStamp" value="85" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/rsubstitute/tests/struct_various_self_tests.rs</url>
+          <line>905</line>
+          <option name="timeStamp" value="86" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/rsubstitute/tests/struct_various_self_tests.rs</url>
+          <line>909</line>
+          <option name="timeStamp" value="87" />
+        </line-breakpoint>
+      </breakpoints>
+    </breakpoint-manager>
+  </component>
+  <component name="XSLT-Support.FileAssociations.UIState">
+    <expand />
+    <select />
   </component>
 </project>
