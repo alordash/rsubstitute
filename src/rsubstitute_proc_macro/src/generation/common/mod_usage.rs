@@ -1,9 +1,10 @@
+use crate::syntax::attributes;
 use syn::*;
 
 pub(crate) fn new<const N: usize>(mod_ident: Ident, target_idents: [Ident; N]) -> ItemUse {
     let span = mod_ident.span();
     let result = ItemUse {
-        attrs: Vec::new(),
+        attrs: vec![attributes::allow_unreachable_pub(span)],
         vis: Visibility::Public(Token![pub](span)),
         use_token: Token![use](span),
         leading_colon: None,
@@ -35,7 +36,7 @@ pub(crate) fn new_pub_all(mod_ident: Ident) -> ItemUse {
 fn new_core(mod_ident: Ident, public: bool) -> ItemUse {
     let span = mod_ident.span();
     let result = ItemUse {
-        attrs: Vec::new(),
+        attrs: vec![attributes::allow_unreachable_pub(span)],
         vis: if public {
             Visibility::Public(Token![pub](span))
         } else {

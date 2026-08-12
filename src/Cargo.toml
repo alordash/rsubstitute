@@ -1,6 +1,6 @@
 [workspace]
 resolver = "3"
-members = ["rsubstitute", "rsubstitute_core", "rsubstitute_proc_macro", "rsubstitutifier", "wip_demos"]
+members = ["rsubstitute", "rsubstitute_core", "rsubstitute_proc_macro", "rsubstitutifier"]
 
 [workspace.dependencies]
 rsubstitute_core = { version = "0.1.0", path = "rsubstitute_core" }

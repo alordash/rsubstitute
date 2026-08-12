@@ -12,7 +12,7 @@ use quote::format_ident;
 use syn::spanned::Spanned;
 use syn::*;
 
-pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockMod {
+pub(crate) fn generate_module(ctx: &Context, item_trait: ItemTrait) -> MockMod {
     let source_span = item_trait.span();
     let trait_syntax = trait_syntax::prepare(trait_syntax::Params {
         attributes: item_trait.attrs.clone(),
@@ -114,7 +114,6 @@ pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockM
 
     let mod_visibility = item_trait.vis.clone();
     let mock_mod_usages = mock_mod_usages::new(source_span);
-    item_trait.vis = Visibility::Public(Token![pub](source_span));
     let items = [Item::Use(mock_mod_usages.use_super)]
         .into_iter()
         .chain(trait_info.associated_fns.into_iter().flat_map(|x| {
@@ -187,7 +186,11 @@ pub(crate) fn generate_module(ctx: &Context, mut item_trait: ItemTrait) -> MockM
 
     let usage = mod_usage::new(mod_ident.clone(), [trait_mock_struct_ident]);
     let item_mod = ItemMod {
-        attrs: vec![attributes::allow_non_camel_case_types(source_span)],
+        attrs: vec![
+            attributes::allow_unreachable_pub(source_span),
+            attributes::allow_non_snake_case(source_span),
+            attributes::allow_non_camel_case_types(source_span),
+        ],
         vis: mod_visibility,
         unsafety: None,
         mod_token: Token![mod](source_span),

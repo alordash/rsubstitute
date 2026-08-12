@@ -124,7 +124,6 @@ pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
 
     let mod_visibility = item_struct.vis.clone();
     let mod_ident = format_ident!("__rsubstitute_generated_{}Mock", item_struct.ident);
-    item_struct.vis = Visibility::Public(Token![pub](source_span));
     let use_super = use_super::new(source_span);
     let items = vec![
         Item::Use(use_super),
@@ -141,7 +140,10 @@ pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
         Item::Impl(struct_static_received_struct_impl),
     ];
     let item_mod = ItemMod {
-        attrs: Vec::new(),
+        attrs: vec![
+            attributes::allow_unreachable_pub(source_span),
+            attributes::allow_non_snake_case(source_span),
+        ],
         vis: mod_visibility,
         unsafety: None,
         mod_token: Token![mod](source_span),

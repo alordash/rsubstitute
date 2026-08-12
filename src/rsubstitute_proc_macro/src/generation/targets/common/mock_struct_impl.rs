@@ -54,7 +54,6 @@ pub(crate) fn generate(
                 ordered,
                 mod_ident.clone(),
                 false,
-                false,
             )
         })
         .chain(static_fns.iter().map(|ordered| {
@@ -64,7 +63,6 @@ pub(crate) fn generate(
                 ordered,
                 mod_ident.clone(),
                 true,
-                false,
             )
         }))
         .collect();
@@ -208,7 +206,6 @@ pub(crate) fn generate_for_trait(
                 ordered,
                 mod_ident.clone(),
                 false,
-                true,
             )
         })
         .chain(static_fns.iter().map(|ordered| {
@@ -217,7 +214,6 @@ pub(crate) fn generate_for_trait(
                 mock_struct_path.clone(),
                 ordered,
                 mod_ident.clone(),
-                true,
                 true,
             )
         }))
@@ -279,21 +275,11 @@ fn map_fn(
     ordered_fn_info: &Ordered<FnInfo>,
     mod_ident: Ident,
     is_static: bool,
-    for_trait: bool,
 ) -> Ordered<ImplItemFn> {
     ordered_fn_info.ref_map(|fn_info| {
         let span = fn_info.spans.inputs;
         ImplItemFn {
-            attrs: if !for_trait && is_static {
-                fn_info
-                    .attributes
-                    .iter()
-                    .cloned()
-                    .chain(core::iter::once(attributes::doc_hidden(span)))
-                    .collect()
-            } else {
-                fn_info.attributes.clone()
-            },
+            attrs: fn_info.attributes.clone(),
             vis: fn_info.visibility.clone(),
             modifiers: FnModifiers::default(),
             sig: *fn_info.source_signature.clone(),

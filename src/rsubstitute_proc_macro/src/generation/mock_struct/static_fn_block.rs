@@ -1,3 +1,4 @@
+use std::ops::Not;
 use crate::common::models::*;
 use crate::generation::common::*;
 use crate::generation::fn_info::models::*;
@@ -33,7 +34,7 @@ pub(crate) fn generate(
             remove_lifetime_generic_arguments: true,
         },
     );
-    let use_mod_stmt = Item::Use(mod_usage::new_all(mod_ident.clone()));
+    let use_mod_stmt = (!for_struct).then(|| Item::Use(mod_usage::new_all(mod_ident.clone())));
     let call_stmt::Result {
         impl_trait_cast_stmts,
         call_var_path,
@@ -65,8 +66,8 @@ pub(crate) fn generate(
         stmts: impl_trait_cast_stmts
             .into_iter()
             .map(Stmt::Local)
+            .chain(use_mod_stmt.into_iter().map(Stmt::Item))
             .chain([
-                Stmt::Item(use_mod_stmt),
                 Stmt::Local(call_stmt),
                 Stmt::Local(fn_data_stmt),
                 Stmt::Expr(Expr::MethodCall(fn_handle_stmt), None),

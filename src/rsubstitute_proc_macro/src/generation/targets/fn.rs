@@ -128,7 +128,10 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
         .collect();
 
     let item_mod = ItemMod {
-        attrs: vec![attributes::allow_non_camel_case_types(source_span)],
+        attrs: vec![
+            attributes::allow_unreachable_pub(source_span),
+            attributes::allow_non_camel_case_types(source_span),
+        ],
         vis: fn_info.visibility.clone(),
         unsafety: None,
         mod_token: Token![mod](source_span),

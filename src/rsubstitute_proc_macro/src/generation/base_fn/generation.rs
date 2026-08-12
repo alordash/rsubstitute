@@ -1,6 +1,5 @@
 use crate::common::models::*;
 use crate::common::*;
-use crate::generation::common::*;
 use crate::generation::fn_info::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
@@ -65,7 +64,7 @@ pub(crate) fn generate_associated(
         (sig, block) = normalization::normalize_associated_items(associated_items_info, sig, block);
     }
     let result = ImplItemFn {
-        attrs: Vec::new(),
+        attrs: vec![attributes::doc_hidden(span)],
         vis: Visibility::Inherited,
         modifiers: FnModifiers::default(),
         sig,
@@ -216,7 +215,11 @@ fn generate_core(
                 .map(|x| FieldPat {
                     attrs: Vec::new(),
                     member: Member::Named(x.ident.clone()),
-                    colon_token: Some(Token![:](span)),
+                    colon_token: if let Pat::Ident(_) = x.source_pat_type.pat.as_ref() {
+                        None
+                    } else {
+                        Some(Token![:](span))
+                    },
                     pat: Box::new(Pat::Path(PatPath {
                         attrs: Vec::new(),
                         qself: None,

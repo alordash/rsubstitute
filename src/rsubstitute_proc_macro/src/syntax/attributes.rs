@@ -43,6 +43,10 @@ pub(crate) fn allow_non_snake_case(span: Span) -> Attribute {
     allow(span, "non_snake_case")
 }
 
+pub(crate) fn allow_unreachable_pub(span: Span) -> Attribute {
+    allow(span, "unreachable_pub")
+}
+
 fn allow(span: Span, allowed: &'static str) -> Attribute {
     let result = Attribute {
         pound_token: Token![#](span),
