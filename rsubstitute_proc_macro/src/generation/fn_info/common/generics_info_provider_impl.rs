@@ -8,16 +8,20 @@ use syn::*;
 
 pub(crate) fn generate(impl_generics: Generics, generics: Generics, target_type: Type) -> ItemImpl {
     let span = generics.span();
-    let fn_get_generic_parameter_infos =
-        generate_fn_get_generic_parameter_infos(span, generics.params.iter());
-    let fn_hash_generics_type_ids =
-        generate_fn_hash_generics_type_ids(span, generics.type_params());
-    let fn_hash_const_values = generate_fn_hash_const_values(span, generics.const_params());
-    let items = vec![
-        ImplItem::Fn(fn_get_generic_parameter_infos),
-        ImplItem::Fn(fn_hash_generics_type_ids),
-        ImplItem::Fn(fn_hash_const_values),
-    ];
+    let items = if generics.params.is_empty() {
+        Vec::new()
+    } else {
+        let fn_get_generic_parameter_infos =
+            generate_fn_get_generic_parameter_infos(span, generics.params.iter());
+        let fn_hash_generics_type_ids =
+            generate_fn_hash_generics_type_ids(span, generics.type_params());
+        let fn_hash_const_values = generate_fn_hash_const_values(span, generics.const_params());
+        vec![
+            ImplItem::Fn(fn_get_generic_parameter_infos),
+            ImplItem::Fn(fn_hash_generics_type_ids),
+            ImplItem::Fn(fn_hash_const_values),
+        ]
+    };
 
     let result = ItemImpl {
         attrs: Vec::new(),

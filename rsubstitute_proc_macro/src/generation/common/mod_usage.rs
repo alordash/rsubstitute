@@ -37,10 +37,6 @@ pub(crate) fn new_all(mod_ident: Ident) -> ItemUse {
     new_core(mod_ident, false)
 }
 
-pub(crate) fn new_pub_all(mod_ident: Ident) -> ItemUse {
-    new_core(mod_ident, true)
-}
-
 #[inline]
 fn new_core(mod_ident: Ident, public: bool) -> ItemUse {
     let span = mod_ident.span();

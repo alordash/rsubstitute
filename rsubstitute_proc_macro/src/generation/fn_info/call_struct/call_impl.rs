@@ -14,13 +14,17 @@ pub(crate) fn generate(
     arguments: &[Argument],
     target_type: Type,
 ) -> ItemImpl {
-    let fn_get_arg_infos = generate_fn_get_args_infos(span, arguments);
-    let fn_get_ptr_to_boxed_tuple_of_refs =
-        generate_fn_get_ptr_to_boxed_tuple_of_refs(span, arguments);
-    let items = vec![
-        ImplItem::Fn(fn_get_arg_infos),
-        ImplItem::Fn(fn_get_ptr_to_boxed_tuple_of_refs),
-    ];
+    let items = if arguments.is_empty() {
+        Vec::new()
+    } else {
+        let fn_get_arg_infos = generate_fn_get_args_infos(span, arguments);
+        let fn_get_ptr_to_boxed_tuple_of_refs =
+            generate_fn_get_ptr_to_boxed_tuple_of_refs(span, arguments);
+        vec![
+            ImplItem::Fn(fn_get_arg_infos),
+            ImplItem::Fn(fn_get_ptr_to_boxed_tuple_of_refs),
+        ]
+    };
 
     let result = ItemImpl {
         attrs: Vec::new(),

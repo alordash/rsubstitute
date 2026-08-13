@@ -16,9 +16,13 @@ pub(crate) fn generate(
     target_type: Type,
     call_struct_type: Type,
 ) -> ItemImpl {
-    let fn_check = generate_fn_check(span, arguments, call_struct_type);
-    let fn_fmt_args = generate_fn_fmt_args(span, arguments);
-    let items = vec![ImplItem::Fn(fn_check), ImplItem::Fn(fn_fmt_args)];
+    let items = if arguments.is_empty() {
+        Vec::new()
+    } else {
+        let fn_check = generate_fn_check(span, arguments, call_struct_type);
+        let fn_fmt_args = generate_fn_fmt_args(span, arguments);
+        vec![ImplItem::Fn(fn_check), ImplItem::Fn(fn_fmt_args)]
+    };
 
     let result = ItemImpl {
         attrs: Vec::new(),
