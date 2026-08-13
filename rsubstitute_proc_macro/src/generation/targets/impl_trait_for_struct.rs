@@ -2,7 +2,6 @@ mod as_trait_control_impl;
 
 use crate::common::models::*;
 use crate::common::*;
-use crate::generation::common::*;
 use crate::generation::mock_controls::models::*;
 use crate::generation::mock_controls::*;
 use crate::generation::mock_struct::models::*;
