@@ -243,23 +243,27 @@ fn generate_core(
         }),
         semi_token: Token![;](span),
     };
-    let cast_args_stmts = fn_info.arguments.iter().map(|x| Local {
-        attrs: Vec::new(),
-        let_token: Token![let](span),
-        modifiers: LocalModifiers::default(),
-        pat: Pat::Type(x.source_pat_type.clone()),
-        init: Some(LocalInit {
-            eq_token: Token![=](span),
-            expr: Box::new(Expr::Macro(transmute_lifetime_expr::new(Expr::Path(
-                ExprPath {
-                    attrs: Vec::new(),
-                    qself: None,
-                    path: path::from_ident(x.ident.clone()),
-                },
-            )))),
-            diverge: None,
-        }),
-        semi_token: Token![;](span),
+    let cast_args_stmts = fn_info.arguments.iter().map(|x| {
+        let mut source_pat_type = x.source_pat_type.clone();
+        let attrs = core::mem::take(&mut source_pat_type.attrs);
+        Local {
+            attrs,
+            let_token: Token![let](span),
+            modifiers: LocalModifiers::default(),
+            pat: Pat::Type(source_pat_type),
+            init: Some(LocalInit {
+                eq_token: Token![=](span),
+                expr: Box::new(Expr::Macro(transmute_lifetime_expr::new(Expr::Path(
+                    ExprPath {
+                        attrs: Vec::new(),
+                        qself: None,
+                        path: path::from_ident(x.ident.clone()),
+                    },
+                )))),
+                diverge: None,
+            }),
+            semi_token: Token![;](span),
+        }
     });
 
     let stmts = core::iter::once(Stmt::Local(deconstruct_call_stmt))

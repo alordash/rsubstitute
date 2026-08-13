@@ -55,7 +55,7 @@ impl Trait for Struct {
 
     fn get_my_type<TT: Clone>(
         &self,
-        input: <Self as Trait>::InputType<i32>,
+        #[allow(unused)] input: <Self as Trait>::InputType<i32>,
     ) -> <Self as Trait>::OutputType<TT>
     where
         Self: Clone + Sized,

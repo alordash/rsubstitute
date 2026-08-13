@@ -43,12 +43,20 @@ pub(crate) fn allow_non_snake_case(span: Span) -> Attribute {
     allow(span, "non_snake_case")
 }
 
+pub(crate) fn allow_non_upper_case_globals(span: Span) -> Attribute {
+    allow(span, "non_upper_case_globals")
+}
+
 pub(crate) fn allow_unreachable_pub(span: Span) -> Attribute {
     allow(span, "unreachable_pub")
 }
 
 pub(crate) fn allow_private_interfaces(span: Span) -> Attribute {
     allow(span, "private_interfaces")
+}
+
+pub(crate) fn allow_private_bounds(span: Span) -> Attribute {
+    allow(span, "private_bounds")
 }
 
 fn allow(span: Span, allowed: &'static str) -> Attribute {

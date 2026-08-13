@@ -16,7 +16,7 @@ impl Trait for Box<dyn Trait> {
     }
 }
 
-pub fn f() -> impl Trait {
+pub(crate) fn f() -> impl Trait {
     pub use f::*;
     let call = f_Call {
         generics: ::core::marker::PhantomData,

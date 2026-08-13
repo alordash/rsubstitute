@@ -11,8 +11,7 @@ use std::fmt::Debug;
 trait Trait {
     const CONST: usize = 43;
 
-    type InputType<TAmogus: Clone>: Clone + Debug
-        = i32;
+    type InputType<TAmogus: Clone>: Clone + Debug = i32;
 
     type OutputType<TT>: Clone + Sized + Default
         = u8

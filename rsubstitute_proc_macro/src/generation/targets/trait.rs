@@ -188,6 +188,7 @@ pub(crate) fn generate_module(ctx: &Context, item_trait: ItemTrait) -> MockMod {
             attributes::allow_unreachable_pub(source_span),
             attributes::allow_non_snake_case(source_span),
             attributes::allow_non_camel_case_types(source_span),
+            attributes::allow_non_upper_case_globals(source_span),
         ],
         vis: mod_visibility,
         unsafety: None,

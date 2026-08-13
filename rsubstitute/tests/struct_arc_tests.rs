@@ -2,13 +2,14 @@ use rsubstitute::*;
 use std::sync::Arc;
 
 #[mock]
-#[allow(unused)]
 struct Struct {
+    #[allow(unused)]
     pub number: i32,
 }
 
 #[mock(base)]
 impl Struct {
+    #[allow(unused)]
     pub fn new(number: i32) -> Self {
         Self { number }
     }
@@ -17,7 +18,6 @@ impl Struct {
 #[mock(base)]
 #[allow(unused)]
 impl Struct {
-    #[allow(unused)]
     pub(crate) fn accept_arc(&self, r: Arc<i32>) {}
 
     pub(crate) fn return_arc(&self) -> Arc<i32> {
@@ -40,7 +40,6 @@ mod tests {
     #![allow(non_snake_case)]
     use super::*;
     use not_enough_asserts::*;
-    use rsubstitute::*;
 
     mod accept_arc_tests {
         use super::*;

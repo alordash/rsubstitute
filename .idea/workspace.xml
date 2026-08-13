@@ -24,13 +24,12 @@
   <component name="ChangeListManager">
     <list default="true" id="f847079f-511f-4600-8811-ffe4728519b1" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_core/src/args/i_args_checker.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_core/src/args/i_args_checker.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_core/src/args/i_generics_info_provider.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_core/src/args/i_generics_info_provider.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_core/src/fn_parameters/i_call.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_core/src/fn_parameters/i_call.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/common/mod_usage.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/common/mod_usage.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/fn_info/args_checker_struct/args_checker_impl.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/fn_info/args_checker_struct/args_checker_impl.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/fn_info/call_struct/call_impl.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/fn_info/call_struct/call_impl.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/fn_info/common/generics_info_provider_impl.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/fn_info/common/generics_info_provider_impl.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute/bin/NEW_impl_Trait.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/bin/NEW_impl_Trait.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute/bin/NEW_trait_assoc_types.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/bin/NEW_trait_assoc_types.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/struct_arc_tests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/struct_arc_tests.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/impl_trait_for_struct.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/impl_trait_for_struct.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/trait.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/trait.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/syntax/attributes.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/syntax/attributes.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -487,8 +486,8 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Test struct_type_reference_normalization_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="test --package rsubstitute --test struct_type_reference_normalization_tests -- tests" />
+    <configuration name="Test struct_arc_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test struct_arc_tests -- tests" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -504,8 +503,8 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Tests in 'tests' (1)" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="test --package rsubstitute --test arg_printing_test --test associated_types_tests --test behaviour_tests --test config_tests --test fn_advanced_tests --test fn_deref_tests --test fn_generics_tests --test fn_ref_tests --test fn_simple_tests --test fn_value_type_tests --test generics_info_in_logs_tests --test impl_trait_tests --test no_matching_config_tests --test reference_tests --test struct_advanced_tests --test struct_arc_tests --test struct_base_impl_tests --test struct_generics_tests --test struct_rc_tests --test struct_ref_tests --test struct_repeating_generics_tests --test struct_simple_tests --test struct_trait_impl_generics_tests --test struct_type_reference_normalization_tests --test struct_value_type_tests --test struct_various_self_tests --test trait_advanced_tests --test trait_arc_tests --test trait_base_impl_tests --test trait_generics_tests --test trait_rc_tests --test trait_ref_tests --test trait_simple_tests --test trait_value_type_tests --test trait_various_self_tests --test ub_tests --test unsized_tests" />
+    <configuration name="Test struct_type_reference_normalization_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test struct_type_reference_normalization_tests -- tests" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -542,19 +541,19 @@
     <list>
       <item itemvalue="Cargo.Run sandbox" />
       <item itemvalue="Cargo.Test src" />
+      <item itemvalue="Cargo.Test struct_arc_tests::tests" />
       <item itemvalue="Cargo.Test struct_type_reference_normalization_tests::tests" />
       <item itemvalue="Cargo.Run NEW_struct_from_wip" />
       <item itemvalue="Cargo.Test optional_generics_tests::tests" />
-      <item itemvalue="Cargo.Tests in 'tests' (1)" />
       <item itemvalue="Cargo.Tests in 'tests'" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Cargo.Tests in 'tests'" />
+        <item itemvalue="Cargo.Test struct_arc_tests::tests" />
         <item itemvalue="Cargo.Test struct_type_reference_normalization_tests::tests" />
         <item itemvalue="Cargo.Run NEW_struct_from_wip" />
         <item itemvalue="Cargo.Test optional_generics_tests::tests" />
-        <item itemvalue="Cargo.Tests in 'tests' (1)" />
       </list>
     </recent_temporary>
   </component>
