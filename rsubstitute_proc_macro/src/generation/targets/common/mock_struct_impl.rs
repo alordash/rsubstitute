@@ -56,6 +56,7 @@ pub(crate) fn generate(
                 ordered,
                 mod_ident.clone(),
                 false,
+                None,
             )
         })
         .chain(static_fns.iter().map(|ordered| {
@@ -65,6 +66,7 @@ pub(crate) fn generate(
                 ordered,
                 mod_ident.clone(),
                 true,
+                None,
             )
         }))
         .collect();
@@ -202,6 +204,9 @@ pub(crate) fn generate_for_trait(
         );
         return (base_fn_trait, base_fns_impl);
     });
+    let maybe_base_trait_ident = maybe_base_trait_and_fns_impl
+        .as_ref()
+        .map(|x| x.0.ident.clone());
     let fns: Vec<_> = associated_fns
         .iter()
         .map(|ordered| {
@@ -211,6 +216,7 @@ pub(crate) fn generate_for_trait(
                 ordered,
                 mod_ident.clone(),
                 false,
+                maybe_base_trait_ident.clone(),
             )
         })
         .chain(static_fns.iter().map(|ordered| {
@@ -220,6 +226,7 @@ pub(crate) fn generate_for_trait(
                 ordered,
                 mod_ident.clone(),
                 true,
+                maybe_base_trait_ident.clone(),
             )
         }))
         .collect();
@@ -282,6 +289,7 @@ fn map_fn(
     ordered_fn_info: &Ordered<FnInfo>,
     mod_ident: Ident,
     is_static: bool,
+    maybe_base_trait_ident: Option<Ident>,
 ) -> Ordered<ImplItemFn> {
     ordered_fn_info.ref_map(|fn_info| {
         let span = fn_info.spans.inputs;
@@ -304,6 +312,7 @@ fn map_fn(
                         },
                         mod_ident,
                         for_struct: true,
+                        maybe_base_trait_ident,
                     },
                 )
             } else {
@@ -318,7 +327,8 @@ fn map_fn(
                         } else {
                             None
                         },
-                        maybe_mod_ident: Some(mod_ident),
+                        mod_ident,
+                        maybe_base_trait_ident,
                     },
                 )
             },

@@ -5,19 +5,28 @@ pub(crate) fn new<const N: usize>(mod_ident: Ident, target_idents: [Ident; N]) -
     let span = mod_ident.span();
     let result = ItemUse {
         attrs: vec![attributes::allow_unreachable_pub(span)],
-        vis: Visibility::Public(Token![pub](span)),
+        vis: Visibility::Inherited,
         use_token: Token![use](span),
         leading_colon: None,
         tree: UseTree::Path(UsePath {
             ident: mod_ident.clone(),
             colon2_token: Token![::](mod_ident.span()),
-            tree: Box::new(UseTree::Group(UseGroup {
-                brace_token: token::Brace(span),
-                items: target_idents
-                    .into_iter()
-                    .map(|ident| UseTree::Name(UseName { ident }))
-                    .collect(),
-            })),
+            tree: Box::new(if N == 1 {
+                UseTree::Name(UseName {
+                    ident: target_idents
+                        .into_iter()
+                        .next()
+                        .expect("`target_idents` length must be 1"),
+                })
+            } else {
+                UseTree::Group(UseGroup {
+                    brace_token: token::Brace(span),
+                    items: target_idents
+                        .into_iter()
+                        .map(|ident| UseTree::Name(UseName { ident }))
+                        .collect(),
+                })
+            }),
         }),
         semi_token: Token![;](span),
     };

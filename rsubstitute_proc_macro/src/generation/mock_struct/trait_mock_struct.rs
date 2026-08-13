@@ -209,6 +209,7 @@ fn map_fn(
                         },
                         mod_ident,
                         for_struct: false,
+                        maybe_base_trait_ident: None,
                     },
                 )
             } else {
@@ -223,7 +224,8 @@ fn map_fn(
                         } else {
                             None
                         },
-                        maybe_mod_ident: Some(mod_ident),
+                        mod_ident,
+                        maybe_base_trait_ident: None,
                     },
                 )
             },

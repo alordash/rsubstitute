@@ -12,6 +12,7 @@ pub(crate) struct Params<'a> {
     pub base_fn_kind: BaseFnKind,
     pub mod_ident: Ident,
     pub for_struct: bool,
+    pub maybe_base_trait_ident: Option<Ident>,
 }
 pub(crate) fn generate(
     ctx: &Context,
@@ -22,6 +23,7 @@ pub(crate) fn generate(
         base_fn_kind,
         mod_ident,
         for_struct,
+        maybe_base_trait_ident,
     }: Params,
 ) -> Block {
     let generic_arguments = generic_arguments::new(
@@ -34,11 +36,13 @@ pub(crate) fn generate(
         },
     );
     let use_mod_stmt = (!for_struct).then(|| Item::Use(mod_usage::new_all(mod_ident.clone())));
+    let maybe_use_base_trait =
+        maybe_base_trait_ident.map(|x| Item::Use(mod_usage::new(mod_ident.clone(), [x])));
     let call_stmt::Result {
         impl_trait_cast_stmts,
         call_var_path,
         call_stmt,
-    } = call_stmt::new(span, fn_info, Some(mod_ident));
+    } = call_stmt::new(span, fn_info, mod_ident);
     let (fn_data_var_path, fn_data_stmt) = fn_data_stmt::new_static(
         span,
         fn_data_stmt::StaticParams {
@@ -65,6 +69,7 @@ pub(crate) fn generate(
             .into_iter()
             .map(Stmt::Local)
             .chain(use_mod_stmt.into_iter().map(Stmt::Item))
+            .chain(maybe_use_base_trait.into_iter().map(Stmt::Item))
             .chain([
                 Stmt::Local(call_stmt),
                 Stmt::Local(fn_data_stmt),
