@@ -215,10 +215,13 @@ fn generate_core(
                 .map(|x| FieldPat {
                     attrs: Vec::new(),
                     member: Member::Named(x.ident.clone()),
-                    colon_token: if let Pat::Ident(_) = x.source_pat_type.pat.as_ref() {
-                        None
-                    } else {
-                        Some(Token![:](span))
+                    colon_token: match x.source_pat_type.pat.as_ref() {
+                        Pat::Ident(_) | Pat::Wild(_) => {
+                            None
+                        }
+                        _ => {
+                            Some(Token![:](span))
+                        }
                     },
                     pat: Box::new(Pat::Path(PatPath {
                         attrs: Vec::new(),

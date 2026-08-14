@@ -58,7 +58,7 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
     }
 
     let result = ItemImpl {
-        attrs: Vec::new(),
+        attrs: vec![attributes::allow_unused(span)],
         modifiers: ImplModifiers::default(),
         unsafety: None,
         impl_token: Token![impl](span),
@@ -271,7 +271,7 @@ fn generate_fn_no_other_calls_for_static_fn(span: Span, mock_struct_path: Path) 
     };
 
     let result = ImplItemFn {
-        attrs: Vec::new(),
+        attrs: vec![attributes::allow_unused(span)],
         vis: Visibility::Public(Token![pub](span)),
         modifiers: FnModifiers::default(),
         sig,
@@ -308,7 +308,7 @@ fn generate_regular_fn_no_other_calls(span: Span) -> ImplItemFn {
     };
 
     let result = ImplItemFn {
-        attrs: Vec::new(),
+        attrs: vec![attributes::allow_unused(span)],
         vis: Visibility::Public(Token![pub](span)),
         modifiers: FnModifiers::default(),
         sig,

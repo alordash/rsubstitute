@@ -42,7 +42,6 @@ mod tests {
 
     use super::*;
     use not_enough_asserts::*;
-    use rsubstitute::*;
     use std::cell::RefCell;
     use std::sync::Arc;
 

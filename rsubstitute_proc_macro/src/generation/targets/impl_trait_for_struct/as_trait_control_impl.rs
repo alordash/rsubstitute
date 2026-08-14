@@ -84,7 +84,10 @@ fn generate_fn_as_trait(
     is_static: bool,
 ) -> ImplItemFn {
     let result = ImplItemFn {
-        attrs: vec![attributes::allow_non_snake_case(span)],
+        attrs: vec![
+            attributes::allow_non_snake_case(span),
+            attributes::allow_unused(span),
+        ],
         vis: Visibility::Public(Token![pub](span)),
         modifiers: FnModifiers::default(),
         sig: Signature {

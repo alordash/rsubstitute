@@ -13,19 +13,19 @@ impl Struct {
 
 #[mock(base)]
 impl Struct {
-    pub(crate) fn accept_rc(&self, r: Rc<i32>) {}
+    pub(crate) fn accept_rc(&self, _: Rc<i32>) {}
 
     pub(crate) fn return_rc(&self) -> Rc<i32> {
         todo!()
     }
 
-    pub(crate) fn accept_rc_return_rc(&self, r: Rc<i32>) -> Rc<i32> {
+    pub(crate) fn accept_rc_return_rc(&self, _: Rc<i32>) -> Rc<i32> {
         todo!()
     }
 
-    pub(crate) fn accept_two_rcs(&self, r1: Rc<i32>, r2: Rc<f32>) {}
+    pub(crate) fn accept_two_rcs(&self, _: Rc<i32>, _: Rc<f32>) {}
 
-    pub(crate) fn accept_two_rcs_return_rc(&self, r1: Rc<i32>, r2: Rc<f32>) -> Rc<String> {
+    pub(crate) fn accept_two_rcs_return_rc(&self, _: Rc<i32>, _: Rc<f32>) -> Rc<String> {
         todo!()
     }
 }
@@ -35,7 +35,6 @@ mod tests {
     #![allow(non_snake_case)]
     use super::*;
     use not_enough_asserts::*;
-    use rsubstitute::*;
 
     mod accept_rc_tests {
         use super::*;
@@ -99,7 +98,7 @@ Received no non-matching calls"
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
 accept_rc(*{r}*)
-	1. r (alloc::rc::Rc<i32>):
+	1. __arg0 (alloc::rc::Rc<i32>):
 		Expected (ptr: {invalid_r_ptr:?}): {invalid_r}
 		Actual   (ptr: {r_ptr:?}): {r}"
                 ),

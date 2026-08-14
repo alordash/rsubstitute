@@ -35,6 +35,10 @@ pub(crate) fn allow_unused_imports(span: Span) -> Attribute {
     allow(span, "unused_imports")
 }
 
+pub(crate) fn allow_unused(span: Span) -> Attribute {
+    allow(span, "unused")
+}
+
 pub(crate) fn allow_non_camel_case_types(span: Span) -> Attribute {
     allow(span, "non_camel_case_types")
 }

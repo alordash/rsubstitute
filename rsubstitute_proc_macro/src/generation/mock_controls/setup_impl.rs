@@ -48,7 +48,7 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
         .collect();
 
     let result = ItemImpl {
-        attrs: Vec::new(),
+        attrs: vec![attributes::allow_unused(span)],
         modifiers: ImplModifiers::default(),
         unsafety: None,
         impl_token: Token![impl](span),

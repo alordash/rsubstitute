@@ -94,6 +94,7 @@ struct Struct;
 
 #[mock(base)]
 impl Struct {
+    #[allow(unused)]
     pub fn new() -> Self {
         Self
     }

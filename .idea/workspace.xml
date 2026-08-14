@@ -22,7 +22,17 @@
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f847079f-511f-4600-8811-ffe4728519b1" name="Changes" comment="" />
+    <list default="true" id="f847079f-511f-4600-8811-ffe4728519b1" name="Changes" comment="">
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/arg_printing_test.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/arg_printing_test.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/behaviour_tests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/behaviour_tests.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/struct_simple_tests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/struct_simple_tests.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/base_fn/generation.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/base_fn/generation.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_controls/received_impl.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_controls/received_impl.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_controls/setup_impl.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_controls/setup_impl.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/impl_trait_for_struct/as_trait_control_impl.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/impl_trait_for_struct/as_trait_control_impl.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/syntax/attributes.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/syntax/attributes.rs" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -214,6 +224,7 @@
     "Cargo.Test struct_simple_tests.executor": "Run",
     "Cargo.Test struct_simple_tests::tests.executor": "Run",
     "Cargo.Test struct_tests.executor": "Run",
+    "Cargo.Test struct_tests::MockedStructPassedAsArgument_UsesMockedStruct.executor": "Run",
     "Cargo.Test struct_trait_impl_generics_tests::tests.executor": "Run",
     "Cargo.Test struct_type_reference_normalization_tests.executor": "Run",
     "Cargo.Test struct_type_reference_normalization_tests::tests.executor": "Run",
@@ -406,25 +417,7 @@
       <recent name="C:\_RS\rsubstitute\src\rsubstitute_proc_macro\src\generation\mock_controls\common" />
     </key>
   </component>
-  <component name="RunManager" selected="Cargo.Test associated_types_tests::tests">
-    <configuration name="Run NEW_struct_from_wip" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="buildProfileId" value="dev" />
-      <option name="command" value="run --package rsubstitute --bin NEW_struct_from_wip" />
-      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
-      <envs />
-      <option name="emulateTerminal" value="true" />
-      <option name="channel" value="DEFAULT" />
-      <option name="requiredFeatures" value="true" />
-      <option name="allFeatures" value="false" />
-      <option name="withSudo" value="false" />
-      <option name="buildTarget" value="REMOTE" />
-      <option name="backtrace" value="SHORT" />
-      <option name="isRedirectInput" value="false" />
-      <option name="redirectInputPath" value="" />
-      <method v="2">
-        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="Cargo.Tests in 'tests'">
     <configuration name="Run sandbox" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="buildProfileId" value="test" />
       <option name="command" value="run --package rsubstitute --bin sandbox" />
@@ -478,8 +471,8 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Test struct_arc_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="test --package rsubstitute --test struct_arc_tests -- tests" />
+    <configuration name="Test struct_rc_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test struct_rc_tests -- tests" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -495,8 +488,25 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Test struct_type_reference_normalization_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="test --package rsubstitute --test struct_type_reference_normalization_tests -- tests" />
+    <configuration name="Test struct_tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test behaviour_tests -- struct_tests" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Test struct_tests::MockedStructPassedAsArgument_UsesMockedStruct" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test behaviour_tests -- struct_tests::MockedStructPassedAsArgument_UsesMockedStruct --exact" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -533,19 +543,19 @@
     <list>
       <item itemvalue="Cargo.Run sandbox" />
       <item itemvalue="Cargo.Test src" />
+      <item itemvalue="Cargo.Test struct_rc_tests::tests" />
+      <item itemvalue="Cargo.Test struct_tests" />
+      <item itemvalue="Cargo.Test struct_tests::MockedStructPassedAsArgument_UsesMockedStruct" />
       <item itemvalue="Cargo.Test associated_types_tests::tests" />
-      <item itemvalue="Cargo.Test struct_arc_tests::tests" />
-      <item itemvalue="Cargo.Test struct_type_reference_normalization_tests::tests" />
-      <item itemvalue="Cargo.Run NEW_struct_from_wip" />
       <item itemvalue="Cargo.Tests in 'tests'" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Cargo.Test associated_types_tests::tests" />
         <item itemvalue="Cargo.Tests in 'tests'" />
-        <item itemvalue="Cargo.Test struct_arc_tests::tests" />
-        <item itemvalue="Cargo.Test struct_type_reference_normalization_tests::tests" />
-        <item itemvalue="Cargo.Run NEW_struct_from_wip" />
+        <item itemvalue="Cargo.Test struct_rc_tests::tests" />
+        <item itemvalue="Cargo.Test struct_tests" />
+        <item itemvalue="Cargo.Test struct_tests::MockedStructPassedAsArgument_UsesMockedStruct" />
+        <item itemvalue="Cargo.Test associated_types_tests::tests" />
       </list>
     </recent_temporary>
   </component>

@@ -48,7 +48,7 @@ pub(crate) fn new((number, source_pat_type): (usize, PatType)) -> Argument {
 fn prepare_ident(number: usize, pat_type: &PatType) -> Ident {
     let result = match pat_type.pat.as_ref() {
         Pat::Ident(pat_ident) => pat_ident.ident.clone(),
-        not_ident => Ident::new(&format!("__pat_arg{number}"), not_ident.span()),
+        not_ident => Ident::new(&format!("__arg{number}"), not_ident.span()),
     };
 
     return result;

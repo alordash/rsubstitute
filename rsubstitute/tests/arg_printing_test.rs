@@ -144,7 +144,7 @@ accept_ref(*{r}*)
         #[test]
         fn accept_ref_ptr_NoConfig_Ok() {
             // Arrange
-            let mut mock = TraitMock::<T0>::new();
+            let mock = TraitMock::<T0>::new();
 
             let r = &&(&&&5 as *const &&i32);
 
@@ -220,7 +220,7 @@ accept_ref_ptr(*{r:?}*)
         #[test]
         fn generic_NoConfig_Ok() {
             // Arrange
-            let mut mock = TraitMock::<T0>::new();
+            let mock = TraitMock::<T0>::new();
             type T1 = i32;
             type T2 = f64;
             let t1_name = core::any::type_name::<T1>();
@@ -417,7 +417,7 @@ accept_ref(*{r}*)
         #[test]
         fn accept_ref_ptr_NoConfig_Ok() {
             // Arrange
-            let mut mock = Struct::<T0>::new();
+            let mock = Struct::<T0>::new();
 
             let r = &&(&&&5 as *const &&i32);
 
@@ -493,7 +493,7 @@ accept_ref_ptr(*{r:?}*)
         #[test]
         fn generic_NoConfig_Ok() {
             // Arrange
-            let mut mock = Struct::<T0>::new();
+            let mock = Struct::<T0>::new();
             type T1 = i32;
             type T2 = f64;
             let t1_name = core::any::type_name::<T1>();
