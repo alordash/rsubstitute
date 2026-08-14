@@ -12,19 +12,19 @@ impl Struct {
 
 #[mock(base)]
 impl Struct {
-    pub fn accept_ref(&self, r: &i32) {}
+    pub fn accept_ref(&self, _: &i32) {}
 
     pub fn return_ref(&self) -> &'static i32 {
         todo!()
     }
 
-    pub fn accept_ref_return_ref(&self, r: &i32) -> &'static i32 {
+    pub fn accept_ref_return_ref(&self, _: &i32) -> &'static i32 {
         todo!()
     }
 
-    pub fn accept_two_refs(&self, r1: &i32, r2: &f32) {}
+    pub fn accept_two_refs(&self, _: &i32, _: &f32) {}
 
-    pub fn accept_two_refs_return_ref(&self, r1: &i32, r2: &f32) -> &'static str {
+    pub fn accept_two_refs_return_ref(&self, _: &i32, _: &f32) -> &'static str {
         unreachable!()
     }
 }
@@ -34,7 +34,6 @@ mod tests {
     #![allow(non_snake_case)]
     use super::*;
     use not_enough_asserts::*;
-    use rsubstitute::*;
 
     mod accept_ref_tests {
         use super::*;
@@ -95,7 +94,7 @@ Received no non-matching calls"
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
 accept_ref(*{r}*)
-	1. r (&i32):
+	1. __arg0 (&i32):
 		Expected reference (ptr: {invalid_r_ptr:?}): {invalid_r}
 		Actual reference   (ptr: {r_ptr:?}): {r}"
                 ),
@@ -114,7 +113,7 @@ accept_ref(*{r}*)
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
 accept_ref(*{r}*)
-	1. r (&i32):
+	1. __arg0 (&i32):
 		Expected reference (ptr: {invalid_r_ptr:?}): {invalid_r}
 		Actual reference   (ptr: {r_ptr:?}): {r}"
                 ),

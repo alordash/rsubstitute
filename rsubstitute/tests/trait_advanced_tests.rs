@@ -25,7 +25,7 @@ trait Trait<'a, 'b> {
     }
 }
 
-// TODO - replace in generated `Call` and `ArgsChecker` `Self` with `ISelfishMock`
+#[allow(unused)]
 #[mock(base)]
 trait ISelfish {
     fn work(&self, _: &Self);

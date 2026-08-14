@@ -182,9 +182,11 @@ struct Consumer<'a> {
 }
 
 #[mock(base)]
-fn consume(consumer: Consumer<'_>) {}
+#[allow(unused)]
+fn consume(_: Consumer<'_>) {}
 
 #[mock(base)]
+#[allow(unused)]
 fn option_ref(_: Option<&i32>) {}
 
 #[cfg(test)]

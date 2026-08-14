@@ -1,12 +1,13 @@
 use rsubstitute_proc_macro::mock;
 
 #[mock(base)]
+#[allow(unused)]
 trait Trait<TA, const TB: usize, TC, const TD: usize = 3> {}
 
 #[mock]
 struct S<SA, const SB: usize, SC, const SD: usize = 2> {
-    first: [SA; SB],
-    second: [SC; SD],
+    #[allow(unused)] first: [SA; SB],
+    #[allow(unused)] second: [SC; SD],
 }
 
 #[mock(base)]

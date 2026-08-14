@@ -4,10 +4,6 @@
 use rsubstitute::*;
 use std::fmt::Debug;
 
-// TODO - test how TraitA : TraitB behaves
-#[mock]
-fn f() {}
-
 #[mock(base)]
 trait Trait {
     const CONST: usize = 43;

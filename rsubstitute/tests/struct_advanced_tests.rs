@@ -14,12 +14,11 @@ impl Struct {
         Self
     }
 
-    #[allow(unused_mut)]
-    fn fooo(
+    #[allow(unused)]
+    fn foo(
         &mut self,
         Foo { mut number }: Foo,
-        #[allow(unused_variables)]
-        mut qq: &mut &mut &&&&mut i32,
+        #[allow(unused_variables)] mut qq: &mut &mut &&&&mut i32,
     ) {
         println!("number: {number:?}")
     }
@@ -49,11 +48,6 @@ impl Selfish {
 
 #[cfg(test)]
 mod tests {
-    #![allow(non_snake_case)]
-
-    #[test]
-    fn flex() {}
-
     #[test]
     fn compile() {}
 }
