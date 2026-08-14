@@ -4,15 +4,15 @@ use quote::format_ident;
 use syn::spanned::Spanned;
 use syn::*;
 
-pub(crate) fn generate(source_span: Span, target_path: &Path) -> ItemUse {
+pub(crate) fn generate(span: Span, target_path: &Path) -> ItemUse {
     let tree_tail = UseTree::Path(UsePath {
         ident: format_ident!(
             "__rsubstitute_generated_{}Mock",
             path::last_ident(target_path)
         ),
-        colon2_token: Token![::](source_span),
+        colon2_token: Token![::](span),
         tree: Box::new(UseTree::Glob(UseGlob {
-            star_token: Token![*](source_span),
+            star_token: Token![*](span),
         })),
     });
     let tree_body_and_tail = target_path
@@ -28,17 +28,17 @@ pub(crate) fn generate(source_span: Span, target_path: &Path) -> ItemUse {
             })
         });
     let tree = UseTree::Path(UsePath {
-        ident: Ident::new("super", source_span),
-        colon2_token: Token![::](source_span),
+        ident: Ident::new("super", span),
+        colon2_token: Token![::](span),
         tree: Box::new(tree_body_and_tail),
     });
     let result = ItemUse {
-        attrs: Vec::new(),
+        attrs: vec![attributes::allow_unused_imports(span)],
         vis: Visibility::Inherited,
-        use_token: Token![use](source_span),
+        use_token: Token![use](span),
         leading_colon: None,
         tree,
-        semi_token: Token![;](source_span),
+        semi_token: Token![;](span),
     };
     return result;
 }

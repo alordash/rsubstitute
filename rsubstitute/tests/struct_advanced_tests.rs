@@ -14,7 +14,12 @@ impl Struct {
         Self
     }
 
-    fn fooo(&mut self, Foo { mut number }: Foo, mut qq: &mut &mut &&&&mut i32) {
+    #[allow(unused)]
+    fn fooo(
+        &mut self,
+        Foo { #[allow(unused_mut)] mut number }: Foo,
+        #[allow(unused_variables)] #[allow(unused_mut)] mut qq: &mut &mut &&&&mut i32,
+    ) {
         println!("number: {number:?}")
     }
 }
@@ -37,6 +42,7 @@ struct Selfish;
 
 #[mock(base)]
 impl Selfish {
+    #[allow(unused)]
     fn work(&self, _: &Self) {}
 }
 

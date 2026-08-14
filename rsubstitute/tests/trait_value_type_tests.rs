@@ -468,7 +468,7 @@ accept_value(*{first_value}*)
         #[test]
         fn return_value_NoMatchingConfiguration_Panics() {
             // Arrange
-            let mut mock = TraitMock::new();
+            let mock = TraitMock::new();
 
             // Act
             let actual_error_msg = record_panic(|| mock.return_value());

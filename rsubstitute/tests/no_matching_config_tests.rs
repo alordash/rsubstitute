@@ -17,6 +17,7 @@ mod tests {
     use super::*;
     use not_enough_asserts::*;
     use rsubstitute::Arg;
+    use rsubstitute_core::Times;
 
     #[test]
     fn trait_work_Panics() {
@@ -92,5 +93,6 @@ List of existing configuration ordered by number of correctly matched arguments 
 	3. Matched 1/4 arguments: work({v1}, *{v2}*, *{v3}*, *{v4}*)
 	4. Matched 0/4 arguments: work(*{v1}*, *{v2}*, *{v3}*, *{v4}*)");
         assert_eq!(Some(expected_error_msg), actual_error_msg);
+        work::received(Arg::Any, Arg::Any, Arg::Any, Arg::Any, Times::Never);
     }
 }

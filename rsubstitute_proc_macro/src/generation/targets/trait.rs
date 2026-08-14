@@ -182,7 +182,8 @@ pub(crate) fn generate_module(ctx: &Context, item_trait: ItemTrait) -> MockMod {
         )
         .collect();
 
-    let usage = mod_usage::new(mod_ident.clone(), [trait_mock_struct_ident]);
+    let mut usage = mod_usage::new(mod_ident.clone(), [trait_mock_struct_ident]);
+    usage.attrs.push(attributes::allow_unused(source_span));
     let item_mod = ItemMod {
         attrs: vec![
             attributes::allow_unreachable_pub(source_span),

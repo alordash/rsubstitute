@@ -34,7 +34,6 @@ mod tests {
     #![allow(non_snake_case)]
     use super::*;
     use not_enough_asserts::*;
-    use rsubstitute::*;
     use std::cell::RefCell;
     use std::sync::Arc;
 
@@ -479,7 +478,7 @@ accept_value(*{first_value}*)
         #[test]
         fn return_value_NoMatchingConfiguration_Panics() {
             // Arrange
-            let mut mock = Struct::new();
+            let mock = Struct::new();
 
             // Act
             let actual_error_msg = record_panic(|| mock.return_value());

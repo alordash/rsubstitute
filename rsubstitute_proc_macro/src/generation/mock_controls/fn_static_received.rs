@@ -82,7 +82,7 @@ pub(crate) fn generate(span: Span, static_received_path: Path, fn_info: &FnInfo)
     };
 
     let result = ItemFn {
-        attrs: Vec::new(),
+        attrs: vec![attributes::allow_unused(span)],
         vis: Visibility::Public(Token![pub](span)),
         modifiers: FnModifiers::default(),
         sig,

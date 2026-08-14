@@ -1,5 +1,6 @@
 use rsubstitute::*;
 
+#[allow(unused)]
 trait Trait<T> {
     fn work(&self, t: T) -> T;
 }

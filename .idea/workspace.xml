@@ -24,14 +24,17 @@
   <component name="ChangeListManager">
     <list default="true" id="f847079f-511f-4600-8811-ffe4728519b1" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/arg_printing_test.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/arg_printing_test.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/behaviour_tests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/behaviour_tests.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/struct_simple_tests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/struct_simple_tests.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/no_matching_config_tests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/no_matching_config_tests.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/struct_advanced_tests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/struct_advanced_tests.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/struct_trait_impl_generics_tests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/struct_trait_impl_generics_tests.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/struct_value_type_tests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/struct_value_type_tests.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/trait_value_type_tests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/trait_value_type_tests.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/base_fn/generation.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/base_fn/generation.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_controls/received_impl.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_controls/received_impl.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_controls/setup_impl.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_controls/setup_impl.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/impl_trait_for_struct/as_trait_control_impl.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/impl_trait_for_struct/as_trait_control_impl.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/syntax/attributes.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/syntax/attributes.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_controls/fn_static_received.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_controls/fn_static_received.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_controls/fn_static_setup.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_controls/fn_static_setup.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/trait_mock_struct.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/trait_mock_struct.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/common/use_struct_mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/common/use_struct_mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/trait.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/trait.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -90,6 +93,8 @@
   "keyToString": {
     "Cargo.Build `Test bin_struct::tests`.executor": "Run",
     "Cargo.Build `Test optional_generics_tests::tests`.executor": "Run",
+    "Cargo.Build `Test struct_rc_tests::tests`.executor": "Run",
+    "Cargo.Build `Test tests::fn_work_Panics`.executor": "Run",
     "Cargo.Build `Tests in 'tests' (1)`.executor": "Run",
     "Cargo.Build `Tests in 'tests'`.executor": "Run",
     "Cargo.Expand NEW.executor": "Run",
@@ -280,6 +285,7 @@
     "Cargo.Test tests::flex.executor": "Run",
     "Cargo.Test tests::fn_tests::output_Ok.executor": "Run",
     "Cargo.Test tests::fn_work_Ok.executor": "Run",
+    "Cargo.Test tests::fn_work_Panics.executor": "Run",
     "Cargo.Test tests::fn_work_PanicsOk.executor": "Run",
     "Cargo.Test tests::foo_CallBase_Ok.executor": "Run",
     "Cargo.Test tests::foo_Ok.executor": "Run",
@@ -313,6 +319,7 @@
     "Cargo.Test tests::return_tests::return_by_value_Ok.executor": "Run",
     "Cargo.Test tests::return_value_tests::return_value_ManyToSingle_Ok.executor": "Run",
     "Cargo.Test tests::return_value_tests::return_value_ManyWithCallback_Ok.executor": "Run",
+    "Cargo.Test tests::return_value_tests::return_value_NoMatchingConfiguration_Panics.executor": "Run",
     "Cargo.Test tests::return_value_tests::return_value_NoMatchingConfiguration_PanicsOk.executor": "Run",
     "Cargo.Test tests::return_value_tests::return_value_Single_Ok.executor": "Run",
     "Cargo.Test tests::return_value_tests::return_value_UsesFirstConfiguration_Ok (1).executor": "Run",
@@ -436,8 +443,8 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Test associated_types_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="test --package rsubstitute --test associated_types_tests -- tests" />
+    <configuration name="Test no_matching_config_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test no_matching_config_tests -- tests" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -488,8 +495,8 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Test struct_tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="test --package rsubstitute --test behaviour_tests -- struct_tests" />
+    <configuration name="Test tests::fn_work_Panics" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test no_matching_config_tests -- tests::fn_work_Panics --exact" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -505,8 +512,8 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Test struct_tests::MockedStructPassedAsArgument_UsesMockedStruct" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="test --package rsubstitute --test behaviour_tests -- struct_tests::MockedStructPassedAsArgument_UsesMockedStruct --exact" />
+    <configuration name="Test tests::return_value_tests::return_value_NoMatchingConfiguration_Panics" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test struct_value_type_tests -- tests::return_value_tests::return_value_NoMatchingConfiguration_Panics --exact" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -543,19 +550,19 @@
     <list>
       <item itemvalue="Cargo.Run sandbox" />
       <item itemvalue="Cargo.Test src" />
+      <item itemvalue="Cargo.Test no_matching_config_tests::tests" />
       <item itemvalue="Cargo.Test struct_rc_tests::tests" />
-      <item itemvalue="Cargo.Test struct_tests" />
-      <item itemvalue="Cargo.Test struct_tests::MockedStructPassedAsArgument_UsesMockedStruct" />
-      <item itemvalue="Cargo.Test associated_types_tests::tests" />
+      <item itemvalue="Cargo.Test tests::fn_work_Panics" />
+      <item itemvalue="Cargo.Test tests::return_value_tests::return_value_NoMatchingConfiguration_Panics" />
       <item itemvalue="Cargo.Tests in 'tests'" />
     </list>
     <recent_temporary>
       <list>
         <item itemvalue="Cargo.Tests in 'tests'" />
+        <item itemvalue="Cargo.Test tests::return_value_tests::return_value_NoMatchingConfiguration_Panics" />
+        <item itemvalue="Cargo.Test tests::fn_work_Panics" />
+        <item itemvalue="Cargo.Test no_matching_config_tests::tests" />
         <item itemvalue="Cargo.Test struct_rc_tests::tests" />
-        <item itemvalue="Cargo.Test struct_tests" />
-        <item itemvalue="Cargo.Test struct_tests::MockedStructPassedAsArgument_UsesMockedStruct" />
-        <item itemvalue="Cargo.Test associated_types_tests::tests" />
       </list>
     </recent_temporary>
   </component>
