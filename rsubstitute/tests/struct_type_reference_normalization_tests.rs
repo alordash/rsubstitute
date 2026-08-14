@@ -8,6 +8,7 @@ mod unit_mod {
 
     #[mock(base)]
     impl Unit {
+        #[allow(unused)]
         fn ident(&self) {
             let unit = Unit;
             let Unit = unit;
@@ -46,21 +47,29 @@ mod named_mod {
 
     #[mock]
     pub struct Named {
+        #[allow(unused)]
         pub v: i32,
     }
 
     #[mock(base)]
     impl Named {
+        #[allow(unused)]
         fn ident(&self) {
             let unit = Named { v: 1 };
-            let Named { v: a } = unit;
+            let Named {
+                #[allow(unused_variables)]
+                    v: a,
+            } = unit;
             let s = Self { v: 2 };
             let Self = s;
         }
 
         fn static_ident() {
             let unit = Named { v: 1 };
-            let Named { v: a } = unit;
+            let Named {
+                #[allow(unused_variables)]
+                    v: a,
+            } = unit;
             let s = Self { v: 2 };
             let Self = s;
         }
@@ -71,14 +80,20 @@ mod named_mod {
 impl named_mod::Named {
     fn path(&self) {
         let unit = named_mod::Named { v: 1 };
-        let named_mod::Named { v: a } = unit;
+        let named_mod::Named {
+            #[allow(unused_variables)]
+                v: a,
+        } = unit;
         let s = Self { v: 2 };
         let Self = s;
     }
 
     fn static_path() {
         let unit = named_mod::Named { v: 1 };
-        let named_mod::Named { v: a } = unit;
+        let named_mod::Named {
+            #[allow(unused_variables)]
+                v: a,
+        } = unit;
         let s = Self { v: 2 };
         let Self = s;
     }

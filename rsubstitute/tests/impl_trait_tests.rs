@@ -20,11 +20,11 @@ fn output() -> impl Dummy {
 
 #[mock]
 trait Trait {
-    fn input(&self, dummy: impl Dummy) -> i32 {
+    fn input(&self, _: impl Dummy) -> i32 {
         unreachable!()
     }
 
-    fn static_input(dummy: impl Dummy) -> i32 {
+    fn static_input(_: impl Dummy) -> i32 {
         unreachable!()
     }
 }

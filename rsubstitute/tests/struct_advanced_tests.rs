@@ -14,11 +14,12 @@ impl Struct {
         Self
     }
 
-    #[allow(unused)]
+    #[allow(unused_mut)]
     fn fooo(
         &mut self,
-        Foo { #[allow(unused_mut)] mut number }: Foo,
-        #[allow(unused_variables)] #[allow(unused_mut)] mut qq: &mut &mut &&&&mut i32,
+        Foo { mut number }: Foo,
+        #[allow(unused_variables)]
+        mut qq: &mut &mut &&&&mut i32,
     ) {
         println!("number: {number:?}")
     }

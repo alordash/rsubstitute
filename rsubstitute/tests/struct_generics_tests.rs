@@ -1,7 +1,7 @@
 use rsubstitute::*;
 use std::fmt::Debug;
 
-// TODO - move source mock target from inside generated module and place it before generated module
+#[allow(unused)]
 trait Trait {}
 
 #[mock]
