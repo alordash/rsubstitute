@@ -274,14 +274,7 @@ fn generate_core(
 
     let stmts = core::iter::once(Stmt::Local(deconstruct_call_stmt))
         .chain(cast_args_stmts.map(Stmt::Local))
-        .chain(core::iter::once(Stmt::Expr(
-            Expr::Block(ExprBlock {
-                attrs: Vec::new(),
-                label: None,
-                block: *base_impl,
-            }),
-            None,
-        )))
+        .chain(base_impl.stmts)
         .collect();
     let block = Block {
         brace_token: token::Brace(span),

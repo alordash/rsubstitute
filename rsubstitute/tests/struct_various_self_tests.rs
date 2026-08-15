@@ -551,8 +551,6 @@ mod tests {
             });
 
             // Act
-            let c = mock.clone();
-            dbg!(c.v);
             Box::new(mock.clone()).by_box();
             Box::new(mock.clone()).by_box();
 
