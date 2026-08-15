@@ -210,6 +210,7 @@ fn map_fn(
                         mod_ident,
                         for_struct: false,
                         maybe_base_trait_ident: None,
+                        use_mod_path_for_call_stmt: true,
                     },
                 )
             } else {

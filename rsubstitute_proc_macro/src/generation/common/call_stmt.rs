@@ -10,16 +10,18 @@ pub(crate) struct Result {
     pub call_var_path: ExprPath,
     pub call_stmt: Local,
 }
-pub(crate) fn new(span: Span, fn_info: &FnInfo, mod_ident: Ident) -> Result {
+pub(crate) fn new(span: Span, fn_info: &FnInfo, maybe_mod_ident: Option<Ident>) -> Result {
     let fn_data_var_path = expr::path::new(span, ["call"]);
     let mut call_struct_path = fn_info.call_struct.path.clone();
-    call_struct_path.segments.insert(
-        0,
-        PathSegment {
-            ident: mod_ident,
-            arguments: PathArguments::None,
-        },
-    );
+    if let Some(mod_ident) = maybe_mod_ident {
+        call_struct_path.segments.insert(
+            0,
+            PathSegment {
+                ident: mod_ident,
+                arguments: PathArguments::None,
+            },
+        );
+    }
     rsubstitute_lifetime::revert_in_first_generic_arg(&mut call_struct_path);
     let impl_trait_cast_stmts: Vec<_> = fn_info
         .arguments

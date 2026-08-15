@@ -23,16 +23,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f847079f-511f-4600-8811-ffe4728519b1" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/associated_types_tests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/associated_types_tests.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/config_tests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/config_tests.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/optional_generics_tests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/optional_generics_tests.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/reference_tests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/reference_tests.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/struct_advanced_tests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/struct_advanced_tests.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/struct_base_impl_tests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/struct_base_impl_tests.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/struct_ref_tests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/struct_ref_tests.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/struct_type_reference_normalization_tests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/struct_type_reference_normalization_tests.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/trait_advanced_tests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/trait_advanced_tests.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/common/fn_data_stmt.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/common/fn_data_stmt.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/fn_info/args_checker_struct/args_checker_impl.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/fn_info/args_checker_struct/args_checker_impl.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/syntax/common.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/syntax/common.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -426,7 +419,7 @@
       <recent name="C:\_RS\rsubstitute\src\rsubstitute_proc_macro\src\generation\mock_controls\common" />
     </key>
   </component>
-  <component name="RunManager" selected="Cargo.Test trait_various_self_tests::tests">
+  <component name="RunManager" selected="Cargo.Tests in 'tests'">
     <configuration name="Run sandbox" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="buildProfileId" value="test" />
       <option name="command" value="run --package rsubstitute --bin sandbox" />
@@ -445,8 +438,25 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Test associated_types_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="test --package rsubstitute --test associated_types_tests -- tests" />
+    <configuration name="Test basic_tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test trait_various_self_tests -- tests::basic_tests" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Test reference_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test reference_tests -- tests" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -480,25 +490,8 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Test tests::accept_ref_tests::accept_rc_Panics" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="test --package rsubstitute --test struct_ref_tests -- tests::accept_ref_tests::accept_rc_Panics --exact" />
-      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
-      <envs />
-      <option name="emulateTerminal" value="true" />
-      <option name="channel" value="DEFAULT" />
-      <option name="requiredFeatures" value="true" />
-      <option name="allFeatures" value="false" />
-      <option name="withSudo" value="false" />
-      <option name="buildTarget" value="REMOTE" />
-      <option name="backtrace" value="SHORT" />
-      <option name="isRedirectInput" value="false" />
-      <option name="redirectInputPath" value="" />
-      <method v="2">
-        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Test tests::struct_tests::struct_static_output_self_Ok" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="test --package rsubstitute --test impl_trait_tests -- tests::struct_tests::struct_static_output_self_Ok --exact" />
+    <configuration name="Test struct_various_self_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test struct_various_self_tests -- tests" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -531,8 +524,8 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Tests in 'rsubstitute'" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="test --package rsubstitute" />
+    <configuration name="Tests in 'tests'" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test arg_printing_test --test associated_types_tests --test behaviour_tests --test config_tests --test fn_advanced_tests --test fn_deref_tests --test fn_generics_tests --test fn_ref_tests --test fn_simple_tests --test fn_value_type_tests --test generics_info_in_logs_tests --test impl_trait_tests --test no_matching_config_tests --test optional_generics_tests --test reference_tests --test struct_advanced_tests --test struct_arc_tests --test struct_base_impl_tests --test struct_generics_tests --test struct_rc_tests --test struct_ref_tests --test struct_repeating_generics_tests --test struct_simple_tests --test struct_trait_impl_generics_tests --test struct_type_reference_normalization_tests --test struct_value_type_tests --test struct_various_self_tests --test trait_advanced_tests --test trait_arc_tests --test trait_base_impl_tests --test trait_generics_tests --test trait_rc_tests --test trait_ref_tests --test trait_simple_tests --test trait_value_type_tests --test trait_various_self_tests --test ub_tests --test unsized_tests" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -551,19 +544,19 @@
     <list>
       <item itemvalue="Cargo.Run sandbox" />
       <item itemvalue="Cargo.Test src" />
+      <item itemvalue="Cargo.Test basic_tests" />
+      <item itemvalue="Cargo.Test reference_tests::tests" />
+      <item itemvalue="Cargo.Test struct_various_self_tests::tests" />
+      <item itemvalue="Cargo.Tests in 'tests'" />
       <item itemvalue="Cargo.Test trait_various_self_tests::tests" />
-      <item itemvalue="Cargo.Test associated_types_tests::tests" />
-      <item itemvalue="Cargo.Test tests::accept_ref_tests::accept_rc_Panics" />
-      <item itemvalue="Cargo.Test tests::struct_tests::struct_static_output_self_Ok" />
-      <item itemvalue="Cargo.Tests in 'rsubstitute'" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Cargo.Tests in 'tests'" />
+        <item itemvalue="Cargo.Test reference_tests::tests" />
+        <item itemvalue="Cargo.Test struct_various_self_tests::tests" />
         <item itemvalue="Cargo.Test trait_various_self_tests::tests" />
-        <item itemvalue="Cargo.Test tests::struct_tests::struct_static_output_self_Ok" />
-        <item itemvalue="Cargo.Tests in 'rsubstitute'" />
-        <item itemvalue="Cargo.Test tests::accept_ref_tests::accept_rc_Panics" />
-        <item itemvalue="Cargo.Test associated_types_tests::tests" />
+        <item itemvalue="Cargo.Test basic_tests" />
       </list>
     </recent_temporary>
   </component>
@@ -828,7 +821,7 @@
       <breakpoints>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/rsubstitute/tests/config_tests.rs</url>
-          <line>109</line>
+          <line>111</line>
           <option name="timeStamp" value="15" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
@@ -882,22 +875,22 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/rsubstitute/tests/struct_various_self_tests.rs</url>
-          <line>892</line>
+          <line>890</line>
           <option name="timeStamp" value="84" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/rsubstitute/tests/struct_various_self_tests.rs</url>
-          <line>894</line>
+          <line>892</line>
           <option name="timeStamp" value="85" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/rsubstitute/tests/struct_various_self_tests.rs</url>
-          <line>905</line>
+          <line>903</line>
           <option name="timeStamp" value="86" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/rsubstitute/tests/struct_various_self_tests.rs</url>
-          <line>909</line>
+          <line>907</line>
           <option name="timeStamp" value="87" />
         </line-breakpoint>
       </breakpoints>

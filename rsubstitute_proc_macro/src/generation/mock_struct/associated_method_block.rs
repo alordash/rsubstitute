@@ -39,7 +39,7 @@ pub(crate) fn generate(
         impl_trait_cast_stmts,
         call_var_path,
         call_stmt,
-    } = call_stmt::new(span, fn_info, mod_ident);
+    } = call_stmt::new(span, fn_info, Some(mod_ident));
     let (fn_data_var_path, fn_data_stmt) = fn_data_stmt::new_associated(
         span,
         fn_data_stmt::AssociatedParams {

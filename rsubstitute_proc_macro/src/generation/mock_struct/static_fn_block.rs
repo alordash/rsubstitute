@@ -13,6 +13,7 @@ pub(crate) struct Params<'a> {
     pub mod_ident: Ident,
     pub for_struct: bool,
     pub maybe_base_trait_ident: Option<Ident>,
+    pub use_mod_path_for_call_stmt: bool,
 }
 pub(crate) fn generate(
     ctx: &Context,
@@ -24,6 +25,7 @@ pub(crate) fn generate(
         mod_ident,
         for_struct,
         maybe_base_trait_ident,
+        use_mod_path_for_call_stmt,
     }: Params,
 ) -> Block {
     let generic_arguments = generic_arguments::new(
@@ -42,7 +44,7 @@ pub(crate) fn generate(
         impl_trait_cast_stmts,
         call_var_path,
         call_stmt,
-    } = call_stmt::new(span, fn_info, mod_ident);
+    } = call_stmt::new(span, fn_info, use_mod_path_for_call_stmt.then_some(mod_ident));
     let (fn_data_var_path, fn_data_stmt) = fn_data_stmt::new_static(
         span,
         fn_data_stmt::StaticParams {
