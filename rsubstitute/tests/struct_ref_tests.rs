@@ -15,11 +15,11 @@ impl Struct {
     pub fn accept_ref(&self, _: &i32) {}
 
     pub fn return_ref(&self) -> &'static i32 {
-        todo!()
+        unreachable!()
     }
 
     pub fn accept_ref_return_ref(&self, _: &i32) -> &'static i32 {
-        todo!()
+        unreachable!()
     }
 
     pub fn accept_two_refs(&self, _: &i32, _: &f32) {}

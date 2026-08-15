@@ -16,17 +16,17 @@ impl Struct {
     pub(crate) fn accept_rc(&self, _: Rc<i32>) {}
 
     pub(crate) fn return_rc(&self) -> Rc<i32> {
-        todo!()
+        unreachable!()
     }
 
     pub(crate) fn accept_rc_return_rc(&self, _: Rc<i32>) -> Rc<i32> {
-        todo!()
+        unreachable!()
     }
 
     pub(crate) fn accept_two_rcs(&self, _: Rc<i32>, _: Rc<f32>) {}
 
     pub(crate) fn accept_two_rcs_return_rc(&self, _: Rc<i32>, _: Rc<f32>) -> Rc<String> {
-        todo!()
+        unreachable!()
     }
 }
 

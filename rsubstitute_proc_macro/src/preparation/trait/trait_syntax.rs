@@ -114,8 +114,8 @@ fn split_items(items: Vec<TraitItem>, trait_ident: &Ident) -> SplitItems {
                     item: trait_item_type,
                 },
             )),
-            TraitItem::Macro(_) => todo!("macro invocations inside trait are not supported"),
-            TraitItem::Verbatim(_) => todo!("verbatim trait items are not supported"),
+            TraitItem::Macro(_) => panic!("Macro invocations inside trait are not supported"),
+            TraitItem::Verbatim(_) => panic!("Verbatim trait items are not supported"),
             _ => panic!(
                 "Unexpected trait item: {}",
                 item.to_token_stream().to_string()
