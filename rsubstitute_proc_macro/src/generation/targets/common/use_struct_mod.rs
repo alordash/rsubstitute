@@ -33,7 +33,7 @@ pub(crate) fn generate(span: Span, target_path: &Path) -> ItemUse {
         tree: Box::new(tree_body_and_tail),
     });
     let result = ItemUse {
-        attrs: vec![attributes::allow_unused_imports(span)],
+        attrs: Vec::new(),
         vis: Visibility::Inherited,
         use_token: Token![use](span),
         leading_colon: None,

@@ -27,28 +27,12 @@ pub(crate) fn doc_hidden(span: Span) -> Attribute {
     return result;
 }
 
-pub(crate) fn allow_unused_variables(span: Span) -> Attribute {
-    allow(span, "unused_variables")
-}
-
-pub(crate) fn allow_unused_imports(span: Span) -> Attribute {
-    allow(span, "unused_imports")
-}
-
 pub(crate) fn allow_unused(span: Span) -> Attribute {
     allow(span, "unused")
 }
 
-pub(crate) fn allow_non_camel_case_types(span: Span) -> Attribute {
-    allow(span, "non_camel_case_types")
-}
-
-pub(crate) fn allow_non_snake_case(span: Span) -> Attribute {
-    allow(span, "non_snake_case")
-}
-
-pub(crate) fn allow_non_upper_case_globals(span: Span) -> Attribute {
-    allow(span, "non_upper_case_globals")
+pub(crate) fn allow_nonstandard_style(span: Span) -> Attribute {
+    allow(span, "nonstandard_style")
 }
 
 pub(crate) fn allow_unreachable_pub(span: Span) -> Attribute {

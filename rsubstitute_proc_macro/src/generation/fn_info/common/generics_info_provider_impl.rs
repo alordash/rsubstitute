@@ -263,7 +263,7 @@ fn generate_hash_fn_sig(span: Span, fn_name: &'static str) -> Signature {
     let inputs = punctuated([
         ref_self_fn_arg(span),
         FnArg::Typed(PatType {
-            attrs: vec![attributes::allow_unused_variables(span)],
+            attrs: Vec::new(),
             pat: Box::new(Pat::Ident(PatIdent {
                 attrs: Vec::new(),
                 by_ref: None,

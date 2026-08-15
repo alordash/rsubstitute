@@ -120,7 +120,7 @@ fn generate_trait_impl(
     let items = items_with_order.into_iter().map(|x| x.value).collect();
 
     let result = ItemImpl {
-        attrs: vec![attributes::allow_unused(span)],
+        attrs: Vec::new(),
         modifiers: ImplModifiers::default(),
         unsafety: trait_info.unsafety,
         impl_token: Token![impl](span),
@@ -302,7 +302,7 @@ fn generate_inner_impl(
         .collect();
 
     let result = ItemImpl {
-        attrs: vec![attributes::allow_unused(span)],
+        attrs: Vec::new(),
         modifiers: ImplModifiers::default(),
         unsafety: None,
         impl_token: Token![impl](span),

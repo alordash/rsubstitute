@@ -99,7 +99,7 @@ pub(crate) fn generate(
     };
 
     let result = ItemFn {
-        attrs: vec![attributes::allow_unused(span)],
+        attrs: Vec::new(),
         vis: Visibility::Public(Token![pub](span)),
         modifiers: FnModifiers::default(),
         sig,

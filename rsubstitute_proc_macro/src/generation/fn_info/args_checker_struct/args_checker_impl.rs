@@ -1,7 +1,6 @@
 use crate::common::*;
 use crate::generation::fn_info::*;
 use crate::preparation::r#fn::models::*;
-use crate::syntax::attributes::allow_unused_variables;
 use crate::syntax::*;
 use proc_macro2::Span;
 use quote::ToTokens;
@@ -91,7 +90,7 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
     let use_i_debug_printer_stmt = rsubstitute_for_generated::glob_usage(span, "arg_printing");
     let call_path = path::new(span, ["call"]);
     let call_stmt = Stmt::Local(Local {
-        attrs: vec![allow_unused_variables(span)],
+        attrs: Vec::new(),
         let_token: Token![let](span),
         modifiers: LocalModifiers::default(),
         pat: Pat::Type(PatType {

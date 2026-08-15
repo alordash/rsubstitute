@@ -28,7 +28,7 @@
 ///     let r = &v;
 ///     mock.work(r);
 /// }
-/// // `Arg::is` callback will receive a dangling reference.
+/// // `Arg::is` will receive a dangling reference.
 /// mock.received.work(Arg::is(|v| *v > 0, Times::once);
 /// ```
 /// To fix it either move `v` to the same or higher scope where `mock` is defined:
@@ -45,7 +45,7 @@
 ///     let v = 1;
 ///     let r = &v;
 ///     mock.work(r);
-///     // `Arg::is` callback will receive a valid reference.
+///     // `Arg::is` will receive a valid reference.
 ///     mock.received.work(Arg::is(|v| *v > 0, Times::once);
 /// }
 /// ```

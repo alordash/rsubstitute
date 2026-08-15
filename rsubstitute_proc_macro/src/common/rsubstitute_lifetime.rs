@@ -1,3 +1,4 @@
+use crate::constants;
 use crate::syntax::punctuated;
 use proc_macro2::Span;
 use syn::punctuated::Punctuated;
@@ -5,7 +6,7 @@ use syn::spanned::Spanned;
 use syn::*;
 
 pub(crate) fn new(span: Span) -> Lifetime {
-    let result = Lifetime::new("'__rsa", span);
+    let result = Lifetime::new(constants::DEFAULT_ARG_LIFETIME_IDENT_STR, span);
 
     return result;
 }
@@ -53,7 +54,7 @@ pub(crate) fn revert_in_first_generic_arg(path: &mut Path) {
                     .first_mut()
                     .map(|first_generic_arg| match first_generic_arg {
                         GenericArgument::Lifetime(lifetime_param)
-                            if lifetime_param.ident == "__rsa" =>
+                            if lifetime_param.ident == constants::DEFAULT_ARG_LIFETIME =>
                         {
                             Some(lifetime_param)
                         }

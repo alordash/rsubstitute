@@ -1,10 +1,9 @@
-use crate::syntax::attributes;
 use proc_macro2::{Ident, Span};
 use syn::*;
 
 pub(crate) fn new(span: Span) -> ItemUse {
     let result = ItemUse {
-        attrs: vec![attributes::allow_unused_imports(span)],
+        attrs: Vec::new(),
         vis: Visibility::Inherited,
         use_token: Token![use](span),
         leading_colon: None,
