@@ -67,10 +67,15 @@ fn generate_fn_check(span: Span, arguments: &[Argument], call_struct_type: Type)
                     and_token: Token![&](span),
                     lifetime: None,
                     mutability: None,
-                    elem: Box::new(Type::Path(r#type::path::new_global(
-                        span,
-                        rsubstitute_for_generated::new("DynCall"),
-                    ))),
+                    elem: Box::new(Type::Path(TypePath {
+                        attrs: Vec::new(),
+                        qself: None,
+                        path: path::new_generics_global(
+                            span,
+                            rsubstitute_for_generated::new("DynCall"),
+                            [anonymous_lifetime_generic_argument(span)],
+                        ),
+                    })),
                 })),
             }),
         ]),

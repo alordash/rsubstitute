@@ -152,6 +152,7 @@ fn fn_data_pat(
                                     colon2_token: None,
                                     lt_token: Token![<](span),
                                     args: punctuated([
+                                        anonymous_lifetime_generic_argument(span),
                                         generic_arguments.mock_generic_argument,
                                         generic_arguments.has_return_value_argument,
                                         generic_arguments.supports_base_calling_argument,

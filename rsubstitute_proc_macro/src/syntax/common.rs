@@ -91,3 +91,7 @@ pub(crate) fn placeholder_lifetime(span: Span) -> Lifetime {
 pub(crate) fn punctuated<T, P: Default, const N: usize>(items: [T; N]) -> Punctuated<T, P> {
     items.into_iter().collect()
 }
+
+pub(crate) fn anonymous_lifetime_generic_argument(span: Span) -> GenericArgument {
+    GenericArgument::Lifetime(Lifetime::new("'_", span))
+}
