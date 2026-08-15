@@ -30,7 +30,7 @@ pub(crate) fn generate(
         generic_arguments::Params {
             mock_struct_path: mock_struct_path.clone(),
             fn_info,
-            remove_lifetime_generic_arguments: true,
+            normalize_lifetimes_in_generic_arguments: false,
         },
     );
     let maybe_use_base_trait =

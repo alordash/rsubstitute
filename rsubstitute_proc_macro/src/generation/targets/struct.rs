@@ -105,7 +105,7 @@ pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
                 fn_no_other_calls_kind: received_impl::FnNoOtherCallsKind::ForStaticFn {
                     mock_struct_path: path::from_ident_with_generics(
                         item_struct.ident.clone(),
-                        &generics_for_impl,
+                        &item_struct.generics,
                     ),
                 },
             },

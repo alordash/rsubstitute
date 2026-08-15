@@ -34,7 +34,7 @@ pub(crate) fn generate(
         generic_arguments::Params {
             mock_struct_path: mock_struct_path.clone(),
             fn_info,
-            remove_lifetime_generic_arguments: true,
+            normalize_lifetimes_in_generic_arguments: false,
         },
     );
     let use_mod_stmt = (!for_struct).then(|| Item::Use(mod_usage::new_all(mod_ident.clone())));

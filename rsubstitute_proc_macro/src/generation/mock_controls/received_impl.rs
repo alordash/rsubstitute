@@ -133,7 +133,7 @@ fn generate_received_fn(
         generic_arguments::Params {
             mock_struct_path: mock_struct_path.clone(),
             fn_info,
-            remove_lifetime_generic_arguments: true,
+            normalize_lifetimes_in_generic_arguments: false,
         },
     );
     let rsubstitute_lifetime = rsubstitute_lifetime::new(span);
@@ -255,7 +255,7 @@ fn generate_fn_no_other_calls_for_static_fn(span: Span, mock_struct_path: Path) 
                 [GenericArgument::Type(Type::Path(TypePath {
                     attrs: Vec::new(),
                     qself: None,
-                    path: path::remove_lifetime_generic_arguments(mock_struct_path),
+                    path: mock_struct_path,
                 }))],
             ),
         }),

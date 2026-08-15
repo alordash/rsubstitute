@@ -1,4 +1,5 @@
 use crate::common::models::*;
+use crate::common::normalization;
 use crate::generation::fn_info::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
@@ -7,7 +8,7 @@ use syn::*;
 pub(crate) struct Params<'a> {
     pub mock_struct_path: Path,
     pub fn_info: &'a FnInfo,
-    pub remove_lifetime_generic_arguments: bool,
+    pub normalize_lifetimes_in_generic_arguments: bool,
 }
 pub(crate) struct Result {
     pub mock_generic_argument: GenericArgument,
@@ -21,11 +22,12 @@ pub(crate) fn new(
     Params {
         mut mock_struct_path,
         fn_info,
-        remove_lifetime_generic_arguments,
+        normalize_lifetimes_in_generic_arguments,
     }: Params,
 ) -> Result {
-    if remove_lifetime_generic_arguments {
-        mock_struct_path = path::remove_lifetime_generic_arguments(mock_struct_path);
+    if normalize_lifetimes_in_generic_arguments {
+        mock_struct_path =
+            normalization::normalize_lifetimes_in_generic_arguments(mock_struct_path);
     }
     let result = Result {
         mock_generic_argument: GenericArgument::Type(Type::Path(TypePath {

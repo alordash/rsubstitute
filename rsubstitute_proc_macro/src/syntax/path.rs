@@ -1,4 +1,5 @@
-use crate::syntax::{generic_argument, punctuated};
+use crate::constants;
+use crate::syntax::*;
 use proc_macro2::Span;
 use syn::*;
 
@@ -118,21 +119,4 @@ pub(crate) fn equal(left: &Path, right: &Path) -> bool {
         .zip(right.segments.iter())
         .all(|(left_segment, right_segment)| left_segment.ident == right_segment.ident);
     return result;
-}
-
-pub(crate) fn remove_lifetime_generic_arguments(mut path: Path) -> Path {
-    if let Some(last_segment) = path.segments.last_mut()
-        && let PathArguments::AngleBracketed(angle_bracketed_path_arguments) =
-            &mut last_segment.arguments
-    {
-        angle_bracketed_path_arguments.args =
-            core::mem::take(&mut angle_bracketed_path_arguments.args)
-                .into_iter()
-                .filter(|x| match x {
-                    GenericArgument::Lifetime(l) if l.ident != "_" => false,
-                    _ => true,
-                })
-                .collect();
-    }
-    return path;
 }

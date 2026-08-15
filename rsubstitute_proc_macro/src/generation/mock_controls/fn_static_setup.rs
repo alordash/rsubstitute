@@ -20,7 +20,7 @@ pub(crate) fn generate(
         generic_arguments::Params {
             mock_struct_path: mock_path.clone(),
             fn_info,
-            remove_lifetime_generic_arguments: false,
+            normalize_lifetimes_in_generic_arguments: false,
         },
     );
     let fn_configurator_path = fn_configurator_path::new(
