@@ -18,8 +18,6 @@ pub(crate) fn new(span: Span) -> MockModUsages {
         semi_token: Token![;](span),
     };
 
-    let result = MockModUsages {
-        use_super,
-    };
+    let result = MockModUsages { use_super };
     return result;
 }

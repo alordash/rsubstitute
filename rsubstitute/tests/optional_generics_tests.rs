@@ -6,8 +6,10 @@ trait Trait<TA, const TB: usize, TC, const TD: usize = 3> {}
 
 #[mock]
 struct S<SA, const SB: usize, SC, const SD: usize = 2> {
-    #[allow(unused)] first: [SA; SB],
-    #[allow(unused)] second: [SC; SD],
+    #[allow(unused)]
+    first: [SA; SB],
+    #[allow(unused)]
+    second: [SC; SD],
 }
 
 #[mock(base)]

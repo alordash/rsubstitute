@@ -23,7 +23,8 @@ fn generate_core(ctx: &Context, fn_syntax: FnSyntax, generics_for_impl: Generics
     let call_struct = call_struct::generate(ctx, &fn_syntax, generics_for_impl.clone());
     let args_checker_struct = args_checker_struct::generate(
         &fn_syntax,
-        Type::Path(TypePath {attrs: Vec::new(),
+        Type::Path(TypePath {
+            attrs: Vec::new(),
             qself: None,
             path: call_struct.path.clone(),
         }),

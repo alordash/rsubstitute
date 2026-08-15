@@ -2,8 +2,8 @@
 #![allow(non_snake_case)]
 #![allow(unused)]
 
-use rsubstitute_core::args::Arg;
 use rsubstitute_core::Times;
+use rsubstitute_core::args::Arg;
 #[allow(unused_imports)]
 use rsubstitute_proc_macro::mock;
 use std::marker::PhantomData;

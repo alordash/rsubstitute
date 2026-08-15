@@ -1,8 +1,8 @@
 use super::models::*;
 use crate::common::{normalization, rsubstitute_lifetime};
-use crate::preparation::models::*;
 use crate::preparation::r#fn::fn_syntax;
 use crate::preparation::r#fn::models::*;
+use crate::preparation::models::*;
 use crate::syntax::*;
 use quote::{ToTokens, format_ident};
 use syn::*;

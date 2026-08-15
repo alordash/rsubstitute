@@ -73,7 +73,10 @@ Received no non-matching calls"
             let invalid_r = Arc::new(22);
             let invalid_r_ptr = Arc::as_ptr(&invalid_r);
             assert_panics(
-                || mock.received().accept_arc(Arg::ref_eq(invalid_r.clone()), Times::Once),
+                || {
+                    mock.received()
+                        .accept_arc(Arg::ref_eq(invalid_r.clone()), Times::Once)
+                },
                 format!(
                     "Expected to receive a call exactly once matching:
 	accept_arc((alloc::sync::Arc<i32>): equal to {invalid_r})

@@ -6,11 +6,11 @@ pub(crate) mod models {
     pub(crate) use mock_mod_usages::*;
 }
 
+mod common;
 pub mod r#fn;
 pub mod impl_struct;
 pub mod impl_trait_for_struct;
 pub mod r#struct;
 pub mod r#trait;
-mod common;
 
 mod mock_mod_usages;
