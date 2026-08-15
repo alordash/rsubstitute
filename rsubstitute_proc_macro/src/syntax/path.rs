@@ -129,7 +129,7 @@ pub(crate) fn remove_lifetime_generic_arguments(mut path: Path) -> Path {
             core::mem::take(&mut angle_bracketed_path_arguments.args)
                 .into_iter()
                 .filter(|x| match x {
-                    GenericArgument::Lifetime(_) => false,
+                    GenericArgument::Lifetime(l) if l.ident != "_" => false,
                     _ => true,
                 })
                 .collect();
