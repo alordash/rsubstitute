@@ -11,7 +11,7 @@ pub struct Data<'a, 'b, T1, T2> {
     ),
 }
 
-#[mock]
+#[mock(base)]
 #[allow(unused)]
 trait Trait<'a, 'b: 'a, T1: Clone> {
     fn work<'c, 'd: 'a, T2: Clone>(

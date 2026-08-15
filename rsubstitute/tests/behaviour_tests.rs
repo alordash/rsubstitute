@@ -124,7 +124,6 @@ mod struct_tests {
         mock.setup().f().returns(mocked_value);
 
         // Act
-        // TODO - modify generated struct and add SharedFnData field?
         let result = g(&mock);
 
         // Assert
