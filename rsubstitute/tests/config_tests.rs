@@ -1,3 +1,5 @@
+#![feature(rwlock_downgrade)]
+
 use rsubstitute::mock;
 
 #[mock]

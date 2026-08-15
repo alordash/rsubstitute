@@ -948,8 +948,10 @@ mod tests {
                 .and_does(move |_, _| counter.double_inc());
 
             // Act
-            Box::new(&mut mock.clone()).by_mut_ref_mut_box_mut_ref_mut_with_lifetimes();
-            Box::new(&mut mock.clone()).by_mut_ref_mut_box_mut_ref_mut_with_lifetimes();
+            #[allow(unused_allocation)]
+            Box::new(&mut mock).by_mut_ref_mut_box_mut_ref_mut_with_lifetimes();
+            #[allow(unused_allocation)]
+            Box::new(&mut mock).by_mut_ref_mut_box_mut_ref_mut_with_lifetimes();
 
             // Assert
             mock.received()
@@ -2032,10 +2034,12 @@ mod tests {
                 .and_does(move |_, _| counter.double_inc());
 
             // Act
+            #[allow(unused_allocation)]
             let actual_first_value =
-                Box::new(&mut mock.clone()).return_by_mut_ref_mut_box_mut_ref_mut_with_lifetimes();
+                Box::new(&mut mock).return_by_mut_ref_mut_box_mut_ref_mut_with_lifetimes();
+            #[allow(unused_allocation)]
             let actual_second_value =
-                Box::new(&mut mock.clone()).return_by_mut_ref_mut_box_mut_ref_mut_with_lifetimes();
+                Box::new(&mut mock).return_by_mut_ref_mut_box_mut_ref_mut_with_lifetimes();
 
             // Assert
             mock.received()
