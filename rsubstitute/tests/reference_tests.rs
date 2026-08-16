@@ -189,6 +189,18 @@ fn consume(_: Consumer<'_>) {}
 #[allow(unused)]
 fn option_ref(_: Option<&i32>) {}
 
+#[mock]
+#[allow(unused)]
+struct ImplRef;
+
+#[mock]
+impl ImplRef {
+    #[allow(unused)]
+    fn work(&self) -> impl Iterator<Item = &i32> {
+        [].iter()
+    }
+}
+
 #[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
