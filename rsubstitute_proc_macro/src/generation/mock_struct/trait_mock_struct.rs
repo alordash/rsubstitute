@@ -227,6 +227,7 @@ fn map_fn(
                         },
                         mod_ident,
                         maybe_base_trait_ident: None,
+                        qualify_call: false,
                     },
                 )
             },

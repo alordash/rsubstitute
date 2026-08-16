@@ -41,6 +41,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
             static_fns: &impl_struct_info.static_fns,
             generics: impl_struct_info.generics.clone(),
             mod_ident: &mod_ident,
+            qualify_call: true,
         },
     );
     let control_struct_path_base =

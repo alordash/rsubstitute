@@ -128,9 +128,12 @@ pub(crate) fn remove_lifetime_generic_arguments(mut path: Path) -> Path {
         angle_bracketed_path_arguments.args =
             core::mem::take(&mut angle_bracketed_path_arguments.args)
                 .into_iter()
-                .filter(|x| match x {
-                    GenericArgument::Lifetime(l) if l.ident != "_" => false,
-                    _ => true,
+                .map(|x| match x {
+                    GenericArgument::Lifetime(mut l) => {
+                        l.ident = Ident::new("_", l.ident.span());
+                        GenericArgument::Lifetime(l)
+                    }
+                    rest => rest,
                 })
                 .collect();
     }

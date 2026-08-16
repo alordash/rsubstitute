@@ -187,6 +187,7 @@ pub(crate) fn generate_module(ctx: &Context, item_trait: ItemTrait) -> MockMod {
     let item_mod = ItemMod {
         attrs: vec![
             attributes::allow_unused(source_span),
+            attributes::allow_unreachable_pub(source_span),
             attributes::allow_nonstandard_style(source_span),
         ],
         vis: mod_visibility,

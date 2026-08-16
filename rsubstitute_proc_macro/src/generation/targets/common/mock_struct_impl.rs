@@ -18,6 +18,7 @@ pub(crate) struct Params<'a> {
     pub static_fns: &'a [Ordered<FnInfo>],
     pub generics: Generics,
     pub mod_ident: &'a Ident,
+    pub qualify_call: bool,
 }
 pub(crate) fn generate(
     ctx: &Context,
@@ -29,6 +30,7 @@ pub(crate) fn generate(
         static_fns,
         generics,
         mod_ident,
+        qualify_call,
     }: Params,
 ) -> ItemImpl {
     let base_fns = if ctx.support_base_calling {
@@ -57,6 +59,7 @@ pub(crate) fn generate(
                 mod_ident.clone(),
                 false,
                 None,
+                qualify_call,
             )
         })
         .chain(static_fns.iter().map(|ordered| {
@@ -67,6 +70,7 @@ pub(crate) fn generate(
                 mod_ident.clone(),
                 true,
                 None,
+                qualify_call,
             )
         }))
         .collect();
@@ -217,6 +221,7 @@ pub(crate) fn generate_for_trait(
                 mod_ident.clone(),
                 false,
                 maybe_base_trait_ident.clone(),
+                true,
             )
         })
         .chain(static_fns.iter().map(|ordered| {
@@ -227,6 +232,7 @@ pub(crate) fn generate_for_trait(
                 mod_ident.clone(),
                 true,
                 maybe_base_trait_ident.clone(),
+                true,
             )
         }))
         .collect();
@@ -290,6 +296,7 @@ fn map_fn(
     mod_ident: Ident,
     is_static: bool,
     maybe_base_trait_ident: Option<Ident>,
+    qualify_call: bool,
 ) -> Ordered<ImplItemFn> {
     ordered_fn_info.ref_map(|fn_info| {
         let span = fn_info.spans.inputs;
@@ -330,6 +337,7 @@ fn map_fn(
                         },
                         mod_ident,
                         maybe_base_trait_ident,
+                        qualify_call,
                     },
                 )
             },

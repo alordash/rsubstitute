@@ -12,6 +12,7 @@ pub(crate) struct Params<'a> {
     pub maybe_base_fn_ident: Option<Ident>,
     pub mod_ident: Ident,
     pub maybe_base_trait_ident: Option<Ident>,
+    pub qualify_call: bool,
 }
 pub(crate) fn generate(
     ctx: &Context,
@@ -22,6 +23,7 @@ pub(crate) fn generate(
         maybe_base_fn_ident,
         mod_ident,
         maybe_base_trait_ident,
+        qualify_call,
     }: Params,
 ) -> Block {
     let generic_arguments = generic_arguments::new(
@@ -39,7 +41,7 @@ pub(crate) fn generate(
         impl_trait_cast_stmts,
         call_var_path,
         call_stmt,
-    } = call_stmt::new(span, fn_info, Some(mod_ident));
+    } = call_stmt::new(span, fn_info, qualify_call.then_some(mod_ident));
     let (fn_data_var_path, fn_data_stmt) = fn_data_stmt::new_associated(
         span,
         fn_data_stmt::AssociatedParams {
