@@ -16,6 +16,12 @@ struct Rewriter<'a> {
 
 impl<'a> VisitMut for Rewriter<'a> {
     fn visit_item_fn_mut(&mut self, i: &mut ItemFn) {
+        if i.attrs.iter().any(|x| match &x.meta {
+            Meta::Path(p) if p.segments.len() == 1 => p.segments[0].ident == "test",
+            _ => false,
+        }) {
+            return;
+        }
         i.attrs.insert(0, mock_attribute::new_base(i.span()));
     }
 
