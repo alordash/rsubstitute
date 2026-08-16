@@ -272,9 +272,10 @@ fn generate_core(
         }
     });
 
+    let normalized_base_impl = normalization::normalize_super_paths(*base_impl);
     let stmts = core::iter::once(Stmt::Local(deconstruct_call_stmt))
         .chain(cast_args_stmts.map(Stmt::Local))
-        .chain(base_impl.stmts)
+        .chain(normalized_base_impl.stmts)
         .collect();
     let block = Block {
         brace_token: token::Brace(span),

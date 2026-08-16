@@ -34,6 +34,9 @@ fn accept_many_ref<'a, 'b>(mut r: &'a &'b &'a &i32, _em: &()) -> &'a &'b &'a &'b
     unreachable!()
 }
 
+#[mock]
+fn accept_impl_trait(_: impl AsRef<str>) {}
+
 #[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
