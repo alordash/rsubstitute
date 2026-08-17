@@ -194,7 +194,7 @@ fn map_fn(
             attrs: fn_info.attributes.clone(),
             vis: Visibility::Inherited,
             modifiers: FnModifiers::default(),
-            sig: *fn_info.source_signature.clone(),
+            sig: *fn_info.signature.clone(),
             block: if is_static {
                 static_fn_block::generate(
                     ctx,

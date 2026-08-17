@@ -143,7 +143,7 @@ fn generate_received_fn(
         rsubstitute_lifetime.clone(),
     );
     if !for_static_fn {
-        generics = generics::combine(generics, &fn_info.source_signature.generics);
+        generics = generics::combine(generics, &fn_info.signature.generics);
     }
     let self_arg = ref_self_fn_arg(span);
     let output_type = Type::Path(TypePath {
@@ -167,7 +167,7 @@ fn generate_received_fn(
         ident: if for_static_fn {
             Ident::new("received", span)
         } else {
-            fn_info.source_signature.ident.clone()
+            fn_info.signature.ident.clone()
         },
         generics,
         paren_token: token::Paren(span),

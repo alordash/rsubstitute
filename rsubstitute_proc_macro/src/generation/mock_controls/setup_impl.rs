@@ -93,7 +93,7 @@ fn generate_setup_fn(
     );
     let mut generics = Generics::default();
     if !for_static_fn {
-        generics = generics::combine(generics, &fn_info.source_signature.generics);
+        generics = generics::combine(generics, &fn_info.signature.generics);
     }
     let sig = Signature {
         constness: None,
@@ -104,7 +104,7 @@ fn generate_setup_fn(
         ident: if for_static_fn {
             Ident::new("setup", span)
         } else {
-            fn_info.source_signature.ident.clone()
+            fn_info.signature.ident.clone()
         },
         generics,
         paren_token: token::Paren(span),

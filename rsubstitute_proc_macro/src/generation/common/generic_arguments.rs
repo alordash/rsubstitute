@@ -46,7 +46,7 @@ pub(crate) fn new(
         ),
         passes_mock_to_callback_argument: generic_argument::bool(
             span,
-            signature::is_associated(&fn_info.source_signature),
+            signature::is_associated(&fn_info.signature),
         ),
     };
     return result;

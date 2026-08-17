@@ -90,7 +90,7 @@ fn generate_core(
     base_impl: Box<Block>,
     maybe_mod_ident: Option<Ident>,
 ) -> (Signature, Block) {
-    let source_signature = &fn_info.source_signature;
+    let source_signature = &fn_info.signature;
     let call_path = path::new(span, ["call"]);
     let mut generics = source_signature.generics.clone();
     let mut output = source_signature.output.clone();

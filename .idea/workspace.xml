@@ -24,16 +24,26 @@
   <component name="ChangeListManager">
     <list default="true" id="f847079f-511f-4600-8811-ffe4728519b1" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute/bin/NEW_impl_Trait.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/bin/NEW_impl_Trait.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/impl_trait_tests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/impl_trait_tests.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rsubstitute/tests/reference_tests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/reference_tests.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/common/normalization/impl_trait_normalization.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/common/normalization/impl_trait_normalization.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/common/normalization/struct_type_references_normalization.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/common/normalization/struct_type_references_normalization.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/impl_struct.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/impl_struct.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/impl_trait_for_struct.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/impl_trait_for_struct.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/base_fn/generation.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/base_fn/generation.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/common/generic_arguments.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/common/generic_arguments.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/fn_info/args_checker_struct.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/fn_info/args_checker_struct.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/fn_info/call_struct.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/fn_info/call_struct.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/fn_info/generation.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/fn_info/generation.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/fn_info/models/fn_info.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/fn_info/models/fn_info.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_controls/received_impl.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_controls/received_impl.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_controls/setup_impl.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_controls/setup_impl.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/common/fn_handle_stmt.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/common/fn_handle_stmt.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/trait_mock_struct.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/trait_mock_struct.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/common/mock_struct_impl.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/common/mock_struct_impl.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/fn.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/fn.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/fn/mocked_fn.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/fn/mocked_fn.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/fn/fn_syntax.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/fn/fn_syntax.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/models/ordered.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/models/ordered.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/syntax/attributes.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/syntax/attributes.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/fn/models/fn_syntax.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/fn/models/fn_syntax.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/struct/impl_struct_syntax.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/struct/impl_struct_syntax.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/struct/impl_trait_for_struct_syntax.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/struct/impl_trait_for_struct_syntax.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/trait/trait_syntax.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/trait/trait_syntax.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -431,7 +441,7 @@
       <recent name="C:\_RS\rsubstitute\src\rsubstitute_proc_macro\src\generation\mock_controls\common" />
     </key>
   </component>
-  <component name="RunManager" selected="Cargo.Test impl_trait_tests::tests">
+  <component name="RunManager" selected="Cargo.Test reference_tests::tests">
     <configuration name="Run sandbox" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="buildProfileId" value="test" />
       <option name="command" value="run --package rsubstitute --bin sandbox" />
@@ -565,11 +575,11 @@
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Cargo.Test reference_tests::tests" />
         <item itemvalue="Cargo.Test impl_trait_tests::tests" />
         <item itemvalue="Cargo.Test tests::fn_tests::output_Base_Ok" />
         <item itemvalue="Cargo.Test tests::fn_tests::input_ArgPredicate_Ok" />
         <item itemvalue="Cargo.Tests in 'tests' (1)" />
-        <item itemvalue="Cargo.Test reference_tests::tests" />
       </list>
     </recent_temporary>
   </component>

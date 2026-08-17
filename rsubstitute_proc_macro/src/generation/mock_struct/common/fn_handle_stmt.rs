@@ -81,7 +81,7 @@ fn generate_base_fn_path(span: Span, fn_info: &FnInfo, base_fn_ident: Ident) -> 
                 colon2_token: Some(Token![::](span)),
                 lt_token: Token![<](span),
                 args: fn_info
-                    .source_signature
+                    .signature
                     .generics
                     .params
                     .iter()

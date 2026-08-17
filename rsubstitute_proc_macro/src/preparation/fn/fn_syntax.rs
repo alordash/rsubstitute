@@ -16,6 +16,7 @@ pub(crate) struct Params<'a> {
     pub signature: Signature,
     pub maybe_base_impl: Option<Box<Block>>,
     pub maybe_owner: Option<&'a dyn IFnOwner>,
+    pub maybe_target_path: Option<&'a Path>,
 }
 
 pub(crate) fn prepare(
@@ -25,8 +26,16 @@ pub(crate) fn prepare(
         mut signature,
         mut maybe_base_impl,
         maybe_owner,
+        maybe_target_path,
     }: Params,
 ) -> FnSyntax {
+    let mut source_signature = signature.clone();
+    if let Some(target_path) = maybe_target_path {
+        signature =
+            normalization::normalize_struct_type_references_in_signature(signature, target_path);
+        maybe_base_impl = maybe_base_impl
+            .map(|x| normalization::normalize_struct_type_references_in_block(x, target_path));
+    }
     let merged_generics = combine_generics(signature.generics.clone(), maybe_owner);
     let fn_ident = format_fn_ident(signature.ident.clone(), maybe_owner);
     let fn_data_name = format_fn_data_name(signature.ident.clone(), maybe_owner);
@@ -54,15 +63,23 @@ pub(crate) fn prepare(
                 maybe_base_impl = maybe_base_impl
                     .map(|x| Box::new(normalization::box_impl_trait_return_values(*x)));
                 attributes.push(attributes::allow_refining_impl_trait(signature_span));
+                source_signature.output = ReturnType::Type(
+                    arrow_token.clone(),
+                    Box::new(replace_impl_trait_result.ty.clone()),
+                );
             }
-            ReturnType::Type(arrow_token.clone(), Box::new(replace_impl_trait_result.ty))
+            let correct_return_type =
+                ReturnType::Type(arrow_token.clone(), Box::new(replace_impl_trait_result.ty));
+            correct_return_type
         }
     };
     signature = r#fn::common::replace_arg_pats_with_idents(signature, &arguments);
+    source_signature = r#fn::common::replace_arg_pats_with_idents(source_signature, &arguments);
     let result = FnSyntax {
         spans,
         attributes,
-        source_signature: Box::new(signature),
+        source_signature,
+        signature: Box::new(signature),
         visibility,
         merged_generics,
         generics_field,

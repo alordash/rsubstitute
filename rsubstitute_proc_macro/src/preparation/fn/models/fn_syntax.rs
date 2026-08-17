@@ -5,7 +5,8 @@ use syn::*;
 pub(crate) struct FnSyntax {
     pub spans: Spans,
     pub attributes: Vec<Attribute>,
-    pub source_signature: Box<Signature>,
+    pub source_signature: Signature,
+    pub signature: Box<Signature>,
     pub visibility: Visibility,
     pub merged_generics: Generics,
     pub generics_field: Field,

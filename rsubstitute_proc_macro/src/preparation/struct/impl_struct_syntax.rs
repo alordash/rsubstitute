@@ -1,5 +1,4 @@
 use super::models::*;
-use crate::common::normalization;
 use crate::preparation::r#fn::models::*;
 use crate::preparation::r#fn::*;
 use crate::preparation::models::*;
@@ -20,7 +19,7 @@ pub(crate) fn prepare(
         attributes,
         generics,
         target_type,
-        mut impl_items,
+        impl_items,
     }: Params,
 ) -> ImplStructSyntax {
     let target_path = parse_target_type(*target_type);
@@ -30,10 +29,6 @@ pub(crate) fn prepare(
         .expect("`impl` target path can not be empty")
         .ident
         .clone();
-    impl_items = impl_items
-        .into_iter()
-        .map(|x| normalization::normalize_struct_type_references(x, &target_path))
-        .collect();
     let split_items = split_items(impl_items);
     let impl_struct_syntax_as_fn_owner = ImplStructSyntaxAsFnOwner {
         generics: &generics,
@@ -42,14 +37,18 @@ pub(crate) fn prepare(
         .static_fns
         .into_iter()
         .map(|ordered| {
-            ordered.map(|x| map_impl_item_fn_to_fn_syntax(x, &impl_struct_syntax_as_fn_owner))
+            ordered.map(|x| {
+                map_impl_item_fn_to_fn_syntax(x, &impl_struct_syntax_as_fn_owner, &target_path)
+            })
         })
         .collect();
     let associated_fns = split_items
         .associated_fns
         .into_iter()
         .map(|ordered| {
-            ordered.map(|x| map_impl_item_fn_to_fn_syntax(x, &impl_struct_syntax_as_fn_owner))
+            ordered.map(|x| {
+                map_impl_item_fn_to_fn_syntax(x, &impl_struct_syntax_as_fn_owner, &target_path)
+            })
         })
         .collect();
 
@@ -100,6 +99,7 @@ fn split_items(items: Vec<ImplItem>) -> SplitItems {
 fn map_impl_item_fn_to_fn_syntax(
     impl_item_fn: ImplItemFn,
     impl_struct_syntax_as_fn_owner: &ImplStructSyntaxAsFnOwner,
+    target_path: &Path,
 ) -> FnSyntax {
     let result = fn_syntax::prepare(fn_syntax::Params {
         attributes: impl_item_fn.attrs,
@@ -107,6 +107,7 @@ fn map_impl_item_fn_to_fn_syntax(
         signature: impl_item_fn.sig,
         maybe_base_impl: Some(Box::new(impl_item_fn.block)),
         maybe_owner: Some(impl_struct_syntax_as_fn_owner),
+        maybe_target_path: Some(target_path),
     });
     return result;
 }

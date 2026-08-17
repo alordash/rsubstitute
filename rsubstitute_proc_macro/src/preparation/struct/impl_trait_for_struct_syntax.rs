@@ -1,5 +1,4 @@
 use super::models::*;
-use crate::common::normalization;
 use crate::preparation::r#fn::models::*;
 use crate::preparation::r#fn::*;
 use crate::preparation::models::*;
@@ -22,15 +21,11 @@ pub(crate) fn prepare(
         merged_generics,
         target_type,
         trait_path,
-        mut impl_items,
+        impl_items,
     }: Params,
 ) -> ImplTraitForStructSyntax {
     let trait_ident = ident::combine_path_segments(&trait_path);
     let target_path = prase_target_type(&target_type);
-    impl_items = impl_items
-        .into_iter()
-        .map(|x| normalization::normalize_struct_type_references(x, &target_path))
-        .collect();
     let split_items = split_items(impl_items);
     let impl_struct_syntax_as_fn_owner = ImplTraitForStructSyntaxAsFnOwner {
         ident: &trait_ident,
@@ -40,14 +35,18 @@ pub(crate) fn prepare(
         .static_fns
         .into_iter()
         .map(|ordered| {
-            ordered.map(|x| map_impl_item_fn_to_fn_syntax(x, &impl_struct_syntax_as_fn_owner))
+            ordered.map(|x| {
+                map_impl_item_fn_to_fn_syntax(x, &impl_struct_syntax_as_fn_owner, &target_path)
+            })
         })
         .collect();
     let associated_fns = split_items
         .associated_fns
         .into_iter()
         .map(|ordered| {
-            ordered.map(|x| map_impl_item_fn_to_fn_syntax(x, &impl_struct_syntax_as_fn_owner))
+            ordered.map(|x| {
+                map_impl_item_fn_to_fn_syntax(x, &impl_struct_syntax_as_fn_owner, &target_path)
+            })
         })
         .collect();
     let split_generics = item_impl::split_generics(&merged_generics, &trait_path, &target_type);
@@ -108,6 +107,7 @@ fn split_items(items: Vec<ImplItem>) -> SplitItems {
 fn map_impl_item_fn_to_fn_syntax(
     impl_item_fn: ImplItemFn,
     impl_struct_syntax_as_fn_owner: &ImplTraitForStructSyntaxAsFnOwner,
+    target_path: &Path,
 ) -> FnSyntax {
     let result = fn_syntax::prepare(fn_syntax::Params {
         attributes: impl_item_fn.attrs,
@@ -115,6 +115,7 @@ fn map_impl_item_fn_to_fn_syntax(
         signature: impl_item_fn.sig,
         maybe_base_impl: Some(Box::new(impl_item_fn.block)),
         maybe_owner: Some(impl_struct_syntax_as_fn_owner),
+        maybe_target_path: Some(target_path),
     });
     return result;
 }

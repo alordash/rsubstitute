@@ -136,6 +136,7 @@ fn map_trait_item_fn_to_fn_syntax(
         signature: trait_item_fn.sig,
         maybe_base_impl: trait_item_fn.default.map(Box::new),
         maybe_owner: Some(trait_syntax_as_fn_owner),
+        maybe_target_path: None,
     });
     return result;
 }

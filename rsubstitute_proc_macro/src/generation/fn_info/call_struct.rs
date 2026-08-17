@@ -47,7 +47,7 @@ pub(crate) fn generate(
     });
     let generics_info_provider_impl = generics_info_provider_impl::generate(
         generics_for_impl.clone(),
-        fn_syntax.source_signature.generics.clone(),
+        fn_syntax.signature.generics.clone(),
         r#type.clone(),
     );
     let call_impl = call_impl::generate(

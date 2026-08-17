@@ -20,6 +20,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
         signature: item_fn.sig,
         maybe_base_impl: Some(item_fn.block),
         maybe_owner: None,
+        maybe_target_path: None,
     });
     let fn_info = fn_info::generate(ctx, fn_syntax);
 
@@ -86,7 +87,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
     let fn_static_received =
         fn_static_received::generate(source_span, static_received_struct.path.clone(), &fn_info);
 
-    let mod_ident = fn_info.source_signature.ident.clone();
+    let mod_ident = fn_info.signature.ident.clone();
     let mocked_fn = mocked_fn::generate(
         ctx,
         source_span,

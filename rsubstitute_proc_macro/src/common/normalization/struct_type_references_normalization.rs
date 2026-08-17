@@ -1,17 +1,27 @@
 use crate::common::data_field;
 use crate::syntax::*;
+use std::borrow::BorrowMut;
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::visit_mut::VisitMut;
 use syn::*;
 
-pub(crate) fn normalize_struct_type_references(
-    mut impl_item: ImplItem,
+pub(crate) fn normalize_struct_type_references_in_signature(
+    mut signature: Signature,
     struct_path: &Path,
-) -> ImplItem {
+) -> Signature {
     let mut normalizer = StructTypeReferencesNormalizer::new(struct_path);
-    normalizer.visit_impl_item_mut(&mut impl_item);
-    return impl_item;
+    normalizer.visit_signature_mut(&mut signature);
+    return signature;
+}
+
+pub(crate) fn normalize_struct_type_references_in_block<T: BorrowMut<Block>>(
+    mut block: T,
+    struct_path: &Path,
+) -> T {
+    let mut normalizer = StructTypeReferencesNormalizer::new(struct_path);
+    normalizer.visit_block_mut(block.borrow_mut());
+    return block;
 }
 
 pub(crate) fn normalize_struct_type_references_in_trait_item(

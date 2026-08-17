@@ -34,7 +34,7 @@ pub(crate) fn generate(
         attrs: fn_info.attributes.clone(),
         vis: fn_info.visibility.clone(),
         modifiers: FnModifiers::default(),
-        sig: *fn_info.source_signature.clone(),
+        sig: *fn_info.signature.clone(),
         block: Box::new(block),
     };
     return result;

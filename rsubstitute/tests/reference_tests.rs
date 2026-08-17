@@ -212,14 +212,23 @@ struct LifetimeHolder<'a> {
     _unused: PhantomData<&'a ()>,
 }
 
-// #[mock(base)]
-// impl Default for LifetimeHolder<'_> {
-//     fn default() -> Self {
-//         LifetimeHolder {
-//             _unused: PhantomData,
-//         }
-//     }
-// }
+#[mock(base)]
+impl LifetimeHolder<'_> {
+    fn new() -> Self {
+        LifetimeHolder {
+            _unused: PhantomData,
+        }
+    }
+}
+
+#[mock(base)]
+impl Default for LifetimeHolder<'_> {
+    fn default() -> Self {
+        LifetimeHolder {
+            _unused: PhantomData,
+        }
+    }
+}
 
 #[cfg(test)]
 mod tests {
