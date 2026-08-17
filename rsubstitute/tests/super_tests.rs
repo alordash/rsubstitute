@@ -6,9 +6,10 @@ mod inner {
 
     #[mock(base)]
     #[allow(unused)]
-    fn work(_: super::Dependency) {
+    fn work(_: super::Dependency) -> super::Dependency {
         use super::Dependency;
-        let _ = Dependency;
+        let result = Dependency;
+        return result;
     }
 }
 

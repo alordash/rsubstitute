@@ -180,7 +180,7 @@ fn generate_core(
     );
     rsubstitute_lifetime::revert_in_first_generic_arg(&mut call_struct_path);
 
-    let sig = normalization::normalize_super_paths_in_signature(Signature {
+    let sig = Signature {
         constness: source_signature.constness.clone(),
         asyncness: source_signature.asyncness.clone(),
         safety: source_signature.safety.clone(),
@@ -208,7 +208,7 @@ fn generate_core(
         ]),
         variadic: None,
         output,
-    });
+    };
 
     let deconstruct_call_stmt = Local {
         attrs: Vec::new(),
