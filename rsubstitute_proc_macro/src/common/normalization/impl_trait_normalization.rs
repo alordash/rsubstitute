@@ -1,4 +1,5 @@
 use crate::syntax::*;
+use proc_macro2::TokenStream;
 use syn::spanned::Spanned;
 use syn::visit_mut::VisitMut;
 use syn::*;
@@ -52,5 +53,44 @@ impl VisitMut for ImplTraitReplacer {
         }
 
         visit_mut::visit_type_mut(self, i);
+    }
+}
+
+pub(crate) fn box_impl_trait_return_values(mut block: Block) -> Block {
+    ImplTraitReturnValueBoxer.visit_block_mut(&mut block);
+    return block;
+}
+
+struct ImplTraitReturnValueBoxer;
+
+impl VisitMut for ImplTraitReturnValueBoxer {
+    fn visit_block_mut(&mut self, i: &mut Block) {
+        if let Some(Stmt::Expr(return_expr, None)) = i.stmts.last_mut() {
+            let span = return_expr.span();
+            let decoy_expr = Expr::Verbatim(TokenStream::new());
+            let source_return_expr = core::mem::replace(return_expr, decoy_expr);
+            *return_expr = Expr::Call(expr::call::new(
+                span,
+                Expr::Path(expr::path::new(span, ["Box", "new"])),
+                [source_return_expr],
+            ));
+        }
+
+        visit_mut::visit_block_mut(self, i);
+    }
+
+    fn visit_expr_return_mut(&mut self, i: &mut ExprReturn) {
+        if let Some(return_expr) = i.expr.as_mut() {
+            let span = return_expr.span();
+            let decoy_expr = Box::new(Expr::Verbatim(TokenStream::new()));
+            let source_return_expr = core::mem::replace(return_expr, decoy_expr);
+            *return_expr = Box::new(Expr::Call(expr::call::new(
+                span,
+                Expr::Path(expr::path::new(span, ["Box", "new"])),
+                [*source_return_expr],
+            )));
+        }
+
+        visit_mut::visit_expr_return_mut(self, i);
     }
 }

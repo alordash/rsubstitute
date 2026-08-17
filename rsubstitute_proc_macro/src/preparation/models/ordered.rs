@@ -1,4 +1,4 @@
-use std::borrow::Borrow;
+use std::borrow::{Borrow, BorrowMut};
 use std::ops::Deref;
 
 pub(crate) struct Ordered<T> {
@@ -40,5 +40,11 @@ impl<T> Deref for Ordered<T> {
 impl<T> Borrow<T> for Ordered<T> {
     fn borrow(&self) -> &T {
         &self.value
+    }
+}
+
+impl<T> BorrowMut<T> for Ordered<T> {
+    fn borrow_mut(&mut self) -> &mut T {
+        &mut self.value
     }
 }

@@ -47,6 +47,10 @@ pub(crate) fn allow_private_bounds(span: Span) -> Attribute {
     allow(span, "private_bounds")
 }
 
+pub(crate) fn allow_refining_impl_trait(span: Span) -> Attribute {
+    allow(span, "refining_impl_trait")
+}
+
 fn allow(span: Span, allowed: &'static str) -> Attribute {
     let result = Attribute {
         pound_token: Token![#](span),

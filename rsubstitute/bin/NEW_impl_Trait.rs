@@ -16,6 +16,21 @@ impl Trait for Box<dyn Trait> {
     }
 }
 
+#[mock]
+struct S;
+
+#[mock(base)]
+impl S {
+    fn kavo(&self) -> impl Trait {
+        TraitMock::new()
+    }
+}
+
+#[mock(base)]
+fn kavo() -> impl Trait {
+    TraitMock::new()
+}
+
 pub(crate) fn f() -> impl Trait {
     pub use f::*;
     let call = f_Call {

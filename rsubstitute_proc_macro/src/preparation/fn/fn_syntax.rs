@@ -20,10 +20,10 @@ pub(crate) struct Params<'a> {
 
 pub(crate) fn prepare(
     Params {
-        attributes,
+        mut attributes,
         visibility,
         mut signature,
-        maybe_base_impl,
+        mut maybe_base_impl,
         maybe_owner,
     }: Params,
 ) -> FnSyntax {
@@ -43,14 +43,17 @@ pub(crate) fn prepare(
         Some(arguments.iter_generics_style_types().collect()),
     );
     let arg_refs_tuple = generate_arg_refs_tuple(spans.inputs, &arguments);
+    let signature_span = signature.span();
     let return_type = match &mut signature.output {
         ReturnType::Default => ReturnType::Default,
         ReturnType::Type(arrow_token, ty) => {
-            let replace_impl_trait_result = normalization::replace_impl_trait_with_box_dyn_trait(
-                *ty.clone()
-            );
+            let replace_impl_trait_result =
+                normalization::replace_impl_trait_with_box_dyn_trait(*ty.clone());
             if replace_impl_trait_result.is_impl_trait {
                 *ty = Box::new(replace_impl_trait_result.ty.clone());
+                maybe_base_impl = maybe_base_impl
+                    .map(|x| Box::new(normalization::box_impl_trait_return_values(*x)));
+                attributes.push(attributes::allow_refining_impl_trait(signature_span));
             }
             ReturnType::Type(arrow_token.clone(), Box::new(replace_impl_trait_result.ty))
         }
