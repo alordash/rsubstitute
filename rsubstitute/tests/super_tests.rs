@@ -1,3 +1,4 @@
+#[derive(Clone)]
 struct Dependency;
 
 mod inner {
@@ -5,7 +6,7 @@ mod inner {
 
     #[mock(base)]
     #[allow(unused)]
-    fn work() {
+    fn work(_: super::Dependency) {
         use super::Dependency;
         let _ = Dependency;
     }

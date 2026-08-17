@@ -180,7 +180,7 @@ fn generate_core(
     );
     rsubstitute_lifetime::revert_in_first_generic_arg(&mut call_struct_path);
 
-    let sig = Signature {
+    let sig = normalization::normalize_super_paths_in_signature(Signature {
         constness: source_signature.constness.clone(),
         asyncness: source_signature.asyncness.clone(),
         safety: source_signature.safety.clone(),
@@ -208,7 +208,7 @@ fn generate_core(
         ]),
         variadic: None,
         output,
-    };
+    });
 
     let deconstruct_call_stmt = Local {
         attrs: Vec::new(),
@@ -272,7 +272,7 @@ fn generate_core(
         }
     });
 
-    let normalized_base_impl = normalization::normalize_super_paths(*base_impl);
+    let normalized_base_impl = normalization::normalize_super_paths_in_block(*base_impl);
     let stmts = core::iter::once(Stmt::Local(deconstruct_call_stmt))
         .chain(cast_args_stmts.map(Stmt::Local))
         .chain(normalized_base_impl.stmts)

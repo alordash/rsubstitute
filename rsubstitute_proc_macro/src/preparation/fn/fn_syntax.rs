@@ -30,6 +30,7 @@ pub(crate) fn prepare(
     }: Params,
 ) -> FnSyntax {
     let mut source_signature = signature.clone();
+    signature = normalization::normalize_super_paths_in_signature(signature);
     if let Some(target_path) = maybe_target_path {
         signature =
             normalization::normalize_struct_type_references_in_signature(signature, target_path);
@@ -74,7 +75,8 @@ pub(crate) fn prepare(
         }
     };
     signature = r#fn::common::replace_arg_pats_with_idents(signature, &arguments);
-    source_signature = r#fn::common::replace_arg_pats_with_idents(source_signature, &arguments);
+    source_signature =
+        r#fn::common::replace_arg_pats_in_source_signature(source_signature, &arguments);
     let result = FnSyntax {
         spans,
         attributes,
