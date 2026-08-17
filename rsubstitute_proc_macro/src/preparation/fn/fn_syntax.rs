@@ -47,10 +47,7 @@ pub(crate) fn prepare(
         ReturnType::Default => ReturnType::Default,
         ReturnType::Type(arrow_token, ty) => {
             let replace_impl_trait_result = normalization::replace_impl_trait_with_box_dyn_trait(
-                r#type::replace_anonymous_lifetimes_in_references(
-                    *ty.clone(),
-                    &rsubstitute_lifetime::new(spans.inputs),
-                ),
+                *ty.clone()
             );
             if replace_impl_trait_result.is_impl_trait {
                 *ty = Box::new(replace_impl_trait_result.ty.clone());
