@@ -3,6 +3,7 @@ use crate::generation::common::*;
 use crate::generation::fn_info::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
+use syn::spanned::Spanned;
 use syn::*;
 
 pub(crate) fn new(
@@ -44,7 +45,11 @@ pub(crate) fn new(
             GenericArgument::Type(Type::Tuple(fn_info.arg_refs_tuple.clone())),
             GenericArgument::Type(match &fn_info.return_type {
                 ReturnType::Default => void_type(span),
-                ReturnType::Type(_, return_type) => *return_type.clone(),
+                ReturnType::Type(_, return_type) =>
+                r#type::replace_anonymous_lifetimes_in_references(
+                    *return_type.clone(),
+                    &rsubstitute_lifetime::new(return_type.span()),
+                ),
             }),
             GenericArgument::Type(mock_arg_type),
             generic_arguments.has_return_value_argument.clone(),

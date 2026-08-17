@@ -201,6 +201,26 @@ impl ImplRef {
     }
 }
 
+#[mock(base)]
+#[allow(unused)]
+fn return_ref(_: &i32) -> &i32 {
+    unreachable!()
+}
+
+#[mock(base)]
+struct LifetimeHolder<'a> {
+    _unused: PhantomData<&'a ()>,
+}
+
+#[mock(base)]
+impl Default for LifetimeHolder<'_> {
+    fn default() -> Self {
+        LifetimeHolder {
+            _unused: PhantomData,
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
