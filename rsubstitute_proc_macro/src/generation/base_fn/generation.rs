@@ -4,7 +4,6 @@ use crate::generation::fn_info::models::*;
 use crate::syntax::*;
 use proc_macro2::Span;
 use quote::format_ident;
-use syn::punctuated::Punctuated;
 use syn::*;
 
 pub(crate) fn get_base_fn_ident(fn_ident: &Ident) -> Ident {
@@ -13,18 +12,13 @@ pub(crate) fn get_base_fn_ident(fn_ident: &Ident) -> Ident {
 
 pub(crate) struct StaticFnParams<'a> {
     pub fn_info: &'a FnInfo,
-    pub target_struct_path: Path,
     pub base_impl: Box<Block>,
 }
 pub(crate) fn generate_static_fn(
     span: Span,
-    StaticFnParams {
-        fn_info,
-        target_struct_path,
-        base_impl,
-    }: StaticFnParams,
+    StaticFnParams { fn_info, base_impl }: StaticFnParams,
 ) -> ItemFn {
-    let (sig, block) = generate_core(span, fn_info, target_struct_path, base_impl, None);
+    let (sig, block) = generate_core(span, fn_info, base_impl, None);
     let result = ItemFn {
         attrs: fn_info
             .attributes
@@ -42,7 +36,6 @@ pub(crate) fn generate_static_fn(
 
 pub(crate) struct AssociatedParams<'a> {
     pub fn_info: &'a FnInfo,
-    pub target_struct_path: Path,
     pub base_impl: Box<Block>,
     pub maybe_associated_items_info: Option<&'a AssociatedItemsInfo>, // `Some` for trait impls, `None` for struct impls
     pub maybe_mod_ident: Option<Ident>,
@@ -51,20 +44,12 @@ pub(crate) fn generate_associated(
     span: Span,
     AssociatedParams {
         fn_info,
-        target_struct_path,
         base_impl,
         maybe_associated_items_info,
         maybe_mod_ident,
     }: AssociatedParams,
 ) -> ImplItemFn {
-    let (mut sig, mut block) = generate_core(
-        span,
-        fn_info,
-        target_struct_path,
-        base_impl,
-        maybe_mod_ident,
-    );
-    (sig, block) = normalization::normalize_method(sig, block);
+    let (mut sig, mut block) = generate_core(span, fn_info, base_impl, maybe_mod_ident);
     if let Some(associated_items_info) = maybe_associated_items_info {
         (sig, block) = normalization::normalize_associated_items(associated_items_info, sig, block);
     }
@@ -86,84 +71,28 @@ pub(crate) fn generate_associated(
 fn generate_core(
     span: Span,
     fn_info: &FnInfo,
-    target_struct_path: Path,
     base_impl: Box<Block>,
     maybe_mod_ident: Option<Ident>,
 ) -> (Signature, Block) {
     let source_signature = &fn_info.signature;
     let call_path = path::new(span, ["call"]);
-    let mut generics = source_signature.generics.clone();
-    let mut output = source_signature.output.clone();
-    let mock_pat = if let Some(receiver) = &fn_info.maybe_self_type {
-        let (is_reference, maybe_target_type_mutability, maybe_target_type) = match &receiver.kind {
-            ReceiverKind::Reference(_, _, mutability) => (true, mutability.clone(), None),
-            ReceiverKind::Typed(_, ty) => (false, None, Some(*ty.clone())),
-            _ => (false, None, None),
-        };
-        let reference_mutability = maybe_target_type_mutability.or_else(|| receiver.mutability);
-        let mut self_lifetime = None;
-        if is_reference && let ReturnType::Type(_, return_type) = &mut output {
-            let anonymous_lifetime_substitute = Lifetime {
-                apostrophe: span,
-                ident: Ident::new("__rs_ret", span),
-            };
-            r#type::replace_anonymous_lifetimes_in_references(
-                return_type.as_mut(),
-                &anonymous_lifetime_substitute,
-            );
-            self_lifetime = Some(anonymous_lifetime_substitute.clone());
-            generics.params.insert(
-                0,
-                GenericParam::Lifetime(LifetimeParam {
-                    attrs: Vec::new(),
-                    lifetime: anonymous_lifetime_substitute,
-                    colon_token: None,
-                    bounds: Punctuated::new(),
-                }),
-            );
-        }
-        let normalized_target_type = maybe_target_type
-            .map(|target_type| normalization::normalize_in_type(target_type, &target_struct_path))
-            .unwrap_or_else(|| {
-                Type::Path(TypePath {
-                    attrs: Vec::new(),
-                    qself: None,
-                    path: target_struct_path,
-                })
-            });
-        PatType {
-            attrs: Vec::new(),
-            pat: Box::new(Pat::Ident(PatIdent {
+    let generics = source_signature.generics.clone();
+    let output = source_signature.output.clone();
+    let mock_arg = fn_info
+        .maybe_self_type
+        .clone()
+        .map(FnArg::Receiver)
+        .unwrap_or_else(|| {
+            FnArg::Typed(PatType {
                 attrs: Vec::new(),
-                by_ref: None,
-                mutability: receiver.mutability,
-                ident: rsubstitute_self(span),
-                subpat: None,
-            })),
-            colon_token: Token![:](span),
-            ty: Box::new(if is_reference {
-                Type::Reference(TypeReference {
+                pat: Box::new(Pat::Wild(PatWild {
                     attrs: Vec::new(),
-                    and_token: Token![&](span),
-                    lifetime: self_lifetime,
-                    mutability: reference_mutability,
-                    elem: Box::new(normalized_target_type),
-                })
-            } else {
-                normalized_target_type
-            }),
-        }
-    } else {
-        PatType {
-            attrs: Vec::new(),
-            pat: Box::new(Pat::Wild(PatWild {
-                attrs: Vec::new(),
-                underscore_token: Token![_](span),
-            })),
-            colon_token: Token![:](span),
-            ty: Box::new(void_type(span)),
-        }
-    };
+                    underscore_token: Token![_](span),
+                })),
+                colon_token: Token![:](span),
+                ty: Box::new(void_type(span)),
+            })
+        });
     let mut call_struct_path = maybe_mod_ident.map_or_else(
         || fn_info.call_struct.path.clone(),
         |mod_ident| {
@@ -190,7 +119,7 @@ fn generate_core(
         generics,
         paren_token: token::Paren(span),
         inputs: punctuated([
-            FnArg::Typed(mock_pat),
+            mock_arg,
             FnArg::Typed(PatType {
                 attrs: Vec::new(),
                 pat: Box::new(Pat::Path(ExprPath {

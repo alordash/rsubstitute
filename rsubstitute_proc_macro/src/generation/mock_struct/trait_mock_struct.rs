@@ -290,7 +290,7 @@ fn generate_inner_impl(
                 .iter()
                 .chain(trait_info.static_fns.iter())
                 .filter_map(|fn_info| {
-                    try_extract_base_fn(span, &mock_struct_path, trait_info, fn_info, mod_ident)
+                    try_extract_base_fn(span, trait_info, fn_info, mod_ident)
                 }),
         )
     } else {
@@ -323,7 +323,6 @@ fn generate_inner_impl(
 
 fn try_extract_base_fn(
     span: Span,
-    mock_struct_path: &Path,
     trait_info: &TraitInfo,
     fn_info: &FnInfo,
     mod_ident: &Ident,
@@ -333,7 +332,6 @@ fn try_extract_base_fn(
             span,
             base_fn::AssociatedParams {
                 fn_info,
-                target_struct_path: mock_struct_path.clone(),
                 base_impl,
                 maybe_associated_items_info: Some(&trait_info.associated_items_info),
                 maybe_mod_ident: Some(mod_ident.clone()),

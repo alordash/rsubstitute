@@ -14,6 +14,3 @@ pub(crate) mod normalization;
 pub(crate) mod rsubstitute_for_generated;
 pub(crate) mod rsubstitute_lifetime;
 pub(crate) mod transmute_lifetime_expr;
-
-mod rsubstitute_self;
-pub(crate) use rsubstitute_self::*;

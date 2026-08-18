@@ -14,10 +14,10 @@ mod inner {
 
     #[mock]
     #[allow(unused)]
-    fn work_impl_trait(_: impl AsRef<super::Dependency>) -> super::Dependency {
+    fn work_impl_trait(_: impl AsRef<super::Dependency>) -> &'static super::Dependency {
         use super::Dependency;
         let result = Dependency;
-        return result;
+        unreachable!()
     }
 }
 
