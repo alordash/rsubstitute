@@ -11,6 +11,14 @@ mod inner {
         let result = Dependency;
         return result;
     }
+
+    #[mock]
+    #[allow(unused)]
+    fn work_impl_trait(_: impl AsRef<super::Dependency>) -> super::Dependency {
+        use super::Dependency;
+        let result = Dependency;
+        return result;
+    }
 }
 
 #[cfg(test)]

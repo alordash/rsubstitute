@@ -24,16 +24,38 @@ pub(crate) fn new(span: Span, fn_info: &FnInfo, maybe_mod_ident: Option<Ident>) 
     }
     rsubstitute_lifetime::revert_in_first_generic_arg(&mut call_struct_path);
     let impl_trait_cast_stmts: Vec<_> = fn_info
-        .arguments
+        .source_signature
+        .inputs
         .iter()
-        .filter_map(|x| {
-            if x.is_impl_trait {
-                let span = x.source_pat_type.span();
+        .skip_while(|x| match x {
+            FnArg::Receiver(_) => true,
+            _ => false,
+        })
+        .map(|x| match x {
+            FnArg::Typed(typed) => typed,
+            _ => panic!(
+                "All arguments after `FnArg::Receiver` should be of type `FnArg::Typed` only."
+            ),
+        })
+        .zip(&fn_info.arguments)
+        .filter_map(|(source_arg, arg)| {
+            if arg.is_impl_trait {
+                let span = source_arg.span();
                 Some(Local {
                     attrs: Vec::new(),
                     let_token: Token![let](span),
                     modifiers: LocalModifiers::default(),
-                    pat: Pat::Type(x.ident_pat_type.clone()),
+                    pat: Pat::Type(PatType {
+                        attrs: Vec::new(),
+                        pat: arg.ident_pat_type.pat.clone(),
+                        colon_token: Token![:](span),
+                        ty: Box::new(
+                            normalization::replace_impl_trait_with_box_dyn_trait(
+                                *source_arg.ty.clone(),
+                            )
+                            .ty,
+                        ),
+                    }),
                     init: Some(LocalInit {
                         eq_token: Token![=](span),
                         expr: Box::new(Expr::Call(expr::call::new(
@@ -42,7 +64,7 @@ pub(crate) fn new(span: Span, fn_info: &FnInfo, maybe_mod_ident: Option<Ident>) 
                             [Expr::Path(ExprPath {
                                 attrs: Vec::new(),
                                 qself: None,
-                                path: path::from_ident(x.ident.clone()),
+                                path: path::from_ident(arg.ident.clone()),
                             })],
                         ))),
                         diverge: None,
