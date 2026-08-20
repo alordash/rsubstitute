@@ -107,6 +107,7 @@ fn generate_core(
             return result;
         },
     );
+    // let mut call_struct_path = fn_info.call_struct.path.clone();
     rsubstitute_lifetime::revert_in_first_generic_arg(&mut call_struct_path);
 
     let sig = Signature {

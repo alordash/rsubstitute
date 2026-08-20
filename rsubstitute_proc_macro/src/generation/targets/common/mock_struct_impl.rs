@@ -37,7 +37,9 @@ pub(crate) fn generate(
         associated_fns
             .iter()
             .chain(static_fns.iter())
-            .map(|ordered| ordered.ref_map(|x| try_extract_base_fn(span, &x, mod_ident)))
+            .map(|ordered| {
+                ordered.ref_map(|x| try_extract_base_fn(span, &x, Some(mod_ident.clone())))
+            })
             .filter_map(|ordered| match ordered.value {
                 Some(x) => Some(Ordered::new(ordered.order_number, x)),
                 _ => None,
@@ -115,7 +117,7 @@ pub(crate) fn generate_for_trait(
         let base_fns: Vec<_> = associated_fns
             .iter()
             .chain(static_fns.iter())
-            .map(|ordered| ordered.ref_map(|x| try_extract_base_fn(span, &x, mod_ident)))
+            .map(|ordered| ordered.ref_map(|x| try_extract_base_fn(span, &x, None)))
             .filter_map(|ordered| match ordered.value {
                 Some(x) => Some(Ordered::new(ordered.order_number, x)),
                 _ => None,
@@ -339,7 +341,11 @@ fn map_fn(
     })
 }
 
-fn try_extract_base_fn(span: Span, fn_info: &FnInfo, mod_ident: &Ident) -> Option<ImplItemFn> {
+fn try_extract_base_fn(
+    span: Span,
+    fn_info: &FnInfo,
+    maybe_mod_ident: Option<Ident>,
+) -> Option<ImplItemFn> {
     fn_info.maybe_base_impl.clone().map(|base_impl| {
         base_fn::generate_associated(
             span,
@@ -347,7 +353,7 @@ fn try_extract_base_fn(span: Span, fn_info: &FnInfo, mod_ident: &Ident) -> Optio
                 fn_info,
                 base_impl,
                 maybe_associated_items_info: None,
-                maybe_mod_ident: Some(mod_ident.clone()),
+                maybe_mod_ident,
             },
         )
     })
