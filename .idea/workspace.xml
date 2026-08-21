@@ -22,7 +22,11 @@
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f847079f-511f-4600-8811-ffe4728519b1" name="Changes" comment="" />
+    <list default="true" id="f847079f-511f-4600-8811-ffe4728519b1" name="Changes" comment="">
+      <change afterPath="$PROJECT_DIR$/rsubstitute/bin/NEW_async.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/Cargo.toml" afterDir="false" />
+    </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -77,340 +81,341 @@
     <option name="hideEmptyMiddlePackages" value="true" />
     <option name="showLibraryContents" value="true" />
   </component>
-  <component name="PropertiesComponent">{
-  &quot;keyToString&quot;: {
-    &quot;Cargo.Build `Test associated_types_tests::tests`.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Build `Test bin_struct::tests`.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Build `Test optional_generics_tests::tests`.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Build `Test struct_rc_tests::tests`.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Build `Test tests::fn_work_Panics`.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Build `Test tests::struct_tests::struct_static_output_self_Ok`.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Build `Tests in 'tests' (1)`.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Build `Tests in 'tests'`.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand NEW.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand NEW_static_fn.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand NEW_struct.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand NEW_trait.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand actual_dyn_data.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand actual_dyn_data::sandbox.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand arg_printing_test.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand associated_types_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand dyn_data_generics::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand f.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand fn_advanced_ref_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand fn_simple_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand fn_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand fn_value_type_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand reference_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand rsubstitute_core::fn_parameters::generics_hash_key.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand rsubstitute_core::fn_parameters::i_raw_return_value.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand rsubstitute_proc_macro.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand rsubstitute_proc_macro::mock_generation::struct_mock_syntax::qwd.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand rsubstitute_proc_macro::syntax::expr_reference_factory.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand rsubstitute_proc_macro::syntax::generics::generics_merging.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand sandbox::generated.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand sandbox::single.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand struct.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand struct_advanced_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand struct_arc_type_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand struct_base_impl_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand struct_simple_generics_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand struct_simple_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand struct_various_self_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand trait_advanced_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand trait_various_self_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Expand trait_various_self_tests::__rsubstitute_generated_Trait.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run NEW.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run NEW_impl_Trait.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run NEW_static_fn.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run NEW_struct.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run NEW_struct_from_wip.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run NEW_struct_ref.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run NEW_trait.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run NEW_trait_assoc_types.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run NEW_trait_ref.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run bin_struct_generics.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run bin_struct_trait_more.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run dyn_data.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run dyn_data_base_and_generics.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run fn.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run rsubstitutifier.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run sandbox.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run struct.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run trait.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Run trait_generics.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test accept_two_values.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test accept_value_ArgIs_OkPanics.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test accept_value_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test accept_value_OkPanics.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test accept_value_return_value_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test accept_value_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test another_work.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test arg_printing_test.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test arg_printing_test::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test associated_types_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test basic_tests (1).executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test basic_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test behaviour_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test bin_dyn_data::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test bin_dyn_data_base_and_generics::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test bin_dyn_data_generics::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test bin_dyn_data_ref::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test bin_fn::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test bin_gen_dyn_data_generics::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test bin_struct::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test cdcd::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test cdcd_gen::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test compile (1).executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test compile.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test default.executor&quot;: &quot;Debug&quot;,
-    &quot;Cargo.Test f::test.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test f_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test flex.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test fn_advanced_ref_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test fn_advanced_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test fn_deref_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test fn_deref_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test fn_generics_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test fn_ref_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test fn_simple_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test fn_value_type_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test generics_info_in_logs_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test get_CallBase_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test get_return_TwoTypes_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test get_return_different_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test get_return_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test impl_trait_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test max_invalid_calls_listed_count_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test max_invalid_calls_listed_count_tests::default::CallsCountLessThanLimit_PrintsAll.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test max_invalid_calls_listed_count_tests::default::CallsCountMoreThanLimit_PrintsTrimmed.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test max_invalid_calls_listed_count_tests::default::DefaultMaxInvalidCallsListedCount_LessThanLimit_PrintsAll.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test max_invalid_calls_listed_count_tests::default::DefaultMaxInvalidCallsListedCount_MoreThanLimit_PrintsTrimmed.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test max_invalid_calls_listed_count_tests::set::set_max_invalid_calls_listed_count_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test max_invalid_calls_listed_count_tests::set_local_max_invalid_calls_listed_count_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test multiple selected files (1).executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test multiple selected files (2).executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test multiple selected files (3).executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test multiple selected files.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test no_matching_config_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test no_return_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test optional_generics_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test received_nothing_else_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test received_nothing_else_PanicsOk.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test reference_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test reference_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test repeating_generics_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test return_constraint_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test return_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test return_where_constraint_tests (1).executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test return_where_constraint_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test struct.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test struct_advanced_ref_type_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test struct_advanced_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test struct_arc_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test struct_arc_type_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test struct_base_impl_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test struct_generics_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test struct_rc_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test struct_rc_type_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test struct_ref_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test struct_ref_type_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test struct_repeating_generics_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test struct_simple_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test struct_simple_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test struct_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test struct_tests::MockedStructPassedAsArgument_UsesMockedStruct.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test struct_trait_impl_generics_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test struct_type_reference_normalization_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test struct_type_reference_normalization_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test struct_value_type_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test struct_various_self_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test struct_various_self_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test super_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test test::compile.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::DefaultMaxInvalidCallsListedCount_LessThanLimit_PrintsAll.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::DefaultMaxInvalidCallsListedCount_MoreThanLimit_PrintsTrimmed.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::Trait_f_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::a.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_arc_tests::accept_arc_Panics.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_many_ref_test.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_rc_tests::accept_rc_Panics.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_ref_DidNotReceive_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_ref_NoConfig_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_ref_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_ref_UnexpectedCall_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_ref_ptr_DidNotReceive_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_ref_ptr_NoConfig_Ok.executor&quot;: &quot;Debug&quot;,
-    &quot;Cargo.Test tests::accept_ref_ptr_UnexpectedCall_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_ref_return_ref_tests::accept_ref_return_ref_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_ref_tests::accept_rc_Panics.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_ref_tests::accept_ref_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_two_values_return_value_tests::accept_two_values_return_value_NoReturnValueInFirstConfig_ReturnsValueFromSecondConfig.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_two_values_return_value_tests::accept_two_values_return_value_NoReturnValue_Panics.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_two_values_return_value_tests::accept_two_values_return_value_NoReturnValue_PanicsOk (1).executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_two_values_return_value_tests::accept_two_values_return_value_NoReturnValue_PanicsOk.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_two_values_return_value_tests::accept_two_values_return_value_Panics.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_value_return_value_tests::accept_value_return_value_Many2_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_value_return_value_tests::accept_value_return_value_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_value_tests::accept_value_Callback_ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_value_tests::accept_value_NoOtherCallsWithManyOtherCalls_Panics (1).executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_value_tests::accept_value_NoOtherCallsWithManyOtherCalls_Panics.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_value_tests::accept_value_NoOtherCallsWithOtherCalls_Panics (1).executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_value_tests::accept_value_NoOtherCallsWithOtherCalls_Panics.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_value_tests::accept_value_NoOtherCallsWithoutOtherCalls_Ok (1).executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_value_tests::accept_value_NoOtherCallsWithoutOtherCalls_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::accept_value_tests::accept_value_Ok.executor&quot;: &quot;Debug&quot;,
-    &quot;Cargo.Test tests::basic_tests::by_box_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::basic_tests::by_box_ref_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::basic_tests::by_box_ref_mut_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::basic_tests::by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::basic_tests::by_ref_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::basic_tests::by_value_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::basic_tests::nested_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::by_ref_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::by_value_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::compile.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::compiles.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::f_ArgPredicate_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::f_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::flex (1).executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::flex.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::fn_tests::input_ArgPredicate_Ok.executor&quot;: &quot;Debug&quot;,
-    &quot;Cargo.Test tests::fn_tests::output_Base_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::fn_tests::output_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::fn_work_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::fn_work_Panics.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::fn_work_PanicsOk.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::foo_CallBase_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::foo_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::generic_DidNotReceiveDifferentGenerics_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::generic_DidNotReceiveSameGenerics_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::generic_NoConfig_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::generic_ref_UnexpectedCall_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::get_plus_one_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::get_return_CallBase_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::get_return_TwoTypes_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::get_return_different_tests::get_return_different_CallBase_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::get_return_tests::get_return_UnconfiguredType_PanicsOk.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::global_test.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::global_test2.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::my_test (1).executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::my_test (2).executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::my_test (3).executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::my_test.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::no_return_tests::by_arc_Ok.executor&quot;: &quot;Debug&quot;,
-    &quot;Cargo.Test tests::no_return_tests::by_box_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::no_return_tests::by_ref_Ok.executor&quot;: &quot;Debug&quot;,
-    &quot;Cargo.Test tests::no_return_tests::by_ref_colon_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::no_return_tests::by_value_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::no_return_tests::nested_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::no_support.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::r#trait::generic_DidNotReceiveDifferentGenerics_Ok.executor&quot;: &quot;Debug&quot;,
-    &quot;Cargo.Test tests::return_constraint_tests::return_constraint_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::return_mut_ref_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::return_mut_ref_with_base_CallBase_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::return_mut_ref_with_base_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::return_tests::return_by_value_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::return_value_tests::return_value_ManyToSingle_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::return_value_tests::return_value_ManyWithCallback_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::return_value_tests::return_value_NoMatchingConfiguration_Panics.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::return_value_tests::return_value_NoMatchingConfiguration_PanicsOk.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::return_value_tests::return_value_Single_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::return_value_tests::return_value_UsesFirstConfiguration_Ok (1).executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::return_value_tests::return_value_UsesFirstConfiguration_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::return_value_tests::return_value_UsesLastConfiguration_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::static_work_ReceivedUnexpectedCalls_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::struct_test.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::struct_tests::f_MultipleTimes_Panics.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::struct_tests::struct_output_self_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::struct_tests::struct_static_output_self_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::struct_work_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::test (1).executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::test.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::trait_tests::Trait_f_MultipleTimes_Panics.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::trait_tests::Trait_f_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::trait_tests::trait_work_ArgPredicate_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::trait_work_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::trait_work_PanicsOk.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::work_DidNotReceiveDifferentGenerics_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::work_DidNotReceiveSameGenerics_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::work_DidNotReceive_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::work_FixByNotUsingTemporaryValue_ReceivesValidReference.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::work_NoConfigs_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::work_NoReturnValue_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::work_NoSuitableConfig_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::work_OnlyUnsuitableConfigs_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::work_ReceivedUnexpectedCalls_Ok.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::work_ReferenceDies_ReceviesRewroteReference.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::work_ReferenceToTemporaryValue_FixByReceivingBeforeDrop_ReceivesValidReference.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::work_ReferenceToTemporaryValue_ReceivesDanglingReference.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test tests::work_ReferenceToTemporaryValue_ReceviesDanglingReference.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test trait_advanced_ref_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test trait_advanced_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test trait_arc_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test trait_base_impl_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test trait_generic_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test trait_rc_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test trait_ref_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test trait_simple_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test trait_simple_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test trait_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test trait_value_type_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test trait_various_self_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test ub_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test unsized_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test unsupported_tests::tests (1).executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test unsupported_tests::tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test value_type_trait_tests.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Test work.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Tests in 'rsubstitute'.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Tests in 'rsubstitute_core'.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Tests in 'rsubstitute_proc_macro'.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Tests in 'rsubstitutifier'.executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Tests in 'tests' (1).executor&quot;: &quot;Run&quot;,
-    &quot;Cargo.Tests in 'tests'.executor&quot;: &quot;Run&quot;,
-    &quot;CidrDebugProfileConversion&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.ShowReadmeOnStart&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.git.unshallow&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.rust.reset.selective.auto.import&quot;: &quot;true&quot;,
-    &quot;RunOnceActivity.typescript.service.memoryLimit.init&quot;: &quot;true&quot;,
-    &quot;codeWithMe.voiceChat.enabledByDefault&quot;: &quot;false&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1&quot;: &quot;true&quot;,
-    &quot;com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1&quot;: &quot;true&quot;,
-    &quot;git-widget-placeholder&quot;: &quot;main&quot;,
-    &quot;ignore.virus.scanning.warn.message&quot;: &quot;true&quot;,
-    &quot;junie.onboarding.icon.badge.shown&quot;: &quot;true&quot;,
-    &quot;last_opened_file_path&quot;: &quot;C:/_RS/rsubstitute/rsubstitute/tests&quot;,
-    &quot;node.js.detected.package.eslint&quot;: &quot;true&quot;,
-    &quot;node.js.detected.package.tslint&quot;: &quot;true&quot;,
-    &quot;node.js.selected.package.eslint&quot;: &quot;(autodetect)&quot;,
-    &quot;node.js.selected.package.tslint&quot;: &quot;(autodetect)&quot;,
-    &quot;nodejs_package_manager_path&quot;: &quot;npm&quot;,
-    &quot;org.rust.cargo.project.model.PROJECT_DISCOVERY&quot;: &quot;true&quot;,
-    &quot;org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon&quot;: &quot;&quot;,
-    &quot;org.rust.disableDetachedFileInspectionC:/_RS/rsubstitute/src/rsubstitute_core/src/arguments_matching/arg.rs&quot;: &quot;true&quot;,
-    &quot;org.rust.disableDetachedFileInspectionC:/_RS/rsubstitute/src/rsubstitute_core/src/arguments_matching/mod.rs&quot;: &quot;true&quot;,
-    &quot;run.code.analysis.last.selected.profile&quot;: &quot;pProject Default&quot;,
-    &quot;settings.editor.selected.configurable&quot;: &quot;project.propVCSSupport.DirectoryMappings&quot;,
-    &quot;to.speed.mode.migration.done&quot;: &quot;true&quot;,
-    &quot;vue.rearranger.settings.migration&quot;: &quot;true&quot;
+  <component name="PropertiesComponent"><![CDATA[{
+  "keyToString": {
+    "Cargo.Build `Test associated_types_tests::tests`.executor": "Run",
+    "Cargo.Build `Test bin_struct::tests`.executor": "Run",
+    "Cargo.Build `Test optional_generics_tests::tests`.executor": "Run",
+    "Cargo.Build `Test struct_rc_tests::tests`.executor": "Run",
+    "Cargo.Build `Test tests::fn_work_Panics`.executor": "Run",
+    "Cargo.Build `Test tests::struct_tests::struct_static_output_self_Ok`.executor": "Run",
+    "Cargo.Build `Tests in 'tests' (1)`.executor": "Run",
+    "Cargo.Build `Tests in 'tests'`.executor": "Run",
+    "Cargo.Expand NEW.executor": "Run",
+    "Cargo.Expand NEW_impl_Trait.executor": "Run",
+    "Cargo.Expand NEW_static_fn.executor": "Run",
+    "Cargo.Expand NEW_struct.executor": "Run",
+    "Cargo.Expand NEW_trait.executor": "Run",
+    "Cargo.Expand actual_dyn_data.executor": "Run",
+    "Cargo.Expand actual_dyn_data::sandbox.executor": "Run",
+    "Cargo.Expand arg_printing_test.executor": "Run",
+    "Cargo.Expand associated_types_tests.executor": "Run",
+    "Cargo.Expand dyn_data_generics::tests.executor": "Run",
+    "Cargo.Expand f.executor": "Run",
+    "Cargo.Expand fn_advanced_ref_tests.executor": "Run",
+    "Cargo.Expand fn_simple_tests.executor": "Run",
+    "Cargo.Expand fn_tests.executor": "Run",
+    "Cargo.Expand fn_value_type_tests.executor": "Run",
+    "Cargo.Expand reference_tests.executor": "Run",
+    "Cargo.Expand rsubstitute_core::fn_parameters::generics_hash_key.executor": "Run",
+    "Cargo.Expand rsubstitute_core::fn_parameters::i_raw_return_value.executor": "Run",
+    "Cargo.Expand rsubstitute_proc_macro.executor": "Run",
+    "Cargo.Expand rsubstitute_proc_macro::mock_generation::struct_mock_syntax::qwd.executor": "Run",
+    "Cargo.Expand rsubstitute_proc_macro::syntax::expr_reference_factory.executor": "Run",
+    "Cargo.Expand rsubstitute_proc_macro::syntax::generics::generics_merging.executor": "Run",
+    "Cargo.Expand sandbox::generated.executor": "Run",
+    "Cargo.Expand sandbox::single.executor": "Run",
+    "Cargo.Expand struct.executor": "Run",
+    "Cargo.Expand struct_advanced_tests.executor": "Run",
+    "Cargo.Expand struct_arc_type_tests.executor": "Run",
+    "Cargo.Expand struct_base_impl_tests.executor": "Run",
+    "Cargo.Expand struct_simple_generics_tests.executor": "Run",
+    "Cargo.Expand struct_simple_tests.executor": "Run",
+    "Cargo.Expand struct_various_self_tests.executor": "Run",
+    "Cargo.Expand tests.executor": "Run",
+    "Cargo.Expand trait_advanced_tests.executor": "Run",
+    "Cargo.Expand trait_various_self_tests.executor": "Run",
+    "Cargo.Expand trait_various_self_tests::__rsubstitute_generated_Trait.executor": "Run",
+    "Cargo.Run NEW.executor": "Run",
+    "Cargo.Run NEW_impl_Trait.executor": "Run",
+    "Cargo.Run NEW_static_fn.executor": "Run",
+    "Cargo.Run NEW_struct.executor": "Run",
+    "Cargo.Run NEW_struct_from_wip.executor": "Run",
+    "Cargo.Run NEW_struct_ref.executor": "Run",
+    "Cargo.Run NEW_trait.executor": "Run",
+    "Cargo.Run NEW_trait_assoc_types.executor": "Run",
+    "Cargo.Run NEW_trait_ref.executor": "Run",
+    "Cargo.Run bin_struct_generics.executor": "Run",
+    "Cargo.Run bin_struct_trait_more.executor": "Run",
+    "Cargo.Run dyn_data.executor": "Run",
+    "Cargo.Run dyn_data_base_and_generics.executor": "Run",
+    "Cargo.Run fn.executor": "Run",
+    "Cargo.Run rsubstitutifier.executor": "Run",
+    "Cargo.Run sandbox.executor": "Run",
+    "Cargo.Run struct.executor": "Run",
+    "Cargo.Run trait.executor": "Run",
+    "Cargo.Run trait_generics.executor": "Run",
+    "Cargo.Test accept_two_values.executor": "Run",
+    "Cargo.Test accept_value_ArgIs_OkPanics.executor": "Run",
+    "Cargo.Test accept_value_Ok.executor": "Run",
+    "Cargo.Test accept_value_OkPanics.executor": "Run",
+    "Cargo.Test accept_value_return_value_tests.executor": "Run",
+    "Cargo.Test accept_value_tests.executor": "Run",
+    "Cargo.Test another_work.executor": "Run",
+    "Cargo.Test arg_printing_test.executor": "Run",
+    "Cargo.Test arg_printing_test::tests.executor": "Run",
+    "Cargo.Test associated_types_tests::tests.executor": "Run",
+    "Cargo.Test basic_tests (1).executor": "Run",
+    "Cargo.Test basic_tests.executor": "Run",
+    "Cargo.Test behaviour_tests.executor": "Run",
+    "Cargo.Test bin_dyn_data::tests.executor": "Run",
+    "Cargo.Test bin_dyn_data_base_and_generics::tests.executor": "Run",
+    "Cargo.Test bin_dyn_data_generics::tests.executor": "Run",
+    "Cargo.Test bin_dyn_data_ref::tests.executor": "Run",
+    "Cargo.Test bin_fn::tests.executor": "Run",
+    "Cargo.Test bin_gen_dyn_data_generics::tests.executor": "Run",
+    "Cargo.Test bin_struct::tests.executor": "Run",
+    "Cargo.Test cdcd::tests.executor": "Run",
+    "Cargo.Test cdcd_gen::tests.executor": "Run",
+    "Cargo.Test compile (1).executor": "Run",
+    "Cargo.Test compile.executor": "Run",
+    "Cargo.Test default.executor": "Debug",
+    "Cargo.Test f::test.executor": "Run",
+    "Cargo.Test f_Ok.executor": "Run",
+    "Cargo.Test flex.executor": "Run",
+    "Cargo.Test fn_advanced_ref_tests::tests.executor": "Run",
+    "Cargo.Test fn_advanced_tests::tests.executor": "Run",
+    "Cargo.Test fn_deref_tests.executor": "Run",
+    "Cargo.Test fn_deref_tests::tests.executor": "Run",
+    "Cargo.Test fn_generics_tests::tests.executor": "Run",
+    "Cargo.Test fn_ref_tests::tests.executor": "Run",
+    "Cargo.Test fn_simple_tests::tests.executor": "Run",
+    "Cargo.Test fn_value_type_tests::tests.executor": "Run",
+    "Cargo.Test generics_info_in_logs_tests::tests.executor": "Run",
+    "Cargo.Test get_CallBase_Ok.executor": "Run",
+    "Cargo.Test get_return_TwoTypes_Ok.executor": "Run",
+    "Cargo.Test get_return_different_tests.executor": "Run",
+    "Cargo.Test get_return_tests.executor": "Run",
+    "Cargo.Test impl_trait_tests::tests.executor": "Run",
+    "Cargo.Test max_invalid_calls_listed_count_tests.executor": "Run",
+    "Cargo.Test max_invalid_calls_listed_count_tests::default::CallsCountLessThanLimit_PrintsAll.executor": "Run",
+    "Cargo.Test max_invalid_calls_listed_count_tests::default::CallsCountMoreThanLimit_PrintsTrimmed.executor": "Run",
+    "Cargo.Test max_invalid_calls_listed_count_tests::default::DefaultMaxInvalidCallsListedCount_LessThanLimit_PrintsAll.executor": "Run",
+    "Cargo.Test max_invalid_calls_listed_count_tests::default::DefaultMaxInvalidCallsListedCount_MoreThanLimit_PrintsTrimmed.executor": "Run",
+    "Cargo.Test max_invalid_calls_listed_count_tests::set::set_max_invalid_calls_listed_count_Ok.executor": "Run",
+    "Cargo.Test max_invalid_calls_listed_count_tests::set_local_max_invalid_calls_listed_count_Ok.executor": "Run",
+    "Cargo.Test multiple selected files (1).executor": "Run",
+    "Cargo.Test multiple selected files (2).executor": "Run",
+    "Cargo.Test multiple selected files (3).executor": "Run",
+    "Cargo.Test multiple selected files.executor": "Run",
+    "Cargo.Test no_matching_config_tests::tests.executor": "Run",
+    "Cargo.Test no_return_tests.executor": "Run",
+    "Cargo.Test optional_generics_tests::tests.executor": "Run",
+    "Cargo.Test received_nothing_else_Ok.executor": "Run",
+    "Cargo.Test received_nothing_else_PanicsOk.executor": "Run",
+    "Cargo.Test reference_tests.executor": "Run",
+    "Cargo.Test reference_tests::tests.executor": "Run",
+    "Cargo.Test repeating_generics_tests::tests.executor": "Run",
+    "Cargo.Test return_constraint_tests.executor": "Run",
+    "Cargo.Test return_tests.executor": "Run",
+    "Cargo.Test return_where_constraint_tests (1).executor": "Run",
+    "Cargo.Test return_where_constraint_tests.executor": "Run",
+    "Cargo.Test struct.executor": "Run",
+    "Cargo.Test struct_advanced_ref_type_tests::tests.executor": "Run",
+    "Cargo.Test struct_advanced_tests::tests.executor": "Run",
+    "Cargo.Test struct_arc_tests::tests.executor": "Run",
+    "Cargo.Test struct_arc_type_tests::tests.executor": "Run",
+    "Cargo.Test struct_base_impl_tests::tests.executor": "Run",
+    "Cargo.Test struct_generics_tests::tests.executor": "Run",
+    "Cargo.Test struct_rc_tests::tests.executor": "Run",
+    "Cargo.Test struct_rc_type_tests::tests.executor": "Run",
+    "Cargo.Test struct_ref_tests::tests.executor": "Run",
+    "Cargo.Test struct_ref_type_tests::tests.executor": "Run",
+    "Cargo.Test struct_repeating_generics_tests::tests.executor": "Run",
+    "Cargo.Test struct_simple_tests.executor": "Run",
+    "Cargo.Test struct_simple_tests::tests.executor": "Run",
+    "Cargo.Test struct_tests.executor": "Run",
+    "Cargo.Test struct_tests::MockedStructPassedAsArgument_UsesMockedStruct.executor": "Run",
+    "Cargo.Test struct_trait_impl_generics_tests::tests.executor": "Run",
+    "Cargo.Test struct_type_reference_normalization_tests.executor": "Run",
+    "Cargo.Test struct_type_reference_normalization_tests::tests.executor": "Run",
+    "Cargo.Test struct_value_type_tests::tests.executor": "Run",
+    "Cargo.Test struct_various_self_tests.executor": "Run",
+    "Cargo.Test struct_various_self_tests::tests.executor": "Run",
+    "Cargo.Test super_tests::tests.executor": "Run",
+    "Cargo.Test test::compile.executor": "Run",
+    "Cargo.Test tests::DefaultMaxInvalidCallsListedCount_LessThanLimit_PrintsAll.executor": "Run",
+    "Cargo.Test tests::DefaultMaxInvalidCallsListedCount_MoreThanLimit_PrintsTrimmed.executor": "Run",
+    "Cargo.Test tests::Trait_f_Ok.executor": "Run",
+    "Cargo.Test tests::a.executor": "Run",
+    "Cargo.Test tests::accept_arc_tests::accept_arc_Panics.executor": "Run",
+    "Cargo.Test tests::accept_many_ref_test.executor": "Run",
+    "Cargo.Test tests::accept_rc_tests::accept_rc_Panics.executor": "Run",
+    "Cargo.Test tests::accept_ref_DidNotReceive_Ok.executor": "Run",
+    "Cargo.Test tests::accept_ref_NoConfig_Ok.executor": "Run",
+    "Cargo.Test tests::accept_ref_Ok.executor": "Run",
+    "Cargo.Test tests::accept_ref_UnexpectedCall_Ok.executor": "Run",
+    "Cargo.Test tests::accept_ref_ptr_DidNotReceive_Ok.executor": "Run",
+    "Cargo.Test tests::accept_ref_ptr_NoConfig_Ok.executor": "Debug",
+    "Cargo.Test tests::accept_ref_ptr_UnexpectedCall_Ok.executor": "Run",
+    "Cargo.Test tests::accept_ref_return_ref_tests::accept_ref_return_ref_Ok.executor": "Run",
+    "Cargo.Test tests::accept_ref_tests::accept_rc_Panics.executor": "Run",
+    "Cargo.Test tests::accept_ref_tests::accept_ref_Ok.executor": "Run",
+    "Cargo.Test tests::accept_two_values_return_value_tests::accept_two_values_return_value_NoReturnValueInFirstConfig_ReturnsValueFromSecondConfig.executor": "Run",
+    "Cargo.Test tests::accept_two_values_return_value_tests::accept_two_values_return_value_NoReturnValue_Panics.executor": "Run",
+    "Cargo.Test tests::accept_two_values_return_value_tests::accept_two_values_return_value_NoReturnValue_PanicsOk (1).executor": "Run",
+    "Cargo.Test tests::accept_two_values_return_value_tests::accept_two_values_return_value_NoReturnValue_PanicsOk.executor": "Run",
+    "Cargo.Test tests::accept_two_values_return_value_tests::accept_two_values_return_value_Panics.executor": "Run",
+    "Cargo.Test tests::accept_value_return_value_tests::accept_value_return_value_Many2_Ok.executor": "Run",
+    "Cargo.Test tests::accept_value_return_value_tests::accept_value_return_value_Ok.executor": "Run",
+    "Cargo.Test tests::accept_value_tests::accept_value_Callback_ok.executor": "Run",
+    "Cargo.Test tests::accept_value_tests::accept_value_NoOtherCallsWithManyOtherCalls_Panics (1).executor": "Run",
+    "Cargo.Test tests::accept_value_tests::accept_value_NoOtherCallsWithManyOtherCalls_Panics.executor": "Run",
+    "Cargo.Test tests::accept_value_tests::accept_value_NoOtherCallsWithOtherCalls_Panics (1).executor": "Run",
+    "Cargo.Test tests::accept_value_tests::accept_value_NoOtherCallsWithOtherCalls_Panics.executor": "Run",
+    "Cargo.Test tests::accept_value_tests::accept_value_NoOtherCallsWithoutOtherCalls_Ok (1).executor": "Run",
+    "Cargo.Test tests::accept_value_tests::accept_value_NoOtherCallsWithoutOtherCalls_Ok.executor": "Run",
+    "Cargo.Test tests::accept_value_tests::accept_value_Ok.executor": "Debug",
+    "Cargo.Test tests::basic_tests::by_box_Ok.executor": "Run",
+    "Cargo.Test tests::basic_tests::by_box_ref_Ok.executor": "Run",
+    "Cargo.Test tests::basic_tests::by_box_ref_mut_Ok.executor": "Run",
+    "Cargo.Test tests::basic_tests::by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes_Ok.executor": "Run",
+    "Cargo.Test tests::basic_tests::by_ref_Ok.executor": "Run",
+    "Cargo.Test tests::basic_tests::by_value_Ok.executor": "Run",
+    "Cargo.Test tests::basic_tests::nested_Ok.executor": "Run",
+    "Cargo.Test tests::by_ref_Ok.executor": "Run",
+    "Cargo.Test tests::by_value_Ok.executor": "Run",
+    "Cargo.Test tests::compile.executor": "Run",
+    "Cargo.Test tests::compiles.executor": "Run",
+    "Cargo.Test tests::f_ArgPredicate_Ok.executor": "Run",
+    "Cargo.Test tests::f_Ok.executor": "Run",
+    "Cargo.Test tests::flex (1).executor": "Run",
+    "Cargo.Test tests::flex.executor": "Run",
+    "Cargo.Test tests::fn_tests::input_ArgPredicate_Ok.executor": "Debug",
+    "Cargo.Test tests::fn_tests::output_Base_Ok.executor": "Run",
+    "Cargo.Test tests::fn_tests::output_Ok.executor": "Run",
+    "Cargo.Test tests::fn_work_Ok.executor": "Run",
+    "Cargo.Test tests::fn_work_Panics.executor": "Run",
+    "Cargo.Test tests::fn_work_PanicsOk.executor": "Run",
+    "Cargo.Test tests::foo_CallBase_Ok.executor": "Run",
+    "Cargo.Test tests::foo_Ok.executor": "Run",
+    "Cargo.Test tests::generic_DidNotReceiveDifferentGenerics_Ok.executor": "Run",
+    "Cargo.Test tests::generic_DidNotReceiveSameGenerics_Ok.executor": "Run",
+    "Cargo.Test tests::generic_NoConfig_Ok.executor": "Run",
+    "Cargo.Test tests::generic_ref_UnexpectedCall_Ok.executor": "Run",
+    "Cargo.Test tests::get_plus_one_Ok.executor": "Run",
+    "Cargo.Test tests::get_return_CallBase_Ok.executor": "Run",
+    "Cargo.Test tests::get_return_TwoTypes_Ok.executor": "Run",
+    "Cargo.Test tests::get_return_different_tests::get_return_different_CallBase_Ok.executor": "Run",
+    "Cargo.Test tests::get_return_tests::get_return_UnconfiguredType_PanicsOk.executor": "Run",
+    "Cargo.Test tests::global_test.executor": "Run",
+    "Cargo.Test tests::global_test2.executor": "Run",
+    "Cargo.Test tests::my_test (1).executor": "Run",
+    "Cargo.Test tests::my_test (2).executor": "Run",
+    "Cargo.Test tests::my_test (3).executor": "Run",
+    "Cargo.Test tests::my_test.executor": "Run",
+    "Cargo.Test tests::no_return_tests::by_arc_Ok.executor": "Debug",
+    "Cargo.Test tests::no_return_tests::by_box_Ok.executor": "Run",
+    "Cargo.Test tests::no_return_tests::by_ref_Ok.executor": "Debug",
+    "Cargo.Test tests::no_return_tests::by_ref_colon_Ok.executor": "Run",
+    "Cargo.Test tests::no_return_tests::by_value_Ok.executor": "Run",
+    "Cargo.Test tests::no_return_tests::nested_Ok.executor": "Run",
+    "Cargo.Test tests::no_support.executor": "Run",
+    "Cargo.Test tests::r#trait::generic_DidNotReceiveDifferentGenerics_Ok.executor": "Debug",
+    "Cargo.Test tests::return_constraint_tests::return_constraint_Ok.executor": "Run",
+    "Cargo.Test tests::return_mut_ref_Ok.executor": "Run",
+    "Cargo.Test tests::return_mut_ref_with_base_CallBase_Ok.executor": "Run",
+    "Cargo.Test tests::return_mut_ref_with_base_Ok.executor": "Run",
+    "Cargo.Test tests::return_tests::return_by_value_Ok.executor": "Run",
+    "Cargo.Test tests::return_value_tests::return_value_ManyToSingle_Ok.executor": "Run",
+    "Cargo.Test tests::return_value_tests::return_value_ManyWithCallback_Ok.executor": "Run",
+    "Cargo.Test tests::return_value_tests::return_value_NoMatchingConfiguration_Panics.executor": "Run",
+    "Cargo.Test tests::return_value_tests::return_value_NoMatchingConfiguration_PanicsOk.executor": "Run",
+    "Cargo.Test tests::return_value_tests::return_value_Single_Ok.executor": "Run",
+    "Cargo.Test tests::return_value_tests::return_value_UsesFirstConfiguration_Ok (1).executor": "Run",
+    "Cargo.Test tests::return_value_tests::return_value_UsesFirstConfiguration_Ok.executor": "Run",
+    "Cargo.Test tests::return_value_tests::return_value_UsesLastConfiguration_Ok.executor": "Run",
+    "Cargo.Test tests::static_work_ReceivedUnexpectedCalls_Ok.executor": "Run",
+    "Cargo.Test tests::struct_test.executor": "Run",
+    "Cargo.Test tests::struct_tests::f_MultipleTimes_Panics.executor": "Run",
+    "Cargo.Test tests::struct_tests::struct_output_self_Ok.executor": "Run",
+    "Cargo.Test tests::struct_tests::struct_static_output_self_Ok.executor": "Run",
+    "Cargo.Test tests::struct_work_Ok.executor": "Run",
+    "Cargo.Test tests::test (1).executor": "Run",
+    "Cargo.Test tests::test.executor": "Run",
+    "Cargo.Test tests::tests.executor": "Run",
+    "Cargo.Test tests::trait_tests::Trait_f_MultipleTimes_Panics.executor": "Run",
+    "Cargo.Test tests::trait_tests::Trait_f_Ok.executor": "Run",
+    "Cargo.Test tests::trait_tests::trait_work_ArgPredicate_Ok.executor": "Run",
+    "Cargo.Test tests::trait_work_Ok.executor": "Run",
+    "Cargo.Test tests::trait_work_PanicsOk.executor": "Run",
+    "Cargo.Test tests::work_DidNotReceiveDifferentGenerics_Ok.executor": "Run",
+    "Cargo.Test tests::work_DidNotReceiveSameGenerics_Ok.executor": "Run",
+    "Cargo.Test tests::work_DidNotReceive_Ok.executor": "Run",
+    "Cargo.Test tests::work_FixByNotUsingTemporaryValue_ReceivesValidReference.executor": "Run",
+    "Cargo.Test tests::work_NoConfigs_Ok.executor": "Run",
+    "Cargo.Test tests::work_NoReturnValue_Ok.executor": "Run",
+    "Cargo.Test tests::work_NoSuitableConfig_Ok.executor": "Run",
+    "Cargo.Test tests::work_OnlyUnsuitableConfigs_Ok.executor": "Run",
+    "Cargo.Test tests::work_ReceivedUnexpectedCalls_Ok.executor": "Run",
+    "Cargo.Test tests::work_ReferenceDies_ReceviesRewroteReference.executor": "Run",
+    "Cargo.Test tests::work_ReferenceToTemporaryValue_FixByReceivingBeforeDrop_ReceivesValidReference.executor": "Run",
+    "Cargo.Test tests::work_ReferenceToTemporaryValue_ReceivesDanglingReference.executor": "Run",
+    "Cargo.Test tests::work_ReferenceToTemporaryValue_ReceviesDanglingReference.executor": "Run",
+    "Cargo.Test trait_advanced_ref_tests::tests.executor": "Run",
+    "Cargo.Test trait_advanced_tests::tests.executor": "Run",
+    "Cargo.Test trait_arc_tests::tests.executor": "Run",
+    "Cargo.Test trait_base_impl_tests::tests.executor": "Run",
+    "Cargo.Test trait_generic_tests.executor": "Run",
+    "Cargo.Test trait_rc_tests::tests.executor": "Run",
+    "Cargo.Test trait_ref_tests::tests.executor": "Run",
+    "Cargo.Test trait_simple_tests.executor": "Run",
+    "Cargo.Test trait_simple_tests::tests.executor": "Run",
+    "Cargo.Test trait_tests.executor": "Run",
+    "Cargo.Test trait_value_type_tests::tests.executor": "Run",
+    "Cargo.Test trait_various_self_tests::tests.executor": "Run",
+    "Cargo.Test ub_tests::tests.executor": "Run",
+    "Cargo.Test unsized_tests::tests.executor": "Run",
+    "Cargo.Test unsupported_tests::tests (1).executor": "Run",
+    "Cargo.Test unsupported_tests::tests.executor": "Run",
+    "Cargo.Test value_type_trait_tests.executor": "Run",
+    "Cargo.Test work.executor": "Run",
+    "Cargo.Tests in 'rsubstitute'.executor": "Run",
+    "Cargo.Tests in 'rsubstitute_core'.executor": "Run",
+    "Cargo.Tests in 'rsubstitute_proc_macro'.executor": "Run",
+    "Cargo.Tests in 'rsubstitutifier'.executor": "Run",
+    "Cargo.Tests in 'tests' (1).executor": "Run",
+    "Cargo.Tests in 'tests'.executor": "Run",
+    "CidrDebugProfileConversion": "true",
+    "RunOnceActivity.ShowReadmeOnStart": "true",
+    "RunOnceActivity.TerminalTabsStorage.copyFrom.TerminalArrangementManager.252": "true",
+    "RunOnceActivity.git.unshallow": "true",
+    "RunOnceActivity.rust.reset.selective.auto.import": "true",
+    "RunOnceActivity.typescript.service.memoryLimit.init": "true",
+    "codeWithMe.voiceChat.enabledByDefault": "false",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultAutoModeForALLUsers.v1": "true",
+    "com.intellij.ml.llm.matterhorn.ej.ui.settings.DefaultModelSelectionForGA.v1": "true",
+    "git-widget-placeholder": "main",
+    "ignore.virus.scanning.warn.message": "true",
+    "junie.onboarding.icon.badge.shown": "true",
+    "last_opened_file_path": "C:/Users/alordash/Documents/PROJECTS/rsubstitute/rsubstitute/bin",
+    "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.tslint": "true",
+    "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.tslint": "(autodetect)",
+    "nodejs_package_manager_path": "npm",
+    "org.rust.cargo.project.model.PROJECT_DISCOVERY": "true",
+    "org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon": "",
+    "org.rust.disableDetachedFileInspectionC:/_RS/rsubstitute/src/rsubstitute_core/src/arguments_matching/arg.rs": "true",
+    "org.rust.disableDetachedFileInspectionC:/_RS/rsubstitute/src/rsubstitute_core/src/arguments_matching/mod.rs": "true",
+    "run.code.analysis.last.selected.profile": "pProject Default",
+    "settings.editor.selected.configurable": "project.propVCSSupport.DirectoryMappings",
+    "to.speed.mode.migration.done": "true",
+    "vue.rearranger.settings.migration": "true"
   },
-  &quot;keyToStringList&quot;: {
-    &quot;com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File&quot;: [
-      &quot;Rust&quot;
+  "keyToStringList": {
+    "com.intellij.ide.scratch.ScratchImplUtil$2/New Scratch File": [
+      "Rust"
     ]
   }
-}</component>
+}]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\alordash\Documents\PROJECTS\rsubstitute\rsubstitute\bin" />
       <recent name="C:\_RS\rsubstitute\rsubstitute\tests" />
       <recent name="C:\_RS\rsubstitute\src\rsubstitute\tests" />
       <recent name="C:\_RS\rsubstitute\src\rsubstitute\bin" />
       <recent name="C:\_RS\rsubstitute\src\rsubstitute_proc_macro\src\generation\fn" />
-      <recent name="C:\_RS\rsubstitute\src\rsubstitute_proc_macro\src\mock_generation\fn_info_generation" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\_RS\rsubstitute\src\rsubstitute_proc_macro\src\generation\targets\struct" />
@@ -420,11 +425,27 @@
       <recent name="C:\_RS\rsubstitute\src\rsubstitute_proc_macro\src\generation\mock_controls\common" />
     </key>
   </component>
-  <component name="RunManager" selected="Cargo.Test super_tests::tests">
-    <configuration name="Run NEW_struct_ref" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="buildProfileId" value="dev" />
-      <option name="command" value="run --package rsubstitute --bin NEW_struct_ref" />
-      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+  <component name="RunManager" selected="Cargo.Test associated_types_tests::tests">
+    <configuration name="Expand NEW_impl_Trait" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="expand --bin NEW_impl_Trait --color=always --theme=Dracula --tests" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$/rsubstitute" />
+      <envs />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Expand reference_tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="expand --test reference_tests --color=always --theme=Dracula --tests" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$/rsubstitute" />
       <envs />
       <option name="emulateTerminal" value="true" />
       <option name="channel" value="DEFAULT" />
@@ -457,9 +478,8 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Test impl_trait_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="buildProfileId" value="test" />
-      <option name="command" value="test --package rsubstitute --test impl_trait_tests -- tests" />
+    <configuration name="Test associated_types_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test associated_types_tests -- tests" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -476,6 +496,7 @@
       </method>
     </configuration>
     <configuration name="Test reference_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="buildProfileId" value="test" />
       <option name="command" value="test --package rsubstitute --test reference_tests -- tests" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
@@ -510,26 +531,8 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Test super_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="buildProfileId" value="test" />
-      <option name="command" value="test --package rsubstitute --test super_tests -- tests" />
-      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
-      <envs />
-      <option name="emulateTerminal" value="true" />
-      <option name="channel" value="DEFAULT" />
-      <option name="requiredFeatures" value="true" />
-      <option name="allFeatures" value="false" />
-      <option name="withSudo" value="false" />
-      <option name="buildTarget" value="REMOTE" />
-      <option name="backtrace" value="SHORT" />
-      <option name="isRedirectInput" value="false" />
-      <option name="redirectInputPath" value="" />
-      <method v="2">
-        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Tests in 'tests'" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="test --package rsubstitute --test arg_printing_tests --test associated_types_tests --test behaviour_tests --test config_tests --test fn_advanced_tests --test fn_deref_tests --test fn_generics_tests --test fn_ref_tests --test fn_simple_tests --test fn_value_type_tests --test generics_info_in_logs_tests --test impl_trait_tests --test no_matching_config_tests --test optional_generics_tests --test reference_tests --test struct_advanced_tests --test struct_arc_tests --test struct_base_impl_tests --test struct_generics_tests --test struct_rc_tests --test struct_ref_tests --test struct_repeating_generics_tests --test struct_simple_tests --test struct_trait_impl_generics_tests --test struct_type_reference_normalization_tests --test struct_value_type_tests --test struct_various_self_tests --test super_tests --test trait_advanced_tests --test trait_arc_tests --test trait_base_impl_tests --test trait_generics_tests --test trait_rc_tests --test trait_ref_tests --test trait_simple_tests --test trait_value_type_tests --test trait_various_self_tests --test ub_tests --test unsized_tests" />
+    <configuration name="Tests in 'tests' (1)" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test arg_printing_tests --test associated_types_tests --test behaviour_tests --test config_tests --test fn_advanced_tests --test fn_deref_tests --test fn_generics_tests --test fn_ref_tests --test fn_simple_tests --test fn_value_type_tests --test generics_info_in_logs_tests --test impl_trait_tests --test no_matching_config_tests --test optional_generics_tests --test reference_tests --test self_in_macro_tests --test struct_advanced_tests --test struct_arc_tests --test struct_base_impl_tests --test struct_generics_tests --test struct_rc_tests --test struct_ref_tests --test struct_repeating_generics_tests --test struct_simple_tests --test struct_trait_impl_generics_tests --test struct_type_reference_normalization_tests --test struct_value_type_tests --test struct_various_self_tests --test super_tests --test trait_advanced_tests --test trait_arc_tests --test trait_base_impl_tests --test trait_generics_tests --test trait_rc_tests --test trait_ref_tests --test trait_simple_tests --test trait_value_type_tests --test trait_various_self_tests --test ub_tests --test unsized_tests" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -548,19 +551,19 @@
     <list>
       <item itemvalue="Cargo.Run sandbox" />
       <item itemvalue="Cargo.Test src" />
-      <item itemvalue="Cargo.Run NEW_struct_ref" />
-      <item itemvalue="Cargo.Test super_tests::tests" />
-      <item itemvalue="Cargo.Tests in 'tests'" />
-      <item itemvalue="Cargo.Test impl_trait_tests::tests" />
+      <item itemvalue="Cargo.Expand NEW_impl_Trait" />
+      <item itemvalue="Cargo.Expand reference_tests" />
+      <item itemvalue="Cargo.Test associated_types_tests::tests" />
+      <item itemvalue="Cargo.Tests in 'tests' (1)" />
       <item itemvalue="Cargo.Test reference_tests::tests" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Cargo.Test super_tests::tests" />
-        <item itemvalue="Cargo.Tests in 'tests'" />
-        <item itemvalue="Cargo.Run NEW_struct_ref" />
+        <item itemvalue="Cargo.Test associated_types_tests::tests" />
+        <item itemvalue="Cargo.Tests in 'tests' (1)" />
         <item itemvalue="Cargo.Test reference_tests::tests" />
-        <item itemvalue="Cargo.Test impl_trait_tests::tests" />
+        <item itemvalue="Cargo.Expand NEW_impl_Trait" />
+        <item itemvalue="Cargo.Expand reference_tests" />
       </list>
     </recent_temporary>
   </component>
@@ -676,6 +679,8 @@
       <workItem from="1786749066918" duration="637000" />
       <workItem from="1786749742168" duration="421000" />
       <workItem from="1787176289236" duration="1351000" />
+      <workItem from="1787258493158" duration="3236000" />
+      <workItem from="1787343513260" duration="1221000" />
     </task>
     <task id="LOCAL-00001" summary="fix todo">
       <option name="closed" value="true" />
@@ -908,6 +913,11 @@
           <url>file://$PROJECT_DIR$/rsubstitute_core/src/infrastructure/fn_data.rs</url>
           <line>372</line>
           <option name="timeStamp" value="94" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/common/mock_struct_impl.rs</url>
+          <line>40</line>
+          <option name="timeStamp" value="95" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>
