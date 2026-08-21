@@ -163,12 +163,19 @@ pub(crate) fn generate_for_trait(
         };
         let trait_base_fns: Vec<TraitItemFn> = base_fns
             .iter()
-            .map(|x| TraitItemFn {
-                attrs: Vec::new(),
-                modifiers: FnModifiers::default(),
-                sig: x.sig.clone(),
-                default: None,
-                semi_token: Some(Token![;](span)),
+            .zip(associated_fns.iter().chain(static_fns.iter()))
+            .map(|(x, fn_info)| {
+                let mut signature = x.sig.clone();
+                if let Some(FnArg::Receiver(receiver)) = fn_info.source_signature.inputs.first() {
+                    signature.inputs[0] = FnArg::Receiver(receiver.clone());
+                }
+                TraitItemFn {
+                    attrs: Vec::new(),
+                    modifiers: FnModifiers::default(),
+                    sig: signature,
+                    default: None,
+                    semi_token: Some(Token![;](span)),
+                }
             })
             .collect();
         let base_fn_trait = ItemTrait {
@@ -180,7 +187,13 @@ pub(crate) fn generate_for_trait(
             ident: format_ident!("__rs_base_{}_{}", mod_ident, path::last_ident(&trait_path)),
             generics: merged_generics.clone(),
             colon_token: None,
-            supertraits: Punctuated::new(),
+            supertraits: punctuated([TypeParamBound::Trait(TraitBound {
+                paren_token: None,
+                lifetimes: None,
+                modifiers: TraitBoundModifiers::default(),
+                maybe: None,
+                path: trait_path.clone(),
+            })]),
             brace_token: token::Brace(span),
             items: core::iter::once(fn_generics)
                 .chain(trait_base_fns)
