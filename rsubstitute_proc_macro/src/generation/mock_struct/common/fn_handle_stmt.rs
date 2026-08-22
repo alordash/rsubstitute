@@ -22,7 +22,7 @@ pub(crate) fn generate(
         fn_data_var_path,
         is_static,
     }: Params,
-) -> ExprMethodCall {
+) -> Expr {
     let mock_arg = if is_static {
         void_tuple(span)
     } else {
@@ -53,6 +53,7 @@ pub(crate) fn generate(
         })
     });
 
+    let with_base_call = maybe_base_call.is_some();
     let args = if let Some(base_call) = maybe_base_call {
         [mock_arg, Expr::Path(call_var_path), base_call]
             .into_iter()
@@ -60,7 +61,7 @@ pub(crate) fn generate(
     } else {
         [mock_arg, Expr::Path(call_var_path)].into_iter().collect()
     };
-    let result = ExprMethodCall {
+    let handle_expr = ExprMethodCall {
         attrs: Vec::new(),
         receiver: Box::new(Expr::Path(fn_data_var_path)),
         dot_token: Token![.](span),
@@ -68,6 +69,16 @@ pub(crate) fn generate(
         turbofish: None,
         paren_token: token::Paren(span),
         args,
+    };
+    let result = if with_base_call && fn_info.source_signature.asyncness.is_some() {
+        Expr::Await(ExprAwait {
+            attrs: Vec::new(),
+            base: Box::new(Expr::MethodCall(handle_expr)),
+            dot_token: Token![.](span),
+            await_token: Token![await](span),
+        })
+    } else {
+        Expr::MethodCall(handle_expr)
     };
     return result;
 }

@@ -23,16 +23,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f847079f-511f-4600-8811-ffe4728519b1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/rsubstitute/bin/NEW_async.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rsubstitute/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/Cargo.toml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute/bin/NEW_async.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/bin/NEW_async.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/associated_method_block.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/associated_method_block.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/common/fn_handle_stmt.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/common/fn_handle_stmt.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/static_fn_block.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/static_fn_block.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="ExecutionTargetManager" SELECTED_TARGET="RsBuildProfile:test" />
+  <component name="ExecutionTargetManager" SELECTED_TARGET="RsBuildProfile:dev" />
   <component name="FileTemplateManagerImpl">
     <option name="RECENT_TEMPLATES">
       <list>
@@ -127,6 +130,7 @@
     "Cargo.Expand trait_various_self_tests.executor": "Run",
     "Cargo.Expand trait_various_self_tests::__rsubstitute_generated_Trait.executor": "Run",
     "Cargo.Run NEW.executor": "Run",
+    "Cargo.Run NEW_async.executor": "Debug",
     "Cargo.Run NEW_impl_Trait.executor": "Run",
     "Cargo.Run NEW_static_fn.executor": "Run",
     "Cargo.Run NEW_struct.executor": "Run",
@@ -425,7 +429,7 @@
       <recent name="C:\_RS\rsubstitute\src\rsubstitute_proc_macro\src\generation\mock_controls\common" />
     </key>
   </component>
-  <component name="RunManager" selected="Cargo.Test associated_types_tests::tests">
+  <component name="RunManager" selected="Cargo.Run NEW_async">
     <configuration name="Expand NEW_impl_Trait" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
       <option name="command" value="expand --bin NEW_impl_Trait --color=always --theme=Dracula --tests" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$/rsubstitute" />
@@ -443,9 +447,10 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Expand reference_tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="expand --test reference_tests --color=always --theme=Dracula --tests" />
-      <option name="workingDirectory" value="file://$PROJECT_DIR$/rsubstitute" />
+    <configuration name="Run NEW_async" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="buildProfileId" value="dev" />
+      <option name="command" value="run --package rsubstitute --bin NEW_async" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
       <option name="channel" value="DEFAULT" />
@@ -551,19 +556,19 @@
     <list>
       <item itemvalue="Cargo.Run sandbox" />
       <item itemvalue="Cargo.Test src" />
+      <item itemvalue="Cargo.Run NEW_async" />
       <item itemvalue="Cargo.Expand NEW_impl_Trait" />
-      <item itemvalue="Cargo.Expand reference_tests" />
       <item itemvalue="Cargo.Test associated_types_tests::tests" />
       <item itemvalue="Cargo.Tests in 'tests' (1)" />
       <item itemvalue="Cargo.Test reference_tests::tests" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Cargo.Run NEW_async" />
         <item itemvalue="Cargo.Test associated_types_tests::tests" />
         <item itemvalue="Cargo.Tests in 'tests' (1)" />
         <item itemvalue="Cargo.Test reference_tests::tests" />
         <item itemvalue="Cargo.Expand NEW_impl_Trait" />
-        <item itemvalue="Cargo.Expand reference_tests" />
       </list>
     </recent_temporary>
   </component>
@@ -905,19 +910,34 @@
           <option name="timeStamp" value="92" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/rsubstitute_core/src/infrastructure/fn_config.rs</url>
-          <line>75</line>
-          <option name="timeStamp" value="93" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/rsubstitute_core/src/infrastructure/fn_data.rs</url>
-          <line>372</line>
-          <option name="timeStamp" value="94" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/common/mock_struct_impl.rs</url>
           <line>40</line>
           <option name="timeStamp" value="95" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/rsubstitute/bin/NEW_async.rs</url>
+          <line>48</line>
+          <option name="timeStamp" value="98" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/rsubstitute/bin/NEW_async.rs</url>
+          <line>73</line>
+          <option name="timeStamp" value="101" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/rsubstitute/bin/NEW_async.rs</url>
+          <line>72</line>
+          <option name="timeStamp" value="104" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/rsubstitute_core/src/infrastructure/fn_data.rs</url>
+          <line>171</line>
+          <option name="timeStamp" value="105" />
+        </line-breakpoint>
+        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
+          <url>file://$PROJECT_DIR$/rsubstitute_core/src/infrastructure/fn_data.rs</url>
+          <line>257</line>
+          <option name="timeStamp" value="106" />
         </line-breakpoint>
       </breakpoints>
     </breakpoint-manager>

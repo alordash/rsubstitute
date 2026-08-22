@@ -44,7 +44,11 @@ pub(crate) fn generate(
         impl_trait_cast_stmts,
         call_var_path,
         call_stmt,
-    } = call_stmt::new(span, fn_info, use_mod_path_for_call_stmt.then_some(mod_ident));
+    } = call_stmt::new(
+        span,
+        fn_info,
+        use_mod_path_for_call_stmt.then_some(mod_ident),
+    );
     let (fn_data_var_path, fn_data_stmt) = fn_data_stmt::new_static(
         span,
         fn_data_stmt::StaticParams {
@@ -75,7 +79,7 @@ pub(crate) fn generate(
             .chain([
                 Stmt::Local(call_stmt),
                 Stmt::Local(fn_data_stmt),
-                Stmt::Expr(Expr::MethodCall(fn_handle_stmt), None),
+                Stmt::Expr(fn_handle_stmt, None),
             ])
             .collect(),
     };

@@ -73,7 +73,7 @@ pub(crate) fn generate(
             .chain([
                 Stmt::Local(call_stmt),
                 Stmt::Local(fn_data_stmt),
-                Stmt::Expr(Expr::MethodCall(fn_handle_stmt), None),
+                Stmt::Expr(fn_handle_stmt, None),
             ])
             .collect(),
     };

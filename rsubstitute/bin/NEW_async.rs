@@ -6,6 +6,7 @@ use std::task::{Context, Poll, Waker};
 use std::thread;
 use std::thread::JoinHandle;
 use std::time::Duration;
+use rsubstitute_core::Times;
 
 #[mock]
 struct MyFuture {
@@ -25,7 +26,7 @@ impl MyFuture {
             atomic_waker,
             atomic_result,
             thread: thread::spawn(move || {
-                thread::sleep(Duration::from_secs(1));
+                thread::sleep(Duration::from_millis(100));
 
                 atomic_result_clone.store(value, Ordering::SeqCst);
 
@@ -39,6 +40,12 @@ impl MyFuture {
             }),
         }
     }
+}
+
+#[mock(base)]
+async fn work() -> i32 {
+    tokio::time::sleep(Duration::from_secs(1));
+    return 12;
 }
 
 #[mock(base)]
@@ -62,4 +69,16 @@ async fn main() {
     future.setup().as_Future().poll(Arg::Any).call_base();
     let result = future.await;
     assert_eq!(166, result);
+    
+    work::setup().returns(515);
+    let work_result = work().await;
+    assert_eq!(515, work_result);
+    work::received(Times::Once).no_other_calls();
+    dbg!(work_result);
+
+    // work::setup().call_base();
+    // let work_result = work().await;
+    // assert_eq!(12, work_result);
+    // work::received(Times::Exactly(2)).no_other_calls();
+    // dbg!(work_result);
 }
