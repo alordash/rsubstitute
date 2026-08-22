@@ -24,11 +24,9 @@
   <component name="ChangeListManager">
     <list default="true" id="f847079f-511f-4600-8811-ffe4728519b1" name="Changes" comment="">
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/Cargo.toml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/rsubstitute/bin/NEW_async.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/bin/NEW_async.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/associated_method_block.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/associated_method_block.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/common/fn_handle_stmt.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/common/fn_handle_stmt.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/static_fn_block.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/mock_struct/static_fn_block.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_core/src/fn_parameters/dyn_return_value.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_core/src/fn_parameters/dyn_return_value.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_core/src/infrastructure/fn_data.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_core/src/infrastructure/fn_data.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -130,7 +128,7 @@
     "Cargo.Expand trait_various_self_tests.executor": "Run",
     "Cargo.Expand trait_various_self_tests::__rsubstitute_generated_Trait.executor": "Run",
     "Cargo.Run NEW.executor": "Run",
-    "Cargo.Run NEW_async.executor": "Debug",
+    "Cargo.Run NEW_async.executor": "Run",
     "Cargo.Run NEW_impl_Trait.executor": "Run",
     "Cargo.Run NEW_static_fn.executor": "Run",
     "Cargo.Run NEW_struct.executor": "Run",
@@ -905,38 +903,28 @@
           <option name="timeStamp" value="91" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/rsubstitute_core/src/infrastructure/fn_data.rs</url>
-          <line>340</line>
-          <option name="timeStamp" value="92" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/rsubstitute_proc_macro/src/generation/targets/common/mock_struct_impl.rs</url>
           <line>40</line>
           <option name="timeStamp" value="95" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/rsubstitute/bin/NEW_async.rs</url>
-          <line>48</line>
-          <option name="timeStamp" value="98" />
-        </line-breakpoint>
-        <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
-          <url>file://$PROJECT_DIR$/rsubstitute/bin/NEW_async.rs</url>
-          <line>73</line>
+          <line>209</line>
           <option name="timeStamp" value="101" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/rsubstitute/bin/NEW_async.rs</url>
-          <line>72</line>
+          <line>208</line>
           <option name="timeStamp" value="104" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/rsubstitute_core/src/infrastructure/fn_data.rs</url>
-          <line>171</line>
+          <line>172</line>
           <option name="timeStamp" value="105" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/rsubstitute_core/src/infrastructure/fn_data.rs</url>
-          <line>257</line>
+          <line>258</line>
           <option name="timeStamp" value="106" />
         </line-breakpoint>
       </breakpoints>
