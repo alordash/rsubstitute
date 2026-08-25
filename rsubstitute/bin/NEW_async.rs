@@ -48,6 +48,18 @@ async fn work() -> i32 {
     return 12;
 }
 
+#[mock]
+async fn work_return() -> i32 {
+    tokio::time::sleep(Duration::from_secs(1));
+    return 12;
+}
+
+#[mock]
+async fn work_nothing() {}
+
+#[mock(base)]
+async fn work_base_nothing() {}
+
 #[mock(base)]
 impl Future for MyFuture {
     type Output = i32;

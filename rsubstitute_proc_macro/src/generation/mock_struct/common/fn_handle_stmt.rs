@@ -53,7 +53,6 @@ pub(crate) fn generate(
         })
     });
 
-    let with_base_call = maybe_base_call.is_some();
     let args = if let Some(base_call) = maybe_base_call {
         [mock_arg, Expr::Path(call_var_path), base_call]
             .into_iter()
@@ -61,7 +60,7 @@ pub(crate) fn generate(
     } else {
         [mock_arg, Expr::Path(call_var_path)].into_iter().collect()
     };
-    let method_ident = if fn_info.signature.asyncness.is_some() {
+    let method_ident = if fn_info.source_signature.asyncness.is_some() {
         "handle_async"
     } else {
         "handle"
@@ -75,7 +74,7 @@ pub(crate) fn generate(
         paren_token: token::Paren(span),
         args,
     };
-    let result = if with_base_call && fn_info.source_signature.asyncness.is_some() {
+    let result = if fn_info.source_signature.asyncness.is_some() {
         Expr::Await(ExprAwait {
             attrs: Vec::new(),
             base: Box::new(Expr::MethodCall(handle_expr)),

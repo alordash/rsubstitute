@@ -14,4 +14,12 @@ impl<'rs, TMock, const PASSES_MOCK_TO_CALLBACK: bool>
             }
         }
     }
+
+    pub async fn handle_async<'a, TMockArg, TCall: ICall + 'a>(
+        &self,
+        mock_arg: TMockArg,
+        the_call: TCall,
+    ) {
+        self.handle(mock_arg, the_call)
+    }
 }
