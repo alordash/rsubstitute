@@ -42,146 +42,10 @@ impl MyFuture {
     }
 }
 
+#[mock(base)]
 async fn work() -> i32 {
-    use work::*;
-    let call = work_Call::<'_> {
-        __rs_generics: ::core::marker::PhantomData,
-    };
-    let fn_data: &::rsubstitute::for_generated::FnData<'_, workMock<'_>, true, true, false> =
-        ::rsubstitute::for_generated::get_static_fn_data("work");
-    fn_data.handle_async((), call, __rs_base_work).await
-}
-#[allow(unused)]
-#[allow(unreachable_pub)]
-#[allow(nonstandard_style)]
-mod work {
-    use super::*;
-    #[doc(hidden)]
-    pub async fn __rs_base_work(_: (), call: work_Call<'_>) -> i32 {
-        let work_Call::<'_> { .. } = call;
-        tokio::time::sleep(Duration::from_secs(1));
-        return 12;
-    }
-    pub fn setup<'__rsa>() -> ::rsubstitute::for_generated::FnConfigurator<
-        '__rsa,
-        workMock<'__rsa>,
-        workStaticSetup<'__rsa>,
-        (),
-        i32,
-        workMock<'__rsa>,
-        true,
-        true,
-        false,
-    > {
-        ::rsubstitute::for_generated::clear_static_fn_data::<workMock<'__rsa>>();
-        workStaticSetup::<'__rsa> {
-            __rs_generics: ::core::marker::PhantomData,
-        }
-        .setup()
-    }
-    pub fn received<'__rsa>(
-        times: ::rsubstitute::for_generated::Times,
-    ) -> ::rsubstitute::for_generated::ArgRefsBinder<workStaticReceived<'__rsa>, ()> {
-        workStaticReceived::<'__rsa> {
-            __rs_generics: ::core::marker::PhantomData,
-        }
-        .received(times)
-    }
-    pub struct work_Call<'__rsa> {
-        pub __rs_generics: ::core::marker::PhantomData<(&'__rsa (),)>,
-    }
-    impl<'__rsa> ::rsubstitute::for_generated::IGenericsInfoProvider for work_Call<'__rsa> {}
-    impl<'__rsa> ::rsubstitute::for_generated::ICall for work_Call<'__rsa> {}
-    impl<'__rsa> ::core::clone::Clone for work_Call<'__rsa> {
-        #[inline]
-        fn clone(&self) -> work_Call<'__rsa> {
-            work_Call::<'__rsa> {
-                __rs_generics: ::core::clone::Clone::clone(&self.__rs_generics),
-            }
-        }
-    }
-    struct work_ArgsChecker<'__rsa> {
-        pub __rs_generics: ::core::marker::PhantomData<(&'__rsa (),)>,
-    }
-    impl<'__rsa> ::rsubstitute::for_generated::IGenericsInfoProvider for work_ArgsChecker<'__rsa> {}
-    impl<'__rsa> ::rsubstitute::for_generated::IArgsChecker for work_ArgsChecker<'__rsa> {}
-    pub struct workMock<'__rsa> {
-        pub __rs_generics: ::core::marker::PhantomData<(&'__rsa (),)>,
-    }
-    pub struct workStaticSetup<'__rsa> {
-        pub __rs_generics: ::core::marker::PhantomData<(&'__rsa (),)>,
-    }
-    impl<'__rsa> workStaticSetup<'__rsa> {
-        pub fn setup(
-            &self,
-        ) -> ::rsubstitute::for_generated::FnConfigurator<
-            '_,
-            workMock<'__rsa>,
-            Self,
-            (),
-            i32,
-            workMock<'__rsa>,
-            true,
-            true,
-            false,
-        > {
-            let args_checker = work_ArgsChecker::<'__rsa> {
-                __rs_generics: ::core::marker::PhantomData,
-            };
-            let fn_data: &::rsubstitute::for_generated::FnData<
-                '_,
-                workMock<'__rsa>,
-                true,
-                true,
-                false,
-            > = ::rsubstitute::for_generated::get_static_fn_data("work");
-            let fn_configurator: ::rsubstitute::for_generated::FnConfigurator<
-                '_,
-                workMock<'__rsa>,
-                Self,
-                (),
-                i32,
-                workMock<'__rsa>,
-                true,
-                true,
-                false,
-            > = fn_data.add_config(args_checker, self);
-            ::rsubstitute::transmute_lifetime!(fn_configurator)
-        }
-    }
-    pub struct workStaticReceived<'__rsa> {
-        pub __rs_generics: ::core::marker::PhantomData<(&'__rsa (),)>,
-    }
-    impl<'__rsa> ::core::clone::Clone for workStaticReceived<'__rsa> {
-        #[inline]
-        fn clone(&self) -> workStaticReceived<'__rsa> {
-            workStaticReceived::<'__rsa> {
-                __rs_generics: ::core::clone::Clone::clone(&self.__rs_generics),
-            }
-        }
-    }
-    impl<'__rsa> workStaticReceived<'__rsa> {
-        pub fn received(
-            &self,
-            times: ::rsubstitute::for_generated::Times,
-        ) -> ::rsubstitute::for_generated::ArgRefsBinder<Self, ()> {
-            let args_checker = work_ArgsChecker::<'__rsa> {
-                __rs_generics: ::core::marker::PhantomData,
-            };
-            let fn_data: &::rsubstitute::for_generated::FnData<
-                '_,
-                workMock<'_>,
-                true,
-                true,
-                false,
-            > = ::rsubstitute::for_generated::get_static_fn_data("work");
-            fn_data.verify_received(args_checker, times);
-            rsubstitute::for_generated::ArgRefsBinder::new(self.clone())
-        }
-        pub fn no_other_calls(&self) {
-            ::rsubstitute::for_generated::verify_static_fn_received_nothing_else::<workMock<'_>>()
-        }
-    }
+    tokio::time::sleep(Duration::from_secs(1));
+    return 12;
 }
 
 #[mock(base)]
@@ -206,7 +70,7 @@ async fn main() {
     let result = future.await;
     assert_eq!(166, result);
 
-    work::setup().returns(515);
+    work::setup().returns_with(|_| 515);
     let work_result = work().await;
     assert_eq!(515, work_result);
     work::received(Times::Once).no_other_calls();

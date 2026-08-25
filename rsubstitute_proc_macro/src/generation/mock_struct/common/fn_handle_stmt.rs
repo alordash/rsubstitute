@@ -61,11 +61,16 @@ pub(crate) fn generate(
     } else {
         [mock_arg, Expr::Path(call_var_path)].into_iter().collect()
     };
+    let method_ident = if fn_info.signature.asyncness.is_some() {
+        "handle_async"
+    } else {
+        "handle"
+    };
     let handle_expr = ExprMethodCall {
         attrs: Vec::new(),
         receiver: Box::new(Expr::Path(fn_data_var_path)),
         dot_token: Token![.](span),
-        method: Ident::new("handle", span),
+        method: Ident::new(method_ident, span),
         turbofish: None,
         paren_token: token::Paren(span),
         args,
