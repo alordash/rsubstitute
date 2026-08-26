@@ -23,10 +23,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f847079f-511f-4600-8811-ffe4728519b1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/rsubstitute/tests/fn_async_tests.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rsubstitute/tests/struct_async_tests.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rsubstitute/tests/trait_async_tests.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/Cargo.toml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute/Cargo.toml" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/Cargo.toml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -177,6 +176,7 @@
     "Cargo.Test flex.executor": "Run",
     "Cargo.Test fn_advanced_ref_tests::tests.executor": "Run",
     "Cargo.Test fn_advanced_tests::tests.executor": "Run",
+    "Cargo.Test fn_async_tests::tests.executor": "Run",
     "Cargo.Test fn_deref_tests.executor": "Run",
     "Cargo.Test fn_deref_tests::tests.executor": "Run",
     "Cargo.Test fn_generics_tests::tests.executor": "Run",
@@ -217,6 +217,7 @@
     "Cargo.Test struct_advanced_tests::tests.executor": "Run",
     "Cargo.Test struct_arc_tests::tests.executor": "Run",
     "Cargo.Test struct_arc_type_tests::tests.executor": "Run",
+    "Cargo.Test struct_async_tests::tests.executor": "Run",
     "Cargo.Test struct_base_impl_tests::tests.executor": "Run",
     "Cargo.Test struct_generics_tests::tests.executor": "Run",
     "Cargo.Test struct_rc_tests::tests.executor": "Run",
@@ -302,6 +303,7 @@
     "Cargo.Test tests::get_return_tests::get_return_UnconfiguredType_PanicsOk.executor": "Run",
     "Cargo.Test tests::global_test.executor": "Run",
     "Cargo.Test tests::global_test2.executor": "Run",
+    "Cargo.Test tests::input_output_Ok.executor": "Run",
     "Cargo.Test tests::my_test (1).executor": "Run",
     "Cargo.Test tests::my_test (2).executor": "Run",
     "Cargo.Test tests::my_test (3).executor": "Run",
@@ -358,6 +360,7 @@
     "Cargo.Test trait_advanced_ref_tests::tests.executor": "Run",
     "Cargo.Test trait_advanced_tests::tests.executor": "Run",
     "Cargo.Test trait_arc_tests::tests.executor": "Run",
+    "Cargo.Test trait_async_tests::tests.executor": "Run",
     "Cargo.Test trait_base_impl_tests::tests.executor": "Run",
     "Cargo.Test trait_generic_tests.executor": "Run",
     "Cargo.Test trait_rc_tests::tests.executor": "Run",
@@ -391,7 +394,7 @@
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "C:/Users/alordash/Documents/PROJECTS/rsubstitute/rsubstitute/bin",
+    "last_opened_file_path": "C:/_RS/rsubstitute/rsubstitute/tests",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
@@ -414,8 +417,8 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
-      <recent name="C:\Users\alordash\Documents\PROJECTS\rsubstitute\rsubstitute\bin" />
       <recent name="C:\_RS\rsubstitute\rsubstitute\tests" />
+      <recent name="C:\Users\alordash\Documents\PROJECTS\rsubstitute\rsubstitute\bin" />
       <recent name="C:\_RS\rsubstitute\src\rsubstitute\tests" />
       <recent name="C:\_RS\rsubstitute\src\rsubstitute\bin" />
       <recent name="C:\_RS\rsubstitute\src\rsubstitute_proc_macro\src\generation\fn" />
@@ -428,25 +431,7 @@
       <recent name="C:\_RS\rsubstitute\src\rsubstitute_proc_macro\src\generation\mock_controls\common" />
     </key>
   </component>
-  <component name="RunManager" selected="Cargo.Test tests::simple::f_base_dep">
-    <configuration name="Run NEW_async" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="buildProfileId" value="dev" />
-      <option name="command" value="run --package rsubstitute --bin NEW_async" />
-      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
-      <envs />
-      <option name="emulateTerminal" value="true" />
-      <option name="channel" value="DEFAULT" />
-      <option name="requiredFeatures" value="true" />
-      <option name="allFeatures" value="false" />
-      <option name="withSudo" value="false" />
-      <option name="buildTarget" value="REMOTE" />
-      <option name="backtrace" value="SHORT" />
-      <option name="isRedirectInput" value="false" />
-      <option name="redirectInputPath" value="" />
-      <method v="2">
-        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="Cargo.Test trait_async_tests::tests">
     <configuration name="Run sandbox" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="buildProfileId" value="test" />
       <option name="command" value="run --package rsubstitute --bin sandbox" />
@@ -465,26 +450,8 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Test associated_types_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="test --package rsubstitute --test associated_types_tests -- tests" />
-      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
-      <envs />
-      <option name="emulateTerminal" value="true" />
-      <option name="channel" value="DEFAULT" />
-      <option name="requiredFeatures" value="true" />
-      <option name="allFeatures" value="false" />
-      <option name="withSudo" value="false" />
-      <option name="buildTarget" value="REMOTE" />
-      <option name="backtrace" value="SHORT" />
-      <option name="isRedirectInput" value="false" />
-      <option name="redirectInputPath" value="" />
-      <method v="2">
-        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Test reference_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="buildProfileId" value="test" />
-      <option name="command" value="test --package rsubstitute --test reference_tests -- tests" />
+    <configuration name="Test fn_async_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test fn_async_tests -- tests" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -518,6 +485,40 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
+    <configuration name="Test struct_async_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test struct_async_tests -- tests" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Test tests::input_output_Ok" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test fn_async_tests -- tests::input_output_Ok --exact" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Test tests::simple::f_base_dep" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
       <option name="command" value="test --package rsubstitute --test fn_simple_tests -- tests::simple::f_base_dep --exact" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
@@ -535,9 +536,8 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Tests in 'tests' (1)" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="buildProfileId" value="test" />
-      <option name="command" value="test --package rsubstitute --test arg_printing_tests --test associated_types_tests --test behaviour_tests --test config_tests --test fn_advanced_tests --test fn_deref_tests --test fn_generics_tests --test fn_ref_tests --test fn_simple_tests --test fn_value_type_tests --test generics_info_in_logs_tests --test impl_trait_tests --test no_matching_config_tests --test optional_generics_tests --test reference_tests --test self_in_macro_tests --test struct_advanced_tests --test struct_arc_tests --test struct_base_impl_tests --test struct_generics_tests --test struct_rc_tests --test struct_ref_tests --test struct_repeating_generics_tests --test struct_simple_tests --test struct_trait_impl_generics_tests --test struct_type_reference_normalization_tests --test struct_value_type_tests --test struct_various_self_tests --test super_tests --test trait_advanced_tests --test trait_arc_tests --test trait_base_impl_tests --test trait_generics_tests --test trait_rc_tests --test trait_ref_tests --test trait_simple_tests --test trait_value_type_tests --test trait_various_self_tests --test ub_tests --test unsized_tests" />
+    <configuration name="Test trait_async_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test trait_async_tests -- tests" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -556,19 +556,19 @@
     <list>
       <item itemvalue="Cargo.Run sandbox" />
       <item itemvalue="Cargo.Test src" />
+      <item itemvalue="Cargo.Test fn_async_tests::tests" />
+      <item itemvalue="Cargo.Test struct_async_tests::tests" />
+      <item itemvalue="Cargo.Test tests::input_output_Ok" />
       <item itemvalue="Cargo.Test tests::simple::f_base_dep" />
-      <item itemvalue="Cargo.Run NEW_async" />
-      <item itemvalue="Cargo.Test associated_types_tests::tests" />
-      <item itemvalue="Cargo.Tests in 'tests' (1)" />
-      <item itemvalue="Cargo.Test reference_tests::tests" />
+      <item itemvalue="Cargo.Test trait_async_tests::tests" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Cargo.Test trait_async_tests::tests" />
+        <item itemvalue="Cargo.Test struct_async_tests::tests" />
+        <item itemvalue="Cargo.Test fn_async_tests::tests" />
+        <item itemvalue="Cargo.Test tests::input_output_Ok" />
         <item itemvalue="Cargo.Test tests::simple::f_base_dep" />
-        <item itemvalue="Cargo.Tests in 'tests' (1)" />
-        <item itemvalue="Cargo.Run NEW_async" />
-        <item itemvalue="Cargo.Test associated_types_tests::tests" />
-        <item itemvalue="Cargo.Test reference_tests::tests" />
       </list>
     </recent_temporary>
   </component>
@@ -911,12 +911,12 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/rsubstitute/bin/NEW_async.rs</url>
-          <line>85</line>
+          <line>88</line>
           <option name="timeStamp" value="101" />
         </line-breakpoint>
         <line-breakpoint enabled="true" type="com.jetbrains.cidr.execution.debugger.OCBreakpointType">
           <url>file://$PROJECT_DIR$/rsubstitute/bin/NEW_async.rs</url>
-          <line>84</line>
+          <line>87</line>
           <option name="timeStamp" value="104" />
         </line-breakpoint>
       </breakpoints>
