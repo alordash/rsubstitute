@@ -1,5 +1,6 @@
 #![allow(clippy::needless_return)]
 pub use rsubstitute_core::args::*;
+pub use rsubstitute_core::verify_call_order;
 pub use rsubstitute_core::*;
 
 pub use rsubstitute_core::infrastructure::Mockable;

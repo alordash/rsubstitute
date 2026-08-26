@@ -23,9 +23,18 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f847079f-511f-4600-8811-ffe4728519b1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/rsubstitute/tests/struct_async_tests.rs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rsubstitute/tests/trait_async_tests.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rsubstitute/tests/verify_call_order_tests.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rsubstitute_core/src/args/ordered_calls_check_result.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rsubstitute_core/src/fn_parameters/call_check/formatting.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rsubstitute_core/src/infrastructure/call_order_verification.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/src/lib.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_core/src/args/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_core/src/args/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_core/src/fn_parameters/call_check.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_core/src/fn_parameters/call_check.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_core/src/infrastructure/error_printing.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_core/src/infrastructure/error_printing.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_core/src/infrastructure/fn_data.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_core/src/infrastructure/fn_data.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_core/src/infrastructure/mod.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_core/src/infrastructure/mod.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute_core/src/lib.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_core/src/lib.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -239,6 +248,7 @@
     "Cargo.Test test::compile.executor": "Run",
     "Cargo.Test tests::DefaultMaxInvalidCallsListedCount_LessThanLimit_PrintsAll.executor": "Run",
     "Cargo.Test tests::DefaultMaxInvalidCallsListedCount_MoreThanLimit_PrintsTrimmed.executor": "Run",
+    "Cargo.Test tests::NoVerification_Correct.executor": "Run",
     "Cargo.Test tests::Trait_f_Ok.executor": "Run",
     "Cargo.Test tests::a.executor": "Run",
     "Cargo.Test tests::accept_arc_tests::accept_arc_Panics.executor": "Run",
@@ -394,10 +404,12 @@
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "C:/_RS/rsubstitute/rsubstitute/tests",
+    "last_opened_file_path": "C:/_RS/rsubstitute/rsubstitute_core/src/args",
     "node.js.detected.package.eslint": "true",
+    "node.js.detected.package.jshint": "true",
     "node.js.detected.package.tslint": "true",
     "node.js.selected.package.eslint": "(autodetect)",
+    "node.js.selected.package.jshint": "",
     "node.js.selected.package.tslint": "(autodetect)",
     "nodejs_package_manager_path": "npm",
     "org.rust.cargo.project.model.PROJECT_DISCOVERY": "true",
@@ -417,21 +429,21 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\_RS\rsubstitute\rsubstitute_core\src\args" />
       <recent name="C:\_RS\rsubstitute\rsubstitute\tests" />
       <recent name="C:\Users\alordash\Documents\PROJECTS\rsubstitute\rsubstitute\bin" />
       <recent name="C:\_RS\rsubstitute\src\rsubstitute\tests" />
       <recent name="C:\_RS\rsubstitute\src\rsubstitute\bin" />
-      <recent name="C:\_RS\rsubstitute\src\rsubstitute_proc_macro\src\generation\fn" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\_RS\rsubstitute\rsubstitute_core\src\infrastructure" />
       <recent name="C:\_RS\rsubstitute\src\rsubstitute_proc_macro\src\generation\targets\struct" />
       <recent name="C:\_RS\rsubstitute\src\rsubstitute_proc_macro\src\generation\common" />
       <recent name="C:\_RS\rsubstitute\src\rsubstitute_proc_macro\src\generation\mock_controls" />
       <recent name="C:\_RS\rsubstitute\src\rsubstitute_proc_macro\src\generation\mock_struct\common" />
-      <recent name="C:\_RS\rsubstitute\src\rsubstitute_proc_macro\src\generation\mock_controls\common" />
     </key>
   </component>
-  <component name="RunManager" selected="Cargo.Test trait_async_tests::tests">
+  <component name="RunManager" selected="Cargo.Test tests::WithVerification_Throws">
     <configuration name="Run sandbox" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="buildProfileId" value="test" />
       <option name="command" value="run --package rsubstitute --bin sandbox" />
@@ -502,8 +514,8 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Test tests::input_output_Ok" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="test --package rsubstitute --test fn_async_tests -- tests::input_output_Ok --exact" />
+    <configuration name="Test tests::NoVerification_Correct" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test verify_call_order_tests -- tests::NoVerification_Correct --exact" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -519,8 +531,8 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Test tests::simple::f_base_dep" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="test --package rsubstitute --test fn_simple_tests -- tests::simple::f_base_dep --exact" />
+    <configuration name="Test tests::WithVerification_Throws" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test verify_call_order_tests -- tests::WithVerification_Throws --exact" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -556,19 +568,19 @@
     <list>
       <item itemvalue="Cargo.Run sandbox" />
       <item itemvalue="Cargo.Test src" />
+      <item itemvalue="Cargo.Test tests::NoVerification_Correct" />
+      <item itemvalue="Cargo.Test tests::WithVerification_Throws" />
       <item itemvalue="Cargo.Test fn_async_tests::tests" />
       <item itemvalue="Cargo.Test struct_async_tests::tests" />
-      <item itemvalue="Cargo.Test tests::input_output_Ok" />
-      <item itemvalue="Cargo.Test tests::simple::f_base_dep" />
       <item itemvalue="Cargo.Test trait_async_tests::tests" />
     </list>
     <recent_temporary>
       <list>
+        <item itemvalue="Cargo.Test tests::WithVerification_Throws" />
+        <item itemvalue="Cargo.Test tests::NoVerification_Correct" />
         <item itemvalue="Cargo.Test trait_async_tests::tests" />
         <item itemvalue="Cargo.Test struct_async_tests::tests" />
         <item itemvalue="Cargo.Test fn_async_tests::tests" />
-        <item itemvalue="Cargo.Test tests::input_output_Ok" />
-        <item itemvalue="Cargo.Test tests::simple::f_base_dep" />
       </list>
     </recent_temporary>
   </component>

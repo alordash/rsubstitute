@@ -5,7 +5,6 @@ use crate::*;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
-use std::sync::atomic::AtomicUsize;
 
 mod handle_no_return_value_no_base_calling;
 mod handle_no_return_value_with_base_calling;
@@ -23,7 +22,6 @@ pub struct FnData<
     // TODO - remove RefCell? can I just make mock methods all requires `&mut self`?
     pub call_infos: RefCell<HashMap<GenericsHashKey, Vec<CallCheck<'rs>>>>,
     pub configs: RefCell<HashMap<GenericsHashKey, Vec<Rc<RefCell<FnConfig<'rs, TMock>>>>>>,
-    next_call_number: AtomicUsize,
     force_call_base: bool,
 }
 
@@ -40,7 +38,6 @@ impl<
             fn_name,
             call_infos: RefCell::new(HashMap::new()),
             configs: RefCell::new(HashMap::new()),
-            next_call_number: AtomicUsize::new(1),
             force_call_base: for_struct,
         }
     }
@@ -105,6 +102,18 @@ impl<
                 times,
             );
         }
+        if call_order_verification::should_perform() {
+            for matching_call in matching_calls_check_result.calls_args_check_results {
+                let matching_call_order_number = matching_call.call_order_number;
+                if let Err(last_call_order_number) =
+                    call_order_verification::cmp_swap_call_order_number(matching_call_order_number)
+                {
+                    panic!(
+                        "call order is invalid, last call order_number: {last_call_order_number}, actual: {matching_call_order_number}"
+                    );
+                }
+            }
+        }
     }
 
     pub fn get_unexpected_calls_error_msgs(&self) -> Vec<String> {
@@ -150,7 +159,6 @@ impl<
 
 mod internal {
     use super::*;
-    use std::sync::atomic::Ordering;
 
     impl<
         'rs,
@@ -166,17 +174,14 @@ mod internal {
                 .borrow_mut()
                 .entry(generics_hash_key)
                 .or_default()
-                .push(CallCheck::new(
-                    self.next_call_number.fetch_add(1, Ordering::Relaxed),
-                    call,
-                ));
+                .push(CallCheck::new(call));
             self
         }
 
         pub(crate) fn get_matching_and_non_matching_calls(
             &self,
             dyn_args_checker: &DynArgsChecker,
-        ) -> (CallsCheckResult, CallsCheckResult) {
+        ) -> (OrderedCallsCheckResult, OrderedCallsCheckResult) {
             let mut matching_calls_args_check_results = Vec::new();
             let mut non_matching_calls_args_check_results = Vec::new();
             let generics_hash_key = dyn_args_checker.get_generics_hash_key();
@@ -185,17 +190,19 @@ mod internal {
             for call_info in specific_call_infos.iter_mut() {
                 let call_args_check_results = dyn_args_checker.check(call_info.get_call());
                 let is_matching = call_args_check_results.iter().all(ArgCheckResult::is_ok);
+                let ordered_call_check_result =
+                    OrderedCallCheckResult::new(call_info.number, call_args_check_results);
                 if is_matching {
                     call_info.mark_as_verified();
-                    matching_calls_args_check_results.push(call_args_check_results);
+                    matching_calls_args_check_results.push(ordered_call_check_result);
                 } else {
-                    non_matching_calls_args_check_results.push(call_args_check_results);
+                    non_matching_calls_args_check_results.push(ordered_call_check_result);
                 }
             }
             let matching_calls_check_result =
-                CallsCheckResult::new(matching_calls_args_check_results);
+                OrderedCallsCheckResult::new(matching_calls_args_check_results);
             let non_matching_calls_check_result =
-                CallsCheckResult::new(non_matching_calls_args_check_results);
+                OrderedCallsCheckResult::new(non_matching_calls_args_check_results);
             return (matching_calls_check_result, non_matching_calls_check_result);
         }
 
