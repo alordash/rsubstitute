@@ -151,6 +151,7 @@ tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread", "time"] }
 
 [dev-dependencies]
 rsubstitute_core = { workspace = true, features = ["debug_naming"] }
+tokio = { workspace = true }
 
 [features]
 debug_naming = ["rsubstitute_core/debug_naming"]

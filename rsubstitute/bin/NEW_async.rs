@@ -49,15 +49,18 @@ async fn work() -> i32 {
 }
 
 #[mock]
+#[allow(unused)]
 async fn work_return() -> i32 {
     tokio::time::sleep(Duration::from_secs(1));
     return 12;
 }
 
 #[mock]
+#[allow(unused)]
 async fn work_nothing() {}
 
 #[mock(base)]
+#[allow(unused)]
 async fn work_base_nothing() {}
 
 #[mock(base)]
