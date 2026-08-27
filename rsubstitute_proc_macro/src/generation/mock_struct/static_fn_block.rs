@@ -54,7 +54,6 @@ pub(crate) fn generate(
         fn_data_stmt::StaticParams {
             fn_info,
             generic_arguments,
-            for_struct,
         },
     );
     let fn_handle_stmt = fn_handle_stmt::generate(

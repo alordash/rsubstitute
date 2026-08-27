@@ -62,7 +62,7 @@ work(*{unexpected_v}*)
             .repeat(calls_count);
             let expected_error_msg = format!(
                 "Expected to receive a call exactly once matching:
-	work((i32): equal to {expected_v})
+	Trait::work((i32): equal to {expected_v})
 Actually received no matching calls
 Received {calls_count} non-matching calls (non-matching arguments indicated with '*' characters):{calls_error_msgs}"
             );
@@ -102,7 +102,7 @@ work(*{unexpected_v}*)
             .repeat(max_invalid_calls_listed_count);
             let expected_error_msg = format!(
                 "Expected to receive a call exactly once matching:
-	work((i32): equal to {expected_v})
+	Trait::work((i32): equal to {expected_v})
 Actually received no matching calls
 Received {calls_count} non-matching calls (listing only first {max_invalid_calls_listed_count}) (non-matching arguments indicated with '*' characters):{calls_error_msgs}"
             );

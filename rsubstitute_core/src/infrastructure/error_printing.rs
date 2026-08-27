@@ -5,7 +5,8 @@ use crate::infrastructure::call_order_verification::CallOrderEntry;
 use crate::*;
 
 pub(crate) fn panic_received_verification_error(
-    fn_name: &'static str,
+    fn_name: &str,
+    formatted_fn_name: &str,
     args_checker: &DynArgsChecker,
     matching_calls_check_result: OrderedCallsCheckResult,
     non_matching_calls_check_result: OrderedCallsCheckResult,
@@ -18,7 +19,7 @@ pub(crate) fn panic_received_verification_error(
         GenericParameterInfosFormattingPolicy::Perform(&generic_parameter_infos),
     );
     let expected_call_msg = format!(
-        "\t{fn_name}{}({})",
+        "\t{formatted_fn_name}{}({})",
         generic_parameters_msg,
         args_checker.fmt_args(),
     );
@@ -57,7 +58,7 @@ pub(crate) fn panic_received_verification_error(
             .take(max_invalid_calls_listed_count)
             .map(|x| {
                 fmt_call(
-                    fn_name,
+                    &fn_name,
                     x.args_check_results,
                     GenericParameterInfosFormattingPolicy::Skip,
                 )
@@ -85,13 +86,17 @@ pub(crate) fn panic_received_verification_error(
 }
 
 pub(crate) fn panic_no_suitable_fn_configuration_found(
-    fn_name: &'static str,
+    fn_name: &str,
+    formatted_fn_name: &str,
     unexpected_call: Vec<ArgInfo>,
     generic_parameter_infos: Vec<GenericParameterInfo>,
     matching_config_search_err: MatchingConfigSearchErr,
 ) -> ! {
-    let call_msg =
-        format_received_unexpected_call_error(fn_name, unexpected_call, generic_parameter_infos);
+    let call_msg = format_received_unexpected_call_error(
+        formatted_fn_name,
+        unexpected_call,
+        generic_parameter_infos,
+    );
     let calls = matching_config_search_err
         .args_check_results_sorted_by_number_of_correctly_matched_args_descending;
     let needed_return_value = matching_config_search_err.needed_return_value;
@@ -130,7 +135,7 @@ List of existing configuration ordered by number of correctly matched arguments 
 }
 
 pub(crate) fn format_received_unexpected_call_error(
-    fn_name: &'static str,
+    formatted_fn_name: &str,
     call_args: Vec<ArgInfo>,
     generic_parameter_infos: Vec<GenericParameterInfo>,
 ) -> String {
@@ -142,7 +147,7 @@ pub(crate) fn format_received_unexpected_call_error(
     let generic_parameters_msg = fmt_generic_parameter_infos(
         GenericParameterInfosFormattingPolicy::Perform(&generic_parameter_infos),
     );
-    let error_msg = format!("{fn_name}{generic_parameters_msg}({call_args_msg})");
+    let error_msg = format!("{formatted_fn_name}{generic_parameters_msg}({call_args_msg})");
     return error_msg;
 }
 
@@ -166,12 +171,15 @@ pub(crate) fn panic_received_unexpected_calls_error(error_msgs: Vec<String>) -> 
 }
 
 pub(crate) fn panic_no_return_value_was_configured(
-    fn_name: &'static str,
+    formatted_fn_name: &str,
     call_args: Vec<ArgInfo>,
     generic_parameter_infos: Vec<GenericParameterInfo>,
 ) -> ! {
-    let call_msg =
-        format_received_unexpected_call_error(fn_name, call_args, generic_parameter_infos);
+    let call_msg = format_received_unexpected_call_error(
+        formatted_fn_name,
+        call_args,
+        generic_parameter_infos,
+    );
     let error_msg = format!("No return value found for following call: {call_msg}");
     panic!("{error_msg}");
 }

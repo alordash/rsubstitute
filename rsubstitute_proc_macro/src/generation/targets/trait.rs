@@ -37,7 +37,6 @@ pub(crate) fn generate_module(ctx: &Context, item_trait: ItemTrait) -> MockMod {
                 mock_struct_path: &trait_mock_struct_path,
                 fn_infos: &trait_info.associated_fns,
                 maybe_trait_ident: None,
-                for_struct: false,
             },
         );
         let received_struct = received::generate(
@@ -50,7 +49,6 @@ pub(crate) fn generate_module(ctx: &Context, item_trait: ItemTrait) -> MockMod {
                 mock_struct_path: &trait_mock_struct_path,
                 fn_infos: &trait_info.associated_fns,
                 maybe_trait_ident: None,
-                for_struct: false,
             },
         );
         let associated_controls = AssociatedControls {
@@ -72,7 +70,6 @@ pub(crate) fn generate_module(ctx: &Context, item_trait: ItemTrait) -> MockMod {
                 fn_infos: &trait_info.static_fns,
                 for_static_fn: false,
                 maybe_trait_ident: None,
-                for_struct: false,
             },
         );
         let static_received_struct = static_received::generate(
@@ -87,7 +84,6 @@ pub(crate) fn generate_module(ctx: &Context, item_trait: ItemTrait) -> MockMod {
                 fn_infos: &trait_info.static_fns,
                 for_static_fn: false,
                 maybe_trait_ident: None,
-                for_struct: false,
             },
         );
         let static_controls = StaticControls {

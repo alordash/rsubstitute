@@ -101,7 +101,7 @@ mod tests {
                 || mock.received().accept_value(Arg::Any, Times::Never),
                 format!(
                     r#"Expected to never receive a call matching:
-	accept_value((i32): any)
+	Struct::accept_value((i32): any)
 Actually received 2 matching calls:
 	accept_value({first_value})
 	accept_value({second_value})
@@ -112,7 +112,7 @@ Received no non-matching calls"#
                 || mock.received().accept_value(Arg::Any, Times::Once),
                 format!(
                     r#"Expected to receive a call exactly once matching:
-	accept_value((i32): any)
+	Struct::accept_value((i32): any)
 Actually received 2 matching calls:
 	accept_value({first_value})
 	accept_value({second_value})
@@ -123,7 +123,7 @@ Received no non-matching calls"#
                 || mock.received().accept_value(Arg::Any, Times::Exactly(3)),
                 format!(
                     r#"Expected to receive a call 3 times matching:
-	accept_value((i32): any)
+	Struct::accept_value((i32): any)
 Actually received 2 matching calls:
 	accept_value({first_value})
 	accept_value({second_value})
@@ -151,7 +151,7 @@ Received no non-matching calls"#
                 },
                 format!(
                     r#"Expected to never receive a call matching:
-	accept_value((i32): equal to {first_value})
+	Struct::accept_value((i32): equal to {first_value})
 Actually received 1 matching call:
 	accept_value({first_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
@@ -168,7 +168,7 @@ accept_value(*{second_value}*)
                 },
                 format!(
                     r#"Expected to receive a call 3 times matching:
-	accept_value((i32): equal to {first_value})
+	Struct::accept_value((i32): equal to {first_value})
 Actually received 1 matching call:
 	accept_value({first_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
@@ -185,7 +185,7 @@ accept_value(*{second_value}*)
                 },
                 format!(
                     r#"Expected to never receive a call matching:
-	accept_value((i32): equal to {second_value})
+	Struct::accept_value((i32): equal to {second_value})
 Actually received 1 matching call:
 	accept_value({second_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
@@ -202,7 +202,7 @@ accept_value(*{first_value}*)
                 },
                 format!(
                     r#"Expected to receive a call 3 times matching:
-	accept_value((i32): equal to {second_value})
+	Struct::accept_value((i32): equal to {second_value})
 Actually received 1 matching call:
 	accept_value({second_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
@@ -235,7 +235,7 @@ accept_value(*{first_value}*)
                 },
                 format!(
                     r#"Expected to never receive a call matching:
-	accept_value((i32): custom predicate)
+	Struct::accept_value((i32): custom predicate)
 Actually received 1 matching call:
 	accept_value({first_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
@@ -253,7 +253,7 @@ accept_value(*{second_value}*)
                 },
                 format!(
                     r#"Expected to receive a call 3 times matching:
-	accept_value((i32): custom predicate)
+	Struct::accept_value((i32): custom predicate)
 Actually received 1 matching call:
 	accept_value({first_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
@@ -271,7 +271,7 @@ accept_value(*{second_value}*)
                 },
                 format!(
                     r#"Expected to never receive a call matching:
-	accept_value((i32): custom predicate)
+	Struct::accept_value((i32): custom predicate)
 Actually received 1 matching call:
 	accept_value({second_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
@@ -289,7 +289,7 @@ accept_value(*{first_value}*)
                 },
                 format!(
                     r#"Expected to receive a call 3 times matching:
-	accept_value((i32): custom predicate)
+	Struct::accept_value((i32): custom predicate)
 Actually received 1 matching call:
 	accept_value({second_value})
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
@@ -335,7 +335,7 @@ accept_value(*{first_value}*)
                 },
                 format!(
                     "Did not expect to receive any other calls. Received 1 unexpected call:
-1. accept_value({second_value})"
+1. Struct::accept_value({second_value})"
                 ),
             );
         }
@@ -362,8 +362,8 @@ accept_value(*{first_value}*)
                 },
                 format!(
                     "Did not expect to receive any other calls. Received 2 unexpected calls:
-1. accept_value({second_value})
-2. accept_value({third_value})"
+1. Struct::accept_value({second_value})
+2. Struct::accept_value({third_value})"
                 ),
             );
         }
@@ -485,7 +485,7 @@ accept_value(*{first_value}*)
 
             // Assert
             let expected_error_msg = "Mock wasn't configured to handle following call:
-	return_value()";
+	Struct::return_value()";
             assert_eq!(Some(expected_error_msg.to_owned()), actual_error_msg);
         }
     }
@@ -741,7 +741,7 @@ accept_value(*{first_value}*)
                 },
                 format!(
                     r#"Expected to never receive a call matching:
-	accept_two_values_return_value((i32): equal to {v1}, (f32): equal to {v2})
+	Struct::accept_two_values_return_value((i32): equal to {v1}, (f32): equal to {v2})
 Actually received 1 matching call:
 	accept_two_values_return_value({v1}, {v2})
 Received no non-matching calls"#
@@ -755,7 +755,7 @@ Received no non-matching calls"#
                 },
                 format!(
                     r#"Expected to receive a call 3 times matching:
-	accept_two_values_return_value((i32): equal to {v1}, (f32): equal to {v2})
+	Struct::accept_two_values_return_value((i32): equal to {v1}, (f32): equal to {v2})
 Actually received 1 matching call:
 	accept_two_values_return_value({v1}, {v2})
 Received no non-matching calls"#
@@ -774,7 +774,7 @@ Received no non-matching calls"#
                 },
                 format!(
                     r#"Expected to receive a call exactly once matching:
-	accept_two_values_return_value((i32): equal to {invalid_expected_v1}, (f32): equal to {invalid_expected_v2})
+	Struct::accept_two_values_return_value((i32): equal to {invalid_expected_v1}, (f32): equal to {invalid_expected_v2})
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
 accept_two_values_return_value(*10*, *20.2*)
@@ -809,7 +809,7 @@ accept_two_values_return_value(*10*, *20.2*)
             // Assert
             let expected_error_msg = format!(
                 "Mock wasn't configured to handle following call because no return value was provided:
-	accept_two_values_return_value({unexpected_v1}, {unexpected_v2})
+	Struct::accept_two_values_return_value({unexpected_v1}, {unexpected_v2})
 List of existing configuration ordered by number of correctly matched arguments (non-matching arguments indicated with '*' characters):
 	1. Matched 0/2 arguments: accept_two_values_return_value(*{unexpected_v1}*, *{unexpected_v2}*)"
             );

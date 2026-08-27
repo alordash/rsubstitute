@@ -26,7 +26,8 @@ impl<'rs, TMock, const PASSES_MOCK_TO_CALLBACK: bool>
                     return base_return_value;
                 }
                 error_printing::panic_no_suitable_fn_configuration_found(
-                    self.fn_name,
+                    &self.fn_name,
+                    &self.formatted_fn_name,
                     call.get_arg_infos(),
                     call.get_generic_parameter_infos(),
                     matching_config_search_err,
@@ -46,7 +47,7 @@ impl<'rs, TMock, const PASSES_MOCK_TO_CALLBACK: bool>
         drop(fn_config_ref);
         let Some(return_value) = fn_config.borrow_mut().select_next_return_value(&call) else {
             error_printing::panic_no_return_value_was_configured(
-                self.fn_name,
+                &self.formatted_fn_name,
                 call.get_arg_infos(),
                 call.get_generic_parameter_infos(),
             );
@@ -78,7 +79,8 @@ impl<'rs, TMock, const PASSES_MOCK_TO_CALLBACK: bool>
                     return base_return_value.await;
                 }
                 error_printing::panic_no_suitable_fn_configuration_found(
-                    self.fn_name,
+                    &self.fn_name,
+                    &self.formatted_fn_name,
                     call.get_arg_infos(),
                     call.get_generic_parameter_infos(),
                     matching_config_search_err,
@@ -98,7 +100,7 @@ impl<'rs, TMock, const PASSES_MOCK_TO_CALLBACK: bool>
         drop(fn_config_ref);
         let Some(return_value) = fn_config.borrow_mut().select_next_return_value(&call) else {
             error_printing::panic_no_return_value_was_configured(
-                self.fn_name,
+                &self.formatted_fn_name,
                 call.get_arg_infos(),
                 call.get_generic_parameter_infos(),
             );

@@ -23,6 +23,7 @@ mod common {
 
 use common::*;
 
+pub mod fn_static_received_nothing;
 pub mod fn_static_received;
 pub mod fn_static_setup;
 pub mod received;

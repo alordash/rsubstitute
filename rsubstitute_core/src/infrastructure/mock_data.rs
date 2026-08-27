@@ -38,6 +38,7 @@ impl MockData {
         const PASSES_MOCK_TO_CALLBACK: bool,
     >(
         &'_ mut self,
+        maybe_owner_name: Option<&'static str>,
         fn_ident: &'static str,
         generics_hash_key: GenericsHashKey,
         for_struct: bool,
@@ -55,7 +56,9 @@ impl MockData {
                     HAS_RETURN_VALUE,
                     SUPPORTS_BASE_CALLING,
                     PASSES_MOCK_TO_CALLBACK,
-                >::new(fn_ident, for_struct))) as *const _ as *const ()
+                >::new(
+                    maybe_owner_name, fn_ident, for_struct
+                ))) as *const _ as *const ()
             });
 
         let fn_data_ref = Self::cast_ptr_to_ref(*fn_data_ptr);

@@ -11,18 +11,7 @@ pub trait ISharedMockData {
         const PASSES_MOCK_TO_CALLBACK: bool,
     >(
         &'_ self,
-        fn_ident: &'static str,
-        generics_hash_key: GenericsHashKey,
-    ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, PASSES_MOCK_TO_CALLBACK>;
-
-    fn get_shared_fn_data_for_struct<
-        'a,
-        TMock,
-        const HAS_RETURN_VALUE: bool,
-        const SUPPORTS_BASE_CALLING: bool,
-        const PASSES_MOCK_TO_CALLBACK: bool,
-    >(
-        &'_ self,
+        owner_name: &'static str,
         fn_ident: &'static str,
         generics_hash_key: GenericsHashKey,
     ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, PASSES_MOCK_TO_CALLBACK>;
@@ -40,30 +29,14 @@ impl ISharedMockData for SharedMockData {
         const PASSES_MOCK_TO_CALLBACK: bool,
     >(
         &'_ self,
+        owner_name: &'static str,
         fn_ident: &'static str,
         generics_hash_key: GenericsHashKey,
     ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, PASSES_MOCK_TO_CALLBACK>
     {
         self.write()
             .expect(UNABLE_TO_LOCK_FOR_WRITING_ERROR)
-            .get_or_create_fn_data(fn_ident, generics_hash_key, false)
-    }
-
-    fn get_shared_fn_data_for_struct<
-        'a,
-        TMock,
-        const HAS_RETURN_VALUE: bool,
-        const SUPPORTS_BASE_CALLING: bool,
-        const PASSES_MOCK_TO_CALLBACK: bool,
-    >(
-        &'_ self,
-        fn_ident: &'static str,
-        generics_hash_key: GenericsHashKey,
-    ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, PASSES_MOCK_TO_CALLBACK>
-    {
-        self.write()
-            .expect(UNABLE_TO_LOCK_FOR_WRITING_ERROR)
-            .get_or_create_fn_data(fn_ident, generics_hash_key, true)
+            .get_or_create_fn_data(Some(owner_name), fn_ident, generics_hash_key, false)
     }
 }
 

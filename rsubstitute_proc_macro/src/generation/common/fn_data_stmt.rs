@@ -19,6 +19,10 @@ pub(crate) fn new_associated(
     }: AssociatedParams,
 ) -> (ExprPath, Local) {
     let fn_data_var_path = expr::path::new(span, ["fn_data"]);
+    let owner_name = fn_info
+        .maybe_owner_name
+        .as_ref()
+        .expect("Associated function must have owner name.");
     let fn_data_stmt = Local {
         attrs: Vec::new(),
         let_token: Token![let](span),
@@ -42,7 +46,8 @@ pub(crate) fn new_associated(
                             span,
                         )))),
                     }),
-                    fn_info_ident_to_expr_lit(span, fn_info),
+                    expr::lit::string(span, owner_name),
+                    expr::lit::string(span, &fn_info.fn_data_name),
                     Expr::Call(expr::call::new(
                         span,
                         Expr::Path(expr::path::new_global(
@@ -71,21 +76,22 @@ pub(crate) fn new_associated(
 pub(crate) struct StaticParams<'a> {
     pub fn_info: &'a FnInfo,
     pub generic_arguments: generic_arguments::Result,
-    pub for_struct: bool,
 }
 pub(crate) fn new_static(
     span: Span,
     StaticParams {
         fn_info,
         generic_arguments,
-        for_struct,
     }: StaticParams,
 ) -> (ExprPath, Local) {
     let fn_data_var_path = expr::path::new(span, ["fn_data"]);
-    let fn_name = if for_struct {
-        "get_static_fn_data_for_struct"
-    } else {
-        "get_static_fn_data"
+    let fn_name = expr::lit::string(span, &fn_info.fn_data_name);
+    let (fn_data_fn_name, args) = match &fn_info.maybe_owner_name {
+        None => ("get_static_fn_data", punctuated([fn_name])),
+        Some(owner_name) => (
+            "get_static_fn_data_for_struct",
+            punctuated([expr::lit::string(span, owner_name), fn_name]),
+        ),
     };
     let fn_data_stmt = Local {
         attrs: Vec::new(),
@@ -94,27 +100,21 @@ pub(crate) fn new_static(
         pat: fn_data_pat(span, fn_data_var_path.clone(), generic_arguments),
         init: Some(LocalInit {
             eq_token: Token![=](span),
-            expr: Box::new(Expr::Call(expr::call::new(
-                span,
-                Expr::Path(ExprPath {
+            expr: Box::new(Expr::Call(ExprCall {
+                attrs: Vec::new(),
+                func: Box::new(Expr::Path(ExprPath {
                     attrs: Vec::new(),
                     qself: None,
-                    path: path::new_global(span, rsubstitute_for_generated::new(fn_name)),
-                }),
-                [fn_info_ident_to_expr_lit(span, fn_info)],
-            ))),
+                    path: path::new_global(span, rsubstitute_for_generated::new(fn_data_fn_name)),
+                })),
+                paren_token: token::Paren(span),
+                args,
+            })),
             diverge: None,
         }),
         semi_token: Token![;](span),
     };
     return (fn_data_var_path, fn_data_stmt);
-}
-
-fn fn_info_ident_to_expr_lit(span: Span, fn_info: &FnInfo) -> Expr {
-    Expr::Lit(ExprLit {
-        attrs: Vec::new(),
-        lit: Lit::Str(LitStr::new(&fn_info.fn_data_name, span)),
-    })
 }
 
 fn fn_data_pat(

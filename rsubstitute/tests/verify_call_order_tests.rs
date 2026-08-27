@@ -36,7 +36,23 @@ mod tests {
     use not_enough_asserts::assert_panics;
 
     #[test]
-    fn OnlyFn_NoVerification_Correct() {
+    fn OnlyFn_NoVerificationValidOrder_Ok() {
+        // Arrange
+        // Act
+        foo(1);
+        foo(2);
+        foo("amogus");
+        bar(false);
+
+        // Assert
+        foo::received(1, Times::Once).no_other_calls();
+        foo::received(2, Times::Once);
+        foo::received("amogus", Times::Once);
+        bar::received(false, Times::Once).no_other_calls();
+    }
+
+    #[test]
+    fn OnlyFn_NoVerificationInvalidOrder_Ok() {
         // Arrange
         // Act
         foo(1);
@@ -51,6 +67,25 @@ mod tests {
         foo::received(1, Times::Once).no_other_calls();
     }
 
+    #[test]
+    fn OnlyFn_WithVerificationValidOrder_Ok() {
+        // Arrange
+        // Act
+        foo(1);
+        foo(2);
+        foo("amogus");
+        bar(false);
+
+        // Assert
+        verify_call_order(|| {
+            foo::received(1, Times::Once).no_other_calls();
+            foo::received(2, Times::Once);
+            foo::received("amogus", Times::Once);
+            bar::received(false, Times::Once).no_other_calls();
+        });
+    }
+
+    // TODO - add test WithVerification that doesn't panic
     #[test]
     fn OnlyFn_WithVerification_Panics() {
         // Arrange

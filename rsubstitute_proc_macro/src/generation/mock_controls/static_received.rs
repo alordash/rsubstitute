@@ -17,7 +17,6 @@ pub(crate) struct Params<'a, T: Borrow<FnInfo>> {
     pub fn_infos: &'a [T],
     pub for_static_fn: bool,
     pub maybe_trait_ident: Option<Ident>,
-    pub for_struct: bool,
 }
 pub(crate) fn generate<T: Borrow<FnInfo>>(
     ctx: &Context,
@@ -31,7 +30,6 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
         fn_infos,
         for_static_fn,
         maybe_trait_ident,
-        for_struct,
     }: Params<T>,
 ) -> StaticReceivedStruct {
     let item_struct = control_struct::new_static(
@@ -60,7 +58,6 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
             for_static_fn,
             is_static: true,
             generate_fn_no_other_calls: true,
-            for_struct,
         },
     );
 

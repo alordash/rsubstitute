@@ -6,7 +6,7 @@ pub(crate) enum GenericParameterInfosFormattingPolicy<'a> {
 }
 
 pub(crate) fn fmt_call(
-    fn_name: &'static str,
+    fn_name: &str,
     args_check_results: Vec<ArgCheckResult>,
     generic_parameter_infos_formatting: GenericParameterInfosFormattingPolicy,
 ) -> String {
@@ -45,7 +45,7 @@ pub(crate) fn fmt_call(
 }
 
 pub(crate) fn fmt_fn_parameters_msg(
-    fn_name: &'static str,
+    fn_name: &str,
     args_check_results: Vec<ArgCheckResult>,
     generic_parameter_infos_formatting: GenericParameterInfosFormattingPolicy,
 ) -> String {

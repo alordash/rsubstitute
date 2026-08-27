@@ -19,6 +19,7 @@ pub struct FnData<
     const PASSES_MOCK_TO_CALLBACK: bool,
 > {
     fn_name: &'static str,
+    formatted_fn_name: String,
     // TODO - remove RefCell? can I just make mock methods all requires `&mut self`?
     pub call_infos: RefCell<HashMap<GenericsHashKey, Vec<CallCheck<'rs>>>>,
     pub configs: RefCell<HashMap<GenericsHashKey, Vec<Rc<RefCell<FnConfig<'rs, TMock>>>>>>,
@@ -33,9 +34,18 @@ impl<
     const PASSES_MOCK_TO_CALLBACK: bool,
 > FnData<'rs, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, PASSES_MOCK_TO_CALLBACK>
 {
-    pub fn new(fn_name: &'static str, for_struct: bool) -> Self {
+    pub(crate) fn new(
+        maybe_owner_name: Option<&'static str>,
+        fn_name: &'static str,
+        for_struct: bool,
+    ) -> Self {
+        let formatted_fn_name = match maybe_owner_name {
+            None => fn_name.to_owned(),
+            Some(owner_name) => format!("{owner_name}::{fn_name}"),
+        };
         Self {
             fn_name,
+            formatted_fn_name,
             call_infos: RefCell::new(HashMap::new()),
             configs: RefCell::new(HashMap::new()),
             force_call_base: for_struct,
@@ -95,7 +105,8 @@ impl<
         let valid = times.matches(matching_calls_count);
         if !valid {
             error_printing::panic_received_verification_error(
-                self.fn_name,
+                &self.fn_name,
+                &self.formatted_fn_name,
                 &dyn_args_checker,
                 matching_calls_check_result,
                 non_matching_calls_check_result,
@@ -105,7 +116,7 @@ impl<
         if call_order_verification::should_perform() {
             for matching_call in matching_calls_check_result.calls_args_check_results {
                 let formatted_string = fmt_call(
-                    self.fn_name,
+                    &self.formatted_fn_name,
                     matching_call.args_check_results,
                     GenericParameterInfosFormattingPolicy::Skip,
                 );
@@ -133,7 +144,7 @@ impl<
             .map(|x| {
                 let call = x.get_call();
                 error_printing::format_received_unexpected_call_error(
-                    self.fn_name,
+                    &self.formatted_fn_name,
                     call.get_arg_infos(),
                     call.get_generic_parameter_infos(),
                 )
@@ -224,7 +235,8 @@ mod internal {
                 MatchingConfigSearchResult::Ok(matching_config) => matching_config,
                 MatchingConfigSearchResult::Err(matching_config_search_err) => {
                     error_printing::panic_no_suitable_fn_configuration_found(
-                        self.fn_name,
+                        &self.fn_name,
+                        &self.formatted_fn_name,
                         dyn_call.get_arg_infos(),
                         dyn_call.get_generic_parameter_infos(),
                         matching_config_search_err,

@@ -39,7 +39,7 @@ pub(crate) fn prepare(
     }
     let merged_generics = combine_generics(signature.generics.clone(), maybe_owner);
     let fn_ident = format_fn_ident(signature.ident.clone(), maybe_owner);
-    let fn_data_name = format_fn_data_name(signature.ident.clone(), maybe_owner);
+    let fn_data_name = signature.ident.to_string();
     let spans = Spans {
         inputs: signature.inputs.span(),
     };
@@ -85,6 +85,7 @@ pub(crate) fn prepare(
         visibility,
         merged_generics,
         generics_field,
+        maybe_owner_name: maybe_owner.map(|x| x.format_name()),
         fn_ident,
         fn_data_name,
         maybe_self_type,
@@ -95,23 +96,11 @@ pub(crate) fn prepare(
     };
     return result;
 }
-
 fn format_fn_ident(fn_ident: Ident, maybe_owner: Option<&dyn IFnOwner>) -> Ident {
     if let Some(owner_ident) = maybe_owner.map(|x| x.maybe_ident()).flatten() {
         return format_ident!("{owner_ident}_{fn_ident}");
     }
     return fn_ident;
-}
-
-fn format_fn_data_name(fn_ident: Ident, maybe_owner: Option<&dyn IFnOwner>) -> String {
-    let fn_data_name_parts: Vec<_> = maybe_owner
-        .map(|owner| owner.maybe_ident().map(|ident| ident.to_string()))
-        .into_iter()
-        .flatten()
-        .chain(core::iter::once(fn_ident.to_string()))
-        .collect();
-    let result = fn_data_name_parts.join("::");
-    return result;
 }
 
 // TODO - prove assumption - assuming fn_info generics and owner generics can not intersect
