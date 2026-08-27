@@ -45,9 +45,9 @@ mod tests {
         bar(false);
 
         // Assert
-        foo::received(1, Times::Once).no_other_calls();
+        foo::received(1, Times::Once);
         foo::received(2, Times::Once);
-        foo::received("amogus", Times::Once);
+        foo::received("amogus", Times::Once).no_other_calls();
         bar::received(false, Times::Once).no_other_calls();
     }
 
@@ -78,9 +78,9 @@ mod tests {
 
         // Assert
         verify_call_order(|| {
-            foo::received(1, Times::Once).no_other_calls();
+            foo::received(1, Times::Once);
             foo::received(2, Times::Once);
-            foo::received("amogus", Times::Once);
+            foo::received("amogus", Times::Once).no_other_calls();
             bar::received(false, Times::Once).no_other_calls();
         });
     }
