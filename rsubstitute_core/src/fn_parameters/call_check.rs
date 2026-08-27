@@ -6,7 +6,7 @@ use std::sync::atomic::*;
 mod formatting;
 pub(crate) use formatting::*;
 
-static CALL_ORDER_NUMBER: AtomicUsize = AtomicUsize::new(1);
+static CALL_ORDER_NUMBER: AtomicUsize = AtomicUsize::new(0);
 
 pub struct CallCheck<'rs> {
     pub number: usize,

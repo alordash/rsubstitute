@@ -1,6 +1,7 @@
 use crate::args::*;
 use crate::fn_parameters::*;
 use crate::infrastructure::MatchingConfigSearchErr;
+use crate::infrastructure::call_order_verification::CallOrderEntry;
 use crate::*;
 
 pub(crate) fn panic_received_verification_error(
@@ -178,4 +179,33 @@ pub(crate) fn panic_no_return_value_was_configured(
 fn fmt_calls(calls_count: usize) -> &'static str {
     assert_ne!(calls_count, 0);
     return if calls_count == 1 { "call" } else { "calls" };
+}
+
+pub(crate) fn panic_invalid_calls_order(expected_calls_order: &mut [CallOrderEntry]) -> ! {
+    let expected_order_string = fmt_call_order_entries(&expected_calls_order);
+    let actual_calls_order = {
+        expected_calls_order.sort_by(|a, b| a.call_order_number.cmp(&b.call_order_number));
+        expected_calls_order
+    };
+    let actual_order_string = fmt_call_order_entries(&actual_calls_order);
+    let error_msg = format!(
+        "Expected to receive these calls in order:
+
+\t{expected_order_string}
+
+Actually received matching calls in this order:
+
+\t{actual_order_string}
+"
+    );
+    panic!("{error_msg}")
+}
+
+fn fmt_call_order_entries(call_order_entries: &[CallOrderEntry]) -> String {
+    let formatted_strings: Vec<_> = call_order_entries
+        .iter()
+        .map(|x| x.formatted_string.clone())
+        .collect();
+    let string = formatted_strings.join("\n\t");
+    return string;
 }

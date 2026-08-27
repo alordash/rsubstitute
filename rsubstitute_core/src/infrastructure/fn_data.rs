@@ -104,14 +104,15 @@ impl<
         }
         if call_order_verification::should_perform() {
             for matching_call in matching_calls_check_result.calls_args_check_results {
-                let matching_call_order_number = matching_call.call_order_number;
-                if let Err(last_call_order_number) =
-                    call_order_verification::cmp_swap_call_order_number(matching_call_order_number)
-                {
-                    panic!(
-                        "call order is invalid, last call order_number: {last_call_order_number}, actual: {matching_call_order_number}"
-                    );
-                }
+                let formatted_string = fmt_call(
+                    self.fn_name,
+                    matching_call.args_check_results,
+                    GenericParameterInfosFormattingPolicy::Skip,
+                );
+                call_order_verification::add_call(
+                    matching_call.call_order_number,
+                    formatted_string,
+                );
             }
         }
     }

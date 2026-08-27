@@ -13,6 +13,7 @@ mod shared_mock_data;
 mod static_fn_datas_global_map;
 
 pub use arg_refs_binder::*;
+pub use call_order_verification::verify_call_order;
 pub use fn_callback_configurator::*;
 pub(crate) use fn_config::*;
 pub use fn_configurator::*;
@@ -23,4 +24,3 @@ pub use mock_data::*;
 pub use mockable::*;
 pub use shared_mock_data::*;
 pub use static_fn_datas_global_map::*;
-pub use call_order_verification::verify_call_order;
