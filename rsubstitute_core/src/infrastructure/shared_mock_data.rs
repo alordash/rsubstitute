@@ -39,7 +39,7 @@ impl ISharedMockData for SharedMockData {
             .expect(UNABLE_TO_LOCK_FOR_WRITING_ERROR)
             .get_or_create_fn_data(
                 Some(owner_name),
-                &unique_fn_ident,
+                unique_fn_ident,
                 fn_ident,
                 generics_hash_key,
                 false,
