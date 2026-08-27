@@ -39,6 +39,7 @@ impl MockData {
     >(
         &'_ mut self,
         maybe_owner_name: Option<&'static str>,
+        unique_fn_ident: &'static str,  // for trait fns
         fn_ident: &'static str,
         generics_hash_key: GenericsHashKey,
         for_struct: bool,
@@ -46,7 +47,7 @@ impl MockData {
     {
         let fn_data_ptr = self
             .map
-            .entry(fn_ident)
+            .entry(unique_fn_ident)
             .or_insert_with(|| IndexMap::new())
             .entry(generics_hash_key)
             .or_insert_with(|| {

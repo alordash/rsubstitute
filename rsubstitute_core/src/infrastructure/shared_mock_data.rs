@@ -34,9 +34,16 @@ impl ISharedMockData for SharedMockData {
         generics_hash_key: GenericsHashKey,
     ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, PASSES_MOCK_TO_CALLBACK>
     {
+        let unique_fn_ident = format!("{owner_name}_{fn_ident}");
         self.write()
             .expect(UNABLE_TO_LOCK_FOR_WRITING_ERROR)
-            .get_or_create_fn_data(Some(owner_name), fn_ident, generics_hash_key, false)
+            .get_or_create_fn_data(
+                Some(owner_name),
+                &unique_fn_ident,
+                fn_ident,
+                generics_hash_key,
+                false,
+            )
     }
 }
 
