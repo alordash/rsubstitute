@@ -55,16 +55,16 @@ mod tests {
     fn OnlyFn_NoVerificationInvalidOrder_Ok() {
         // Arrange
         // Act
-        foo(1);
-        foo(2);
-        foo("amogus");
         bar(false);
+        foo("amogus");
+        foo(2);
+        foo(1);
 
         // Assert
-        bar::received(false, Times::Once).no_other_calls();
-        foo::received("amogus", Times::Once);
+        foo::received(1, Times::Once);
         foo::received(2, Times::Once);
-        foo::received(1, Times::Once).no_other_calls();
+        foo::received("amogus", Times::Once).no_other_calls();
+        bar::received(false, Times::Once).no_other_calls();
     }
 
     #[test]
@@ -85,45 +85,44 @@ mod tests {
         });
     }
 
-    // TODO - add test WithVerification that doesn't panic
     #[test]
     fn OnlyFn_WithVerification_Panics() {
         // Arrange
         // Act
-        foo(1);
-        foo(2);
-        foo("amogus");
         bar(false);
+        foo("amogus");
+        foo(2);
+        foo(1);
 
         // Assert
         assert_panics(
             || {
                 verify_call_order(|| {
-                    bar::received(false, Times::Once).no_other_calls();
-                    foo::received("amogus", Times::Once);
+                    foo::received(1, Times::Once);
                     foo::received(2, Times::Once);
-                    foo::received(1, Times::Once).no_other_calls();
+                    foo::received("amogus", Times::Once).no_other_calls();
+                    bar::received(false, Times::Once).no_other_calls();
                 })
             },
             r#"Expected to receive these calls in order:
 
-	bar(false)
-	foo("amogus")
-	foo(2)
 	foo(1)
+	foo(2)
+	foo("amogus")
+	bar(false)
 
 Actually received matching calls in this order:
 
-	foo(1)
-	foo(2)
-	foo("amogus")
 	bar(false)
+	foo("amogus")
+	foo(2)
+	foo(1)
 "#,
         );
     }
 
     #[test]
-    fn AllTogether_NoVerification_Ok() {
+    fn AllTogether_NoVerificationValidOrder_Ok() {
         // Arrange
         let mut trait_mock = TraitMock::new();
         let mut struct_mock = Struct::new();
@@ -136,21 +135,49 @@ Actually received matching calls in this order:
         struct_mock.traiting(5);
 
         // Assert
-        struct_mock.received().as_Trait().traiting(5, Times::Once);
-        bar::received(4, Times::Once).no_other_calls();
-        struct_mock
-            .received()
-            .structing(3, Times::Once)
-            .no_other_calls();
+        foo::received(1, Times::Once).no_other_calls();
         trait_mock
             .received()
             .traiting(2, Times::Once)
             .no_other_calls();
-        foo::received(1, Times::Once).no_other_calls();
+        struct_mock
+            .received()
+            .structing(3, Times::Once)
+            .no_other_calls();
+        bar::received(4, Times::Once).no_other_calls();
+        struct_mock.received().as_Trait().traiting(5, Times::Once);
     }
 
     #[test]
-    fn AllTogether_WithVerification_Panics() {
+    fn AllTogether_NoVerificationInvalidOrder_Ok() {
+        // Arrange
+        let mut trait_mock = TraitMock::new();
+        let mut struct_mock = Struct::new();
+
+        // Act
+        struct_mock.traiting(5);
+        bar(4);
+        struct_mock.structing(3);
+        trait_mock.traiting(2);
+        foo(1);
+
+        // Assert
+        foo::received(1, Times::Once).no_other_calls();
+        trait_mock
+            .received()
+            .traiting(2, Times::Once)
+            .no_other_calls();
+        struct_mock.received().structing(3, Times::Once);
+        bar::received(4, Times::Once).no_other_calls();
+        struct_mock
+            .received()
+            .as_Trait()
+            .traiting(5, Times::Once)
+            .no_other_calls();
+    }
+
+    #[test]
+    fn AllTogether_WithVerificationValidOrder_Ok() {
         // Arrange
         let mut trait_mock = TraitMock::new();
         let mut struct_mock = Struct::new();
@@ -164,17 +191,67 @@ Actually received matching calls in this order:
 
         // Assert
         verify_call_order(|| {
-            struct_mock.received().as_Trait().traiting(5, Times::Once);
-            bar::received(4, Times::Once).no_other_calls();
-            struct_mock
-                .received()
-                .structing(3, Times::Once)
-                .no_other_calls();
+            foo::received(1, Times::Once).no_other_calls();
             trait_mock
                 .received()
                 .traiting(2, Times::Once)
                 .no_other_calls();
-            foo::received(1, Times::Once).no_other_calls();
+            struct_mock
+                .received()
+                .structing(3, Times::Once)
+                .no_other_calls();
+            bar::received(4, Times::Once).no_other_calls();
+            struct_mock.received().as_Trait().traiting(5, Times::Once);
         });
+    }
+
+    #[test]
+    fn AllTogether_WithVerificationInvalidOrder_Panics() {
+        // Arrange
+        let mut trait_mock = TraitMock::new();
+        let mut struct_mock = Struct::new();
+
+        // Act
+        struct_mock.traiting(5);
+        bar(4);
+        struct_mock.structing(3);
+        trait_mock.traiting(2);
+        foo(1);
+
+        // Assert
+        assert_panics(
+            || {
+                verify_call_order(|| {
+                    foo::received(1, Times::Once).no_other_calls();
+                    trait_mock
+                        .received()
+                        .traiting(2, Times::Once)
+                        .no_other_calls();
+                    struct_mock.received().structing(3, Times::Once);
+                    bar::received(4, Times::Once).no_other_calls();
+                    struct_mock
+                        .received()
+                        .as_Trait()
+                        .traiting(5, Times::Once)
+                        .no_other_calls();
+                });
+            },
+            r#"Expected to receive these calls in order:
+
+	foo(1)
+	Trait::traiting(2)
+	Struct::structing(3)
+	bar(4)
+	<Struct as Trait>::traiting(5)
+
+Actually received matching calls in this order:
+
+	<Struct as Trait>::traiting(5)
+	bar(4)
+	Struct::structing(3)
+	Trait::traiting(2)
+	foo(1)
+"#,
+        );
     }
 }
