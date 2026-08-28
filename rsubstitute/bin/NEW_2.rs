@@ -85,13 +85,19 @@ fn main() {
     .join();
     Struct::work();
 
-    let mut s = Struct::new(32);
+    let mut s = Struct::new(432);
     s.f();
+    // s.setup()
+    //     .f()
+    //     .does(|s_ref, _| println!("mocked Struct::f! v = {}", s_ref.v));
     s.setup()
+        // .f()
+        // .does(|one| println!("one = {one:?}"))
         .f()
-        .does(|s_ref, _| println!("mocked Struct::f! v = {}", s_ref.v));
+        .does(|one: &&Struct, two| println!("one = {}, two = {:?}", one.v, two));
     // TODO - maybe it's possible to add `does` overload that accepts only args without mock itself
     // s.setup().f().does(|_| println!("not mock arg"));
+    s.f();
     s.f();
 
     println!("Done");

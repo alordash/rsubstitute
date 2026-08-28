@@ -10,7 +10,7 @@ pub struct FnConfig<'rs, TMock> {
     pub args_checker: DynArgsChecker<'rs>,
     pub return_value_sources: VecDeque<ReturnValueSource<'rs>>,
     pub calls: Vec<Rc<DynCall<'rs>>>,
-    pub callback: Option<Rc<RefCell<dyn FnMut(*const (), &DynCall<'rs>)>>>,
+    pub callback: Option<Rc<RefCell<dyn FnMut(*const (), &DynCall<'rs>) + 'rs>>>,
     pub call_base: bool,
 }
 
@@ -39,7 +39,7 @@ impl<'rs, TMock> FnConfig<'rs, TMock> {
 
     pub(crate) fn set_callback<TArgRefsTuple, TMockArg>(
         &mut self,
-        mut callback: impl FnMut(&TMockArg, TArgRefsTuple) + 'static,
+        mut callback: impl FnMut(&TMockArg, TArgRefsTuple) + 'rs,
     ) {
         let dyn_callback = move |raw_mock_ptr: *const (), dyn_call: &DynCall<'rs>| {
             let raw_arg_refs_tuple_ptr = dyn_call.get_ptr_to_boxed_tuple_of_refs();
@@ -106,7 +106,9 @@ impl<'rs, TMock> FnConfig<'rs, TMock> {
         };
     }
 
-    pub(crate) fn get_callback(&self) -> Option<Rc<RefCell<dyn FnMut(*const (), &DynCall<'rs>)>>> {
+    pub(crate) fn get_callback(
+        &self,
+    ) -> Option<Rc<RefCell<dyn FnMut(*const (), &DynCall<'rs>) + 'rs>>> {
         self.callback.clone()
     }
 

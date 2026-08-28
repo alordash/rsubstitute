@@ -9,9 +9,9 @@ pub struct FnConfigurator<
     'rs,
     TMock,
     TOwner,
-    TArgRefsTuple: Copy,
+    TArgRefsTuple: Copy + 'rs,
     TReturnValue,
-    TMockArg,
+    TMockArg: 'rs,
     const HAS_RETURN_VALUE: bool,
     const SUPPORTS_BASE_CALLING: bool,
     const PASSES_MOCK_TO_CALLBACK: bool,
@@ -203,9 +203,52 @@ impl<
         true,
     >
 {
-    pub fn does(&self, callback: impl FnMut(&TMockArg, TArgRefsTuple) + 'static) -> &'rs TOwner {
-        self.fn_config.borrow_mut().set_callback(callback);
+    // pub fn does(&self, callback: impl FnMut(&TMockArg, TArgRefsTuple) + 'static) -> &'rs TOwner {
+    //     self.fn_config.borrow_mut().set_callback(callback);
+    //     return self.owner;
+    // }
+
+    pub fn does<
+        'a,
+        const ARGS_COUNT: usize,
+        TCallback: IntoCallback<'rs, TMockArg, TArgRefsTuple, ARGS_COUNT>,
+    >(
+        &self,
+        into_callback: TCallback,
+    ) -> &'rs TOwner {
+        // let mut callback: Callback<'static, TMockArg, TArgRefsTuple> =
+        //     transmute_lifetime!(into_callback.into_callback());
+        let mut callback = into_callback.into_callback();
+        self.fn_config
+            .borrow_mut()
+            .set_callback(move |mock_arg, arg_refs_tuple| (callback.f)(mock_arg, arg_refs_tuple));
         return self.owner;
+    }
+}
+
+struct Callback<'a, TMockArg, TArgRefsTuple> {
+    pub f: Box<dyn FnMut(&TMockArg, TArgRefsTuple) + 'a>,
+}
+
+trait IntoCallback<'a, TMockArg: 'a, TArgRefsTuple: 'a, const ARGS_COUNT: usize> {
+    fn into_callback(self) -> Callback<'a, TMockArg, TArgRefsTuple>;
+}
+
+impl<'a, TMockArg: 'a, TArgRefsTuple: 'a, T: FnMut(TArgRefsTuple) + 'a>
+    IntoCallback<'a, TMockArg, TArgRefsTuple, 1> for T
+{
+    fn into_callback(mut self) -> Callback<'a, TMockArg, TArgRefsTuple> {
+        Callback {
+            f: Box::new(move |_, arg_refs_tuple| self(arg_refs_tuple)),
+        }
+    }
+}
+
+impl<'a, TMockArg: 'a, TArgRefsTuple: 'a, T: FnMut(&TMockArg, TArgRefsTuple) + 'a>
+    IntoCallback<'a, TMockArg, TArgRefsTuple, 2> for T
+{
+    fn into_callback(self) -> Callback<'a, TMockArg, TArgRefsTuple> {
+        Callback { f: Box::new(self) }
     }
 }
 
