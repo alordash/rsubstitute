@@ -35,7 +35,7 @@ fn main() {
         .does(|_, _| println!("first mocked callback"))
         .f(2)
         .call_base()
-        .and_does(|_, (v,)| println!("little extra BEFORE base call, v = {v}")) // TODO - write in docs/limitations that `and_does` is called before base call
+        .and_does(|_, (v,)| println!("little extra BEFORE base call, v = {v}"))
         .f(Arg::Any)
         .does(|_, (v,)| println!("any v = {v}"));
     mock.f(1);

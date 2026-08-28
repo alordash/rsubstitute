@@ -14,7 +14,6 @@ trait Trait {
     fn accept_two_arcs_return_arc(&self, r1: Arc<i32>, r2: Arc<f32>) -> Arc<String>;
 }
 
-#[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
     use super::*;

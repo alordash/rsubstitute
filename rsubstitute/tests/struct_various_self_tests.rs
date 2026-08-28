@@ -60,7 +60,7 @@ pub struct Struct {
 
 #[mock(base)]
 #[rustfmt::skip]
-#[allow(unused_mut)] // TODO - this should disable warnings
+#[allow(unused_mut)]
 impl Struct {
     pub fn new() -> Self { Self { v: DEFAULT_STRUCT_VALUE } }
 
@@ -159,8 +159,6 @@ impl Struct {
     pub fn return_nested<'a, 'b, 'c>(self: &'a Box<&mut Pin<&'c mut Rc<&'b mut Box<&'a& Arc<&mut &'c Pin<Rc<&'b mut&&mut Self>>>>>>>) -> i32 { NESTED }
 }
 
-// TODO - remove #[cfg(test)] from every integration test, it makes no sense
-// #[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
     #![allow(unused_imports)]

@@ -65,14 +65,14 @@ impl<T> S<T> {
 struct MyI32;
 impl PartialEq<MyI32> for i32 {
     fn eq(&self, _: &MyI32) -> bool {
-        todo!()
+        unreachable!()
     }
 }
 
 #[mock(base)]
 impl<T: PartialEq<U>, U> PartialEq<U> for S<T> {
     fn eq(&self, _: &U) -> bool {
-        todo!()
+        unreachable!()
     }
 }
 

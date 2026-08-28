@@ -61,7 +61,7 @@ impl<T> Trait<T> for Q {
     type MyType = i32;
 
     fn flex(&self) -> Self::MyType {
-        todo!()
+        unreachable!()
     }
 }
 

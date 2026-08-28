@@ -106,7 +106,6 @@ impl Trait for Struct {
     }
 }
 
-#[cfg(test)]
 mod tests {
     #[test]
     fn compile() {}

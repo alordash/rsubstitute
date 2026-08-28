@@ -41,7 +41,7 @@ impl Struct<i8> {
 #[mock]
 impl<T1> Trait<T1> for Struct<i16> {
     fn f<T2>(&self) -> T1 {
-        todo!()
+        unreachable!()
     }
     fn g<T3>() {}
     fn tself<T4>(&self) {}
@@ -50,7 +50,7 @@ impl<T1> Trait<T1> for Struct<i16> {
 #[mock]
 impl Trait<Box<[i64]>> for Struct<i128> {
     fn f<T2>(&self) -> Box<[i64]> {
-        todo!()
+        unreachable!()
     }
     fn g<T3>() {}
     fn tself<T4>(&self) {}

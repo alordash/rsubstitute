@@ -46,7 +46,6 @@ impl Selfish {
     fn work(&self, _: &Self) {}
 }
 
-#[cfg(test)]
 mod tests {
     #[test]
     fn compile() {}

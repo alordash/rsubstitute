@@ -91,6 +91,7 @@ fn main() {
         .f()
         .does(|s_ref, _| println!("mocked Struct::f! v = {}", s_ref.v));
     // TODO - maybe it's possible to add `does` overload that accepts only args without mock itself
+    // attempt: https://github.com/alordash/rsubstitute/commit/07e5c2f1856e9089b4baa9a0d06e44fc263dcb60
     // s.setup().f().does(|_| println!("not mock arg"));
     s.f();
 

@@ -149,7 +149,6 @@ trait Trait: Sized {
     fn return_nested<'a, 'b, 'c>(self: &'a Box<&mut Pin<&'c mut Rc<&'b mut Box<&'a& Arc<&mut &'c Pin<Rc<&'b mut&&mut Self>>>>>>>) -> i32 { NESTED }
 }
 
-#[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
     #![allow(unused_imports)]

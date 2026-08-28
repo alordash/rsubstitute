@@ -1,5 +1,3 @@
-#![allow(unused)]
-
 use rsubstitute::mock;
 use std::cell::{Cell, RefCell};
 use std::sync::Arc;
@@ -39,7 +37,6 @@ fn accept_two_values_return_value(v1: i32, v2: f32) -> &'static str {
     return BASE_ACCEPT_TWO_VALUES_RETURN_VALUE;
 }
 
-#[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
     use super::*;

@@ -1,7 +1,5 @@
-#![allow(unused)]
 use rsubstitute::mock;
 
-// TODO - write more tests where arg is passed as wildcard
 #[mock(base)]
 fn accept_ref(_: &i32) {}
 
@@ -15,43 +13,47 @@ fn return_ref() -> &'static i32 {
 // TODO - write test with passing `Deref` and checking that it's compared with `Arg::ref_eq`
 const BASE_ACCEPT_REF_RETURN_REF: &'static i32 = &2000;
 #[mock(base)]
-fn accept_ref_return_ref(r: &i32) -> &'static i32 {
+fn accept_ref_return_ref(_: &i32) -> &'static i32 {
     BASE_ACCEPT_REF_RETURN_REF
 }
 
 #[mock(base)]
-fn accept_two_refs(r1: &i32, r2: &f32) {}
+fn accept_two_refs(_: &i32, _: &f32) {}
 
 const ACCEPT_TWO_REFS_RETURN_REF: &'static str = "quo vadis";
 #[mock(base)]
-fn accept_two_refs_return_ref(r1: &i32, r2: &f32) -> &'static str {
+fn accept_two_refs_return_ref(_: &i32, _: &f32) -> &'static str {
     ACCEPT_TWO_REFS_RETURN_REF
 }
 
 #[mock(base)]
+#[allow(unused)]
 fn accept_mut_ref(r: &mut i32) {}
 
 static mut BASE_RETURN_MUT_REF: i32 = 12;
 #[mock(base)]
+#[allow(unused)]
 fn return_mut_ref() -> &'static mut i32 {
     unsafe { &mut *&raw mut BASE_RETURN_MUT_REF }
 }
 
 #[mock(base)]
-fn accept_mut_ref_return_mut_ref(r: &mut i32) -> &'static i32 {
+#[allow(unused)]
+fn accept_mut_ref_return_mut_ref(_: &mut i32) -> &'static i32 {
     BASE_ACCEPT_REF_RETURN_REF
 }
 
 #[mock(base)]
-fn accept_two_mut_refs(r1: &mut i32, r2: &mut f32) {}
+#[allow(unused)]
+fn accept_two_mut_refs(_: &mut i32, _: &mut f32) {}
 
 static mut ACCEPT_TWO_REFS_RETURN_MUT_REF: i32 = 382;
 #[mock(base)]
-fn accept_two_mut_refs_return_mut_ref(r1: &mut i32, r2: &mut f32) -> &'static mut i32 {
+#[allow(unused)]
+fn accept_two_mut_refs_return_mut_ref(_: &mut i32, _: &mut f32) -> &'static mut i32 {
     unsafe { &mut *&raw mut ACCEPT_TWO_REFS_RETURN_MUT_REF }
 }
 
-#[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
     use super::*;

@@ -1,3 +1,4 @@
+#![allow(stable_features)]
 #![feature(rwlock_downgrade)]
 
 use rsubstitute::mock;
@@ -8,7 +9,6 @@ trait Trait {
 }
 
 // TODO - rename all tests mods?
-#[cfg(test)]
 mod max_invalid_calls_listed_count_tests {
     #![allow(non_snake_case)]
     use super::*;

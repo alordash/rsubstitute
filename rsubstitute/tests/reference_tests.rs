@@ -230,7 +230,6 @@ impl Default for LifetimeHolder<'_> {
     }
 }
 
-#[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
     use super::*;

@@ -43,7 +43,6 @@ async fn input_output_base(_: i32) -> i32 {
     DEFAULT_RESULT
 }
 
-#[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
     use super::*;

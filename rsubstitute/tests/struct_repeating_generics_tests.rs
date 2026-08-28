@@ -49,7 +49,6 @@ where
 #[allow(unused)]
 struct Const<const C: usize>;
 
-#[cfg(test)]
 mod tests {
     #[test]
     fn compile() {}

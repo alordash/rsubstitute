@@ -35,7 +35,6 @@ impl Struct {
     }
 }
 
-#[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
     use super::*;

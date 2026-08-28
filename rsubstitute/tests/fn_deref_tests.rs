@@ -1,4 +1,3 @@
-#![allow(unused)]
 mod test_utils;
 
 use rsubstitute::mock;
@@ -34,7 +33,6 @@ impl Deref for Custom {
 #[mock]
 fn custom_test(custom: Custom) {}
 
-#[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
     use super::*;

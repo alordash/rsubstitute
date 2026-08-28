@@ -25,7 +25,6 @@ unsafe impl UnsafeTraitBase for Struct {
     fn work() {}
 }
 
-#[cfg(test)]
 mod tests {
     #[test]
     fn compile() {}

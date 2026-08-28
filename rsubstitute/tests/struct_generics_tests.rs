@@ -33,7 +33,6 @@ impl<'a, T1: Debug + ToString, T2: Debug + AsRef<[i32]>> Struct<'a, T1, T2> {
     }
 }
 
-#[cfg(test)]
 mod tests {
     use super::*;
 

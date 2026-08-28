@@ -8,7 +8,6 @@ trait Trait<'a, T1, const B: bool> {
     fn static_work<'b, T2, const N: usize>(v: &'b T1) -> T2;
 }
 
-#[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
     use super::*;

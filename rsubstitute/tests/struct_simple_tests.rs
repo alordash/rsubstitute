@@ -36,7 +36,6 @@ impl Struct {
     pub fn non_associative() {}
 }
 
-#[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
 

@@ -28,7 +28,6 @@ impl Trait for Struct {
     fn traiting(&self, _: i32) {}
 }
 
-#[cfg(test)]
 mod tests {
     #![allow(non_snake_case)]
 

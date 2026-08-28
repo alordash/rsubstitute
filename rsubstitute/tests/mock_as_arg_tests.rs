@@ -6,7 +6,6 @@ fn f() -> i32 {
     DEFAULT_VALUE
 }
 
-#[cfg(test)]
 mod fn_tests {
     #![allow(non_snake_case)]
     use super::*;
@@ -42,7 +41,6 @@ trait Trait {
     }
 }
 
-#[cfg(test)]
 mod trait_tests {
     #![allow(non_snake_case)]
     use super::*;
@@ -107,7 +105,6 @@ impl Struct {
     }
 }
 
-#[cfg(test)]
 mod struct_tests {
     #![allow(non_snake_case)]
     use super::*;

@@ -1,6 +1,5 @@
 use crate::common::models::*;
 use crate::generation::fn_info::models::*;
-use crate::generation::mock_controls::common::*;
 use crate::generation::mock_controls::models::*;
 use crate::generation::mock_controls::*;
 use crate::syntax::*;
