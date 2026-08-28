@@ -36,6 +36,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
         source_span,
         mock_struct_impl::Params {
             attributes: impl_struct_info.attributes,
+            unsafety: item_impl.unsafety,
             mock_struct_path: impl_struct_info.target_path.clone(),
             associated_fns: &impl_struct_info.associated_fns,
             static_fns: &impl_struct_info.static_fns,

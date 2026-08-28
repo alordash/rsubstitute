@@ -13,6 +13,7 @@ use syn::*;
 
 pub(crate) struct Params<'a> {
     pub attributes: Vec<Attribute>,
+    pub unsafety: Option<Token![unsafe]>,
     pub mock_struct_path: Path,
     pub associated_fns: &'a [Ordered<FnInfo>],
     pub static_fns: &'a [Ordered<FnInfo>],
@@ -25,6 +26,7 @@ pub(crate) fn generate(
     span: Span,
     Params {
         attributes,
+        unsafety,
         mock_struct_path,
         associated_fns,
         static_fns,
@@ -79,12 +81,21 @@ pub(crate) fn generate(
         .chain(base_fns)
         .map(|x| ImplItem::Fn(x.value))
         .collect();
-    let result = generate_item_impl(attributes, span, generics, mock_struct_path, items, None);
+    let result = generate_item_impl(
+        attributes,
+        unsafety,
+        span,
+        generics,
+        mock_struct_path,
+        items,
+        None,
+    );
     return result;
 }
 
 pub(crate) struct ParamsForTrait<'a> {
     pub attributes: Vec<Attribute>,
+    pub unsafety: Option<Token![unsafe]>,
     pub mock_struct_path: Path,
     pub constants: &'a [Ordered<ImplItemConst>],
     pub types: &'a [Ordered<ImplItemType>],
@@ -103,6 +114,7 @@ pub(crate) fn generate_for_trait(
     span: Span,
     ParamsForTrait {
         attributes,
+        unsafety,
         mock_struct_path,
         constants,
         types,
@@ -206,6 +218,7 @@ pub(crate) fn generate_for_trait(
             .collect();
         let base_fns_impl = generate_item_impl(
             Vec::new(),
+            None,
             span,
             merged_generics.clone(),
             mock_struct_path.clone(),
@@ -259,6 +272,7 @@ pub(crate) fn generate_for_trait(
     let items = ordered_items.into_iter().map(|x| x.value).collect();
     let trait_impl = generate_item_impl(
         attributes,
+        unsafety,
         span,
         merged_generics,
         mock_struct_path,
@@ -274,6 +288,7 @@ pub(crate) fn generate_for_trait(
 
 fn generate_item_impl(
     attributes: Vec<Attribute>,
+    unsafety: Option<Token![unsafe]>,
     span: Span,
     generics: Generics,
     mock_struct_path: Path,
@@ -283,7 +298,7 @@ fn generate_item_impl(
     let result = ItemImpl {
         attrs: attributes,
         modifiers: ImplModifiers::default(),
-        unsafety: None,
+        unsafety,
         impl_token: Token![impl](span),
         generics,
         trait_: maybe_trait_path.map(|trait_path| (trait_path, Token![for](span))),
