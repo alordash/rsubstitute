@@ -6,7 +6,7 @@ description = "Library for mocking."
 license = "MIT"
 homepage = "https://github.com/alordash/rsubstitute"
 repository = "https://github.com/alordash/rsubstitute"
-readme = "../../README.md"
+readme = "../README.md"
 
 #[[bin]]
 #name = "trait"
@@ -150,7 +150,7 @@ not_enough_asserts = { workspace = true }
 tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread", "time"] }
 
 [dev-dependencies]
-rsubstitute_core = { workspace = true, features = ["debug_naming"] }
+rsubstitute_core = { workspace = true }
 tokio = { workspace = true }
 
 [features]

@@ -1,3 +1,3 @@
-mod counter;
+mod calls_asserter;
 
-pub use counter::*;
+pub use calls_asserter::*;
