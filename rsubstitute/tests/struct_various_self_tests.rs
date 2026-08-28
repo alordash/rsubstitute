@@ -175,12 +175,12 @@ mod tests {
         fn by_value_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             // TODO - assert mock type in callback
             mock.setup().by_value().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Struct);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_value()
@@ -188,7 +188,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Struct);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -197,18 +197,18 @@ mod tests {
 
             // Assert
             mock.received().by_value(Times::Exactly(2)).no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_value_colon_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_value_colon().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Struct);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_value_colon()
@@ -216,7 +216,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Struct);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -228,18 +228,18 @@ mod tests {
             mock.received()
                 .by_value_colon(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_value_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_mut_value().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Struct);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_mut_value()
@@ -247,7 +247,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Struct);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -258,18 +258,18 @@ mod tests {
             mock.received()
                 .by_mut_value(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_value_colon_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_mut_value_colon().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Struct);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_mut_value_colon()
@@ -277,7 +277,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Struct);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -288,23 +288,23 @@ mod tests {
             mock.received()
                 .by_mut_value_colon(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_ref_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_ref().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, &Struct);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup().by_ref().call_base().and_does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, &Struct);
-                calls_asserter.second()
+                counter.double_inc()
             });
 
             // Act
@@ -313,18 +313,18 @@ mod tests {
 
             // Assert
             mock.received().by_ref(Times::Exactly(2)).no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_ref_colon_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_ref_colon().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, &Struct);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_ref_colon()
@@ -332,7 +332,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &Struct);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -343,18 +343,18 @@ mod tests {
             mock.received()
                 .by_ref_colon(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_ref_with_lifetime_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_ref_with_lifetime().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, &Struct);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_ref_with_lifetime()
@@ -362,7 +362,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &Struct);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -373,20 +373,20 @@ mod tests {
             mock.received()
                 .by_ref_with_lifetime(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_ref_colon_with_lifetime_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_ref_colon_with_lifetime()
                 .does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &Struct);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .by_ref_colon_with_lifetime()
@@ -394,7 +394,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &Struct);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -405,18 +405,18 @@ mod tests {
             mock.received()
                 .by_ref_colon_with_lifetime(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_ref_mut_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_ref_mut().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, &mut Struct);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_ref_mut()
@@ -424,7 +424,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Struct);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -435,18 +435,18 @@ mod tests {
             mock.received()
                 .by_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_ref_mut_colon_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_ref_mut_colon().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, &mut Struct);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_ref_mut_colon()
@@ -454,7 +454,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Struct);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -465,20 +465,20 @@ mod tests {
             mock.received()
                 .by_ref_mut_colon(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_ref_mut_with_lifetime_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_ref_mut_with_lifetime()
                 .does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Struct);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .by_ref_mut_with_lifetime()
@@ -486,7 +486,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Struct);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -497,20 +497,20 @@ mod tests {
             mock.received()
                 .by_ref_mut_with_lifetime(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_ref_mut_colon_with_lifetime_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_ref_mut_colon_with_lifetime()
                 .does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Struct);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .by_ref_mut_colon_with_lifetime()
@@ -518,7 +518,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Struct);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -529,23 +529,23 @@ mod tests {
             mock.received()
                 .by_ref_mut_colon_with_lifetime(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_box_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_box().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Box<Struct>);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup().by_box().call_base().and_does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Box<Struct>);
-                calls_asserter.second()
+                counter.double_inc()
             });
 
             // Act
@@ -554,18 +554,18 @@ mod tests {
 
             // Assert
             mock.received().by_box(Times::Exactly(2)).no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_box_ref_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_box_ref().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Box<&Struct>);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_box_ref()
@@ -573,7 +573,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Box<&Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -584,18 +584,18 @@ mod tests {
             mock.received()
                 .by_box_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_box_ref_mut_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_box_ref_mut().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Box<&mut Struct>);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_box_ref_mut()
@@ -603,7 +603,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Box<&mut Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -614,18 +614,18 @@ mod tests {
             mock.received()
                 .by_box_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_box_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_mut_box().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Box<Struct>);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_mut_box()
@@ -633,7 +633,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Box<Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -644,18 +644,18 @@ mod tests {
             mock.received()
                 .by_mut_box(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_box_ref_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_mut_box_ref().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Box<&Struct>);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_mut_box_ref()
@@ -663,7 +663,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Box<&Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -674,18 +674,18 @@ mod tests {
             mock.received()
                 .by_mut_box_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_box_ref_mut_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_mut_box_ref_mut().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Box<&mut Struct>);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_mut_box_ref_mut()
@@ -693,7 +693,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Box<&mut Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -704,23 +704,23 @@ mod tests {
             mock.received()
                 .by_mut_box_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_rc_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_rc().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Rc<Struct>);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup().by_rc().call_base().and_does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Rc<Struct>);
-                calls_asserter.second()
+                counter.double_inc()
             });
 
             // Act
@@ -729,18 +729,18 @@ mod tests {
 
             // Assert
             mock.received().by_rc(Times::Exactly(2)).no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_rc_ref_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_rc_ref().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Rc<&Struct>);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_rc_ref()
@@ -748,7 +748,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Rc<&Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -759,18 +759,18 @@ mod tests {
             mock.received()
                 .by_rc_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_rc_ref_mut_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_rc_ref_mut().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Rc<&mut Struct>);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_rc_ref_mut()
@@ -778,7 +778,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Rc<&mut Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -789,18 +789,18 @@ mod tests {
             mock.received()
                 .by_rc_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_rc_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_mut_rc().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Rc<Struct>);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_mut_rc()
@@ -808,7 +808,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Rc<Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -819,18 +819,18 @@ mod tests {
             mock.received()
                 .by_mut_rc(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_rc_ref_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_mut_rc_ref().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Rc<&Struct>);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_mut_rc_ref()
@@ -838,7 +838,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Rc<&Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -849,18 +849,18 @@ mod tests {
             mock.received()
                 .by_mut_rc_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_rc_ref_mut_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_mut_rc_ref_mut().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Rc<&mut Struct>);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_mut_rc_ref_mut()
@@ -868,7 +868,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Rc<&mut Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -879,23 +879,23 @@ mod tests {
             mock.received()
                 .by_mut_rc_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_arc_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_arc().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Arc<Struct>);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup().by_arc().call_base().and_does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Arc<Struct>);
-                calls_asserter.second()
+                counter.double_inc()
             });
 
             // Act
@@ -904,18 +904,18 @@ mod tests {
 
             // Assert
             mock.received().by_arc(Times::Exactly(2)).no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_arc_ref_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_arc_ref().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Arc<&Struct>);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_arc_ref()
@@ -923,7 +923,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Arc<&Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -934,18 +934,18 @@ mod tests {
             mock.received()
                 .by_arc_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_arc_ref_mut_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_arc_ref_mut().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Arc<&mut Struct>);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_arc_ref_mut()
@@ -953,7 +953,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Arc<&mut Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -964,18 +964,18 @@ mod tests {
             mock.received()
                 .by_arc_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_arc_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_mut_arc().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Arc<Struct>);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_mut_arc()
@@ -983,7 +983,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Arc<Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -994,18 +994,18 @@ mod tests {
             mock.received()
                 .by_mut_arc(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_arc_ref_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_mut_arc_ref().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Arc<&Struct>);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_mut_arc_ref()
@@ -1013,7 +1013,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Arc<&Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1024,18 +1024,18 @@ mod tests {
             mock.received()
                 .by_mut_arc_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_arc_ref_mut_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_mut_arc_ref_mut().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Arc<&mut Struct>);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_mut_arc_ref_mut()
@@ -1043,7 +1043,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Arc<&mut Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1054,18 +1054,18 @@ mod tests {
             mock.received()
                 .by_mut_arc_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_pin_ref_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_pin_ref().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Pin<&Struct>);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_pin_ref()
@@ -1073,7 +1073,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Pin<&Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1084,18 +1084,18 @@ mod tests {
             mock.received()
                 .by_pin_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_pin_ref_mut_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_pin_ref_mut().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Pin<&mut Struct>);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_pin_ref_mut()
@@ -1103,7 +1103,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Pin<&mut Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1114,18 +1114,18 @@ mod tests {
             mock.received()
                 .by_pin_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_pin_ref_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_mut_pin_ref().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Pin<&Struct>);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_mut_pin_ref()
@@ -1133,7 +1133,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Pin<&Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1144,18 +1144,18 @@ mod tests {
             mock.received()
                 .by_mut_pin_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_pin_ref_mut_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().by_mut_pin_ref_mut().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Pin<&mut Struct>);
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup()
                 .by_mut_pin_ref_mut()
@@ -1163,7 +1163,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Pin<&mut Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1174,20 +1174,20 @@ mod tests {
             mock.received()
                 .by_mut_pin_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_ref_mut_box_mut_ref_mut_with_lifetimes_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_mut_ref_mut_box_mut_ref_mut_with_lifetimes()
                 .does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Box<&mut Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .by_mut_ref_mut_box_mut_ref_mut_with_lifetimes()
@@ -1195,7 +1195,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Box<&mut Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1206,20 +1206,20 @@ mod tests {
             mock.received()
                 .by_mut_ref_mut_box_mut_ref_mut_with_lifetimes(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes()
                 .does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Rc<&mut Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes()
@@ -1227,7 +1227,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Rc<&mut Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1238,20 +1238,20 @@ mod tests {
             mock.received()
                 .by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes()
                 .does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Arc<&mut Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes()
@@ -1259,7 +1259,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Arc<&mut Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1270,20 +1270,20 @@ mod tests {
             mock.received()
                 .by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes()
                 .does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Pin<&mut Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes()
@@ -1291,7 +1291,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Pin<&mut Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1302,21 +1302,21 @@ mod tests {
             mock.received()
                 .by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn nested_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup().nested().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(
                     mock,
                     &Box<&mut Pin<&mut Rc<&mut Box<&&Arc<&mut &Pin<Rc<&mut &&mut Struct>>>>>>>
                 );
-                calls_asserter.first()
+                counter.inc()
             });
             mock.setup().nested().call_base().and_does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
@@ -1324,7 +1324,7 @@ mod tests {
                     mock,
                     &Box<&mut Pin<&mut Rc<&mut Box<&&Arc<&mut &Pin<Rc<&mut &&mut Struct>>>>>>>
                 );
-                calls_asserter.second()
+                counter.double_inc()
             });
 
             let mut the_self = mock.clone();
@@ -1343,7 +1343,7 @@ mod tests {
 
             // Assert
             mock.received().nested(Times::Exactly(2)).no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
     }
 
@@ -1354,7 +1354,7 @@ mod tests {
         fn return_by_value_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_value()
@@ -1362,7 +1362,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Struct);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_value()
@@ -1370,7 +1370,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Struct);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1381,7 +1381,7 @@ mod tests {
             mock.received()
                 .return_by_value(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_VALUE, actual_second_value);
         }
@@ -1390,7 +1390,7 @@ mod tests {
         fn return_by_value_colon_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_value_colon()
@@ -1398,7 +1398,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Struct);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_value_colon()
@@ -1406,7 +1406,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Struct);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1417,7 +1417,7 @@ mod tests {
             mock.received()
                 .return_by_value_colon(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_VALUE_COLON, actual_second_value);
         }
@@ -1426,7 +1426,7 @@ mod tests {
         fn return_by_mut_value_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_value()
@@ -1434,7 +1434,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Struct);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_mut_value()
@@ -1442,7 +1442,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Struct);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1453,7 +1453,7 @@ mod tests {
             mock.received()
                 .return_by_mut_value(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_MUT_VALUE, actual_second_value);
         }
@@ -1462,7 +1462,7 @@ mod tests {
         fn return_by_mut_value_colon_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_value_colon()
@@ -1470,7 +1470,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Struct);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_mut_value_colon()
@@ -1478,7 +1478,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Struct);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1489,7 +1489,7 @@ mod tests {
             mock.received()
                 .return_by_mut_value_colon(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_MUT_VALUE_COLON, actual_second_value);
         }
@@ -1498,7 +1498,7 @@ mod tests {
         fn return_by_ref_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_ref()
@@ -1506,7 +1506,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &Struct);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_ref()
@@ -1514,7 +1514,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &Struct);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1525,7 +1525,7 @@ mod tests {
             mock.received()
                 .return_by_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_REF, actual_second_value);
         }
@@ -1534,7 +1534,7 @@ mod tests {
         fn return_by_ref_colon_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_ref_colon()
@@ -1542,7 +1542,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &Struct);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_ref_colon()
@@ -1550,7 +1550,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &Struct);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1561,7 +1561,7 @@ mod tests {
             mock.received()
                 .return_by_ref_colon(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_REF_COLON, actual_second_value);
         }
@@ -1570,7 +1570,7 @@ mod tests {
         fn return_by_ref_with_lifetime_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_ref_with_lifetime()
@@ -1578,7 +1578,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &Struct);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_ref_with_lifetime()
@@ -1586,7 +1586,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &Struct);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1597,7 +1597,7 @@ mod tests {
             mock.received()
                 .return_by_ref_with_lifetime(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_REF_WITH_LIFETIME, actual_second_value);
         }
@@ -1606,7 +1606,7 @@ mod tests {
         fn return_by_ref_colon_with_lifetime_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_ref_colon_with_lifetime()
@@ -1614,7 +1614,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &Struct);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_ref_colon_with_lifetime()
@@ -1622,7 +1622,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &Struct);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1633,7 +1633,7 @@ mod tests {
             mock.received()
                 .return_by_ref_colon_with_lifetime(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_REF_COLON_WITH_LIFETIME, actual_second_value);
         }
@@ -1642,7 +1642,7 @@ mod tests {
         fn return_by_ref_mut_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_ref_mut()
@@ -1650,7 +1650,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Struct);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_ref_mut()
@@ -1658,7 +1658,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Struct);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1669,7 +1669,7 @@ mod tests {
             mock.received()
                 .return_by_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_REF_MUT, actual_second_value);
         }
@@ -1678,7 +1678,7 @@ mod tests {
         fn return_by_ref_mut_colon_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_ref_mut_colon()
@@ -1686,7 +1686,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Struct);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_ref_mut_colon()
@@ -1694,7 +1694,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Struct);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1705,7 +1705,7 @@ mod tests {
             mock.received()
                 .return_by_ref_mut_colon(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_REF_MUT_COLON, actual_second_value);
         }
@@ -1714,7 +1714,7 @@ mod tests {
         fn return_by_ref_mut_with_lifetime_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_ref_mut_with_lifetime()
@@ -1722,7 +1722,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Struct);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_ref_mut_with_lifetime()
@@ -1730,7 +1730,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Struct);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1741,7 +1741,7 @@ mod tests {
             mock.received()
                 .return_by_ref_mut_with_lifetime(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_REF_MUT_WITH_LIFETIME, actual_second_value);
         }
@@ -1750,7 +1750,7 @@ mod tests {
         fn return_by_ref_mut_colon_with_lifetime_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_ref_mut_colon_with_lifetime()
@@ -1758,7 +1758,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Struct);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_ref_mut_colon_with_lifetime()
@@ -1766,7 +1766,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Struct);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1777,7 +1777,7 @@ mod tests {
             mock.received()
                 .return_by_ref_mut_colon_with_lifetime(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_REF_MUT_COLON_WITH_LIFETIME, actual_second_value);
         }
@@ -1786,7 +1786,7 @@ mod tests {
         fn return_by_box_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_box()
@@ -1794,7 +1794,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Box<Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_box()
@@ -1802,7 +1802,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Box<Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1813,7 +1813,7 @@ mod tests {
             mock.received()
                 .return_by_box(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_BOX, actual_second_value);
         }
@@ -1822,7 +1822,7 @@ mod tests {
         fn return_by_box_ref_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_box_ref()
@@ -1830,7 +1830,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Box<&Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_box_ref()
@@ -1838,7 +1838,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Box<&Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1849,7 +1849,7 @@ mod tests {
             mock.received()
                 .return_by_box_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_BOX_REF, actual_second_value);
         }
@@ -1858,7 +1858,7 @@ mod tests {
         fn return_by_box_ref_mut_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_box_ref_mut()
@@ -1866,7 +1866,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Box<&mut Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_box_ref_mut()
@@ -1874,7 +1874,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Box<&mut Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1885,7 +1885,7 @@ mod tests {
             mock.received()
                 .return_by_box_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_BOX_REF_MUT, actual_second_value);
         }
@@ -1894,7 +1894,7 @@ mod tests {
         fn return_by_mut_box_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_box()
@@ -1902,7 +1902,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Box<Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_mut_box()
@@ -1910,7 +1910,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Box<Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1921,7 +1921,7 @@ mod tests {
             mock.received()
                 .return_by_mut_box(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_MUT_BOX, actual_second_value);
         }
@@ -1930,7 +1930,7 @@ mod tests {
         fn return_by_mut_box_ref_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_box_ref()
@@ -1938,7 +1938,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Box<&Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_mut_box_ref()
@@ -1946,7 +1946,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Box<&Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1957,7 +1957,7 @@ mod tests {
             mock.received()
                 .return_by_mut_box_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_MUT_BOX_REF, actual_second_value);
         }
@@ -1966,7 +1966,7 @@ mod tests {
         fn return_by_mut_box_ref_mut_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_box_ref_mut()
@@ -1974,7 +1974,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Box<&mut Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_mut_box_ref_mut()
@@ -1982,7 +1982,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Box<&mut Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -1993,7 +1993,7 @@ mod tests {
             mock.received()
                 .return_by_mut_box_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_MUT_BOX_REF_MUT, actual_second_value);
         }
@@ -2002,7 +2002,7 @@ mod tests {
         fn return_by_rc_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_rc()
@@ -2010,7 +2010,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Rc<Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_rc()
@@ -2018,7 +2018,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Rc<Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -2029,7 +2029,7 @@ mod tests {
             mock.received()
                 .return_by_rc(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_RC, actual_second_value);
         }
@@ -2038,7 +2038,7 @@ mod tests {
         fn return_by_rc_ref_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_rc_ref()
@@ -2046,7 +2046,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Rc<&Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_rc_ref()
@@ -2054,7 +2054,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Rc<&Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -2065,7 +2065,7 @@ mod tests {
             mock.received()
                 .return_by_rc_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_RC_REF, actual_second_value);
         }
@@ -2074,7 +2074,7 @@ mod tests {
         fn return_by_rc_ref_mut_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_rc_ref_mut()
@@ -2082,7 +2082,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Rc<&mut Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_rc_ref_mut()
@@ -2090,7 +2090,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Rc<&mut Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -2101,7 +2101,7 @@ mod tests {
             mock.received()
                 .return_by_rc_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_RC_REF_MUT, actual_second_value);
         }
@@ -2110,7 +2110,7 @@ mod tests {
         fn return_by_mut_rc_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_rc()
@@ -2118,7 +2118,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Rc<Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_mut_rc()
@@ -2126,7 +2126,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Rc<Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -2137,7 +2137,7 @@ mod tests {
             mock.received()
                 .return_by_mut_rc(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_MUT_RC, actual_second_value);
         }
@@ -2146,7 +2146,7 @@ mod tests {
         fn return_by_mut_rc_ref_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_rc_ref()
@@ -2154,7 +2154,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Rc<&Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_mut_rc_ref()
@@ -2162,7 +2162,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Rc<&Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -2173,7 +2173,7 @@ mod tests {
             mock.received()
                 .return_by_mut_rc_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_MUT_RC_REF, actual_second_value);
         }
@@ -2182,7 +2182,7 @@ mod tests {
         fn return_by_mut_rc_ref_mut_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_rc_ref_mut()
@@ -2190,7 +2190,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Rc<&mut Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_mut_rc_ref_mut()
@@ -2198,7 +2198,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Rc<&mut Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -2209,7 +2209,7 @@ mod tests {
             mock.received()
                 .return_by_mut_rc_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_MUT_RC_REF_MUT, actual_second_value);
         }
@@ -2218,7 +2218,7 @@ mod tests {
         fn return_by_arc_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_arc()
@@ -2226,7 +2226,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Arc<Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_arc()
@@ -2234,7 +2234,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Arc<Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -2245,7 +2245,7 @@ mod tests {
             mock.received()
                 .return_by_arc(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_ARC, actual_second_value);
         }
@@ -2254,7 +2254,7 @@ mod tests {
         fn return_by_arc_ref_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_arc_ref()
@@ -2262,7 +2262,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Arc<&Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_arc_ref()
@@ -2270,7 +2270,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Arc<&Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -2281,7 +2281,7 @@ mod tests {
             mock.received()
                 .return_by_arc_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_ARC_REF, actual_second_value);
         }
@@ -2290,7 +2290,7 @@ mod tests {
         fn return_by_arc_ref_mut_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_arc_ref_mut()
@@ -2298,7 +2298,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Arc<&mut Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_arc_ref_mut()
@@ -2306,7 +2306,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Arc<&mut Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -2317,7 +2317,7 @@ mod tests {
             mock.received()
                 .return_by_arc_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_ARC_REF_MUT, actual_second_value);
         }
@@ -2326,7 +2326,7 @@ mod tests {
         fn return_by_mut_arc_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_arc()
@@ -2334,7 +2334,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Arc<Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_mut_arc()
@@ -2342,7 +2342,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Arc<Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -2353,7 +2353,7 @@ mod tests {
             mock.received()
                 .return_by_mut_arc(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_MUT_ARC, actual_second_value);
         }
@@ -2362,7 +2362,7 @@ mod tests {
         fn return_by_mut_arc_ref_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_arc_ref()
@@ -2370,7 +2370,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Arc<&Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_mut_arc_ref()
@@ -2378,7 +2378,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Arc<&Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -2389,7 +2389,7 @@ mod tests {
             mock.received()
                 .return_by_mut_arc_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_MUT_ARC_REF, actual_second_value);
         }
@@ -2398,7 +2398,7 @@ mod tests {
         fn return_by_mut_arc_ref_mut_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_arc_ref_mut()
@@ -2406,7 +2406,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Arc<&mut Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_mut_arc_ref_mut()
@@ -2414,7 +2414,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Arc<&mut Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -2425,7 +2425,7 @@ mod tests {
             mock.received()
                 .return_by_mut_arc_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_MUT_ARC_REF_MUT, actual_second_value);
         }
@@ -2434,7 +2434,7 @@ mod tests {
         fn return_by_pin_ref_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_pin_ref()
@@ -2442,7 +2442,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Pin<&Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_pin_ref()
@@ -2450,7 +2450,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Pin<&Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -2461,7 +2461,7 @@ mod tests {
             mock.received()
                 .return_by_pin_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_PIN_REF, actual_second_value);
         }
@@ -2470,7 +2470,7 @@ mod tests {
         fn return_by_pin_ref_mut_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_pin_ref_mut()
@@ -2478,7 +2478,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Pin<&mut Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_pin_ref_mut()
@@ -2486,7 +2486,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Pin<&mut Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -2497,7 +2497,7 @@ mod tests {
             mock.received()
                 .return_by_pin_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_PIN_REF_MUT, actual_second_value);
         }
@@ -2506,7 +2506,7 @@ mod tests {
         fn return_by_mut_pin_ref_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_pin_ref()
@@ -2514,7 +2514,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Pin<&Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_mut_pin_ref()
@@ -2522,7 +2522,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Pin<&Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -2533,7 +2533,7 @@ mod tests {
             mock.received()
                 .return_by_mut_pin_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_MUT_PIN_REF, actual_second_value);
         }
@@ -2542,7 +2542,7 @@ mod tests {
         fn return_by_mut_pin_ref_mut_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_pin_ref_mut()
@@ -2550,7 +2550,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Pin<&mut Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_mut_pin_ref_mut()
@@ -2558,7 +2558,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, Pin<&mut Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -2569,7 +2569,7 @@ mod tests {
             mock.received()
                 .return_by_mut_pin_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_MUT_PIN_REF_MUT, actual_second_value);
         }
@@ -2578,7 +2578,7 @@ mod tests {
         fn return_by_mut_ref_mut_box_mut_ref_mut_with_lifetimes_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_ref_mut_box_mut_ref_mut_with_lifetimes()
@@ -2586,7 +2586,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Box<&mut Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_mut_ref_mut_box_mut_ref_mut_with_lifetimes()
@@ -2594,7 +2594,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Box<&mut Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -2607,7 +2607,7 @@ mod tests {
             mock.received()
                 .return_by_mut_ref_mut_box_mut_ref_mut_with_lifetimes(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(
                 BY_MUT_REF_MUT_BOX_MUT_REF_MUT_WITH_LIFETIMES,
@@ -2619,7 +2619,7 @@ mod tests {
         fn return_by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes()
@@ -2627,7 +2627,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Rc<&mut Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes()
@@ -2635,7 +2635,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Rc<&mut Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -2648,7 +2648,7 @@ mod tests {
             mock.received()
                 .return_by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(
                 BY_MUT_REF_MUT_RC_MUT_REF_MUT_WITH_LIFETIMES,
@@ -2660,7 +2660,7 @@ mod tests {
         fn return_by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes()
@@ -2668,7 +2668,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Arc<&mut Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes()
@@ -2676,7 +2676,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Arc<&mut Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -2689,7 +2689,7 @@ mod tests {
             mock.received()
                 .return_by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(
                 BY_MUT_REF_MUT_ARC_MUT_REF_MUT_WITH_LIFETIMES,
@@ -2701,7 +2701,7 @@ mod tests {
         fn return_by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes()
@@ -2709,7 +2709,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Pin<&mut Struct>);
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes()
@@ -2717,7 +2717,7 @@ mod tests {
                 .and_does(move |mock, _| {
                     assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                     assert_type_eq!(mock, &mut Pin<&mut Struct>);
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             // Act
@@ -2730,7 +2730,7 @@ mod tests {
             mock.received()
                 .return_by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(
                 BY_MUT_REF_MUT_PIN_MUT_REF_MUT_WITH_LIFETIMES,
@@ -2742,7 +2742,7 @@ mod tests {
         fn return_nested_Ok() {
             // Arrange
             let mut mock = Struct::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_nested()
@@ -2753,7 +2753,7 @@ mod tests {
                         mock,
                         &Box<&mut Pin<&mut Rc<&mut Box<&&Arc<&mut &Pin<Rc<&mut &&mut Struct>>>>>>>
                     );
-                    calls_asserter.first()
+                    counter.inc()
                 });
             mock.setup()
                 .return_nested()
@@ -2764,7 +2764,7 @@ mod tests {
                         mock,
                         &Box<&mut Pin<&mut Rc<&mut Box<&&Arc<&mut &Pin<Rc<&mut &&mut Struct>>>>>>>
                     );
-                    calls_asserter.second()
+                    counter.double_inc()
                 });
 
             let mut the_self = mock.clone();
@@ -2785,7 +2785,7 @@ mod tests {
             mock.received()
                 .return_nested(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(NESTED, actual_second_value);
         }

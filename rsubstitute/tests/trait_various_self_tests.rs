@@ -164,12 +164,12 @@ mod tests {
         fn by_value_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
-            mock.setup().by_value().does(move |_, _| calls_asserter.first());
+            let counter = Counter::new();
+            mock.setup().by_value().does(move |_, _| counter.inc());
             mock.setup()
                 .by_value()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             mock.clone().by_value();
@@ -177,21 +177,21 @@ mod tests {
 
             // Assert
             mock.received().by_value(Times::Exactly(2)).no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_value_colon_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_value_colon()
-                .does(move |_, _| calls_asserter.first());
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_value_colon()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             // TODO - test and write in doc about the ability to clone mocks and what does it mean
@@ -202,19 +202,19 @@ mod tests {
             mock.received()
                 .by_value_colon(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_value_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
-            mock.setup().by_mut_value().does(move |_, _| calls_asserter.first());
+            let counter = Counter::new();
+            mock.setup().by_mut_value().does(move |_, _| counter.inc());
             mock.setup()
                 .by_mut_value()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             mock.clone().by_mut_value();
@@ -224,21 +224,21 @@ mod tests {
             mock.received()
                 .by_mut_value(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_value_colon_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_mut_value_colon()
-                .does(move |_, _| calls_asserter.first());
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_mut_value_colon()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             mock.clone().by_mut_value_colon();
@@ -248,19 +248,19 @@ mod tests {
             mock.received()
                 .by_mut_value_colon(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_ref_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
-            mock.setup().by_ref().does(move |_, _| calls_asserter.first());
+            let counter = Counter::new();
+            mock.setup().by_ref().does(move |_, _| counter.inc());
             mock.setup()
                 .by_ref()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             mock.by_ref();
@@ -268,19 +268,19 @@ mod tests {
 
             // Assert
             mock.received().by_ref(Times::Exactly(2)).no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_ref_colon_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
-            mock.setup().by_ref_colon().does(move |_, _| calls_asserter.first());
+            let counter = Counter::new();
+            mock.setup().by_ref_colon().does(move |_, _| counter.inc());
             mock.setup()
                 .by_ref_colon()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             mock.by_ref_colon();
@@ -290,21 +290,21 @@ mod tests {
             mock.received()
                 .by_ref_colon(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_ref_with_lifetime_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_ref_with_lifetime()
-                .does(move |_, _| calls_asserter.first());
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_ref_with_lifetime()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             mock.by_ref_with_lifetime();
@@ -314,21 +314,21 @@ mod tests {
             mock.received()
                 .by_ref_with_lifetime(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_ref_colon_with_lifetime_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_ref_colon_with_lifetime()
-                .does(move |_, _| calls_asserter.first());
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_ref_colon_with_lifetime()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             mock.by_ref_colon_with_lifetime();
@@ -338,19 +338,19 @@ mod tests {
             mock.received()
                 .by_ref_colon_with_lifetime(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_ref_mut_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
-            mock.setup().by_ref_mut().does(move |_, _| calls_asserter.first());
+            let counter = Counter::new();
+            mock.setup().by_ref_mut().does(move |_, _| counter.inc());
             mock.setup()
                 .by_ref_mut()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             mock.by_ref_mut();
@@ -360,21 +360,21 @@ mod tests {
             mock.received()
                 .by_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_ref_mut_colon_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_ref_mut_colon()
-                .does(move |_, _| calls_asserter.first());
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_ref_mut_colon()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             mock.by_ref_mut_colon();
@@ -384,21 +384,21 @@ mod tests {
             mock.received()
                 .by_ref_mut_colon(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_ref_mut_with_lifetime_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_ref_mut_with_lifetime()
-                .does(move |_, _| calls_asserter.first());
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_ref_mut_with_lifetime()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             mock.by_ref_mut_with_lifetime();
@@ -408,21 +408,21 @@ mod tests {
             mock.received()
                 .by_ref_mut_with_lifetime(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_ref_mut_colon_with_lifetime_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_ref_mut_colon_with_lifetime()
-                .does(move |_, _| calls_asserter.first());
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_ref_mut_colon_with_lifetime()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             mock.by_ref_mut_colon_with_lifetime();
@@ -432,19 +432,19 @@ mod tests {
             mock.received()
                 .by_ref_mut_colon_with_lifetime(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_box_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
-            mock.setup().by_box().does(move |_, _| calls_asserter.first());
+            let counter = Counter::new();
+            mock.setup().by_box().does(move |_, _| counter.inc());
             mock.setup()
                 .by_box()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             Box::new(mock.clone()).by_box();
@@ -452,19 +452,19 @@ mod tests {
 
             // Assert
             mock.received().by_box(Times::Exactly(2)).no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_box_ref_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
-            mock.setup().by_box_ref().does(move |_, _| calls_asserter.first());
+            let counter = Counter::new();
+            mock.setup().by_box_ref().does(move |_, _| counter.inc());
             mock.setup()
                 .by_box_ref()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             Box::new(&mock.clone()).by_box_ref();
@@ -474,21 +474,21 @@ mod tests {
             mock.received()
                 .by_box_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_box_ref_mut_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_box_ref_mut()
-                .does(move |_, _| calls_asserter.first());
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_box_ref_mut()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             Box::new(&mut mock.clone()).by_box_ref_mut();
@@ -498,19 +498,19 @@ mod tests {
             mock.received()
                 .by_box_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_box_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
-            mock.setup().by_mut_box().does(move |_, _| calls_asserter.first());
+            let counter = Counter::new();
+            mock.setup().by_mut_box().does(move |_, _| counter.inc());
             mock.setup()
                 .by_mut_box()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             Box::new(mock.clone()).by_mut_box();
@@ -520,21 +520,21 @@ mod tests {
             mock.received()
                 .by_mut_box(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_box_ref_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_mut_box_ref()
-                .does(move |_, _| calls_asserter.first());
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_mut_box_ref()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             Box::new(&mock.clone()).by_mut_box_ref();
@@ -544,21 +544,21 @@ mod tests {
             mock.received()
                 .by_mut_box_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_box_ref_mut_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_mut_box_ref_mut()
-                .does(move |_, _| calls_asserter.first());
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_mut_box_ref_mut()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             Box::new(&mut mock.clone()).by_mut_box_ref_mut();
@@ -568,19 +568,19 @@ mod tests {
             mock.received()
                 .by_mut_box_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_rc_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
-            mock.setup().by_rc().does(move |_, _| calls_asserter.first());
+            let counter = Counter::new();
+            mock.setup().by_rc().does(move |_, _| counter.inc());
             mock.setup()
                 .by_rc()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             Rc::new(mock.clone()).by_rc();
@@ -588,19 +588,19 @@ mod tests {
 
             // Assert
             mock.received().by_rc(Times::Exactly(2)).no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_rc_ref_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
-            mock.setup().by_rc_ref().does(move |_, _| calls_asserter.first());
+            let counter = Counter::new();
+            mock.setup().by_rc_ref().does(move |_, _| counter.inc());
             mock.setup()
                 .by_rc_ref()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             Rc::new(&mock.clone()).by_rc_ref();
@@ -610,19 +610,19 @@ mod tests {
             mock.received()
                 .by_rc_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_rc_ref_mut_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
-            mock.setup().by_rc_ref_mut().does(move |_, _| calls_asserter.first());
+            let counter = Counter::new();
+            mock.setup().by_rc_ref_mut().does(move |_, _| counter.inc());
             mock.setup()
                 .by_rc_ref_mut()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             Rc::new(&mut mock.clone()).by_rc_ref_mut();
@@ -632,19 +632,19 @@ mod tests {
             mock.received()
                 .by_rc_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_rc_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
-            mock.setup().by_mut_rc().does(move |_, _| calls_asserter.first());
+            let counter = Counter::new();
+            mock.setup().by_mut_rc().does(move |_, _| counter.inc());
             mock.setup()
                 .by_mut_rc()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             Rc::new(mock.clone()).by_mut_rc();
@@ -654,19 +654,19 @@ mod tests {
             mock.received()
                 .by_mut_rc(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_rc_ref_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
-            mock.setup().by_mut_rc_ref().does(move |_, _| calls_asserter.first());
+            let counter = Counter::new();
+            mock.setup().by_mut_rc_ref().does(move |_, _| counter.inc());
             mock.setup()
                 .by_mut_rc_ref()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             Rc::new(&mock.clone()).by_mut_rc_ref();
@@ -676,21 +676,21 @@ mod tests {
             mock.received()
                 .by_mut_rc_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_rc_ref_mut_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_mut_rc_ref_mut()
-                .does(move |_, _| calls_asserter.first());
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_mut_rc_ref_mut()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             Rc::new(&mut mock.clone()).by_mut_rc_ref_mut();
@@ -700,19 +700,19 @@ mod tests {
             mock.received()
                 .by_mut_rc_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_arc_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
-            mock.setup().by_arc().does(move |_, _| calls_asserter.first());
+            let counter = Counter::new();
+            mock.setup().by_arc().does(move |_, _| counter.inc());
             mock.setup()
                 .by_arc()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             Arc::new(mock.clone()).by_arc();
@@ -720,19 +720,19 @@ mod tests {
 
             // Assert
             mock.received().by_arc(Times::Exactly(2)).no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_arc_ref_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
-            mock.setup().by_arc_ref().does(move |_, _| calls_asserter.first());
+            let counter = Counter::new();
+            mock.setup().by_arc_ref().does(move |_, _| counter.inc());
             mock.setup()
                 .by_arc_ref()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             Arc::new(&mock.clone()).by_arc_ref();
@@ -742,21 +742,21 @@ mod tests {
             mock.received()
                 .by_arc_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_arc_ref_mut_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_arc_ref_mut()
-                .does(move |_, _| calls_asserter.first());
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_arc_ref_mut()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             Arc::new(&mut mock.clone()).by_arc_ref_mut();
@@ -766,19 +766,19 @@ mod tests {
             mock.received()
                 .by_arc_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_arc_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
-            mock.setup().by_mut_arc().does(move |_, _| calls_asserter.first());
+            let counter = Counter::new();
+            mock.setup().by_mut_arc().does(move |_, _| counter.inc());
             mock.setup()
                 .by_mut_arc()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             Arc::new(mock.clone()).by_mut_arc();
@@ -788,21 +788,21 @@ mod tests {
             mock.received()
                 .by_mut_arc(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_arc_ref_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_mut_arc_ref()
-                .does(move |_, _| calls_asserter.first());
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_mut_arc_ref()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             Arc::new(&mock.clone()).by_mut_arc_ref();
@@ -812,21 +812,21 @@ mod tests {
             mock.received()
                 .by_mut_arc_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_arc_ref_mut_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_mut_arc_ref_mut()
-                .does(move |_, _| calls_asserter.first());
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_mut_arc_ref_mut()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             Arc::new(&mut mock.clone()).by_mut_arc_ref_mut();
@@ -836,19 +836,19 @@ mod tests {
             mock.received()
                 .by_mut_arc_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_pin_ref_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
-            mock.setup().by_pin_ref().does(move |_, _| calls_asserter.first());
+            let counter = Counter::new();
+            mock.setup().by_pin_ref().does(move |_, _| counter.inc());
             mock.setup()
                 .by_pin_ref()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             Pin::new(&mock.clone()).by_pin_ref();
@@ -858,21 +858,21 @@ mod tests {
             mock.received()
                 .by_pin_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_pin_ref_mut_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_pin_ref_mut()
-                .does(move |_, _| calls_asserter.first());
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_pin_ref_mut()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             Pin::new(&mut mock.clone()).by_pin_ref_mut();
@@ -882,21 +882,21 @@ mod tests {
             mock.received()
                 .by_pin_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_pin_ref_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_mut_pin_ref()
-                .does(move |_, _| calls_asserter.first());
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_mut_pin_ref()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             Pin::new(&mock.clone()).by_mut_pin_ref();
@@ -906,21 +906,21 @@ mod tests {
             mock.received()
                 .by_mut_pin_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_pin_ref_mut_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_mut_pin_ref_mut()
-                .does(move |_, _| calls_asserter.first());
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_mut_pin_ref_mut()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             Pin::new(&mut mock.clone()).by_mut_pin_ref_mut();
@@ -930,21 +930,21 @@ mod tests {
             mock.received()
                 .by_mut_pin_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_ref_mut_box_mut_ref_mut_with_lifetimes_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_mut_ref_mut_box_mut_ref_mut_with_lifetimes()
-                .does(move |_, _| calls_asserter.first());
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_mut_ref_mut_box_mut_ref_mut_with_lifetimes()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             #[allow(unused_allocation)]
@@ -956,21 +956,21 @@ mod tests {
             mock.received()
                 .by_mut_ref_mut_box_mut_ref_mut_with_lifetimes(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes()
-                .does(move |_, _| calls_asserter.first());
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             Rc::new(&mut mock.clone()).by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes();
@@ -980,21 +980,21 @@ mod tests {
             mock.received()
                 .by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes()
-                .does(move |_, _| calls_asserter.first());
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             Arc::new(&mut mock.clone()).by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes();
@@ -1004,21 +1004,21 @@ mod tests {
             mock.received()
                 .by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             mock.setup()
                 .by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes()
-                .does(move |_, _| calls_asserter.first());
+                .does(move |_, _| counter.inc());
             mock.setup()
                 .by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             Pin::new(&mut mock.clone()).by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes();
@@ -1028,19 +1028,19 @@ mod tests {
             mock.received()
                 .by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
 
         #[test]
         fn nested_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
-            mock.setup().nested().does(move |_, _| calls_asserter.first());
+            let counter = Counter::new();
+            mock.setup().nested().does(move |_, _| counter.inc());
             mock.setup()
                 .nested()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             let mut the_self = mock.clone();
             let mut the_self = &&mut the_self;
@@ -1058,7 +1058,7 @@ mod tests {
 
             // Assert
             mock.received().nested(Times::Exactly(2)).no_other_calls();
-            calls_asserter.assert_only_second_was_called();
+            assert_eq!(2, counter.get());
         }
     }
 
@@ -1069,16 +1069,16 @@ mod tests {
         fn return_by_value_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_value()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_value()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = mock.clone().return_by_value();
@@ -1088,7 +1088,7 @@ mod tests {
             mock.received()
                 .return_by_value(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_VALUE, actual_second_value);
         }
@@ -1097,16 +1097,16 @@ mod tests {
         fn return_by_value_colon_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_value_colon()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_value_colon()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = mock.clone().return_by_value_colon();
@@ -1116,7 +1116,7 @@ mod tests {
             mock.received()
                 .return_by_value_colon(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_VALUE_COLON, actual_second_value);
         }
@@ -1125,16 +1125,16 @@ mod tests {
         fn return_by_mut_value_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_value()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_mut_value()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = mock.clone().return_by_mut_value();
@@ -1144,7 +1144,7 @@ mod tests {
             mock.received()
                 .return_by_mut_value(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_MUT_VALUE, actual_second_value);
         }
@@ -1153,16 +1153,16 @@ mod tests {
         fn return_by_mut_value_colon_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_value_colon()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_mut_value_colon()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = mock.clone().return_by_mut_value_colon();
@@ -1172,7 +1172,7 @@ mod tests {
             mock.received()
                 .return_by_mut_value_colon(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_MUT_VALUE_COLON, actual_second_value);
         }
@@ -1181,16 +1181,16 @@ mod tests {
         fn return_by_ref_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_ref()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_ref()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = mock.clone().return_by_ref();
@@ -1200,7 +1200,7 @@ mod tests {
             mock.received()
                 .return_by_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_REF, actual_second_value);
         }
@@ -1209,16 +1209,16 @@ mod tests {
         fn return_by_ref_colon_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_ref_colon()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_ref_colon()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = mock.clone().return_by_ref_colon();
@@ -1228,7 +1228,7 @@ mod tests {
             mock.received()
                 .return_by_ref_colon(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_REF_COLON, actual_second_value);
         }
@@ -1237,16 +1237,16 @@ mod tests {
         fn return_by_ref_with_lifetime_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_ref_with_lifetime()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_ref_with_lifetime()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = mock.clone().return_by_ref_with_lifetime();
@@ -1256,7 +1256,7 @@ mod tests {
             mock.received()
                 .return_by_ref_with_lifetime(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_REF_WITH_LIFETIME, actual_second_value);
         }
@@ -1265,16 +1265,16 @@ mod tests {
         fn return_by_ref_colon_with_lifetime_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_ref_colon_with_lifetime()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_ref_colon_with_lifetime()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = mock.clone().return_by_ref_colon_with_lifetime();
@@ -1284,7 +1284,7 @@ mod tests {
             mock.received()
                 .return_by_ref_colon_with_lifetime(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_REF_COLON_WITH_LIFETIME, actual_second_value);
         }
@@ -1293,16 +1293,16 @@ mod tests {
         fn return_by_ref_mut_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_ref_mut()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_ref_mut()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = mock.return_by_ref_mut();
@@ -1312,7 +1312,7 @@ mod tests {
             mock.received()
                 .return_by_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_REF_MUT, actual_second_value);
         }
@@ -1321,16 +1321,16 @@ mod tests {
         fn return_by_ref_mut_colon_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_ref_mut_colon()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_ref_mut_colon()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = mock.return_by_ref_mut_colon();
@@ -1340,7 +1340,7 @@ mod tests {
             mock.received()
                 .return_by_ref_mut_colon(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_REF_MUT_COLON, actual_second_value);
         }
@@ -1349,16 +1349,16 @@ mod tests {
         fn return_by_ref_mut_with_lifetime_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_ref_mut_with_lifetime()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_ref_mut_with_lifetime()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = mock.return_by_ref_mut_with_lifetime();
@@ -1368,7 +1368,7 @@ mod tests {
             mock.received()
                 .return_by_ref_mut_with_lifetime(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_REF_MUT_WITH_LIFETIME, actual_second_value);
         }
@@ -1377,16 +1377,16 @@ mod tests {
         fn return_by_ref_mut_colon_with_lifetime_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_ref_mut_colon_with_lifetime()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_ref_mut_colon_with_lifetime()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = mock.return_by_ref_mut_colon_with_lifetime();
@@ -1396,7 +1396,7 @@ mod tests {
             mock.received()
                 .return_by_ref_mut_colon_with_lifetime(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_REF_MUT_COLON_WITH_LIFETIME, actual_second_value);
         }
@@ -1405,16 +1405,16 @@ mod tests {
         fn return_by_box_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_box()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_box()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = Box::new(mock.clone()).return_by_box();
@@ -1424,7 +1424,7 @@ mod tests {
             mock.received()
                 .return_by_box(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_BOX, actual_second_value);
         }
@@ -1433,16 +1433,16 @@ mod tests {
         fn return_by_box_ref_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_box_ref()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_box_ref()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = Box::new(&mock.clone()).return_by_box_ref();
@@ -1452,7 +1452,7 @@ mod tests {
             mock.received()
                 .return_by_box_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_BOX_REF, actual_second_value);
         }
@@ -1461,16 +1461,16 @@ mod tests {
         fn return_by_box_ref_mut_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_box_ref_mut()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_box_ref_mut()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = Box::new(&mut mock.clone()).return_by_box_ref_mut();
@@ -1480,7 +1480,7 @@ mod tests {
             mock.received()
                 .return_by_box_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_BOX_REF_MUT, actual_second_value);
         }
@@ -1489,16 +1489,16 @@ mod tests {
         fn return_by_mut_box_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_box()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_mut_box()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = Box::new(mock.clone()).return_by_mut_box();
@@ -1508,7 +1508,7 @@ mod tests {
             mock.received()
                 .return_by_mut_box(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_MUT_BOX, actual_second_value);
         }
@@ -1517,16 +1517,16 @@ mod tests {
         fn return_by_mut_box_ref_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_box_ref()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_mut_box_ref()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = Box::new(&mock.clone()).return_by_mut_box_ref();
@@ -1536,7 +1536,7 @@ mod tests {
             mock.received()
                 .return_by_mut_box_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_MUT_BOX_REF, actual_second_value);
         }
@@ -1545,16 +1545,16 @@ mod tests {
         fn return_by_mut_box_ref_mut_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_box_ref_mut()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_mut_box_ref_mut()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = Box::new(&mut mock.clone()).return_by_mut_box_ref_mut();
@@ -1564,7 +1564,7 @@ mod tests {
             mock.received()
                 .return_by_mut_box_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_MUT_BOX_REF_MUT, actual_second_value);
         }
@@ -1573,16 +1573,16 @@ mod tests {
         fn return_by_rc_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_rc()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_rc()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = Rc::new(mock.clone()).return_by_rc();
@@ -1592,7 +1592,7 @@ mod tests {
             mock.received()
                 .return_by_rc(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_RC, actual_second_value);
         }
@@ -1601,16 +1601,16 @@ mod tests {
         fn return_by_rc_ref_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_rc_ref()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_rc_ref()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = Rc::new(&mock.clone()).return_by_rc_ref();
@@ -1620,7 +1620,7 @@ mod tests {
             mock.received()
                 .return_by_rc_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_RC_REF, actual_second_value);
         }
@@ -1629,16 +1629,16 @@ mod tests {
         fn return_by_rc_ref_mut_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_rc_ref_mut()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_rc_ref_mut()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = Rc::new(&mut mock.clone()).return_by_rc_ref_mut();
@@ -1648,7 +1648,7 @@ mod tests {
             mock.received()
                 .return_by_rc_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_RC_REF_MUT, actual_second_value);
         }
@@ -1657,16 +1657,16 @@ mod tests {
         fn return_by_mut_rc_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_rc()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_mut_rc()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = Rc::new(mock.clone()).return_by_mut_rc();
@@ -1676,7 +1676,7 @@ mod tests {
             mock.received()
                 .return_by_mut_rc(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_MUT_RC, actual_second_value);
         }
@@ -1685,16 +1685,16 @@ mod tests {
         fn return_by_mut_rc_ref_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_rc_ref()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_mut_rc_ref()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = Rc::new(&mock.clone()).return_by_mut_rc_ref();
@@ -1704,7 +1704,7 @@ mod tests {
             mock.received()
                 .return_by_mut_rc_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_MUT_RC_REF, actual_second_value);
         }
@@ -1713,16 +1713,16 @@ mod tests {
         fn return_by_mut_rc_ref_mut_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_rc_ref_mut()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_mut_rc_ref_mut()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = Rc::new(&mut mock.clone()).return_by_mut_rc_ref_mut();
@@ -1732,7 +1732,7 @@ mod tests {
             mock.received()
                 .return_by_mut_rc_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_MUT_RC_REF_MUT, actual_second_value);
         }
@@ -1741,16 +1741,16 @@ mod tests {
         fn return_by_arc_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_arc()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_arc()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = Arc::new(mock.clone()).return_by_arc();
@@ -1760,7 +1760,7 @@ mod tests {
             mock.received()
                 .return_by_arc(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_ARC, actual_second_value);
         }
@@ -1769,16 +1769,16 @@ mod tests {
         fn return_by_arc_ref_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_arc_ref()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_arc_ref()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = Arc::new(&mock.clone()).return_by_arc_ref();
@@ -1788,7 +1788,7 @@ mod tests {
             mock.received()
                 .return_by_arc_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_ARC_REF, actual_second_value);
         }
@@ -1797,16 +1797,16 @@ mod tests {
         fn return_by_arc_ref_mut_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_arc_ref_mut()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_arc_ref_mut()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = Arc::new(&mut mock.clone()).return_by_arc_ref_mut();
@@ -1816,7 +1816,7 @@ mod tests {
             mock.received()
                 .return_by_arc_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_ARC_REF_MUT, actual_second_value);
         }
@@ -1825,16 +1825,16 @@ mod tests {
         fn return_by_mut_arc_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_arc()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_mut_arc()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = Arc::new(mock.clone()).return_by_mut_arc();
@@ -1844,7 +1844,7 @@ mod tests {
             mock.received()
                 .return_by_mut_arc(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_MUT_ARC, actual_second_value);
         }
@@ -1853,16 +1853,16 @@ mod tests {
         fn return_by_mut_arc_ref_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_arc_ref()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_mut_arc_ref()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = Arc::new(&mock.clone()).return_by_mut_arc_ref();
@@ -1872,7 +1872,7 @@ mod tests {
             mock.received()
                 .return_by_mut_arc_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_MUT_ARC_REF, actual_second_value);
         }
@@ -1881,16 +1881,16 @@ mod tests {
         fn return_by_mut_arc_ref_mut_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_arc_ref_mut()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_mut_arc_ref_mut()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = Arc::new(&mut mock.clone()).return_by_mut_arc_ref_mut();
@@ -1900,7 +1900,7 @@ mod tests {
             mock.received()
                 .return_by_mut_arc_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_MUT_ARC_REF_MUT, actual_second_value);
         }
@@ -1909,16 +1909,16 @@ mod tests {
         fn return_by_pin_ref_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_pin_ref()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_pin_ref()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = Pin::new(&mock.clone()).return_by_pin_ref();
@@ -1928,7 +1928,7 @@ mod tests {
             mock.received()
                 .return_by_pin_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_PIN_REF, actual_second_value);
         }
@@ -1937,16 +1937,16 @@ mod tests {
         fn return_by_pin_ref_mut_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_pin_ref_mut()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_pin_ref_mut()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = Pin::new(&mut mock.clone()).return_by_pin_ref_mut();
@@ -1956,7 +1956,7 @@ mod tests {
             mock.received()
                 .return_by_pin_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_PIN_REF_MUT, actual_second_value);
         }
@@ -1965,16 +1965,16 @@ mod tests {
         fn return_by_mut_pin_ref_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_pin_ref()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_mut_pin_ref()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = Pin::new(&mock.clone()).return_by_mut_pin_ref();
@@ -1984,7 +1984,7 @@ mod tests {
             mock.received()
                 .return_by_mut_pin_ref(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_MUT_PIN_REF, actual_second_value);
         }
@@ -1993,16 +1993,16 @@ mod tests {
         fn return_by_mut_pin_ref_mut_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_pin_ref_mut()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_mut_pin_ref_mut()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value = Pin::new(&mut mock.clone()).return_by_mut_pin_ref_mut();
@@ -2012,7 +2012,7 @@ mod tests {
             mock.received()
                 .return_by_mut_pin_ref_mut(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(BY_MUT_PIN_REF_MUT, actual_second_value);
         }
@@ -2021,16 +2021,16 @@ mod tests {
         fn return_by_mut_ref_mut_box_mut_ref_mut_with_lifetimes_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_ref_mut_box_mut_ref_mut_with_lifetimes()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_mut_ref_mut_box_mut_ref_mut_with_lifetimes()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             #[allow(unused_allocation)]
@@ -2044,7 +2044,7 @@ mod tests {
             mock.received()
                 .return_by_mut_ref_mut_box_mut_ref_mut_with_lifetimes(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(
                 BY_MUT_REF_MUT_BOX_MUT_REF_MUT_WITH_LIFETIMES,
@@ -2056,16 +2056,16 @@ mod tests {
         fn return_by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value =
@@ -2077,7 +2077,7 @@ mod tests {
             mock.received()
                 .return_by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(
                 BY_MUT_REF_MUT_RC_MUT_REF_MUT_WITH_LIFETIMES,
@@ -2089,16 +2089,16 @@ mod tests {
         fn return_by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value =
@@ -2110,7 +2110,7 @@ mod tests {
             mock.received()
                 .return_by_mut_ref_mut_arc_mut_ref_mut_with_lifetimes(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(
                 BY_MUT_REF_MUT_ARC_MUT_REF_MUT_WITH_LIFETIMES,
@@ -2122,16 +2122,16 @@ mod tests {
         fn return_by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             // Act
             let actual_first_value =
@@ -2143,7 +2143,7 @@ mod tests {
             mock.received()
                 .return_by_mut_ref_mut_pin_mut_ref_mut_with_lifetimes(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(
                 BY_MUT_REF_MUT_PIN_MUT_REF_MUT_WITH_LIFETIMES,
@@ -2155,16 +2155,16 @@ mod tests {
         fn return_nested_Ok() {
             // Arrange
             let mut mock = TraitMock::new();
-            let calls_asserter = CallsAsserter::new();
+            let counter = Counter::new();
             let first_value = -100;
             mock.setup()
                 .return_nested()
                 .returns(first_value)
-                .and_does(move |_, _| calls_asserter.first());
+                .and_does(move |_, _| counter.inc());
             mock.setup()
                 .return_nested()
                 .call_base()
-                .and_does(move |_, _| calls_asserter.second());
+                .and_does(move |_, _| counter.double_inc());
 
             let mut the_self = mock.clone();
             let mut the_self = &&mut the_self;
@@ -2184,7 +2184,7 @@ mod tests {
             mock.received()
                 .return_nested(Times::Exactly(2))
                 .no_other_calls();
-            calls_asserter.assert_both_were_called();
+            assert_eq!(3, counter.get());
             assert_eq!(first_value, actual_first_value);
             assert_eq!(NESTED, actual_second_value);
         }
