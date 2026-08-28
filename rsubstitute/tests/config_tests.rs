@@ -8,8 +8,7 @@ trait Trait {
     fn work(&self, v: i32);
 }
 
-// TODO - rename all tests mods?
-mod max_invalid_calls_listed_count_tests {
+mod tests {
     #![allow(non_snake_case)]
     use super::*;
     use not_enough_asserts::*;
@@ -29,7 +28,6 @@ mod max_invalid_calls_listed_count_tests {
     mod default {
         use super::*;
         #[test]
-        // TODO - rename all tests to ThisCase
         fn CallsCountLessThanLimit_PrintsAll() {
             let _lock = seq_sync();
 
