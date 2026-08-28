@@ -109,10 +109,10 @@ fn generate_core(
     );
     rsubstitute_lifetime::revert_in_first_generic_arg(&mut call_struct_path);
     let sig = Signature {
-        constness: source_signature.constness.clone(),
+        constness: None, // not supported
         asyncness: source_signature.asyncness.clone(),
-        safety: source_signature.safety.clone(),
-        abi: source_signature.abi.clone(),
+        safety: Safety::Default,
+        abi: None,
         fn_token: Token![fn](span),
         ident: get_base_fn_ident(&fn_info.fn_ident),
         generics,
@@ -201,10 +201,21 @@ fn generate_core(
     });
 
     let normalized_base_impl = normalization::normalize_super_paths_in_block(*base_impl);
-    let stmts = core::iter::once(Stmt::Local(deconstruct_call_stmt))
+    let mut stmts = core::iter::once(Stmt::Local(deconstruct_call_stmt))
         .chain(cast_args_stmts.map(Stmt::Local))
         .chain(normalized_base_impl.stmts)
         .collect();
+    if let Safety::Unsafe(unsafe_token) = source_signature.safety {
+        let unsafe_block = ExprUnsafe {
+            attrs: Vec::new(),
+            unsafe_token,
+            block: Block {
+                brace_token: token::Brace(span),
+                stmts,
+            },
+        };
+        stmts = vec![Stmt::Expr(Expr::Unsafe(unsafe_block), None)];
+    }
     let block = Block {
         brace_token: token::Brace(span),
         stmts,

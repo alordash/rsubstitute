@@ -180,7 +180,7 @@ pub(crate) fn generate_for_trait(
             .collect();
         let base_fn_trait = ItemTrait {
             attrs: Vec::new(),
-            vis: Visibility::Public(Token![pub](span)),
+            vis: visibility::pub_super(span),
             modifiers: TraitModifiers::default(),
             unsafety: None,
             trait_token: Token![trait](span),
