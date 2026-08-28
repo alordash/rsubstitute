@@ -4,7 +4,7 @@ use indexmap::IndexMap;
 use std::fmt::Formatter;
 
 // Two layer map: fn name + fn generics
-type Map = IndexMap<&'static str, IndexMap<GenericsHashKey, *const ()>>;
+type Map = IndexMap<String, IndexMap<GenericsHashKey, *const ()>>;
 
 pub struct MockData {
     map: Map,
@@ -38,6 +38,8 @@ impl MockData {
         const PASSES_MOCK_TO_CALLBACK: bool,
     >(
         &'_ mut self,
+        maybe_owner_name: Option<&'static str>,
+        unique_fn_ident: String,  // for trait fns
         fn_ident: &'static str,
         generics_hash_key: GenericsHashKey,
         for_struct: bool,
@@ -45,7 +47,7 @@ impl MockData {
     {
         let fn_data_ptr = self
             .map
-            .entry(fn_ident)
+            .entry(unique_fn_ident)
             .or_insert_with(|| IndexMap::new())
             .entry(generics_hash_key)
             .or_insert_with(|| {
@@ -55,7 +57,9 @@ impl MockData {
                     HAS_RETURN_VALUE,
                     SUPPORTS_BASE_CALLING,
                     PASSES_MOCK_TO_CALLBACK,
-                >::new(fn_ident, for_struct))) as *const _ as *const ()
+                >::new(
+                    maybe_owner_name, fn_ident, for_struct
+                ))) as *const _ as *const ()
             });
 
         let fn_data_ref = Self::cast_ptr_to_ref(*fn_data_ptr);

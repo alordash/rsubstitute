@@ -48,6 +48,7 @@ impl StaticFnDatasGlobalMap {
         const SUPPORTS_BASE_CALLING: bool,
     >(
         &'_ self,
+        maybe_owner_name: Option<&'static str>,
         fn_ident: &'static str,
         for_struct: bool,
     ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, false> {
@@ -63,7 +64,9 @@ impl StaticFnDatasGlobalMap {
                     HAS_RETURN_VALUE,
                     SUPPORTS_BASE_CALLING,
                     false,
-                >::new(fn_ident, for_struct))) as *mut _ as *const _
+                >::new(
+                    maybe_owner_name, fn_ident, for_struct
+                ))) as *mut _ as *const _
             });
 
         let fn_data_ref =
@@ -111,7 +114,8 @@ pub fn get_static_fn_data<
 >(
     fn_ident: &'static str,
 ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, false> {
-    let result = STATIC_FN_DATAS_GLOBAL_MAP.with(|this| this.get_specific_fn_data(fn_ident, false));
+    let result =
+        STATIC_FN_DATAS_GLOBAL_MAP.with(|this| this.get_specific_fn_data(None, fn_ident, false));
     return result;
 }
 
@@ -121,9 +125,11 @@ pub fn get_static_fn_data_for_struct<
     const HAS_RETURN_VALUE: bool,
     const SUPPORTS_BASE_CALLING: bool,
 >(
+    owner_name: &'static str,
     fn_ident: &'static str,
 ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, false> {
-    let result = STATIC_FN_DATAS_GLOBAL_MAP.with(|this| this.get_specific_fn_data(fn_ident, true));
+    let result = STATIC_FN_DATAS_GLOBAL_MAP
+        .with(|this| this.get_specific_fn_data(Some(owner_name), fn_ident, true));
     return result;
 }
 

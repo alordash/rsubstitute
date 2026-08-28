@@ -25,7 +25,7 @@ mod tests {
 
         // Assert
         let expected_panic_msg = "Mock wasn't configured to handle following call:
-	work<f32, 5>(14)";
+	Trait::work<f32, 5>(14)";
         assert_eq!(Some(expected_panic_msg.to_owned()), panic_msg);
     }
 
@@ -47,7 +47,7 @@ mod tests {
 
         // Assert
         let expected_panic_msg = "Mock wasn't configured to handle following call because no return value was provided:
-	work<f32, 1>(5)
+	Trait::work<f32, 1>(5)
 List of existing configuration ordered by number of correctly matched arguments (non-matching arguments indicated with '*' characters):
 	1. Matched 0/1 arguments: work(*5*)";
         assert_eq!(Some(expected_panic_msg.to_owned()), panic_msg);
@@ -98,7 +98,7 @@ List of existing configuration ordered by number of correctly matched arguments 
         let expected_value_ptr = core::ptr::from_ref(&expected_value);
         let expected_panic_msg = format!(
             "Expected to receive a call exactly once matching:
-	work<f32, {N}>((&i32): equal to {expected_value})
+	Trait::work<f32, {N}>((&i32): equal to {expected_value})
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
 work(*5*)
@@ -127,7 +127,7 @@ work(*5*)
         assert_eq!(returned_value, actual_returned_value);
 
         let expected_panic_msg = "Expected to receive a call exactly once matching:
-	work<alloc::string::String, 124>((&i32): equal to 5)
+	Trait::work<alloc::string::String, 124>((&i32): equal to 5)
 Actually received no matching calls
 Received no non-matching calls";
         assert_eq!(Some(expected_panic_msg.to_owned()), panic_msg);
@@ -162,8 +162,8 @@ Received no non-matching calls";
 
         let expected_panic_msg =
             "Did not expect to receive any other calls. Received 2 unexpected calls:
-1. work<f32, 1>(5)
-2. work<[i32; 3], 200>(100)";
+1. Trait::work<f32, 1>(5)
+2. Trait::work<[i32; 3], 200>(100)";
         assert_eq!(Some(expected_panic_msg.to_owned()), panic_msg);
     }
 
@@ -175,7 +175,7 @@ Received no non-matching calls";
 
         // Assert
         let expected_panic_msg = "Mock wasn't configured to handle following call:
-	static_work<f32, 5>(14)";
+	Trait::static_work<f32, 5>(14)";
         assert_eq!(Some(expected_panic_msg.to_owned()), panic_msg);
     }
 
@@ -199,7 +199,7 @@ Received no non-matching calls";
 
         // Assert
         let expected_panic_msg = "Mock wasn't configured to handle following call because no return value was provided:
-	static_work<f32, 1>(5)
+	Trait::static_work<f32, 1>(5)
 List of existing configuration ordered by number of correctly matched arguments (non-matching arguments indicated with '*' characters):
 	1. Matched 0/1 arguments: static_work(*5*)";
         assert_eq!(Some(expected_panic_msg.to_owned()), panic_msg);
@@ -250,7 +250,7 @@ List of existing configuration ordered by number of correctly matched arguments 
         let expected_value_ptr = core::ptr::from_ref(&expected_value);
         let expected_panic_msg = format!(
             "Expected to receive a call exactly once matching:
-	static_work<f32, {N}>((&i32): equal to {expected_value})
+	Trait::static_work<f32, {N}>((&i32): equal to {expected_value})
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
 static_work(*5*)
@@ -282,7 +282,7 @@ static_work(*5*)
         assert_eq!(returned_value, actual_returned_value);
 
         let expected_panic_msg = "Expected to receive a call exactly once matching:
-	static_work<alloc::string::String, 124>((&i32): equal to 5)
+	Trait::static_work<alloc::string::String, 124>((&i32): equal to 5)
 Actually received no matching calls
 Received no non-matching calls";
         assert_eq!(Some(expected_panic_msg.to_owned()), panic_msg);
@@ -326,8 +326,8 @@ Received no non-matching calls";
 
         let expected_panic_msg =
             "Did not expect to receive any other calls. Received 2 unexpected calls:
-1. static_work<f32, 1>(5)
-2. static_work<[i32; 3], 200>(100)";
+1. Trait::static_work<f32, 1>(5)
+2. Trait::static_work<[i32; 3], 200>(100)";
         assert_eq!(Some(expected_panic_msg.to_owned()), panic_msg);
     }
 }

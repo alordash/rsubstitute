@@ -15,7 +15,6 @@ pub(crate) struct Params<'a, T: Borrow<FnInfo>> {
     pub fn_infos: &'a [T],
     pub for_static_fn: bool,
     pub is_static: bool,
-    pub for_struct: bool,
 }
 
 pub(crate) fn generate<T: Borrow<FnInfo>>(
@@ -28,7 +27,6 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
         fn_infos,
         for_static_fn,
         is_static,
-        for_struct,
     }: Params<T>,
 ) -> ItemImpl {
     let items = fn_infos
@@ -41,7 +39,6 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
                 fn_info.borrow(),
                 for_static_fn,
                 is_static,
-                for_struct,
             )
         })
         .map(ImplItem::Fn)
@@ -72,7 +69,6 @@ fn generate_setup_fn(
     fn_info: &FnInfo,
     for_static_fn: bool,
     is_static: bool,
-    for_struct: bool,
 ) -> ImplItemFn {
     let generic_arguments = generic_arguments::new(
         ctx,
@@ -141,7 +137,6 @@ fn generate_setup_fn(
             fn_data_stmt::StaticParams {
                 fn_info,
                 generic_arguments,
-                for_struct,
             },
         )
     } else {

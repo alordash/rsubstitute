@@ -15,7 +15,6 @@ pub(crate) struct Params<'a, T: Borrow<FnInfo>> {
     pub mock_struct_path: &'a Path,
     pub fn_infos: &'a [T],
     pub maybe_trait_ident: Option<Ident>,
-    pub for_struct: bool,
 }
 pub(crate) fn generate<T: Borrow<FnInfo>>(
     ctx: &Context,
@@ -27,7 +26,6 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
         mock_struct_path,
         fn_infos,
         maybe_trait_ident,
-        for_struct,
     }: Params<T>,
 ) -> ReceivedStruct {
     let item_struct = control_struct::new(
@@ -55,7 +53,6 @@ pub(crate) fn generate<T: Borrow<FnInfo>>(
             for_static_fn: false,
             is_static: false,
             generate_fn_no_other_calls: true,
-            for_struct,
         },
     );
 

@@ -67,7 +67,7 @@ mod tests {
                 || mock.received().accept_rc(Arg::Any, Times::Never),
                 format!(
                     "Expected to never receive a call matching:
-	accept_rc((alloc::rc::Rc<i32>): any)
+	Struct::accept_rc((alloc::rc::Rc<i32>): any)
 Actually received 1 matching call:
 	accept_rc({r})
 Received no non-matching calls"
@@ -78,7 +78,7 @@ Received no non-matching calls"
                 || mock.received().accept_rc(Arg::Any, Times::Exactly(3)),
                 format!(
                     "Expected to receive a call 3 times matching:
-	accept_rc((alloc::rc::Rc<i32>): any)
+	Struct::accept_rc((alloc::rc::Rc<i32>): any)
 Actually received 1 matching call:
 	accept_rc({r})
 Received no non-matching calls"
@@ -94,7 +94,7 @@ Received no non-matching calls"
                 },
                 format!(
                     "Expected to receive a call exactly once matching:
-	accept_rc((alloc::rc::Rc<i32>): equal to {invalid_r})
+	Struct::accept_rc((alloc::rc::Rc<i32>): equal to {invalid_r})
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
 accept_rc(*{r}*)

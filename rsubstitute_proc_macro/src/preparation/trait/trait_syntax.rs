@@ -39,6 +39,7 @@ pub(crate) fn prepare(
         &split_items.assoc_constants,
     );
     let trait_syntax_as_fn_owner = TraitSyntaxAsFnOwner {
+        trait_ident: &ident,
         generics: &merged_generics,
     };
     let static_fns = split_items
@@ -185,11 +186,16 @@ fn merge_generics_with_assoc_generics(
 }
 
 struct TraitSyntaxAsFnOwner<'a> {
+    pub trait_ident: &'a Ident,
     pub generics: &'a Generics,
 }
 impl<'a> IFnOwner for TraitSyntaxAsFnOwner<'a> {
     fn maybe_ident(&self) -> Option<&Ident> {
         None
+    }
+
+    fn format_name(&self) -> String {
+        self.trait_ident.to_string()
     }
 
     fn generics(&self) -> &Generics {

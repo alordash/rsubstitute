@@ -57,7 +57,6 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
             fn_infos: &fn_infos,
             for_static_fn: true,
             maybe_trait_ident: None,
-            for_struct: false,
         },
     );
     let static_received_struct = static_received::generate(
@@ -72,7 +71,6 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
             fn_infos: &fn_infos,
             for_static_fn: true,
             maybe_trait_ident: None,
-            for_struct: false,
         },
     );
     let [fn_info] = fn_infos;
@@ -85,6 +83,11 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
     );
     let fn_static_received =
         fn_static_received::generate(source_span, static_received_struct.path.clone(), &fn_info);
+    let fn_static_received_nothing = fn_static_received_nothing::generate(
+        source_span,
+        static_fn_mock_struct.path.clone(),
+        &fn_info,
+    );
 
     let mod_ident = fn_info.signature.ident.clone();
     let mocked_fn = mocked_fn::generate(
@@ -103,6 +106,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
         .chain([
             Item::Fn(fn_static_setup),
             Item::Fn(fn_static_received),
+            Item::Fn(fn_static_received_nothing),
             Item::Struct(fn_info.call_struct.item_struct),
             Item::Impl(fn_info.call_struct.generics_info_provider_impl),
             Item::Impl(fn_info.call_struct.call_impl),

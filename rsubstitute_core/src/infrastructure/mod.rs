@@ -1,4 +1,5 @@
 mod arg_refs_binder;
+mod call_order_verification;
 mod error_printing;
 mod fn_callback_configurator;
 mod fn_config;
@@ -12,6 +13,7 @@ mod shared_mock_data;
 mod static_fn_datas_global_map;
 
 pub use arg_refs_binder::*;
+pub use call_order_verification::verify_call_order;
 pub use fn_callback_configurator::*;
 pub(crate) use fn_config::*;
 pub use fn_configurator::*;

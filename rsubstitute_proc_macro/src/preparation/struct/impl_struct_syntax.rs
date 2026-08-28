@@ -23,14 +23,10 @@ pub(crate) fn prepare(
     }: Params,
 ) -> ImplStructSyntax {
     let target_path = parse_target_type(*target_type);
-    let target_ident = target_path
-        .segments
-        .last()
-        .expect("`impl` target path can not be empty")
-        .ident
-        .clone();
+    let target_ident = path::last_ident(&target_path).clone();
     let split_items = split_items(impl_items);
     let impl_struct_syntax_as_fn_owner = ImplStructSyntaxAsFnOwner {
+        struct_ident: &target_ident,
         generics: &generics,
     };
     let static_fns = split_items
@@ -124,11 +120,16 @@ fn parse_target_type(target_type: Type) -> Path {
 }
 
 struct ImplStructSyntaxAsFnOwner<'a> {
+    pub struct_ident: &'a Ident,
     pub generics: &'a Generics,
 }
 impl<'a> IFnOwner for ImplStructSyntaxAsFnOwner<'a> {
     fn maybe_ident(&self) -> Option<&Ident> {
         None
+    }
+
+    fn format_name(&self) -> String {
+        self.struct_ident.to_string()
     }
 
     fn generics(&self) -> &Generics {

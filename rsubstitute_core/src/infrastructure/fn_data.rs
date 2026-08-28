@@ -5,7 +5,6 @@ use crate::*;
 use std::cell::RefCell;
 use std::collections::HashMap;
 use std::rc::Rc;
-use std::sync::atomic::AtomicUsize;
 
 mod handle_no_return_value_no_base_calling;
 mod handle_no_return_value_with_base_calling;
@@ -20,10 +19,10 @@ pub struct FnData<
     const PASSES_MOCK_TO_CALLBACK: bool,
 > {
     fn_name: &'static str,
+    formatted_fn_name: String,
     // TODO - remove RefCell? can I just make mock methods all requires `&mut self`?
     pub call_infos: RefCell<HashMap<GenericsHashKey, Vec<CallCheck<'rs>>>>,
     pub configs: RefCell<HashMap<GenericsHashKey, Vec<Rc<RefCell<FnConfig<'rs, TMock>>>>>>,
-    next_call_number: AtomicUsize,
     force_call_base: bool,
 }
 
@@ -35,12 +34,20 @@ impl<
     const PASSES_MOCK_TO_CALLBACK: bool,
 > FnData<'rs, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, PASSES_MOCK_TO_CALLBACK>
 {
-    pub fn new(fn_name: &'static str, for_struct: bool) -> Self {
+    pub(crate) fn new(
+        maybe_owner_name: Option<&'static str>,
+        fn_name: &'static str,
+        for_struct: bool,
+    ) -> Self {
+        let formatted_fn_name = match maybe_owner_name {
+            None => fn_name.to_owned(),
+            Some(owner_name) => format!("{owner_name}::{fn_name}"),
+        };
         Self {
             fn_name,
+            formatted_fn_name,
             call_infos: RefCell::new(HashMap::new()),
             configs: RefCell::new(HashMap::new()),
-            next_call_number: AtomicUsize::new(1),
             force_call_base: for_struct,
         }
     }
@@ -98,12 +105,26 @@ impl<
         let valid = times.matches(matching_calls_count);
         if !valid {
             error_printing::panic_received_verification_error(
-                self.fn_name,
+                &self.fn_name,
+                &self.formatted_fn_name,
                 &dyn_args_checker,
                 matching_calls_check_result,
                 non_matching_calls_check_result,
                 times,
             );
+        }
+        if call_order_verification::should_perform() {
+            for matching_call in matching_calls_check_result.calls_args_check_results {
+                let formatted_string = fmt_call(
+                    &self.formatted_fn_name,
+                    matching_call.args_check_results,
+                    GenericParameterInfosFormattingPolicy::Skip,
+                );
+                call_order_verification::add_call(
+                    matching_call.call_order_number,
+                    formatted_string,
+                );
+            }
         }
     }
 
@@ -123,7 +144,7 @@ impl<
             .map(|x| {
                 let call = x.get_call();
                 error_printing::format_received_unexpected_call_error(
-                    self.fn_name,
+                    &self.formatted_fn_name,
                     call.get_arg_infos(),
                     call.get_generic_parameter_infos(),
                 )
@@ -150,7 +171,6 @@ impl<
 
 mod internal {
     use super::*;
-    use std::sync::atomic::Ordering;
 
     impl<
         'rs,
@@ -166,17 +186,14 @@ mod internal {
                 .borrow_mut()
                 .entry(generics_hash_key)
                 .or_default()
-                .push(CallCheck::new(
-                    self.next_call_number.fetch_add(1, Ordering::Relaxed),
-                    call,
-                ));
+                .push(CallCheck::new(call));
             self
         }
 
         pub(crate) fn get_matching_and_non_matching_calls(
             &self,
             dyn_args_checker: &DynArgsChecker,
-        ) -> (CallsCheckResult, CallsCheckResult) {
+        ) -> (OrderedCallsCheckResult, OrderedCallsCheckResult) {
             let mut matching_calls_args_check_results = Vec::new();
             let mut non_matching_calls_args_check_results = Vec::new();
             let generics_hash_key = dyn_args_checker.get_generics_hash_key();
@@ -185,17 +202,19 @@ mod internal {
             for call_info in specific_call_infos.iter_mut() {
                 let call_args_check_results = dyn_args_checker.check(call_info.get_call());
                 let is_matching = call_args_check_results.iter().all(ArgCheckResult::is_ok);
+                let ordered_call_check_result =
+                    OrderedCallCheckResult::new(call_info.number, call_args_check_results);
                 if is_matching {
                     call_info.mark_as_verified();
-                    matching_calls_args_check_results.push(call_args_check_results);
+                    matching_calls_args_check_results.push(ordered_call_check_result);
                 } else {
-                    non_matching_calls_args_check_results.push(call_args_check_results);
+                    non_matching_calls_args_check_results.push(ordered_call_check_result);
                 }
             }
             let matching_calls_check_result =
-                CallsCheckResult::new(matching_calls_args_check_results);
+                OrderedCallsCheckResult::new(matching_calls_args_check_results);
             let non_matching_calls_check_result =
-                CallsCheckResult::new(non_matching_calls_args_check_results);
+                OrderedCallsCheckResult::new(non_matching_calls_args_check_results);
             return (matching_calls_check_result, non_matching_calls_check_result);
         }
 
@@ -216,7 +235,8 @@ mod internal {
                 MatchingConfigSearchResult::Ok(matching_config) => matching_config,
                 MatchingConfigSearchResult::Err(matching_config_search_err) => {
                     error_printing::panic_no_suitable_fn_configuration_found(
-                        self.fn_name,
+                        &self.fn_name,
+                        &self.formatted_fn_name,
                         dyn_call.get_arg_infos(),
                         dyn_call.get_generic_parameter_infos(),
                         matching_config_search_err,

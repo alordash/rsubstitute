@@ -97,13 +97,12 @@ pub(crate) fn from_base_path_with_ident(base: &Path, ident: Ident) -> Path {
     return result;
 }
 
-pub(crate) fn last_ident(path: &Path) -> Ident {
-    let result = path
+pub(crate) fn last_ident(path: &Path) -> &Ident {
+    let result = &path
         .segments
         .last()
         .expect("`path::last` expects given path to have at least one segment.")
-        .ident
-        .clone();
+        .ident;
     return result;
 }
 
