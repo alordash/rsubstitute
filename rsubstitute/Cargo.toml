@@ -150,7 +150,7 @@ not_enough_asserts = { workspace = true }
 tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread", "time"] }
 
 [dev-dependencies]
-rsubstitute_core = { workspace = true }
+rsubstitute_core = { workspace = true, features = ["debug_naming"] }
 tokio = { workspace = true }
 
 [features]
