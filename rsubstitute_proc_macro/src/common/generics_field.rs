@@ -34,7 +34,6 @@ pub(crate) fn new_value(span: Span) -> FieldValue {
         expr: Expr::Path(ExprPath {
             attrs: Vec::new(),
             qself: None,
-            // TODO - replace all other references to STD lib with global paths
             path: path::new_global(span, ["core", "marker", "PhantomData"]),
         }),
     };

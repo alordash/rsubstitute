@@ -458,7 +458,6 @@ accept_value(*{first_value}*)
             assert_eq!(first_value, actual_first_value);
             assert_eq!(second_value, actual_second_value);
 
-            // TODO - add calls check to ALL tests
             mock.received()
                 .return_value(Times::Exactly(2))
                 .no_other_calls();

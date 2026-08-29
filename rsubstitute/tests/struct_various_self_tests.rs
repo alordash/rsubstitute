@@ -218,7 +218,6 @@ mod tests {
                 });
 
             // Act
-            // TODO - test and write in doc about the ability to clone mocks and what does it mean
             mock.clone().by_value_colon();
             mock.clone().by_value_colon();
 

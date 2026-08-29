@@ -1,5 +1,4 @@
-use std::fmt::{Display, Formatter};
-
+#[derive(PartialEq, Debug)]
 pub enum Times {
     Never,
     Once,
@@ -22,17 +21,30 @@ impl Times {
     }
 }
 
-impl Display for Times {
-    fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
-        match self {
-            Times::Never | Times::Exactly(0) => write!(f, "Expected to never receive a call"),
-            Times::Once | Times::Exactly(1) => write!(f, "Expected to receive a call exactly once"),
-            Times::Exactly(exact_count) => {
-                write!(f, "Expected to receive a call {exact_count} times")
-            }
-            Times::Any => write!(f, "Expected to receive a call any number of times."),
-        }
+pub trait ITimes {
+    fn times(self) -> Times;
+}
+
+impl ITimes for usize {
+    fn times(self) -> Times {
+        Times::Exactly(self)
     }
 }
 
-// TODO - impl From<usize> for Times? (Exactly)
+#[cfg(test)]
+mod tests {
+    #![allow(non_snake_case)]
+    use super::*;
+
+    #[test]
+    fn ITimes_times_Ok() {
+        // Arrange
+        let raw = 1usize;
+
+        // Act
+        let times = raw.times();
+
+        // Assert
+        assert_eq!(Times::Exactly(1), times);
+    }
+}

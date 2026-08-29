@@ -20,7 +20,6 @@ pub struct FnData<
 > {
     fn_name: &'static str,
     formatted_fn_name: String,
-    // TODO - remove RefCell? can I just make mock methods all requires `&mut self`?
     pub call_infos: RefCell<HashMap<GenericsHashKey, Vec<CallCheck<'rs>>>>,
     pub configs: RefCell<HashMap<GenericsHashKey, Vec<Rc<RefCell<FnConfig<'rs, TMock>>>>>>,
     force_call_base: bool,
@@ -135,9 +134,6 @@ impl<
             .flatten()
             .filter(|x| x.is_not_verified())
             .collect();
-        if unexpected_call_infos.is_empty() {
-            return Vec::new();
-        }
         unexpected_call_infos.sort_by(|a, b| a.number.cmp(&b.number));
         let unexpected_call_arg_infos = unexpected_call_infos
             .into_iter()

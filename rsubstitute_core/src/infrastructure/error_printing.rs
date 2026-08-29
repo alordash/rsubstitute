@@ -76,8 +76,9 @@ pub(crate) fn panic_received_verification_error(
 {non_matching_calls_args_msg}"
         )
     };
+    let times_format = format_times(times);
     let error_msg = format!(
-        r"{times} matching:
+        r"{times_format} matching:
 {expected_call_msg}
 {matching_calls_report}
 {non_matching_calls_report}"
@@ -216,4 +217,16 @@ fn fmt_call_order_entries(call_order_entries: &[CallOrderEntry]) -> String {
         .collect();
     let string = formatted_strings.join("\n\t");
     return string;
+}
+
+fn format_times(times: Times) -> String {
+    let result = match times {
+        Times::Never | Times::Exactly(0) => "Expected to never receive a call".to_owned(),
+        Times::Once | Times::Exactly(1) => "Expected to receive a call exactly once".to_owned(),
+        Times::Exactly(exact_count) => {
+            format!("Expected to receive a call {exact_count} times")
+        }
+        Times::Any => "Expected to receive a call any number of times.".to_owned(),
+    };
+    return result;
 }

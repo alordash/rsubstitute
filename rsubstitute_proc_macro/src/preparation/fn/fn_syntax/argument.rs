@@ -25,7 +25,6 @@ pub(crate) fn new((number, source_pat_type): (usize, PatType)) -> Argument {
     let generic_arg_style_type =
         r#type::replace_anonymous_references_with_pointers(ref_style_type.clone());
 
-    // TODO - perhaps need to pass here ptr_style_type
     let control_fn_arg = generate_control_fn_arg(
         ident.span(),
         ident_pat_type.pat.clone(),

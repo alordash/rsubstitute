@@ -21,7 +21,6 @@ pub(crate) fn create_for_mock_macro(proc_macro_attribute: proc_macro::TokenStrea
 }
 
 fn support_base_calling_from_parameters(parameters: &[&str]) -> bool {
-    // TODO - throw if passed parameter is unknown (like #[mock(wtf)])
     #[cfg(not(feature = "mock_base_by_default"))]
     return parameters
         .iter()

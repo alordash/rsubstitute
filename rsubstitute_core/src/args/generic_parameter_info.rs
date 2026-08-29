@@ -30,7 +30,6 @@ pub fn generic_const_info<T: Debug>(name: &'static str, value: T) -> GenericPara
     });
     return result;
 }
-// TODO - code format all project
 
 impl Display for GenericParameterInfo {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {

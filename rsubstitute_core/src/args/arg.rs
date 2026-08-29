@@ -6,7 +6,6 @@ use std::ops::Deref;
 struct Private;
 
 #[allow(private_interfaces)]
-// TODO - remove  lifetime, it is no longer needed since accepting raw ptr in PrivateIs
 #[repr(C)]
 pub enum Arg<T: ?Sized> {
     Any,
@@ -23,19 +22,6 @@ impl<T: PartialEq> From<T> for Arg<T> {
         Arg::eq(value)
     }
 }
-
-// TODO - is this needed? write tests that operate on pointers
-// impl<'a, T> From<&'a T> for Arg<*const T> {
-//     fn from(value: &'a T) -> Self {
-//         Arg::eq(value as *const T)
-//     }
-// }
-//
-// impl<'a, T> From<&'a mut T> for Arg<*mut T> {
-//     fn from(value: &'a mut T) -> Self {
-//         Arg::eq(value as *mut T)
-//     }
-// }
 
 impl<T: Debug> Debug for Arg<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
@@ -110,7 +96,6 @@ impl<T> Arg<T> {
         return Self::PrivateEq(arg_cmp, Private);
     }
 
-    // TODO - write tests for that
     pub fn ref_not_eq<U>(value: T) -> Self
     where
         T: Deref<Target = U>,

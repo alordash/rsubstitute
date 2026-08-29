@@ -52,7 +52,7 @@ use consts::*;
 
 #[rustfmt::skip]
 #[mock(base)]
-#[allow(unused_mut)] // TODO - this should disable warnings
+#[allow(unused_mut)]
 trait Trait: Sized {
     fn by_value          (    self      ) {}
     fn by_value_colon    (    self: Self) {}
@@ -194,7 +194,6 @@ mod tests {
                 .and_does(move |_, _| counter.double_inc());
 
             // Act
-            // TODO - test and write in doc about the ability to clone mocks and what does it mean
             mock.clone().by_value_colon();
             mock.clone().by_value_colon();
 

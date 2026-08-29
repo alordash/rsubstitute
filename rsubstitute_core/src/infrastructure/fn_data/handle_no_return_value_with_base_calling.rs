@@ -16,7 +16,6 @@ impl<'rs, TMock, const PASSES_MOCK_TO_CALLBACK: bool>
         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
             fn_config.borrow_mut().register_call(call.clone());
             let fn_config_ref = fn_config.borrow();
-            // TODO - verify through tests that callbacks are called before base_fn
             if let Some(callback) = fn_config_ref.get_callback() {
                 callback.borrow_mut()(&mock_arg as *const TMockArg as *const (), call.as_ref());
             }
@@ -41,7 +40,6 @@ impl<'rs, TMock, const PASSES_MOCK_TO_CALLBACK: bool>
         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
             fn_config.borrow_mut().register_call(call.clone());
             let fn_config_ref = fn_config.borrow();
-            // TODO - verify through tests that callbacks are called before base_fn
             if let Some(callback) = fn_config_ref.get_callback() {
                 callback.borrow_mut()(&mock_arg as *const TMockArg as *const (), call.as_ref());
             }

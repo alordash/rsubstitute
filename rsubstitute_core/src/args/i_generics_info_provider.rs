@@ -9,10 +9,8 @@ pub trait IGenericsInfoProvider {
         Vec::new()
     }
 
-    // TODO - add #[allow(unused)] on hasher in generated impl
     fn hash_generics_type_ids(&self, #[allow(unused_variables)] hasher: &mut GenericsHasher) {}
 
-    // TODO - add #[allow(unused_args)] on hasher in generated impl
     fn hash_const_values(&self, #[allow(unused_variables)] hasher: &mut GenericsHasher) {}
 
     fn get_generics_hash_key(&self) -> GenericsHashKey {
@@ -30,7 +28,7 @@ pub fn tid<T: ?Sized>() -> TypeId {
 }
 
 // Helper method for calculating hash in `IGenericsInfoProvider::hash_consts_values` of any sized
-// const value (passed as const parameter) by using types raw bytes. Not calling `t.hash` because
+// const value (passed as const parameter) by using type's raw bytes. Not calling `t.hash` because
 // `T` is not guaranteed to implement `Hash`.
 // This approach anticipates adt_const_params feature:
 // https://doc.rust-lang.org/beta/unstable-book/language-features/adt-const-params.html

@@ -144,8 +144,3 @@ impl Drop for MockData {
         }
     }
 }
-
-// TODO - write test case for:
-// #[mock]
-// unsafe impl Send/Sync for Struct {}
-// TODO - and write that it's not supported

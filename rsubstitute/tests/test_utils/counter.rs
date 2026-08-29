@@ -1,6 +1,5 @@
 use std::sync::atomic::{AtomicUsize, Ordering};
 
-// TODO - reuse
 // Helper trait for callbacks verification.
 // Leaking for ability to `Copy` so no need to create clones for moving them in closures.
 #[derive(Copy, Clone)]
