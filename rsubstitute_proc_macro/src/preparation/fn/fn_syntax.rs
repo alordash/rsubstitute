@@ -163,7 +163,7 @@ fn generate_arg_refs_tuple(span: Span, arguments: &[Argument]) -> TypeTuple {
                     attrs: Vec::new(),
                     and_token: Token![&](span),
                     lifetime: Some(rsubstitute_lifetime::new(span)),
-                    mutability: None,
+                    mutability: Some(Token![mut](span)),
                     elem: x.ref_style_type.clone(),
                 })
             })

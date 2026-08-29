@@ -19,18 +19,10 @@ pub(crate) fn prepare(
         unsafety,
         ident,
         generics,
-        mut items,
+        items,
     }: Params,
 ) -> TraitSyntax {
-    let trait_mock_path = path::from_ident_with_generics(
-        format_ident!("{}Mock", ident),
-        &rsubstitute_lifetime::prepend_to_generics(generics.clone()),
-    );
-    items = items
-        .into_iter()
-        .map(|x| normalization::normalize_struct_type_references_in_trait_item(x, &trait_mock_path))
-        .collect();
-    let split_items = split_items(items, &ident);
+    let mut split_items = split_items(items, &ident);
     let path = path::from_ident_with_generics(ident.clone(), &generics);
     let mut merged_generics = merge_generics_with_assoc_generics(
         &ident,
@@ -38,6 +30,34 @@ pub(crate) fn prepare(
         &split_items.assoc_types,
         &split_items.assoc_constants,
     );
+    let trait_mock_path = path::from_ident_with_generics(
+        format_ident!("{}Mock", ident),
+        &rsubstitute_lifetime::prepend_to_generics(merged_generics.clone()),
+    );
+    split_items.associated_fns = split_items
+        .associated_fns
+        .into_iter()
+        .map(|ordered| {
+            ordered.map(|x| {
+                normalization::normalize_struct_type_references_in_trait_item_fn(
+                    x,
+                    &trait_mock_path,
+                )
+            })
+        })
+        .collect();
+    split_items.static_fns = split_items
+        .static_fns
+        .into_iter()
+        .map(|ordered| {
+            ordered.map(|x| {
+                normalization::normalize_struct_type_references_in_trait_item_fn(
+                    x,
+                    &trait_mock_path,
+                )
+            })
+        })
+        .collect();
     let trait_syntax_as_fn_owner = TraitSyntaxAsFnOwner {
         trait_ident: &ident,
         generics: &merged_generics,

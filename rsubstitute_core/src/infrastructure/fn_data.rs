@@ -61,7 +61,7 @@ impl<
         'a,
         TArgsChecker: IArgsChecker + 'a,
         TOwner,
-        TArgRefsTuple: Copy,
+        TArgRefsTuple,
         TReturnValue,
         TMockArg,
     >(

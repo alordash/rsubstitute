@@ -24,13 +24,13 @@ pub(crate) fn normalize_struct_type_references_in_block<T: BorrowMut<Block>>(
     return block;
 }
 
-pub(crate) fn normalize_struct_type_references_in_trait_item(
-    mut trait_item: TraitItem,
+pub(crate) fn normalize_struct_type_references_in_trait_item_fn(
+    mut trait_item_fn: TraitItemFn,
     trait_mock_path: &Path,
-) -> TraitItem {
+) -> TraitItemFn {
     let mut normalizer = StructTypeReferencesNormalizer::new(trait_mock_path);
-    normalizer.visit_trait_item_mut(&mut trait_item);
-    return trait_item;
+    normalizer.visit_trait_item_fn_mut(&mut trait_item_fn);
+    return trait_item_fn;
 }
 
 pub(crate) fn normalize_struct_type_references_in_impl_item_fn(

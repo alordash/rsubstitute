@@ -11,6 +11,18 @@ trait Trait<T1, T2 = u16> {
     fn get_return_different(&self, value: T1) -> T2;
 }
 
+trait Consumer<T> {}
+
+#[mock]
+trait Another {
+    type Item;
+
+    #[allow(unused)]
+    fn work<T: Into<<Self as Another>::Item>>(&self)
+    where
+        Self: Consumer<<Self as Another>::Item>;
+}
+
 mod trait_generic_tests {
     #![allow(non_snake_case)]
     use super::*;
