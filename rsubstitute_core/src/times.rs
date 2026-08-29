@@ -21,7 +21,12 @@ impl Times {
     }
 }
 
-pub trait ITimes {
+pub trait ITimes: Sized {
+    // Syntactic sugar for writing `1.time()`
+    fn time(self) -> Times {
+        Self::times(self)
+    }
+
     fn times(self) -> Times;
 }
 
