@@ -27,7 +27,7 @@ mod tests {
     #[test]
     fn should_mock_direct_generic_function_call() {
         // Arrange
-        target::setup(Arg::Any).returns_with(|(x,)| x + 100);
+        target::setup::<i32>(Arg::Any).returns_with(|(x,)| *x + 100);
 
         // Act
         let result = call_direct(5);
@@ -40,7 +40,7 @@ mod tests {
     #[test]
     fn should_mock_generic_function_through_function_pointer() {
         // Arrange
-        target::setup(Arg::Any).returns_with(|(x,)| x + 100);
+        target::setup::<i32>(Arg::Any).returns_with(|(x,)| *x + 100);
 
         // Act
         let result = call_through_pointer(5);
@@ -53,7 +53,7 @@ mod tests {
     #[test]
     fn should_mock_generic_function_through_generic_fn() {
         // Arrange
-        target::setup(Arg::Any).returns_with(|(x,)| x + 100);
+        target::setup::<i32>(Arg::Any).returns_with(|(x,)| *x + 100);
 
         // Act
         let result = call_through_generic(target::<i32>, 5);
@@ -66,7 +66,7 @@ mod tests {
     #[test]
     fn should_mock_generic_function_through_all_call_paths() {
         // Arrange
-        target::setup(Arg::Any).returns_with(|(x,)| x + 100);
+        target::setup::<i32>(Arg::Any).returns_with(|(x,)| *x + 100);
 
         // Act
         let direct = call_direct(5);

@@ -47,7 +47,7 @@ fn evil(x: i32) -> i32 {
 #[test]
 fn should_mock_static_function_through_all_invocation_paths() {
     // Arrange
-    target::setup(Arg::Any).returns_with(|(x,)| x + 100);
+    target::setup(Arg::Any).returns_with(|(x,)| *x + 100);
 
     // Act
     let result = evil(5);
