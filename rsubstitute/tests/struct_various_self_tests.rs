@@ -5,7 +5,6 @@ use std::pin::Pin;
 use std::rc::Rc;
 use std::sync::Arc;
 
-// TODO - also test callbacks - they must receive reference to same `self` type that was used in fn
 #[rustfmt::skip]
 #[allow(unused)]
 mod consts {
@@ -176,7 +175,6 @@ mod tests {
             // Arrange
             let mut mock = Struct::new();
             let counter = Counter::new();
-            // TODO - assert mock type in callback
             mock.setup().by_value().does(move |mock, _| {
                 assert_eq!(DEFAULT_STRUCT_VALUE, mock.v);
                 assert_type_eq!(mock, Struct);

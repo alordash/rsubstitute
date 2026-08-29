@@ -2,7 +2,7 @@
 struct Dependency;
 
 mod inner {
-    use rsubstitute_proc_macro::mock;
+    use rsubstitute::mock;
 
     #[mock(base)]
     #[allow(unused)]

@@ -1,8 +1,7 @@
-use rsubstitute_proc_macro::mock;
+use rsubstitute::mock;
 
 #[mock]
 trait Trait<'a, T1, const B: bool> {
-    // TODO - decide what to do with incorrect generics order. Somehow lib is fixing this by placing lifetime `'b` before `T2`
     fn work<T2, 'b, const N: usize>(&self, v: &'b T1) -> T2;
 
     fn static_work<'b, T2, const N: usize>(v: &'b T1) -> T2;
@@ -296,7 +295,6 @@ Received no non-matching calls";
         let second_value = 100;
         let second_returned_value = [4; 3];
         const SECOND_N: usize = 200;
-        // TODO - add test that verifies that subsequent `setup` or `static_setup` calls on static fn mock lead to fn data clearing
         // TODO - use code below to show in docs how to call `static_setup` once but then reuse it in different places (if branches, iterators, etc)
         // let setup = TraitMock::<i32, false>::static_setup();
         // setup

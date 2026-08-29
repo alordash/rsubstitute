@@ -21,7 +21,7 @@ pub(crate) fn generate(
     let path = path::from_ident_with_generics(struct_ident.clone(), &generics);
 
     let item_struct = ItemStruct {
-        attrs: Vec::new(),
+        attrs: vec![attributes::doc_hidden(span)],
         vis: Visibility::Public(Token![pub](span)),
         struct_token: Token![struct](span),
         ident: struct_ident.clone(),

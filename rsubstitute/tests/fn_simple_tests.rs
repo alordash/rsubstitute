@@ -1,4 +1,4 @@
-use rsubstitute_proc_macro::mock;
+use rsubstitute::mock;
 use std::cell::RefCell;
 use std::sync::Arc;
 

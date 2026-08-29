@@ -40,7 +40,6 @@ trait Trait<'a, 'b: 'a, T1: Clone> {
         xaxbxcxdx_t2_ref: &&'a &&'b &&'c &&'d &T2,
         xapx: &&'a *const &i32,
     ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32 {
-        // TODO - mock(base) to verify that anonymous lifetiems are correct
         unreachable!()
     }
 }

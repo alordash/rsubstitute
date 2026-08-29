@@ -5,7 +5,6 @@ trait Trait {
     fn f(&self);
 }
 
-// TODO - write tests for all targets (fn, trait and struct) with default generic values
 #[mock]
 struct Struct<Q = i32> {
     pub phantom: core::marker::PhantomData<Q>,
