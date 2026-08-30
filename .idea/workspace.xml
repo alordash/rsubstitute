@@ -61,14 +61,7 @@
     </cargoProject>
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="f847079f-511f-4600-8811-ffe4728519b1" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/struct_various_self_tests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/struct_various_self_tests.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/test_utils/counter.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/test_utils/counter.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/trait_value_type_tests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/trait_value_type_tests.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/trait_various_self_tests.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/trait_various_self_tests.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_core/src/infrastructure/error_printing.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_core/src/infrastructure/error_printing.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_core/src/times.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_core/src/times.rs" afterDir="false" />
-    </list>
+    <list default="true" id="f847079f-511f-4600-8811-ffe4728519b1" name="Changes" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
@@ -196,6 +189,10 @@
     "Cargo.Test accept_value_OkPanics.executor": "Run",
     "Cargo.Test accept_value_return_value_tests.executor": "Run",
     "Cargo.Test accept_value_tests.executor": "Run",
+    "Cargo.Test ai_fn_2::tests.executor": "Run",
+    "Cargo.Test ai_fn_5::tests.executor": "Run",
+    "Cargo.Test ai_trait_1::tests.executor": "Run",
+    "Cargo.Test ai_trait_2::tests.executor": "Run",
     "Cargo.Test another_work.executor": "Run",
     "Cargo.Test arg_printing_test.executor": "Run",
     "Cargo.Test arg_printing_test::tests.executor": "Run",
@@ -401,6 +398,8 @@
     "Cargo.Test tests::return_value_tests::return_value_UsesFirstConfiguration_Ok.executor": "Run",
     "Cargo.Test tests::return_value_tests::return_value_UsesLastConfiguration_Ok.executor": "Run",
     "Cargo.Test tests::setup_ClearsPreviousSetups.executor": "Run",
+    "Cargo.Test tests::should_mock_complex_trait_through_generic_code.executor": "Run",
+    "Cargo.Test tests::should_mock_trait_through_dyn_dispatch.executor": "Run",
     "Cargo.Test tests::simple::f_base_dep.executor": "Run",
     "Cargo.Test tests::static_work_OnlyUnsuitableConfigs_Ok.executor": "Run",
     "Cargo.Test tests::static_work_ReceivedUnexpectedCalls_Ok.executor": "Run",
@@ -472,7 +471,7 @@
     "git-widget-placeholder": "main",
     "ignore.virus.scanning.warn.message": "true",
     "junie.onboarding.icon.badge.shown": "true",
-    "last_opened_file_path": "C:/_RS/rsubstitute/rsubstitute/tests",
+    "last_opened_file_path": "C:/Users/alordash/Documents/PROJECTS/rsubstitute/rsubstitute/tests",
     "node.js.detected.package.eslint": "true",
     "node.js.detected.package.jshint": "true",
     "node.js.detected.package.tslint": "true",
@@ -484,6 +483,7 @@
     "org.rust.cargo.project.model.impl.CargoExternalSystemProjectAware.subscribe.first.balloon": "",
     "org.rust.disableDetachedFileInspectionC:/_RS/rsubstitute/src/rsubstitute_core/src/arguments_matching/arg.rs": "true",
     "org.rust.disableDetachedFileInspectionC:/_RS/rsubstitute/src/rsubstitute_core/src/arguments_matching/mod.rs": "true",
+    "org.rust.hideNoCargoProjectNotificationsC:/Users/alordash/Documents/PROJECTS/rsubstitute/rsubstitute_core/src/times.rs": "true",
     "run.code.analysis.last.selected.profile": "pProject Default",
     "settings.editor.selected.configurable": "language.rust.cargo.check",
     "to.speed.mode.migration.done": "true",
@@ -497,11 +497,11 @@
 }]]></component>
   <component name="RecentsManager">
     <key name="CopyFile.RECENT_KEYS">
+      <recent name="C:\Users\alordash\Documents\PROJECTS\rsubstitute\rsubstitute\tests" />
       <recent name="C:\_RS\rsubstitute\rsubstitute\tests" />
       <recent name="C:\_RS\rsubstitute\rsubstitute_core\src\args" />
       <recent name="C:\Users\alordash\Documents\PROJECTS\rsubstitute\rsubstitute\bin" />
       <recent name="C:\_RS\rsubstitute\src\rsubstitute\tests" />
-      <recent name="C:\_RS\rsubstitute\src\rsubstitute\bin" />
     </key>
     <key name="MoveFile.RECENT_KEYS">
       <recent name="C:\_RS\rsubstitute\rsubstitute_core\src\infrastructure" />
@@ -511,7 +511,7 @@
       <recent name="C:\_RS\rsubstitute\src\rsubstitute_proc_macro\src\generation\mock_struct\common" />
     </key>
   </component>
-  <component name="RunManager" selected="Cargo.Test times::tests">
+  <component name="RunManager" selected="Cargo.Tests in 'tests'">
     <configuration name="Run sandbox" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="buildProfileId" value="test" />
       <option name="command" value="run --package rsubstitute --bin sandbox" />
@@ -530,8 +530,25 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Test mock_clone_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="test --package rsubstitute --test mock_clone_tests -- tests" />
+    <configuration name="Test ai_fn_2::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test ai_fn_2 -- tests" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Test ai_trait_2::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test ai_trait_2 -- tests" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -565,8 +582,8 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Test tests::TraitMock_Clone_ContainsSameConfiguration" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="test --package rsubstitute --test mock_clone_tests -- tests::TraitMock_Clone_ContainsSameConfiguration --exact" />
+    <configuration name="Test tests::should_mock_complex_trait_through_generic_code" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test ai_trait_2 -- tests::should_mock_complex_trait_through_generic_code --exact" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -582,8 +599,8 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Test tests::test" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="test --package rsubstitute --test mock_clone_tests -- tests::test --exact" />
+    <configuration name="Test tests::should_mock_trait_through_dyn_dispatch" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test ai_trait_2 -- tests::should_mock_trait_through_dyn_dispatch --exact" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -599,25 +616,8 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Test times::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="test --package rsubstitute_core --lib -- times::tests" />
-      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
-      <envs />
-      <option name="emulateTerminal" value="true" />
-      <option name="channel" value="DEFAULT" />
-      <option name="requiredFeatures" value="true" />
-      <option name="allFeatures" value="false" />
-      <option name="withSudo" value="false" />
-      <option name="buildTarget" value="REMOTE" />
-      <option name="backtrace" value="SHORT" />
-      <option name="isRedirectInput" value="false" />
-      <option name="redirectInputPath" value="" />
-      <method v="2">
-        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Test trait_various_self_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="test --package rsubstitute --test trait_various_self_tests -- tests" />
+    <configuration name="Tests in 'tests'" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test ai_fn_1 --test ai_fn_2 --test ai_fn_3 --test ai_fn_4 --test ai_fn_5 --test ai_trait_1 --test ai_trait_2 --test arg_printing_tests --test arg_tests --test associated_types_tests --test callback_and_base_impl_order_tests --test config_tests --test default_generics_tests --test fn_advanced_tests --test fn_async_tests --test fn_deref_tests --test fn_generics_tests --test fn_modifiers_tests --test fn_ref_tests --test fn_setup_tests --test fn_simple_tests --test fn_value_type_tests --test generics_info_in_logs_tests --test impl_trait_tests --test mock_as_arg_tests --test mock_clone_tests --test mod_tests --test no_matching_config_tests --test optional_generics_tests --test reference_tests --test self_in_macro_tests --test struct_advanced_tests --test struct_arc_tests --test struct_async_tests --test struct_base_impl_tests --test struct_generics_tests --test struct_rc_tests --test struct_ref_tests --test struct_repeating_generics_tests --test struct_simple_tests --test struct_trait_impl_generics_tests --test struct_type_reference_normalization_tests --test struct_value_type_tests --test struct_various_self_tests --test super_tests --test trait_advanced_tests --test trait_arc_tests --test trait_async_tests --test trait_base_impl_tests --test trait_generics_tests --test trait_modifiers_tests --test trait_rc_tests --test trait_ref_tests --test trait_simple_tests --test trait_value_type_tests --test trait_various_self_tests --test ub_tests --test unsized_tests --test verify_call_order_tests" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -636,19 +636,19 @@
     <list>
       <item itemvalue="Cargo.Run sandbox" />
       <item itemvalue="Cargo.Test src" />
-      <item itemvalue="Cargo.Test mock_clone_tests::tests" />
-      <item itemvalue="Cargo.Test tests::TraitMock_Clone_ContainsSameConfiguration" />
-      <item itemvalue="Cargo.Test tests::test" />
-      <item itemvalue="Cargo.Test times::tests" />
-      <item itemvalue="Cargo.Test trait_various_self_tests::tests" />
+      <item itemvalue="Cargo.Test ai_fn_2::tests" />
+      <item itemvalue="Cargo.Test ai_trait_2::tests" />
+      <item itemvalue="Cargo.Test tests::should_mock_complex_trait_through_generic_code" />
+      <item itemvalue="Cargo.Test tests::should_mock_trait_through_dyn_dispatch" />
+      <item itemvalue="Cargo.Tests in 'tests'" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Cargo.Test times::tests" />
-        <item itemvalue="Cargo.Test trait_various_self_tests::tests" />
-        <item itemvalue="Cargo.Test mock_clone_tests::tests" />
-        <item itemvalue="Cargo.Test tests::TraitMock_Clone_ContainsSameConfiguration" />
-        <item itemvalue="Cargo.Test tests::test" />
+        <item itemvalue="Cargo.Tests in 'tests'" />
+        <item itemvalue="Cargo.Test ai_fn_2::tests" />
+        <item itemvalue="Cargo.Test ai_trait_2::tests" />
+        <item itemvalue="Cargo.Test tests::should_mock_trait_through_dyn_dispatch" />
+        <item itemvalue="Cargo.Test tests::should_mock_complex_trait_through_generic_code" />
       </list>
     </recent_temporary>
   </component>
@@ -766,6 +766,7 @@
       <workItem from="1787176289236" duration="1351000" />
       <workItem from="1787258493158" duration="3236000" />
       <workItem from="1787343513260" duration="1221000" />
+      <workItem from="1788029597045" duration="9325000" />
     </task>
     <task id="LOCAL-00001" summary="fix todo">
       <option name="closed" value="true" />
