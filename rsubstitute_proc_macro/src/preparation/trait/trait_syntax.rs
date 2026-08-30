@@ -175,7 +175,7 @@ fn merge_generics_with_assoc_generics(
                 ident: format_ident!("{}_{}", trait_ident, x.item.ident),
                 colon_token: None,
                 bounds: x.item.bounds.clone(),
-                default: None,
+                default: x.item.default.clone(),
             };
             return GenericParam::Type(result);
         })
@@ -190,7 +190,7 @@ fn merge_generics_with_assoc_generics(
                 ident: const_ident,
                 colon_token: Token![:](span),
                 ty: x.item.ty.clone(),
-                default: None,
+                default: x.item.default.clone(),
             };
             return GenericParam::Const(result);
         })
