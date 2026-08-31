@@ -109,7 +109,7 @@ impl Factory {
 //
 
 mod consumer {
-    use super::{Factory, Generator};
+    use super::{Factory};
 
     pub fn generator(factory: &Factory) -> i32 {
         let generator = factory.generator(42);
@@ -119,7 +119,7 @@ mod consumer {
     pub fn iterator(factory: &Factory) -> Vec<i32> {
         factory.iterator(42).collect()
     }
-
+    #[allow(unused)]
     pub fn iterator_send_sync(factory: &Factory) -> Vec<i32> {
         factory.iterator_send_sync(42).collect()
     }
@@ -127,22 +127,22 @@ mod consumer {
     pub async fn future(factory: &Factory) -> i32 {
         factory.future(42).await
     }
-
+    #[allow(unused)]
     pub async fn future_send(factory: &Factory) -> i32 {
         factory.future_send(42).await
     }
-
+    #[allow(unused)]
     pub fn function(factory: &Factory) -> i32 {
         let function = factory.function(42);
         function(10)
     }
-
+    #[allow(unused)]
     pub fn function_send_sync(factory: &Factory) -> i32 {
         let function = factory.function_send_sync(42);
 
         function(10)
     }
-
+    #[allow(unused)]
     pub fn complicated_iterator(factory: &Factory) -> Vec<i32> {
         factory.complicated_iterator(42).collect()
     }

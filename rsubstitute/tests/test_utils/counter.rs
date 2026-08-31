@@ -11,6 +11,7 @@ impl Counter {
     pub fn inc(&self) {
         self.0.fetch_add(1, Ordering::Relaxed);
     }
+    #[allow(unused)] // idk why cargo check it's not used anywhere despite it being used a lot
     pub fn double_inc(&self) {
         self.0.fetch_add(2, Ordering::Relaxed);
     }

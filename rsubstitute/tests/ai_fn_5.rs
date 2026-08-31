@@ -1,5 +1,4 @@
 use rsubstitute::*;
-use std::sync::Arc;
 
 // ============================================================
 // Module 1: the actual static functions
@@ -7,14 +6,17 @@ use std::sync::Arc;
 
 mod target_module {
     use super::*;
-
+    
+    #[allow(unused)]
     pub const OFFSET: i32 = 7;
 
+    #[allow(unused)]
     pub static GLOBAL: i32 = 11;
 
     pub trait Convert {
         type Output;
 
+        #[allow(unused)]
         fn convert(&self) -> Self::Output;
     }
 
@@ -90,10 +92,6 @@ mod target_module {
     #[mock]
     pub async fn async_target(value: i32) -> i32 {
         async_helper(value).await + 100
-    }
-
-    async fn async_helper(value: i32) -> i32 {
-        value + 1
     }
 
     // --------------------------------------------------------
@@ -234,24 +232,6 @@ mod middle_module {
 
 mod outer_module {
     use super::middle_module;
-
-    pub fn everything_except_async() -> i32 {
-        let a = middle_module::call_normal();
-
-        let b = middle_module::call_extern_c();
-
-        let c = unsafe { middle_module::call_unsafe() };
-
-        let d = middle_module::call_recursive() as i32;
-
-        let e = middle_module::call_associated();
-
-        let f = middle_module::call_associated_generic();
-
-        let g = middle_module::call_trait_recursion() as i32;
-
-        a + b + c + d + e + f + g
-    }
 
     pub async fn async_everything() -> i32 {
         middle_module::call_async().await

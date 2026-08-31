@@ -1,4 +1,4 @@
-// TODO - write in docs that this is supported only using feature
+// TODO (DOC) - write in docs that this is supported only using feature
 #![feature(associated_type_defaults)]
 
 use rsubstitute::*;
@@ -27,7 +27,7 @@ trait Trait {
         TT: ToString;
 }
 
-// TODO - write in docs about limitation: `Self` should not be used ambiguously, e.g.
+// TODO (DOC) - write in docs about limitation: `Self` should not be used ambiguously, e.g.
 // correct: <Self as Trait>::OutputType
 //   wrong: Self::OutputType
 #[mock]

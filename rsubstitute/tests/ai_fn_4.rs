@@ -2,12 +2,15 @@ use rsubstitute::*;
 
 use std::sync::Arc;
 
+#[allow(unused)]
 const OFFSET: i32 = 7;
+#[allow(unused)]
 static GLOBAL: i32 = 11;
 
 trait Convert {
     type Output;
 
+    #[allow(unused)]
     fn convert(&self) -> Self::Output;
 }
 

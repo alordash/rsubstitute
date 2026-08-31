@@ -112,6 +112,7 @@ trait AbiMethods {
 
 #[mock]
 trait Base {
+    #[allow(unused)]
     fn base(&self);
 }
 
@@ -140,7 +141,7 @@ trait ConstGeneric<const N: usize> {
 #[mock]
 trait SelfTypes {
     fn foo(&self) -> Self;
-
+    #[allow(unused)]
     fn bar(self) -> Self;
 }
 

@@ -33,6 +33,7 @@ where
 
     const SIZE: usize = N;
 
+    #[allow(unused)]
     const MAGIC: char = 'm';
 
     // ------------------------------------------------------------------------
@@ -48,7 +49,7 @@ where
     // ------------------------------------------------------------------------
     // Every receiver form
     // ------------------------------------------------------------------------
-
+    #[allow(unused)]
     fn by_value(self);
 
     fn by_ref(&self);
@@ -171,7 +172,7 @@ where
     fn closure_mut(&self, f: impl FnMut(i32) -> i32) -> i32;
 
     fn closure_once(&self, f: impl FnOnce(i32) -> i32) -> i32;
-
+    #[allow(unused)]
     fn impl_iterator(&self, value: impl Iterator<Item = i32>);
 
     // ------------------------------------------------------------------------
@@ -781,13 +782,14 @@ mod tests {
     #[test]
     fn boxed_receiver() {
         // Arrange
-        let mut mock = MonsterMock::<i32, 4, DefaultOutput, DefaultIterator<i32>>::new();
+        let mock = MonsterMock::<i32, 4, DefaultOutput, DefaultIterator<i32>>::new();
 
         // Act
+        let mut clone = mock.clone();
         Box::new(mock).boxed();
 
         // Assert
-        // The boxed mock is consumed by the Act.
+        clone.received().boxed(1.time()).no_other_calls();
     }
 
     #[test]

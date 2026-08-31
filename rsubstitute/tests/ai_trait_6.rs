@@ -39,7 +39,7 @@ mod consumer {
     }
 
     pub unsafe fn call_unsafe(dependency: &impl Dependency, value: *mut i32) {
-        dependency.unsafe_call(value)
+        unsafe { dependency.unsafe_call(value) }
     }
 
     pub fn call_static(value: i32) -> i32 {

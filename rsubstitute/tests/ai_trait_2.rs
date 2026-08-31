@@ -8,6 +8,7 @@ trait Repository {
     type Error: Display;
 
     const NAME: char;
+    #[allow(unused)]
     const LIMIT: usize;
 
     fn get(&self, id: u32) -> Result<Self::Item, Self::Error>;
@@ -47,6 +48,7 @@ trait Repository {
     }
 
     // Another default method calling a required method.
+    #[allow(unused)]
     fn exists(&self, id: u32) -> bool {
         <Self as Repository>::get(&self, id).is_ok()
     }
@@ -80,6 +82,7 @@ impl Display for RepoError {
     }
 }
 
+#[allow(unused)]
 struct RealRepository {
     value: Item,
 }

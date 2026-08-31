@@ -403,7 +403,7 @@ mod consumer {
     }
 
     pub unsafe fn dangerous(monster: &Monster<'static, i32, 4>, value: *mut i32) {
-        monster.unsafe_method(value);
+        unsafe {monster.unsafe_method(value);}
     }
 
     pub fn static_call<'a, T: Clone + Send + Sync + 'a, const N: usize>() -> i32 {
@@ -717,11 +717,9 @@ mod tests {
         // Act
         let result = mock.closure(|x| x + 1);
 
-        let mut factor = 2;
+        let factor = 2;
 
         let mutable_result = mock.closure_mut(|x| x + factor);
-
-        factor += 1;
 
         let once_result = mock.closure_once(|x| x + 3);
 
@@ -926,9 +924,6 @@ mod tests {
     #[test]
     fn static_functions() {
         // Arrange
-        type Mock = Monster<'static, i32, 4>;
-        let mut mock = Monster::<'static, i32, 4>::new();
-
         Monster::<'static, i32, 4>::static_setup()
             .static_with_args(42, "hello".to_owned())
             .returns(123)
@@ -1098,7 +1093,7 @@ mod tests {
 
         mock.setup().rc().returns(123);
 
-        let mut mock = std::rc::Rc::new(mock);
+        let mock = std::rc::Rc::new(mock);
 
         // Act
         let result = mock.rc();
@@ -1114,7 +1109,7 @@ mod tests {
 
         mock.setup().arc().returns(123);
 
-        let mut mock = std::sync::Arc::new(mock);
+        let mock = std::sync::Arc::new(mock);
 
         // Act
         let result = mock.arc();
@@ -1130,7 +1125,7 @@ mod tests {
 
         mock.setup().pinned().returns(123);
 
-        let mut mock = Box::pin(mock);
+        let mock = Box::pin(mock);
 
         // Act
         let result = mock.pinned();
