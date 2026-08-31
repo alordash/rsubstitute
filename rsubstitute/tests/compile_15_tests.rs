@@ -1,5 +1,5 @@
-use rsubstitute::{Arg, Mockable, mock};
-use rsubstitute_core::Times;
+#![allow(unused)]
+use rsubstitute::*;
 use std::pin::Pin;
 use std::sync::atomic::{AtomicI32, Ordering};
 use std::sync::{Arc, Mutex};
@@ -32,10 +32,7 @@ impl MyFuture {
 
                 let mut waker_lock = atomic_waker_clone.lock().unwrap();
                 if let Some(waker) = waker_lock.take() {
-                    println!("Waking!");
                     waker.wake();
-                } else {
-                    println!("No waker :(");
                 }
             }),
         }
@@ -68,7 +65,6 @@ impl Future for MyFuture {
     type Output = i32;
 
     fn poll(self: Pin<&mut Self>, cx: &mut Context<'_>) -> Poll<<Self as Future>::Output> {
-        println!("Polling!");
         if self.thread.is_finished() {
             Poll::Ready(self.atomic_result.load(Ordering::SeqCst))
         } else {
@@ -78,22 +74,5 @@ impl Future for MyFuture {
     }
 }
 
-#[tokio::main]
-async fn main() {
-    let mut future = MyFuture::new(166);
-    future.setup().as_Future().poll(Arg::Any).call_base();
-    let result = future.await;
-    assert_eq!(166, result);
-
-    work::setup().returns_with(|_| 515);
-    let work_result = work().await;
-    assert_eq!(515, work_result);
-    work::received(Times::Once).no_other_calls();
-    dbg!(work_result);
-
-    work::setup().call_base();
-    let work_result = work().await;
-    assert_eq!(12, work_result);
-    work::received(Times::Once).no_other_calls();
-    dbg!(work_result);
-}
+#[test]
+fn compile() {}

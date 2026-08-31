@@ -81,11 +81,7 @@ mod tests {
             .returns(struct_value)
             .get_plus_one()
             .call_base()
-            .and_does(|mock, _| {
-                println!(
-                    "doing something, mock name: {}",
-                    core::any::type_name_of_val(mock)
-                )
+            .and_does(|_, _| {
             })
             .as_FirstTrait()
             .get()

@@ -1,11 +1,10 @@
 use rsubstitute::*;
 
 #[mock]
-trait Trait {
+trait Trait<'rs> {
     fn work(&self, v: i32) -> i32;
 }
 
-#[cfg(test)]
 mod tests {
     use super::*;
     use rsubstitute_core::Times;
@@ -14,7 +13,7 @@ mod tests {
     #[test]
     fn my_test() {
         // Arrange
-        let mock = TraitMock::new();
+        let mut mock = TraitMock::new();
         let v1 = 10;
         let v2 = 20;
         let v3 = -31;
@@ -26,14 +25,14 @@ mod tests {
         let r3 = 333;
         let r45 = 50505;
 
-        mock.setup
+        mock.setup()
             .work(v1)
             .returns(r1)
             .work(v2)
             .returns(r2)
-            .work(Arg::Is(|x| *x < 0))
-            .returns_with(move |(number,)| number + r3)
-            .and_does(|args| println!("amogus received number: {:?}", args))
+            .work(Arg::is(|x| *x < 0))
+            .returns_with(move |(args,)| r3 + *args)
+            .and_does(|_, (_,)| {})
             .work(Arg::Any)
             .returns_always(r45);
 
@@ -51,7 +50,7 @@ mod tests {
         assert_eq!(r45, actual_r4);
         assert_eq!(r45, actual_r5);
 
-        mock.received
+        mock.received()
             .work(v1, Times::Once)
             .work(v2, Times::Once)
             .work(v3, Times::Once)
@@ -61,5 +60,3 @@ mod tests {
             .no_other_calls();
     }
 }
-
-fn main() {}

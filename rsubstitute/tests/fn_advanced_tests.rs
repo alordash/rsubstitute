@@ -27,8 +27,6 @@ struct Foo {
 #[allow(unused)]
 fn accept_foo(Foo { mut number }: Foo) {
     let q = Foo { number };
-
-    println!("number: ???");
 }
 
 #[mock]

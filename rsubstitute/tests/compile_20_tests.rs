@@ -3,8 +3,6 @@
 #![allow(unused)]
 
 use rsubstitute::*;
-#[allow(unused_imports)]
-use rsubstitute_proc_macro::mock;
 use std::marker::PhantomData;
 use std::ops::Deref;
 
@@ -24,15 +22,6 @@ impl<'a, T1: Clone> Struct<'a, T1> {
     }
 }
 
-fn main() {
-    let mut s = Struct::<u8> {
-        phantom_data: PhantomData,
-        __rs_data: Default::default(),
-    };
-
-    println!("Done");
-}
-
 #[mock(base)]
 trait Trait {
     fn f(v: i32) -> i32;
@@ -42,3 +31,6 @@ trait Trait {
 fn f(v: i32) -> i32 {
     v + 10
 }
+
+#[test]
+fn compile() {}

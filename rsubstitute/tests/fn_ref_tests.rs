@@ -69,13 +69,12 @@ mod tests {
             {
                 let v2 = 24;
                 let r2 = &v2;
-                accept_ref::setup(r2)
-                    .does(|(ref received_r2,)| println!("received_r2 = {received_r2}"));
+                accept_ref::setup(r2).does(|(ref _unused,)| {});
                 accept_ref(r2);
             }
 
-            let some_data = [15, 22, 32, 42, 52, 62, 72, 82, 92, 102];
-            println!("some_data = {some_data:?}");
+            let _some_data_for_stack_filling =
+                core::hint::black_box([15, 22, 32, 42, 52, 62, 72, 82, 92, 102]);
 
             // Act
             accept_ref(r);
@@ -83,8 +82,7 @@ mod tests {
             // Assert
             accept_ref::received(r, Times::Once)
                 .received(
-                    Arg::is(|ref received_r2| {
-                        println!("checking received, received_r2 = {received_r2}");
+                    Arg::is(|ref _unused| {
                         return true;
                     }),
                     Times::Exactly(2),

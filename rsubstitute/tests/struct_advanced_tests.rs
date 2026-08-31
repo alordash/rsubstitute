@@ -20,7 +20,6 @@ impl Struct {
         Foo { mut number }: Foo,
         #[allow(unused_variables)] mut qq: &mut &mut &&&&mut i32,
     ) {
-        println!("number: {number:?}")
     }
 }
 

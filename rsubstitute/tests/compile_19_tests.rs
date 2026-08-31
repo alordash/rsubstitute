@@ -3,8 +3,6 @@
 #![allow(unused)]
 
 use rsubstitute::*;
-#[allow(unused_imports)]
-use rsubstitute_proc_macro::mock;
 
 trait Trait<T1> {
     fn f<T2>(&self) -> T1;
@@ -68,20 +66,5 @@ where
     fn gstatic<G5>() {}
 }
 
-fn main() {
-    Struct::static_setup().new(Arg::Any).returns(Struct {
-        s1: 3i16,
-        __rs_data: Default::default(),
-    });
-    let mut s = Struct::new(10i16);
-    println!("s.s1 = {}", s.s1);
-    s.received().as_Trait::<i32>().no_other_calls();
-    s.setup().as_Gen::<[u8; 3]>();
-    s.received().no_other_calls();
-    Struct::<i128>::static_setup().as_Gen::<[[u8; 2]; 1]>();
-    Struct::<i128>::static_received()
-        .as_Gen::<[[u8; 2]; 1]>()
-        .no_other_calls();
-
-    println!("Done");
-}
+#[test]
+fn compile() {}

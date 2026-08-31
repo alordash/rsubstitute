@@ -2,10 +2,7 @@
 #![allow(non_snake_case)]
 #![allow(unused)]
 
-use rsubstitute_core::Times;
-use rsubstitute_core::args::Arg;
-#[allow(unused_imports)]
-use rsubstitute_proc_macro::mock;
+use rsubstitute::*;
 use std::marker::PhantomData;
 
 #[derive(Default, Debug, PartialEq, Clone)]
@@ -49,6 +46,5 @@ trait TraitRef<'a, 'b: 'a, T1> {
     ) -> &&'a &&'a &&'b &&'b &&'c &&'c &&'d &&'d &i32;
 }
 
-fn main() {
-    println!("Done");
-}
+#[test]
+fn compile() {}

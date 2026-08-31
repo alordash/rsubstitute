@@ -3,8 +3,7 @@
 #![allow(unused)]
 #![feature(associated_type_defaults)]
 
-#[allow(unused_imports)]
-use rsubstitute_proc_macro::mock;
+use rsubstitute::*;
 use std::fmt::Debug;
 
 #[mock(base)]
@@ -27,6 +26,5 @@ trait Trait {
         TT: ToString;
 }
 
-fn main() {
-    println!("Dones");
-}
+#[test]
+fn compile() {}
