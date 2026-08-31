@@ -178,7 +178,11 @@ pub(crate) fn generate_module(ctx: &Context, item_trait: ItemTrait) -> MockMod {
         )
         .collect();
 
-    let mut usage = mod_usage::new(item_trait.vis.clone(), mod_ident.clone(), [trait_mock_struct_ident]);
+    let mut usage = mod_usage::new(
+        item_trait.vis.clone(),
+        mod_ident.clone(),
+        [trait_mock_struct_ident],
+    );
     usage.attrs.push(attributes::allow_unused(source_span));
     let item_mod = ItemMod {
         attrs: vec![

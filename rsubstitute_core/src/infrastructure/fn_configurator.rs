@@ -152,15 +152,7 @@ impl<
     }
 }
 
-impl<
-    'rs,
-    TMock,
-    TOwner,
-    TArgRefsTuple,
-    TReturnValue,
-    TMockArg,
-    const SUPPORTS_BASE_CALLING: bool,
->
+impl<'rs, TMock, TOwner, TArgRefsTuple, TReturnValue, TMockArg, const SUPPORTS_BASE_CALLING: bool>
     FnConfigurator<
         'rs,
         TMock,

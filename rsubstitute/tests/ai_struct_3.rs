@@ -403,7 +403,9 @@ mod consumer {
     }
 
     pub unsafe fn dangerous(monster: &Monster<'static, i32, 4>, value: *mut i32) {
-        unsafe {monster.unsafe_method(value);}
+        unsafe {
+            monster.unsafe_method(value);
+        }
     }
 
     pub fn static_call<'a, T: Clone + Send + Sync + 'a, const N: usize>() -> i32 {

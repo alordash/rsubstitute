@@ -109,7 +109,7 @@ impl Factory {
 //
 
 mod consumer {
-    use super::{Factory};
+    use super::Factory;
 
     pub fn generator(factory: &Factory) -> i32 {
         let generator = factory.generator(42);

@@ -6,7 +6,7 @@ use rsubstitute::*;
 
 mod target_module {
     use super::*;
-    
+
     #[allow(unused)]
     pub const OFFSET: i32 = 7;
 

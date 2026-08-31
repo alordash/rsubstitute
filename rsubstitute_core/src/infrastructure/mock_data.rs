@@ -39,7 +39,7 @@ impl MockData {
     >(
         &'_ mut self,
         maybe_owner_name: Option<&'static str>,
-        unique_fn_ident: String,  // for trait fns
+        unique_fn_ident: String, // for trait fns
         fn_ident: &'static str,
         generics_hash_key: GenericsHashKey,
         for_struct: bool,

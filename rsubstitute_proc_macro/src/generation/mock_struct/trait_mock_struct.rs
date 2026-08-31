@@ -289,9 +289,7 @@ fn generate_inner_impl(
                 .associated_fns
                 .iter()
                 .chain(trait_info.static_fns.iter())
-                .filter_map(|fn_info| {
-                    try_extract_base_fn(span, trait_info, fn_info, mod_ident)
-                }),
+                .filter_map(|fn_info| try_extract_base_fn(span, trait_info, fn_info, mod_ident)),
         )
     } else {
         None
