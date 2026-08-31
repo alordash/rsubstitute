@@ -61,8 +61,14 @@ pub(crate) fn prepare(
                 normalization::replace_impl_trait_with_box_dyn_trait(*ty.clone());
             if replace_impl_trait_result.is_impl_trait {
                 *ty = Box::new(replace_impl_trait_result.ty.clone());
-                maybe_base_impl = maybe_base_impl
-                    .map(|x| Box::new(normalization::box_impl_trait_return_values(*x)));
+                maybe_base_impl = maybe_base_impl.map(|x| {
+                    Box::new(normalization::box_impl_trait_return_values(
+                        normalization::BoxImplParams {
+                            block: *x,
+                            needs_pinning: replace_impl_trait_result.needs_pinning,
+                        },
+                    ))
+                });
                 attributes.push(attributes::allow_refining_impl_trait(signature_span));
                 source_signature.output = ReturnType::Type(
                     arrow_token.clone(),
