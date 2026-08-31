@@ -36,7 +36,7 @@ pub(crate) fn generate(
         },
     );
     let maybe_use_base_trait =
-        maybe_base_trait_ident.map(|x| Item::Use(mod_usage::new(mod_ident.clone(), [x])));
+        maybe_base_trait_ident.map(|x| Item::Use(mod_usage::new(Visibility::Inherited, mod_ident.clone(), [x])));
     let call_stmt::Result {
         impl_trait_cast_stmts,
         call_var_path,

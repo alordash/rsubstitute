@@ -1,11 +1,11 @@
 use crate::syntax::attributes;
 use syn::*;
 
-pub(crate) fn new<const N: usize>(mod_ident: Ident, target_idents: [Ident; N]) -> ItemUse {
+pub(crate) fn new<const N: usize>(visibility: Visibility, mod_ident: Ident, target_idents: [Ident; N]) -> ItemUse {
     let span = mod_ident.span();
     let result = ItemUse {
         attrs: Vec::new(),
-        vis: Visibility::Inherited,
+        vis: visibility,
         use_token: Token![use](span),
         leading_colon: None,
         tree: UseTree::Path(UsePath {

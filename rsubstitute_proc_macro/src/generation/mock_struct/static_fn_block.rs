@@ -38,8 +38,13 @@ pub(crate) fn generate(
         },
     );
     let use_mod_stmt = (!for_struct).then(|| Item::Use(mod_usage::new_all(mod_ident.clone())));
-    let maybe_use_base_trait =
-        maybe_base_trait_ident.map(|x| Item::Use(mod_usage::new(mod_ident.clone(), [x])));
+    let maybe_use_base_trait = maybe_base_trait_ident.map(|x| {
+        Item::Use(mod_usage::new(
+            Visibility::Inherited,
+            mod_ident.clone(),
+            [x],
+        ))
+    });
     let call_stmt::Result {
         impl_trait_cast_stmts,
         call_var_path,
