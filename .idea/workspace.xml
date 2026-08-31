@@ -62,14 +62,9 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="f847079f-511f-4600-8811-ffe4728519b1" name="Changes" comment="">
-      <change afterPath="$PROJECT_DIR$/rsubstitute/tests/ai_struct_1.rs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rsubstitute/tests/ai_struct_2.rs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rsubstitute/tests/ai_struct_3.rs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rsubstitute/tests/ai_struct_4.rs" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/rsubstitute/tests/futures_tests.rs" afterDir="false" />
+      <change afterPath="$PROJECT_DIR$/rsubstitute/tests/ai_struct_5.rs" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/common/normalization/impl_trait_normalization.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/common/normalization/impl_trait_normalization.rs" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/fn/fn_syntax.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute_proc_macro/src/preparation/fn/fn_syntax.rs" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/rsubstitute/tests/ai_struct_4.rs" beforeDir="false" afterPath="$PROJECT_DIR$/rsubstitute/tests/ai_struct_4.rs" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -205,6 +200,7 @@
     "Cargo.Test ai_struct_2::tests.executor": "Run",
     "Cargo.Test ai_struct_3::tests.executor": "Run",
     "Cargo.Test ai_struct_4::tests.executor": "Run",
+    "Cargo.Test ai_struct_5::tests.executor": "Run",
     "Cargo.Test ai_trait_1::tests.executor": "Run",
     "Cargo.Test ai_trait_2::tests.executor": "Run",
     "Cargo.Test ai_trait_6::tests.executor": "Run",
@@ -236,6 +232,7 @@
     "Cargo.Test f::test.executor": "Run",
     "Cargo.Test f_Ok.executor": "Run",
     "Cargo.Test flex.executor": "Run",
+    "Cargo.Test fn.executor": "Run",
     "Cargo.Test fn_advanced_ref_tests::tests.executor": "Run",
     "Cargo.Test fn_advanced_tests::tests.executor": "Run",
     "Cargo.Test fn_async_tests::tests.executor": "Run",
@@ -388,6 +385,7 @@
     "Cargo.Test tests::get_return_tests::get_return_UnconfiguredType_PanicsOk.executor": "Run",
     "Cargo.Test tests::global_test.executor": "Run",
     "Cargo.Test tests::global_test2.executor": "Run",
+    "Cargo.Test tests::impl_future_cross_module.executor": "Run",
     "Cargo.Test tests::input_output_Ok.executor": "Run",
     "Cargo.Test tests::my_test (1).executor": "Run",
     "Cargo.Test tests::my_test (2).executor": "Run",
@@ -451,6 +449,7 @@
     "Cargo.Test tests::work_ReferenceToTemporaryValue_ReceivesDanglingReference.executor": "Run",
     "Cargo.Test tests::work_ReferenceToTemporaryValue_ReceviesDanglingReference.executor": "Run",
     "Cargo.Test times::tests.executor": "Run",
+    "Cargo.Test trait.executor": "Run",
     "Cargo.Test trait_advanced_ref_tests::tests.executor": "Run",
     "Cargo.Test trait_advanced_tests::tests.executor": "Run",
     "Cargo.Test trait_arc_tests::tests.executor": "Run",
@@ -530,24 +529,7 @@
       <recent name="C:\_RS\rsubstitute\src\rsubstitute_proc_macro\src\generation\mock_struct\common" />
     </key>
   </component>
-  <component name="RunManager" selected="Cargo.Test futures_tests::tests">
-    <configuration name="Expand futures_tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="expand --test futures_tests --color=always --theme=Dracula --tests" />
-      <option name="workingDirectory" value="file://$PROJECT_DIR$/rsubstitute" />
-      <envs />
-      <option name="emulateTerminal" value="true" />
-      <option name="channel" value="DEFAULT" />
-      <option name="requiredFeatures" value="true" />
-      <option name="allFeatures" value="false" />
-      <option name="withSudo" value="false" />
-      <option name="buildTarget" value="REMOTE" />
-      <option name="backtrace" value="SHORT" />
-      <option name="isRedirectInput" value="false" />
-      <option name="redirectInputPath" value="" />
-      <method v="2">
-        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
-      </method>
-    </configuration>
+  <component name="RunManager" selected="Cargo.Test compile (1)">
     <configuration name="Run sandbox" type="CargoCommandRunConfiguration" factoryName="Cargo Command">
       <option name="buildProfileId" value="test" />
       <option name="command" value="run --package rsubstitute --bin sandbox" />
@@ -566,43 +548,59 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
+    <configuration name="Test ai_struct_4::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test ai_struct_4 -- tests" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Test ai_struct_5::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test ai_struct_5 -- tests" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
     <configuration name="Test compile (1)" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test ai_struct_5 -- compile --exact" />
+      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
+      <envs />
+      <option name="emulateTerminal" value="true" />
+      <option name="channel" value="DEFAULT" />
+      <option name="requiredFeatures" value="true" />
+      <option name="allFeatures" value="false" />
+      <option name="withSudo" value="false" />
+      <option name="buildTarget" value="REMOTE" />
+      <option name="backtrace" value="SHORT" />
+      <option name="isRedirectInput" value="false" />
+      <option name="redirectInputPath" value="" />
+      <method v="2">
+        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
+      </method>
+    </configuration>
+    <configuration name="Test compile" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
       <option name="command" value="test --package rsubstitute --test ai_struct_4 -- compile --exact" />
-      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
-      <envs />
-      <option name="emulateTerminal" value="true" />
-      <option name="channel" value="DEFAULT" />
-      <option name="requiredFeatures" value="true" />
-      <option name="allFeatures" value="false" />
-      <option name="withSudo" value="false" />
-      <option name="buildTarget" value="REMOTE" />
-      <option name="backtrace" value="SHORT" />
-      <option name="isRedirectInput" value="false" />
-      <option name="redirectInputPath" value="" />
-      <method v="2">
-        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Test compile (2)" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="buildProfileId" value="test" />
-      <option name="command" value="test --package rsubstitute --test futures_tests -- compile --exact" />
-      <option name="workingDirectory" value="file://$PROJECT_DIR$" />
-      <envs />
-      <option name="emulateTerminal" value="true" />
-      <option name="channel" value="DEFAULT" />
-      <option name="requiredFeatures" value="true" />
-      <option name="allFeatures" value="false" />
-      <option name="withSudo" value="false" />
-      <option name="buildTarget" value="REMOTE" />
-      <option name="backtrace" value="SHORT" />
-      <option name="isRedirectInput" value="false" />
-      <option name="redirectInputPath" value="" />
-      <method v="2">
-        <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
-      </method>
-    </configuration>
-    <configuration name="Test futures_tests::tests" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="test --package rsubstitute --test futures_tests -- tests" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -636,8 +634,8 @@
         <option name="CARGO.BUILD_TASK_PROVIDER" enabled="true" />
       </method>
     </configuration>
-    <configuration name="Tests in 'tests'" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
-      <option name="command" value="test --package rsubstitute --test ai_fn_1 --test ai_fn_2 --test ai_fn_3 --test ai_fn_4 --test ai_fn_5 --test ai_struct_1 --test ai_struct_2 --test ai_struct_3 --test ai_trait_1 --test ai_trait_2 --test ai_trait_3 --test ai_trait_4 --test ai_trait_5 --test ai_trait_6 --test arg_printing_tests --test arg_tests --test associated_types_tests --test callback_and_base_impl_order_tests --test config_tests --test default_generics_tests --test fn_advanced_tests --test fn_async_tests --test fn_deref_tests --test fn_generics_tests --test fn_modifiers_tests --test fn_ref_tests --test fn_setup_tests --test fn_simple_tests --test fn_value_type_tests --test futures_tests --test generics_info_in_logs_tests --test impl_trait_tests --test mock_as_arg_tests --test mock_clone_tests --test mod_tests --test no_matching_config_tests --test optional_generics_tests --test reference_tests --test self_in_macro_tests --test struct_advanced_tests --test struct_arc_tests --test struct_async_tests --test struct_base_impl_tests --test struct_generics_tests --test struct_inherent_trait_tests --test struct_rc_tests --test struct_ref_tests --test struct_repeating_generics_tests --test struct_simple_tests --test struct_trait_impl_generics_tests --test struct_type_reference_normalization_tests --test struct_value_type_tests --test struct_various_self_tests --test super_tests --test trait_advanced_tests --test trait_arc_tests --test trait_associated_items_tests --test trait_async_tests --test trait_base_impl_tests --test trait_generics_tests --test trait_modifiers_tests --test trait_rc_tests --test trait_ref_tests --test trait_simple_tests --test trait_value_type_tests --test trait_various_self_tests --test ub_tests --test unsized_tests --test verify_call_order_tests" />
+    <configuration name="Test tests::impl_future_cross_module" type="CargoCommandRunConfiguration" factoryName="Cargo Command" temporary="true">
+      <option name="command" value="test --package rsubstitute --test ai_struct_4 -- tests::impl_future_cross_module --exact" />
       <option name="workingDirectory" value="file://$PROJECT_DIR$" />
       <envs />
       <option name="emulateTerminal" value="true" />
@@ -656,19 +654,19 @@
     <list>
       <item itemvalue="Cargo.Run sandbox" />
       <item itemvalue="Cargo.Test src" />
-      <item itemvalue="Cargo.Expand futures_tests" />
+      <item itemvalue="Cargo.Test ai_struct_4::tests" />
+      <item itemvalue="Cargo.Test ai_struct_5::tests" />
+      <item itemvalue="Cargo.Test compile" />
       <item itemvalue="Cargo.Test compile (1)" />
-      <item itemvalue="Cargo.Test compile (2)" />
-      <item itemvalue="Cargo.Test futures_tests::tests" />
-      <item itemvalue="Cargo.Tests in 'tests'" />
+      <item itemvalue="Cargo.Test tests::impl_future_cross_module" />
     </list>
     <recent_temporary>
       <list>
-        <item itemvalue="Cargo.Test futures_tests::tests" />
-        <item itemvalue="Cargo.Test compile (2)" />
-        <item itemvalue="Cargo.Expand futures_tests" />
-        <item itemvalue="Cargo.Tests in 'tests'" />
         <item itemvalue="Cargo.Test compile (1)" />
+        <item itemvalue="Cargo.Test ai_struct_5::tests" />
+        <item itemvalue="Cargo.Test tests::impl_future_cross_module" />
+        <item itemvalue="Cargo.Test ai_struct_4::tests" />
+        <item itemvalue="Cargo.Test compile" />
       </list>
     </recent_temporary>
   </component>

@@ -28,7 +28,7 @@ impl Factory {
     }
 }
 
-#[mock]
+#[cfg_attr(test, mock)]
 impl Factory {
     // ------------------------------------------------------------------------
     // impl Trait in return position
