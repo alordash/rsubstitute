@@ -23,15 +23,17 @@ fn work(v: i32) -> i32 {
     1
 }
 
-// Arrange
-work::setup(10).returns(20);
-
-// Act
-let result = work(10);
-
-// Assert
-assert_eq!(result, 20);
-work::received(10, 1.time());
+# fn main() {
+    // Arrange
+    work::setup(10).returns(20);
+    
+    // Act
+    let result = work(10);
+    
+    // Assert
+    assert_eq!(result, 20);
+    work::received(10, 1.time());
+# }
 ```
 
 Trait:
@@ -48,14 +50,16 @@ fn use_trait(t: &dyn Trait, v: i32) -> i32 {
     t.work(v)
 }
 
-// Arrange
-let mut mock = TraitMock::new();
-mock.setup().work(10).returns(20);
+# fn main() {
+    // Arrange
+    let mut mock = TraitMock::new();
+    mock.setup().work(10).returns(20);
 
-// Act
-let result = use_trait(&mock, 10);
+    // Act
+    let result = use_trait(&mock, 10);
 
-// Assert
-assert_eq!(result, 20);
-mock.received().work(10, 1.time());
+    // Assert
+    assert_eq!(result, 20);
+    mock.received().work(10, 1.time());
+# }
 ```
