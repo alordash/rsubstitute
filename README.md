@@ -34,7 +34,7 @@ fn use_trait(t: &dyn Trait, v: i32) -> i32 {
     t.work(v)
 }
 
-#[cfg(test)]`
+#[cfg(test)]
 mod tests {
     use super::*;
 
@@ -53,8 +53,8 @@ mod tests {
 }
 ```
 
-To learn how to mock structures and functions and use features such as sequence validation and base implementations
-usage see [API docs](https://docs.rs/rsubstitute).
+To learn how to mock structures and functions as well as use sequence validation, base implementations usage and other
+features - see [API docs](https://docs.rs/rsubstitute).
 
 # Minimum Supported Rust Version (MSRV)
 
