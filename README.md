@@ -6,8 +6,8 @@ Library for mocking functions, traits and structures in Rust.
 
 ## Overview
 
-This library exposes `mock` attribute for making code mockable and an API for mocks configuration. No changes for source
-code are needed (apart from adding `#[cfg_attr(test, mock)]` attribute).
+This library exposes `mock` attribute that generates all infrastructure required for creating mocks and an API for their
+configuration. No changes for source code are needed (apart from adding `#[cfg_attr(test, mock)]` attribute).
 
 ## Usage
 
@@ -53,7 +53,7 @@ mod tests {
 }
 ```
 
-To learn how to mock structures and functions as well as use sequence validation, base implementations usage and other
+To learn how to mock structures and functions as well as use call order validation, base implementations and other
 features - see [API docs](https://docs.rs/rsubstitute).
 
 # Minimum Supported Rust Version (MSRV)
