@@ -49,6 +49,7 @@
 ///     mock.received.work(Arg::is(|v| *v > 0, Times::once);
 /// }
 /// ```
+#[doc(hidden)]
 #[macro_export]
 macro_rules! transmute_lifetime {
     ($expr:expr) => {

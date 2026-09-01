@@ -11,37 +11,21 @@ code are needed (apart from adding `#[cfg_attr(test, mock)]` attribute).
 
 ## Usage
 
-Import `rsubstitute::*` and apply `mock` attribute on your function, trait, struct, or `impl` block.
+Add `rsubsitute` to your `dev-dependencies`:
 
-Here's an example of how to mock regular function:
-
-```rust
-use rsubstitute::*;
-
-#[mock]
-fn work(v: i32) -> i32 {
-    1
-}
-
-# fn main() {
-    // Arrange
-    work::setup(10).returns(20);
-    
-    // Act
-    let result = work(10);
-    
-    // Assert
-    assert_eq!(result, 20);
-    work::received(10, 1.time());
-# }
+```toml
+[dev-dependencies]
+rsubsitute = "0.1.1"
 ```
 
-Trait:
+Import `rsubstitute::*` and apply `mock` attribute on your function, trait, structure, or `impl` block.  
+Here's an example of how to test function `use_trait` using `Trait` mock:
 
 ```rust
+#[cfg(test)]
 use rsubstitute::*;
 
-#[mock]
+#[cfg_attr(test, mock)]
 trait Trait {
     fn work(&self, v: i32) -> i32;
 }
@@ -50,16 +34,40 @@ fn use_trait(t: &dyn Trait, v: i32) -> i32 {
     t.work(v)
 }
 
-# fn main() {
-    // Arrange
-    let mut mock = TraitMock::new();
-    mock.setup().work(10).returns(20);
+#[cfg(test)]`
+mod tests {
+    use super::*;
 
-    // Act
-    let result = use_trait(&mock, 10);
+    fn trait_test() {
+        // Arrange
+        let mut mock = TraitMock::new();
+        mock.setup().work(10).returns(20);
 
-    // Assert
-    assert_eq!(result, 20);
-    mock.received().work(10, 1.time());
-# }
+        // Act
+        let result = use_trait(&mock, 10);
+
+        // Assert
+        assert_eq!(result, 20);
+        mock.received().work(10, 1.time());
+    }
+}
 ```
+
+To learn how to mock structures and functions and use features such as sequence validation and base implementations
+usage see [API docs](https://docs.rs/rsubstitute).
+
+# Minimum Supported Rust Version (MSRV)
+
+`rsubstitute` is supported on Rust 1.88.0 and higher. `rsubstitute`'s MSRV will not be changed in the future without
+bumping the major or minor version.
+
+# License
+
+`rsubstitute` is distributed under the terms of MIT license. See [license.txt](license.txt) for details.
+
+# Acknowledgements
+
+`rsubstitute` was heavily inspired by two mocking libraries: [mockall](https://github.com/asomers/mockall) (Rust)
+and [NSubstitute](https://github.com/nsubstitute/NSubstitute) (C#). A lot of documentation and features were based on
+`mockall` (including this README's structure). Errors string format and API structure were basically borrowed from
+`NSubstitute`.
