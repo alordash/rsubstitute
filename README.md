@@ -1,8 +1,6 @@
-# WIP
-
 # rsubstitute
 
-Library for mocking functions, traits and structures in Rust.
+Library for mocking static functions, traits and structures in Rust designed to follow arrange-act-assert pattern.
 
 ## Overview
 
