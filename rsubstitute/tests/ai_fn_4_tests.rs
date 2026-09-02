@@ -291,7 +291,7 @@ mod tests {
             Arg::Any,
             Arg::Any,
         )
-        .returns_always(42);
+        .always_returns(42);
 
         // Act
         let result = evil();

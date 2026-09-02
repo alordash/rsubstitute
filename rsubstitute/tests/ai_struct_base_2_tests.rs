@@ -111,9 +111,9 @@ mod tests {
 
         mock.setup().process(10).call_base();
 
-        mock.setup().transform(10).returns_always(100);
+        mock.setup().transform(10).always_returns(100);
 
-        mock.setup().adjust().returns_always(5);
+        mock.setup().adjust().always_returns(5);
 
         // Act
         let result = mock.calculate(10);
@@ -197,9 +197,9 @@ mod tests {
 
         mock.setup().process(10).call_base();
 
-        mock.setup().transform(10).returns_always(7);
+        mock.setup().transform(10).always_returns(7);
 
-        mock.setup().adjust().returns_always(3);
+        mock.setup().adjust().always_returns(3);
 
         // Act
         let result = mock.run(10);
@@ -283,13 +283,13 @@ mod tests {
 
         mock.setup().recursive(1).call_base();
 
-        mock.setup().recursive(0).returns_always(100);
+        mock.setup().recursive(0).always_returns(100);
 
-        mock.setup().transform(0).returns_always(10);
+        mock.setup().transform(0).always_returns(10);
 
-        mock.setup().transform(1).returns_always(20);
+        mock.setup().transform(1).always_returns(20);
 
-        mock.setup().transform(2).returns_always(30);
+        mock.setup().transform(2).always_returns(30);
 
         // Act
         let result = mock.recursive(3);
@@ -315,7 +315,7 @@ mod tests {
 
         mock.setup().reset().call_base();
 
-        mock.setup().adjust().returns_always(50);
+        mock.setup().adjust().always_returns(50);
 
         // Act
         let result = mock.reset();
@@ -373,9 +373,9 @@ mod tests {
 
         mock.setup().prepare(10).call_base();
 
-        mock.setup().process(10).returns_always(500);
+        mock.setup().process(10).always_returns(500);
 
-        mock.setup().transform(10).returns_always(7);
+        mock.setup().transform(10).always_returns(7);
 
         // Act
         let result = mock.run(10);

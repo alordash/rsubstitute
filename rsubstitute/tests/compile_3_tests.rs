@@ -34,7 +34,7 @@ mod tests {
             .returns_with(move |(args,)| r3 + *args)
             .and_does(|_, (_,)| {})
             .work(Arg::Any)
-            .returns_always(r45);
+            .always_returns(r45);
 
         // Act
         let actual_r1 = mock.work(v1);

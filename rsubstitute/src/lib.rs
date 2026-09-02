@@ -14,7 +14,7 @@
 //! # }
 //! ```
 //!
-//! Automatically generated mock structure has two special methods to control it's behaviour:
+//! Automatically generated mock structure has two special methods to control its behaviour:
 //! `setup()` and `received()`. `setup()` allows you to configure what mock object should do when
 //! it's methods are called. `received()` is used to check how mock object was used.
 //! ```rust
@@ -48,8 +48,9 @@
 //! * [`Trait mock`](#trait-mock)
 //! * [`Structure mock`](#structure-mock)
 //! * [`Trait implementation mock`](#trait-implementation-mock)
-//! * [`Function mock`](#function-mock)
+//! * [`Standalone function mock`](#standalone-function-mock)
 //! * [`Arguments matching`](#arguments-matching)
+//! * [`Controlling function behaviour`](#controlling-function-behaviour)
 //!
 //! ## Trait mock
 //!
@@ -258,7 +259,7 @@
 //!
 //! </div>
 //!
-//! # Function mock
+//! # Standalone function mock
 //!
 //! To mock standalone function add `#[mock]` or `#[mock(base)]` attribute. This will generate
 //! module with the same name as mocked function, which exposes standalone `setup()` and
@@ -334,7 +335,7 @@
 //! let mut mock = TraitMock::new();
 //! let r1 = Rc::new(1);
 //! let r2 = r1.clone();
-//! mock.setup().work(Arg::ref_eq(r1.clone())).returns_always(10);
+//! mock.setup().work(Arg::ref_eq(r1.clone())).always_returns(10);
 //!
 //! // Act
 //! let first  = mock.work(r1.clone());
@@ -349,6 +350,13 @@
 //! 5. [`Arg::ref_not_eq`] - checks that argument's reference DOES NOT point to the same place as
 //! provided reference. Compares references returned by [`std::ops::Deref::deref`] of `T`. Opposite
 //! of `Arg::ref_eq`.
+//! 
+//! # Controlling function behaviour
+//! 
+//! Calling `setup()` returns [`for_generated::FnConfigurator`] - type that is used to tell mocked
+//! function what it should do upon receiving call with successfully matched tuple of arguments.
+//! 
+//! 
 #![allow(clippy::needless_return)]
 pub use rsubstitute_proc_macro::mock;
 

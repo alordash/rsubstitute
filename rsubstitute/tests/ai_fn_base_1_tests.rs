@@ -69,7 +69,7 @@ mod tests {
         // Arrange
         calculate::setup(10).call_base();
 
-        transform::setup(10).returns_always(100);
+        transform::setup(10).always_returns(100);
 
         adjust::setup(10).call_base();
 
