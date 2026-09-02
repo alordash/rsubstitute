@@ -11,6 +11,14 @@ trait Trait<T1, T2 = u16> {
     fn get_return_different(&self, value: T1) -> T2;
 }
 
+// TODO - panic not only from struct's associated type, but also from associated const
+#[mock]
+struct Structs00;
+#[mock(base)]
+impl Structs00 {
+    pub const FOO: i32 = 1;
+}
+
 trait Consumer<T> {}
 
 #[mock]

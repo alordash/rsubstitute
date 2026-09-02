@@ -14,7 +14,7 @@
 //! # }
 //! ```
 //!
-//! Automatically generated mock structure has two special methods to control its behaviour:
+//! Automatically generated mock structure has two special methods to control its behavior:
 //! `setup()` and `received()`. `setup()` allows you to configure what mock object should do when
 //! it's methods are called. `received()` is used to check how mock object was used.
 //! ```rust
@@ -45,14 +45,22 @@
 //!
 //! # User guide
 //!
-//! * [`Trait mock`](#trait-mock)
-//! * [`Structure mock`](#structure-mock)
-//! * [`Trait implementation mock`](#trait-implementation-mock)
-//! * [`Standalone function mock`](#standalone-function-mock)
-//! * [`Arguments matching`](#arguments-matching)
-//! * [`Controlling function behaviour`](#controlling-function-behaviour)
+//! * [Mocking traits](#mocking-traits)
+//! * [Mocking structures](#mocking-structures)
+//! * [Mocking trait implementations](#mocking-trait-implementations)
+//! * [Mocking standalone functions](#mocking-standalone-functions)
+//! * [Static associated functions](#static-associated-functions)       TODO
+//! * [Arguments matching](#arguments-matching)
+//! * [Controlling function behavior](#controlling-function-behavior)   TODO - WIP
+//! * [Generics](#generics)                                             TODO
+//! * [Associated constants and types](#associated-constants-and-types) TODO
+//! * [`impl Trait` types](#impl-trait-types)                           TODO
+//! * [Trait modifiers](#trait-modifiers)                               TODO
+//! * [Function modifiers](#function-modifiers)                         TODO
+//! * [Call order validation](#call-order-validation)                   TODO
+//! * [Undefined behavior](#undefined-behavior)                         TODO
 //!
-//! ## Trait mock
+//! ## Mocking traits
 //!
 //! To mock trait add `#[mock]` or `#[mock(base)]` attribute to it.
 //! ```
@@ -99,7 +107,7 @@
 //! # fn main() {}
 //! ```
 //!
-//! ## Structure mock
+//! ## Mocking structures
 //!
 //! `rsubstitute` supports mocking structures, but it's intended to be used only on structures that
 //! behave more like simply "stateful" functions.  
@@ -172,7 +180,7 @@
 //!
 //! </div>
 //!
-//! ## Trait implementation mock
+//! ## Mocking trait implementations
 //! To mock implementations of traits on mockable structures (trait itself does not need to be
 //! mockable) add `#[mock]` or `#[mock(base)]` on `impl` block. Each mocked trait implementation adds
 //! `as_TRAIT_NAME` method both to mock's `setup` and `received` functions:
@@ -259,7 +267,7 @@
 //!
 //! </div>
 //!
-//! # Standalone function mock
+//! ## Mocking standalone functions
 //!
 //! To mock standalone function add `#[mock]` or `#[mock(base)]` attribute. This will generate
 //! module with the same name as mocked function, which exposes standalone `setup()` and
@@ -308,7 +316,7 @@
 //!      .setup(2).returns(20); // `.setup(2)` does not clear previous configuration
 //! ```
 //!
-//! # Arguments matching
+//! ## Arguments matching
 //!
 //! `setup()` and `received()` functions accept [`Arg<T>`] as arguments, where `T` is type of
 //! argument in source function. `Arg` provides multiple ways to match argument's value:
@@ -350,13 +358,13 @@
 //! 5. [`Arg::ref_not_eq`] - checks that argument's reference DOES NOT point to the same place as
 //! provided reference. Compares references returned by [`std::ops::Deref::deref`] of `T`. Opposite
 //! of `Arg::ref_eq`.
-//! 
-//! # Controlling function behaviour
-//! 
+//!
+//! ## Controlling function behavior
+//!
 //! Calling `setup()` returns [`for_generated::FnConfigurator`] - type that is used to tell mocked
 //! function what it should do upon receiving call with successfully matched tuple of arguments.
-//! 
-//! 
+//!
+//!
 #![allow(clippy::needless_return)]
 pub use rsubstitute_proc_macro::mock;
 
