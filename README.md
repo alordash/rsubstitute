@@ -1,6 +1,6 @@
 # rsubstitute
 
-Library for mocking static functions, traits and structures in Rust designed to follow arrange-act-assert pattern.
+Library for mocking Rust static functions, traits and structures designed to follow arrange-act-assert pattern.
 
 ## Overview
 

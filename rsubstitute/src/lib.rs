@@ -1,10 +1,49 @@
-//! Library for mocking static functions, traits and structures in Rust designed to follow
+//! Library for mocking Rust static functions, traits and structures designed to follow
 //! arrange-act-assert pattern.
 //!
 //! # Usage
 //! Just apply `#[mock]` attribute on your function, trait, structure or `impl` block. You can also
 //! use `#[mock(base)]` if you want the ability to use base implementation in your tests (refer to
 //! [`Base implementation`](#base-implementation) section in user guide).
+//!
+//! ```rust
+//! use rsubstitute::*;
+//! #[mock] trait Trait {}
+//!
+//! # fn main() {
+//! let mock = TraitMock::new();
+//! # }
+//! ```
+//!
+//! Automatically generated mock structure has two special methods to control it's behaviour:
+//! `setup()` and `received()`. `setup()` allows you to configure what mock object should do when
+//! it's methods are called. `received()` is used to check how mock object was used.
+//! ```rust
+//! # use rsubstitute::*;
+//!
+//! #[mock]
+//! trait Trait {
+//!     fn work(&self, v: i32) -> i32;
+//! }
+//!
+//! # fn main() {
+//! // Arrange
+//! let mut mock = TraitMock::new();
+//! mock.setup()
+//!     .work(1).returns(10)    // when called as `work(1)` it will return 10
+//!     .work(2).returns(20);   // when called as `work(2)` it will return 20
+//!
+//! // Act
+//! let result = mock.work(1);
+//!
+//! // Assert
+//! assert_eq!(result, 10);
+//! mock.received()
+//!     .work(1, 1.time())      // verify that `work(1)` was called once
+//!     .work(2, Times::Never); // verify that `work(2)` was never called
+//! # }
+//! ```
+//!
 //!
 //! # User guide
 //!
@@ -14,7 +53,7 @@
 //!
 //! ## Trait mock
 //!
-//! To mock trait just add `#[mock]` or `#[mock(base)]` attribute to it.
+//! To mock trait add `#[mock]` or `#[mock(base)]` attribute to it.
 //! ```
 //! use rsubstitute::*;
 //!
@@ -46,13 +85,25 @@
 //!     .work(2, 1.time());
 //! # }
 //! ```
+//! 
+//! There is one limitation: `rsubstitute` can't mock trait that has super traits (other than
+//! `Clone`). For example, this won't compile:
+//! ```ignore
+//! #[mock] trait Trait: SuperTrait {}
+//! ```
+//! But this will:
+//! ```
+//! # use rsubstitute::*;
+//! #[mock] trait Trait: Clone {}
+//! # fn main() {}
+//! ```
 //!
 //! ## Structure mock
 //!
-//! `rsubstitute` supports mocking structures, but it's intended to be used only on structs that
-//! behave like "stateful" functions (or "services" in other words).  
+//! `rsubstitute` supports mocking structures, but it's intended to be used only on structures that
+//! behave more like simply "stateful" functions.  
 //! To mock structure add `#[mock]` attribute to structure definition and `#[mock]` or
-//! `#[mock(base)]` to all it's `impl` blocks whose functionality you want to mock.
+//! `#[mock(base)]` to it's `impl` blocks whose functionality you want to mock.
 //! ```rust
 //! use rsubstitute::*;
 //!
@@ -85,16 +136,15 @@
 //! <div class="warning">
 //!
 //! There are a couple of limitations for structures mocking:
-//! 1. Mocked structure can not be constructed or deconstructed outside associated functions that
+//! 1. Mocked structure can not be constructed or deconstructed outside of associated functions that
 //! were mocked. This is because `rsubstitute` adds special `__rs_data` field to generated structure
-//! that it automatically fills when inside mocked `impl` block.
+//! that it automatically fills inside mocked `impl` block.
 //! 2. Structure must have either named fields or no fields at all. `struct Struct { v: i32 }` and
 //! `struct Struct;` can be mocked, but `struct Struct(i32)` can not.
-//! 3. Only functions inside mocked `impl` blocks can be mocked. For example, in the code snippet
-//! below only `foo` can be mocked; `bar` will always use base implementation:
+//! 3. Only functions inside mocked `impl` blocks can be mocked. In the example below only `foo` can
+//! be mocked; `bar` will always use base implementation:
 //! ```rust
-//! use rsubstitute::*;
-//!
+//! # use rsubstitute::*;
 //! #[mock] struct Structure;
 //!
 //! #[mock]
@@ -108,8 +158,8 @@
 //!
 //! # fn main() {}
 //! ```
-//! 4. To add `#[mock]` to structure's `impl` blocks the structure itself must be mockable (i.e.
-//! have `#[mock]` attribute).
+//! 4. To add `#[mock]` to structure's `impl` blocks the structure itself must have `#[mock]`
+//! attribute.
 //! 5. Can not mock functions separated by `#[cfg]`. This won't compile:
 //! ```ignore
 //! #[mock]
@@ -123,8 +173,9 @@
 //!
 //! ## Trait implementation mock
 //! `rsubstitute` supports mocking implementations of traits on mockable structures (trait itself
-//! does not need to be mockable) by adding `#[mock]` or `#[mock(base]`. Each mocked trait
-//! implementation adds `as_TRAIT_NAME` method both to mock's `setup` and `received` functions:
+//! does not need to be mockable) by adding `#[mock]` or `#[mock(base]` on `impl` block. Each mocked
+//! trait implementation adds `as_TRAIT_NAME` method both to mock's `setup` and `received`
+//! functions:
 //! ```rust
 //! use rsubstitute::*;
 //!
@@ -189,7 +240,22 @@
 //!
 //! # fn main() {}
 //! ```
-//! 2. Limitations from [`Structure mock`].
+//! 2. If trait has default implementations for some methods, these methods can be mocked only if
+//! they are defined inside structure's `impl` block. For example:
+//! ```ignore
+//! trait Trait {
+//!     fn get(&self) -> i32 { 10 }
+//! }
+//! 
+//! // Can't mock `Trait::get()`
+//! impl Trait for Struct {}
+//! 
+//! // Can mock `Trait::get()`
+//! impl Trait for Struct {
+//!     fn get(&self) -> i32 { 10 }
+//! }
+//! ```
+//! 3. Limitations from [`Structure mock`](#structure-mock).
 //!
 //! </div>
 #![allow(clippy::needless_return)]
