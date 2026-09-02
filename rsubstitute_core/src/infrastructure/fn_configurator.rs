@@ -116,6 +116,8 @@ impl<
         return &self.fn_callback_configurator;
     }
 
+    // TODO - rename to `always_returns`?
+    // TODO - add `always_returns_with`
     pub fn returns_always<'a>(
         &self,
         return_value: TReturnValue,

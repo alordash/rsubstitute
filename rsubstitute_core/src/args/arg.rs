@@ -5,9 +5,13 @@ use std::ops::Deref;
 
 struct Private;
 
+/// Argument matcher, checks whether certain argument value matches some expectation.
+/// 
+/// [`T`] - type of argument.
 #[allow(private_interfaces)]
 #[repr(C)]
 pub enum Arg<T: ?Sized> {
+    /// Accepts any possible value.
     Any,
     #[doc(hidden)]
     PrivateEq(ArgCmp<T>, Private),
@@ -42,6 +46,7 @@ impl<T: Debug> Debug for Arg<T> {
 }
 
 impl<T> Arg<T> {
+    /// Checks that argument value matches some predicate.
     pub fn is<'a, TFn: Fn(&T) -> bool + 'a>(predicate: TFn) -> Self {
         let anonymous_predicate = move |ptr: *const ()| {
             // SAFETY: anonymous predicate is called only internally and passed pointer is always
@@ -59,6 +64,7 @@ impl<T> Arg<T> {
         return Self::PrivateIs(transmute_lifetime!(boxed_anonymous_predicate), Private);
     }
 
+    /// Checks that argument value is equal to given value.
     pub fn eq(value: T) -> Self
     where
         T: PartialEq,
@@ -71,6 +77,7 @@ impl<T> Arg<T> {
         return Self::PrivateEq(arg_cmp, Private);
     }
 
+    /// Checks that argument value is NOT equal to given value.
     pub fn not_eq(value: T) -> Self
     where
         T: PartialEq,
@@ -83,6 +90,9 @@ impl<T> Arg<T> {
         return Self::PrivateNotEq(arg_cmp, Private);
     }
 
+    /// Checks that reference of argument value is equal to reference of given value.
+    /// 
+    /// Reference is acquired from [`Deref::deref`].
     pub fn ref_eq<U>(value: T) -> Self
     where
         T: Deref<Target = U>,
@@ -96,6 +106,9 @@ impl<T> Arg<T> {
         return Self::PrivateEq(arg_cmp, Private);
     }
 
+    /// Checks that reference of argument value is NOT equal to reference of given value.
+    ///
+    /// Reference is acquired from [`Deref::deref`].
     pub fn ref_not_eq<U>(value: T) -> Self
     where
         T: Deref<Target = U>,
@@ -111,6 +124,7 @@ impl<T> Arg<T> {
 }
 
 impl<T: ?Sized> Arg<T> {
+    #[doc(hidden)]
     pub fn check<'a>(
         &self,
         arg_name: &'static str,
@@ -169,6 +183,7 @@ impl<T: ?Sized> Arg<T> {
 }
 
 impl<'rs, 'a, T: ?Sized> Arg<&'a T> {
+    #[doc(hidden)]
     pub fn check_ref(
         &self,
         arg_name: &'static str,
@@ -219,6 +234,7 @@ impl<'rs, 'a, T: ?Sized> Arg<&'a T> {
 }
 
 impl<'a, T: ?Sized> Arg<&'a mut T> {
+    #[doc(hidden)]
     pub fn check_mut_ref(
         &self,
         arg_name: &'static str,

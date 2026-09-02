@@ -1,5 +1,4 @@
-//! Library for mocking Rust static functions, traits and structures designed to follow
-//! arrange-act-assert pattern.
+//! Library for mocking Rust static functions, traits and structures.
 //!
 //! # Usage
 //! Just apply `#[mock]` attribute on your function, trait, structure or `impl` block. You can also
@@ -44,12 +43,13 @@
 //! # }
 //! ```
 //!
-//!
 //! # User guide
 //!
 //! * [`Trait mock`](#trait-mock)
 //! * [`Structure mock`](#structure-mock)
 //! * [`Trait implementation mock`](#trait-implementation-mock)
+//! * [`Function mock`](#function-mock)
+//! * [`Arguments matching`](#arguments-matching)
 //!
 //! ## Trait mock
 //!
@@ -85,7 +85,7 @@
 //!     .work(2, 1.time());
 //! # }
 //! ```
-//! 
+//!
 //! There is one limitation: `rsubstitute` can't mock trait that has super traits (other than
 //! `Clone`). For example, this won't compile:
 //! ```ignore
@@ -172,10 +172,9 @@
 //! </div>
 //!
 //! ## Trait implementation mock
-//! `rsubstitute` supports mocking implementations of traits on mockable structures (trait itself
-//! does not need to be mockable) by adding `#[mock]` or `#[mock(base]` on `impl` block. Each mocked
-//! trait implementation adds `as_TRAIT_NAME` method both to mock's `setup` and `received`
-//! functions:
+//! To mock implementations of traits on mockable structures (trait itself does not need to be
+//! mockable) add `#[mock]` or `#[mock(base)]` on `impl` block. Each mocked trait implementation adds
+//! `as_TRAIT_NAME` method both to mock's `setup` and `received` functions:
 //! ```rust
 //! use rsubstitute::*;
 //!
@@ -246,10 +245,10 @@
 //! trait Trait {
 //!     fn get(&self) -> i32 { 10 }
 //! }
-//! 
+//!
 //! // Can't mock `Trait::get()`
 //! impl Trait for Struct {}
-//! 
+//!
 //! // Can mock `Trait::get()`
 //! impl Trait for Struct {
 //!     fn get(&self) -> i32 { 10 }
@@ -258,6 +257,98 @@
 //! 3. Limitations from [`Structure mock`](#structure-mock).
 //!
 //! </div>
+//!
+//! # Function mock
+//!
+//! To mock standalone function add `#[mock]` or `#[mock(base)]` attribute. This will generate
+//! module with the same name as mocked function, which exposes standalone `setup()` and
+//! `received()` functions:
+//!
+//! ```rust
+//! use rsubstitute::*;
+//!
+//! #[mock]
+//! fn work(v: i32) -> i32 { v + 1 }
+//!
+//! # fn main() {
+//! // Arrange
+//! work::setup(1).returns(10)
+//!      .setup(2).returns(20);
+//!
+//! // Act
+//! let first  = work(1);
+//! let second = work(2);
+//!
+//! // Assert
+//! assert_eq!(first,  10);
+//! assert_eq!(second, 20);
+//! work::received(1, 1.time())
+//!      .received(2, 1.time());
+//! # }
+//! ```
+//!
+//! There are a couple of limitations for functions mocking:
+//! 1. Configuration for standalone function mock is stored in thread-local storage to prevent race
+//! condition when running multiple tests in parallel. This may impact tests running on
+//! work-stealing async runtimes.
+//! 2. Calling `setup()` of standalone function clears it's all previous configurations to prevent
+//! configuration from one test leaking into next sequentially ran test. Standalone function set-up
+//! must happen in **single module-level `setup()` call** in each unit-test.  
+//! For example, this is a wrong way of configuring standalone function:
+//! ```ignore
+//! #[mock] fn work(v: i32) -> i32 { v }
+//!
+//! work::setup(1).returns(10);
+//! work::setup(2).returns(20); // `work::setup(2)` will clear previous configuration
+//! ```
+//! Here is a correct way: call `work::setup()` only once and then use chain of `.setup()` calls:
+//! ```ignore
+//! work::setup(1).returns(10)
+//!      .setup(2).returns(20); // `.setup(2)` does not clear previous configuration
+//! ```
+//!
+//! # Arguments matching
+//!
+//! `setup()` and `received()` functions accept [`Arg<T>`] as arguments, where `T` is type of
+//! argument in source function. `Arg` provides multiple ways to match argument's value:
+//!
+//! 1. [`Arg::eq`] - checks that argument is equal to provided value. Uses [`PartialEq::eq`] of `T`.
+//! Can be used either manually like `mock.setup(Arg::eq(10))` or implicitly using `Into` conversion
+//! like `mock.setup(10)`.
+//! 2. [`Arg::is`] - checks that argument passes provided predicate. Usage example:
+//! `mock.setup(Arg::is(|v| *v == 10))`
+//! 3. [`Arg::not_eq`] - checks that argument is NOT equal to provided value. Uses [`Partial::eq`]
+//! of `T`. Opposite of `Arg::eq`. Usage example: `mock.setup(Arg::not_eq(10))`.
+//! 4. [`Arg::ref_eq`] - checks that argument's reference points to the same place as provided
+//! reference. Compares referenes returned by [`std::ops::Deref::deref`] of `T`. Usage example:
+//! ```rust
+//! # use rsubstitute::*;
+//! # use std::rc::Rc;
+//! #[mock]
+//! trait Trait {
+//!     fn work(&self, r: Rc<i32>) -> i32;
+//! }
+//!
+//! # fn main() {
+//! // Arrange
+//! let mut mock = TraitMock::new();
+//! let r1 = Rc::new(1);
+//! let r2 = r1.clone();
+//! mock.setup().work(Arg::ref_eq(r1.clone())).returns_always(10);
+//!
+//! // Act
+//! let first  = mock.work(r1.clone());
+//! let second = mock.work(r2);
+//!
+//! // Assert
+//! assert_eq!(first,  10);
+//! assert_eq!(second, 10);
+//! mock.received().work(Arg::ref_eq(r1), 2.times());
+//! # }
+//! ```
+//! 5. [`Arg::ref_not_eq`] - checks that argument's reference DOES NOT point to the same place as
+//! provided reference. Compares references returned by [`std::ops::Deref::deref`] of `T`. Opposite
+//! of `Arg::ref_eq`.
 #![allow(clippy::needless_return)]
 pub use rsubstitute_proc_macro::mock;
 

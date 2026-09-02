@@ -1,6 +1,6 @@
 # rsubstitute
 
-Library for mocking Rust static functions, traits and structures designed to follow arrange-act-assert pattern.
+Library for mocking Rust static functions, traits and structures.
 
 ## Overview
 
@@ -67,5 +67,5 @@ bumping the major or minor version.
 
 `rsubstitute` was heavily inspired by two mocking libraries: [mockall](https://github.com/asomers/mockall) (Rust)
 and [NSubstitute](https://github.com/nsubstitute/NSubstitute) (C#). A lot of documentation and features were based on
-`mockall` (including this README's structure). Errors string format and API structure were basically borrowed from
-`NSubstitute`.
+`mockall` (including this README's structure). Errors formatting and API structure were basically borrowed from
+`NSubstitute`, as well as name.
