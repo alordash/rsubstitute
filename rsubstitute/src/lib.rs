@@ -48,17 +48,17 @@
 //! * [Mocking traits](#mocking-traits)
 //! * [Mocking structures](#mocking-structures)
 //! * [Mocking trait implementations](#mocking-trait-implementations)
-//! * [Mocking standalone functions](#mocking-standalone-functions)
-//! * [Static associated functions](#static-associated-functions)       TODO
+//! * [Mocking static functions](#mocking-static-functions)
+//! * [Mocking static associated functions](#mocking-static-associated-functions)   TODO
 //! * [Arguments matching](#arguments-matching)
-//! * [Controlling function behavior](#controlling-function-behavior)   TODO - WIP
-//! * [Generics](#generics)                                             TODO
-//! * [Associated constants and types](#associated-constants-and-types) TODO
-//! * [`impl Trait` types](#impl-trait-types)                           TODO
-//! * [Trait modifiers](#trait-modifiers)                               TODO
-//! * [Function modifiers](#function-modifiers)                         TODO
-//! * [Call order validation](#call-order-validation)                   TODO
-//! * [Undefined behavior](#undefined-behavior)                         TODO
+//! * [Controlling function behavior](#controlling-function-behavior)               TODO - WIP
+//! * [Generics](#generics)                                                         TODO
+//! * [Associated constants and types](#associated-constants-and-types)             TODO
+//! * [`impl Trait` types](#impl-trait-types)                                       TODO
+//! * [Trait modifiers](#trait-modifiers)                                           TODO
+//! * [Function modifiers](#function-modifiers)                                     TODO
+//! * [Call order validation](#call-order-validation)                               TODO
+//! * [Undefined behavior](#undefined-behavior)                                     TODO
 //!
 //! ## Mocking traits
 //!
@@ -267,11 +267,11 @@
 //!
 //! </div>
 //!
-//! ## Mocking standalone functions
+//! ## Mocking static functions
 //!
-//! To mock standalone function add `#[mock]` or `#[mock(base)]` attribute. This will generate
-//! module with the same name as mocked function, which exposes standalone `setup()` and
-//! `received()` functions:
+//! To mock static function add `#[mock]` or `#[mock(base)]` attribute. This will generate module
+//! with the same name as mocked function, which exposes standalone `setup()` and `received()`
+//! functions:
 //!
 //! ```rust
 //! use rsubstitute::*;
