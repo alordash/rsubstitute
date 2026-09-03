@@ -3,7 +3,7 @@
 //! # Usage
 //! Just apply `#[mock]` attribute on your function, trait, structure or `impl` block. You can also
 //! use `#[mock(base)]` if you want the ability to use base implementation in your tests (refer to
-//! [`Base implementation`](#base-implementation) section in user guide).
+//! [`Base implementation`](#base-implementation) for more information).
 //!
 //! ```rust
 //! use rsubstitute::*;
@@ -27,7 +27,7 @@
 //!
 //! # fn main() {
 //! // Arrange
-//! let mut mock = TraitMock::new();
+//! let mut mock = TraitMock::new();    // `mock` must be mutable in order to be configured
 //! mock.setup()
 //!     .work(1).returns(10)    // when called as `work(1)` it will return 10
 //!     .work(2).returns(20);   // when called as `work(2)` it will return 20
@@ -51,7 +51,8 @@
 //! * [Mocking static functions](#mocking-static-functions)
 //! * [Mocking static associated functions](#mocking-static-associated-functions)   TODO
 //! * [Arguments matching](#arguments-matching)
-//! * [Controlling function behavior](#controlling-function-behavior)               TODO - WIP
+//! * [Controlling function behavior](#controlling-function-behavior)
+//! * [Base implementation](#using-base-implementation)
 //! * [Verifying calls](#verifying-calls)                                           TODO
 //! * [Generics](#generics)                                                         TODO
 //! * [Associated constants and types](#associated-constants-and-types)             TODO
@@ -59,7 +60,9 @@
 //! * [Trait modifiers](#trait-modifiers)                                           TODO
 //! * [Function modifiers](#function-modifiers)                                     TODO
 //! * [Call order validation](#call-order-validation)                               TODO
+//! * [Mocks cloning](#mocks-cloning)                                               TODO
 //! * [Undefined behavior](#undefined-behavior)                                     TODO
+//! * [Limitations](#limitations)
 //!
 //! ## Mocking traits
 //!
@@ -405,30 +408,29 @@
 //! ```
 //!
 //! ### Callbacks
-//! Every function can have a callback.
+//! Every mocked function can have a callback that is called when function's configuration is called
+//! with matching arguments.
 //! 
 //! If function has return value, then it can be set using [`FnCallbackConfigurator::and_does`]
 //! after it's return value was specified. If function does not have return value, then it can be
-//! set by calling [`FnConfigurator::does`] straightaway
-//! 
-//! If function has return value, then it can be set using
-//! [`FnCallbackConfigurator::and_does`], otherwise
-//! [`FnConfigurator::does`] is used. Static functions receive tuple of argument
+//! set by calling [`FnConfigurator::does`] straightaway. Static functions receive tuple of argument
 //! values in the callback:
 //! ```rust
 //! use rsubstitute::*;
 //!
-//! #[mock] fn set(_: i32) {}
-//! #[mock] fn get() -> i32 { 1 }
+//! #[mock] fn get(v: i32) -> i32 { v + 1 }
+//! #[mock] fn set(v: i32) {}
 //!
 //! # fn main() {
-//! // Function with return value
-//! set::setup().returns(10)    // must set return value first
-//!             .and_does(|(v,)| assert_eq!(*v, 10));
+//! get::setup(Arg::Any)    // Function with return value
+//!     .returns(10)        // must set return value first
+//!     .and_does(|(v,)| assert_eq!(*v, 10));
 //! 
-//! // Function without return value
-//! set::setup(Arg::Any).does(|(v,)| assert_eq!(*v, 10));
-//! set(10);
+//!                         // Function without return value
+//! set::setup(Arg::Any)    // can set callback immediately
+//!     .does(|(v,)| assert_eq!(*v, 20));
+//! get(10);
+//! set(20);
 //! # }
 //! ```
 //! Associated functions receive reference to mock and tuple of argument values in the callback:
@@ -438,17 +440,105 @@
 //! #[mock]
 //! trait Trait {
 //!     fn get(&self) -> i32;
-//!     fn work(&self);
+//!     fn work(&self, v: i32);
 //! }
 //!
 //! # fn main() {
 //! let mut mock = TraitMock::new();
 //! mock.setup()
 //!     .get().returns(10)
-//!     .work().does(|mock_ref, _| assert_eq!(mock_ref.get(), 10));
-//! mock.work();
+//!     .work(Arg::Any)
+//!     .does(|mock_ref, (v,)| {
+//!         assert_eq!(mock_ref.get(), 10);
+//!         assert_eq!(*v, 20);
+//!     });
+//! mock.work(20);
 //! # }
 //! ```
+//! 
+//! ## Base implementation
+//! 
+//! Mocked functions can use their base implementation in tests. To do so, apply `#[mock]` attribute
+//! with `base` argument: `#[mock(base)]`.
+//! ```ignore
+//! #[mock(base)] trait Trait {}
+//! #[mock(base)] impl Struct {}
+//! #[mock(base)] fn function() {}
+//! ```
+//! 
+//! To tell mock object to use base implementation call `call_base()` on function setup:
+//! 
+//! ```
+//! use rsubstitute::*;
+//! 
+//! #[mock] fn dependency() {}
+//! #[mock(base)]
+//! fn work() {
+//!     dependency();   // will be called in test
+//! }
+//! 
+//! # fn main() {
+//! // Arrange
+//! work::setup().call_base();
+//! 
+//! // Act
+//! work();
+//! 
+//! // Assert
+//! dependency::received(1.time());
+//! # }
+//! ```
+//! 
+//! Functions that have return values treat `call_base()` as return value configuration, so you can
+//! not call any of `returns` functions after enabling base implementation:
+//! 
+//! ```ignore
+//! #[mock(base)] fn work() -> i32 { 1 }
+//! 
+//! work::setup().call_base().returns(10);
+//!                        // ^^^^^^^ - error, return value is already
+//!                        //           provided by base implementation
+//! ```
+//! 
+//! Base implementation usage is completely optional, you can mix mocked behaviour with base calls:
+//! ```
+//! use rsubstitute::*;
+//! 
+//! #[mock(base)]
+//! trait Trait {
+//!     fn dependency(&self);
+//!     fn work(&self, v: i32) -> i32 {
+//!         self.dependency();
+//!         return v + 1;
+//!     } 
+//! }
+//! 
+//! # fn main() {
+//! // Arrange
+//! let mut mock = TraitMock::new();
+//! mock.setup()
+//!     .work(10).call_base()
+//!     .work(20).returns(30);
+//!
+//! // Act
+//! let first  = mock.work(10);
+//! let second = mock.work(20);
+//!
+//! // Assert
+//! assert_eq!(first,  11);
+//! assert_eq!(second, 30);
+//! mock.received()
+//!     .work(10, 1.time())
+//!     .work(20, 1.time())
+//!     .dependency(1.time()); 
+//! # }
+//! ```
+//! 
+//! There is one limitation: all arguments of function must be [`Clone`]able for its implementation
+//! to be used in tests. If even single argument does not implement `Clone` you will get compilation
+//! error. You'll have to change your code or just use `#[mock]`.
+//! 
+//! ## Verifying calls
 //!
 #![allow(clippy::needless_return)]
 pub use rsubstitute_proc_macro::mock;
