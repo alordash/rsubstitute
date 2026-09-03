@@ -52,6 +52,7 @@
 //! * [Mocking static associated functions](#mocking-static-associated-functions)   TODO
 //! * [Arguments matching](#arguments-matching)
 //! * [Controlling function behavior](#controlling-function-behavior)               TODO - WIP
+//! * [Verifying calls](#verifying-calls)                                           TODO
 //! * [Generics](#generics)                                                         TODO
 //! * [Associated constants and types](#associated-constants-and-types)             TODO
 //! * [`impl Trait` types](#impl-trait-types)                                       TODO
@@ -361,9 +362,93 @@
 //!
 //! ## Controlling function behavior
 //!
-//! Calling `setup()` returns [`for_generated::FnConfigurator`] - type that is used to tell mocked
-//! function what it should do upon receiving call with successfully matched tuple of arguments.
+//! Calling `setup()` returns [`FnConfigurator`] - type that is used to tell mocked
+//! function what it should do upon receiving matching call.
 //!
+//! ### Return values
+//! Functions that have return values can set them in multiple ways:
+//! 1. [`FnConfigurator::returns`] - sets single-use return value.
+//! 2. [`FnConfigurator::returns_many`] - sets multiple single-use return values in
+//! one call.
+//! 3. [`FnConfigurator::always_returns`] - sets return value that will can be
+//! returned unlimited number of times.
+//! 4. [`FnConfigurator::returns_with`] - calculates return value on the fly using
+//! functions' source arguments. Receives tuple of argument references. Returns unlimited number of
+//! times.
+//!
+//! If multiple return values were specified, then they will be used in the same order:
+//! ```rust
+//! use rsubstitute::*;
+//!
+//! #[mock] fn work(v: i32) -> i32 { v + 1 }
+//!
+//! # fn main() {
+//! // Arrange
+//! work::setup(Arg::Any).returns(10)                   // config #1
+//!      .setup(Arg::Any).returns_many([20, 30])          // config #2
+//!      .setup(Arg::Any).returns_with(|(v,)| *v + 10); // config #3
+//!
+//! // Act
+//! let first  = work(1);   // uses config #1
+//! let second = work(2);   // uses config #2
+//! let third  = work(3);   // uses config #2
+//! let fourth = work(4);   // uses config #3
+//! let fifth  = work(5);   // uses config #3
+//!
+//! // Assert
+//! assert_eq!(first,  10);
+//! assert_eq!(second, 20);
+//! assert_eq!(third,  30);
+//! assert_eq!(fourth, 14);
+//! assert_eq!(fifth,  15);
+//! # }
+//! ```
+//!
+//! ### Callbacks
+//! Every function can have a callback.
+//! 
+//! If function has return value, then it can be set using [`FnCallbackConfigurator::and_does`]
+//! after it's return value was specified. If function does not have return value, then it can be
+//! set by calling [`FnConfigurator::does`] straightaway
+//! 
+//! If function has return value, then it can be set using
+//! [`FnCallbackConfigurator::and_does`], otherwise
+//! [`FnConfigurator::does`] is used. Static functions receive tuple of argument
+//! values in the callback:
+//! ```rust
+//! use rsubstitute::*;
+//!
+//! #[mock] fn set(_: i32) {}
+//! #[mock] fn get() -> i32 { 1 }
+//!
+//! # fn main() {
+//! // Function with return value
+//! set::setup().returns(10)    // must set return value first
+//!             .and_does(|(v,)| assert_eq!(*v, 10));
+//! 
+//! // Function without return value
+//! set::setup(Arg::Any).does(|(v,)| assert_eq!(*v, 10));
+//! set(10);
+//! # }
+//! ```
+//! Associated functions receive reference to mock and tuple of argument values in the callback:
+//! ```rust
+//! use rsubstitute::*;
+//!
+//! #[mock]
+//! trait Trait {
+//!     fn get(&self) -> i32;
+//!     fn work(&self);
+//! }
+//!
+//! # fn main() {
+//! let mut mock = TraitMock::new();
+//! mock.setup()
+//!     .get().returns(10)
+//!     .work().does(|mock_ref, _| assert_eq!(mock_ref.get(), 10));
+//! mock.work();
+//! # }
+//! ```
 //!
 #![allow(clippy::needless_return)]
 pub use rsubstitute_proc_macro::mock;
@@ -398,6 +483,7 @@ pub use rsubstitute_proc_macro::mock;
 pub use rsubstitute_core::args::*;
 pub use rsubstitute_core::verify_call_order;
 pub use rsubstitute_core::*;
+pub use rsubstitute_core::infrastructure::{FnConfigurator, FnCallbackConfigurator};
 
 pub use rsubstitute_core::infrastructure::Mockable;
 

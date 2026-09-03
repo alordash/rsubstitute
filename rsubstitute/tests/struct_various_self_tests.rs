@@ -145,10 +145,10 @@ impl Struct {
     pub fn return_by_mut_arc_ref    (mut self: Arc<&       Self>) -> i32 { BY_MUT_ARC_REF }
     pub fn return_by_mut_arc_ref_mut(mut self: Arc<&   mut Self>) -> i32 { BY_MUT_ARC_REF_MUT }
 
-    pub fn return_by_pin_ref                  (    self: Pin<&       Self>) -> i32 { BY_PIN_REF }
-    pub fn return_by_pin_ref_mut              (    self: Pin<&   mut Self>) -> i32 { BY_PIN_REF_MUT }
-    pub fn return_by_mut_pin_ref              (mut self: Pin<&       Self>) -> i32 { BY_MUT_PIN_REF }
-    pub fn return_by_mut_pin_ref_mut          (mut self: Pin<&   mut Self>) -> i32 { BY_MUT_PIN_REF_MUT }
+    pub fn return_by_pin_ref        (    self: Pin<&       Self>) -> i32 { BY_PIN_REF }
+    pub fn return_by_pin_ref_mut    (    self: Pin<&   mut Self>) -> i32 { BY_PIN_REF_MUT }
+    pub fn return_by_mut_pin_ref    (mut self: Pin<&       Self>) -> i32 { BY_MUT_PIN_REF }
+    pub fn return_by_mut_pin_ref_mut(mut self: Pin<&   mut Self>) -> i32 { BY_MUT_PIN_REF_MUT }
 
     pub fn return_by_mut_ref_mut_box_mut_ref_mut_with_lifetimes<'a, 'b>(mut self: &'a mut Box<&'b mut Self>) -> i32 { BY_MUT_REF_MUT_BOX_MUT_REF_MUT_WITH_LIFETIMES }
     pub fn return_by_mut_ref_mut_rc_mut_ref_mut_with_lifetimes <'a, 'b>(mut self: &'a mut Rc <&'b mut Self>) -> i32 { BY_MUT_REF_MUT_RC_MUT_REF_MUT_WITH_LIFETIMES }
