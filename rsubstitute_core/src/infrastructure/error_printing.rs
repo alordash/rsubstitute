@@ -226,6 +226,7 @@ fn format_times(times: Times) -> String {
         Times::Exactly(exact_count) => {
             format!("Expected to receive a call {exact_count} times")
         }
+        #[allow(deprecated)]
         Times::Any => "Expected to receive a call any number of times.".to_owned(),
     };
     return result;

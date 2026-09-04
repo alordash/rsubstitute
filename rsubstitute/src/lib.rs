@@ -54,7 +54,7 @@
 //! * [Controlling function behavior](#controlling-function-behavior)
 //! * [Base implementation](#using-base-implementation)
 //! * [Verifying calls](#verifying-calls)
-//! * [Generics](#generics)                                                         TODO
+//! * [Generics](#generics)
 //! * [Associated constants and types](#associated-constants-and-types)             TODO
 //! * [`impl Trait` types](#impl-trait-types)                                       TODO
 //! * [Trait modifiers](#trait-modifiers)                                           TODO
@@ -268,7 +268,7 @@
 //!     fn get(&self) -> i32 { 10 }
 //! }
 //! ```
-//! 3. Limitations from [`Structure mock`](#structure-mock).
+//! 3. Limitations from [`Mocking structures`](#mocking-structures).
 //!
 //! </div>
 //!
@@ -373,7 +373,12 @@
 //! # }
 //! ```
 //! 
-//! Associated static functions mocks have same limitations as regular static functions mocks.
+//! There are a couple of limitations:
+//! 1. Associated functions that use base implementation using `#[mock(base)]` use base
+//! implementation by default, without any configuration. This is done to make creation of structure
+//! mocks simpler by just calling `Struct::new()` without needing to first do
+//! `Struct::static_setup().new(Arg::Any, ...).call_base()` in each test.
+//! 2. Limitations from [`Mocking static functions`](#mocking-static-functions)
 //! 
 //! ## Arguments matching
 //!
@@ -618,6 +623,138 @@
 //! `N` times respectively.
 //! 3. [usize::time] and [usize::times] - syntactic sugar for constructing [`Times::Exactly`]`(N)`
 //! from `usize` values like `1.time()` or `2.times()`.
+//! 
+//! You can also check that no calls except the ones you expected were called using
+//! `no_other_calls()`:
+//! ```rust
+//! use rsubstitute::*;
+//! 
+//! #[mock] fn set(_: i32) {}
+//! 
+//! # fn main() {
+//! // Act
+//! set(10);
+//! set(20);
+//! 
+//! // Assert
+//! set::received(10, 1.time())
+//!     .received(20, 1.time())
+//!     .no_other_calls();  // checks that no other calls were performed
+//! # }
+//! ```
+//! 
+//! If there were some unvalidated calls when `no_other_calls()` was called, then mock object will
+//! panic:
+//! ```ignore
+//! #[mock]
+//! trait Trait { fn set(&self, _: i32); }
+//! 
+//! // Arrange
+//! let mut mock = TraitMock::new();
+//! 
+//! // Act
+//! mock.set(10);
+//! mock.set(20);
+//! mock.set(30);
+//! 
+//! // Assert
+//! mock.received()
+//!     .set(10, 1.time())
+//!     .set(20, 1.time())
+//!     .no_other_calls();  // will panic because `set(30)` was not validated
+//! ```
+//! 
+//! ## Generics
+//! 
+//! `rsubstitute` supports generics in functions, traits and structures. They are transferred to
+//! generated mocks as is. Here's a simple generics usage example with trait:
+//! ```rust
+//! use rsubstitute::*;
+//!
+//! #[mock]
+//! trait Trait<T> { fn get(&self) -> T; }
+//! 
+//! # fn main() {
+//! // Arrange
+//! let mut mock = TraitMock::<i32>::new();
+//! mock.setup().get().returns(10);
+//! 
+//! // Act
+//! let result = mock.get();
+//! 
+//! // Assert
+//! assert_eq!(result, 10);
+//! mock.received().get(1.time());
+//! # }
+//! 
+//! ```
+//! 
+//! ```rust
+//! # use std::marker::PhantomData;
+//! # use std::fmt::{Debug, Display};
+//! use rsubstitute::*;
+//!
+//! #[mock]
+//! struct Struct<'a, T1: Clone + ToString, T2>
+//!     where T2: Debug 
+//! {
+//!     t1: T1,
+//!     t2: &'a T2
+//! }
+//!
+//! #[mock(base)]
+//! impl<'a, T1: Clone + ToString, T2> Struct<'a, T1, T2>
+//!     where T2: Debug
+//! {
+//!     fn new<'b, T3: Debug + ?Sized>(t1: T1, t2: &'a T2, t3: &'b T3) -> Self 
+//!         where T3: Display
+//!     {
+//! Self { t1, t2 }
+//!     }
+//!
+//!     fn get_t1(&self) -> T1 {
+//!         self.t1.clone()
+//!     }
+//! }
+//!
+//! # fn main() {
+//! // Arrange
+//! let mut mock = Struct::new::<str>(10i32, &[1, 2, 3], "quo vadis");
+//! mock.setup().get_t1().returns(20);
+//!
+//! // Act
+//! let result = mock.get_t1();
+//!
+//! // Assert
+//! assert_eq!(result, 20);
+//! mock.received().get_t1(1.time());
+//! # }
+//! ```
+//! 
+//! Static functions use separate configurations for each generics combination:
+//! ```rust
+//! use rsubstitute::*;
+//! 
+//! #[mock] fn get<T1, T2: Default>(t1: T1) -> T2 { T2::default() }
+//! 
+//! # fn main() {
+//! // Arrange
+//! get::setup::<i32, &'static str>(10)
+//!     .returns("quo vadis");
+//! get::setup::<[i32; 3], &'static str>([1, 2, 3])
+//!     .returns("veridis quo");
+//! 
+//! // Act
+//! let first:  &str = get(10i32);
+//! let second: &str = get([1, 2, 3]);
+//! 
+//! // Assert
+//! assert_eq!(first,  "quo vadis");
+//! assert_eq!(second, "veridis quo");
+//! get::received::<_, &str>(10i32, 1.time());
+//! get::received::<_, &str>([1, 2, 3], 1.time()); 
+//! # }
+//! ```
 #![allow(clippy::needless_return)]
 pub use rsubstitute_proc_macro::mock;
 
