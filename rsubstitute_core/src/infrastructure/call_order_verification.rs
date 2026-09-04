@@ -1,6 +1,8 @@
 use crate::infrastructure::error_printing;
 use std::cell::{Cell, RefCell};
 
+/// Checks that `received()` assertions inside `verifications` are performed sequentially relative
+/// to each other.
 pub fn verify_call_order(mut verifications: impl FnMut()) {
     enable();
     verifications();
