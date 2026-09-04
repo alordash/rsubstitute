@@ -1,12 +1,10 @@
+/// Defines number of times the function should have been called.
 #[derive(PartialEq, Debug)]
 pub enum Times {
     Never,
     Once,
     Exactly(usize),
-    #[cfg_attr(
-        not(debug_assertions),
-        deprecated = "Expecting varying number of calls is not recommended, as it may lead to inconsistent test run results. Determine concrete number of expected calls."
-    )]
+    #[deprecated = "Expecting varying number of calls is not recommended, as it may lead to inconsistent test run results. Determine concrete number of expected calls."]
     Any,
 }
 
@@ -16,13 +14,14 @@ impl Times {
             Times::Never => count == 0,
             Times::Once => count == 1,
             Times::Exactly(exact_count) => count == *exact_count,
+            #[allow(deprecated)]
             Times::Any => true,
         }
     }
 }
 
+/// Syntactic sugar for writing `1.time()` or `2.times()`.
 pub trait ITimes: Sized {
-    // Syntactic sugar for writing `1.time()`
     fn time(self) -> Times {
         Self::times(self)
     }

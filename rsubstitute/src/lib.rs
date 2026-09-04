@@ -53,7 +53,7 @@
 //! * [Arguments matching](#arguments-matching)
 //! * [Controlling function behavior](#controlling-function-behavior)
 //! * [Base implementation](#using-base-implementation)
-//! * [Verifying calls](#verifying-calls)                                           TODO
+//! * [Verifying calls](#verifying-calls)
 //! * [Generics](#generics)                                                         TODO
 //! * [Associated constants and types](#associated-constants-and-types)             TODO
 //! * [`impl Trait` types](#impl-trait-types)                                       TODO
@@ -63,7 +63,7 @@
 //! * [Receiver types](#receiver-types)                                             TODO
 //! * [Cloning mocks](#mocks-cloning)                                               TODO
 //! * [Undefined behavior](#undefined-behavior)                                     TODO
-//! * [Limitations](#limitations)
+//! * [Limitations](#limitations)                                                   TODO
 //!
 //! ## Mocking traits
 //!
@@ -596,6 +596,28 @@
 //! 
 //! ## Verifying calls
 //!
+//! You can check how exactly mocked function was called. To do it use `received()` followed by
+//! descriptions of expected calls:
+//! ```rust
+//! use rsubstitute::*;
+//! 
+//! #[mock] fn work() {}
+//! 
+//! # fn main() {
+//! work();
+//! work::received(1.time());   // checks that `work` was called one time
+//! # }
+//! ```
+//! 
+//! You can verify exact values of passed arguments using [`Arg`], for more information see
+//! [Arguments matching](#arguments-matching).
+//! 
+//! Number of calls is verified using [`Times`] type. It can be used in several ways:
+//! 1. [`Times::Never`] - expects function to never be called with given arguments.
+//! 2. [`Times::Once`] and [`Times::Exactly`]`(N)` - expects function to be called exactly once or
+//! `N` times respectively.
+//! 3. [usize::time] and [usize::times] - syntactic sugar for constructing [`Times::Exactly`]`(N)`
+//! from `usize` values like `1.time()` or `2.times()`.
 #![allow(clippy::needless_return)]
 pub use rsubstitute_proc_macro::mock;
 
