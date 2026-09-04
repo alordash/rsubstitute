@@ -49,7 +49,7 @@
 //! * [Mocking structures](#mocking-structures)
 //! * [Mocking trait implementations](#mocking-trait-implementations)
 //! * [Mocking static functions](#mocking-static-functions)
-//! * [Mocking static associated functions](#mocking-static-associated-functions)   TODO
+//! * [Mocking static associated functions](#mocking-static-associated-functions)
 //! * [Arguments matching](#arguments-matching)
 //! * [Controlling function behavior](#controlling-function-behavior)
 //! * [Base implementation](#using-base-implementation)
@@ -60,7 +60,8 @@
 //! * [Trait modifiers](#trait-modifiers)                                           TODO
 //! * [Function modifiers](#function-modifiers)                                     TODO
 //! * [Call order validation](#call-order-validation)                               TODO
-//! * [Mocks cloning](#mocks-cloning)                                               TODO
+//! * [Receiver types](#receiver-types)                                             TODO
+//! * [Cloning mocks](#mocks-cloning)                                               TODO
 //! * [Undefined behavior](#undefined-behavior)                                     TODO
 //! * [Limitations](#limitations)
 //!
@@ -320,6 +321,60 @@
 //!      .setup(2).returns(20); // `.setup(2)` does not clear previous configuration
 //! ```
 //!
+//! ## Mocking static associated functions
+//! 
+//! Static associated functions are mocked almost the same way as regular static functions, except
+//! that instead of `setup()` and `received()` you must use `static_setup()` and
+//! `static_received()`. Here's example of mocking trait with static function:
+//! ```rust
+//! use rsubstitute::*;
+//! 
+//! #[mock]
+//! trait Trait {
+//!     fn work(v: i32) -> i32;
+//! }
+//! 
+//! fn use_trait_impl<T: Trait>(v: i32)  -> i32 { T::work(v) } 
+//! 
+//! # fn main() {
+//! // Arrange
+//! TraitMock::static_setup().work(10).returns(20);
+//! 
+//! // Act
+//! let result = use_trait_impl::<TraitMock>(10);
+//! 
+//! // Assert
+//! assert_eq!(result, 20);
+//! TraitMock::static_received().work(10, 1.time());
+//! # }
+//! ```
+//! 
+//! Static functions in structure implementations can also be mocked:
+//! ```rust
+//! use rsubstitute::*;
+//! 
+//! #[mock] struct Struct;
+//! 
+//! #[mock]
+//! impl Struct {
+//!     fn work(v: i32) -> i32 { v + 1 }
+//! }
+//! 
+//! # fn main() {
+//! // Arrange
+//! Struct::static_setup().work(10).returns(20);
+//! 
+//! // Act
+//! let result = Struct::work(10);
+//! 
+//! // Assert
+//! assert_eq!(result, 20);
+//! Struct::static_received().work(10, 1.time());
+//! # }
+//! ```
+//! 
+//! Associated static functions mocks have same limitations as regular static functions mocks.
+//! 
 //! ## Arguments matching
 //!
 //! `setup()` and `received()` functions accept [`Arg<T>`] as arguments, where `T` is type of
@@ -500,14 +555,15 @@
 //!                        //           provided by base implementation
 //! ```
 //! 
-//! Base implementation usage is completely optional, you can mix mocked behaviour with base calls:
+//! Base implementation usage is completely optional, you can mix mocked behavior with base calls.
+//! In traits, only functions with default implementation can use `call_base()`:
 //! ```
 //! use rsubstitute::*;
 //! 
 //! #[mock(base)]
 //! trait Trait {
-//!     fn dependency(&self);
-//!     fn work(&self, v: i32) -> i32 {
+//!     fn dependency(&self);               // no default implementation - can not use `call_base()`
+//!     fn work(&self, v: i32) -> i32 {     // has default implementation - can use `call_base()`
 //!         self.dependency();
 //!         return v + 1;
 //!     } 
