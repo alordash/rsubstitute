@@ -233,13 +233,20 @@ mod accept_ref {
             '__rsa: '__rsa + 'b,
         {
             let mut r = r.into();
-            if let Some(v) = r.try_get_value() {
-                let debug_string = (&::rsubstitute::for_generated::ArgPrinter(
-                    ::rsubstitute::transmute_lifetime!(v, &&&&'b i32),
-                ))
-                    .debug_string();
-                r.set_print_arg(debug_string);
-            }
+            // if let Some(v) = r.try_get_value() {
+            //     let debug_string = (&::rsubstitute::for_generated::ArgPrinter(
+            //         ::rsubstitute::transmute_lifetime!(v, &&&&'b i32),
+            //     ))
+            //         .debug_string();
+            //     r.set_print_arg(debug_string);
+            // }
+            r.try_set_print_arg(|v| {
+                (&::rsubstitute::for_generated::ArgPrinter(::rsubstitute::transmute_lifetime!(
+                    v,
+                    &&&&'b i32
+                )))
+                    .debug_string()
+            });
             let args_checker = accept_ref_ArgsChecker::<'__rsa, 'b> {
                 __rs_generics: ::core::marker::PhantomData,
                 r: ::rsubstitute::transmute_lifetime!(r),

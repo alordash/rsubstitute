@@ -61,6 +61,14 @@ impl<T> Arg<T> {
             _ => None,
         }
     }
+    
+    pub fn try_set_print_arg(&mut self, setter: impl Fn(&T) -> String) {
+        match self {
+            Arg::PrivateEq(arg_cmp, _) => arg_cmp.print_arg = setter(arg_cmp.value.as_ref()),
+            Arg::PrivateNotEq(arg_cmp, _) => arg_cmp.print_arg = setter(arg_cmp.value.as_ref()),
+            _ => {}
+        }
+    }
 
     /// Checks that argument value matches some predicate.
     pub fn is<'a, TFn: Fn(&T) -> bool + 'a>(predicate: TFn) -> Self {
