@@ -62,8 +62,10 @@
 //! * [Call order validation](#call-order-validation)
 //! * [Receiver types](#receiver-types)
 //! * [Cloning mocks](#mocks-cloning)
-//! * [Undefined behavior](#undefined-behavior) TODO
-//! * [Limitations](#limitations)               TODO
+//! * [`rsubstitute` config](#rsubstitute-config)   TODO
+//! * [Feature flags](#feature-flags)               TODO - WIP
+//! * [Undefined behavior](#undefined-behavior)     TODO
+//! * [Limitations](#limitations)                   TODO
 //!
 //! ## Mocking traits
 //!
@@ -102,7 +104,7 @@
 //!
 //! There is one limitation: `rsubstitute` can't mock trait that has super traits (other than
 //! `Clone`). For example, this won't compile:
-//! ```ignore
+//! ```compile_fail
 //! #[mock] trait Trait: SuperTrait {}
 //! ```
 //! But this will:
@@ -114,8 +116,8 @@
 //!
 //! ## Mocking structures
 //!
-//! `rsubstitute` supports mocking structures, but it's intended to be used only on structures that
-//! behave more like simply "stateful" functions.  
+//! `rsubstitute` supports mocking structures, but it's intended for structures that behave more
+//! like "stateful" functions.  
 //! To mock structure add `#[mock]` attribute to structure definition and `#[mock]` or
 //! `#[mock(base)]` to it's `impl` blocks whose functionality you want to mock.
 //! ```rust
@@ -175,7 +177,7 @@
 //! 4. To add `#[mock]` to structure's `impl` blocks the structure itself must have `#[mock]`
 //! attribute.
 //! 5. Can not mock functions separated by `#[cfg]`. This won't compile:
-//! ```ignore
+//! ```compile_fail
 //! #[mock]
 //! impl Structure {
 //!     #[cfg(test)]      fn work(&self) {}
@@ -226,7 +228,7 @@
 //! There are a couple of limitations for trait implementations mocking:
 //! 1. Can not mock more than one implementation of same trait on a struct differing only in trait's
 //! generics. For example, this won't compile:
-//! ```ignore
+//! ```compile_fail
 //! # use rsubstitute::*;
 //! #[mock]
 //! impl From<i32> for Struct {
@@ -255,18 +257,22 @@
 //! ```
 //! 2. If trait has default implementations for some methods, these methods can be mocked only if
 //! they are defined inside structure's `impl` block. For example:
-//! ```ignore
+//! ```
+//! # use rsubstitute::*; #[mock] struct Foo; #[mock] struct Bar;
 //! trait Trait {
 //!     fn get(&self) -> i32 { 10 }
 //! }
 //!
 //! // Can't mock `Trait::get()`
-//! impl Trait for Struct {}
+//! #[mock]
+//! impl Trait for Foo {}
 //!
 //! // Can mock `Trait::get()`
-//! impl Trait for Struct {
+//! #[mock]
+//! impl Trait for Bar {
 //!     fn get(&self) -> i32 { 10 }
 //! }
+//! # fn main() {}
 //! ```
 //! 3. Limitations from [`Mocking structures`](#mocking-structures).
 //!
@@ -309,14 +315,16 @@
 //! configuration from one test leaking into next sequentially ran test. Standalone function set-up
 //! must happen in **single module-level `setup()` call** in each unit-test.  
 //! For example, this is a wrong way of configuring standalone function:
-//! ```ignore
+//! ```no_run
+//! # use rsubstitute::*;
 //! #[mock] fn work(v: i32) -> i32 { v }
 //!
 //! work::setup(1).returns(10);
 //! work::setup(2).returns(20); // `work::setup(2)` will clear previous configuration
 //! ```
 //! Here is a correct way: call `work::setup()` only once and then use chain of `.setup()` calls:
-//! ```ignore
+//! ```no_run
+//! # use rsubstitute::*; #[mock] fn work(v: i32) -> i32 { v }
 //! work::setup(1).returns(10)
 //!      .setup(2).returns(20); // `.setup(2)` does not clear previous configuration
 //! ```
@@ -390,7 +398,7 @@
 //! like `mock.setup(10)`.
 //! 2. [`Arg::is`] - checks that argument passes provided predicate. Usage example:
 //! `mock.setup(Arg::is(|v| *v == 10))`
-//! 3. [`Arg::not_eq`] - checks that argument is NOT equal to provided value. Uses [`Partial::eq`]
+//! 3. [`Arg::not_eq`] - checks that argument is NOT equal to provided value. Uses [`PartialEq::eq`]
 //! of `T`. Opposite of `Arg::eq`. Usage example: `mock.setup(Arg::not_eq(10))`.
 //! 4. [`Arg::ref_eq`] - checks that argument's reference points to the same place as provided
 //! reference. Compares referenes returned by [`std::ops::Deref::deref`] of `T`. Usage example:
@@ -429,7 +437,7 @@
 //! function what it should do upon receiving matching call.
 //!
 //! ### Return values
-//! Functions that have return values can set them in multiple ways:
+//! Mocked functions that have return values can set them in multiple ways:
 //! 1. [`FnConfigurator::returns`] - sets single-use return value.
 //! 2. [`FnConfigurator::returns_many`] - sets multiple single-use return values in
 //! one call.
@@ -439,7 +447,7 @@
 //! functions' source arguments. Receives tuple of argument references. Returns unlimited number of
 //! times.
 //!
-//! If multiple return values were specified, then they will be used in the same order:
+//! If multiple return values were specified they will be used in the same order:
 //! ```rust
 //! use rsubstitute::*;
 //!
@@ -448,7 +456,7 @@
 //! # fn main() {
 //! // Arrange
 //! work::setup(Arg::Any).returns(10)                   // config #1
-//!      .setup(Arg::Any).returns_many([20, 30])          // config #2
+//!      .setup(Arg::Any).returns_many([20, 30])        // config #2
 //!      .setup(Arg::Any).returns_with(|(v,)| *v + 10); // config #3
 //!
 //! // Act
@@ -471,8 +479,8 @@
 //! Every mocked function can have a callback that is called when function's configuration is called
 //! with matching arguments.
 //!
-//! If function has return value, then it can be set using [`FnCallbackConfigurator::and_does`]
-//! after it's return value was specified. If function does not have return value, then it can be
+//! If function has return value callback can be set using [`FnCallbackConfigurator::and_does`]
+//! after it's return value was specified. If function does not have return value callback can be
 //! set by calling [`FnConfigurator::does`] straightaway. Static functions receive tuple of argument
 //! values in the callback:
 //! ```rust
@@ -520,10 +528,12 @@
 //!
 //! Mocked functions can use their base implementation in tests. To do so, apply `#[mock]` attribute
 //! with `base` argument: `#[mock(base)]`.
-//! ```ignore
+//! ```
+//! # use rsubstitute::*; #[mock] struct Struct;
 //! #[mock(base)] trait Trait {}
 //! #[mock(base)] impl Struct {}
 //! #[mock(base)] fn function() {}
+//! # fn main() {}
 //! ```
 //!
 //! To tell mock object to use base implementation call `call_base()` on function setup:
@@ -552,8 +562,9 @@
 //! Functions that have return values treat `call_base()` as return value configuration, so you can
 //! not call any of `returns` functions after enabling base implementation:
 //!
-//! ```ignore
-//! #[mock(base)] fn work() -> i32 { 1 }
+//! ```compile_error
+//! # use rsubstitute::*;
+//! # [mock(base)] fn work() -> i32 { 1 }
 //!
 //! work::setup().call_base().returns(10);
 //!                        // ^^^^^^^ - error, return value is already
@@ -617,12 +628,16 @@
 //! You can verify exact values of passed arguments using [`Arg`], for more information see
 //! [Arguments matching](#arguments-matching).
 //!
+//! ### Verify number of calls
+//!
 //! Number of calls is verified using [`Times`] type. It can be defined in several ways:
 //! 1. [`Times::Never`] - expects function to never be called with given arguments.
 //! 2. [`Times::Once`] and [`Times::Exactly`]`(N)` - expects function to be called exactly once or
 //! `N` times respectively.
-//! 3. [usize::time] and [usize::times] - syntactic sugar for constructing [`Times::Exactly`]`(N)`
-//! from `usize` values like `1.time()` or `2.times()`.
+//! 3. [`<usize as ITimes>::time`] and [`<usize as ITimes>::times`] - syntactic sugar for
+//! constructing [`Times::Exactly`]`(N)` from `usize` values like `1.time()` or `2.times()`.
+//!
+//! ### Verify no other calls were performed
 //!
 //! You can also check that no calls except the ones you expected were called using
 //! `no_other_calls()`:
@@ -645,10 +660,12 @@
 //!
 //! If there were some unvalidated calls when `no_other_calls()` was called, then mock object will
 //! panic:
-//! ```ignore
+//! ```should_panic
+//! # use rsubstitute::*;
 //! #[mock]
 //! trait Trait { fn set(&self, _: i32); }
 //!
+//! # fn main() {
 //! // Arrange
 //! let mut mock = TraitMock::new();
 //!
@@ -662,6 +679,7 @@
 //!     .set(10, 1.time())
 //!     .set(20, 1.time())
 //!     .no_other_calls();  // will panic because `set(30)` was not validated
+//! # }
 //! ```
 //!
 //! ## Generics
@@ -689,6 +707,8 @@
 //!
 //! ```
 //!
+//! Here's more complex example of generics usage with structure:
+//! 
 //! ```rust
 //! # use std::marker::PhantomData;
 //! # use std::fmt::{Debug, Display};
@@ -709,7 +729,7 @@
 //!     fn new<'b, T3: Debug + ?Sized>(t1: T1, t2: &'a T2, t3: &'b T3) -> Self
 //!         where T3: Display
 //!     {
-//! Self { t1, t2 }
+//!         Self { t1, t2 }
 //!     }
 //!
 //!     fn get_t1(&self) -> T1 {
@@ -741,18 +761,23 @@
 //! // Arrange
 //! get::setup::<i32, &'static str>(10)
 //!     .returns("quo vadis");
-//! get::setup::<[i32; 3], &'static str>([1, 2, 3])
-//!     .returns("veridis quo");
+//! get::setup::<[u8; 3], &'static str>([1, 2, 3])
+//!     .returns("veridis quo")
+//!     .setup([10, 10])            // generic types are inferred here by `setup` function,
+//!     .returns("third call");     // no need to specify them again
 //!
 //! // Act
 //! let first:  &str = get(10i32);
-//! let second: &str = get([1, 2, 3]);
+//! let second: &str = get([1u8, 2, 3]);
+//! let third:  &str = get([10u8, 10]);
 //!
 //! // Assert
 //! assert_eq!(first,  "quo vadis");
 //! assert_eq!(second, "veridis quo");
-//! get::received::<_, &str>(10i32, 1.time());
-//! get::received::<_, &str>([1, 2, 3], 1.time());
+//! assert_eq!(third,  "third");
+//! get::received::<_, &str>(10i32, 1.time());          // type inference works with mocks
+//! get::received::<_, &str>([1u8, 2, 3], 1.time())
+//!     .received([10u8, 10]);
 //! # }
 //! ```
 //!
@@ -778,9 +803,9 @@
 //!
 //! # fn main() {
 //! // Arrange
-//! let mut mock = TraitMock::<i32, 3>::new();
+//! let mut mock = TraitMock::<i32, 20>::new();
 //!                          // |    \
-//!                          // |     Trait::COUNT
+//!                          // |     Trait::NUMBER
 //!                          // Trait::Item
 //! mock.setup()
 //!     .get_item().returns(10)
@@ -792,8 +817,10 @@
 //!
 //! // Assert
 //! assert_eq!(item, 10);
-//! assert_eq!(number, 3);
-//! mock.received().get_item(1.time());
+//! assert_eq!(number, 20);
+//! mock.received()
+//!     .get_item(1.time())
+//!     .get_number(1.time());
 //! # }
 //! ```
 //!
@@ -840,9 +867,9 @@
 //! implementation:
 //! ```rust
 //! use rsubstitute::*;
+//! # #[mock] struct Struct;
 //!
 //! #[mock] unsafe trait Trait {}
-//! #[mock] struct Struct;
 //! #[mock] unsafe impl Trait for Struct {}
 //! # fn main() {}
 //! ```
@@ -858,7 +885,7 @@
 //! #[mock] async fn async_dep() {}
 //! #[mock] unsafe fn unsafe_dep() {}
 //! #[mock] extern "C" fn extern_dep() {}
-//! 
+//!
 //! #[mock(base)]
 //! # #[allow(improper_ctypes_definitions)]
 //! async unsafe extern "C" fn modifiers() {
@@ -866,7 +893,8 @@
 //!     unsafe_dep();
 //!     extern_dep();
 //! }
-//! 
+//!
+//! #[mock(base)]
 //! trait Trait {
 //! # #[allow(improper_ctypes_definitions)]
 //!     async unsafe extern "C" fn modifiers(&self) {
@@ -877,21 +905,21 @@
 //! }
 //! # fn main() {}
 //! ```
-//! 
+//!
 //! ## Call order validation
-//! 
+//!
 //! To verify that calls were received in the specific order wrap `received()` assertions inside
-//! [`verify_call_order`] callback. This function checks that all assertions inside of it are passed
+//! [`verify_call_order`] callback. This function checks that all calls inside of it were asserted
 //! sequentially:
 //! ```rust
 //! use rsubstitute::*;
-//! 
+//!
 //! #[mock] fn set(_: i32) {}
-//! 
+//!
 //! # fn main() {
 //! // Act
 //! set(1); set(2); set(3);
-//! 
+//!
 //! // Assert
 //! verify_call_order(|| {
 //!     set::received(1, 1.time())
@@ -900,52 +928,69 @@
 //! });
 //! # }
 //! ```
-//! 
-//! If call order is violated, then [`verify_call_order`] will panic after performing all `received`
+//!
+//! If call order was violated [`verify_call_order`] will panic after performing all `received`
 //! assertions. For example, this panics:
-//! ```ignore
-//! // Act
-//! set(1); set(3); set(2);
-//! 
-//! // Assert
-//! verify_call_order(|| {
-//!     set::received(1, 1.time())
-//!         .received(2, 1.time())
-//!         .received(3, 1.time());
-//! });
-//! ```
-//! 
-//! Call order is verified for all mocked functions relative to each, regardless if they're the same
-//! function:
-//! ```rust
-//! use rsubstitute::*;
-//! 
-//! #[mock] fn first() {}
-//! #[mock] fn second() {}
-//! #[mock] fn third() {}
-//! 
+//! ```should_panic
+//! # use rsubstitute::*; #[mock] fn set(_: i32) {}
 //! # fn main() {
 //! // Act
-//! first(); second(); third();
-//! 
+//! set(2); set(1); set(3);
+//!
 //! // Assert
 //! verify_call_order(|| {
-//!      first::received(1.time());
-//!     second::received(1.time());
-//!      third::received(1.time());
+//!     set::received(1, 1.time())
+//!         .received(2, 1.time())
+//!         .received(3, 1.time());
+//! }); // panic: expected order 1-2-3, actually got 2-1-3
+//! # }
+//! ```
+//!
+//! Call order is verified for all mocked functions relative to each other, regardless if they're
+//! the same function or even come from different mock object:
+//! ```rust
+//! use rsubstitute::*;
+//!
+//! #[mock] fn first() {}
+//! 
+//! #[mock]
+//! trait Trait {
+//!     fn second(&self);
+//! }
+//! 
+//! #[mock] struct Struct;
+//! #[mock(base)]
+//! impl Struct {
+//!     pub fn new() -> Self { Self }
+//!     pub fn third(&self) {}
+//! }
+//!
+//! # fn main() {
+//! // Arrange
+//! let trait_mock = TraitMock::new();
+//! let struct_mock = Struct::new();
+//! 
+//! // Act
+//! first(); trait_mock.second(); struct_mock.third();
+//!
+//! // Assert
+//! verify_call_order(|| {
+//!     first::received(1.time());
+//!     trait_mock.received().second(1.time());
+//!     struct_mock.received().third(1.time());
 //! });
 //! # }
 //! ```
-//! 
+//!
 //! ## Receiver types
-//! 
+//!
 //! Associated functions can have any kind of receiver type: `&Self`, `Self`, `Rc<Self>` or even
 //! nested types like `Box<Rc<Arc<&Self>>>`:
 //! ```rust
 //! # use std::rc::Rc;
 //! # use std::sync::Arc;
 //! use rsubstitute::*;
-//! 
+//!
 //! #[mock]
 //! trait Trait {
 //!     fn fn_self(self);
@@ -953,63 +998,72 @@
 //!     fn fn_rc_self(self: Rc<Self>);
 //!     fn fn_nested_self(self: Box<Rc<Arc<&Self>>>);
 //! }
-//! 
+//!
 //! # fn main() {}
 //! ```
-//! 
-//! To mock them you don't need to put mock in the same container as source function:
+//!
+//! To mock them you don't need to put mock in the same container that is used in source functions
+//! signature:
 //! ```rust
 //! use rsubstitute::*;
-//! 
+//!
 //! #[mock]
 //! trait Trait {
 //!     fn boxed(self: Box<Self>) -> i32;
 //! }
-//! 
+//!
 //! # fn main() {
 //! // Arrange
 //! let mut mock = TraitMock::new();
-//! mock.setup().boxed().returns(10);
-//! 
+//! mock.setup().boxed().returns(10);   // setup() and received() are always called on "&mut self"
+//!
 //! // Act
 //! let result = Box::new(mock.clone()).boxed();    // another feature - mocks cloning, more
 //!                                                 // information in "Cloning mocks" section
-//! 
+//!
 //! // Assert
 //! assert_eq!(result, 10);
 //! mock.received().boxed(1.time());
 //! # }
 //! ```
-//! 
+//!
 //! ## Cloning mocks
-//! 
+//!
 //! Mock can be cloned either if:
-//! 1. it is mock of trait,
-//! 2. it is mock struct that has `#[derive(Clone)]` attribute (manually implementing [`Clone`]
+//! 1. it is mock of a trait,
+//! 2. it is mock of a struct that has `#[derive(Clone)]` attribute (manually implementing [`Clone`]
 //! won't work).
-//! 
-//! Mock clones share same configuration (it is stored behind reference-counted pointer internally).
-//! This let's you share mocks between parts of your code. This maybe useful, for example, if you
-//! want to verify that mock received consuming function:
+//!
+//! Cloned mocks sharethe  same configuration (it is stored behind reference-counted pointer
+//! internally). This let's you share mocks between parts of your code. This can be useful, for
+//! example, if you want to verify that mock received some consuming function:
 //! ```rust
 //! use rsubstitute::*;
-//! 
+//!
 //! #[mock]
 //! trait Trait {
 //!     fn consume(self);
 //! }
-//! 
+//!
 //! # fn main() {
 //! // Arrange
 //! let mut mock = TraitMock::new();
 //! let mut mock_for_verification = mock.clone();
-//! 
+//!
 //! // Act
 //! mock.consume();
-//! 
+//!
 //! // Assert
 //! mock_for_verification.received().consume(1.time());
 //! # }
+//! ```
+//!
+//! ## Feature flags
+//!
+//! ### `debug_naming`
+//!
+//! This feature requires nightly version of compiler because it uses Rust's
+//! [`specialization`](https://rust-lang.github.io/rfcs/1210-impl-specialization.html) feature.
 #![allow(clippy::needless_return)]
 pub use rsubstitute_proc_macro::mock;
 

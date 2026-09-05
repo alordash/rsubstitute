@@ -1,7 +1,7 @@
 #![allow(stable_features)]
 #![feature(rwlock_downgrade)]
 
-use rsubstitute::mock;
+use rsubstitute::*;
 
 #[mock]
 trait Trait {
@@ -12,7 +12,6 @@ mod tests {
     #![allow(non_snake_case)]
     use super::*;
     use not_enough_asserts::*;
-    use rsubstitute::*;
     use std::sync::*;
 
     // Used to run tests sequentially, otherwise `write_config` may cause deadlock

@@ -7,7 +7,7 @@ struct Private;
 
 /// Argument matcher, checks whether certain argument value matches some expectation.
 /// 
-/// [`T`] - type of argument.
+/// `T` - type of argument.
 #[allow(private_interfaces)]
 #[repr(C)]
 pub enum Arg<T: ?Sized> {
