@@ -31,7 +31,7 @@ pub mod arg_printing {
 
         impl<'a, T: Debug + ?Sized> IDebugArgPrinter for ArgPrinter<'a, T> {
             fn debug_string(&self) -> String {
-                return format!("{:?}", self.0);
+                format!("{:?}", self.0)
             }
         }
 
@@ -60,7 +60,7 @@ pub mod arg_printing {
 
         impl<'a, T: Debug + ?Sized> IDebugPrinter for ArgPrinter<'a, T> {
             fn debug_string(&self) -> String {
-                return format!("{:?}", self.0);
+                format!("{:?}", self.0)
             }
         }
     }

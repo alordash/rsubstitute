@@ -6,7 +6,7 @@ use std::ops::Deref;
 struct Private;
 
 /// Argument matcher, checks whether certain argument value matches some expectation.
-/// 
+///
 /// `T` - type of argument.
 #[allow(private_interfaces)]
 #[repr(C)]
@@ -46,6 +46,22 @@ impl<T: Debug> Debug for Arg<T> {
 }
 
 impl<T> Arg<T> {
+    pub fn set_print_arg(&mut self, print_arg: String) {
+        match self {
+            Arg::PrivateEq(arg_cmp, _) => arg_cmp.print_arg = print_arg,
+            Arg::PrivateNotEq(arg_cmp, _) => arg_cmp.print_arg = print_arg,
+            _ => {}
+        }
+    }
+
+    pub fn try_get_value(&self) -> Option<&T> {
+        match self {
+            Arg::PrivateEq(arg_cmp, _) => Some(arg_cmp.value.as_ref()),
+            Arg::PrivateNotEq(arg_cmp, _) => Some(arg_cmp.value.as_ref()),
+            _ => None,
+        }
+    }
+
     /// Checks that argument value matches some predicate.
     pub fn is<'a, TFn: Fn(&T) -> bool + 'a>(predicate: TFn) -> Self {
         let anonymous_predicate = move |ptr: *const ()| {
@@ -70,6 +86,7 @@ impl<T> Arg<T> {
         T: PartialEq,
     {
         let arg_cmp = ArgCmp {
+            print_arg: print_arg(&value),
             value: Box::new(value),
             comparator: PartialEq::eq,
             maybe_deref_info: None,
@@ -83,6 +100,7 @@ impl<T> Arg<T> {
         T: PartialEq,
     {
         let arg_cmp = ArgCmp {
+            print_arg: print_arg(&value),
             value: Box::new(value),
             comparator: PartialEq::eq,
             maybe_deref_info: None,
@@ -91,7 +109,7 @@ impl<T> Arg<T> {
     }
 
     /// Checks that reference of argument value is equal to reference of given value.
-    /// 
+    ///
     /// Reference is acquired from [`Deref::deref`].
     pub fn ref_eq<U>(value: T) -> Self
     where
@@ -99,6 +117,7 @@ impl<T> Arg<T> {
     {
         let deref_info = DerefInfo::new(&value);
         let arg_cmp = ArgCmp {
+            print_arg: print_arg(&value),
             value: Box::new(value),
             comparator: |a, b| core::ptr::eq(a.deref(), b.deref()),
             maybe_deref_info: Some(deref_info),
@@ -115,6 +134,7 @@ impl<T> Arg<T> {
     {
         let deref_info = DerefInfo::new(&value);
         let arg_cmp = ArgCmp {
+            print_arg: print_arg(&value),
             value: Box::new(value),
             comparator: |a, b| core::ptr::eq(a.deref(), b.deref()),
             maybe_deref_info: Some(deref_info),
@@ -138,7 +158,8 @@ impl<T: ?Sized> Arg<T> {
         match self {
             Arg::PrivateEq(arg_cmp, _) => {
                 if !arg_cmp.is_arg_equal_to(actual_value) {
-                    let expected_value_str = print_arg(&arg_cmp.value);
+                    // let expected_value_str = print_arg(arg_cmp.value.as_ref());
+                    let expected_value_str = &arg_cmp.print_arg;
                     let PtrInfo {
                         expected_ptr_info_suffix,
                         actual_ptr_info_suffix,
@@ -153,7 +174,8 @@ impl<T: ?Sized> Arg<T> {
             }
             Arg::PrivateNotEq(arg_cmp, _) => {
                 if arg_cmp.is_arg_equal_to(actual_value) {
-                    let not_expected_value_str = print_arg(&arg_cmp.value);
+                    // let not_expected_value_str = print_arg(arg_cmp.value.as_ref());
+                    let not_expected_value_str = &arg_cmp.print_arg;
                     let PtrInfo {
                         expected_ptr_info_suffix,
                         ..
@@ -196,7 +218,8 @@ impl<'rs, 'a, T: ?Sized> Arg<&'a T> {
             Arg::PrivateEq(arg_cmp, _) => {
                 let expected_ptr = core::ptr::from_ref(*arg_cmp.value);
                 if !core::ptr::eq(actual_ptr, expected_ptr) {
-                    let expected_value_str = print_arg(&arg_cmp.value);
+                    // let expected_value_str = print_arg(arg_cmp.value.as_ref());
+                    let expected_value_str = &arg_cmp.print_arg;
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
@@ -208,7 +231,8 @@ impl<'rs, 'a, T: ?Sized> Arg<&'a T> {
             Arg::PrivateNotEq(arg_cmp, _) => {
                 let not_expected_ptr = core::ptr::from_ref(*arg_cmp.value);
                 if core::ptr::eq(actual_ptr, not_expected_ptr) {
-                    let not_expected_value_str = print_arg(&arg_cmp.value);
+                    // let not_expected_value_str = print_arg(arg_cmp.value.as_ref());
+                    let not_expected_value_str = &arg_cmp.print_arg;
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
@@ -257,7 +281,8 @@ impl<'a, T: ?Sized> Arg<&'a mut T> {
             Arg::PrivateEq(arg_cmp, _) => {
                 let expected_ptr = core::ptr::from_ref(*arg_cmp.value);
                 if !core::ptr::eq(actual_ptr, expected_ptr) {
-                    let expected_value_str = print_arg(&arg_cmp.value);
+                    // let expected_value_str = print_arg(arg_cmp.value.as_ref());
+                    let expected_value_str = &arg_cmp.print_arg;
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
@@ -269,7 +294,8 @@ impl<'a, T: ?Sized> Arg<&'a mut T> {
             Arg::PrivateNotEq(arg_cmp, _) => {
                 let not_expected_ptr = core::ptr::from_ref(*arg_cmp.value);
                 if core::ptr::eq(actual_ptr, not_expected_ptr) {
-                    let not_expected_value_str = print_arg(&arg_cmp.value);
+                    // let not_expected_value_str = print_arg(arg_cmp.value.as_ref());
+                    let not_expected_value_str = &arg_cmp.print_arg;
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(

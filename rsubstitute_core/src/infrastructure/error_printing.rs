@@ -26,9 +26,11 @@ pub(crate) fn panic_received_verification_error(
     let matching_calls_report = if matching_calls_count == 0 {
         "Actually received no matching calls".to_string()
     } else {
+        let max_invalid_calls_listed_count = read_config().max_invalid_calls_listed_count;
         let matching_calls_args_msgs: Vec<_> = matching_calls_check_result
             .calls_args_check_results
             .into_iter()
+            .take(max_invalid_calls_listed_count)
             .map(|x| {
                 fmt_call(
                     fn_name,
@@ -37,10 +39,16 @@ pub(crate) fn panic_received_verification_error(
                 )
             })
             .collect();
+        let trimmed_output_disclaimer = if matching_calls_count > max_invalid_calls_listed_count
+        {
+            format!(" (listing only first {})", max_invalid_calls_listed_count)
+        } else {
+            String::new()
+        };
         let matching_calls_args_msg = matching_calls_args_msgs.join("\n\t");
         let call_fmt = fmt_calls(matching_calls_count);
         format!(
-            "Actually received {matching_calls_count} matching {call_fmt}:
+            "Actually received {matching_calls_count} matching {call_fmt}{trimmed_output_disclaimer}:
 \t{matching_calls_args_msg}"
         )
     };

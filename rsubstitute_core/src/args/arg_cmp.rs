@@ -2,6 +2,7 @@ use crate::args::DerefInfo;
 
 #[repr(C)]
 pub(crate) struct ArgCmp<T: ?Sized> {
+    pub print_arg: String,
     pub value: Box<T>,
     pub comparator: fn(&T, &T) -> bool,
     pub maybe_deref_info: Option<DerefInfo>,

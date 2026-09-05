@@ -63,7 +63,7 @@
 //! * [Receiver types](#receiver-types)
 //! * [Cloning mocks](#mocks-cloning)
 //! * [`rsubstitute` config](#rsubstitute-config)   TODO
-//! * [Feature flags](#feature-flags)               TODO - WIP
+//! * [Crate features](#create-features)
 //! * [Undefined behavior](#undefined-behavior)     TODO
 //! * [Limitations](#limitations)                   TODO
 //!
@@ -681,6 +681,21 @@
 //!     .no_other_calls();  // will panic because `set(30)` was not validated
 //! # }
 //! ```
+//! 
+//! ### Verify no calls were performed in static functions
+//! 
+//! With trait objects you can call `mock.received().no_other_calls()` to verify that it didn't
+//! receive any calls. For static functions you need to use `received_nothing()` function:
+//! ```
+//! use rsubstitute::*;
+//! 
+//! #[mock] fn work() {}
+//! 
+//! # fn main() {
+//! // Assert
+//! work::received_nothing();
+//! # }
+//! ```
 //!
 //! ## Generics
 //!
@@ -1057,11 +1072,46 @@
 //! mock_for_verification.received().consume(1.time());
 //! # }
 //! ```
+//! 
+//! ## `rsubstitute` config
+//! 
+//! You can configure some crate level options using [`read_config`] and [`write_config`] functions
+//! (or use [`CONFIG`] static variable directly). This config contains infrastructure settings.
+//! Currently it has only `max_invalid_calls_listed_count` setting that controls how many invalid
+//! calls will be listed in case of an calls validation error.
+//! 
+//! Config can be used like this:
+//! 
+//! ```
+//! use rsubstitute::*;
+//! 
+//! #[mock] fn work(_: i32) {}
+//! 
+//! # fn main() {
+//! // Arrange
+//! write_config().max_invalid_calls_listed_count = 3;
+//! 
+//! // Act
+//! for i in 0..10 {
+//!     work(i);
+//! }
+//! 
+//! // Assert
+//! work::received(1, 1.time()).no_other_calls(); // will panic and show only first 3 calls,
+//!                                               // other calls won't be listed
+//! # }
+//! ```
 //!
 //! ## Feature flags
 //!
 //! ### `debug_naming`
 //!
+//! Enables better generic argument values display in error messages.
+//! 
+//! Without this feature arguments that have generic type will be printed as just "?" in errors,
+//! even if they implement [`std::fmt::Debug`]. With this feature such arguments will be printed as their debug
+//! strings if they implement `Debug`;
+//! 
 //! This feature requires nightly version of compiler because it uses Rust's
 //! [`specialization`](https://rust-lang.github.io/rfcs/1210-impl-specialization.html) feature.
 #![allow(clippy::needless_return)]

@@ -12,11 +12,10 @@ readme = "../README.md"
 rsubstitute_core = { workspace = true }
 rsubstitute_proc_macro = { workspace = true }
 not_enough_asserts = { workspace = true }
-tokio = { version = "1.53.1", features = ["macros", "rt-multi-thread", "time"] }
 
 [dev-dependencies]
-rsubstitute_core = { workspace = true, features = ["debug_naming"] }
-tokio = { workspace = true }
+rsubstitute_core = { workspace = true }
+tokio = { workspace = true, features = ["macros", "rt-multi-thread", "time"] }
 typeid = { workspace = true }
 
 [features]

@@ -1,9 +1,265 @@
 use rsubstitute::*;
 use std::marker::PhantomData;
 
-#[mock]
 fn accept_ref<'b>(r: &&&'b i32) -> i32 {
-    unreachable!()
+    use accept_ref::*;
+    let call = accept_ref_Call::<'_, 'b> {
+        __rs_generics: ::core::marker::PhantomData,
+        r: ::rsubstitute::transmute_lifetime!(r),
+    };
+    let fn_data: &::rsubstitute::for_generated::FnData<
+        '_,
+        accept_refMock<'_, '_>,
+        true,
+        false,
+        false,
+    > = ::rsubstitute::for_generated::get_static_fn_data("accept_ref");
+    fn_data.handle((), call)
+}
+#[allow(unused)]
+#[allow(unreachable_pub)]
+#[allow(nonstandard_style)]
+mod accept_ref {
+    use super::*;
+    use rsubstitute_core::args::arg_printing::IDebugArgPrinter;
+    pub fn setup<'__rsa, 'b>(
+        r: impl Into<::rsubstitute::for_generated::Arg<&'__rsa &'__rsa &'b i32>>,
+    ) -> ::rsubstitute::for_generated::FnConfigurator<
+        '__rsa,
+        accept_refMock<'__rsa, 'b>,
+        accept_refStaticSetup<'__rsa, 'b>,
+        (&'__rsa mut &'__rsa &'__rsa &'b i32,),
+        i32,
+        accept_refMock<'__rsa, 'b>,
+        true,
+        false,
+        false,
+    > {
+        ::rsubstitute::for_generated::clear_static_fn_data::<accept_refMock<'__rsa, 'b>>();
+        accept_refStaticSetup::<'__rsa, 'b> {
+            __rs_generics: ::core::marker::PhantomData,
+        }
+        .setup(r)
+    }
+    pub fn received<'__rsa, 'b>(
+        r: impl Into<::rsubstitute::for_generated::Arg<&'__rsa &'__rsa &'b i32>>,
+        times: ::rsubstitute::for_generated::Times,
+    ) -> ::rsubstitute::for_generated::ArgRefsBinder<
+        accept_refStaticReceived<'__rsa, 'b>,
+        (&'__rsa mut &'__rsa &'__rsa &'b i32,),
+    >
+    where
+        'b: '__rsa,
+        '__rsa: '__rsa + 'b,
+    {
+        accept_refStaticReceived::<'__rsa, 'b> {
+            __rs_generics: ::core::marker::PhantomData,
+        }
+        .received(r, times)
+    }
+    pub fn received_nothing<'__rsa, 'b>()
+    where
+        'b: '__rsa,
+        '__rsa: '__rsa + 'b,
+    {
+        ::rsubstitute::for_generated::verify_static_fn_received_nothing_else::<accept_refMock<'_, '_>>(
+        )
+    }
+    #[doc(hidden)]
+    pub struct accept_ref_Call<'__rsa, 'b> {
+        pub __rs_generics:
+            ::core::marker::PhantomData<(&'__rsa (), &'b (), &'__rsa &'__rsa &'b i32)>,
+        pub(super) r: ::core::ptr::NonNull<&'__rsa ::core::ptr::NonNull<i32>>,
+    }
+    impl<'__rsa, 'b> ::rsubstitute::for_generated::IGenericsInfoProvider
+        for accept_ref_Call<'__rsa, 'b>
+    {
+        fn get_generic_parameter_infos(
+            &self,
+        ) -> Vec<::rsubstitute::for_generated::GenericParameterInfo> {
+            vec![]
+        }
+        fn hash_generics_type_ids(
+            &self,
+            hasher: &mut ::rsubstitute::for_generated::GenericsHasher,
+        ) {
+        }
+        fn hash_const_values(&self, hasher: &mut ::rsubstitute::for_generated::GenericsHasher) {}
+    }
+    impl<'__rsa, 'b> ::rsubstitute::for_generated::ICall for accept_ref_Call<'__rsa, 'b> {
+        fn get_arg_infos(&self) -> Vec<::rsubstitute::for_generated::ArgInfo> {
+            use ::rsubstitute::for_generated::arg_printing::*;
+            vec![::rsubstitute::for_generated::ArgInfo::new(
+                "r",
+                &self.r,
+                (&::rsubstitute::for_generated::ArgPrinter(::rsubstitute::transmute_lifetime!(
+                    &self.r,
+                    &&&&'b i32
+                )))
+                    .debug_string(),
+            )]
+        }
+        fn get_ptr_to_boxed_tuple_of_refs(&self) -> *mut () {
+            Box::leak(Box::new((&self.r,))) as *mut _ as *mut ()
+        }
+    }
+    #[doc(hidden)]
+    struct accept_ref_ArgsChecker<'__rsa, 'b> {
+        pub __rs_generics:
+            ::core::marker::PhantomData<(&'__rsa (), &'b (), &'__rsa &'__rsa &'b i32)>,
+        r: ::rsubstitute::for_generated::Arg<
+            ::core::ptr::NonNull<&'__rsa ::core::ptr::NonNull<i32>>,
+        >,
+    }
+    impl<'__rsa, 'b> ::rsubstitute::for_generated::IGenericsInfoProvider
+        for accept_ref_ArgsChecker<'__rsa, 'b>
+    {
+        fn get_generic_parameter_infos(
+            &self,
+        ) -> Vec<::rsubstitute::for_generated::GenericParameterInfo> {
+            vec![]
+        }
+        fn hash_generics_type_ids(
+            &self,
+            hasher: &mut ::rsubstitute::for_generated::GenericsHasher,
+        ) {
+        }
+        fn hash_const_values(&self, hasher: &mut ::rsubstitute::for_generated::GenericsHasher) {}
+    }
+    impl<'__rsa, 'b> ::rsubstitute::for_generated::IArgsChecker for accept_ref_ArgsChecker<'__rsa, 'b> {
+        fn check(
+            &self,
+            dyn_call: &::rsubstitute::for_generated::DynCall<'_>,
+        ) -> Vec<::rsubstitute::for_generated::ArgCheckResult> {
+            use ::rsubstitute::for_generated::arg_printing::*;
+            let call: &accept_ref_Call<'__rsa, 'b> = dyn_call.downcast_ref();
+            vec![
+                ::rsubstitute::transmute_lifetime!(
+                    &self.r,
+                    &::rsubstitute::for_generated::Arg::<&&&'b i32>
+                )
+                .check_ref(
+                    "r",
+                    ::rsubstitute::transmute_lifetime!(&call.r),
+                    (&::rsubstitute::for_generated::ArgPrinter(
+                        ::rsubstitute::transmute_lifetime!(&call.r, &&&&'b i32),
+                    ))
+                        .debug_string(),
+                ),
+            ]
+        }
+        fn fmt_args(&self) -> String {
+            use ::rsubstitute::for_generated::arg_printing::*;
+            format!(
+                "{}",
+                (&::rsubstitute::for_generated::ArgPrinter(::rsubstitute::transmute_lifetime!(
+                    &&self.r,
+                    &&::rsubstitute::for_generated::Arg::<&&&'b i32>
+                )))
+                    .debug_string()
+            )
+        }
+    }
+    pub struct accept_refMock<'__rsa, 'b> {
+        pub __rs_generics:
+            ::core::marker::PhantomData<(&'__rsa (), &'b (), &'__rsa &'__rsa &'b i32)>,
+    }
+    #[doc(hidden)]
+    pub struct accept_refStaticSetup<'__rsa, 'b> {
+        pub __rs_generics:
+            ::core::marker::PhantomData<(&'__rsa (), &'b (), &'__rsa &'__rsa &'b i32)>,
+    }
+    impl<'__rsa, 'b> accept_refStaticSetup<'__rsa, 'b> {
+        pub fn setup(
+            &self,
+            r: impl Into<::rsubstitute::for_generated::Arg<&'__rsa &'__rsa &'b i32>>,
+        ) -> ::rsubstitute::for_generated::FnConfigurator<
+            '_,
+            accept_refMock<'__rsa, 'b>,
+            Self,
+            (&'__rsa mut &'__rsa &'__rsa &'b i32,),
+            i32,
+            accept_refMock<'__rsa, 'b>,
+            true,
+            false,
+            false,
+        > {
+            let args_checker = accept_ref_ArgsChecker::<'__rsa, 'b> {
+                __rs_generics: ::core::marker::PhantomData,
+                r: ::rsubstitute::transmute_lifetime!(r.into()),
+            };
+            let fn_data: &::rsubstitute::for_generated::FnData<
+                '_,
+                accept_refMock<'__rsa, 'b>,
+                true,
+                false,
+                false,
+            > = ::rsubstitute::for_generated::get_static_fn_data("accept_ref");
+            let fn_configurator: ::rsubstitute::for_generated::FnConfigurator<
+                '_,
+                accept_refMock<'__rsa, 'b>,
+                Self,
+                (&'__rsa mut &'__rsa &'__rsa &'b i32,),
+                i32,
+                accept_refMock<'__rsa, 'b>,
+                true,
+                false,
+                false,
+            > = fn_data.add_config(args_checker, self);
+            ::rsubstitute::transmute_lifetime!(fn_configurator)
+        }
+    }
+    #[doc(hidden)]
+    pub struct accept_refStaticReceived<'__rsa, 'b> {
+        pub __rs_generics:
+            ::core::marker::PhantomData<(&'__rsa (), &'b (), &'__rsa &'__rsa &'b i32)>,
+    }
+    impl<'__rsa, 'b> ::core::clone::Clone for accept_refStaticReceived<'__rsa, 'b> {
+        #[inline]
+        fn clone(&self) -> accept_refStaticReceived<'__rsa, 'b> {
+            accept_refStaticReceived::<'__rsa, 'b> {
+                __rs_generics: ::core::clone::Clone::clone(&self.__rs_generics),
+            }
+        }
+    }
+    impl<'__rsa, 'b> accept_refStaticReceived<'__rsa, 'b> {
+        pub fn received(
+            &self,
+            r: impl Into<::rsubstitute::for_generated::Arg<&'__rsa &'__rsa &'b i32>>,
+            times: ::rsubstitute::for_generated::Times,
+        ) -> ::rsubstitute::for_generated::ArgRefsBinder<Self, (&'__rsa mut &'__rsa &'__rsa &'b i32,)>
+        where
+            'b: '__rsa,
+            '__rsa: '__rsa + 'b,
+        {
+            let mut r = r.into();
+            if let Some(v) = r.try_get_value() {
+                let debug_string = (&::rsubstitute::for_generated::ArgPrinter(
+                    ::rsubstitute::transmute_lifetime!(v, &&&&'b i32),
+                ))
+                    .debug_string();
+                r.set_print_arg(debug_string);
+            }
+            let args_checker = accept_ref_ArgsChecker::<'__rsa, 'b> {
+                __rs_generics: ::core::marker::PhantomData,
+                r: ::rsubstitute::transmute_lifetime!(r),
+            };
+            let fn_data: &::rsubstitute::for_generated::FnData<
+                '_,
+                accept_refMock<'_, '_>,
+                true,
+                false,
+                false,
+            > = ::rsubstitute::for_generated::get_static_fn_data("accept_ref");
+            fn_data.verify_received(args_checker, times);
+            rsubstitute::for_generated::ArgRefsBinder::new(self.clone())
+        }
+        pub fn no_other_calls(&self) {
+            ::rsubstitute::for_generated::verify_static_fn_received_nothing_else::<
+                accept_refMock<'_, '_>,
+            >()
+        }
+    }
 }
 
 #[mock]
