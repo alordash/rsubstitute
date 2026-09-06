@@ -9,6 +9,7 @@ mod generic_parameter_info;
 mod generics_hash_key;
 mod i_args_checker;
 mod i_generics_info_provider;
+mod into_arg;
 mod ordered_calls_check_result;
 
 pub use arg::*;
@@ -22,4 +23,5 @@ pub use generic_parameter_info::*;
 pub use generics_hash_key::*;
 pub use i_args_checker::*;
 pub use i_generics_info_provider::*;
+pub use into_arg::*;
 pub(crate) use ordered_calls_check_result::*;

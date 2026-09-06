@@ -6,7 +6,12 @@ use proc_macro2::Span;
 use syn::spanned::Spanned;
 use syn::*;
 
-pub(crate) fn new((number, source_pat_type): (usize, PatType)) -> Argument {
+mod fn_format;
+
+pub(crate) fn new(
+    owning_function_signature: &Signature,
+    (number, source_pat_type): (usize, PatType),
+) -> Argument {
     let mut pat_ty = source_pat_type.clone();
     let impl_trait_replacement_result =
         normalization::replace_impl_trait_with_box_dyn_trait(*pat_ty.ty);
@@ -31,6 +36,8 @@ pub(crate) fn new((number, source_pat_type): (usize, PatType)) -> Argument {
         ref_style_type.clone(),
     );
 
+    let fn_format = fn_format::create(owning_function_signature, ident.clone(), pat_ty.ty.clone());
+
     let result = Argument {
         source_pat_type,
         ident_pat_type,
@@ -40,6 +47,7 @@ pub(crate) fn new((number, source_pat_type): (usize, PatType)) -> Argument {
         generic_arg_style_type,
         control_fn_arg,
         is_impl_trait,
+        fn_format,
     };
     return result;
 }
@@ -69,16 +77,8 @@ fn generate_control_fn_arg(span: Span, pat: Box<Pat>, ref_style_type: Box<Type>)
                 lifetimes: None,
                 path: path::new_generics(
                     span,
-                    ["Into"],
-                    [GenericArgument::Type(Type::Path(TypePath {
-                        attrs: Vec::new(),
-                        qself: None,
-                        path: path::new_generics_global(
-                            span,
-                            rsubstitute_for_generated::new("Arg"),
-                            [GenericArgument::Type(*ref_style_type)],
-                        ),
-                    }))],
+                    ["IntoArg"],
+                    [GenericArgument::Type(*ref_style_type)],
                 ),
             })]),
         })),

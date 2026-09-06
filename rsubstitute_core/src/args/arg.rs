@@ -3,7 +3,7 @@ use crate::transmute_lifetime;
 use std::fmt::{Debug, Formatter};
 use std::ops::Deref;
 
-struct Private;
+pub(crate) struct Internal;
 
 /// Argument matcher, checks whether certain argument value matches some expectation.
 ///
@@ -14,18 +14,14 @@ pub enum Arg<T: ?Sized> {
     /// Accepts any possible value.
     Any,
     #[doc(hidden)]
-    PrivateEq(ArgCmp<T>, Private),
+    PrivateEq(ArgCmp<T>, Internal),
     #[doc(hidden)]
-    PrivateNotEq(ArgCmp<T>, Private),
+    PrivateNotEq(ArgCmp<T>, Internal),
     #[doc(hidden)]
-    PrivateIs(Box<dyn Fn(*const ()) -> bool>, Private),
+    PrivateIs(Box<dyn Fn(*const ()) -> bool>, Internal),
 }
 
-impl<T: PartialEq> From<T> for Arg<T> {
-    fn from(value: T) -> Self {
-        Arg::eq(value)
-    }
-}
+const UNINITIALIZED_ARG_PRINT_STRING: &'static str = "[CRITICAL ERROR]: This string should represent arguments value, but if you see this is it means that `ArgCmp.print_arg` wasn't initialized!";
 
 impl<T: Debug> Debug for Arg<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
@@ -46,30 +42,6 @@ impl<T: Debug> Debug for Arg<T> {
 }
 
 impl<T> Arg<T> {
-    pub fn set_print_arg(&mut self, print_arg: String) {
-        match self {
-            Arg::PrivateEq(arg_cmp, _) => arg_cmp.print_arg = print_arg,
-            Arg::PrivateNotEq(arg_cmp, _) => arg_cmp.print_arg = print_arg,
-            _ => {}
-        }
-    }
-
-    pub fn try_get_value(&self) -> Option<&T> {
-        match self {
-            Arg::PrivateEq(arg_cmp, _) => Some(arg_cmp.value.as_ref()),
-            Arg::PrivateNotEq(arg_cmp, _) => Some(arg_cmp.value.as_ref()),
-            _ => None,
-        }
-    }
-    
-    pub fn try_set_print_arg(&mut self, setter: impl Fn(&T) -> String) {
-        match self {
-            Arg::PrivateEq(arg_cmp, _) => arg_cmp.print_arg = setter(arg_cmp.value.as_ref()),
-            Arg::PrivateNotEq(arg_cmp, _) => arg_cmp.print_arg = setter(arg_cmp.value.as_ref()),
-            _ => {}
-        }
-    }
-
     /// Checks that argument value matches some predicate.
     pub fn is<'a, TFn: Fn(&T) -> bool + 'a>(predicate: TFn) -> Self {
         let anonymous_predicate = move |ptr: *const ()| {
@@ -85,7 +57,7 @@ impl<T> Arg<T> {
         };
         let boxed_anonymous_predicate =
             Box::new(anonymous_predicate) as Box<dyn Fn(*const ()) -> bool + 'a>;
-        return Self::PrivateIs(transmute_lifetime!(boxed_anonymous_predicate), Private);
+        return Self::PrivateIs(transmute_lifetime!(boxed_anonymous_predicate), Internal);
     }
 
     /// Checks that argument value is equal to given value.
@@ -94,12 +66,12 @@ impl<T> Arg<T> {
         T: PartialEq,
     {
         let arg_cmp = ArgCmp {
-            print_arg: print_arg(&value),
+            print_arg: UNINITIALIZED_ARG_PRINT_STRING.to_owned(),
             value: Box::new(value),
             comparator: PartialEq::eq,
             maybe_deref_info: None,
         };
-        return Self::PrivateEq(arg_cmp, Private);
+        return Self::PrivateEq(arg_cmp, Internal);
     }
 
     /// Checks that argument value is NOT equal to given value.
@@ -108,12 +80,12 @@ impl<T> Arg<T> {
         T: PartialEq,
     {
         let arg_cmp = ArgCmp {
-            print_arg: print_arg(&value),
+            print_arg: UNINITIALIZED_ARG_PRINT_STRING.to_owned(),
             value: Box::new(value),
             comparator: PartialEq::eq,
             maybe_deref_info: None,
         };
-        return Self::PrivateNotEq(arg_cmp, Private);
+        return Self::PrivateNotEq(arg_cmp, Internal);
     }
 
     /// Checks that reference of argument value is equal to reference of given value.
@@ -125,12 +97,12 @@ impl<T> Arg<T> {
     {
         let deref_info = DerefInfo::new(&value);
         let arg_cmp = ArgCmp {
-            print_arg: print_arg(&value),
+            print_arg: UNINITIALIZED_ARG_PRINT_STRING.to_owned(),
             value: Box::new(value),
             comparator: |a, b| core::ptr::eq(a.deref(), b.deref()),
             maybe_deref_info: Some(deref_info),
         };
-        return Self::PrivateEq(arg_cmp, Private);
+        return Self::PrivateEq(arg_cmp, Internal);
     }
 
     /// Checks that reference of argument value is NOT equal to reference of given value.
@@ -142,12 +114,12 @@ impl<T> Arg<T> {
     {
         let deref_info = DerefInfo::new(&value);
         let arg_cmp = ArgCmp {
-            print_arg: print_arg(&value),
+            print_arg: UNINITIALIZED_ARG_PRINT_STRING.to_owned(),
             value: Box::new(value),
             comparator: |a, b| core::ptr::eq(a.deref(), b.deref()),
             maybe_deref_info: Some(deref_info),
         };
-        return Self::PrivateNotEq(arg_cmp, Private);
+        return Self::PrivateNotEq(arg_cmp, Internal);
     }
 }
 
