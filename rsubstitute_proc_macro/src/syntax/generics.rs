@@ -72,15 +72,3 @@ pub(crate) fn remove_defaults(mut generics: Generics) -> Generics {
     }
     return generics;
 }
-
-pub(crate) fn remove_lifetimes(mut generics: Generics) -> Generics {
-    generics.params = generics
-        .params
-        .into_iter()
-        .filter(|x| match x {
-            GenericParam::Lifetime(_) => false,
-            _ => true,
-        })
-        .collect();
-    return generics;
-}

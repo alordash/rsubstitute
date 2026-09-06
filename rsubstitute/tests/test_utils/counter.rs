@@ -4,7 +4,6 @@ use std::sync::atomic::{AtomicUsize, Ordering};
 // Leaking for ability to `Copy` so no need to create clones for moving them in closures.
 #[derive(Copy, Clone)]
 pub struct Counter(&'static AtomicUsize);
-#[allow(unused)]
 impl Counter {
     pub fn new() -> Self {
         Self(Box::leak(Box::new(AtomicUsize::new(0))))

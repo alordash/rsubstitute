@@ -1,10 +1,10 @@
-mod common;
+mod test_utils;
 
 use rsubstitute::mock;
 use std::ops::Deref;
 use std::rc::Rc;
 use std::sync::Arc;
-use common::*;
+use test_utils::*;
 
 #[mock]
 fn ref_test(r: &i32) {}

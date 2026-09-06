@@ -10,7 +10,6 @@ pub(crate) struct Argument {
     pub control_fn_arg: FnArg,
     pub is_impl_trait: bool,
     pub fn_format: ItemFn,
-    pub fn_format_path: Path
 }
 
 pub(crate) trait IArgumentTypesCloner {

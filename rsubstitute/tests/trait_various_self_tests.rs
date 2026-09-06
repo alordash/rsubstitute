@@ -1,4 +1,4 @@
-mod common;
+mod test_utils;
 
 use rsubstitute::*;
 use std::pin::Pin;
@@ -155,7 +155,7 @@ mod tests {
 
     use super::*;
     use rsubstitute::*;
-    use common::*;
+    use test_utils::*;
 
     mod basic_tests {
         use super::*;
