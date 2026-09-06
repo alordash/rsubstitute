@@ -6,7 +6,8 @@ use syn::*;
 const ARGUMENT_ARG_NAME: &'static str = "v";
 
 pub(crate) fn create(
-    owning_function_signature: &Signature,
+    owning_function_ident: Ident,
+    merged_generics: Generics,
     argument_ident: Ident,
     argument_type: Box<Type>,
 ) -> ItemFn {
@@ -57,8 +58,8 @@ pub(crate) fn create(
             safety: Safety::Default,
             abi: None,
             fn_token: Token![fn](span),
-            ident: format_ident!("fmt_{}_{}", owning_function_signature.ident, argument_ident),
-            generics: owning_function_signature.generics.clone(),
+            ident: format_ident!("fmt_{}_{}", owning_function_ident, argument_ident),
+            generics: merged_generics,
             paren_token: token::Paren(span),
             inputs: punctuated([FnArg::Typed(PatType {
                 attrs: Vec::new(),

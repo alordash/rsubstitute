@@ -36,7 +36,7 @@ pub(crate) fn new(span: Span, fn_info: &FnInfo) -> (ExprPath, Local) {
                                 [Expr::Path(ExprPath {
                                     attrs: Vec::new(),
                                     qself: None,
-                                    path: path::from_ident(x.fn_format.sig.ident.clone()),
+                                    path: x.fn_format_path.clone(),
                                 })],
                             ),
                         ))),

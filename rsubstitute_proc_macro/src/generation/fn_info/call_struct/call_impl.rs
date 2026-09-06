@@ -1,5 +1,4 @@
 use crate::common::*;
-use crate::generation::fn_info::*;
 use crate::preparation::r#fn::models::*;
 use crate::syntax::r#type::vec_of;
 use crate::syntax::*;
@@ -115,7 +114,7 @@ fn generate_arg_info_new_expr(argument: &Argument) -> Expr {
         Expr::Path(ExprPath {
             attrs: Vec::new(),
             qself: None,
-            path: path::from_ident(argument.fn_format.sig.ident.clone()),
+            path: argument.fn_format_path.clone(),
         }),
         [Expr::Macro(transmute_lifetime_expr::new_with_target(
             Expr::Reference(ExprReference {

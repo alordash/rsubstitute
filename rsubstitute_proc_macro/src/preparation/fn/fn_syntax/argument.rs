@@ -9,7 +9,8 @@ use syn::*;
 mod fn_format;
 
 pub(crate) fn new(
-    owning_function_signature: &Signature,
+    owning_function_ident: Ident,
+    merged_generics: Generics,
     (number, source_pat_type): (usize, PatType),
 ) -> Argument {
     let mut pat_ty = source_pat_type.clone();
@@ -36,7 +37,19 @@ pub(crate) fn new(
         ref_style_type.clone(),
     );
 
-    let fn_format = fn_format::create(owning_function_signature, ident.clone(), pat_ty.ty.clone());
+    let merged_generics_without_defaults = generics::remove_defaults(merged_generics);
+    let merged_generics_for_fn_format_path =
+        generics::remove_lifetimes(merged_generics_without_defaults.clone());
+    let fn_format = fn_format::create(
+        owning_function_ident,
+        merged_generics_without_defaults,
+        ident.clone(),
+        pat_ty.ty.clone(),
+    );
+    let fn_format_path = path::from_ident_with_generics(
+        fn_format.sig.ident.clone(),
+        &merged_generics_for_fn_format_path,
+    );
 
     let result = Argument {
         source_pat_type,
@@ -48,6 +61,7 @@ pub(crate) fn new(
         control_fn_arg,
         is_impl_trait,
         fn_format,
+        fn_format_path,
     };
     return result;
 }
@@ -75,9 +89,9 @@ fn generate_control_fn_arg(span: Span, pat: Box<Pat>, ref_style_type: Box<Type>)
                 modifiers: TraitBoundModifiers::default(),
                 maybe: None,
                 lifetimes: None,
-                path: path::new_generics(
+                path: path::new_generics_global(
                     span,
-                    ["IntoArg"],
+                    rsubstitute_for_generated::new("IntoArg"),
                     [GenericArgument::Type(*ref_style_type)],
                 ),
             })]),

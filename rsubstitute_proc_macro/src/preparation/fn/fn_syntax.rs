@@ -45,7 +45,7 @@ pub(crate) fn prepare(
     let InputsSplit {
         maybe_self_type,
         arguments,
-    } = split_inputs_into_maybe_self_type_and_arguments(&signature);
+    } = split_inputs_into_maybe_self_type_and_arguments(&signature, &merged_generics);
     let generics_field = generics_field::new_field(
         signature.generics.span(),
         &merged_generics,
@@ -122,7 +122,10 @@ struct InputsSplit {
     pub maybe_self_type: Option<Receiver>,
     pub arguments: Vec<Argument>,
 }
-fn split_inputs_into_maybe_self_type_and_arguments(signature: &Signature) -> InputsSplit {
+fn split_inputs_into_maybe_self_type_and_arguments(
+    signature: &Signature,
+    merged_generics: &Generics,
+) -> InputsSplit {
     let mut inputs_iter = signature.inputs.clone().into_iter();
     let Some(first_arg) = inputs_iter.next() else {
         return InputsSplit {
@@ -146,7 +149,7 @@ fn split_inputs_into_maybe_self_type_and_arguments(signature: &Signature) -> Inp
             ),
         })
         .enumerate()
-        .map(|t| argument::new(signature, t))
+        .map(|t| argument::new(signature.ident.clone(), merged_generics.clone(), t))
         .collect();
     let result = InputsSplit {
         maybe_self_type,
