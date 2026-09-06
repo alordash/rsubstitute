@@ -1,6 +1,8 @@
 use rsubstitute::mock;
 use std::fmt::{Debug, Display};
 
+mod common;
+
 #[mock(base)]
 fn get_return<T: Clone>(value: T) -> T {
     return value;
@@ -90,10 +92,10 @@ mod tests {
             // Assert
             assert_eq!(returned_number, actual_returned_number);
             get_return::received(accepted_number, Times::Once).no_other_calls();
-
+            let accepted_str_debug_string = common::debug_string(format!("{accepted_str:?}"));
             let expected_error_msg = format!(
                 "Mock wasn't configured to handle following call:
-	get_return<&str>({accepted_str:?})"
+	get_return<&str>({accepted_str_debug_string})"
             );
             assert_eq!(Some(expected_error_msg), actual_error_msg);
         }

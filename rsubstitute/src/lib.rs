@@ -778,21 +778,21 @@
 //!     .returns("quo vadis");
 //! get::setup::<[u8; 3], &'static str>([1, 2, 3])
 //!     .returns("veridis quo")
-//!     .setup([10, 10])            // generic types are inferred here by `setup` function,
+//!     .setup([10, 10, 10])        // generic types are inferred here by `setup` function,
 //!     .returns("third call");     // no need to specify them again
 //!
 //! // Act
 //! let first:  &str = get(10i32);
 //! let second: &str = get([1u8, 2, 3]);
-//! let third:  &str = get([10u8, 10]);
+//! let third:  &str = get([10u8, 10, 10]);
 //!
 //! // Assert
 //! assert_eq!(first,  "quo vadis");
 //! assert_eq!(second, "veridis quo");
-//! assert_eq!(third,  "third");
+//! assert_eq!(third,  "third call");
 //! get::received::<_, &str>(10i32, 1.time());          // type inference works with mocks
 //! get::received::<_, &str>([1u8, 2, 3], 1.time())
-//!     .received([10u8, 10]);
+//!     .received([10u8, 10, 10], 1.time());
 //! # }
 //! ```
 //!
@@ -982,8 +982,8 @@
 //!
 //! # fn main() {
 //! // Arrange
-//! let trait_mock = TraitMock::new();
-//! let struct_mock = Struct::new();
+//! let mut trait_mock = TraitMock::new();
+//! let mut struct_mock = Struct::new();
 //! 
 //! // Act
 //! first(); trait_mock.second(); struct_mock.third();
@@ -1082,7 +1082,7 @@
 //! 
 //! Config can be used like this:
 //! 
-//! ```
+//! ```should_panic
 //! use rsubstitute::*;
 //! 
 //! #[mock] fn work(_: i32) {}

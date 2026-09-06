@@ -124,7 +124,7 @@ mod tests {
 
             // Assert
             assert_eq!(ACTUAL_VALUE, result);
-            input::received(Arg::Any, Times::Any).no_other_calls();
+            input::received(Arg::Any, Times::Once).no_other_calls();
         }
 
         #[test]
@@ -213,7 +213,9 @@ mod tests {
 
             // Assert
             assert_eq!(ACTUAL_VALUE, result);
-            mock.received().input(Arg::Any, Times::Any).no_other_calls();
+            mock.received()
+                .input(Arg::Any, Times::Once)
+                .no_other_calls();
         }
 
         #[test]
@@ -272,7 +274,7 @@ mod tests {
             // Assert
             assert_eq!(ACTUAL_VALUE, result);
             TraitMock::static_received()
-                .static_input(Arg::Any, Times::Any)
+                .static_input(Arg::Any, Times::Once)
                 .no_other_calls();
         }
 
@@ -404,7 +406,7 @@ mod tests {
             // Assert
             assert_eq!(ACTUAL_VALUE, result);
             mock.received()
-                .input_self(Arg::Any, Times::Any)
+                .input_self(Arg::Any, Times::Once)
                 .no_other_calls();
         }
 
@@ -464,7 +466,7 @@ mod tests {
             // Assert
             assert_eq!(ACTUAL_VALUE, result);
             Struct::static_received()
-                .static_input_self(Arg::Any, Times::Any)
+                .static_input_self(Arg::Any, Times::Once)
                 .no_other_calls();
         }
 
@@ -596,7 +598,7 @@ mod tests {
             assert_eq!(ACTUAL_VALUE, result);
             mock.received()
                 .as_Trait()
-                .input(Arg::Any, Times::Any)
+                .input(Arg::Any, Times::Once)
                 .no_other_calls();
         }
 
@@ -660,7 +662,7 @@ mod tests {
             assert_eq!(ACTUAL_VALUE, result);
             Struct::static_received()
                 .as_Trait()
-                .static_input(Arg::Any, Times::Any)
+                .static_input(Arg::Any, Times::Once)
                 .no_other_calls();
         }
 

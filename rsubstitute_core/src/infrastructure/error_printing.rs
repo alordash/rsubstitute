@@ -39,8 +39,7 @@ pub(crate) fn panic_received_verification_error(
                 )
             })
             .collect();
-        let trimmed_output_disclaimer = if matching_calls_count > max_invalid_calls_listed_count
-        {
+        let trimmed_output_disclaimer = if matching_calls_count > max_invalid_calls_listed_count {
             format!(" (listing only first {})", max_invalid_calls_listed_count)
         } else {
             String::new()
@@ -163,8 +162,10 @@ pub(crate) fn format_received_unexpected_call_error(
 pub(crate) fn panic_received_unexpected_calls_error(error_msgs: Vec<String>) -> ! {
     let unexpected_calls_count = error_msgs.len();
     let call_fmt = fmt_calls(unexpected_calls_count);
+    let max_invalid_calls_listed_count = read_config().max_invalid_calls_listed_count;
     let unexpected_calls_msgs: Vec<_> = error_msgs
         .into_iter()
+        .take(max_invalid_calls_listed_count)
         .enumerate()
         .map(|(i, error_msg)| {
             let error_number = i + 1;
@@ -172,8 +173,13 @@ pub(crate) fn panic_received_unexpected_calls_error(error_msgs: Vec<String>) -> 
         })
         .collect();
     let unexpected_calls_msg = unexpected_calls_msgs.join("\n");
+    let trimmed_output_disclaimer = if unexpected_calls_count > max_invalid_calls_listed_count {
+        format!(" (listing only first {})", max_invalid_calls_listed_count)
+    } else {
+        String::new()
+    };
     let error_msg = format!(
-        "Did not expect to receive any other calls. Received {unexpected_calls_count} unexpected {call_fmt}:
+        "Did not expect to receive any other calls. Received {unexpected_calls_count} unexpected {call_fmt}{trimmed_output_disclaimer}:
 {unexpected_calls_msg}"
     );
     panic!("{error_msg}");

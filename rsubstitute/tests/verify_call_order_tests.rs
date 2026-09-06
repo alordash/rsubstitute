@@ -1,5 +1,7 @@
 use rsubstitute::*;
 
+mod common;
+
 #[mock]
 fn foo<T>(_: T) {}
 
@@ -94,6 +96,10 @@ mod tests {
         foo(1);
 
         // Assert
+        let first_foo_debug_string = common::debug_string("1");
+        let second_foo_debug_string = common::debug_string("2");
+        let third_foo_debug_string = common::debug_string(r#""amogus""#);
+        let bar_debug_string = common::debug_string("false");
         assert_panics(
             || {
                 verify_call_order(|| {
@@ -103,20 +109,22 @@ mod tests {
                     bar::received(false, Times::Once).no_other_calls();
                 })
             },
-            r#"Expected to receive these calls in order:
+            format!(
+                r#"Expected to receive these calls in order:
 
-	foo(1)
-	foo(2)
-	foo("amogus")
-	bar(false)
+	foo({first_foo_debug_string})
+	foo({second_foo_debug_string})
+	foo({third_foo_debug_string})
+	bar({bar_debug_string})
 
 Actually received matching calls in this order:
 
-	bar(false)
-	foo("amogus")
-	foo(2)
-	foo(1)
-"#,
+	bar({bar_debug_string})
+	foo({third_foo_debug_string})
+	foo({second_foo_debug_string})
+	foo({first_foo_debug_string})
+"#
+            ),
         );
     }
 
@@ -218,6 +226,8 @@ Actually received matching calls in this order:
         foo(1);
 
         // Assert
+        let foo_debug_string = common::debug_string("1");
+        let bar_debug_string = common::debug_string("4");
         assert_panics(
             || {
                 verify_call_order(|| {
@@ -235,22 +245,24 @@ Actually received matching calls in this order:
                         .no_other_calls();
                 });
             },
-            r#"Expected to receive these calls in order:
+            format!(
+                r#"Expected to receive these calls in order:
 
-	foo(1)
+	foo({foo_debug_string})
 	Trait::traiting(2)
 	Struct::structing(3)
-	bar(4)
+	bar({bar_debug_string})
 	<Struct as Trait>::traiting(5)
 
 Actually received matching calls in this order:
 
 	<Struct as Trait>::traiting(5)
-	bar(4)
+	bar({bar_debug_string})
 	Struct::structing(3)
 	Trait::traiting(2)
-	foo(1)
-"#,
+	foo({foo_debug_string})
+"#
+            ),
         );
     }
 }
