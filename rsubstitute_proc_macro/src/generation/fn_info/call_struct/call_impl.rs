@@ -110,29 +110,8 @@ fn generate_arg_info_new_expr(argument: &Argument) -> Expr {
         expr: Box::new(arg_field_expr.clone()),
     });
 
-    let arg_debug_string_argument = Expr::Call(expr::call::new(
-        span,
-        Expr::Path(ExprPath {
-            attrs: Vec::new(),
-            qself: None,
-            path: path::from_ident(argument.fn_format.sig.ident.clone()),
-        }),
-        [Expr::Macro(transmute_lifetime_expr::new_with_target(
-            Expr::Reference(ExprReference {
-                attrs: Vec::new(),
-                and_token: Token![&](span),
-                mutability: None,
-                expr: Box::new(arg_field_expr),
-            }),
-            Type::Reference(TypeReference {
-                attrs: Vec::new(),
-                and_token: Token![&](span),
-                lifetime: None,
-                mutability: None,
-                elem: Box::new(*argument.ident_pat_type.ty.clone()),
-            }),
-        ))],
-    ));
+    let arg_debug_string_argument =
+        arg_printer_expr::new(span, arg_field_expr, *argument.ident_pat_type.ty.clone());
 
     let result = Expr::Call(expr::call::new(
         span,

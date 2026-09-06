@@ -113,12 +113,6 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
         ])
         .chain(
             fn_info
-                .arguments
-                .into_iter()
-                .map(|argument| Item::Fn(argument.fn_format)),
-        )
-        .chain(
-            fn_info
                 .call_struct
                 .maybe_clone_impl
                 .map(Item::Impl)

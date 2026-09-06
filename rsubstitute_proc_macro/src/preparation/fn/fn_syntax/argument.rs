@@ -6,12 +6,7 @@ use proc_macro2::Span;
 use syn::spanned::Spanned;
 use syn::*;
 
-mod fn_format;
-
-pub(crate) fn new(
-    owning_function_signature: &Signature,
-    (number, source_pat_type): (usize, PatType),
-) -> Argument {
+pub(crate) fn new((number, source_pat_type): (usize, PatType)) -> Argument {
     let mut pat_ty = source_pat_type.clone();
     let impl_trait_replacement_result =
         normalization::replace_impl_trait_with_box_dyn_trait(*pat_ty.ty);
@@ -36,8 +31,6 @@ pub(crate) fn new(
         ref_style_type.clone(),
     );
 
-    let fn_format = fn_format::create(owning_function_signature, ident.clone(), pat_ty.ty.clone());
-
     let result = Argument {
         source_pat_type,
         ident_pat_type,
@@ -47,7 +40,6 @@ pub(crate) fn new(
         generic_arg_style_type,
         control_fn_arg,
         is_impl_trait,
-        fn_format,
     };
     return result;
 }
@@ -75,9 +67,9 @@ fn generate_control_fn_arg(span: Span, pat: Box<Pat>, ref_style_type: Box<Type>)
                 modifiers: TraitBoundModifiers::default(),
                 maybe: None,
                 lifetimes: None,
-                path: path::new_generics(
+                path: path::new_generics_global(
                     span,
-                    ["IntoArg"],
+                    rsubstitute_for_generated::new("IntoArg"),
                     [GenericArgument::Type(*ref_style_type)],
                 ),
             })]),

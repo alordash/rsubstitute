@@ -9,7 +9,6 @@ pub(crate) struct Argument {
     pub generic_arg_style_type: Box<Type>,
     pub control_fn_arg: FnArg,
     pub is_impl_trait: bool,
-    pub fn_format: ItemFn,
 }
 
 pub(crate) trait IArgumentTypesCloner {

@@ -119,12 +119,6 @@ pub(crate) fn generate_module(ctx: &Context, item_trait: ItemTrait) -> MockMod {
                 Item::Impl(call_struct.call_impl),
             ]
             .into_iter()
-            .chain(
-                x.value
-                    .arguments
-                    .into_iter()
-                    .map(|argument| Item::Fn(argument.fn_format)),
-            )
             .chain(call_struct.maybe_clone_impl.map(Item::Impl).into_iter())
             .chain([
                 Item::Struct(args_checker.item_struct),
@@ -141,12 +135,6 @@ pub(crate) fn generate_module(ctx: &Context, item_trait: ItemTrait) -> MockMod {
                 Item::Impl(call_struct.call_impl),
             ]
             .into_iter()
-            .chain(
-                x.value
-                    .arguments
-                    .into_iter()
-                    .map(|argument| Item::Fn(argument.fn_format)),
-            )
             .chain(call_struct.maybe_clone_impl.map(Item::Impl).into_iter())
             .chain([
                 Item::Struct(args_checker.item_struct),

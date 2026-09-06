@@ -146,7 +146,7 @@ fn split_inputs_into_maybe_self_type_and_arguments(signature: &Signature) -> Inp
             ),
         })
         .enumerate()
-        .map(|t| argument::new(signature, t))
+        .map(argument::new)
         .collect();
     let result = InputsSplit {
         maybe_self_type,
