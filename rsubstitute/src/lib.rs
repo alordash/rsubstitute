@@ -62,7 +62,7 @@
 //! * [Call order validation](#call-order-validation)
 //! * [Receiver types](#receiver-types)
 //! * [Cloning mocks](#mocks-cloning)
-//! * [`rsubstitute` config](#rsubstitute-config)   TODO
+//! * [`rsubstitute` config](#rsubstitute-config)
 //! * [Crate features](#create-features)
 //! * [Undefined behavior](#undefined-behavior)     TODO
 //! * [Limitations](#limitations)                   TODO
@@ -838,6 +838,51 @@
 //!     .get_number(1.time());
 //! # }
 //! ```
+//! 
+//! There is one limitation - when mocking implementation of trait with associated types for struct
+//! all types must be referenced explicitly like `<Self as Trait>::AssociatedType`. Using
+//! `Self::AssociatedType` will lead to compilation error:
+//! ```compile_error
+//! # use rsubstitute::*;
+//! 
+//! trait Trait {
+//!     type Item;
+//!     fn get_item(&self) -> Self::Item;
+//! }
+//! 
+//! #[mock]
+//! struct Struct;
+//! #[mock]
+//! impl Trait for Struct {
+//!     type Item = i32;
+//!     fn get_item(&self) -> Self::Item {
+//!         10
+//!     }
+//! }
+//! 
+//! # fn main() {}
+//! ```
+//! Here's the fix:
+//! ```
+//! # use rsubstitute::*;
+//! # trait Trait {
+//! #     type Item;
+//! #     fn get_item(&self) -> Self::Item;
+//! # }
+//!
+//! # #[mock]
+//! # struct Struct;
+//! #[mock]
+//! impl Trait for Struct {
+//!     type Item = i32;
+//!     fn get_item(&self) -> <Self as Trait>::Item {
+//!         10              // ^^^^^^^^^^^^^
+//!                         // explicit associated item
+//!     }
+//! }
+//!
+//! # fn main() {}
+//! ```
 //!
 //! ## `impl Trait` types
 //!
@@ -1109,8 +1154,9 @@
 //! Enables better generic argument values display in error messages.
 //! 
 //! Without this feature arguments that have generic type will be printed as just "?" in errors,
-//! even if they implement [`std::fmt::Debug`]. With this feature such arguments will be printed as their debug
-//! strings if they implement `Debug`;
+//! even if they implement [`std::fmt::Debug`]. With this feature such arguments will be printed as
+//! their debug strings if they implement `Debug`. For example, without this feature in function
+//! `fn work<T>(t: T)` the argument `t` will be printed as "?" in all errors.
 //! 
 //! This feature requires nightly version of compiler because it uses Rust's
 //! [`specialization`](https://rust-lang.github.io/rfcs/1210-impl-specialization.html) feature.

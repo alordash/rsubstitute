@@ -50,6 +50,10 @@ impl Trait for Struct {
     where
         TAmogus: Debug;
 
+    fn get_const(&self) -> usize {
+        Self::CONST
+    }
+
     fn get_my_type<TT: Clone>(
         &self,
         #[allow(unused)] input: <Self as Trait>::InputType<i32>,
