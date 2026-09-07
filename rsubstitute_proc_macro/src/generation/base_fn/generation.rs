@@ -18,7 +18,7 @@ pub(crate) fn generate_static_fn(
     span: Span,
     StaticFnParams { fn_info, base_impl }: StaticFnParams,
 ) -> ItemFn {
-    let (sig, block) = generate_core(span, fn_info, base_impl, None);
+    let (sig, block) = generate_core(span, fn_info, *base_impl, None);
     let result = ItemFn {
         attrs: fn_info
             .attributes
@@ -49,7 +49,7 @@ pub(crate) fn generate_associated(
         maybe_mod_ident,
     }: AssociatedParams,
 ) -> ImplItemFn {
-    let (mut sig, mut block) = generate_core(span, fn_info, base_impl, maybe_mod_ident);
+    let (mut sig, mut block) = generate_core(span, fn_info, *base_impl, maybe_mod_ident);
     if let Some(associated_items_info) = maybe_associated_items_info {
         (sig, block) = normalization::normalize_associated_items(associated_items_info, sig, block);
     }
@@ -71,7 +71,7 @@ pub(crate) fn generate_associated(
 fn generate_core(
     span: Span,
     fn_info: &FnInfo,
-    base_impl: Box<Block>,
+    base_impl: Block,
     maybe_mod_ident: Option<Ident>,
 ) -> (Signature, Block) {
     let source_signature = &fn_info.signature;
@@ -110,7 +110,7 @@ fn generate_core(
     rsubstitute_lifetime::revert_in_first_generic_arg(&mut call_struct_path);
     let sig = Signature {
         constness: None, // not supported
-        asyncness: source_signature.asyncness.clone(),
+        asyncness: source_signature.asyncness,
         safety: Safety::Default,
         abi: None,
         fn_token: Token![fn](span),
@@ -200,7 +200,7 @@ fn generate_core(
         }
     });
 
-    let normalized_base_impl = normalization::normalize_super_paths_in_block(*base_impl);
+    let normalized_base_impl = normalization::normalize_super_paths_in_block(base_impl);
     let mut stmts = core::iter::once(Stmt::Local(deconstruct_call_stmt))
         .chain(cast_args_stmts.map(Stmt::Local))
         .chain(normalized_base_impl.stmts)

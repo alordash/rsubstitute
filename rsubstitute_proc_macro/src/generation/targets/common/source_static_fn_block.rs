@@ -44,7 +44,7 @@ pub(crate) fn replace(
                         qself: None,
                         path: path::from_ident(arg_ident),
                     };
-                    typed.pat = Box::new(Pat::Path(arg_path.clone()));
+                    *typed.pat = Pat::Path(arg_path.clone());
                     Some(arg_path)
                 }
                 _ => None,

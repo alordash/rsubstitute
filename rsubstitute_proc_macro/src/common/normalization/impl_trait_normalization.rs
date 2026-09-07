@@ -94,11 +94,11 @@ impl VisitMut for ImplTraitReturnValueBoxer {
             let span = return_expr.span();
             let decoy_expr = Box::new(Expr::Verbatim(TokenStream::new()));
             let source_return_expr = core::mem::replace(return_expr, decoy_expr);
-            *return_expr = Box::new(Expr::Call(expr::call::new(
+            **return_expr = Expr::Call(expr::call::new(
                 span,
                 Expr::Path(expr::path::new(span, ["Box", "new"])),
                 [*source_return_expr],
-            )));
+            ));
         }
 
         visit_mut::visit_expr_return_mut(self, i);

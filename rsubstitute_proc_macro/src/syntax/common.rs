@@ -3,8 +3,8 @@ use proc_macro2::Span;
 use syn::punctuated::Punctuated;
 use syn::*;
 
-const SELF: &'static str = "self";
-const SELF_TYPE: &'static str = "Self";
+const SELF: &str = "self";
+const SELF_TYPE: &str = "Self";
 
 pub(crate) fn self_expr_path(span: Span) -> ExprPath {
     expr::path::new(span, [SELF])

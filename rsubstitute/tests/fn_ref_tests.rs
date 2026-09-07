@@ -18,7 +18,7 @@ fn accept_ref_return_ref(_: &i32) -> &'static i32 {
 #[mock(base)]
 fn accept_two_refs(_: &i32, _: &f32) {}
 
-const ACCEPT_TWO_REFS_RETURN_REF: &'static str = "quo vadis";
+const ACCEPT_TWO_REFS_RETURN_REF: &str = "quo vadis";
 #[mock(base)]
 fn accept_two_refs_return_ref(_: &i32, _: &f32) -> &'static str {
     ACCEPT_TWO_REFS_RETURN_REF

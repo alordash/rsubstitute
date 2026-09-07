@@ -24,7 +24,7 @@ pub(crate) fn split_generics(
     let mut target_generics_searcher = GenericsSearcher::new(&mut searched_generics_idents_map);
     target_generics_searcher.visit_type(target_type);
     let mut trait_generics_searcher =
-        GenericsSearcher::new(&mut target_generics_searcher.searched_generics_idents_map);
+        GenericsSearcher::new(target_generics_searcher.searched_generics_idents_map);
     trait_generics_searcher.visit_path(trait_path);
 
     let mut trait_where_type_predicates_map: HashMap<Ident, Vec<TypeParamBound>> = HashMap::new();
@@ -44,7 +44,7 @@ pub(crate) fn split_generics(
                 if idents_searcher.found {
                     let trait_where_predicate = trait_where_type_predicates_map
                         .entry(type_param.ident.clone())
-                        .or_insert(Vec::new());
+                        .or_default();
                     // SAFETY: `bounds` non emptiness is guaranteed by `for i in (0..bounds.len()).rev()` loop
                     let bound = unsafe { bounds.pop().unwrap_unchecked() };
                     trait_where_predicate.push(bound);
@@ -58,7 +58,7 @@ pub(crate) fn split_generics(
                 if idents_searcher.found {
                     let trait_where_predicate = trait_where_lifetime_predicates_map
                         .entry(lifetime_param.lifetime.ident.clone())
-                        .or_insert(Vec::new());
+                        .or_default();
                     // SAFETY: `lifetimes` non emptiness is guaranteed by `for i in (0..lifetimes.len()).rev()` loop
                     let lifetime = unsafe { lifetimes.pop().unwrap_unchecked() };
                     trait_where_predicate.push(lifetime);

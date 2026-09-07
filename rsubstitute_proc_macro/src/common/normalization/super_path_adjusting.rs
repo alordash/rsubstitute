@@ -34,11 +34,11 @@ impl VisitMut for SuperUsagesNormalizer {
             }));
             let mut base_tree = core::mem::replace(&mut i.tree, decoy_tree);
             visit_mut::visit_use_tree_mut(self, &mut base_tree);
-            i.tree = Box::new(UseTree::Path(UsePath {
+            *i.tree = UseTree::Path(UsePath {
                 ident: i.ident.clone(),
-                colon2_token: i.colon2_token.clone(),
+                colon2_token: i.colon2_token,
                 tree: base_tree,
-            }));
+            });
             return;
         }
 

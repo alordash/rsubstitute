@@ -97,7 +97,7 @@ fn split_items(items: Vec<ImplItem>) -> SplitItems {
             ImplItem::Macro(_) => panic!("Macro invocations inside impl blocks are not supported"),
             _ => panic!(
                 "Unexpected impl item: {}",
-                item.to_token_stream().to_string()
+                item.to_token_stream()
             ),
         }
     }
@@ -147,6 +147,6 @@ impl<'a> IFnOwner for ImplTraitForStructSyntaxAsFnOwner<'a> {
     }
 
     fn generics(&self) -> &Generics {
-        &self.generics
+        self.generics
     }
 }

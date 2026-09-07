@@ -239,7 +239,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                     Item::Impl(call_struct.call_impl),
                 ]
                 .into_iter()
-                .chain(call_struct.maybe_clone_impl.map(Item::Impl).into_iter())
+                .chain(call_struct.maybe_clone_impl.map(Item::Impl))
                 .chain([
                     Item::Struct(args_checker.item_struct),
                     Item::Impl(args_checker.generics_info_provider_impl),
@@ -260,7 +260,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
                     Item::Impl(call_struct.call_impl),
                 ]
                 .into_iter()
-                .chain(call_struct.maybe_clone_impl.map(Item::Impl).into_iter())
+                .chain(call_struct.maybe_clone_impl.map(Item::Impl))
                 .chain([
                     Item::Struct(args_checker.item_struct),
                     Item::Impl(args_checker.generics_info_provider_impl),
@@ -300,6 +300,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
     .collect();
     let item_mod = ItemMod {
         attrs: vec![
+            attributes::allow_clippy(source_span),
             attributes::allow_unused(source_span),
             attributes::allow_private_interfaces(source_span),
             attributes::allow_private_bounds(source_span),

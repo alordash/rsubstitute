@@ -21,10 +21,10 @@ struct CallOrderState {
 }
 
 thread_local! {
-    static CALL_ORDER_STATE: CallOrderState = CallOrderState {
+    static CALL_ORDER_STATE: CallOrderState = const {CallOrderState {
         perform_call_order_verification: Cell::new(false),
         expected_calls_order: RefCell::new(Vec::new()),
-    };
+    }};
 }
 
 pub(crate) fn should_perform() -> bool {

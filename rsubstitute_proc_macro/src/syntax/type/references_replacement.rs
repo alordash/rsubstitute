@@ -93,7 +93,7 @@ impl VisitMut for AnonymousReferenceToPointerConverter {
             star_token: Token![*](i_ref.and_token.span),
             mutability: i_ref.mutability.map_or(
                 PointerMutability::Const(Token![const](Span::call_site())),
-                |mutability| PointerMutability::Mut(mutability.clone()),
+                PointerMutability::Mut,
             ),
             elem,
         };

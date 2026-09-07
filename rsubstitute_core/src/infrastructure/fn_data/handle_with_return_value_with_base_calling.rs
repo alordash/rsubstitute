@@ -26,7 +26,7 @@ impl<'rs, TMock, const PASSES_MOCK_TO_CALLBACK: bool>
                     return base_return_value;
                 }
                 error_printing::panic_no_suitable_fn_configuration_found(
-                    &self.fn_name,
+                    self.fn_name,
                     &self.formatted_fn_name,
                     call.get_arg_infos(),
                     call.get_generic_parameter_infos(),
@@ -79,7 +79,7 @@ impl<'rs, TMock, const PASSES_MOCK_TO_CALLBACK: bool>
                     return base_return_value.await;
                 }
                 error_printing::panic_no_suitable_fn_configuration_found(
-                    &self.fn_name,
+                    self.fn_name,
                     &self.formatted_fn_name,
                     call.get_arg_infos(),
                     call.get_generic_parameter_infos(),
@@ -88,16 +88,18 @@ impl<'rs, TMock, const PASSES_MOCK_TO_CALLBACK: bool>
             }
         };
         self.register_call(call.clone());
-        fn_config.borrow_mut().register_call(call.clone());
-        let fn_config_ref = fn_config.borrow();
-        if let Some(callback) = fn_config_ref.get_callback() {
-            callback.borrow_mut()(&mock_arg as *const TMockArg as *const (), call.as_ref());
-        }
-        if fn_config_ref.should_call_base() {
+        let should_call_base = {
+            fn_config.borrow_mut().register_call(call.clone());
+            let fn_config_ref = fn_config.borrow();
+            if let Some(callback) = fn_config_ref.get_callback() {
+                callback.borrow_mut()(&mock_arg as *const TMockArg as *const (), call.as_ref());
+            }
+            fn_config_ref.should_call_base()
+        };
+        if should_call_base {
             let base_return_value = base_call(mock_arg, call_for_base_call);
             return base_return_value.await;
         }
-        drop(fn_config_ref);
         let Some(return_value) = fn_config.borrow_mut().select_next_return_value(&call) else {
             error_printing::panic_no_return_value_was_configured(
                 &self.formatted_fn_name,

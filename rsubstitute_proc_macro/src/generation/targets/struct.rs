@@ -141,6 +141,7 @@ pub(crate) fn generate_module(mut item_struct: ItemStruct) -> MockMod {
     ];
     let item_mod = ItemMod {
         attrs: vec![
+            attributes::allow_clippy(source_span),
             attributes::allow_unused(source_span),
             attributes::allow_unreachable_pub(source_span),
             attributes::allow_nonstandard_style(source_span),

@@ -15,7 +15,7 @@ use syn::*;
 pub(crate) fn generate_module(ctx: &Context, item_trait: ItemTrait) -> MockMod {
     let source_span = item_trait.span();
     let trait_syntax = trait_syntax::prepare(trait_syntax::Params {
-        unsafety: item_trait.unsafety.clone(),
+        unsafety: item_trait.unsafety,
         ident: item_trait.ident.clone(),
         generics: item_trait.generics.clone(),
         items: item_trait.items.clone(),
@@ -119,7 +119,7 @@ pub(crate) fn generate_module(ctx: &Context, item_trait: ItemTrait) -> MockMod {
                 Item::Impl(call_struct.call_impl),
             ]
             .into_iter()
-            .chain(call_struct.maybe_clone_impl.map(Item::Impl).into_iter())
+            .chain(call_struct.maybe_clone_impl.map(Item::Impl))
             .chain([
                 Item::Struct(args_checker.item_struct),
                 Item::Impl(args_checker.generics_info_provider_impl),
@@ -135,7 +135,7 @@ pub(crate) fn generate_module(ctx: &Context, item_trait: ItemTrait) -> MockMod {
                 Item::Impl(call_struct.call_impl),
             ]
             .into_iter()
-            .chain(call_struct.maybe_clone_impl.map(Item::Impl).into_iter())
+            .chain(call_struct.maybe_clone_impl.map(Item::Impl))
             .chain([
                 Item::Struct(args_checker.item_struct),
                 Item::Impl(args_checker.generics_info_provider_impl),
@@ -186,6 +186,7 @@ pub(crate) fn generate_module(ctx: &Context, item_trait: ItemTrait) -> MockMod {
     usage.attrs.push(attributes::allow_unused(source_span));
     let item_mod = ItemMod {
         attrs: vec![
+            attributes::allow_clippy(source_span),
             attributes::allow_unused(source_span),
             attributes::allow_unreachable_pub(source_span),
             attributes::allow_nonstandard_style(source_span),

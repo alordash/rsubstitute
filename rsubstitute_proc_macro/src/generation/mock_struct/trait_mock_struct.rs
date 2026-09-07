@@ -115,7 +115,7 @@ fn generate_trait_impl(
                 .map(|x| map_fn(ctx, mock_struct_path.clone(), x, mod_ident.clone(), true)),
         )
         .collect();
-    items_with_order.sort_by(|a, b| a.order_number.cmp(&b.order_number));
+    items_with_order.sort_by_key(|a| a.order_number);
 
     let items = items_with_order.into_iter().map(|x| x.value).collect();
 
@@ -144,10 +144,10 @@ fn map_const(ordered_const: &Ordered<TraitItemConstSyntax>) -> Ordered<ImplItem>
             attrs: x.item.attrs.clone(),
             vis: Visibility::Inherited,
             modifiers: ConstModifiers::default(),
-            const_token: x.item.const_token.clone(),
+            const_token: x.item.const_token,
             ident: x.item.ident.clone(),
             generics: x.item.generics.clone(),
-            colon_token: x.item.colon_token.clone(),
+            colon_token: x.item.colon_token,
             ty: x.item.ty.clone(),
             eq_token: Token![=](span),
             expr: Expr::Path(ExprPath {
@@ -167,7 +167,7 @@ fn map_assoc_type(ordered_assoc_type: &Ordered<TraitItemTypeSyntax>) -> Ordered<
             attrs: x.item.attrs.clone(),
             vis: Visibility::Inherited,
             modifiers: TypeModifiers::default(),
-            type_token: x.item.type_token.clone(),
+            type_token: x.item.type_token,
             ident: x.item.ident.clone(),
             generics: x.item.generics.clone(),
             eq_token: Token![=](span),
@@ -235,6 +235,7 @@ fn map_fn(
     })
 }
 
+#[allow(clippy::too_many_arguments)]
 fn generate_inner_impl(
     ctx: &Context,
     span: Span,
@@ -269,11 +270,11 @@ fn generate_inner_impl(
                 span,
                 static_controls.static_setup_struct.path.clone(),
                 StaticControlType::Setup {
-                    mock_generic_argument: GenericArgument::Type(Type::Path(TypePath {
+                    mock_generic_argument: Box::new(GenericArgument::Type(Type::Path(TypePath {
                         attrs: Vec::new(),
                         qself: None,
                         path: mock_struct_path.clone(),
-                    })),
+                    }))),
                 },
             ),
             control_creation_fn::generate_static(

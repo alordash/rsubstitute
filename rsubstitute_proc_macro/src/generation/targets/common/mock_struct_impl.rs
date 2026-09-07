@@ -40,7 +40,7 @@ pub(crate) fn generate(
             .iter()
             .chain(static_fns.iter())
             .map(|ordered| {
-                ordered.ref_map(|x| try_extract_base_fn(span, &x, Some(mod_ident.clone())))
+                ordered.ref_map(|x| try_extract_base_fn(span, x, Some(mod_ident.clone())))
             })
             .filter_map(|ordered| match ordered.value {
                 Some(x) => Some(Ordered::new(ordered.order_number, x)),
@@ -75,7 +75,7 @@ pub(crate) fn generate(
             )
         }))
         .collect();
-    fns.sort_by(|a, b| a.order_number.cmp(&b.order_number));
+    fns.sort_by_key(|a| a.order_number);
     let items = fns
         .into_iter()
         .chain(base_fns)
@@ -129,7 +129,7 @@ pub(crate) fn generate_for_trait(
         let base_fns: Vec<_> = associated_fns
             .iter()
             .chain(static_fns.iter())
-            .map(|ordered| ordered.ref_map(|x| try_extract_base_fn(span, &x, None)))
+            .map(|ordered| ordered.ref_map(|x| try_extract_base_fn(span, x, None)))
             .filter_map(|ordered| match ordered.value {
                 Some(x) => Some(Ordered::new(ordered.order_number, x)),
                 _ => None,
@@ -268,7 +268,7 @@ pub(crate) fn generate_for_trait(
         )
         .chain(fns.into_iter().map(|ordered| ordered.map(ImplItem::Fn)))
         .collect();
-    ordered_items.sort_by(|a, b| a.order_number.cmp(&b.order_number));
+    ordered_items.sort_by_key(|a| a.order_number);
     let items = ordered_items.into_iter().map(|x| x.value).collect();
     let trait_impl = generate_item_impl(
         attributes,

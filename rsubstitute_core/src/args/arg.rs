@@ -21,7 +21,7 @@ pub enum Arg<T: ?Sized> {
     PrivateIs(Box<dyn Fn(*const ()) -> bool>, Internal),
 }
 
-const UNINITIALIZED_ARG_PRINT_STRING: &'static str = "[CRITICAL ERROR]: This string should represent arguments value, but if you see this is it means that `ArgCmp.print_arg` wasn't initialized!";
+const UNINITIALIZED_ARG_PRINT_STRING: &str = "[CRITICAL ERROR]: This string should represent arguments value, but if you see this is it means that `ArgCmp.print_arg` wasn't initialized!";
 
 impl<T: Debug> Debug for Arg<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
@@ -184,7 +184,7 @@ impl<T: ?Sized> Arg<T> {
     }
 }
 
-impl<'rs, 'a, T: ?Sized> Arg<&'a T> {
+impl<'a, T: ?Sized> Arg<&'a T> {
     #[doc(hidden)]
     pub fn check_ref(
         &self,
@@ -237,7 +237,7 @@ impl<'rs, 'a, T: ?Sized> Arg<&'a T> {
     }
 }
 
-impl<'a, T: ?Sized> Arg<&'a mut T> {
+impl<T: ?Sized> Arg<&mut T> {
     #[doc(hidden)]
     pub fn check_mut_ref(
         &self,

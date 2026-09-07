@@ -23,9 +23,9 @@ pub(crate) fn new(
         Some(receiver) => match &receiver.kind {
             ReceiverKind::Reference(and_token, _, mutability) => Type::Reference(TypeReference {
                 attrs: Vec::new(),
-                and_token: and_token.clone(),
+                and_token: *and_token,
                 lifetime: None,
-                mutability: mutability.clone(),
+                mutability: *mutability,
                 elem: Box::new(mock_struct_type),
             }),
             ReceiverKind::Typed(_, target_type) => {

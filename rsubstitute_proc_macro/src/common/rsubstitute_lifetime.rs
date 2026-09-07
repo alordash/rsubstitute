@@ -47,7 +47,7 @@ pub(crate) fn revert_in_first_generic_arg(path: &mut Path) {
     if let Some(rsubstitute_anonymous_lifetime) = path
         .segments
         .last_mut()
-        .map(|x| match &mut x.arguments {
+        .and_then(|x| match &mut x.arguments {
             PathArguments::AngleBracketed(generics) => {
                 generics
                     .args
@@ -63,7 +63,6 @@ pub(crate) fn revert_in_first_generic_arg(path: &mut Path) {
             }
             _ => None,
         })
-        .flatten()
         .flatten()
     {
         rsubstitute_anonymous_lifetime.ident =

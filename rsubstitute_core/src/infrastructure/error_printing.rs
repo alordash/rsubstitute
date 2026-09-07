@@ -66,7 +66,7 @@ pub(crate) fn panic_received_verification_error(
             .take(max_invalid_calls_listed_count)
             .map(|x| {
                 fmt_call(
-                    &fn_name,
+                    fn_name,
                     x.args_check_results,
                     GenericParameterInfosFormattingPolicy::Skip,
                 )
@@ -109,7 +109,7 @@ pub(crate) fn panic_no_suitable_fn_configuration_found(
     let calls = matching_config_search_err
         .args_check_results_sorted_by_number_of_correctly_matched_args_descending;
     let needed_return_value = matching_config_search_err.needed_return_value;
-    let configs_report = if calls.calls_args_check_results.len() > 0 {
+    let configs_report = if !calls.calls_args_check_results.is_empty() {
         let args_check_results_msgs: Vec<_> = calls
             .calls_args_check_results
             .into_iter()
@@ -206,12 +206,12 @@ fn fmt_calls(calls_count: usize) -> &'static str {
 }
 
 pub(crate) fn panic_invalid_calls_order(expected_calls_order: &mut [CallOrderEntry]) -> ! {
-    let expected_order_string = fmt_call_order_entries(&expected_calls_order);
+    let expected_order_string = fmt_call_order_entries(expected_calls_order);
     let actual_calls_order = {
-        expected_calls_order.sort_by(|a, b| a.call_order_number.cmp(&b.call_order_number));
+        expected_calls_order.sort_by_key(|a| a.call_order_number);
         expected_calls_order
     };
-    let actual_order_string = fmt_call_order_entries(&actual_calls_order);
+    let actual_order_string = fmt_call_order_entries(actual_calls_order);
     let error_msg = format!(
         "Expected to receive these calls in order:
 

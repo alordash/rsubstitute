@@ -59,7 +59,7 @@ pub(crate) fn prepare(
             let replace_impl_trait_result =
                 normalization::replace_impl_trait_with_box_dyn_trait(*ty.clone());
             if replace_impl_trait_result.is_impl_trait {
-                *ty = Box::new(replace_impl_trait_result.ty.clone());
+                **ty = replace_impl_trait_result.ty.clone();
                 maybe_base_impl = maybe_base_impl.map(|x| {
                     Box::new(normalization::box_impl_trait_return_values(
                         normalization::BoxImplParams {
@@ -69,14 +69,10 @@ pub(crate) fn prepare(
                     ))
                 });
                 attributes.push(attributes::allow_refining_impl_trait(signature_span));
-                source_signature.output = ReturnType::Type(
-                    arrow_token.clone(),
-                    Box::new(replace_impl_trait_result.ty.clone()),
-                );
+                source_signature.output =
+                    ReturnType::Type(*arrow_token, Box::new(replace_impl_trait_result.ty.clone()));
             }
-            let correct_return_type =
-                ReturnType::Type(arrow_token.clone(), Box::new(replace_impl_trait_result.ty));
-            correct_return_type
+            ReturnType::Type(*arrow_token, Box::new(replace_impl_trait_result.ty))
         }
     };
     signature = r#fn::common::replace_arg_pats_with_idents(signature, &arguments);
@@ -102,7 +98,7 @@ pub(crate) fn prepare(
     return result;
 }
 fn format_fn_ident(fn_ident: Ident, maybe_owner: Option<&dyn IFnOwner>) -> Ident {
-    if let Some(owner_ident) = maybe_owner.map(|x| x.maybe_ident()).flatten() {
+    if let Some(owner_ident) = maybe_owner.and_then(|x| x.maybe_ident()) {
         return format_ident!("{owner_ident}_{fn_ident}");
     }
     return fn_ident;
@@ -142,7 +138,7 @@ fn split_inputs_into_maybe_self_type_and_arguments(signature: &Signature) -> Inp
             FnArg::Typed(pat_type) => pat_type,
             unexpected => panic!(
                 "All arguments except first should be `FnArg::Typed`, received: {}.",
-                unexpected.to_token_stream().to_string()
+                unexpected.to_token_stream()
             ),
         })
         .enumerate()

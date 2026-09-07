@@ -25,7 +25,7 @@ pub(crate) fn punctuated<P: Default, const N: usize>(
         },
     ]
     .into_iter()
-    .chain(items.into_iter())
+    .chain(items)
     .collect()
 }
 

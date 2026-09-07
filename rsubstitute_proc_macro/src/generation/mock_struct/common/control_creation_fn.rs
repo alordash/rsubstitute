@@ -105,7 +105,7 @@ pub(crate) fn generate_static(
         StaticControlType::Setup {
             mock_generic_argument,
         } => {
-            let reset_fn_data_stmt = reset_fn_data_stmt::new(span, mock_generic_argument);
+            let reset_fn_data_stmt = reset_fn_data_stmt::new(span, *mock_generic_argument);
             vec![
                 Stmt::Expr(Expr::Call(reset_fn_data_stmt), Some(Token![;](span))),
                 Stmt::Expr(constructor_stmt, None),

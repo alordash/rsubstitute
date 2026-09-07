@@ -1,3 +1,5 @@
+#![allow(clippy::arc_with_non_send_sync)]
+
 use rsubstitute::*;
 use std::cell::{Cell, RefCell};
 use std::sync::Arc;
@@ -30,7 +32,7 @@ fn accept_two_values(v1: i32, v2: f32) {
     BASE_CALLED_FLAG.set(true);
 }
 
-const BASE_ACCEPT_TWO_VALUES_RETURN_VALUE: &'static str = "quo vadis";
+const BASE_ACCEPT_TWO_VALUES_RETURN_VALUE: &str = "quo vadis";
 #[mock(base)]
 fn accept_two_values_return_value(v1: i32, v2: f32) -> &'static str {
     BASE_CALLED_FLAG.set(true);

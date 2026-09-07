@@ -54,5 +54,5 @@ impl IMockData for SharedMockData {
     }
 }
 
-const UNABLE_TO_LOCK_FOR_WRITING_ERROR: &'static str = "Unable to lock SharedMockData for writing.";
-const UNABLE_TO_LOCK_FOR_READING_ERROR: &'static str = "Unable to lock SharedMockData for reading.";
+const UNABLE_TO_LOCK_FOR_WRITING_ERROR: &str = "Unable to lock SharedMockData for writing.";
+const UNABLE_TO_LOCK_FOR_READING_ERROR: &str = "Unable to lock SharedMockData for reading.";

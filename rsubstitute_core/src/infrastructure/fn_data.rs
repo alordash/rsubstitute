@@ -22,6 +22,7 @@ pub struct FnData<
     fn_name: &'static str,
     formatted_fn_name: String,
     pub call_infos: RefCell<HashMap<GenericsHashKey, Vec<CallCheck<'rs>>>>,
+    #[allow(clippy::type_complexity)]
     pub configs: RefCell<HashMap<GenericsHashKey, Vec<Rc<RefCell<FnConfig<'rs, TMock>>>>>>,
     force_call_base: bool,
 }
@@ -105,7 +106,7 @@ impl<
         let valid = times.matches(matching_calls_count);
         if !valid {
             error_printing::panic_received_verification_error(
-                &self.fn_name,
+                self.fn_name,
                 &self.formatted_fn_name,
                 &dyn_args_checker,
                 matching_calls_check_result,
@@ -135,7 +136,7 @@ impl<
             .flatten()
             .filter(|x| x.is_not_verified())
             .collect();
-        unexpected_call_infos.sort_by(|a, b| a.number.cmp(&b.number));
+        unexpected_call_infos.sort_by_key(|a| a.number);
         let unexpected_call_arg_infos = unexpected_call_infos
             .into_iter()
             .map(|x| {
@@ -228,11 +229,11 @@ mod internal {
             dyn_call: &DynCall<'rs>,
         ) -> Rc<RefCell<FnConfig<'rs, TMock>>> {
             let with_return_value = true;
-            let fn_config = match self.try_get_matching_config(&dyn_call, with_return_value) {
+            let fn_config = match self.try_get_matching_config(dyn_call, with_return_value) {
                 MatchingConfigSearchResult::Ok(matching_config) => matching_config,
                 MatchingConfigSearchResult::Err(matching_config_search_err) => {
                     error_printing::panic_no_suitable_fn_configuration_found(
-                        &self.fn_name,
+                        self.fn_name,
                         &self.formatted_fn_name,
                         dyn_call.get_arg_infos(),
                         dyn_call.get_generic_parameter_infos(),

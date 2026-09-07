@@ -137,10 +137,7 @@ fn split_items(items: Vec<TraitItem>, trait_ident: &Ident) -> SplitItems {
             )),
             TraitItem::Macro(_) => panic!("Macro invocations inside trait are not supported"),
             TraitItem::Verbatim(_) => panic!("Verbatim trait items are not supported"),
-            _ => panic!(
-                "Unexpected trait item: {}",
-                item.to_token_stream().to_string()
-            ),
+            _ => panic!("Unexpected trait item: {}", item.to_token_stream()),
         }
     }
 
@@ -198,7 +195,7 @@ fn merge_generics_with_assoc_generics(
     let mut generic_parameters: Vec<_> = assoc_types_as_generic_parameters
         .chain(assoc_constants_as_generic_parameters)
         .collect();
-    generic_parameters.sort_by(|a, b| a.order_number.cmp(&b.order_number));
+    generic_parameters.sort_by_key(|a| a.order_number);
     generics
         .params
         .extend(generic_parameters.into_iter().map(|x| x.value));
@@ -219,6 +216,6 @@ impl<'a> IFnOwner for TraitSyntaxAsFnOwner<'a> {
     }
 
     fn generics(&self) -> &Generics {
-        &self.generics
+        self.generics
     }
 }

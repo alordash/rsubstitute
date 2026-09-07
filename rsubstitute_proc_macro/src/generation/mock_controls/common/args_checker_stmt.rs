@@ -4,7 +4,7 @@ use crate::syntax::*;
 use proc_macro2::Span;
 use syn::*;
 
-const ARGUMENT_ARG_NAME: &'static str = "v";
+const ARGUMENT_ARG_NAME: &str = "v";
 
 pub(crate) fn new(span: Span, fn_info: &FnInfo) -> (ExprPath, Local) {
     let args_checker_var_path = expr::path::new(span, ["args_checker"]);

@@ -21,7 +21,5 @@ pub(crate) fn create_for_mock_macro(proc_macro_attribute: proc_macro::TokenStrea
 }
 
 fn support_base_calling_from_parameters(parameters: &[&str]) -> bool {
-    return parameters
-        .iter()
-        .any(|parameter| *parameter == constants::SUPPORT_BASE_PARAMETER);
+    return parameters.contains(&constants::SUPPORT_BASE_PARAMETER);
 }

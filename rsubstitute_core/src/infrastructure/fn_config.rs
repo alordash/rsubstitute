@@ -10,6 +10,7 @@ pub struct FnConfig<'rs, TMock> {
     pub args_checker: DynArgsChecker<'rs>,
     pub return_value_sources: VecDeque<ReturnValueSource<'rs>>,
     pub calls: Vec<Rc<DynCall<'rs>>>,
+    #[allow(clippy::type_complexity)]
     pub callback: Option<Rc<RefCell<dyn FnMut(*const (), &DynCall<'rs>)>>>,
     pub call_base: bool,
 }
@@ -34,7 +35,7 @@ impl<'rs, TMock> FnConfig<'rs, TMock> {
         &mut self,
         return_values: impl IntoIterator<Item = ReturnValueSource<'rs>>,
     ) {
-        self.return_value_sources.extend(return_values.into_iter());
+        self.return_value_sources.extend(return_values);
     }
 
     pub(crate) fn set_callback<TArgRefsTuple, TMockArg>(
@@ -69,7 +70,7 @@ impl<'rs, TMock> FnConfig<'rs, TMock> {
     }
 
     pub(crate) fn check_call(&self, call: &DynCall<'rs>) -> Vec<ArgCheckResult> {
-        self.args_checker.check(&call)
+        self.args_checker.check(call)
     }
 
     pub(crate) fn has_return_value(&self) -> bool {
@@ -80,9 +81,8 @@ impl<'rs, TMock> FnConfig<'rs, TMock> {
         &mut self,
         call: &DynCall<'rs>,
     ) -> Option<DynReturnValue<'rs>> {
-        let Some(return_value_source) = self.return_value_sources.front() else {
-            return None;
-        };
+        let return_value_source = self.return_value_sources.front()?;
+
         return match return_value_source {
             ReturnValueSource::SingleTime(_) => {
                 let Some(ReturnValueSource::SingleTime(return_value)) =
@@ -106,6 +106,7 @@ impl<'rs, TMock> FnConfig<'rs, TMock> {
         };
     }
 
+    #[allow(clippy::type_complexity)]
     pub(crate) fn get_callback(&self) -> Option<Rc<RefCell<dyn FnMut(*const (), &DynCall<'rs>)>>> {
         self.callback.clone()
     }

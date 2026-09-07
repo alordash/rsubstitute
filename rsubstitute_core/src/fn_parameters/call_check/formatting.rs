@@ -70,7 +70,7 @@ pub(crate) fn fmt_generic_parameter_infos(
             if !generic_parameter_infos.is_empty() =>
         {
             let generic_parameters_msgs: Vec<_> = generic_parameter_infos
-                .into_iter()
+                .iter()
                 .map(|x| x.to_string())
                 .collect();
             let generic_parameters_msgs_joined = generic_parameters_msgs.join(", ");

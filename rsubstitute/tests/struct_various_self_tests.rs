@@ -1,3 +1,10 @@
+#![allow(clippy::arc_with_non_send_sync)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_borrow)]
+#![allow(clippy::needless_lifetimes)]
+#![allow(clippy::redundant_allocation)]
+#![allow(clippy::boxed_local)]
+
 mod common;
 
 use rsubstitute::*;
@@ -163,9 +170,9 @@ mod tests {
     #![allow(unused_imports)]
 
     use super::*;
+    use common::*;
     use not_enough_asserts::*;
     use rsubstitute::*;
-    use common::*;
 
     mod no_return_tests {
         use super::*;

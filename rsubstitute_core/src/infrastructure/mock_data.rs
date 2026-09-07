@@ -21,6 +21,7 @@ impl core::fmt::Debug for MockData {
     }
 }
 
+#[allow(clippy::derivable_impls)]
 impl Default for MockData {
     fn default() -> Self {
         Self {
@@ -48,7 +49,7 @@ impl MockData {
         let fn_data_ptr = self
             .map
             .entry(unique_fn_ident)
-            .or_insert_with(|| IndexMap::new())
+            .or_default()
             .entry(generics_hash_key)
             .or_insert_with(|| {
                 Box::leak(Box::new(FnData::<

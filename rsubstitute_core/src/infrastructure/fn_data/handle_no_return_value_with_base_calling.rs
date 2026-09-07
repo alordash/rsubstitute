@@ -39,11 +39,14 @@ impl<'rs, TMock, const PASSES_MOCK_TO_CALLBACK: bool>
         self.register_call(call.clone());
         if let MatchingConfigSearchResult::Ok(fn_config) = maybe_fn_config {
             fn_config.borrow_mut().register_call(call.clone());
-            let fn_config_ref = fn_config.borrow();
-            if let Some(callback) = fn_config_ref.get_callback() {
-                callback.borrow_mut()(&mock_arg as *const TMockArg as *const (), call.as_ref());
-            }
-            if fn_config_ref.should_call_base() {
+            let should_call_base = {
+                let fn_config_ref = fn_config.borrow();
+                if let Some(callback) = fn_config_ref.get_callback() {
+                    callback.borrow_mut()(&mock_arg as *const TMockArg as *const (), call.as_ref());
+                }
+                fn_config_ref.should_call_base()
+            };
+            if should_call_base {
                 base_call(mock_arg, call_for_base_call).await;
             }
         } else if self.force_call_base {

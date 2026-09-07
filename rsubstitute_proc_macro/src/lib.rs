@@ -1,4 +1,5 @@
 #![allow(clippy::needless_return)]
+#![allow(clippy::match_like_matches_macro)]
 
 use crate::common::context;
 use crate::generation::targets;

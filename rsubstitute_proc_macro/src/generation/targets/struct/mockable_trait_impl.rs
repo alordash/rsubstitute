@@ -61,7 +61,7 @@ pub(crate) fn generate(
     let fn_static_setup = fn_static_control(
         span,
         StaticControlType::Setup {
-            mock_generic_argument: GenericArgument::Type(struct_type.clone()),
+            mock_generic_argument: Box::new(GenericArgument::Type(struct_type.clone())),
         },
     );
     let type_static_received =
@@ -183,7 +183,7 @@ fn fn_static_control(span: Span, static_control_type: StaticControlType) -> Impl
         StaticControlType::Setup {
             mock_generic_argument,
         } => {
-            let reset_fn_data_stmt = reset_fn_data_stmt::new(span, mock_generic_argument);
+            let reset_fn_data_stmt = reset_fn_data_stmt::new(span, *mock_generic_argument);
             vec![
                 Stmt::Expr(Expr::Call(reset_fn_data_stmt), Some(Token![;](span))),
                 Stmt::Expr(constructor_stmt, None),

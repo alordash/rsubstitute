@@ -167,7 +167,7 @@ fn generate_fn_hash_generics_type_ids<'a>(
             ))
         })
         .collect();
-    let stmts = if tids.len() > 0 {
+    let stmts = if !tids.is_empty() {
         let tids_array = Expr::Array(ExprArray {
             attrs: Vec::new(),
             bracket_token: token::Bracket(span),

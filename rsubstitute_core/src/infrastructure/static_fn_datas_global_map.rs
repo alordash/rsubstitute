@@ -12,6 +12,7 @@ struct StaticFnDatasGlobalMap {
 }
 
 impl StaticFnDatasGlobalMap {
+    #[allow(clippy::mut_from_ref)]
     fn get_mut_map(&self) -> &mut Map {
         // SAFETY: static functions data is stored in global TLS, which guarantees that there can't
         // be more than one mutable reference to given static function data at the same time.
@@ -56,7 +57,7 @@ impl StaticFnDatasGlobalMap {
         let map = self.get_mut_map();
         let raw_ptr = map
             .entry(type_id)
-            .or_insert_with(|| HashMap::new())
+            .or_default()
             .entry(fn_ident)
             .or_insert_with(|| {
                 Box::leak(Box::new(FnData::<
