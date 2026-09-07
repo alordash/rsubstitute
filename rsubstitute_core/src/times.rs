@@ -21,7 +21,7 @@ impl Times {
 }
 
 /// Syntactic sugar for writing `1.time()` or `2.times()`.
-pub trait ITimes: Sized {
+pub trait AsTimes: Sized {
     fn time(self) -> Times {
         Self::times(self)
     }
@@ -29,7 +29,7 @@ pub trait ITimes: Sized {
     fn times(self) -> Times;
 }
 
-impl ITimes for usize {
+impl AsTimes for usize {
     fn times(self) -> Times {
         Times::Exactly(self)
     }
@@ -41,7 +41,7 @@ mod tests {
     use super::*;
 
     #[test]
-    fn ITimes_times_Ok() {
+    fn AsTimes_times_Ok() {
         // Arrange
         let raw = 1usize;
 

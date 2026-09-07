@@ -11,6 +11,7 @@ readme = "../README.md"
 [dependencies]
 typeid = { workspace = true }
 indexmap = { workspace = true }
+cfg-if = { workspace = true }
 
 [features]
 debug_naming = []

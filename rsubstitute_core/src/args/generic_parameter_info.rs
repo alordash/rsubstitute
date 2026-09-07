@@ -1,28 +1,33 @@
 use std::fmt::{Debug, Display, Formatter};
 
+#[doc(hidden)]
 #[derive(Clone)]
 pub enum GenericParameterInfo {
     Type(GenericTypeInfo),
     Const(GenericConstInfo),
 }
 
+#[doc(hidden)]
 #[derive(Clone)]
 pub struct GenericTypeInfo {
     pub name: &'static str,
     pub type_name: &'static str,
 }
 
+#[doc(hidden)]
 #[derive(Clone)]
 pub struct GenericConstInfo {
     pub name: &'static str,
     pub debug_value_str: String,
 }
 
+#[doc(hidden)]
 pub fn generic_type_info(name: &'static str, type_name: &'static str) -> GenericParameterInfo {
     let result = GenericParameterInfo::Type(GenericTypeInfo { name, type_name });
     return result;
 }
 
+#[doc(hidden)]
 pub fn generic_const_info<T: Debug>(name: &'static str, value: T) -> GenericParameterInfo {
     let result = GenericParameterInfo::Const(GenericConstInfo {
         name,

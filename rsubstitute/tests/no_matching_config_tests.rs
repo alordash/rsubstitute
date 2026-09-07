@@ -1,4 +1,4 @@
-use rsubstitute::mock;
+use rsubstitute::*;
 
 #[mock]
 trait Trait {
@@ -12,11 +12,8 @@ fn work(_v1: i32, _v2: i32, _v3: i32, _v4: i32) -> i32 {
 
 mod tests {
     #![allow(non_snake_case)]
-
     use super::*;
     use not_enough_asserts::*;
-    use rsubstitute::Arg;
-    use rsubstitute_core::Times;
 
     #[test]
     fn trait_work_Panics() {

@@ -1,4 +1,4 @@
-use rsubstitute::mock;
+use rsubstitute::*;
 
 #[derive(Clone, Debug, PartialOrd, PartialEq)]
 struct Foo {
@@ -34,7 +34,6 @@ trait ISelfish {
 mod tests {
     #![allow(non_snake_case)]
     use super::*;
-    use rsubstitute::*;
 
     #[test]
     fn accept_ref_Ok() {

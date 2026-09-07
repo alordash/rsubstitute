@@ -156,7 +156,6 @@
 //!
 //! ```
 //! # use rsubstitute::*;
-//!
 //! #[mock]
 //! struct Struct;
 //!
@@ -164,6 +163,8 @@
 //! impl Struct {
 //!     pub fn new() -> Self { Self }
 //! }
+//! 
+//! # fn main() {}
 //! ```
 //!
 //! ### Limitations
@@ -344,20 +345,6 @@
 //! work::setup(1).returns(10)
 //!      .setup(2).returns(20); // `.setup(2)` does not clear previous configuration
 //! }
-//! ```
-//!
-//! If your "arrange" part of unit-test uses complex logic you can store setup object in a variable
-//! and reuse it:
-//! ```
-//! # use rsubstitute::*; #[mock] fn work(v: i32) -> i32 { v }
-//! # fn main() {
-//! # let some_flag = core::hint::black_box(false);
-//! let mut work_setup = work::setup(1).returns(10);
-//! work_setup.setup(2).returns(20);
-//! if some_flag {
-//!     work_setup.setup(3).returns(30);
-//! }
-//! # }
 //! ```
 //!
 //! ## Mocking static associated functions
@@ -697,8 +684,8 @@
 //! 1. [`Times::Never`] - expects function to never be called with given arguments.
 //! 2. [`Times::Once`] and [`Times::Exactly`]`(N)` - expects function to be called exactly once or
 //! `N` times respectively.
-//! 3. [`<usize as ITimes>::time`] and [`<usize as ITimes>::times`] - syntactic sugar for
-//! constructing [`Times::Exactly`]`(N)` from `usize` values like `1.time()` or `2.times()`.
+//! 3. [`AsTimes::time`] and [`AsTimes::times`] - syntactic sugar for constructing
+//! [`Times::Exactly`]`(N)` from `usize` values like `1.time()` or `2.times()`.
 //!
 //! ### Verify no other calls were performed
 //!
@@ -1310,16 +1297,19 @@
 #![allow(clippy::needless_return)]
 pub use rsubstitute_proc_macro::mock;
 
+#[doc(hidden)]
 pub use rsubstitute_core::args::*;
-pub use rsubstitute_core::infrastructure::{FnCallbackConfigurator, FnConfigurator};
+pub use rsubstitute_core::config::*;
+pub use rsubstitute_core::infrastructure::{FnCallbackConfigurator, FnConfigurator, Mockable};
+pub use rsubstitute_core::times::*;
+pub use rsubstitute_core::transmute_lifetime;
 pub use rsubstitute_core::verify_call_order;
-pub use rsubstitute_core::*;
 
-pub use rsubstitute_core::infrastructure::Mockable;
-
+#[doc(hidden)]
 pub mod for_generated {
     pub use rsubstitute_core::args::*;
     pub use rsubstitute_core::fn_parameters::*;
     pub use rsubstitute_core::infrastructure::*;
+    pub use rsubstitute_core::times::*;
     pub use rsubstitute_core::*;
 }

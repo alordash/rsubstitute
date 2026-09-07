@@ -1,4 +1,4 @@
-use rsubstitute::mock;
+use rsubstitute::*;
 use std::cell::{Cell, RefCell};
 use std::sync::Arc;
 
@@ -41,7 +41,6 @@ mod tests {
     #![allow(non_snake_case)]
     use super::*;
     use not_enough_asserts::*;
-    use rsubstitute::*;
 
     mod accept_value_tests {
         use super::*;

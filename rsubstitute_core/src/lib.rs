@@ -7,10 +7,8 @@ pub mod args;
 pub mod fn_parameters;
 pub mod infrastructure;
 
-mod config;
+pub mod config;
 mod lifetimes_transmutation;
-mod times;
+pub mod times;
 
-pub use config::*;
 pub use infrastructure::verify_call_order;
-pub use times::*;

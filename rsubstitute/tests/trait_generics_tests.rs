@@ -1,4 +1,4 @@
-use rsubstitute::mock;
+use rsubstitute::*;
 
 #[mock]
 trait Trait<T1, T2 = u16> {
@@ -11,7 +11,6 @@ trait Trait<T1, T2 = u16> {
     fn get_return_different(&self, value: T1) -> T2;
 }
 
-// TODO - panic not only from struct's associated type, but also from associated const
 #[mock]
 struct Structs00;
 #[mock(base)]
@@ -34,7 +33,6 @@ trait Another {
 mod trait_generic_tests {
     #![allow(non_snake_case)]
     use super::*;
-    use rsubstitute::*;
 
     mod get_return_tests {
         use super::*;

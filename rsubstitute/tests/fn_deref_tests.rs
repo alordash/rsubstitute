@@ -1,6 +1,6 @@
 mod common;
 
-use rsubstitute::mock;
+use rsubstitute::*;
 use std::ops::Deref;
 use std::rc::Rc;
 use std::sync::Arc;
@@ -36,7 +36,6 @@ fn custom_test(custom: Custom) {}
 mod tests {
     #![allow(non_snake_case)]
     use super::*;
-    use rsubstitute::*;
 
     mod ref_tests {
         use super::*;

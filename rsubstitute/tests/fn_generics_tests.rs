@@ -1,4 +1,4 @@
-use rsubstitute::mock;
+use rsubstitute::*;
 use std::fmt::{Debug, Display};
 
 mod common;
@@ -34,7 +34,6 @@ mod tests {
     #![allow(non_snake_case)]
     use super::*;
     use not_enough_asserts::*;
-    use rsubstitute::*;
 
     mod get_return_tests {
         use super::*;

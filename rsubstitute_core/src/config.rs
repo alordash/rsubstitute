@@ -1,12 +1,12 @@
 use std::sync::*;
 
-/// Crate level configuration definition.
+/// Crate level configuration.
 pub struct Config {
     /// Controls how many invalid calls will be listed in case of an error.
     pub max_invalid_calls_listed_count: usize,
 }
 
-/// Default crate level configuration value.
+/// Default crate level configuration.
 pub const DEFAULT_CONFIG: Config = Config {
     max_invalid_calls_listed_count: 10,
 };

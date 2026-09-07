@@ -1,14 +1,17 @@
 use crate::args::arg_info::ArgInfo;
 
+#[doc(hidden)]
 pub enum ArgCheckResult {
     Ok(ArgCheckResultOk),
     Err(ArgCheckResultErr),
 }
 
+#[doc(hidden)]
 pub struct ArgCheckResultOk {
     pub arg_info: ArgInfo,
 }
 
+#[doc(hidden)]
 pub struct ArgCheckResultErr {
     pub arg_info: ArgInfo,
     pub error_msg: String,

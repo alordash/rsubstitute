@@ -1,3 +1,4 @@
+#[doc(hidden)]
 pub trait Mockable<'__rsa> {
     type Setup;
     fn setup(&mut self) -> Self::Setup;

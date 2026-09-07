@@ -1,6 +1,7 @@
 use crate::args::*;
 use crate::fn_parameters::*;
 use crate::infrastructure::*;
+use crate::times::*;
 use crate::*;
 use std::cell::RefCell;
 use std::collections::HashMap;
@@ -51,7 +52,7 @@ impl<
         }
     }
 
-    // TODO (DOC) - is it supposed to be public? If so, document it's usage
+    #[doc(hidden)]
     pub fn reset(&self) {
         self.call_infos.borrow_mut().clear();
         self.configs.borrow_mut().clear();
@@ -255,8 +256,6 @@ mod internal {
             let mut calls_args_check_results = Vec::with_capacity(matching_configs.len());
             for config in matching_configs.iter() {
                 let config_ref = config.borrow();
-                // TODO (DOC) - (write in docs) is this logic ok? Configs without return value are reused, but if fn_info returns value then it's skipped if it doesn't have return value.
-                // But I guess this is ok because if fn_info doesn't return anything then you don't care which config is used, it can only break callbacks in tests.
                 if with_return_value && !config_ref.has_return_value() {
                     continue;
                 }

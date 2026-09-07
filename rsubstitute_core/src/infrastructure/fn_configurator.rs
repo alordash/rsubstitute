@@ -120,7 +120,6 @@ impl<
         return &self.fn_callback_configurator;
     }
 
-    // TODO - add `always_returns_with`
     /// Sets return value of this function. Clones of this value will be returned indefinitely. The
     /// provided values itself will never be returned.
     pub fn always_returns<'a>(

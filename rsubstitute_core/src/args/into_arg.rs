@@ -1,5 +1,6 @@
 use crate::args::*;
 
+#[doc(hidden)]
 pub trait IntoArg<T> {
     fn into_arg(self, format_debug_string: impl Fn(&T) -> String) -> Arg<T>;
 }
