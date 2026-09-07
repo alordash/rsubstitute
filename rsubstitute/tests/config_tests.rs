@@ -1,3 +1,4 @@
+#![cfg(nightly)]
 #![allow(stable_features)]
 #![feature(rwlock_downgrade)]
 

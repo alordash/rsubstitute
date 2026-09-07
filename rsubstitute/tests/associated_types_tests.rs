@@ -1,3 +1,4 @@
+#![cfg(nightly)]
 #![feature(associated_type_defaults)]
 
 use rsubstitute::*;
