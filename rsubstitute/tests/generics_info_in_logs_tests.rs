@@ -1,4 +1,6 @@
-use rsubstitute::mock;
+use rsubstitute::*;
+
+mod common;
 
 #[mock]
 trait Trait<'a, T1, const B: bool> {
@@ -11,7 +13,6 @@ mod tests {
     #![allow(non_snake_case)]
     use super::*;
     use not_enough_asserts::*;
-    use rsubstitute_core::Times;
 
     #[test]
     fn work_NoConfigs_Ok() {
@@ -22,8 +23,11 @@ mod tests {
         let panic_msg = record_panic(|| mock.work::<f32, 5>(&14));
 
         // Assert
-        let expected_panic_msg = "Mock wasn't configured to handle following call:
-	Trait::work<f32, 5>(14)";
+        let actual_debug_string = common::debug_string("14");
+        let expected_panic_msg = format!(
+            "Mock wasn't configured to handle following call:
+	Trait::work<f32, 5>({actual_debug_string})"
+        );
         assert_eq!(Some(expected_panic_msg.to_owned()), panic_msg);
     }
 
@@ -44,10 +48,11 @@ mod tests {
         let panic_msg = record_panic(|| mock.work::<f32, 1>(&value));
 
         // Assert
-        let expected_panic_msg = "Mock wasn't configured to handle following call because no return value was provided:
-	Trait::work<f32, 1>(5)
+        let actual_debug_string = common::debug_string("5");
+        let expected_panic_msg = format!("Mock wasn't configured to handle following call because no return value was provided:
+	Trait::work<f32, 1>({actual_debug_string})
 List of existing configuration ordered by number of correctly matched arguments (non-matching arguments indicated with '*' characters):
-	1. Matched 0/1 arguments: work(*5*)";
+	1. Matched 0/1 arguments: work(*{actual_debug_string}*)");
         assert_eq!(Some(expected_panic_msg.to_owned()), panic_msg);
     }
 
@@ -91,18 +96,20 @@ List of existing configuration ordered by number of correctly matched arguments 
 
         // Assert
         assert_eq!(returned_value, actual_returned_value);
-
         let actual_value_ptr = core::ptr::from_ref(&actual_value);
         let expected_value_ptr = core::ptr::from_ref(&expected_value);
+        let arg_debug_string = common::debug_string(format!("(&i32): equal to {expected_value}"));
+        let actual_debug_string = common::debug_string("5");
+        let expected_debug_string = common::debug_string("6");
         let expected_panic_msg = format!(
             "Expected to receive a call exactly once matching:
-	Trait::work<f32, {N}>((&i32): equal to {expected_value})
+	Trait::work<f32, {N}>({arg_debug_string})
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-work(*5*)
+work(*{actual_debug_string}*)
 	1. v (&i32):
-		Expected reference (ptr: {expected_value_ptr:?}): 6
-		Actual reference   (ptr: {actual_value_ptr:?}): 5"
+		Expected reference (ptr: {expected_value_ptr:?}): {expected_debug_string}
+		Actual reference   (ptr: {actual_value_ptr:?}): {actual_debug_string}"
         );
 
         assert_eq!(Some(expected_panic_msg), panic_msg);
@@ -123,11 +130,13 @@ work(*5*)
 
         // Assert
         assert_eq!(returned_value, actual_returned_value);
-
-        let expected_panic_msg = "Expected to receive a call exactly once matching:
-	Trait::work<alloc::string::String, 124>((&i32): equal to 5)
+        let arg_debug_string = common::debug_string("(&i32): equal to 5");
+        let expected_panic_msg = format!(
+            "Expected to receive a call exactly once matching:
+	Trait::work<alloc::string::String, 124>({arg_debug_string})
 Actually received no matching calls
-Received no non-matching calls";
+Received no non-matching calls"
+        );
         assert_eq!(Some(expected_panic_msg.to_owned()), panic_msg);
     }
 
@@ -158,10 +167,13 @@ Received no non-matching calls";
         assert_eq!(first_returned_value, actual_first_returned_value);
         assert_eq!(second_returned_value, actual_second_returned_value);
 
-        let expected_panic_msg =
+        let actual_first_debug_string = common::debug_string("5");
+        let actual_second_debug_string = common::debug_string("100");
+        let expected_panic_msg = format!(
             "Did not expect to receive any other calls. Received 2 unexpected calls:
-1. Trait::work<f32, 1>(5)
-2. Trait::work<[i32; 3], 200>(100)";
+1. Trait::work<f32, 1>({actual_first_debug_string})
+2. Trait::work<[i32; 3], 200>({actual_second_debug_string})"
+        );
         assert_eq!(Some(expected_panic_msg.to_owned()), panic_msg);
     }
 
@@ -172,8 +184,11 @@ Received no non-matching calls";
         let panic_msg = record_panic(|| TraitMock::<i32, false>::static_work::<f32, 5>(&14));
 
         // Assert
-        let expected_panic_msg = "Mock wasn't configured to handle following call:
-	Trait::static_work<f32, 5>(14)";
+        let expected_debug_string = common::debug_string("14");
+        let expected_panic_msg = format!(
+            "Mock wasn't configured to handle following call:
+	Trait::static_work<f32, 5>({expected_debug_string})"
+        );
         assert_eq!(Some(expected_panic_msg.to_owned()), panic_msg);
     }
 
@@ -196,10 +211,11 @@ Received no non-matching calls";
         let panic_msg = record_panic(|| TraitMock::<i32, false>::static_work::<f32, 1>(&value));
 
         // Assert
-        let expected_panic_msg = "Mock wasn't configured to handle following call because no return value was provided:
-	Trait::static_work<f32, 1>(5)
+        let expected_debug_string = common::debug_string("5");
+        let expected_panic_msg = format!("Mock wasn't configured to handle following call because no return value was provided:
+	Trait::static_work<f32, 1>({expected_debug_string})
 List of existing configuration ordered by number of correctly matched arguments (non-matching arguments indicated with '*' characters):
-	1. Matched 0/1 arguments: static_work(*5*)";
+	1. Matched 0/1 arguments: static_work(*{expected_debug_string}*)");
         assert_eq!(Some(expected_panic_msg.to_owned()), panic_msg);
     }
 
@@ -246,15 +262,18 @@ List of existing configuration ordered by number of correctly matched arguments 
 
         let actual_value_ptr = core::ptr::from_ref(&actual_value);
         let expected_value_ptr = core::ptr::from_ref(&expected_value);
+        let arg_debug_string = common::debug_string(format!("(&i32): equal to {expected_value}"));
+        let actual_debug_string = common::debug_string("5");
+        let expected_debug_string = common::debug_string("6");
         let expected_panic_msg = format!(
             "Expected to receive a call exactly once matching:
-	Trait::static_work<f32, {N}>((&i32): equal to {expected_value})
+	Trait::static_work<f32, {N}>({arg_debug_string})
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
-static_work(*5*)
+static_work(*{actual_debug_string}*)
 	1. v (&i32):
-		Expected reference (ptr: {expected_value_ptr:?}): 6
-		Actual reference   (ptr: {actual_value_ptr:?}): 5"
+		Expected reference (ptr: {expected_value_ptr:?}): {expected_debug_string}
+		Actual reference   (ptr: {actual_value_ptr:?}): {actual_debug_string}"
         );
 
         assert_eq!(Some(expected_panic_msg), panic_msg);
@@ -278,11 +297,13 @@ static_work(*5*)
 
         // Assert
         assert_eq!(returned_value, actual_returned_value);
-
-        let expected_panic_msg = "Expected to receive a call exactly once matching:
-	Trait::static_work<alloc::string::String, 124>((&i32): equal to 5)
+        let arg_debug_string = common::debug_string("(&i32): equal to 5".to_owned());
+        let expected_panic_msg = format!(
+            "Expected to receive a call exactly once matching:
+	Trait::static_work<alloc::string::String, 124>({arg_debug_string})
 Actually received no matching calls
-Received no non-matching calls";
+Received no non-matching calls"
+        );
         assert_eq!(Some(expected_panic_msg.to_owned()), panic_msg);
     }
 
@@ -295,12 +316,6 @@ Received no non-matching calls";
         let second_value = 100;
         let second_returned_value = [4; 3];
         const SECOND_N: usize = 200;
-        // TODO (DOC) - use code below to show in docs how to call `static_setup` once but then reuse it in different places (if branches, iterators, etc)
-        // let setup = TraitMock::<i32, false>::static_setup();
-        // setup()        //     .static_work::<f32, FIRST_N>(&first_value)
-        //     .returns(first_returned_value);
-        // setup()        //     .static_work::<_, SECOND_N>(&second_value)
-        //     .returns(second_returned_value);
         TraitMock::<i32, false>::static_setup()
             .static_work::<f32, FIRST_N>(&first_value)
             .returns(first_returned_value)
@@ -319,10 +334,13 @@ Received no non-matching calls";
         assert_eq!(first_returned_value, actual_first_returned_value);
         assert_eq!(second_returned_value, actual_second_returned_value);
 
-        let expected_panic_msg =
+        let actual_first_debug_string = common::debug_string("5");
+        let actual_second_debug_string = common::debug_string("100");
+        let expected_panic_msg = format!(
             "Did not expect to receive any other calls. Received 2 unexpected calls:
-1. Trait::static_work<f32, 1>(5)
-2. Trait::static_work<[i32; 3], 200>(100)";
+1. Trait::static_work<f32, 1>({actual_first_debug_string})
+2. Trait::static_work<[i32; 3], 200>({actual_second_debug_string})"
+        );
         assert_eq!(Some(expected_panic_msg.to_owned()), panic_msg);
     }
 }

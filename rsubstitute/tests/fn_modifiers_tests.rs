@@ -37,6 +37,14 @@ extern "C" fn extern_fn_base() {
     extern_dep()
 }
 
+#[allow(unused, improper_ctypes_definitions)]
+#[mock]
+async unsafe extern "C" fn mutant() {
+    async_dep().await;
+    unsafe_dep();
+    extern_dep();
+}
+
 #[mock(base)]
 #[allow(unused)]
 trait Trait {
@@ -52,6 +60,14 @@ trait Trait {
     extern "C" fn extern_fn_base(&self) {
         extern_dep()
     }
+    #[allow(improper_ctypes_definitions)]
+    async unsafe extern "C" fn mutant(&self);
+    #[allow(improper_ctypes_definitions)]
+    async unsafe extern "C" fn mutant_base(&self) {
+        async_dep().await;
+        unsafe { unsafe_dep(); }
+        extern_dep();
+    }
 }
 
 #[mock]
@@ -60,15 +76,11 @@ struct Struct;
 #[mock]
 #[allow(unused)]
 impl Struct {
-    async fn async_fn(&self) {
-        async_dep().await
-    }
-    unsafe fn unsafe_fn(&self) {
-        unsafe_dep()
-    }
-    extern "C" fn extern_fn(&self) {
-        extern_dep()
-    }
+    async fn async_fn(&self) {}
+    unsafe fn unsafe_fn(&self) {}
+    extern "C" fn extern_fn(&self) {}
+    #[allow(improper_ctypes_definitions)]
+    async unsafe extern "C" fn mutant(&self) {}
 }
 #[mock(base)]
 #[allow(unused)]
@@ -82,27 +94,35 @@ impl Struct {
     extern "C" fn extern_fn_base(&self) {
         extern_dep()
     }
+    #[allow(improper_ctypes_definitions)]
+    async unsafe extern "C" fn mutant_base(&self) {
+        async_dep().await;
+        unsafe_dep();
+        extern_dep();
+    }
 }
 
 #[mock(base)]
 impl Trait for Struct {
-    async fn async_fn(&self) {
-        self.async_fn().await
-    }
+    async fn async_fn(&self) {}
     async fn async_fn_base(&self) {
         self.async_fn_base().await
     }
-    extern "C" fn extern_fn(&self) {
-        self.extern_fn()
-    }
-    extern "C" fn extern_fn_base(&self) {
-        self.extern_fn_base()
-    }
+    unsafe fn unsafe_fn(&self) {}
     unsafe fn unsafe_fn_base(&self) {
         unsafe { self.unsafe_fn_base() }
     }
-    unsafe fn unsafe_fn(&self) {
-        unsafe { self.unsafe_fn() }
+    extern "C" fn extern_fn(&self) {}
+    extern "C" fn extern_fn_base(&self) {
+        self.extern_fn_base()
+    }
+    #[allow(improper_ctypes_definitions)]
+    async unsafe extern "C" fn mutant(&self) {}
+    #[allow(improper_ctypes_definitions)]
+    async unsafe extern "C" fn mutant_base(&self) {
+        async_dep().await;
+        unsafe_dep();
+        extern_dep();
     }
 }
 

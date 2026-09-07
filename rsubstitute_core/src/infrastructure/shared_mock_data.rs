@@ -17,7 +17,6 @@ pub trait ISharedMockData {
     ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, PASSES_MOCK_TO_CALLBACK>;
 }
 
-// TODO - maybe add some multithreaded tests?
 pub type SharedMockData = Arc<RwLock<MockData>>;
 
 impl ISharedMockData for SharedMockData {

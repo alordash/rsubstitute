@@ -13,8 +13,6 @@ struct Foo {
 
 mod tests {
     use super::*;
-    use rsubstitute_core::Times;
-    use rsubstitute_core::args::Arg;
 
     #[test]
     fn my_test() {

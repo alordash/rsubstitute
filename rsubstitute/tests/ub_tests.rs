@@ -1,4 +1,4 @@
-use rsubstitute::mock;
+use rsubstitute::*;
 
 #[mock]
 trait Trait {
@@ -8,7 +8,6 @@ trait Trait {
 mod tests {
     #![allow(non_snake_case)]
     use super::*;
-    use rsubstitute::*;
 
     /// Invalid usage example.
     #[test]

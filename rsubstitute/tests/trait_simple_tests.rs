@@ -1,4 +1,4 @@
-use rsubstitute::mock;
+use rsubstitute::*;
 
 #[mock]
 trait Trait {
@@ -20,7 +20,6 @@ mod tests {
 
     use super::*;
     use not_enough_asserts::*;
-    use rsubstitute::*;
     use std::cell::{Cell, RefCell};
     use std::sync::Arc;
 

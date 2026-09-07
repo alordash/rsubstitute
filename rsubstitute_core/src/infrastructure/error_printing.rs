@@ -1,8 +1,9 @@
 use crate::args::*;
+use crate::config::*;
 use crate::fn_parameters::*;
 use crate::infrastructure::MatchingConfigSearchErr;
 use crate::infrastructure::call_order_verification::CallOrderEntry;
-use crate::*;
+use crate::times::*;
 
 pub(crate) fn panic_received_verification_error(
     fn_name: &str,
@@ -26,9 +27,11 @@ pub(crate) fn panic_received_verification_error(
     let matching_calls_report = if matching_calls_count == 0 {
         "Actually received no matching calls".to_string()
     } else {
+        let max_invalid_calls_listed_count = read_config().max_invalid_calls_listed_count;
         let matching_calls_args_msgs: Vec<_> = matching_calls_check_result
             .calls_args_check_results
             .into_iter()
+            .take(max_invalid_calls_listed_count)
             .map(|x| {
                 fmt_call(
                     fn_name,
@@ -37,10 +40,15 @@ pub(crate) fn panic_received_verification_error(
                 )
             })
             .collect();
+        let trimmed_output_disclaimer = if matching_calls_count > max_invalid_calls_listed_count {
+            format!(" (listing only first {})", max_invalid_calls_listed_count)
+        } else {
+            String::new()
+        };
         let matching_calls_args_msg = matching_calls_args_msgs.join("\n\t");
         let call_fmt = fmt_calls(matching_calls_count);
         format!(
-            "Actually received {matching_calls_count} matching {call_fmt}:
+            "Actually received {matching_calls_count} matching {call_fmt}{trimmed_output_disclaimer}:
 \t{matching_calls_args_msg}"
         )
     };
@@ -155,8 +163,10 @@ pub(crate) fn format_received_unexpected_call_error(
 pub(crate) fn panic_received_unexpected_calls_error(error_msgs: Vec<String>) -> ! {
     let unexpected_calls_count = error_msgs.len();
     let call_fmt = fmt_calls(unexpected_calls_count);
+    let max_invalid_calls_listed_count = read_config().max_invalid_calls_listed_count;
     let unexpected_calls_msgs: Vec<_> = error_msgs
         .into_iter()
+        .take(max_invalid_calls_listed_count)
         .enumerate()
         .map(|(i, error_msg)| {
             let error_number = i + 1;
@@ -164,8 +174,13 @@ pub(crate) fn panic_received_unexpected_calls_error(error_msgs: Vec<String>) -> 
         })
         .collect();
     let unexpected_calls_msg = unexpected_calls_msgs.join("\n");
+    let trimmed_output_disclaimer = if unexpected_calls_count > max_invalid_calls_listed_count {
+        format!(" (listing only first {})", max_invalid_calls_listed_count)
+    } else {
+        String::new()
+    };
     let error_msg = format!(
-        "Did not expect to receive any other calls. Received {unexpected_calls_count} unexpected {call_fmt}:
+        "Did not expect to receive any other calls. Received {unexpected_calls_count} unexpected {call_fmt}{trimmed_output_disclaimer}:
 {unexpected_calls_msg}"
     );
     panic!("{error_msg}");
@@ -226,6 +241,7 @@ fn format_times(times: Times) -> String {
         Times::Exactly(exact_count) => {
             format!("Expected to receive a call {exact_count} times")
         }
+        #[allow(deprecated)]
         Times::Any => "Expected to receive a call any number of times.".to_owned(),
     };
     return result;

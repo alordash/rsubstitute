@@ -1,6 +1,7 @@
 use crate::args::*;
 use crate::fn_parameters::DynCall;
 
+#[doc(hidden)]
 pub trait IArgsChecker: IGenericsInfoProvider {
     fn check(&self, #[allow(unused_variables)] dyn_call: &DynCall) -> Vec<ArgCheckResult> {
         Vec::new()

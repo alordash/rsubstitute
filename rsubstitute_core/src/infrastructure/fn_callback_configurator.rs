@@ -4,6 +4,7 @@ use std::marker::PhantomData;
 use std::ops::Deref;
 use std::rc::Rc;
 
+/// Controls callback of mocked function that has return value.
 pub struct FnCallbackConfigurator<
     'rs,
     TMock,

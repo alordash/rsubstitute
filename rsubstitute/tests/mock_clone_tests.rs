@@ -1,4 +1,4 @@
-use rsubstitute::mock;
+use rsubstitute::*;
 
 #[mock]
 trait Trait {
@@ -34,8 +34,6 @@ mod tests {
     #![allow(non_snake_case)]
 
     use super::*;
-    use rsubstitute_core::Times;
-    use rsubstitute_core::infrastructure::Mockable;
 
     #[test]
     fn TraitMock_Clone_ContainsSameConfiguration() {

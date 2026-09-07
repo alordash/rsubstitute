@@ -1,4 +1,4 @@
-use rsubstitute::mock;
+use rsubstitute::*;
 
 #[mock]
 fn accept_ref<'a>(r: &'a i32) -> &'a i32 {
@@ -41,7 +41,6 @@ fn accept_impl_trait(_: impl AsRef<str>) {}
 mod tests {
     #![allow(non_snake_case)]
     use super::*;
-    use rsubstitute::*;
 
     #[test]
     fn compile() {}

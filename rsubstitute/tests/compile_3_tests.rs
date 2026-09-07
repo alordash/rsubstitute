@@ -7,8 +7,6 @@ trait Trait<'rs> {
 
 mod tests {
     use super::*;
-    use rsubstitute_core::Times;
-    use rsubstitute_core::args::Arg;
 
     #[test]
     fn my_test() {
@@ -34,7 +32,7 @@ mod tests {
             .returns_with(move |(args,)| r3 + *args)
             .and_does(|_, (_,)| {})
             .work(Arg::Any)
-            .returns_always(r45);
+            .always_returns(r45);
 
         // Act
         let actual_r1 = mock.work(v1);

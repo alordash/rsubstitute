@@ -2,8 +2,10 @@ use crate::args::{GenericParameterInfo, GenericsHashKey};
 use std::any::TypeId;
 use std::hash::{DefaultHasher, Hash, Hasher};
 
+#[doc(hidden)]
 pub type GenericsHasher = DefaultHasher;
 
+#[doc(hidden)]
 pub trait IGenericsInfoProvider {
     fn get_generic_parameter_infos(&self) -> Vec<GenericParameterInfo> {
         Vec::new()
@@ -23,6 +25,7 @@ pub trait IGenericsInfoProvider {
 }
 
 // Helper method for clearer `IGenericsInfoProvider::hash_generics_type_ids` auto-generated implementation.
+#[doc(hidden)]
 pub fn tid<T: ?Sized>() -> TypeId {
     typeid::of::<T>()
 }
@@ -32,6 +35,7 @@ pub fn tid<T: ?Sized>() -> TypeId {
 // `T` is not guaranteed to implement `Hash`.
 // This approach anticipates adt_const_params feature:
 // https://doc.rust-lang.org/beta/unstable-book/language-features/adt-const-params.html
+#[doc(hidden)]
 pub fn const_hash<T: Sized + 'static>(t: &T, hasher: &mut GenericsHasher) {
     let t_size = size_of::<T>();
     let t_ptr = t as *const _ as *const u8;

@@ -3,25 +3,25 @@ use crate::transmute_lifetime;
 use std::fmt::{Debug, Formatter};
 use std::ops::Deref;
 
-struct Private;
+pub(crate) struct Internal;
 
+/// Argument matcher, checks whether certain argument value matches some expectation.
+///
+/// `T` - type of argument.
 #[allow(private_interfaces)]
 #[repr(C)]
 pub enum Arg<T: ?Sized> {
+    /// Accepts any possible value.
     Any,
     #[doc(hidden)]
-    PrivateEq(ArgCmp<T>, Private),
+    PrivateEq(ArgCmp<T>, Internal),
     #[doc(hidden)]
-    PrivateNotEq(ArgCmp<T>, Private),
+    PrivateNotEq(ArgCmp<T>, Internal),
     #[doc(hidden)]
-    PrivateIs(Box<dyn Fn(*const ()) -> bool>, Private),
+    PrivateIs(Box<dyn Fn(*const ()) -> bool>, Internal),
 }
 
-impl<T: PartialEq> From<T> for Arg<T> {
-    fn from(value: T) -> Self {
-        Arg::eq(value)
-    }
-}
+const UNINITIALIZED_ARG_PRINT_STRING: &'static str = "[CRITICAL ERROR]: This string should represent arguments value, but if you see this is it means that `ArgCmp.print_arg` wasn't initialized!";
 
 impl<T: Debug> Debug for Arg<T> {
     fn fmt(&self, f: &mut Formatter<'_>) -> std::fmt::Result {
@@ -42,6 +42,7 @@ impl<T: Debug> Debug for Arg<T> {
 }
 
 impl<T> Arg<T> {
+    /// Checks that argument value matches some predicate.
     pub fn is<'a, TFn: Fn(&T) -> bool + 'a>(predicate: TFn) -> Self {
         let anonymous_predicate = move |ptr: *const ()| {
             // SAFETY: anonymous predicate is called only internally and passed pointer is always
@@ -56,61 +57,74 @@ impl<T> Arg<T> {
         };
         let boxed_anonymous_predicate =
             Box::new(anonymous_predicate) as Box<dyn Fn(*const ()) -> bool + 'a>;
-        return Self::PrivateIs(transmute_lifetime!(boxed_anonymous_predicate), Private);
+        return Self::PrivateIs(transmute_lifetime!(boxed_anonymous_predicate), Internal);
     }
 
+    /// Checks that argument value is equal to given value.
     pub fn eq(value: T) -> Self
     where
         T: PartialEq,
     {
         let arg_cmp = ArgCmp {
+            print_arg: UNINITIALIZED_ARG_PRINT_STRING.to_owned(),
             value: Box::new(value),
             comparator: PartialEq::eq,
             maybe_deref_info: None,
         };
-        return Self::PrivateEq(arg_cmp, Private);
+        return Self::PrivateEq(arg_cmp, Internal);
     }
 
+    /// Checks that argument value is NOT equal to given value.
     pub fn not_eq(value: T) -> Self
     where
         T: PartialEq,
     {
         let arg_cmp = ArgCmp {
+            print_arg: UNINITIALIZED_ARG_PRINT_STRING.to_owned(),
             value: Box::new(value),
             comparator: PartialEq::eq,
             maybe_deref_info: None,
         };
-        return Self::PrivateNotEq(arg_cmp, Private);
+        return Self::PrivateNotEq(arg_cmp, Internal);
     }
 
+    /// Checks that reference of argument value is equal to reference of given value.
+    ///
+    /// Reference is acquired from [`Deref::deref`].
     pub fn ref_eq<U>(value: T) -> Self
     where
         T: Deref<Target = U>,
     {
         let deref_info = DerefInfo::new(&value);
         let arg_cmp = ArgCmp {
+            print_arg: UNINITIALIZED_ARG_PRINT_STRING.to_owned(),
             value: Box::new(value),
             comparator: |a, b| core::ptr::eq(a.deref(), b.deref()),
             maybe_deref_info: Some(deref_info),
         };
-        return Self::PrivateEq(arg_cmp, Private);
+        return Self::PrivateEq(arg_cmp, Internal);
     }
 
+    /// Checks that reference of argument value is NOT equal to reference of given value.
+    ///
+    /// Reference is acquired from [`Deref::deref`].
     pub fn ref_not_eq<U>(value: T) -> Self
     where
         T: Deref<Target = U>,
     {
         let deref_info = DerefInfo::new(&value);
         let arg_cmp = ArgCmp {
+            print_arg: UNINITIALIZED_ARG_PRINT_STRING.to_owned(),
             value: Box::new(value),
             comparator: |a, b| core::ptr::eq(a.deref(), b.deref()),
             maybe_deref_info: Some(deref_info),
         };
-        return Self::PrivateNotEq(arg_cmp, Private);
+        return Self::PrivateNotEq(arg_cmp, Internal);
     }
 }
 
 impl<T: ?Sized> Arg<T> {
+    #[doc(hidden)]
     pub fn check<'a>(
         &self,
         arg_name: &'static str,
@@ -124,7 +138,8 @@ impl<T: ?Sized> Arg<T> {
         match self {
             Arg::PrivateEq(arg_cmp, _) => {
                 if !arg_cmp.is_arg_equal_to(actual_value) {
-                    let expected_value_str = print_arg(&arg_cmp.value);
+                    // let expected_value_str = print_arg(arg_cmp.value.as_ref());
+                    let expected_value_str = &arg_cmp.print_arg;
                     let PtrInfo {
                         expected_ptr_info_suffix,
                         actual_ptr_info_suffix,
@@ -139,7 +154,8 @@ impl<T: ?Sized> Arg<T> {
             }
             Arg::PrivateNotEq(arg_cmp, _) => {
                 if arg_cmp.is_arg_equal_to(actual_value) {
-                    let not_expected_value_str = print_arg(&arg_cmp.value);
+                    // let not_expected_value_str = print_arg(arg_cmp.value.as_ref());
+                    let not_expected_value_str = &arg_cmp.print_arg;
                     let PtrInfo {
                         expected_ptr_info_suffix,
                         ..
@@ -169,6 +185,7 @@ impl<T: ?Sized> Arg<T> {
 }
 
 impl<'rs, 'a, T: ?Sized> Arg<&'a T> {
+    #[doc(hidden)]
     pub fn check_ref(
         &self,
         arg_name: &'static str,
@@ -181,7 +198,8 @@ impl<'rs, 'a, T: ?Sized> Arg<&'a T> {
             Arg::PrivateEq(arg_cmp, _) => {
                 let expected_ptr = core::ptr::from_ref(*arg_cmp.value);
                 if !core::ptr::eq(actual_ptr, expected_ptr) {
-                    let expected_value_str = print_arg(&arg_cmp.value);
+                    // let expected_value_str = print_arg(arg_cmp.value.as_ref());
+                    let expected_value_str = &arg_cmp.print_arg;
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
@@ -193,7 +211,8 @@ impl<'rs, 'a, T: ?Sized> Arg<&'a T> {
             Arg::PrivateNotEq(arg_cmp, _) => {
                 let not_expected_ptr = core::ptr::from_ref(*arg_cmp.value);
                 if core::ptr::eq(actual_ptr, not_expected_ptr) {
-                    let not_expected_value_str = print_arg(&arg_cmp.value);
+                    // let not_expected_value_str = print_arg(arg_cmp.value.as_ref());
+                    let not_expected_value_str = &arg_cmp.print_arg;
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
@@ -219,6 +238,7 @@ impl<'rs, 'a, T: ?Sized> Arg<&'a T> {
 }
 
 impl<'a, T: ?Sized> Arg<&'a mut T> {
+    #[doc(hidden)]
     pub fn check_mut_ref(
         &self,
         arg_name: &'static str,
@@ -241,7 +261,8 @@ impl<'a, T: ?Sized> Arg<&'a mut T> {
             Arg::PrivateEq(arg_cmp, _) => {
                 let expected_ptr = core::ptr::from_ref(*arg_cmp.value);
                 if !core::ptr::eq(actual_ptr, expected_ptr) {
-                    let expected_value_str = print_arg(&arg_cmp.value);
+                    // let expected_value_str = print_arg(arg_cmp.value.as_ref());
+                    let expected_value_str = &arg_cmp.print_arg;
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(
@@ -253,7 +274,8 @@ impl<'a, T: ?Sized> Arg<&'a mut T> {
             Arg::PrivateNotEq(arg_cmp, _) => {
                 let not_expected_ptr = core::ptr::from_ref(*arg_cmp.value);
                 if core::ptr::eq(actual_ptr, not_expected_ptr) {
-                    let not_expected_value_str = print_arg(&arg_cmp.value);
+                    // let not_expected_value_str = print_arg(arg_cmp.value.as_ref());
+                    let not_expected_value_str = &arg_cmp.print_arg;
                     return ArgCheckResult::Err(ArgCheckResultErr {
                         arg_info,
                         error_msg: format!(

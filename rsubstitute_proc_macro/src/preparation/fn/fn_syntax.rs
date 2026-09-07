@@ -6,7 +6,6 @@ use crate::preparation::*;
 use crate::syntax::*;
 use proc_macro2::Span;
 use quote::{ToTokens, format_ident};
-use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;
 use syn::*;
 
@@ -46,7 +45,7 @@ pub(crate) fn prepare(
     let InputsSplit {
         maybe_self_type,
         arguments,
-    } = split_inputs_into_maybe_self_type_and_arguments(signature.inputs.clone());
+    } = split_inputs_into_maybe_self_type_and_arguments(&signature);
     let generics_field = generics_field::new_field(
         signature.generics.span(),
         &merged_generics,
@@ -123,10 +122,8 @@ struct InputsSplit {
     pub maybe_self_type: Option<Receiver>,
     pub arguments: Vec<Argument>,
 }
-fn split_inputs_into_maybe_self_type_and_arguments(
-    inputs: Punctuated<FnArg, Token![,]>,
-) -> InputsSplit {
-    let mut inputs_iter = inputs.into_iter();
+fn split_inputs_into_maybe_self_type_and_arguments(signature: &Signature) -> InputsSplit {
+    let mut inputs_iter = signature.inputs.clone().into_iter();
     let Some(first_arg) = inputs_iter.next() else {
         return InputsSplit {
             maybe_self_type: None,

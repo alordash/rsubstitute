@@ -11,7 +11,7 @@ mod b {
     }
 }
 mod c {
-    use rsubstitute::mock;
+    use rsubstitute::*;
     #[mock]
     pub struct S;
 }

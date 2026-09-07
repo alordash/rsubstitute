@@ -63,7 +63,7 @@ mod tests {
         let get_number_returned_value = 22;
         mock.setup()
             .get_number()
-            .returns_always(get_number_returned_value)
+            .always_returns(get_number_returned_value)
             .format()
             .call_base();
 

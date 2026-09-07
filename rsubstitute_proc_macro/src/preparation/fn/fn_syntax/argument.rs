@@ -67,18 +67,10 @@ fn generate_control_fn_arg(span: Span, pat: Box<Pat>, ref_style_type: Box<Type>)
                 modifiers: TraitBoundModifiers::default(),
                 maybe: None,
                 lifetimes: None,
-                path: path::new_generics(
+                path: path::new_generics_global(
                     span,
-                    ["Into"],
-                    [GenericArgument::Type(Type::Path(TypePath {
-                        attrs: Vec::new(),
-                        qself: None,
-                        path: path::new_generics_global(
-                            span,
-                            rsubstitute_for_generated::new("Arg"),
-                            [GenericArgument::Type(*ref_style_type)],
-                        ),
-                    }))],
+                    rsubstitute_for_generated::new("IntoArg"),
+                    [GenericArgument::Type(*ref_style_type)],
                 ),
             })]),
         })),

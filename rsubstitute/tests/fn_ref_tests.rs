@@ -1,4 +1,4 @@
-use rsubstitute::mock;
+use rsubstitute::*;
 
 #[mock(base)]
 fn accept_ref(_: &i32) {}
@@ -56,7 +56,6 @@ mod tests {
     #![allow(non_snake_case)]
     use super::*;
     use not_enough_asserts::*;
-    use rsubstitute::*;
 
     mod accept_ref_tests {
         use super::*;
