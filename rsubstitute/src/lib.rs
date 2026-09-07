@@ -39,7 +39,7 @@
 //! assert_eq!(result, 10);
 //! mock.received()
 //!     .work(1, 1.time())      // verify that `work(1)` was called once
-//!     .work(2, Times::Never); // verify that `work(2)` was never called
+//!     .no_other_calls();      // verify that no other calls were performed
 //! # }
 //! ```
 //!
@@ -64,7 +64,7 @@
 //! * [Cloning mocks](#mocks-cloning)
 //! * [`rsubstitute` config](#rsubstitute-config)
 //! * [Crate features](#create-features)
-//! * [Undefined behavior](#undefined-behavior)     TODO
+//! * [Undefined behavior](#undefined-behavior)
 //!
 //! ## Mocking traits
 //!
@@ -101,7 +101,9 @@
 //! # }
 //! ```
 //!
-//! There is one limitation: `rsubstitute` can't mock trait that has super traits (other than
+//! ### Limitations
+//!
+//! There is one limitation: `rsubstitute` can't mock traits that have super traits (other than
 //! `Clone`). For example, this won't compile:
 //! ```compile_fail
 //! #[mock] trait Trait: SuperTrait {}
@@ -148,6 +150,22 @@
 //! mock.received().get(1.time());
 //! # }
 //! ```
+//!
+//! Common pattern while mocking structures would be adding some public constructor function like
+//! `new` and mocking its base implementation:
+//!
+//! ```
+//! # use rsubstitute::*;
+//!
+//! #[mock]
+//! struct Struct;
+//!
+//! #[mock(base)]
+//! impl Struct {
+//!     pub fn new() -> Self { Self }
+//! }
+//! ```
+//!
 //! ### Limitations
 //!
 //! There are a couple of limitations for structures mocking:
@@ -155,7 +173,7 @@
 //! were mocked. This is because `rsubstitute` adds special `__rs_data` field to generated structure
 //! that it automatically fills inside mocked `impl` block.
 //! 2. Structure must have either named fields or no fields at all. `struct Struct { v: i32 }` and
-//! `struct Struct;` can be mocked, but `struct Struct(i32)` can not.
+//! `struct Struct;` can be mocked, but `struct Struct(i32);` can not.
 //! 3. Only functions inside mocked `impl` blocks can be mocked. In the example below only `foo` can
 //! be mocked; `bar` will always use base implementation:
 //! ```rust
@@ -173,9 +191,9 @@
 //!
 //! # fn main() {}
 //! ```
-//! 4. To add `#[mock]` to structure's `impl` blocks the structure itself must have `#[mock]`
-//! attribute.
-//! 5. Can not mock functions separated by `#[cfg]`. This won't compile:
+//! 4. Structure `impl` block can be mocked only if the structure itself is mocked (has `#[mock]`
+//! attribute).
+//! 5. Can not mock functions with `#[cfg]` attribute. This won't compile:
 //! ```compile_fail
 //! #[mock]
 //! impl Structure {
@@ -219,6 +237,7 @@
 //! mock.received().as_Trait().get(1.time());
 //! # }
 //! ```
+//!
 //! ### Limitations
 //!
 //! There are a couple of limitations for trait implementations mocking:
@@ -303,7 +322,7 @@
 //!
 //! ### Limitations
 //!
-//! There are a couple of limitations for functions mocking:
+//! There are a couple of limitations for static functions mocking:
 //! 1. Configuration for standalone function mock is stored in thread-local storage to prevent race
 //! condition when running multiple tests in parallel. This may impact tests running on
 //! work-stealing async runtimes.
@@ -379,7 +398,7 @@
 //!
 //! ### Limitations
 //!
-//! There are a couple of limitations:
+//! There are a couple of limitations for static associated functions mocking:
 //! 1. Associated functions that use base implementation using `#[mock(base)]` use base
 //! implementation by default, without any configuration. This is done to make creation of structure
 //! mocks simpler by just calling `Struct::new()` without needing to first do
@@ -392,10 +411,9 @@
 //! argument in source function. `Arg` provides multiple ways to match argument's value:
 //!
 //! 1. [`Arg::eq`] - checks that argument is equal to provided value. Uses [`PartialEq::eq`] of `T`.
-//! Can be used either manually like `mock.setup(Arg::eq(10))` or implicitly using `Into` conversion
-//! like `mock.setup(10)`.
+//! Can be used either manually like `mock.setup(Arg::eq(10))` or implicitly  like `mock.setup(10)`.
 //! 2. [`Arg::is`] - checks that argument passes provided predicate. Usage example:
-//! `mock.setup(Arg::is(|v: &i32| *v == 10))`. Must specify argument type in closure.
+//! `mock.setup(Arg::is(|v: &i32| *v == 10))`. Requires specifying closure's argument type.
 //! 3. [`Arg::not_eq`] - checks that argument is NOT equal to provided value. Uses [`PartialEq::eq`]
 //! of `T`. Opposite of `Arg::eq`. Usage example: `mock.setup(Arg::not_eq(10))`.
 //! 4. [`Arg::ref_eq`] - checks that argument's reference points to the same place as provided
@@ -434,16 +452,14 @@
 //! Calling `setup()` returns [`FnConfigurator`] - type that is used to tell mocked
 //! function what it should do upon receiving matching call.
 //!
-//! ### Return values
+//! ### Setting return values
 //! Mocked functions that have return values can set them in multiple ways:
 //! 1. [`FnConfigurator::returns`] - sets single-use return value.
-//! 2. [`FnConfigurator::returns_many`] - sets multiple single-use return values in
-//! one call.
-//! 3. [`FnConfigurator::always_returns`] - sets return value that will can be
-//! returned unlimited number of times.
-//! 4. [`FnConfigurator::returns_with`] - calculates return value on the fly using
-//! functions' source arguments. Receives tuple of argument references. Returns unlimited number of
-//! times.
+//! 2. [`FnConfigurator::returns_many`] - sets multiple single-use return values in one call.
+//! 3. [`FnConfigurator::always_returns`] - sets return value that can be returned unlimited number
+//! of times.
+//! 4. [`FnConfigurator::returns_with`] - calculates return value on the fly using functions' source
+//! arguments. Receives tuple of argument references. Returns unlimited number of times.
 //!
 //! If multiple return values were specified they will be used in the same order:
 //! ```rust
@@ -473,7 +489,7 @@
 //! # }
 //! ```
 //!
-//! ### Callbacks
+//! ### Setting callbacks
 //! Every mocked function can have a callback that is called when function's configuration is called
 //! with matching arguments.
 //!
@@ -1184,7 +1200,7 @@
 //!     fn payload_test() {
 //!         // Act
 //!         payload();
-//! 
+//!
 //!         // Assert
 //!         assert_eq!(F_CALLS_COUNT, 1);
 //!     }
@@ -1192,9 +1208,9 @@
 //! ```
 //! This is basically what `rsubstitute` does - it automatically creates infrastructure for mocking,
 //! except that it generates a more complex code for flexible configuration.
-//! 
+//!
 //! # Undefined behaviour
-//! 
+//!
 //! `rsubstitute` infrastructure stores all call arguments in mock objects. If argument is a
 //! reference, there is possibility that in `received()` function the argument matcher may receive
 //! dangling reference. Here's an example of UB:
@@ -1202,12 +1218,12 @@
 //! # use rsubstitute::*;
 //! #[mock]
 //! fn work(_: &i32) {}
-//! 
+//!
 //! fn use_work() {
 //!     let local = 10;
 //!     work(&local);
 //! }
-//! 
+//!
 //! # fn main() {
 //! // Act
 //! use_work();
@@ -1218,26 +1234,26 @@
 //!                                 // UB - `r` stores reference to dropped `local` in `use_work`
 //! # }
 //! ```
-//! 
+//!
 //! To fix this you may need to remove hard-coded references by passing them from outside so that
 //! you can control them from unit-test:
-//! 
+//!
 //! ```
 //! # use rsubstitute::*;
-//! 
+//!
 //! # #[mock] fn work(_: &i32) {}
-//! 
+//!
 //! fn use_work(r: &i32) {
 //!     work(r);
 //! }
-//! 
+//!
 //! # fn main() {
 //! // Arrange
 //! let test_local = 10;
-//! 
+//!
 //! // Act
 //! use_work(&test_local);
-//! 
+//!
 //! // Assert
 //! // receives reference to `test_local` that is still alive in this scope
 //! work::received(Arg::is(|r: &&i32| **r == test_local), 1.time());
