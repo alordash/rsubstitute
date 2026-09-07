@@ -2,6 +2,10 @@
 
 Library for mocking static functions, traits and structures in Rust.
 
+[![Build Status](https://github.com/alordash/rsubstitute/actions/workflows/ci.yml/badge.svg)](https://github.com/alordash/rsubstitute/actions/workflows/ci.yml)
+[![Crates.io](https://img.shields.io/crates/v/rsubstitute.svg)](https://crates.io/crates/rsubstitute)
+[![Documentation](https://docs.rs/rsubstitute/badge.svg)](https://docs.rs/rsubstitute)
+
 ## Overview
 
 This library exposes `mock` attribute that generates all infrastructure required for creating mocks and an API for their
