@@ -1,3 +1,4 @@
+#![allow(clippy::needless_lifetimes)]
 use rsubstitute::*;
 
 mod common;
@@ -297,7 +298,7 @@ static_work(*{actual_debug_string}*)
 
         // Assert
         assert_eq!(returned_value, actual_returned_value);
-        let arg_debug_string = common::debug_string("(&i32): equal to 5".to_owned());
+        let arg_debug_string = common::debug_string("(&i32): equal to 5");
         let expected_panic_msg = format!(
             "Expected to receive a call exactly once matching:
 	Trait::static_work<alloc::string::String, 124>({arg_debug_string})

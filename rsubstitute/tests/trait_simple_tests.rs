@@ -1,3 +1,4 @@
+#![allow(clippy::arc_with_non_send_sync)]
 use rsubstitute::*;
 
 #[mock]
@@ -52,10 +53,9 @@ mod tests {
             .does(move |_, _| *callback_flag_clone.borrow_mut() = true);
 
         // Act
-        let result = mock.f();
+        mock.f();
 
         // Assert
-        assert_eq!((), result);
         assert!(*callback_flag.borrow());
         mock.received().f(Times::Once).no_other_calls();
     }
@@ -63,13 +63,13 @@ mod tests {
     #[test]
     fn f_NoConfig_Ok() {
         // Arrange
-        let mock = TraitMock::new();
+        let mut mock = TraitMock::new();
 
         // Act
-        let result = mock.f();
+        mock.f();
 
         // Assert
-        assert_eq!((), result);
+        mock.received().f(Times::Once).no_other_calls();
     }
 
     #[test]
@@ -78,15 +78,11 @@ mod tests {
         let mut mock = TraitMock::new();
 
         // Act
-        let result1 = mock.f();
-        let result2 = mock.f();
-        let result3 = mock.f();
+         mock.f();
+         mock.f();
+         mock.f();
 
         // Assert
-        assert_eq!((), result1);
-        assert_eq!((), result2);
-        assert_eq!((), result3);
-
         mock.received().f(Times::Exactly(3)).no_other_calls();
     }
 

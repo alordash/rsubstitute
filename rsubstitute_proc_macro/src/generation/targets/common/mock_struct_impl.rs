@@ -287,7 +287,7 @@ pub(crate) fn generate_for_trait(
 }
 
 fn generate_item_impl(
-    attributes: Vec<Attribute>,
+    mut attributes: Vec<Attribute>,
     unsafety: Option<Token![unsafe]>,
     span: Span,
     generics: Generics,
@@ -295,6 +295,7 @@ fn generate_item_impl(
     items: Vec<ImplItem>,
     maybe_trait_path: Option<Path>,
 ) -> ItemImpl {
+    attributes.push(attributes::allow_clippy(span, "useless_transmute"));
     let result = ItemImpl {
         attrs: attributes,
         modifiers: ImplModifiers::default(),

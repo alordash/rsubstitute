@@ -1,3 +1,4 @@
+#![allow(clippy::borrowed_box)]
 use rsubstitute::*;
 
 const DUMMY_VALUE: i32 = 124;

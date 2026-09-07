@@ -2,6 +2,8 @@
 #![allow(clippy::needless_arbitrary_self_type)]
 #![allow(clippy::useless_transmute)]
 #![allow(clippy::missing_safety_doc)]
+#![allow(clippy::not_unsafe_ptr_arg_deref)]
+#![allow(clippy::type_complexity)]
 use rsubstitute::*;
 
 //

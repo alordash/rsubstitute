@@ -1,3 +1,4 @@
+#![allow(clippy::needless_arbitrary_self_type)]
 #![allow(clippy::arc_with_non_send_sync)]
 #![allow(clippy::type_complexity)]
 #![allow(clippy::needless_borrow)]

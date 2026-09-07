@@ -86,8 +86,7 @@ accept(*Payload(10)*)
         assert_eq!(
             panic_message,
             Some(
-                format!(
-                    r#"Expected to receive a call exactly once matching:
+                r#"Expected to receive a call exactly once matching:
 	accept_debug<debug_naming_tests::Payload>((debug_naming_tests::Payload): equal to Payload(20))
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
@@ -95,8 +94,7 @@ accept_debug(*Payload(10)*)
 	1. __arg0 (debug_naming_tests::Payload):
 		Expected: Payload(20)
 		Actual:   Payload(10)"#
-                )
-                .to_owned()
+                    .to_owned()
             )
         );
     }
@@ -115,8 +113,7 @@ accept_debug(*Payload(10)*)
         assert_eq!(
             panic_message,
             Some(
-                format!(
-                    r#"Expected to receive a call exactly once matching:
+                r#"Expected to receive a call exactly once matching:
 	accept_debug<debug_naming_tests::Payload>((debug_naming_tests::Payload): equal to Payload(20))
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
@@ -124,7 +121,6 @@ accept_debug(*Payload(10)*)
 	1. __arg0 (debug_naming_tests::Payload):
 		Expected: Payload(20)
 		Actual:   Payload(10)"#
-                )
                 .to_owned()
             )
         );

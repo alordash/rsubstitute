@@ -1,3 +1,4 @@
+#![allow(clippy::needless_maybe_sized)]
 use rsubstitute::*;
 
 #[mock(base)]

@@ -139,7 +139,7 @@ accept_ref(*{r}*)
 
             // Act
             let actual_return_value = accept_ref(r);
-            let panic_msg = record_panic(|| accept_ref::received_nothing());
+            let panic_msg = record_panic(accept_ref::received_nothing);
 
             // Assert
             assert_eq!(return_value, actual_return_value);
@@ -208,7 +208,7 @@ accept_ref_ptr(*{r:?}*)
 
             // Act
             let actual_return_value = accept_ref_ptr(r);
-            let panic_msg = record_panic(|| accept_ref_ptr::received_nothing());
+            let panic_msg = record_panic(accept_ref_ptr::received_nothing);
 
             // Assert
             assert_eq!(return_value, actual_return_value);
@@ -325,7 +325,7 @@ Received no non-matching calls"
 
             // Act
             let actual_return_value = generic(t1);
-            let panic_msg = record_panic(|| generic::received_nothing::<T1, T2>());
+            let panic_msg = record_panic(generic::received_nothing::<T1, T2>);
 
             // Assert
             assert_eq!(return_value, actual_return_value);

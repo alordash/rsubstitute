@@ -1,3 +1,4 @@
+#![allow(clippy::deref_addrof)]
 use rsubstitute::*;
 
 #[derive(Clone, Debug, PartialOrd, PartialEq)]

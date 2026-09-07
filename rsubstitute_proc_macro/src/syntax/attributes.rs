@@ -27,7 +27,7 @@ pub(crate) fn doc_hidden(span: Span) -> Attribute {
     return result;
 }
 
-pub(crate) fn allow_clippy(span: Span) -> Attribute {
+pub(crate) fn allow_clippy(span: Span, lint: &str) -> Attribute {
     let result = Attribute {
         pound_token: Token![#](span),
         style: AttrStyle::Outer,
@@ -35,7 +35,7 @@ pub(crate) fn allow_clippy(span: Span) -> Attribute {
         meta: Meta::List(MetaList {
             path: path::new(span, ["allow"]),
             delimiter: MacroDelimiter::Paren(token::Paren(span)),
-            tokens: path::new(span, ["clippy", "all"]).to_token_stream(),
+            tokens: path::new(span, ["clippy", lint]).to_token_stream(),
         }),
     };
     return result;

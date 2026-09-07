@@ -11,7 +11,7 @@ pub struct ArgPrinter<'a, T: ?Sized>(pub &'a T);
 pub mod arg_printing {
     use super::*;
 
-    ::cfg_if::cfg_if! {
+    cfg_if::cfg_if! {
         if #[cfg(feature = "debug_naming")] {
             pub use specialization_printing::*;
             mod specialization_printing {

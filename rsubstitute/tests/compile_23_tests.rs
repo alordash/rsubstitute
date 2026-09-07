@@ -1,6 +1,7 @@
 #![allow(unused_variables)]
 #![allow(non_snake_case)]
 #![allow(unused)]
+#![allow(clippy::too_many_arguments)]
 
 use rsubstitute::*;
 use std::marker::PhantomData;

@@ -24,3 +24,6 @@ typeid = { workspace = true }
 
 [lints.rust]
 unexpected_cfgs = { level = "warn", check-cfg = ['cfg(nightly)'] }
+
+[lints.clippy]
+needless_return = "allow"

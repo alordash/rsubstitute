@@ -178,7 +178,7 @@ pub(crate) fn generate_module(ctx: &Context, mut item_impl: ItemImpl) -> MockMod
     .collect();
     let item_mod = ItemMod {
         attrs: vec![
-            attributes::allow_clippy(source_span),
+            attributes::allow_clippy(source_span, "all"),
             attributes::allow_unused(source_span),
             attributes::allow_unreachable_pub(source_span),
             attributes::allow_nonstandard_style(source_span),

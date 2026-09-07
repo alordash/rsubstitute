@@ -1,3 +1,4 @@
+#![allow(clippy::multiple_bound_locations)]
 use rsubstitute::*;
 use std::fmt::{Debug, Display};
 

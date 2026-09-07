@@ -18,7 +18,7 @@ mod tests {
 
         // Act
         let result = work();
-        let panic_message = record_panic(|| work());
+        let panic_message = record_panic(work);
 
         // Assert
         assert_eq!(result, 10);
@@ -36,7 +36,7 @@ mod tests {
         let first = work();
         let second = work();
         let third = work();
-        let panic_message = record_panic(|| work());
+        let panic_message = record_panic(work);
 
         // Assert
         assert_eq!(first, 10);

@@ -17,7 +17,7 @@ impl<'a> Deref for Payload<'a> {
     type Target = i32;
 
     fn deref(&self) -> &Self::Target {
-        &self.reference
+        self.reference
     }
 }
 

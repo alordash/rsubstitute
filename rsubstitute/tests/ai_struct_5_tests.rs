@@ -2,6 +2,9 @@
 #![allow(clippy::needless_arbitrary_self_type)]
 #![allow(clippy::useless_transmute)]
 #![allow(clippy::missing_safety_doc)]
+#![allow(clippy::type_complexity)]
+#![allow(clippy::needless_lifetimes)]
+#![allow(clippy::borrowed_box)]
 use rsubstitute::*;
 
 //

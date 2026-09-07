@@ -3,13 +3,13 @@ use rsubstitute::*;
 #[mock(base)]
 fn accept_ref(_: &i32) {}
 
-const BASE_RETURN_REF: &'static i32 = &1000;
+const BASE_RETURN_REF: &i32 = &1000;
 #[mock(base)]
 fn return_ref() -> &'static i32 {
     BASE_RETURN_REF
 }
 
-const BASE_ACCEPT_REF_RETURN_REF: &'static i32 = &2000;
+const BASE_ACCEPT_REF_RETURN_REF: &i32 = &2000;
 #[mock(base)]
 fn accept_ref_return_ref(_: &i32) -> &'static i32 {
     BASE_ACCEPT_REF_RETURN_REF
@@ -81,6 +81,8 @@ mod tests {
             // Assert
             accept_ref::received(r, Times::Once)
                 .received(
+                    #[allow(clippy::needless_borrow)]
+                    #[allow(clippy::needless_return)]
                     Arg::is(|ref _unused| {
                         return true;
                     }),

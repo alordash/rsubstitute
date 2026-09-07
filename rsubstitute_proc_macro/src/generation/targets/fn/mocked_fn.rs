@@ -2,6 +2,7 @@ use crate::common::models::*;
 use crate::generation::fn_info::models::*;
 use crate::generation::mock_struct::models::*;
 use crate::generation::mock_struct::*;
+use crate::syntax::attributes;
 use proc_macro2::Span;
 use syn::*;
 
@@ -30,8 +31,10 @@ pub(crate) fn generate(
         },
     );
 
+    let mut attributes = fn_info.attributes.clone();
+    attributes.push(attributes::allow_clippy(source_span, "useless_transmute"));
     let result = ItemFn {
-        attrs: fn_info.attributes.clone(),
+        attrs: attributes,
         vis: fn_info.visibility.clone(),
         modifiers: FnModifiers::default(),
         sig: fn_info.source_signature.clone(),

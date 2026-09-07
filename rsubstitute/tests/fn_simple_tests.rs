@@ -1,3 +1,4 @@
+#![allow(clippy::arc_with_non_send_sync)]
 use rsubstitute::*;
 use std::cell::RefCell;
 use std::sync::Arc;
@@ -24,10 +25,9 @@ mod tests {
             f::setup().does(move |_| *callback_flag_clone.borrow_mut() = true);
 
             // Act
-            let result = f();
+            f();
 
             // Assert
-            assert_eq!((), result);
             assert!(*callback_flag.borrow());
             f::received(Times::Once).no_other_calls();
         }
@@ -38,10 +38,9 @@ mod tests {
             f::setup();
 
             // Act
-            let result = f();
+            f();
 
             // Assert
-            assert_eq!((), result);
             f::received(Times::Once).no_other_calls();
         }
 
@@ -51,15 +50,11 @@ mod tests {
             f::setup();
 
             // Act
-            let result1 = f();
-            let result2 = f();
-            let result3 = f();
+            f();
+            f();
+            f();
 
             // Assert
-            assert_eq!((), result1);
-            assert_eq!((), result2);
-            assert_eq!((), result3);
-
             f::received(Times::Exactly(3)).no_other_calls();
         }
 
@@ -131,10 +126,9 @@ Received no non-matching calls"#,
             f_base::setup().does(move |_| *callback_flag_clone.borrow_mut() = true);
 
             // Act
-            let result = f_base();
+           f_base();
 
             // Assert
-            assert_eq!((), result);
             assert!(*callback_flag.borrow());
             f_base::received(Times::Once).no_other_calls();
         }
@@ -145,10 +139,9 @@ Received no non-matching calls"#,
             f_base::setup();
 
             // Act
-            let result = f_base();
+          f_base();
 
             // Assert
-            assert_eq!((), result);
             f_base::received(Times::Once).no_other_calls();
         }
 
@@ -158,15 +151,11 @@ Received no non-matching calls"#,
             f_base::setup();
 
             // Act
-            let result1 = f_base();
-            let result2 = f_base();
-            let result3 = f_base();
+            f_base();
+            f_base();
+            f_base();
 
             // Assert
-            assert_eq!((), result1);
-            assert_eq!((), result2);
-            assert_eq!((), result3);
-
             f_base::received(Times::Exactly(3)).no_other_calls();
         }
 

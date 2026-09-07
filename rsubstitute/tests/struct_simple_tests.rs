@@ -1,3 +1,4 @@
+#![allow(clippy::arc_with_non_send_sync)]
 use rsubstitute::*;
 use std::marker::PhantomData;
 
@@ -59,11 +60,10 @@ mod tests {
 
             // Act
             Struct::non_associative();
-            let result = mock.f();
+            mock.f();
 
             // Assert
             assert_eq!(value, mock.value);
-            assert_eq!((), result);
             assert!(*callback_flag.borrow());
             mock.received().f(Times::Once).no_other_calls();
         }
@@ -74,10 +74,9 @@ mod tests {
             let mut mock = Struct::new(1);
 
             // Act
-            let result = mock.f();
+             mock.f();
 
             // Assert
-            assert_eq!((), result);
             mock.received().f(Times::Once).no_other_calls();
         }
 
@@ -87,15 +86,11 @@ mod tests {
             let mut mock = Struct::new(1);
 
             // Act
-            let result1 = mock.f();
-            let result2 = mock.f();
-            let result3 = mock.f();
+            mock.f();
+            mock.f();
+            mock.f();
 
             // Assert
-            assert_eq!((), result1);
-            assert_eq!((), result2);
-            assert_eq!((), result3);
-
             mock.received().f(Times::Exactly(3)).no_other_calls();
         }
 
@@ -173,11 +168,10 @@ Received no non-matching calls"#,
 
             // Act
             Struct::non_associative();
-            let result = Trait::f(&mock);
+            Trait::f(&mock);
 
             // Assert
             assert_eq!(value, mock.value);
-            assert_eq!((), result);
             assert!(*callback_flag.borrow());
             mock.received().as_Trait().f(Times::Once);
             mock.received().no_other_calls()
@@ -189,10 +183,9 @@ Received no non-matching calls"#,
             let mut mock = Struct::new(1);
 
             // Act
-            let result = Trait::f(&mock);
+            Trait::f(&mock);
 
             // Assert
-            assert_eq!((), result);
             mock.received().as_Trait().f(Times::Once);
             mock.received().no_other_calls();
         }
@@ -203,15 +196,11 @@ Received no non-matching calls"#,
             let mut mock = Struct::new(1);
 
             // Act
-            let result1 = Trait::f(&mock);
-            let result2 = Trait::f(&mock);
-            let result3 = Trait::f(&mock);
+            Trait::f(&mock);
+            Trait::f(&mock);
+            Trait::f(&mock);
 
             // Assert
-            assert_eq!((), result1);
-            assert_eq!((), result2);
-            assert_eq!((), result3);
-
             mock.received().as_Trait().f(Times::Exactly(3));
             mock.received().no_other_calls();
         }
