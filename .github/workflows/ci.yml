@@ -34,10 +34,8 @@ jobs:
       - name: Test
         run: cargo test --all-targets ${{ matrix.cargo_args }}
       - name: Doc
-        if: matrix.rust_version == 'nightly'
         run: cargo doc --no-deps ${{ matrix.cargo_args }}
       - name: Clippy
-        if: matrix.rust_version == 'nightly'
         run: |
           rustup component add clippy
           cargo clippy --all-targets --workspace ${{ matrix.cargo_args }} -- -D warnings
