@@ -80,11 +80,11 @@ mod tests {
         assert_panics(
             || accept_deref::received(Arg::eq(second), Times::Once),
             "Expected to receive a call exactly once matching:
-	accept_deref((arg_tests::Payload<'_>): equal to Payload { value: 20, reference: 1 })
+	accept_deref((arg_tests::Payload): equal to Payload { value: 20, reference: 1 })
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
 accept_deref(*Payload { value: 10, reference: 1 }*)
-	1. __arg0 (arg_tests::Payload<'_>):
+	1. __arg0 (arg_tests::Payload):
 		Expected: Payload { value: 20, reference: 1 }
 		Actual:   Payload { value: 10, reference: 1 }",
         );
@@ -160,11 +160,11 @@ accept_deref(*Payload { value: 10, reference: 1 }*)
             || accept_deref::received(Arg::ref_eq(second), Times::Once),
             format!(
                 "Expected to receive a call exactly once matching:
-	accept_deref((arg_tests::Payload<'_>): equal to Payload {{ value: 20, reference: 1 }})
+	accept_deref((arg_tests::Payload): equal to Payload {{ value: 20, reference: 1 }})
 Actually received no matching calls
 Received 1 non-matching call (non-matching arguments indicated with '*' characters):
 accept_deref(*Payload {{ value: 10, reference: 1 }}*)
-	1. __arg0 (arg_tests::Payload<'_>):
+	1. __arg0 (arg_tests::Payload):
 		Expected (ptr: {second_ptr:?}): Payload {{ value: 20, reference: 1 }}
 		Actual   (ptr: {first_ptr:?}): Payload {{ value: 10, reference: 1 }}"
             ),
@@ -193,7 +193,7 @@ accept_deref(*Payload {{ value: 10, reference: 1 }}*)
         assert_panics(
             || accept_deref::received(Arg::ref_not_eq(second), Times::Never),
             "Expected to never receive a call matching:
-	accept_deref((arg_tests::Payload<'_>): NOT equal to Payload { value: 20, reference: 1 })
+	accept_deref((arg_tests::Payload): NOT equal to Payload { value: 20, reference: 1 })
 Actually received 1 matching call:
 	accept_deref(Payload { value: 10, reference: 1 })
 Received no non-matching calls",
