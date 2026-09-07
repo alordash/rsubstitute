@@ -1,6 +1,6 @@
 # rsubstitute
 
-Library for mocking Rust static functions, traits and structures.
+Library for mocking static functions, traits and structures in Rust.
 
 ## Overview
 

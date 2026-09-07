@@ -1,4 +1,4 @@
-//! Library for mocking Rust static functions, traits and structures.
+//! Library for mocking static functions, traits and structures in Rust.
 //!
 //! # Usage
 //! Just apply `#[mock]` attribute on your function, trait, structure or `impl` block. You can also
@@ -65,7 +65,6 @@
 //! * [`rsubstitute` config](#rsubstitute-config)
 //! * [Crate features](#create-features)
 //! * [Undefined behavior](#undefined-behavior)     TODO
-//! * [Limitations](#limitations)                   TODO
 //!
 //! ## Mocking traits
 //!
@@ -149,7 +148,7 @@
 //! mock.received().get(1.time());
 //! # }
 //! ```
-//! <div class="warning">
+//! ### Limitations
 //!
 //! There are a couple of limitations for structures mocking:
 //! 1. Mocked structure can not be constructed or deconstructed outside of associated functions that
@@ -184,8 +183,6 @@
 //!     #[cfg(not(test))] fn work(&self) {}
 //! }
 //! ```
-//!
-//! </div>
 //!
 //! ## Mocking trait implementations
 //! To mock implementations of traits on mockable structures (trait itself does not need to be
@@ -222,8 +219,7 @@
 //! mock.received().as_Trait().get(1.time());
 //! # }
 //! ```
-//!
-//! <div class="warning">
+//! ### Limitations
 //!
 //! There are a couple of limitations for trait implementations mocking:
 //! 1. Can not mock more than one implementation of same trait on a struct differing only in trait's
@@ -276,8 +272,6 @@
 //! ```
 //! 3. Limitations from [`Mocking structures`](#mocking-structures).
 //!
-//! </div>
-//!
 //! ## Mocking static functions
 //!
 //! To mock static function add `#[mock]` or `#[mock(base)]` attribute. This will generate module
@@ -306,6 +300,8 @@
 //!      .received(2, 1.time());
 //! # }
 //! ```
+//!
+//! ### Limitations
 //!
 //! There are a couple of limitations for functions mocking:
 //! 1. Configuration for standalone function mock is stored in thread-local storage to prevent race
@@ -381,6 +377,8 @@
 //! # }
 //! ```
 //!
+//! ### Limitations
+//!
 //! There are a couple of limitations:
 //! 1. Associated functions that use base implementation using `#[mock(base)]` use base
 //! implementation by default, without any configuration. This is done to make creation of structure
@@ -397,7 +395,7 @@
 //! Can be used either manually like `mock.setup(Arg::eq(10))` or implicitly using `Into` conversion
 //! like `mock.setup(10)`.
 //! 2. [`Arg::is`] - checks that argument passes provided predicate. Usage example:
-//! `mock.setup(Arg::is(|v| *v == 10))`
+//! `mock.setup(Arg::is(|v: &i32| *v == 10))`. Must specify argument type in closure.
 //! 3. [`Arg::not_eq`] - checks that argument is NOT equal to provided value. Uses [`PartialEq::eq`]
 //! of `T`. Opposite of `Arg::eq`. Usage example: `mock.setup(Arg::not_eq(10))`.
 //! 4. [`Arg::ref_eq`] - checks that argument's reference points to the same place as provided
@@ -606,6 +604,8 @@
 //! # }
 //! ```
 //!
+//! ### Limitations
+//!
 //! There is one limitation: all arguments of function must be [`Clone`]able for its implementation
 //! to be used in tests. If even single argument does not implement `Clone` you will get compilation
 //! error. You'll have to change your code or just use `#[mock]`.
@@ -681,16 +681,16 @@
 //!     .no_other_calls();  // will panic because `set(30)` was not validated
 //! # }
 //! ```
-//! 
+//!
 //! ### Verify no calls were performed in static functions
-//! 
+//!
 //! With trait objects you can call `mock.received().no_other_calls()` to verify that it didn't
 //! receive any calls. For static functions you need to use `received_nothing()` function:
 //! ```
 //! use rsubstitute::*;
-//! 
+//!
 //! #[mock] fn work() {}
-//! 
+//!
 //! # fn main() {
 //! // Assert
 //! work::received_nothing();
@@ -723,7 +723,7 @@
 //! ```
 //!
 //! Here's more complex example of generics usage with structure:
-//! 
+//!
 //! ```rust
 //! # use std::marker::PhantomData;
 //! # use std::fmt::{Debug, Display};
@@ -838,18 +838,20 @@
 //!     .get_number(1.time());
 //! # }
 //! ```
-//! 
+//!
+//! ### Limitations
+//!
 //! There is one limitation - when mocking implementation of trait with associated types for struct
 //! all types must be referenced explicitly like `<Self as Trait>::AssociatedType`. Using
 //! `Self::AssociatedType` will lead to compilation error:
 //! ```compile_error
 //! # use rsubstitute::*;
-//! 
+//!
 //! trait Trait {
 //!     type Item;
 //!     fn get_item(&self) -> Self::Item;
 //! }
-//! 
+//!
 //! #[mock]
 //! struct Struct;
 //! #[mock]
@@ -859,7 +861,7 @@
 //!         10
 //!     }
 //! }
-//! 
+//!
 //! # fn main() {}
 //! ```
 //! Here's the fix:
@@ -907,6 +909,8 @@
 //! assert_eq!(result.to_string(), "20");
 //! # }
 //! ```
+//!
+//! ### Limitations
 //!
 //! There are a couple of limitations:
 //! 1. `Trait` in `impl Trait` must be dyn-compatible.
@@ -1007,17 +1011,17 @@
 //! ```
 //!
 //! Call order is verified for all mocked functions relative to each other, regardless if they're
-//! the same function or even come from different mock object:
+//! come from different function or even mock object:
 //! ```rust
 //! use rsubstitute::*;
 //!
 //! #[mock] fn first() {}
-//! 
+//!
 //! #[mock]
 //! trait Trait {
 //!     fn second(&self);
 //! }
-//! 
+//!
 //! #[mock] struct Struct;
 //! #[mock(base)]
 //! impl Struct {
@@ -1029,7 +1033,7 @@
 //! // Arrange
 //! let mut trait_mock = TraitMock::new();
 //! let mut struct_mock = Struct::new();
-//! 
+//!
 //! // Act
 //! first(); trait_mock.second(); struct_mock.third();
 //!
@@ -1062,7 +1066,7 @@
 //! # fn main() {}
 //! ```
 //!
-//! To mock them you don't need to put mock in the same container that is used in source functions
+//! To mock them you don't need to put mock in the same container that is used in source function's
 //! signature:
 //! ```rust
 //! use rsubstitute::*;
@@ -1094,7 +1098,7 @@
 //! 2. it is mock of a struct that has `#[derive(Clone)]` attribute (manually implementing [`Clone`]
 //! won't work).
 //!
-//! Cloned mocks sharethe  same configuration (it is stored behind reference-counted pointer
+//! Cloned mocks share the same configuration (it is stored behind reference-counted pointer
 //! internally). This let's you share mocks between parts of your code. This can be useful, for
 //! example, if you want to verify that mock received some consuming function:
 //! ```rust
@@ -1117,30 +1121,30 @@
 //! mock_for_verification.received().consume(1.time());
 //! # }
 //! ```
-//! 
+//!
 //! ## `rsubstitute` config
-//! 
+//!
 //! You can configure some crate level options using [`read_config`] and [`write_config`] functions
 //! (or use [`CONFIG`] static variable directly). This config contains infrastructure settings.
 //! Currently it has only `max_invalid_calls_listed_count` setting that controls how many invalid
 //! calls will be listed in case of an calls validation error.
-//! 
+//!
 //! Config can be used like this:
-//! 
+//!
 //! ```should_panic
 //! use rsubstitute::*;
-//! 
+//!
 //! #[mock] fn work(_: i32) {}
-//! 
+//!
 //! # fn main() {
 //! // Arrange
 //! write_config().max_invalid_calls_listed_count = 3;
-//! 
+//!
 //! // Act
 //! for i in 0..10 {
 //!     work(i);
 //! }
-//! 
+//!
 //! // Assert
 //! work::received(1, 1.time()).no_other_calls(); // will panic and show only first 3 calls,
 //!                                               // other calls won't be listed
@@ -1152,44 +1156,96 @@
 //! ### `debug_naming`
 //!
 //! Enables better generic argument values display in error messages.
-//! 
+//!
 //! Without this feature arguments that have generic type will be printed as just "?" in errors,
 //! even if they implement [`std::fmt::Debug`]. With this feature such arguments will be printed as
 //! their debug strings if they implement `Debug`. For example, without this feature in function
 //! `fn work<T>(t: T)` the argument `t` will be printed as "?" in all errors.
-//! 
+//!
 //! This feature requires nightly version of compiler because it uses Rust's
 //! [`specialization`](https://rust-lang.github.io/rfcs/1210-impl-specialization.html) feature.
+//!
+//! # How it works
+//!
+//! Easiest way to mock some function is to create two separate versions of it - one for `release`
+//! build and one for `test` that tracks calls:
+//! ```rust
+//! #[cfg(not(test))] fn f() {}
+//!
+//! #[cfg(test)] fn f() { F_CALLS_COUNT += 1; }
+//! #[cfg(test)] static mut F_CALLS_COUNT: usize = 0;
+//!
+//! fn payload() { f() }
+//!
+//! #[cfg(test)]
+//! mod tests {
+//!     use super::*;
+//!     #[test]
+//!     fn payload_test() {
+//!         // Act
+//!         payload();
+//! 
+//!         // Assert
+//!         assert_eq!(F_CALLS_COUNT, 1);
+//!     }
+//! }
+//! ```
+//! This is basically what `rsubstitute` does - it automatically creates infrastructure for mocking,
+//! except that it generates a more complex code for flexible configuration.
+//! 
+//! # Undefined behaviour
+//! 
+//! `rsubstitute` infrastructure stores all call arguments in mock objects. If argument is a
+//! reference, there is possibility that in `received()` function the argument matcher may receive
+//! dangling reference. Here's an example of UB:
+//! ```should_panic
+//! # use rsubstitute::*;
+//! #[mock]
+//! fn work(_: &i32) {}
+//! 
+//! fn use_work() {
+//!     let local = 10;
+//!     work(&local);
+//! }
+//! 
+//! # fn main() {
+//! // Act
+//! use_work();
+//!
+//! // Assert
+//! work::received(Arg::is(|r: &&i32| **r == 10), 1.time());
+//!                                 // ^^^
+//!                                 // UB - `r` stores reference to dropped `local` in `use_work`
+//! # }
+//! ```
+//! 
+//! To fix this you may need to remove hard-coded references by passing them from outside so that
+//! you can control them from unit-test:
+//! 
+//! ```
+//! # use rsubstitute::*;
+//! 
+//! # #[mock] fn work(_: &i32) {}
+//! 
+//! fn use_work(r: &i32) {
+//!     work(r);
+//! }
+//! 
+//! # fn main() {
+//! // Arrange
+//! let test_local = 10;
+//! 
+//! // Act
+//! use_work(&test_local);
+//! 
+//! // Assert
+//! // receives reference to `test_local` that is still alive in this scope
+//! work::received(Arg::is(|r: &&i32| **r == test_local), 1.time());
+//! # }
+//! ```
 #![allow(clippy::needless_return)]
 pub use rsubstitute_proc_macro::mock;
 
-/// TODO - append to outer doc comment
-/// # How it works
-///
-/// Easiest way to mock some function is to create two separate versions of it - one for `release`
-/// build and one for `test` that tracks calls:
-/// ```rust
-/// #[cfg(not(test))] fn f() {}
-///
-/// #[cfg(test)] fn f() { F_CALLS_COUNT += 1; }
-/// #[cfg(test)] static mut F_CALLS_COUNT: usize = 0;
-///
-/// fn payload() { f() }
-///
-/// #[cfg(test)]
-/// mod tests {
-///     use super::*;
-///     #[test]
-///     fn payload_test() {
-///         // Act
-///         payload();
-///         // Assert
-///         assert_eq!(F_CALLS_COUNT, 1);
-///     }
-/// }
-/// ```
-/// This is basically what `rsubstitute` does - it automatically creates infrastructure for mocking,
-/// except that it generates a more complex code for flexible configuration.
 pub use rsubstitute_core::args::*;
 pub use rsubstitute_core::infrastructure::{FnCallbackConfigurator, FnConfigurator};
 pub use rsubstitute_core::verify_call_order;
