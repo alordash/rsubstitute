@@ -340,8 +340,24 @@
 //! Here is a correct way: call `work::setup()` only once and then use chain of `.setup()` calls:
 //! ```no_run
 //! # use rsubstitute::*; #[mock] fn work(v: i32) -> i32 { v }
+//! # fn main() {
 //! work::setup(1).returns(10)
 //!      .setup(2).returns(20); // `.setup(2)` does not clear previous configuration
+//! }
+//! ```
+//!
+//! If your "arrange" part of unit-test uses complex logic you can store setup object in a variable
+//! and reuse it:
+//! ```
+//! # use rsubstitute::*; #[mock] fn work(v: i32) -> i32 { v }
+//! # fn main() {
+//! # let some_flag = core::hint::black_box(false);
+//! let mut work_setup = work::setup(1).returns(10);
+//! work_setup.setup(2).returns(20);
+//! if some_flag {
+//!     work_setup.setup(3).returns(30);
+//! }
+//! # }
 //! ```
 //!
 //! ## Mocking static associated functions
@@ -576,7 +592,7 @@
 //! Functions that have return values treat `call_base()` as return value configuration, so you can
 //! not call any of `returns` functions after enabling base implementation:
 //!
-//! ```compile_error
+//! ```compile_fail
 //! # use rsubstitute::*;
 //! # [mock(base)] fn work() -> i32 { 1 }
 //!
@@ -586,6 +602,7 @@
 //! ```
 //!
 //! Base implementation usage is completely optional, you can mix mocked behavior with base calls.
+//!
 //! In traits, only functions with default implementation can use `call_base()`:
 //! ```
 //! use rsubstitute::*;
@@ -622,9 +639,17 @@
 //!
 //! ### Limitations
 //!
-//! There is one limitation: all arguments of function must be [`Clone`]able for its implementation
-//! to be used in tests. If even single argument does not implement `Clone` you will get compilation
-//! error. You'll have to change your code or just use `#[mock]`.
+//! There is one limitation: all arguments of function must be [`Clone`]able for its base
+//! implementation to be used in tests. If even single argument does not implement `Clone` you will
+//! get compilation error and will have to change your code or just use `#[mock]`:
+//! ```compile_fail
+//! # use rsubstitute::*;
+//! struct Unclonable;
+//! #[mock(base)]
+//! fn work(_: Unclonable) {}
+//!
+//! # fn main() {}
+//! ```
 //!
 //! ## Verifying calls
 //!
@@ -642,7 +667,29 @@
 //! ```
 //!
 //! You can verify exact values of passed arguments using [`Arg`], for more information see
-//! [Arguments matching](#arguments-matching).
+//! [Arguments matching](#arguments-matching). Here's simple example that checks that mocked
+//! function was called with specific argument:
+//!
+//! ```rust
+//! use rsubstitute::*;
+//!
+//! #[mock] fn work(_: i32, _: &str) {}
+//!
+//! # fn main() {
+//! // Arrange
+//! let number = 10;
+//! let string = "quo vadis";
+//!
+//! // Act
+//! work(number, string);
+//!
+//! // Assert
+//! work::received(
+//!     Arg::is(|actual_number: &i32| *actual_number == number),
+//!     Arg::not_eq("veridis quo"),
+//!     1.time());
+//! # }
+//! ```
 //!
 //! ### Verify number of calls
 //!
@@ -674,7 +721,7 @@
 //! # }
 //! ```
 //!
-//! If there were some unvalidated calls when `no_other_calls()` was called, then mock object will
+//! If there were some unvalidated calls when `no_other_calls()` was called, then this function will
 //! panic:
 //! ```should_panic
 //! # use rsubstitute::*;
@@ -794,7 +841,7 @@
 //!     .returns("quo vadis");
 //! get::setup::<[u8; 3], &'static str>([1, 2, 3])
 //!     .returns("veridis quo")
-//!     .setup([10, 10, 10])        // generic types are inferred here by `setup` function,
+//!     .setup([10, 10, 10])        // generic types are inferred here by `get::setup` function,
 //!     .returns("third call");     // no need to specify them again
 //!
 //! // Act
@@ -806,7 +853,7 @@
 //! assert_eq!(first,  "quo vadis");
 //! assert_eq!(second, "veridis quo");
 //! assert_eq!(third,  "third call");
-//! get::received::<_, &str>(10i32, 1.time());          // type inference works with mocks
+//! get::received::<_, &str>(10i32, 1.time());      // type inference also works with mocks
 //! get::received::<_, &str>([1u8, 2, 3], 1.time())
 //!     .received([10u8, 10, 10], 1.time());
 //! # }
@@ -815,7 +862,7 @@
 //! ## Associated constants and types
 //!
 //! When mocking trait with assoicated constants and types the mock type exposes them via generics
-//! by appending them to the source generics list in the same order in which they are defined in
+//! by appending them to the source generics list in the same order in which they were defined in
 //! trait:
 //! ```rust
 //! # use std::fmt::Debug;
@@ -860,9 +907,8 @@
 //! There is one limitation - when mocking implementation of trait with associated types for struct
 //! all types must be referenced explicitly like `<Self as Trait>::AssociatedType`. Using
 //! `Self::AssociatedType` will lead to compilation error:
-//! ```compile_error
+//! ```compile_fail
 //! # use rsubstitute::*;
-//!
 //! trait Trait {
 //!     type Item;
 //!     fn get_item(&self) -> Self::Item;
@@ -874,8 +920,8 @@
 //! impl Trait for Struct {
 //!     type Item = i32;
 //!     fn get_item(&self) -> Self::Item {
-//!         10
-//!     }
+//!         10             // ^^^^^^^^^^
+//!     }                  // implicit associated item breaks compilation
 //! }
 //!
 //! # fn main() {}
@@ -887,7 +933,6 @@
 //! #     type Item;
 //! #     fn get_item(&self) -> Self::Item;
 //! # }
-//!
 //! # #[mock]
 //! # struct Struct;
 //! #[mock]
@@ -929,7 +974,7 @@
 //! ### Limitations
 //!
 //! There are a couple of limitations:
-//! 1. `Trait` in `impl Trait` must be dyn-compatible.
+//! 1. `Trait` in `arg: impl Trait` must be dyn-compatible.
 //! 2. Because `Trait` must be dyn-compatible, and [`PartialEq`] is not dyn-compatible, the only way
 //! to compare arguments is to use [`Arg::is`]. Alternatively, you can use [`Arg::Any`] if you don't
 //! need to check for concerete argument value.
@@ -998,7 +1043,9 @@
 //!
 //! # fn main() {
 //! // Act
-//! set(1); set(2); set(3);
+//! set(1);
+//! set(2);
+//! set(3);
 //!
 //! // Assert
 //! verify_call_order(|| {
@@ -1015,7 +1062,9 @@
 //! # use rsubstitute::*; #[mock] fn set(_: i32) {}
 //! # fn main() {
 //! // Act
-//! set(2); set(1); set(3);
+//! set(2);
+//! set(1);
+//! set(3);
 //!
 //! // Assert
 //! verify_call_order(|| {
@@ -1026,8 +1075,8 @@
 //! # }
 //! ```
 //!
-//! Call order is verified for all mocked functions relative to each other, regardless if they're
-//! come from different function or even mock object:
+//! Call order is verified for all mocked functions relative to each other, regardless if they come
+//! from different functions or even mock objects:
 //! ```rust
 //! use rsubstitute::*;
 //!
@@ -1051,7 +1100,9 @@
 //! let mut struct_mock = Struct::new();
 //!
 //! // Act
-//! first(); trait_mock.second(); struct_mock.third();
+//! first();
+//! trait_mock.second();
+//! struct_mock.third();
 //!
 //! // Assert
 //! verify_call_order(|| {
@@ -1235,14 +1286,11 @@
 //! # }
 //! ```
 //!
-//! To fix this you may need to remove hard-coded references by passing them from outside so that
-//! you can control them from unit-test:
-//!
+//! To fix this you may need to refactor your function. In example above hard-coded reference can be
+//! passed as argument instead:
 //! ```
 //! # use rsubstitute::*;
-//!
 //! # #[mock] fn work(_: &i32) {}
-//!
 //! fn use_work(r: &i32) {
 //!     work(r);
 //! }
