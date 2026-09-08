@@ -2,7 +2,7 @@
 name = "rsubstitute_core"
 version = "0.1.0"
 edition = "2024"
-rust-version = "1.88.0"
+rust-version = "1.88.1"
 description = "Core of rsubstitute that handles mocking logic."
 license = "MIT"
 homepage = "https://github.com/alordash/rsubstitute"

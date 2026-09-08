@@ -65,7 +65,7 @@ dependencies = [
 
 [[package]]
 name = "rsubstitute"
-version = "0.1.0"
+version = "0.1.1"
 dependencies = [
  "not_enough_asserts",
  "rsubstitute_core",
