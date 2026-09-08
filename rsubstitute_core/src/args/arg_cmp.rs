@@ -14,7 +14,7 @@ impl<T: ?Sized> ArgCmp<T> {
     pub fn set_print_arg(&mut self, print_arg: String) {
         self.print_arg = print_arg;
     }
-    
+
     pub fn is_arg_equal_to(&self, other: &T) -> bool {
         (self.comparator)(&self.value, other)
     }

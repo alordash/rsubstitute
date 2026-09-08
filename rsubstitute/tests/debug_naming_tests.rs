@@ -121,7 +121,7 @@ accept_debug(*Payload(10)*)
 	1. __arg0 (debug_naming_tests::Payload):
 		Expected: Payload(20)
 		Actual:   Payload(10)"#
-                .to_owned()
+                    .to_owned()
             )
         );
     }

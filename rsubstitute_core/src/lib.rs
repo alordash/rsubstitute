@@ -8,8 +8,8 @@ pub mod args;
 pub mod fn_parameters;
 pub mod infrastructure;
 
-pub mod settings;
 mod lifetimes_transmutation;
+pub mod settings;
 pub mod times;
 
 pub use infrastructure::verify_call_order;

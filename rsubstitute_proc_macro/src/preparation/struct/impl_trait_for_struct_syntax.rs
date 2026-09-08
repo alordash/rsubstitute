@@ -95,10 +95,7 @@ fn split_items(items: Vec<ImplItem>) -> SplitItems {
             }
             ImplItem::Type(ty) => split_items.types.push(Ordered::new(order_number, ty)),
             ImplItem::Macro(_) => panic!("Macro invocations inside impl blocks are not supported"),
-            _ => panic!(
-                "Unexpected impl item: {}",
-                item.to_token_stream()
-            ),
+            _ => panic!("Unexpected impl item: {}", item.to_token_stream()),
         }
     }
 

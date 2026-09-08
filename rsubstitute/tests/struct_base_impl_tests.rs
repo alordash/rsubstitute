@@ -81,8 +81,7 @@ mod tests {
             .returns(struct_value)
             .get_plus_one()
             .call_base()
-            .and_does(|_, _| {
-            })
+            .and_does(|_, _| {})
             .as_FirstTrait()
             .get()
             .returns(trait_value);

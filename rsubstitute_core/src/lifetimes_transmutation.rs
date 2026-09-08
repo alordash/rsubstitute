@@ -53,7 +53,7 @@
 #[macro_export]
 macro_rules! transmute_lifetime {
     ($expr:expr) => {
-        unsafe { 
+        unsafe {
             #[allow(clippy::missing_transmute_annotations)]
             let result = core::mem::transmute($expr);
             result

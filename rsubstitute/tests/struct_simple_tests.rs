@@ -74,7 +74,7 @@ mod tests {
             let mut mock = Struct::new(1);
 
             // Act
-             mock.f();
+            mock.f();
 
             // Assert
             mock.received().f(Times::Once).no_other_calls();

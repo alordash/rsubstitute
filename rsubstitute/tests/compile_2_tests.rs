@@ -9,8 +9,7 @@ trait Trait {
 
 #[mock]
 trait Worker {
-    fn work() {
-    }
+    fn work() {}
 }
 
 fn f<T: Worker>() {
@@ -36,11 +35,9 @@ impl Struct {
         let Struct { v: b } = s;
     }
 
-    pub fn f(&self) {
-    }
+    pub fn f(&self) {}
 
-    pub fn work() {
-    }
+    pub fn work() {}
 }
 
 #[test]

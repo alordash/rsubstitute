@@ -111,12 +111,7 @@ pub(crate) fn generate_module(ctx: &Context, item_fn: ItemFn) -> MockMod {
             Item::Impl(fn_info.call_struct.generics_info_provider_impl),
             Item::Impl(fn_info.call_struct.call_impl),
         ])
-        .chain(
-            fn_info
-                .call_struct
-                .maybe_clone_impl
-                .map(Item::Impl)
-        )
+        .chain(fn_info.call_struct.maybe_clone_impl.map(Item::Impl))
         .chain([
             Item::Struct(fn_info.args_checker_struct.item_struct),
             Item::Impl(fn_info.args_checker_struct.generics_info_provider_impl),

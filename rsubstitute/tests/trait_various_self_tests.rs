@@ -162,8 +162,8 @@ mod tests {
     #![allow(unused_imports)]
 
     use super::*;
-    use rsubstitute::*;
     use common::*;
+    use rsubstitute::*;
 
     mod basic_tests {
         use super::*;

@@ -82,10 +82,7 @@ fn split_items(items: Vec<ImplItem>) -> SplitItems {
             }
             ImplItem::Type(_) => panic!("Inherent associated types are not supported"), // feature `inherent_associated_types`
             ImplItem::Macro(_) => panic!("Macro invocations inside impl blocks are not supported"),
-            _ => panic!(
-                "Unexpected impl item: {}",
-                item.to_token_stream()
-            ),
+            _ => panic!("Unexpected impl item: {}", item.to_token_stream()),
         }
     }
 

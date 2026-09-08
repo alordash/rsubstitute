@@ -126,7 +126,7 @@ Received no non-matching calls"#,
             f_base::setup().does(move |_| *callback_flag_clone.borrow_mut() = true);
 
             // Act
-           f_base();
+            f_base();
 
             // Assert
             assert!(*callback_flag.borrow());
@@ -139,7 +139,7 @@ Received no non-matching calls"#,
             f_base::setup();
 
             // Act
-          f_base();
+            f_base();
 
             // Assert
             f_base::received(Times::Once).no_other_calls();

@@ -27,8 +27,7 @@ mod tests {
         mock.setup()
             .work::<_, _, true, 2>(10, &"amogus")
             .returns(v1)
-            .and_does(|_, (_, _)| {
-            })
+            .and_does(|_, (_, _)| {})
             .work::<_, _, true, 4>(10, &"amogus")
             .returns(v2)
             .and_does(|_, _| {})

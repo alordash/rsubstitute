@@ -78,9 +78,9 @@ mod tests {
         let mut mock = TraitMock::new();
 
         // Act
-         mock.f();
-         mock.f();
-         mock.f();
+        mock.f();
+        mock.f();
+        mock.f();
 
         // Assert
         mock.received().f(Times::Exactly(3)).no_other_calls();

@@ -1301,8 +1301,8 @@ pub use rsubstitute_proc_macro::mock;
 
 #[doc(hidden)]
 pub use rsubstitute_core::args::*;
-pub use rsubstitute_core::settings::*;
 pub use rsubstitute_core::infrastructure::{FnCallbackConfigurator, FnConfigurator, Mockable};
+pub use rsubstitute_core::settings::*;
 pub use rsubstitute_core::times::*;
 pub use rsubstitute_core::transmute_lifetime;
 pub use rsubstitute_core::verify_call_order;

@@ -65,7 +65,9 @@ trait Trait {
     #[allow(improper_ctypes_definitions)]
     async unsafe extern "C" fn mutant_base(&self) {
         async_dep().await;
-        unsafe { unsafe_dep(); }
+        unsafe {
+            unsafe_dep();
+        }
         extern_dep();
     }
 }

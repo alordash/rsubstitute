@@ -9,9 +9,7 @@ struct Struct {
 
 #[mock]
 impl Struct {
-    fn first_struct_impl(&self) {
-        
-    }
+    fn first_struct_impl(&self) {}
 }
 
 #[mock(base)]
