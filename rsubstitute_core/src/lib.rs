@@ -8,7 +8,7 @@ pub mod args;
 pub mod fn_parameters;
 pub mod infrastructure;
 
-pub mod config;
+pub mod settings;
 mod lifetimes_transmutation;
 pub mod times;
 

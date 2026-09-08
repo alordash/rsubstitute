@@ -62,7 +62,7 @@
 //! * [Call order validation](#call-order-validation)
 //! * [Receiver types](#receiver-types)
 //! * [Cloning mocks](#mocks-cloning)
-//! * [`rsubstitute` config](#rsubstitute-config)
+//! * [Crate settings](#crate-settings)
 //! * [Crate features](#create-features)
 //! * [Undefined behavior](#undefined-behavior)
 //!
@@ -171,8 +171,8 @@
 //!
 //! There are a couple of limitations for structures mocking:
 //! 1. Mocked structure can not be constructed or deconstructed outside of associated functions that
-//!    were mocked. This is because `rsubstitute` adds special `__rs_data` field to generated structure
-//!    that it automatically fills inside mocked `impl` block.
+//!    were mocked. This is because `rsubstitute` adds special `__rs_data` field to generated
+//!    structure that it automatically fills inside mocked `impl` block.
 //! 2. Structure must have either named fields or no fields at all. `struct Struct { v: i32 }` and
 //!    `struct Struct;` can be mocked, but `struct Struct(i32);` can not.
 //! 3. Only functions inside mocked `impl` blocks can be mocked. In the example below only `foo` can
@@ -205,8 +205,8 @@
 //!
 //! ## Mocking trait implementations
 //! To mock implementations of traits on mockable structures (trait itself does not need to be
-//! mockable) add `#[mock]` or `#[mock(base)]` on `impl` block. Each mocked trait implementation adds
-//! `as_TRAIT_NAME` method both to mock's `setup` and `received` functions:
+//! mockable) add `#[mock]` or `#[mock(base)]` on `impl` block. Each mocked trait implementation
+//! adds `as_TRAIT_NAME` method both to mock's `setup` and `received` functions:
 //! ```
 //! use rsubstitute::*;
 //!
@@ -328,8 +328,8 @@
 //!    condition when running multiple tests in parallel. This may impact tests running on
 //!    work-stealing async runtimes.
 //! 2. Calling `setup()` of standalone function clears it's all previous configurations to prevent
-//!    configuration from one test leaking into next sequentially ran test. Standalone function set-up
-//!    must happen in **single module-level `setup()` call** in each unit-test.  
+//!    configuration from one test leaking into next sequentially ran test. Standalone function
+//!    set-up must happen in **single module-level `setup()` call** in each unit-test.  
 //!    For example, this is a wrong way of configuring standalone function:
 //! ```no_run
 //! # use rsubstitute::*;
@@ -403,8 +403,8 @@
 //!
 //! There are a couple of limitations for static associated functions mocking:
 //! 1. Associated functions that use base implementation using `#[mock(base)]` use base
-//!    implementation by default, without any configuration. This is done to make creation of structure
-//!    mocks simpler by just calling `Struct::new()` without needing to first do
+//!    implementation by default, without any configuration. This is done to make creation of
+//!    structure mocks simpler by just calling `Struct::new()` without needing to first do
 //!    `Struct::static_setup().new(Arg::Any, ...).call_base()` in each test.
 //! 2. Limitations from [`Mocking static functions`](#mocking-static-functions)
 //!
@@ -414,7 +414,8 @@
 //! argument in source function. `Arg` provides multiple ways to match argument's value:
 //!
 //! 1. [`Arg::eq`] - checks that argument is equal to provided value. Uses [`PartialEq::eq`] of `T`.
-//!    Can be used either manually like `mock.setup(Arg::eq(10))` or implicitly  like `mock.setup(10)`.
+//!    Can be used either manually like `mock.setup(Arg::eq(10))` or implicitly like
+//!    `mock.setup(10)`.
 //! 2. [`Arg::is`] - checks that argument passes provided predicate. Usage example:
 //!    `mock.setup(Arg::is(|v: &i32| *v == 10))`. Requires specifying closure's argument type.
 //! 3. [`Arg::not_eq`] - checks that argument is NOT equal to provided value. Uses [`PartialEq::eq`]
@@ -447,8 +448,8 @@
 //! # }
 //! ```
 //! 5. [`Arg::ref_not_eq`] - checks that argument's reference DOES NOT point to the same place as
-//!    provided reference. Compares references returned by [`std::ops::Deref::deref`] of `T`. Opposite
-//!    of `Arg::ref_eq`.
+//!    provided reference. Compares references returned by [`std::ops::Deref::deref`] of `T`.
+//!    Opposite of `Arg::ref_eq`.
 //!
 //! ## Controlling function behavior
 //!
@@ -963,8 +964,8 @@
 //! There are a couple of limitations:
 //! 1. `Trait` in `arg: impl Trait` must be dyn-compatible.
 //! 2. Because `Trait` must be dyn-compatible, and [`PartialEq`] is not dyn-compatible, the only way
-//!    to compare arguments is to use [`Arg::is`]. Alternatively, you can use [`Arg::Any`] if you don't
-//!    need to check for concerete argument value.
+//!    to compare arguments is to use [`Arg::is`]. Alternatively, you can use [`Arg::Any`] if you
+//!    don't need to check for concerete argument value.
 //! 3. Can not use multiple trait bounds like `impl Foo + Bar`, in that case you will need to
 //!    rewrite your function replacing this argument's type with `T: Foo + Bar`.
 //! 4. Can return `impl Trait` from mocked function only if `Trait` is implemented for
@@ -1176,14 +1177,15 @@
 //! # }
 //! ```
 //!
-//! ## `rsubstitute` config
+//! ## Crate settings
 //!
-//! You can configure some crate level options using [`read_config`] and [`write_config`] functions
-//! (or use [`CONFIG`] static variable directly). This config contains infrastructure settings.
-//! Currently it has only `max_invalid_calls_listed_count` setting that controls how many invalid
+//! You can configure some crate level options using [`read_settings`] and [`write_settings`]
+//! functions (or use [`SETTINGS`] static variable directly). This config contains infrastructure
+//! settings.  
+//! Currently it has only `max_invalid_calls_listed_count` parameter that controls how many invalid
 //! calls will be listed in case of an calls validation error.
 //!
-//! Config can be used like this:
+//! Settings can be used like this:
 //!
 //! ```should_panic
 //! use rsubstitute::*;
@@ -1192,7 +1194,7 @@
 //!
 //! # fn main() {
 //! // Arrange
-//! write_config().max_invalid_calls_listed_count = 3;
+//! write_settings().max_invalid_calls_listed_count = 3;
 //!
 //! // Act
 //! for i in 0..10 {
@@ -1200,8 +1202,8 @@
 //! }
 //!
 //! // Assert
-//! work::received(1, 1.time()).no_other_calls(); // will panic and show only first 3 calls,
-//!                                               // other calls won't be listed
+//! work::received_nothing(); // will panic and show only first 3 calls,
+//!                           // other calls won't be listed
 //! # }
 //! ```
 //!
@@ -1247,7 +1249,7 @@
 //! This is basically what `rsubstitute` does - it automatically creates infrastructure for mocking,
 //! except that it generates a more complex code for flexible configuration.
 //!
-//! # Undefined behaviour
+//! # Undefined behavior
 //!
 //! `rsubstitute` infrastructure stores all call arguments in mock objects. If argument is a
 //! reference, there is possibility that in `received()` function the argument matcher may receive
@@ -1299,7 +1301,7 @@ pub use rsubstitute_proc_macro::mock;
 
 #[doc(hidden)]
 pub use rsubstitute_core::args::*;
-pub use rsubstitute_core::config::*;
+pub use rsubstitute_core::settings::*;
 pub use rsubstitute_core::infrastructure::{FnCallbackConfigurator, FnConfigurator, Mockable};
 pub use rsubstitute_core::times::*;
 pub use rsubstitute_core::transmute_lifetime;

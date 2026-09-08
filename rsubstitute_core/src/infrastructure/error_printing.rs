@@ -1,5 +1,5 @@
 use crate::args::*;
-use crate::config::*;
+use crate::settings::*;
 use crate::fn_parameters::*;
 use crate::infrastructure::MatchingConfigSearchErr;
 use crate::infrastructure::call_order_verification::CallOrderEntry;
@@ -27,7 +27,7 @@ pub(crate) fn panic_received_verification_error(
     let matching_calls_report = if matching_calls_count == 0 {
         "Actually received no matching calls".to_string()
     } else {
-        let max_invalid_calls_listed_count = read_config().max_invalid_calls_listed_count;
+        let max_invalid_calls_listed_count = read_settings().max_invalid_calls_listed_count;
         let matching_calls_args_msgs: Vec<_> = matching_calls_check_result
             .calls_args_check_results
             .into_iter()
@@ -58,7 +58,7 @@ pub(crate) fn panic_received_verification_error(
     let non_matching_calls_report = if non_matching_calls_count == 0 {
         "Received no non-matching calls".to_string()
     } else {
-        let max_invalid_calls_listed_count = read_config().max_invalid_calls_listed_count;
+        let max_invalid_calls_listed_count = read_settings().max_invalid_calls_listed_count;
         let call_fmt = fmt_calls(non_matching_calls_count);
         let non_matching_calls_args_msgs: Vec<_> = non_matching_calls_check_result
             .calls_args_check_results
@@ -163,7 +163,7 @@ pub(crate) fn format_received_unexpected_call_error(
 pub(crate) fn panic_received_unexpected_calls_error(error_msgs: Vec<String>) -> ! {
     let unexpected_calls_count = error_msgs.len();
     let call_fmt = fmt_calls(unexpected_calls_count);
-    let max_invalid_calls_listed_count = read_config().max_invalid_calls_listed_count;
+    let max_invalid_calls_listed_count = read_settings().max_invalid_calls_listed_count;
     let unexpected_calls_msgs: Vec<_> = error_msgs
         .into_iter()
         .take(max_invalid_calls_listed_count)

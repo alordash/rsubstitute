@@ -36,7 +36,7 @@ mod tests {
 
         let mut write_config = write_config();
         write_config.max_invalid_calls_listed_count = max_invalid_calls_listed_count;
-        let _read_config_lock = RwLockWriteGuard::downgrade(write_config);
+        let _read_settings_lock = RwLockWriteGuard::downgrade(write_config);
 
         let unexpected_v = 10;
         let expected_v = 20;
@@ -76,7 +76,7 @@ Received {calls_count} non-matching calls (non-matching arguments indicated with
 
         let mut write_config = write_config();
         write_config.max_invalid_calls_listed_count = max_invalid_calls_listed_count;
-        let _read_config_lock = RwLockWriteGuard::downgrade(write_config);
+        let _read_settings_lock = RwLockWriteGuard::downgrade(write_config);
 
         let unexpected_v = 10;
         let expected_v = 20;
@@ -116,7 +116,7 @@ Received {calls_count} non-matching calls (listing only first {max_invalid_calls
 
         let mut write_config = write_config();
         write_config.max_invalid_calls_listed_count = max_invalid_calls_listed_count;
-        let _read_config_lock = RwLockWriteGuard::downgrade(write_config);
+        let _read_settings_lock = RwLockWriteGuard::downgrade(write_config);
 
         let expected_v = 10;
 
@@ -152,7 +152,7 @@ Received no non-matching calls"
 
         let mut write_config = write_config();
         write_config.max_invalid_calls_listed_count = max_invalid_calls_listed_count;
-        let _read_config_lock = RwLockWriteGuard::downgrade(write_config);
+        let _read_settings_lock = RwLockWriteGuard::downgrade(write_config);
 
         let expected_v = 10;
 
@@ -188,7 +188,7 @@ Received no non-matching calls"
 
         let mut write_config = write_config();
         write_config.max_invalid_calls_listed_count = max_invalid_calls_listed_count;
-        let _read_config_lock = RwLockWriteGuard::downgrade(write_config);
+        let _read_settings_lock = RwLockWriteGuard::downgrade(write_config);
 
         let expected_v = 10;
 
@@ -224,7 +224,7 @@ Received no non-matching calls"
 
         let mut write_config = write_config();
         write_config.max_invalid_calls_listed_count = max_invalid_calls_listed_count;
-        let _read_config_lock = RwLockWriteGuard::downgrade(write_config);
+        let _read_settings_lock = RwLockWriteGuard::downgrade(write_config);
 
         let expected_v = 10;
 

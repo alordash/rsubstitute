@@ -16,7 +16,7 @@
 /// constraint: `trait Trait<'rs> { fn_info work<'a: 'rs>(&'a self) -> &'a i32; }`
 ///
 /// For user it means that you just should keep your arguments alive for the duration of mock object.
-/// Not doing so will result in Undefined Behaviour as mock object will try to check whether given
+/// Not doing so will result in Undefined behavior as mock object will try to check whether given
 /// argument is suitable for some configuration. If this argument was a reference to a value that
 /// was dropped, checker function will get a dangling reference.
 ///
