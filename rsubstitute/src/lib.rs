@@ -1,7 +1,7 @@
 //! Library for mocking static functions, traits and structures in Rust.
 //!
 //! # Usage
-//! Just apply `#[mock]` attribute on your function, trait, structure or `impl` block. You can also
+//! Apply `#[mock]` attribute on your function, trait, structure or `impl` block. You can also
 //! use `#[mock(base)]` if you want the ability to use base implementation in your tests (refer to
 //! [`Base implementation`](#base-implementation) for more information).
 //!
@@ -15,8 +15,8 @@
 //! ```
 //!
 //! Automatically generated mock structure has two special methods to control its behavior:
-//! `setup()` and `received()`. `setup()` allows you to configure what mock object should do when
-//! it's methods are called. `received()` is used to check how mock object was used.
+//! `setup()` and `received()`. `setup()` allows you to configure how mock object behaves when
+//! its methods are called. `received()` is used to check how mock object was used.
 //! ```
 //! # use rsubstitute::*;
 //!
@@ -52,7 +52,7 @@
 //! * [Mocking static associated functions](#mocking-static-associated-functions)
 //! * [Arguments matching](#arguments-matching)
 //! * [Controlling function behavior](#controlling-function-behavior)
-//! * [Base implementation](#using-base-implementation)
+//! * [Base implementation](#base-implementation)
 //! * [Verifying calls](#verifying-calls)
 //! * [Generics](#generics)
 //! * [Associated constants and types](#associated-constants-and-types)
@@ -63,12 +63,12 @@
 //! * [Receiver types](#receiver-types)
 //! * [Cloning mocks](#mocks-cloning)
 //! * [Crate settings](#crate-settings)
-//! * [Crate features](#create-features)
+//! * [Crate features](#crate-features)
 //! * [Undefined behavior](#undefined-behavior)
 //!
 //! ## Mocking traits
 //!
-//! To mock trait add `#[mock]` or `#[mock(base)]` attribute to it.
+//! To mock a trait, add `#[mock]` or `#[mock(base)]` attribute to it.
 //! ```
 //! use rsubstitute::*;
 //!
@@ -103,7 +103,7 @@
 //!
 //! ### Limitations
 //!
-//! There is one limitation: `rsubstitute` can't mock traits that have super traits (other than
+//! There is one limitation: `rsubstitute` cannot mock traits that have super traits (other than
 //! `Clone`). For example, this won't compile:
 //! ```compile_fail
 //! #[mock] trait Trait: SuperTrait {}
@@ -117,10 +117,10 @@
 //!
 //! ## Mocking structures
 //!
-//! `rsubstitute` supports mocking structures, but it's intended for structures that behave more
-//! like "stateful" functions.  
-//! To mock structure add `#[mock]` attribute to structure definition and `#[mock]` or
-//! `#[mock(base)]` to it's `impl` blocks whose functionality you want to mock.
+//! `rsubstitute` supports mocking structures, but it is primarily intended for structures that
+//! behave like "stateful" functions.  
+//! To mock a structure, add `#[mock]` attribute to structure definition and `#[mock]` or
+//! `#[mock(base)]` to its `impl` blocks whose functionality you want to mock.
 //! ```
 //! use rsubstitute::*;
 //!
@@ -151,8 +151,8 @@
 //! # }
 //! ```
 //!
-//! Common pattern while mocking structures would be adding some public constructor function like
-//! `new` and mocking its base implementation:
+//! A common pattern when mocking structures is to add a public constructor such as `new` and
+//! mock its base implementation:
 //!
 //! ```
 //! # use rsubstitute::*;
@@ -192,8 +192,8 @@
 //!
 //! # fn main() {}
 //! ```
-//! 4. Structure `impl` block can be mocked only if the structure itself is mocked (has `#[mock]`
-//!    attribute).
+//! 4. A structure's `impl` block can be mocked only if the structure itself is mocked (i.e. it has
+//!    `#[mock]`attribute).
 //! 5. Can not mock functions with `#[cfg]` attribute. This won't compile:
 //! ```compile_fail
 //! #[mock]
@@ -205,7 +205,7 @@
 //!
 //! ## Mocking trait implementations
 //! To mock implementations of traits on mockable structures (trait itself does not need to be
-//! mockable) add `#[mock]` or `#[mock(base)]` on `impl` block. Each mocked trait implementation
+//! mockable), add `#[mock]` or `#[mock(base)]` on `impl` block. Each mocked trait implementation
 //! adds `as_TRAIT_NAME` method both to mock's `setup` and `received` functions:
 //! ```
 //! use rsubstitute::*;
@@ -279,7 +279,7 @@
 //!     fn get(&self) -> i32 { 10 }
 //! }
 //!
-//! // Can't mock `Trait::get()`
+//! // Cannot mock `Trait::get()`
 //! #[mock]
 //! impl Trait for Foo {}
 //!
@@ -294,7 +294,7 @@
 //!
 //! ## Mocking static functions
 //!
-//! To mock static function add `#[mock]` or `#[mock(base)]` attribute. This will generate module
+//! To mock a static function, add `#[mock]` or `#[mock(base)]` attribute. This will generate module
 //! with the same name as mocked function, which exposes standalone `setup()` and `received()`
 //! functions:
 //!
@@ -327,7 +327,7 @@
 //! 1. Configuration for standalone function mock is stored in thread-local storage to prevent race
 //!    condition when running multiple tests in parallel. This may impact tests running on
 //!    work-stealing async runtimes.
-//! 2. Calling `setup()` of standalone function clears it's all previous configurations to prevent
+//! 2. Calling `setup()` of standalone function clears all its previous configurations to prevent
 //!    configuration from one test leaking into next sequentially ran test. Standalone function
 //!    set-up must happen in **single module-level `setup()` call** in each unit-test.  
 //!    For example, this is a wrong way of configuring standalone function:
@@ -338,7 +338,8 @@
 //! work::setup(1).returns(10);
 //! work::setup(2).returns(20); // `work::setup(2)` will clear previous configuration
 //! ```
-//! Here is a correct way: call `work::setup()` only once and then use chain of `.setup()` calls:
+//! The correct approach is to call `work::setup()` only once and then chain subsequent `.setup()`
+//! calls:
 //! ```no_run
 //! # use rsubstitute::*; #[mock] fn work(v: i32) -> i32 { v }
 //! # fn main() {
@@ -420,8 +421,8 @@
 //!    `mock.setup(Arg::is(|v: &i32| *v == 10))`. Requires specifying closure's argument type.
 //! 3. [`Arg::not_eq`] - checks that argument is NOT equal to provided value. Uses [`PartialEq::eq`]
 //!    of `T`. Opposite of `Arg::eq`. Usage example: `mock.setup(Arg::not_eq(10))`.
-//! 4. [`Arg::ref_eq`] - checks that argument's reference points to the same place as provided
-//!    reference. Compares referenes returned by [`std::ops::Deref::deref`] of `T`. Usage example:
+//! 4. [`Arg::ref_eq`] - checks that argument's reference points to the same location as provided
+//!    reference. Compares references returned by [`std::ops::Deref::deref`] of `T`. Usage example:
 //! ```
 //! # use rsubstitute::*;
 //! # use std::rc::Rc;
@@ -462,7 +463,7 @@
 //! 2. [`FnConfigurator::returns_many`] - sets multiple single-use return values in one call.
 //! 3. [`FnConfigurator::always_returns`] - sets return value that can be returned unlimited number
 //!    of times.
-//! 4. [`FnConfigurator::returns_with`] - calculates return value on the fly using functions' source
+//! 4. [`FnConfigurator::returns_with`] - calculates return value on the fly using function's source
 //!    arguments. Receives tuple of argument references. Returns unlimited number of times.
 //!
 //! If multiple return values were specified they will be used in the same order:
@@ -494,13 +495,13 @@
 //! ```
 //!
 //! ### Setting callbacks
-//! Every mocked function can have a callback that is called when function's configuration is called
-//! with matching arguments.
+//! Every mocked function can have a callback that is called when it is called with matching
+//! arguments.
 //!
-//! If function has return value callback can be set using [`FnCallbackConfigurator::and_does`]
-//! after it's return value was specified. If function does not have return value callback can be
-//! set by calling [`FnConfigurator::does`] straightaway. Static functions receive tuple of argument
-//! values in the callback:
+//! If the function has a return value, its callback can be configured using
+//! [`FnCallbackConfigurator::and_does`] after its return value was specified. If function does not
+//! have return value callback can be set by calling [`FnConfigurator::does`] straightaway. Static
+//! functions receive tuple of argument values in the callback:
 //! ```
 //! use rsubstitute::*;
 //!
@@ -627,7 +628,7 @@
 //!
 //! ### Limitations
 //!
-//! There is one limitation: all arguments of function must be [`Clone`]able for its base
+//! There is one limitation: all arguments of function must implement [`Clone`] for its base
 //! implementation to be used in tests. If even single argument does not implement `Clone` you will
 //! get compilation error and will have to change your code or just use `#[mock]`:
 //! ```compile_fail
@@ -641,7 +642,7 @@
 //!
 //! ## Verifying calls
 //!
-//! You can check how exactly mocked function was called. To do it use `received()` followed by
+//! You can verify exactly how a mocked function was called. To do it, use `received()` followed by
 //! descriptions of expected calls:
 //! ```
 //! use rsubstitute::*;
@@ -681,7 +682,7 @@
 //!
 //! ### Verify number of calls
 //!
-//! Number of calls is verified using [`Times`] type. It can be defined in several ways:
+//! The number of calls is verified using [`Times`] type. It can be defined in several ways:
 //! 1. [`Times::Never`] - expects function to never be called with given arguments.
 //! 2. [`Times::Once`] and [`Times::Exactly`]`(N)` - expects function to be called exactly once or
 //!    `N` times respectively.
@@ -735,8 +736,9 @@
 //!
 //! ### Verify no calls were performed in static functions
 //!
-//! With trait objects you can call `mock.received().no_other_calls()` to verify that it didn't
-//! receive any calls. For static functions you need to use `received_nothing()` function:
+//! For trait and structure mocks, you can call `mock.received().no_other_calls()` to verify that
+//! they received no other calls. For static functions you need to use `received_nothing()`
+//! function:
 //! ```
 //! use rsubstitute::*;
 //!
@@ -849,9 +851,9 @@
 //!
 //! ## Associated constants and types
 //!
-//! When mocking trait with assoicated constants and types the mock type exposes them via generics
-//! by appending them to the source generics list in the same order in which they were defined in
-//! trait:
+//! When mocking a trait with associated constants and types, the mock type exposes them as generic
+//! parameters by appending them to the source generics list in the same order in which they were
+//! defined in trait:
 //! ```
 //! # use std::fmt::Debug;
 //! use rsubstitute::*;
@@ -938,7 +940,7 @@
 //! ## `impl Trait` types
 //!
 //! Functions that accept or return `impl Trait` can also be mocked. Their mocking is different only
-//! in one regard: if mocked function returns `impl Trait`, then it's return type is replaced with
+//! in one regard: if mocked function returns `impl Trait`, then its return type is replaced with
 //! `Box<dyn Trait>`. Other than that such functions are mocked as usual:
 //! ```
 //! # use std::fmt::Debug;
@@ -965,13 +967,13 @@
 //! 1. `Trait` in `arg: impl Trait` must be dyn-compatible.
 //! 2. Because `Trait` must be dyn-compatible, and [`PartialEq`] is not dyn-compatible, the only way
 //!    to compare arguments is to use [`Arg::is`]. Alternatively, you can use [`Arg::Any`] if you
-//!    don't need to check for concerete argument value.
+//!    don't need to check for concrete argument value.
 //! 3. Can not use multiple trait bounds like `impl Foo + Bar`, in that case you will need to
 //!    rewrite your function replacing this argument's type with `T: Foo + Bar`.
-//! 4. Can return `impl Trait` from mocked function only if `Trait` is implemented for
-//!    `Box<dyn Trait>` because under the hood `rsubstitute` replaces return value with
-//!    `Box<dyn Trait>` in generated implementations.
-//! 5. Nested `impl Trait` are not supported. For example, this can't be mocked:
+//! 4. A mocked function can return `impl Trait` only if `Trait` is implemented for `Box<dyn Trait>`
+//!    because under the hood `rsubstitute` replaces return value with `Box<dyn Trait>` in generated
+//!    implementations.
+//! 5. Nested `impl Trait` are not supported. For example, this cannot be mocked:
 //!    `fn f(_: impl IntoIterator<Item = impl Debug>) {}`
 //!
 //! ## Trait modifiers
@@ -989,7 +991,7 @@
 //!
 //! ## Function modifiers
 //!
-//! Following modifiers are supported: `async`, `unsafe` and `extern`, both in standalone and
+//! The following modifiers are supported: `async`, `unsafe` and `extern`, both in standalone and
 //! associated functions:
 //!
 //! ```
@@ -1021,7 +1023,7 @@
 //!
 //! ## Call order validation
 //!
-//! To verify that calls were received in the specific order wrap `received()` assertions inside
+//! To verify that calls were received in the specific order, wrap `received()` assertions in a
 //! [`verify_call_order`] callback. This function checks that all calls inside of it were asserted
 //! sequentially:
 //! ```
@@ -1154,7 +1156,7 @@
 //!    won't work).
 //!
 //! Cloned mocks share the same configuration (it is stored behind reference-counted pointer
-//! internally). This let's you share mocks between parts of your code. This can be useful, for
+//! internally). This lets you share mocks between parts of your code. This can be useful, for
 //! example, if you want to verify that mock received some consuming function:
 //! ```
 //! use rsubstitute::*;
@@ -1183,7 +1185,7 @@
 //! functions (or use [`SETTINGS`] static variable directly). This config contains infrastructure
 //! settings.  
 //! Currently it has only `max_invalid_calls_listed_count` parameter that controls how many invalid
-//! calls will be listed in case of an calls validation error.
+//! calls will be listed in case of a calls validation error.
 //!
 //! Settings can be used like this:
 //!
@@ -1251,9 +1253,11 @@
 //!
 //! # Undefined behavior
 //!
-//! `rsubstitute` infrastructure stores all call arguments in mock objects. If argument is a
-//! reference, there is possibility that in `received()` function the argument matcher may receive
-//! dangling reference. Here's an example of UB:
+//! `rsubstitute` infrastructure stores all call arguments in mock objects so that they can later be
+//! inspected by `received()`. When a mocked function receives a reference, this can cause a
+//! dangling reference to be accessed later if the referenced value is dropped before `received()`
+//! is called. This can result in undefined behavior.  
+//! Here's an example of UB:
 //! ```should_panic
 //! # use rsubstitute::*;
 //! #[mock]
@@ -1296,7 +1300,6 @@
 //! work::received(Arg::is(|r: &&i32| **r == test_local), 1.time());
 //! # }
 //! ```
-#![allow(clippy::needless_return)]
 pub use rsubstitute_proc_macro::mock;
 
 #[doc(hidden)]

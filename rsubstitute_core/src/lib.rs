@@ -1,5 +1,3 @@
-#![allow(clippy::needless_return)]
-#![allow(clippy::match_like_matches_macro)]
 #![cfg_attr(feature = "debug_naming", allow(incomplete_features))]
 #![cfg_attr(feature = "debug_naming", allow(unstable_features))]
 #![cfg_attr(feature = "debug_naming", feature(specialization))]

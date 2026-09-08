@@ -1,6 +1,6 @@
 [package]
 name = "rsubstitute_core"
-version = "0.1.1"
+version = "0.1.2"
 edition = "2024"
 rust-version = "1.88.0"
 description = "Core of rsubstitute that handles mocking logic."
@@ -16,3 +16,7 @@ cfg-if = { workspace = true }
 
 [features]
 debug_naming = []
+
+[lints.clippy]
+needless_return = "allow"
+match_like_matches_macro = "allow"
