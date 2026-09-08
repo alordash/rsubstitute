@@ -59,3 +59,13 @@ jobs:
         run: cp Cargo.lock.msrv Cargo.lock
       - name: build
         run: cargo build
+
+  fmt:
+    runs-on: ubuntu-latest
+    name: Code format
+    container:
+      image: rust:1.88.0
+    steps:
+      - uses: actions/checkout@v6
+      - name: check code format
+        run: cargo fmt --check
