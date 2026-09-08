@@ -67,5 +67,7 @@ jobs:
       image: rust:1.88.0
     steps:
       - uses: actions/checkout@v6
-      - name: check code format
-        run: cargo fmt --check
+      - name: cargo-fmt
+        run: |
+          rustup component add rustfmt
+          cargo fmt --check
