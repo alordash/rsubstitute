@@ -3,7 +3,7 @@ use std::any::TypeId;
 use std::cell::UnsafeCell;
 use std::collections::HashMap;
 
-type Map = HashMap<TypeId, HashMap<&'static str, *const ()>>;
+type Map = HashMap<TypeId, HashMap<String, *const ()>>;
 
 // Used for storing static functions' mock data.
 #[derive(Default)]
@@ -55,10 +55,14 @@ impl StaticFnDatasGlobalMap {
     ) -> &'a FnData<'static, TMock, HAS_RETURN_VALUE, SUPPORTS_BASE_CALLING, false> {
         let type_id = typeid::of::<TMock>();
         let map = self.get_mut_map();
+        let fn_key = maybe_owner_name.map_or_else(
+            || fn_ident.to_owned(),
+            |owner_name| format!("{owner_name}_{fn_ident}"),
+        );
         let raw_ptr = map
             .entry(type_id)
             .or_default()
-            .entry(fn_ident)
+            .entry(fn_key)
             .or_insert_with(|| {
                 Box::leak(Box::new(FnData::<
                     TMock,

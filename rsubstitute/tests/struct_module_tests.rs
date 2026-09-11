@@ -101,7 +101,7 @@ mod tests {
             panic_message,
             Some(
                 "Mock wasn't configured to handle following call:
-	Struct::work()"
+	<Struct as tb_Trait>::work()"
                     .to_owned()
             )
         );
