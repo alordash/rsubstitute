@@ -31,7 +31,13 @@ mod tests {
         let panic_message = record_panic(b::work);
 
         // Assert
-        assert_eq!(panic_message, Some("Mock wasn't configured to handle following call:
-	work()".to_owned()));
+        assert_eq!(
+            panic_message,
+            Some(
+                "Mock wasn't configured to handle following call:
+	work()"
+                    .to_owned()
+            )
+        );
     }
 }
