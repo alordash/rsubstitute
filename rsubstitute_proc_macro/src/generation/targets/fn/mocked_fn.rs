@@ -2,7 +2,7 @@ use crate::common::models::*;
 use crate::generation::fn_info::models::*;
 use crate::generation::mock_struct::models::*;
 use crate::generation::mock_struct::*;
-use crate::syntax::attributes;
+use not_enough_syntax::attributes;
 use proc_macro2::Span;
 use syn::*;
 

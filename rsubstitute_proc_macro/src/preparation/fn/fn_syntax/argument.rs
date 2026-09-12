@@ -1,7 +1,7 @@
 use crate::common::*;
 use crate::preparation::r#fn::models::*;
 use crate::preparation::r#fn::*;
-use crate::syntax::*;
+use not_enough_syntax::*;
 use proc_macro2::Span;
 use syn::spanned::Spanned;
 use syn::*;

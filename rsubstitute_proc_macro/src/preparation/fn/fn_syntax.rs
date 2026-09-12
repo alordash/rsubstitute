@@ -3,7 +3,7 @@ mod argument;
 use super::models::*;
 use crate::common::*;
 use crate::preparation::*;
-use crate::syntax::*;
+use not_enough_syntax::*;
 use proc_macro2::Span;
 use quote::{ToTokens, format_ident};
 use syn::spanned::Spanned;

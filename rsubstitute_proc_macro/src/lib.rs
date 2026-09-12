@@ -8,7 +8,6 @@ mod common;
 mod constants;
 mod generation;
 mod preparation;
-mod syntax;
 
 #[proc_macro_attribute]
 pub fn mock(

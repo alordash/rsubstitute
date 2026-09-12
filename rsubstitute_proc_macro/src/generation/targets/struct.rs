@@ -8,7 +8,7 @@ use crate::generation::mock_controls::models::*;
 use crate::generation::mock_controls::*;
 use crate::generation::targets::common::*;
 use crate::generation::targets::models::*;
-use crate::syntax::*;
+use not_enough_syntax::*;
 use quote::format_ident;
 use syn::spanned::Spanned;
 use syn::*;

@@ -10,7 +10,7 @@ use crate::generation::mock_struct::*;
 use crate::generation::trait_info::models::*;
 use crate::preparation::models::*;
 use crate::preparation::r#trait::models::*;
-use crate::syntax::*;
+use not_enough_syntax::*;
 use proc_macro2::Span;
 use syn::spanned::Spanned;
 use syn::*;

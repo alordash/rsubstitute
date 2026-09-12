@@ -1,8 +1,8 @@
 use crate::common::*;
 use crate::generation::fn_info::*;
 use crate::preparation::r#fn::models::*;
-use crate::syntax::r#type::vec_of;
-use crate::syntax::*;
+use not_enough_syntax::r#type::vec_of;
+use not_enough_syntax::*;
 use proc_macro2::Span;
 use quote::ToTokens;
 use syn::punctuated::Punctuated;

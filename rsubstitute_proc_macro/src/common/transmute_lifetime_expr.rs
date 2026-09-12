@@ -1,4 +1,4 @@
-use crate::syntax::*;
+use not_enough_syntax::*;
 use quote::ToTokens;
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;

@@ -1,7 +1,7 @@
 use crate::common::*;
 use crate::generation::common::reset_fn_data_stmt;
 use crate::generation::mock_controls::models::*;
-use crate::syntax::*;
+use not_enough_syntax::*;
 use proc_macro2::Span;
 use syn::punctuated::Punctuated;
 use syn::*;

@@ -10,7 +10,7 @@ use crate::generation::targets::models::*;
 use crate::generation::targets::*;
 use crate::generation::*;
 use crate::preparation::r#struct::*;
-use crate::syntax::*;
+use not_enough_syntax::*;
 use quote::format_ident;
 use syn::spanned::Spanned;
 use syn::*;

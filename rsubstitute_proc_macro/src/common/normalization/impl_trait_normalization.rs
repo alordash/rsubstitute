@@ -1,4 +1,4 @@
-use crate::syntax::*;
+use not_enough_syntax::*;
 use proc_macro2::TokenStream;
 use syn::spanned::Spanned;
 use syn::visit_mut::VisitMut;

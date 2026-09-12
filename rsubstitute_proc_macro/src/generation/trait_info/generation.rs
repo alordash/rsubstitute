@@ -6,7 +6,7 @@ use crate::generation::trait_info::models::*;
 use crate::preparation::r#fn::models::*;
 use crate::preparation::models::*;
 use crate::preparation::r#trait::models::*;
-use crate::syntax::*;
+use not_enough_syntax::*;
 use syn::*;
 
 pub(crate) fn generate(ctx: &Context, trait_syntax: TraitSyntax) -> TraitInfo {

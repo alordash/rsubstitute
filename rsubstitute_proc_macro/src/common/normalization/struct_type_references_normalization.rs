@@ -1,5 +1,5 @@
 use crate::common::data_field;
-use crate::syntax::*;
+use not_enough_syntax::*;
 use std::borrow::BorrowMut;
 use syn::punctuated::Punctuated;
 use syn::spanned::Spanned;

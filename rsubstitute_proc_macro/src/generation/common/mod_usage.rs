@@ -1,4 +1,4 @@
-use crate::syntax::attributes;
+use not_enough_syntax::attributes;
 use syn::*;
 
 pub(crate) fn new<const N: usize>(

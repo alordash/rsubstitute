@@ -1,6 +1,6 @@
 use crate::common::*;
 use crate::generation::mock_controls::models::*;
-use crate::syntax::*;
+use not_enough_syntax::*;
 use proc_macro2::Span;
 use quote::format_ident;
 use syn::*;

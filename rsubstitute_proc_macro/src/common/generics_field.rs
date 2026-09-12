@@ -1,5 +1,5 @@
 use crate::common::generics_phantom_data;
-use crate::syntax::*;
+use not_enough_syntax::*;
 use proc_macro2::Span;
 use syn::*;
 

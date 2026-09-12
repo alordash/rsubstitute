@@ -1,5 +1,5 @@
 use crate::common::*;
-use crate::syntax::*;
+use not_enough_syntax::*;
 use proc_macro2::Span;
 use syn::punctuated::Punctuated;
 use syn::*;

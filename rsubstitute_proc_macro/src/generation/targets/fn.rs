@@ -8,7 +8,7 @@ use crate::generation::targets::*;
 use crate::generation::*;
 use crate::preparation::r#fn::fn_syntax;
 use crate::preparation::r#fn::models::*;
-use crate::syntax::attributes;
+use not_enough_syntax::attributes;
 use syn::spanned::Spanned;
 use syn::*;
 

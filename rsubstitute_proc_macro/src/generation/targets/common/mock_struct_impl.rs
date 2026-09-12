@@ -5,7 +5,7 @@ use crate::generation::mock_struct::models::*;
 use crate::generation::mock_struct::*;
 use crate::generation::*;
 use crate::preparation::models::*;
-use crate::syntax::*;
+use not_enough_syntax::*;
 use proc_macro2::Span;
 use quote::format_ident;
 use syn::punctuated::Punctuated;

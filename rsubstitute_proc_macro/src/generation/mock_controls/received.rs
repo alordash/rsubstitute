@@ -3,7 +3,7 @@ use crate::generation::common::*;
 use crate::generation::fn_info::models::*;
 use crate::generation::mock_controls::models::*;
 use crate::generation::mock_controls::*;
-use crate::syntax::path;
+use not_enough_syntax::path;
 use proc_macro2::Span;
 use std::borrow::Borrow;
 use syn::*;

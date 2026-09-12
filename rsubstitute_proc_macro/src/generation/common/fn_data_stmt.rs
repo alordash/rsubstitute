@@ -1,7 +1,7 @@
 use crate::common::rsubstitute_for_generated;
 use crate::generation::common::*;
 use crate::generation::fn_info::models::*;
-use crate::syntax::*;
+use not_enough_syntax::*;
 use proc_macro2::Span;
 use syn::*;
 
